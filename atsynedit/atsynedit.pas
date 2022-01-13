@@ -741,6 +741,7 @@ type
     FColorFont: TColor;
     FColorBG: TColor;
     FColorCollapseMarkBG: TColor;
+    FColorRulerBG: TColor;
     FRulerHeight: integer;
     FNumbersIndent: integer;
     FRectMain,
@@ -2110,7 +2111,7 @@ begin
   C.Font.Size:= DoScaleFont(Font.Size) * FOptRulerFontSizePercents div 100;
   C.Font.Color:= Colors.RulerFont;
   C.Pen.Color:= Colors.RulerFont;
-  C.Brush.Color:= Colors.RulerBG;
+  C.Brush.Color:= FColorRulerBG;
 
   C.FillRect(FRectRuler);
 
@@ -5333,7 +5334,9 @@ begin
   begin
     FColorFont:= Colors.TextFont;
     FColorBG:= Colors.TextBG;
+    FColorRulerBG:= Colors.RulerBG;
     FColorCollapseMarkBG:= Colors.CollapseMarkBG;
+
     if FOptDimUnfocusedBack<>0 then
       if not _IsFocused then
       begin
@@ -5342,6 +5345,7 @@ begin
         else
           NColorOther:= clWhite;
         FColorBG:= ColorBlend(NColorOther, FColorBG, Abs(FOptDimUnfocusedBack));
+        FColorRulerBG:= ColorBlend(NColorOther, FColorRulerBG, Abs(FOptDimUnfocusedBack));
         FColorCollapseMarkBG:= ColorBlend(NColorOther, FColorCollapseMarkBG, Abs(FOptDimUnfocusedBack));
       end;
   end
