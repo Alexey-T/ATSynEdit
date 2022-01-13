@@ -740,8 +740,10 @@ type
     FColors: TATEditorColors;
     FColorFont: TColor;
     FColorBG: TColor;
-    FColorCollapseMarkBG: TColor;
+    FColorGutterBG: TColor;
+    FColorGutterFoldBG: TColor;
     FColorRulerBG: TColor;
+    FColorCollapseMarkBG: TColor;
     FRulerHeight: integer;
     FNumbersIndent: integer;
     FRectMain,
@@ -3303,14 +3305,14 @@ begin
     FColorOfStates[cLineStateAdded]:= Colors.StateAdded;
     FColorOfStates[cLineStateSaved]:= Colors.StateSaved;
 
-    C.Brush.Color:= Colors.GutterBG;
+    C.Brush.Color:= FColorGutterBG;
     C.FillRect(FRectGutter);
 
     //paint some bands, for full height coloring
     GutterItem:= FGutter[FGutterBandFolding];
     if GutterItem.Visible then
       DoPaintGutterBandBG(C,
-        Colors.GutterFoldBG,
+        FColorGutterFoldBG,
         GutterItem.Left,
         -1,
         GutterItem.Right,
@@ -4033,7 +4035,7 @@ begin
   Inc(ARect.Top, FTextOffsetFromTop);
 
   //paint area over scrolled text
-  C.Brush.Color:= Colors.GutterBG;
+  C.Brush.Color:= FColorGutterBG;
   C.FillRect(FRectGutter.Left, ARect.Top, FRectGutter.Right, ARect.Bottom);
 
   //gutter band: number
@@ -4094,7 +4096,7 @@ begin
   if GutterItem.Visible then
   begin
     DoPaintGutterBandBG(C,
-      Colors.GutterFoldBG,
+      FColorGutterFoldBG,
       GutterItem.Left,
       ARect.Top,
       GutterItem.Right,
@@ -5327,6 +5329,7 @@ end;
 procedure TATSynEdit.DoPaintAll(C: TCanvas; ALineFrom: integer);
 var
   NColorOther: TColor;
+  NBlend: integer;
 begin
   UpdateInitialVars(C);
 
@@ -5334,6 +5337,8 @@ begin
   begin
     FColorFont:= Colors.TextFont;
     FColorBG:= Colors.TextBG;
+    FColorGutterBG:= Colors.GutterBG;
+    FColorGutterFoldBG:= Colors.GutterFoldBG;
     FColorRulerBG:= Colors.RulerBG;
     FColorCollapseMarkBG:= Colors.CollapseMarkBG;
 
@@ -5344,9 +5349,13 @@ begin
           NColorOther:= clBlack
         else
           NColorOther:= clWhite;
-        FColorBG:= ColorBlend(NColorOther, FColorBG, Abs(FOptDimUnfocusedBack));
-        FColorRulerBG:= ColorBlend(NColorOther, FColorRulerBG, Abs(FOptDimUnfocusedBack));
-        FColorCollapseMarkBG:= ColorBlend(NColorOther, FColorCollapseMarkBG, Abs(FOptDimUnfocusedBack));
+        NBlend:= Abs(FOptDimUnfocusedBack);
+
+        FColorBG:= ColorBlend(NColorOther, FColorBG, NBlend);
+        FColorGutterBG:= ColorBlend(NColorOther, FColorGutterBG, NBlend);
+        FColorGutterFoldBG:= ColorBlend(NColorOther, FColorGutterFoldBG, NBlend);
+        FColorRulerBG:= ColorBlend(NColorOther, FColorRulerBG, NBlend);
+        FColorCollapseMarkBG:= ColorBlend(NColorOther, FColorCollapseMarkBG, NBlend);
       end;
   end
   else
@@ -8150,7 +8159,7 @@ begin
   if FOptGutterShowFoldLines then
     NColorLine:= NColorPlus
   else
-    NColorLine:= Colors.GutterFoldBG;
+    NColorLine:= FColorGutterFoldBG;
   C.Pen.Color:= NColorLine;
 
   CoordXCenter:= (ACoordX1+ACoordX2) div 2;
@@ -8232,7 +8241,7 @@ begin
     C.Font.Style:= Style;
 
     Ext:= C.TextExtent(Decor.Data.Text);
-    C.Brush.Color:= Colors.GutterBG;
+    C.Brush.Color:= FColorGutterBG;
 
     case FGutterDecorAlignment of
       taCenter:
@@ -8550,7 +8559,7 @@ begin
       begin
         CanvasPaintPlusMinus(C,
           ALineColor,
-          Colors.GutterFoldBG,
+          FColorGutterFoldBG,
           Point(AX, AY),
           ATEditorScale(FOptGutterPlusSize),
           APlus);
