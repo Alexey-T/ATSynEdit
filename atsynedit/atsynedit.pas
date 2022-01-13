@@ -740,6 +740,7 @@ type
     FColors: TATEditorColors;
     FColorFont: TColor;
     FColorBG: TColor;
+    FColorCollapseMarkBG: TColor;
     FRulerHeight: integer;
     FNumbersIndent: integer;
     FRectMain,
@@ -4378,7 +4379,7 @@ begin
   else
   begin
     C.Font.Color:= Colors.CollapseMarkFont;
-    C.Brush.Color:= Colors.CollapseMarkBG;
+    C.Brush.Color:= FColorCollapseMarkBG;
   end;
 
   //paint text
@@ -5332,6 +5333,7 @@ begin
   begin
     FColorFont:= Colors.TextFont;
     FColorBG:= Colors.TextBG;
+    FColorCollapseMarkBG:= Colors.CollapseMarkBG;
     if FOptDimUnfocusedBack<>0 then
       if not _IsFocused then
       begin
@@ -5340,6 +5342,7 @@ begin
         else
           NColorOther:= clWhite;
         FColorBG:= ColorBlend(NColorOther, FColorBG, Abs(FOptDimUnfocusedBack));
+        FColorCollapseMarkBG:= ColorBlend(NColorOther, FColorCollapseMarkBG, Abs(FOptDimUnfocusedBack));
       end;
   end
   else
