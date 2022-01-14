@@ -374,9 +374,9 @@ type
     procedure ActionDeleteFakeLineAndFinalEol;
     procedure ActionDeleteDupFakeLines;
     function ActionDeleteAllBlanks: boolean;
-    procedure ActionDeleteAdjacentBlanks;
-    procedure ActionDeleteAdjacentDups;
-    procedure ActionDeleteAllDups(AKeepBlanks: boolean);
+    function ActionDeleteAdjacentBlanks: boolean;
+    function ActionDeleteAdjacentDups: boolean;
+    function ActionDeleteAllDups(AKeepBlanks: boolean): boolean;
     procedure ActionAddFakeLineIfNeeded;
     function ActionTrimSpaces(AMode: TATTrimSpaces): boolean;
     function ActionEnsureFinalEol: boolean;
@@ -2264,47 +2264,62 @@ begin
   end;
 end;
 
-procedure TATStrings.ActionDeleteAdjacentBlanks;
+function TATStrings.ActionDeleteAdjacentBlanks: boolean;
 var
   i: integer;
 begin
+  Result:= false;
   ClearUndo;
   ClearLineStates(false);
 
   for i:= Count-1 downto 1{!} do
     if LinesBlank[i] and LinesBlank[i-1] then
+    begin
       FList.Delete(i);
+      Result:= true;
+    end;
 
-  ActionAddFakeLineIfNeeded;
-  ClearLineStates(false);
+  if Result then
+  begin
+    ActionAddFakeLineIfNeeded;
+    ClearLineStates(false);
 
-  DoEventChange(cLineChangeDeletedAll, -1, 1);
-  DoEventLog(0);
+    DoEventChange(cLineChangeDeletedAll, -1, 1);
+    DoEventLog(0);
+  end;
 end;
 
-procedure TATStrings.ActionDeleteAdjacentDups;
+function TATStrings.ActionDeleteAdjacentDups: boolean;
 var
   i: integer;
 begin
+  Result:= false;
   ClearUndo;
   ClearLineStates(false);
 
   for i:= Count-1 downto 1{!} do
     if (LinesLen[i]=LinesLen[i-1]) and (Lines[i]=Lines[i-1]) then
+    begin
       FList.Delete(i);
+      Result:= true;
+    end;
 
-  ActionAddFakeLineIfNeeded;
-  ClearLineStates(false);
+  if Result then
+  begin
+    ActionAddFakeLineIfNeeded;
+    ClearLineStates(false);
 
-  DoEventChange(cLineChangeDeletedAll, -1, 1);
-  DoEventLog(0);
+    DoEventChange(cLineChangeDeletedAll, -1, 1);
+    DoEventLog(0);
+  end;
 end;
 
-procedure TATStrings.ActionDeleteAllDups(AKeepBlanks: boolean);
+function TATStrings.ActionDeleteAllDups(AKeepBlanks: boolean): boolean;
 var
   i, j, NLen: integer;
   S: UnicodeString;
 begin
+  Result:= false;
   ClearUndo;
   ClearLineStates(false);
 
@@ -2318,15 +2333,19 @@ begin
       if (NLen=LinesLen[j]) and (S=Lines[j]) then
       begin
         FList.Delete(i);
+        Result:= true;
         Break
       end;
   end;
 
-  ActionAddFakeLineIfNeeded;
-  ClearLineStates(false);
+  if Result then
+  begin
+    ActionAddFakeLineIfNeeded;
+    ClearLineStates(false);
 
-  DoEventChange(cLineChangeDeletedAll, -1, 1);
-  DoEventLog(0);
+    DoEventChange(cLineChangeDeletedAll, -1, 1);
+    DoEventLog(0);
+  end;
 end;
 
 

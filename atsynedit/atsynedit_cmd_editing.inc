@@ -1305,24 +1305,30 @@ function TATSynEdit.DoCommand_DeleteAdjacentBlanks: TATCommandResults;
 begin
   if ModeReadOnly then exit([]);
   DoCaretSingle(0, 0);
-  Strings.ActionDeleteAdjacentBlanks;
-  Result:= [cResultText, cResultCaretTop];
+  if Strings.ActionDeleteAdjacentBlanks then
+    Result:= [cResultText, cResultCaretTop]
+  else
+    Result:= [cResultCaretTop]
 end;
 
 function TATSynEdit.DoCommand_DeleteAdjacentDups: TATCommandResults;
 begin
   if ModeReadOnly then exit([]);
   DoCaretSingle(0, 0);
-  Strings.ActionDeleteAdjacentDups;
-  Result:= [cResultText, cResultCaretTop];
+  if Strings.ActionDeleteAdjacentDups then
+    Result:= [cResultText, cResultCaretTop]
+  else
+    Result:= [cResultCaretTop];
 end;
 
 function TATSynEdit.DoCommand_DeleteAllDups(AKeepBlanks: boolean): TATCommandResults;
 begin
   if ModeReadOnly then exit([]);
   DoCaretSingle(0, 0);
-  Strings.ActionDeleteAllDups(AKeepBlanks);
-  Result:= [cResultText, cResultCaretTop];
+  if Strings.ActionDeleteAllDups(AKeepBlanks) then
+    Result:= [cResultText, cResultCaretTop]
+  else
+    Result:= [cResultCaretTop];
 end;
 
 function TATSynEdit.DoCommand_ReverseLines: TATCommandResults;
