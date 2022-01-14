@@ -620,6 +620,7 @@ var
 begin
   Result:= [];
   if ModeReadOnly then Exit;
+  bTextChanged:= false;
   St:= Strings;
 
   bNeedGroup:= Carets.Count>1;
@@ -646,12 +647,15 @@ begin
     if (Caret.PosX>=Length(Str)) and ANext then
     begin
       St.TextDeleteRight(Caret.PosX, Caret.PosY, 1, Shift, PosAfter);
+      bTextChanged:= true;
     end
     else
     //jump from beyond eol to eol?
     if (Caret.PosX>Length(Str)) and (not ANext) then
     begin
       Caret.PosX:= Length(Str);
+      PosAfter.X:= Caret.PosX;
+      bTextChanged:= false;
     end
     else
     //delete inside line?
@@ -664,6 +668,7 @@ begin
         St.Lines[Caret.PosY]:= Str;
         Shift.X:= -Abs(Caret.PosX-PosAfter.X);
         PosAfter.X:= Min(Caret.PosX, PosAfter.X);
+        bTextChanged:= true;
       end;
     end;
 
@@ -687,9 +692,12 @@ begin
 
   //cResultCaretLazy is to fix CudaText #3065
   if ANext then
-    Result:= [cResultText, cResultCaretBottom, cResultCaretLazy]
+    Result:= [cResultCaretBottom, cResultCaretLazy]
   else
-    Result:= [cResultText, cResultCaretTop, cResultCaretLazy];
+    Result:= [cResultCaretTop, cResultCaretLazy];
+
+  if bTextChanged then
+    Include(Result, cResultText);
 end;
 
 function TATSynEdit.DoCommand_TextDeleteWordEntire: TATCommandResults;
