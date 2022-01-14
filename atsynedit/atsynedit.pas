@@ -8931,6 +8931,7 @@ var
   St: TATStrings;
   NOutputStrWidth: Int64;
   NLine, NWrapIndex: integer;
+  NVisibleColumns: integer;
   NColorAfter: TColor;
   WrapItem: TATWrapItem;
   TextOutProps: TATCanvasTextOutProps;
@@ -8976,6 +8977,8 @@ begin
   if AConsiderWrapInfo then
     NWrapIndex:= WrapInfo.FindIndexOfCaretPos(Point(0, ALineFrom));
 
+  NVisibleColumns:= GetVisibleColumns;
+
   for NLine:= ALineFrom to ALineTo do
   begin
     NColorAfter:= clNone;
@@ -9006,7 +9009,7 @@ begin
     SText:= St.LineSub(
         WrapItem.NLineIndex,
         WrapItem.NCharIndex,
-        GetVisibleColumns);
+        NVisibleColumns);
 
     if FOptMaskCharUsed then
       SText:= StringOfCharW(FOptMaskChar, Length(SText));
