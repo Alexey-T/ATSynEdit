@@ -616,7 +616,7 @@ var
   Shift, PosAfter: TPoint;
   bNeedGroup: boolean;
   bTextChanged: boolean;
-  i: integer;
+  iCaret: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
@@ -627,9 +627,9 @@ begin
   if bNeedGroup then
     St.BeginUndoGroup;
 
-  for i:= FCarets.Count-1 downto 0 do
+  for iCaret:= FCarets.Count-1 downto 0 do
   begin
-    Caret:= FCarets[i];
+    Caret:= FCarets[iCaret];
     if not St.IsIndexValid(Caret.PosY) then Continue;
     Str:= St.Lines[Caret.PosY];
     Shift.X:= 0;
@@ -671,13 +671,13 @@ begin
       end;
     end;
 
-    DoCaretsShift(i, Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
+    DoCaretsShift(iCaret, Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
 
     if ((Caret.PosX<>PosAfter.X) or (Caret.PosY<>PosAfter.Y)) and
       (FCarets.IndexOfPosXY(PosAfter.X, PosAfter.Y)>=0) then
     begin
       if FCarets.Count>1 then
-        FCarets.Delete(i);
+        FCarets.Delete(iCaret);
     end
     else
     begin
