@@ -924,14 +924,15 @@ var
   St: TATStrings;
   Str: atString;
   NBlockBeginY, NBlockEndY, NIndentAtCol: integer;
+  bChange: boolean;
   i: integer;
 begin
   St:= Strings;
   NBlockBeginY:= Min(SelRect.Top, St.Count-1);
   NBlockEndY:= Min(SelRect.Bottom, St.Count-1);
   NIndentAtCol:= SelRect.Left;
+  bChange:= false;
 
-  //do indent
   St.BeginUndoGroup;
   try
     for i:= NBlockBeginY to NBlockEndY do
@@ -946,13 +947,18 @@ begin
               ARight);
 
       if St.Lines[i]<>Str then
+      begin
         St.Lines[i]:= Str;
+        bChange:= true;
+      end;
     end;
   finally
     St.EndUndoGroup;
   end;
 
-  Result:= [cResultText, cResultCaretAny, cResultKeepColumnSel];
+  Result:= [cResultCaretAny, cResultKeepColumnSel];
+  if bChange then
+    Include(Result, cResultText);
 end;
 
 
