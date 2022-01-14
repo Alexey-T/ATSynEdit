@@ -787,23 +787,23 @@ end;
 
 function TATSynEdit.DoCommand_TextIndentUnindent_StreamBlock(ARight: boolean): TATCommandResults;
 var
-  bChangeAny, bChangeOne: boolean;
+  bChange, bChangeOne: boolean;
   i: integer;
 begin
   DoCaretsDeleteOnSameLines;
 
-  bChangeAny:= false;
+  bChange:= false;
   bChangeOne:= false;
 
   for i:= Carets.Count-1 downto 0 do
   begin
     DoCommand_TextIndentUnindent_StreamBlock_OneCaret(ARight, Carets[i], bChangeOne);
     if bChangeOne then
-      bChangeAny:= true;
+      bChange:= true;
   end;
 
   Result:= [cResultCaretAny];
-  if bChangeAny then
+  if bChange then
     Include(Result, cResultText);
 end;
 
