@@ -5333,15 +5333,15 @@ var
 begin
   UpdateInitialVars(C);
 
+  FColorFont:= Colors.TextFont;
+  FColorBG:= Colors.TextBG;
+  FColorGutterBG:= Colors.GutterBG;
+  FColorGutterFoldBG:= Colors.GutterFoldBG;
+  FColorRulerBG:= Colors.RulerBG;
+  FColorCollapseMarkBG:= Colors.CollapseMarkBG;
+
   if Enabled then
   begin
-    FColorFont:= Colors.TextFont;
-    FColorBG:= Colors.TextBG;
-    FColorGutterBG:= Colors.GutterBG;
-    FColorGutterFoldBG:= Colors.GutterFoldBG;
-    FColorRulerBG:= Colors.RulerBG;
-    FColorCollapseMarkBG:= Colors.CollapseMarkBG;
-
     if FOptDimUnfocusedBack<>0 then
       if not _IsFocused then
       begin
