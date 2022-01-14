@@ -615,12 +615,12 @@ var
   Str: atString;
   Shift, PosAfter: TPoint;
   bNeedGroup: boolean;
-  bTextChanged: boolean;
+  bChange, bChangeOne: boolean;
   iCaret: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
-  bTextChanged:= false;
+  bChange:= false;
   St:= Strings;
 
   bNeedGroup:= Carets.Count>1;
@@ -640,14 +640,16 @@ begin
     //delete to prev line?
     if (Caret.PosX=0) and (not ANext) then
     begin
-      St.TextDeleteLeft(Caret.PosX, Caret.PosY, 1, Shift, PosAfter, FOptKeyBackspaceGoesToPrevLine, bTextChanged);
+      St.TextDeleteLeft(Caret.PosX, Caret.PosY, 1, Shift, PosAfter, FOptKeyBackspaceGoesToPrevLine, bChangeOne);
+      if bChangeOne then
+        bChange:= true;
     end
     else
     //delete to next line?
     if (Caret.PosX>=Length(Str)) and ANext then
     begin
       St.TextDeleteRight(Caret.PosX, Caret.PosY, 1, Shift, PosAfter);
-      bTextChanged:= true;
+      bChange:= true;
     end
     else
     //jump from beyond eol to eol?
@@ -667,7 +669,7 @@ begin
         St.Lines[Caret.PosY]:= Str;
         Shift.X:= -Abs(Caret.PosX-PosAfter.X);
         PosAfter.X:= Min(Caret.PosX, PosAfter.X);
-        bTextChanged:= true;
+        bChange:= true;
       end;
     end;
 
@@ -695,7 +697,7 @@ begin
   else
     Result:= [cResultCaretTop, cResultCaretLazy];
 
-  if bTextChanged then
+  if bChange then
     Include(Result, cResultText);
 end;
 
