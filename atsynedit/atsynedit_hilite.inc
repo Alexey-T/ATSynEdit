@@ -33,7 +33,7 @@ end;
 
 
 procedure TATSynEdit.DoCalcLineHilite(const AData: TATWrapItem;
-  out AParts: TATLineParts;
+  var AParts: TATLineParts;
   ACharsSkipped, ACharsMax: integer;
   AColorBG: TColor; AColorForced: boolean;
   var AColorAfter: TColor;

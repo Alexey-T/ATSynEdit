@@ -1131,7 +1131,7 @@ type
     procedure DoCalcWrapInfos(ALine: integer; AIndentMaximal: integer;
       AItems: TATWrapItems; AConsiderFolding: boolean);
     procedure DoCalcLineHilite(const AData: TATWrapItem;
-      out AParts: TATLineParts; ACharsSkipped, ACharsMax: integer;
+      var AParts: TATLineParts; ACharsSkipped, ACharsMax: integer;
       AColorBG: TColor; AColorForced: boolean; var AColorAfter: TColor;
       AMainText: boolean);
     function DoScaleFont(AValue: integer): integer;
