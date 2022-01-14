@@ -709,11 +709,13 @@ var
   Shift, PosAfter: TPoint;
   bNeedGroup: boolean;
   NLen, N1, N2, i: integer;
+  bChange: boolean;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
   St:= Strings;
 
+  bChange:= false;
   bNeedGroup:= Carets.Count>1;
   if bNeedGroup then
     St.BeginUndoGroup;
@@ -746,7 +748,11 @@ begin
 
     if N1=N2 then Continue;
     System.Delete(Str, N1+1, N2-N1);
-    St.Lines[Caret.PosY]:= Str;
+    if St.Lines[Caret.PosY]<>Str then
+    begin
+      St.Lines[Caret.PosY]:= Str;
+      bChange:= true;
+    end;
 
     Shift.X:= N1-N2;
     Shift.Y:= 0;
@@ -760,7 +766,9 @@ begin
   if bNeedGroup then
     St.EndUndoGroup;
 
-  Result:= [cResultText, cResultCaretBottom];
+  Result:= [cResultCaretBottom];
+  if bChange then
+    Include(Result, cResultText);
 end;
 
 
