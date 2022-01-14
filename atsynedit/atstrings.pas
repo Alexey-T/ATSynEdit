@@ -2351,13 +2351,13 @@ end;
 
 procedure TATStrings.ActionReverseLines;
 var
-  Cnt, i, mid: integer;
+  NCount, NMiddle, i: integer;
 begin
   ActionEnsureFinalEol;
   ActionDeleteFakeLine;
 
-  Cnt:= Count;
-  if Cnt<2 then
+  NCount:= Count;
+  if NCount<2 then
   begin
     ActionAddFakeLineIfNeeded;
     exit;
@@ -2366,12 +2366,12 @@ begin
   ClearUndo;
   ClearLineStates(false);
 
-  mid:= Cnt div 2;
-  if Odd(Cnt) then
-    Inc(mid);
+  NMiddle:= NCount div 2;
+  if Odd(NCount) then
+    Inc(NMiddle);
 
-  for i:= Cnt-1 downto mid do
-    FList.Exchange(i, Cnt-1-i);
+  for i:= NCount-1 downto NMiddle do
+    FList.Exchange(i, NCount-1-i);
 
   ActionAddFakeLineIfNeeded;
   ClearLineStates(false);
