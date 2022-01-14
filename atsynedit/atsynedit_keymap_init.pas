@@ -136,7 +136,7 @@ begin
 
   M.Add(cCommand_TextDeleteWordPrev, 'delete word previous', [cXControl+'+Bksp'], []);
   M.Add(cCommand_TextDeleteWordNext, 'delete word next', [cXControl+'+Del'], []);
-  M.Add(cCommand_TextDeleteWordEntire, 'delete word', [], []);
+  M.Add(cCommand_TextDeleteWordEntire, 'delete word at caret', [], []);
   M.Add(cCommand_TextDeleteToLineBegin, 'delete to line begin', [], []);
   M.Add(cCommand_TextDeleteToLineEnd, 'delete to line end', [cXControl+'+K'], []);
   M.Add(cCommand_TextDeleteToTextBegin, 'delete to document begin', [], []);
