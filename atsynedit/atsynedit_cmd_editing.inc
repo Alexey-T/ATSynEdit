@@ -655,7 +655,6 @@ begin
     begin
       Caret.PosX:= Length(Str);
       PosAfter.X:= Caret.PosX;
-      bTextChanged:= false;
     end
     else
     //delete inside line?
