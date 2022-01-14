@@ -1295,8 +1295,10 @@ function TATSynEdit.DoCommand_DeleteAllBlanks: TATCommandResults;
 begin
   if ModeReadOnly then exit([]);
   DoCaretSingle(0, 0);
-  Strings.ActionDeleteAllBlanks;
-  Result:= [cResultText, cResultCaretTop];
+  if Strings.ActionDeleteAllBlanks then
+    Result:= [cResultText, cResultCaretTop]
+  else
+    Result:= [cResultCaretTop];
 end;
 
 function TATSynEdit.DoCommand_DeleteAdjacentBlanks: TATCommandResults;

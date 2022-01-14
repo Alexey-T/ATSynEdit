@@ -373,7 +373,7 @@ type
     procedure ActionDeleteFakeLine;
     procedure ActionDeleteFakeLineAndFinalEol;
     procedure ActionDeleteDupFakeLines;
-    procedure ActionDeleteAllBlanks;
+    function ActionDeleteAllBlanks: boolean;
     procedure ActionDeleteAdjacentBlanks;
     procedure ActionDeleteAdjacentDups;
     procedure ActionDeleteAllDups(AKeepBlanks: boolean);
@@ -2239,22 +2239,29 @@ begin
     LineDelete(Count-1, false, false, false);
 end;
 
-procedure TATStrings.ActionDeleteAllBlanks;
+function TATStrings.ActionDeleteAllBlanks: boolean;
 var
   i: integer;
 begin
+  Result:= false;
   ClearUndo;
   ClearLineStates(false);
 
   for i:= Count-1 downto 0 do
     if LinesBlank[i] then
+    begin
       FList.Delete(i);
+      Result:= true;
+    end;
 
-  ActionAddFakeLineIfNeeded;
-  ClearLineStates(false);
+  if Result then
+  begin
+    ActionAddFakeLineIfNeeded;
+    ClearLineStates(false);
 
-  DoEventChange(cLineChangeDeletedAll, -1, 1);
-  DoEventLog(0);
+    DoEventChange(cLineChangeDeletedAll, -1, 1);
+    DoEventLog(0);
+  end;
 end;
 
 procedure TATStrings.ActionDeleteAdjacentBlanks;
