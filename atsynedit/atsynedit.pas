@@ -8981,6 +8981,7 @@ begin
 
   for NLine:= ALineFrom to ALineTo do
   begin
+    if not St.IsIndexValid(NLine) then Break;
     NColorAfter:= clNone;
     if AConsiderWrapInfo then
     begin
@@ -8990,7 +8991,6 @@ begin
     end
     else
     begin
-      if not St.IsIndexValid(NLine) then Break;
       FillChar(WrapItem, SizeOf(WrapItem), 0);
       WrapItem.NLineIndex:= NLine;
       WrapItem.NCharIndex:= 1;
