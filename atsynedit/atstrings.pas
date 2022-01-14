@@ -377,7 +377,7 @@ type
     function ActionDeleteAdjacentBlanks: boolean;
     function ActionDeleteAdjacentDups: boolean;
     function ActionDeleteAllDups(AKeepBlanks: boolean): boolean;
-    procedure ActionAddFakeLineIfNeeded;
+    function ActionAddFakeLineIfNeeded: boolean;
     function ActionTrimSpaces(AMode: TATTrimSpaces): boolean;
     function ActionEnsureFinalEol: boolean;
     function ActionTrimFinalEmptyLines: boolean;
@@ -1372,21 +1372,24 @@ begin
       LinesEnds[Count-1]:= cEndNone;
 end;
 
-procedure TATStrings.ActionAddFakeLineIfNeeded;
+function TATStrings.ActionAddFakeLineIfNeeded: boolean;
 begin
   if Count=0 then
   begin
     LineAddRaw('', cEndNone, false{AWithEvent});
-    Exit
+    Exit(true);
   end;
 
-  if IsLastLineFake then Exit;
+  if IsLastLineFake then
+    Exit(false);
 
   if LinesEnds[Count-1]<>cEndNone then
   begin
     LineAddRaw('', cEndNone, false{AWithEvent});
-    Exit
+    Exit(true);
   end;
+
+  Result:= false;
 end;
 
 procedure TATStrings.LineAddRaw(const AString: atString; AEnd: TATLineEnds; AWithEvent: boolean);
