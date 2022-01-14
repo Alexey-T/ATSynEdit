@@ -196,7 +196,7 @@ var
   Shift, PosAfter: TPoint;
   NIndent, NDeleteLen: integer;
   bNeedGroup: boolean;
-  bTextChangeCurrent, bTextChangeAny: boolean;
+  bChange, bChangeOne: boolean;
   ch: WideChar;
   i: integer;
 begin
@@ -215,7 +215,7 @@ begin
   if bNeedGroup then
     St.BeginUndoGroup;
 
-  bTextChangeAny:= false;
+  bChange:= false;
 
   for i:= 0 to Carets.Count-1 do
   begin
@@ -241,15 +241,15 @@ begin
         Inc(NDeleteLen);
     end;
 
-    St.TextDeleteLeft(Caret.PosX, Caret.PosY, NDeleteLen, Shift, PosAfter, FOptKeyBackspaceGoesToPrevLine, bTextChangeCurrent);
+    St.TextDeleteLeft(Caret.PosX, Caret.PosY, NDeleteLen, Shift, PosAfter, FOptKeyBackspaceGoesToPrevLine, bChangeOne);
     DoCaretsShift(i, Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
     Caret.PosX:= PosAfter.X;
     Caret.PosY:= PosAfter.Y;
     Caret.EndX:= -1;
     Caret.EndY:= -1;
 
-    if bTextChangeCurrent then
-      bTextChangeAny:= true;
+    if bChangeOne then
+      bChange:= true;
   end;
 
   if bNeedGroup then
@@ -258,7 +258,7 @@ begin
   //changed for CudaText issue #3065
   Result:= [cResultCaretTop, cResultCaretLazy];
   //changed for CudaText issue #3883
-  if bTextChangeAny then
+  if bChange then
     Include(Result, cResultText);
 end;
 
