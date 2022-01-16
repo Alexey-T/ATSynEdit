@@ -6298,6 +6298,7 @@ var
   bOnMain, bOnMinimap, bOnMicromap,
   bOnGutter, bOnGutterNumbers, bOnGutterBookmk,
   bSelecting, bSelectingGutterNumbers: boolean;
+  bSelectColumnLeft, bSelectColumnMiddle: boolean;
   bMovedMinimal: boolean;
   bUpdateForMinimap: boolean;
   bStartTimerScroll: boolean;
@@ -6315,6 +6316,9 @@ begin
 
   bSelecting:= (not FMouseDragDropping) and (FMouseDownPnt.X>=0);
   bSelectingGutterNumbers:= FMouseDownGutterLineNumber>=0;
+
+  bSelectColumnLeft:= ((ssLeft in Shift) and not FMouseDownWithCtrl and FMouseDownWithAlt and not FMouseDownWithShift);
+  bSelectColumnMiddle:= ((ssMiddle in Shift) and FMouseDownWithCtrl and not FMouseDownWithAlt and not FMouseDownWithShift);
 
   if bSelecting then
   begin
@@ -6473,8 +6477,7 @@ begin
   if bSelecting then
     if bOnMain or bOnGutter then
     begin
-      if (ssLeft in Shift) or
-        ((ssMiddle in Shift) and FMouseDownWithCtrl and not FMouseDownWithAlt and not FMouseDownWithShift) then
+      if (ssLeft in Shift) or bSelectColumnMiddle then
         if Carets.Count>0 then
         begin
           P:= ClientPosToCaretPos(P, Details);
@@ -6536,8 +6539,7 @@ begin
             //drag with Alt pressed: column selection
             //middle button drag with Ctrl pressed: the same
             if FOptMouseEnableColumnSelection then
-              if ((ssLeft in Shift) and not FMouseDownWithCtrl and FMouseDownWithAlt and not FMouseDownWithShift) or
-                ((ssMiddle in Shift) and FMouseDownWithCtrl and not FMouseDownWithAlt and not FMouseDownWithShift) then
+              if bSelectColumnLeft or bSelectColumnMiddle then
               begin
                 FMouseDownAndColumnSelection:= true;
                 DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
