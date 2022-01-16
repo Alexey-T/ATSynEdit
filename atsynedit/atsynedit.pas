@@ -373,6 +373,7 @@ type
     Width: integer;
     Height: integer;
     EmptyInside: boolean;
+    function IsNarrow: boolean;
     procedure Assign(Obj: TATCaretShape);
   end;
 
@@ -1211,7 +1212,7 @@ type
     procedure DoPaintFoldedMark(C: TCanvas;
       APosX, APosY, ACoordX, ACoordY: integer;
       const AMarkText: string);
-    procedure DoPaintCaretShape(C: TCanvas; const ARect: TRect; ACaret: TATCaretItem;
+    procedure DoPaintCaretShape(C: TCanvas; ARect: TRect; ACaret: TATCaretItem;
       ACaretShape: TATCaretShape; ACaretColor: TColor);
     procedure DoPaintCarets(C: TCanvas; AWithInvalidate: boolean);
     procedure TimerBlinkDisable;
@@ -6967,15 +6968,28 @@ begin
 end;
 
 
-procedure TATSynEdit.DoPaintCaretShape(C: TCanvas; const ARect: TRect;
+procedure TATSynEdit.DoPaintCaretShape(C: TCanvas; ARect: TRect;
   ACaret: TATCaretItem; ACaretShape: TATCaretShape; ACaretColor: TColor);
 var
   NCoordX, NCoordY: integer;
 begin
+  if not FCaretBlinkEnabled and ACaretShape.IsNarrow then
+  begin
+    C.Brush.Color:= ACaretColor;
+    C.FillRect(ARect);
+    exit;
+  end;
+
   CanvasInvertRect(C, ARect, ACaretColor);
 
   if ACaretShape.EmptyInside then
-    CanvasInvertRect(C, Rect(ARect.Left+1, ARect.Top+1, ARect.Right-1, ARect.Bottom-1), ACaretColor)
+  begin
+    Inc(ARect.Left);
+    Inc(ARect.Top);
+    Dec(ARect.Right);
+    Dec(ARect.Bottom);
+    CanvasInvertRect(C, ARect, ACaretColor);
+  end
   else
   if FOptCaretTextOverRect then
   begin

@@ -1355,6 +1355,13 @@ end;
 
 { TATCaretShape }
 
+function TATCaretShape.IsNarrow: boolean;
+begin
+  Result:=
+    ((Width>=0) and (Width<=2)) or
+    ((Height>=0) and (Height<=2));
+end;
+
 procedure TATCaretShape.Assign(Obj: TATCaretShape);
 begin
   Width:= Obj.Width;
