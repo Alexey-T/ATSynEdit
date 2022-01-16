@@ -129,7 +129,7 @@ begin
 end;
 
 
-procedure InitEditorMouseActions(var M: TATEditorMouseActionArray);
+procedure InitEditorMouseActions(var M: TATEditorMouseActionArray; ACtrlMiddleForCaret: boolean);
   //
   procedure Add(AId: TATEditorMouseAction; AState: TShiftState);
   begin
@@ -139,13 +139,21 @@ procedure InitEditorMouseActions(var M: TATEditorMouseActionArray);
   end;
   //
 begin
-  SetLength(M, 0);
+  M:= nil;
 
   Add(cMouseActionClickSimple, [ssLeft]);
   Add(cMouseActionClickRight, [ssRight]);
   Add(cMouseActionClickAndSelNormalBlock, [ssLeft, ssShift]);
   Add(cMouseActionClickAndSelVerticalBlock, [ssLeft, ssAlt, ssShift]);
-  Add(cMouseActionMakeCaret, [ssLeft, ssXControl]);
+
+  if ACtrlMiddleForCaret then
+  begin
+    Add(cMouseActionMakeCaret, [ssMiddle, ssXControl]);
+    Add(cMouseActionClickSimple, [ssLeft, ssXControl]);
+  end
+  else
+    Add(cMouseActionMakeCaret, [ssLeft, ssXControl]);
+
   Add(cMouseActionMakeCaretsColumn, [ssLeft, ssXControl, ssShift]);
   Add(cMouseActionClickMiddle, [ssMiddle]);
 

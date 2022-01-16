@@ -2060,6 +2060,9 @@ const
 function EditorLinkIsEmail(const S: string): boolean;
 procedure EditorOpenLink(const S: string);
 
+procedure InitEditorMouseActions(var M: TATEditorMouseActionArray; ACtrlMiddleForCaret: boolean);
+
+
 implementation
 
 uses
@@ -4550,7 +4553,7 @@ begin
 
   FColors:= TATEditorColors.Create;
   InitDefaultColors(FColors);
-  InitEditorMouseActions(FMouseActions);
+  InitEditorMouseActions(FMouseActions, false);
 
   FCursorText:= crIBeam;
   FCursorColumnSel:= crCross;
