@@ -143,6 +143,7 @@ var
 begin
   M:= nil;
   NCount:= 0;
+
   //realloc to some big length
   SetLength(M, 20);
 
@@ -167,7 +168,7 @@ begin
   Add(cMouseActionClickSimple, [ssLeft, ssAlt, ssXControl]);
   Add(cMouseActionClickSimple, [ssLeft, ssAlt, ssShift, ssXControl]);
 
-  //realloc at end, to NCount elements
+  //realloc at end, to actual count
   SetLength(M, NCount);
 end;
 
