@@ -1,7 +1,10 @@
 
+2022.01.16
+* change: rename prop MouseMap to MouseActions
+
 2022.01.06
 * change: move many global constants/vars to global var ATEditorOptions
-+ add: init bitmap/cursor resources on demand; add ATEditorBitmaps
++ add: init bitmap/cursor resources only on demand; add ATEditorBitmaps global var
 
 2022.01.01
 + add: OptFoldIconForMinimalRangeHeight
