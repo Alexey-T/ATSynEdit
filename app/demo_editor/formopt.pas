@@ -272,7 +272,7 @@ begin
     edCaretWidthNormal.Value:= ed.CaretShapeNormal.Width;
     edCaretHeightNormal.Value:= ed.CaretShapeNormal.Height;
     chkCaretEmptyNormal.Checked:= ed.CaretShapeNormal.EmptyInside;
-    chkCaretRenderText.Checked:= ed.OptCaretTextOverRect;
+    chkCaretRenderText.Checked:= ATEditorOptions.CaretTextOverInvertedRect;
 
     //gutter
     edNumStyle.ItemIndex:= Ord(ed.OptNumbersStyle);
@@ -405,7 +405,7 @@ begin
       ed.OptCaretPreferLeftSide:= chkCaretPreferLeft.Checked;
       ed.OptCaretsPrimitiveColumnSelection:= chkCaretPrimitiveCol.Checked;
       ed.OptCaretProximityVert:= edCaretProximity.Value;
-      ed.OptCaretTextOverRect:= chkCaretRenderText.Checked;
+      ATEditorOptions.CaretTextOverInvertedRect:= chkCaretRenderText.Checked;
 
       ed.CaretShapeNormal.Width:= edCaretWidthNormal.Value;
       ed.CaretShapeNormal.Height:= edCaretHeightNormal.Value;

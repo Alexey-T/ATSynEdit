@@ -881,7 +881,6 @@ type
     FOptCaretFixAfterRangeFolded: boolean;
     FOptCaretsMultiToColumnSel: boolean;
     FOptCaretProximityVert: integer;
-    FOptCaretTextOverRect: boolean;
     FOptMarkersSize: integer;
     FOptShowScrollHint: boolean;
     FOptTextCenteringCharWidth: integer;
@@ -1913,7 +1912,6 @@ type
     property OptCaretFixAfterRangeFolded: boolean read FOptCaretFixAfterRangeFolded write FOptCaretFixAfterRangeFolded default true;
     property OptCaretsMultiToColumnSel: boolean read FOptCaretsMultiToColumnSel write FOptCaretsMultiToColumnSel default cInitCaretsMultiToColumnSel;
     property OptCaretProximityVert: integer read FOptCaretProximityVert write FOptCaretProximityVert default 0;
-    property OptCaretTextOverRect: boolean read FOptCaretTextOverRect write FOptCaretTextOverRect default false;
     property OptMarkersSize: integer read FOptMarkersSize write FOptMarkersSize default cInitMarkerSize;
     property OptGutterVisible: boolean read FOptGutterVisible write FOptGutterVisible default true;
     property OptGutterPlusSize: integer read FOptGutterPlusSize write FOptGutterPlusSize default cInitGutterPlusSize;
@@ -6991,7 +6989,7 @@ begin
     CanvasInvertRect(C, ARect, ACaretColor);
   end
   else
-  if FOptCaretTextOverRect then
+  if ATEditorOptions.CaretTextOverInvertedRect then
   begin
     if (ACaret.CharStr<>'') and (ACaret.CharColor<>clNone) and not IsCharUnicodeSpace(ACaret.CharStr[1]) then
     begin
