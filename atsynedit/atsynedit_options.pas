@@ -58,7 +58,6 @@ type
     CommaCharsWrapWithWords: UnicodeString;
     MaxLineLenForAccurateCharWidths: integer; //must be <= cMaxFixedArray
     TextoutNeedsOffsets: boolean;
-    CaretTextOverInvertedRect: boolean;
     DefaultNonWordChars: UnicodeString;
 
     TimerIntervalAutoScroll: integer;

@@ -1,6 +1,7 @@
 
 2022.01.16
 + add: middle-button-drag with Ctrl: make column selection (like Sublime Text)
+* change: ATEditorOptions.CaretTextOverInvertedRect is replaced with prop OptCaretTextOverRect
 * change: rename prop MouseMap to MouseActions
 
 2022.01.06

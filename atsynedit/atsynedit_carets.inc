@@ -158,7 +158,7 @@ begin
       Caret.CoordY:= PntCoord.Y;
     end;
 
-    if ATEditorOptions.CaretTextOverInvertedRect then
+    if FOptCaretTextOverRect then
     begin
       Caret.CharStr:= '';
       Caret.CharColor:= clNone;
