@@ -12,7 +12,6 @@ uses
   ATStringProc,
   ATSynEdit,
   ATSynEdit_Options,
-  ATSynEdit_CanvasProc,
   ATSynEdit_CharSizer;
 
 type

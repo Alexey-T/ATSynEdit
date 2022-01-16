@@ -142,7 +142,7 @@ object fmOpt: TfmOpt
         Top = 8
         Width = 353
         Caption = 'zebra mode'
-        ClientHeight = 77
+        ClientHeight = 62
         ClientWidth = 349
         TabOrder = 8
         object chkZebraActive: TCheckBox
@@ -970,6 +970,7 @@ object fmOpt: TfmOpt
         Height = 26
         Top = 32
         Width = 66
+        MaxValue = 20
         MinValue = -100
         TabOrder = 8
       end
@@ -986,6 +987,7 @@ object fmOpt: TfmOpt
         Height = 26
         Top = 64
         Width = 66
+        MaxValue = 20
         MinValue = -300
         TabOrder = 9
       end
@@ -995,8 +997,8 @@ object fmOpt: TfmOpt
         Left = 416
         Height = 17
         Top = 37
-        Width = 38
-        Caption = 'width'
+        Width = 232
+        Caption = 'width (>0: in pixels, <0: in percents)'
       end
       object Label21: TLabel
         AnchorSideTop.Control = edCrHeightNormal
