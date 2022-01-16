@@ -129,7 +129,7 @@ begin
 end;
 
 
-procedure InitEditorMouseActions(out M: TATEditorMouseActions; ACtrlMiddleForCaret: boolean);
+procedure InitEditorMouseActions(out M: TATEditorMouseActions; ANoCtrlClickForCaret: boolean);
 var
   NCount: integer;
   //
@@ -152,16 +152,15 @@ begin
   Add(cMouseActionClickAndSelNormalBlock, [ssLeft, ssShift]);
   Add(cMouseActionClickAndSelVerticalBlock, [ssLeft, ssAlt, ssShift]);
 
-  if ACtrlMiddleForCaret then
-  begin
-    Add(cMouseActionMakeCaret, [ssMiddle, ssXControl]);
-    Add(cMouseActionClickSimple, [ssLeft, ssXControl]);
-  end
+  if ANoCtrlClickForCaret then
+    Add(cMouseActionClickSimple, [ssLeft, ssXControl])
   else
     Add(cMouseActionMakeCaret, [ssLeft, ssXControl]);
 
   Add(cMouseActionMakeCaretsColumn, [ssLeft, ssXControl, ssShift]);
+
   Add(cMouseActionClickMiddle, [ssMiddle]);
+  Add(cMouseActionMakeCaret, [ssMiddle, ssXControl]);
 
   Add(cMouseActionClickSimple, [ssLeft, ssAlt]);
   Add(cMouseActionClickSimple, [ssLeft, ssAltGr]);
