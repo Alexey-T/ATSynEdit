@@ -129,7 +129,7 @@ begin
 end;
 
 
-procedure InitEditorMouseActions(var M: TATEditorMouseActionArray; ACtrlMiddleForCaret: boolean);
+procedure InitEditorMouseActions(var M: TATEditorMouseActions; ACtrlMiddleForCaret: boolean);
   //
   procedure Add(AId: TATEditorMouseAction; AState: TShiftState);
   begin
@@ -164,7 +164,7 @@ begin
 end;
 
 
-function EditorMouseActionId(const M: TATEditorMouseActionArray; State: TShiftState): TATEditorMouseAction;
+function EditorMouseActionId(const M: TATEditorMouseActions; State: TShiftState): TATEditorMouseAction;
 var
   i: integer;
 begin

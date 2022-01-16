@@ -181,7 +181,7 @@ type
     MouseActionId: TATEditorMouseAction;
   end;
 
-  TATEditorMouseActionArray = array of TATEditorMouseActionRecord;
+  TATEditorMouseActions = array of TATEditorMouseActionRecord;
 
   TATFoldBarState = (
     cFoldbarNone,
@@ -644,7 +644,7 @@ type
     FMouseDragMinimapSelHeight: integer;
     FMouseDownAndColumnSelection: boolean;
     FMouseAutoScrollDirection: TATEditorDirection;
-    FMouseActions: TATEditorMouseActionArray;
+    FMouseActions: TATEditorMouseActions;
     FLockInput: boolean;
     FLastControlWidth: integer;
     FLastControlHeight: integer;
@@ -1493,7 +1493,7 @@ type
     property Gaps: TATGaps read GetGaps;
     property Keymap: TATKeymap read FKeymap write FKeymap;
     property CommandLog: TATEditorCommandLog read FCommandLog;
-    property MouseMap: TATEditorMouseActionArray read FMouseActions write FMouseActions;
+    property MouseActions: TATEditorMouseActions read FMouseActions write FMouseActions;
     property TabHelper: TATStringTabHelper read FTabHelper;
     property WrapInfo: TATWrapInfo read FWrapInfo;
     property ScrollVert: TATEditorScrollInfo read FScrollVert write FScrollVert;
@@ -2060,7 +2060,7 @@ const
 function EditorLinkIsEmail(const S: string): boolean;
 procedure EditorOpenLink(const S: string);
 
-procedure InitEditorMouseActions(var M: TATEditorMouseActionArray; ACtrlMiddleForCaret: boolean);
+procedure InitEditorMouseActions(var M: TATEditorMouseActions; ACtrlMiddleForCaret: boolean);
 
 
 implementation
