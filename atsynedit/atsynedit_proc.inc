@@ -129,17 +129,22 @@ begin
 end;
 
 
-procedure InitEditorMouseActions(var M: TATEditorMouseActions; ACtrlMiddleForCaret: boolean);
+procedure InitEditorMouseActions(out M: TATEditorMouseActions; ACtrlMiddleForCaret: boolean);
+var
+  NCount: integer;
   //
-  procedure Add(AId: TATEditorMouseAction; AState: TShiftState);
+  procedure Add(AId: TATEditorMouseAction; AState: TShiftState); inline;
   begin
-    SetLength(M, Length(M)+1);
-    M[High(M)].MouseActionId:= AId;
-    M[High(M)].MouseState:= AState;
+    M[NCount].MouseActionId:= AId;
+    M[NCount].MouseState:= AState;
+    Inc(NCount);
   end;
   //
 begin
   M:= nil;
+  NCount:= 0;
+  //realloc to some big length
+  SetLength(M, 20);
 
   Add(cMouseActionClickSimple, [ssLeft]);
   Add(cMouseActionClickRight, [ssRight]);
@@ -161,6 +166,9 @@ begin
   Add(cMouseActionClickSimple, [ssLeft, ssAltGr]);
   Add(cMouseActionClickSimple, [ssLeft, ssAlt, ssXControl]);
   Add(cMouseActionClickSimple, [ssLeft, ssAlt, ssShift, ssXControl]);
+
+  //realloc at end, to NCount elements
+  SetLength(M, NCount);
 end;
 
 

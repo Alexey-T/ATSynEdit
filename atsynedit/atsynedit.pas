@@ -2060,7 +2060,7 @@ const
 function EditorLinkIsEmail(const S: string): boolean;
 procedure EditorOpenLink(const S: string);
 
-procedure InitEditorMouseActions(var M: TATEditorMouseActions; ACtrlMiddleForCaret: boolean);
+procedure InitEditorMouseActions(out M: TATEditorMouseActions; ACtrlMiddleForCaret: boolean);
 
 
 implementation
