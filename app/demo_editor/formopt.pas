@@ -21,13 +21,13 @@ type
     bColDown: TButton;
     bColUp: TButton;
     ButtonPanel1: TButtonPanel;
-    chkCrRenderText: TCheckBox;
+    chkCaretRenderText: TCheckBox;
     chkMapClickDoDrag: TCheckBox;
     chkUndoForCrt: TCheckBox;
     chkUndoGrp: TCheckBox;
     chkUndoAfterSave: TCheckBox;
     chkUpDownToEdge: TCheckBox;
-    chkCrPrimitiveCol: TCheckBox;
+    chkCaretPrimitiveCol: TCheckBox;
     chkClickLink: TCheckBox;
     chkCopyNoSel: TCheckBox;
     chkCutNoSel: TCheckBox;
@@ -40,8 +40,8 @@ type
     chkBkspGoPrev: TCheckBox;
     chkUnprintOnlyBothEnds: TCheckBox;
     chkUnprintOnlyEnd: TCheckBox;
-    chkCrEmptyNormal: TCheckBox;
-    chkCrBlinkEn: TCheckBox;
+    chkCaretEmptyNormal: TCheckBox;
+    chkCaretBlinkEn: TCheckBox;
     chkMsNormalSel: TCheckBox;
     chkMsColumnSel: TCheckBox;
     chkShowFullHilite: TCheckBox;
@@ -62,7 +62,7 @@ type
     chkUnprintAsciiRep: TCheckBox;
     chkShowFoldLines: TCheckBox;
     chkShowFoldAlways: TCheckBox;
-    chkCrPreferLeft: TCheckBox;
+    chkCaretPreferLeft: TCheckBox;
     chkKeepCol: TCheckBox;
     chkCurLineMin: TCheckBox;
     chkScrollHint: TCheckBox;
@@ -75,7 +75,7 @@ type
     chkShowNumBg: TCheckBox;
     chkTabSpaces: TCheckBox;
     chkMsClickNumSel: TCheckBox;
-    chkCrStopUnfocus: TCheckBox;
+    chkCaretStopUnfocus: TCheckBox;
     chkEndNonspace: TCheckBox;
     chkHomeNonspace: TCheckBox;
     chkLeftRtSwap: TCheckBox;
@@ -83,8 +83,8 @@ type
     chkOvrSel: TCheckBox;
     chkMsRtClickMove: TCheckBox;
     chkMsDragDrop: TCheckBox;
-    chkCrMul: TCheckBox;
-    chkCrVirt: TCheckBox;
+    chkCaretMulti: TCheckBox;
+    chkCaretVirtual: TCheckBox;
     chkMsClick2Drag: TCheckBox;
     chkMsClick3: TCheckBox;
     chkShowFullSel: TCheckBox;
@@ -96,19 +96,19 @@ type
     chkUnprintSpace: TCheckBox;
     chkUnprintEn: TCheckBox;
     chkZebraActive: TCheckBox;
-    edCrProxi: TSpinEdit;
+    edCaretProximity: TSpinEdit;
     edUnpriEol: TComboBox;
     comboMsMidClick: TComboBox;
     ComboMsClick2: TComboBox;
     comboRulerStyle: TComboBox;
-    edCrHeightNormal: TSpinEdit;
+    edCaretHeightNormal: TSpinEdit;
     edRulerFSize: TSpinEdit;
     edRulerIndent: TSpinEdit;
     edRulerSize: TSpinEdit;
     edMapCharWidth: TSpinEdit;
     edNumAlign: TComboBox;
     edIndentKind: TComboBox;
-    edCrTime: TSpinEdit;
+    edCaretTime: TSpinEdit;
     edSizeSep: TSpinEdit;
     edNonWordChars: TEdit;
     edIndentSize: TSpinEdit;
@@ -166,7 +166,7 @@ type
     LabelZebraStep: TLabel;
     ListCol: TListBox;
     PageControl1: TPageControl;
-    edCrWidthNormal: TSpinEdit;
+    edCaretWidthNormal: TSpinEdit;
     TabSheet1: TTabSheet;
     TabSheet10: TTabSheet;
     TabSheet11: TTabSheet;
@@ -260,19 +260,19 @@ begin
     edTabArrowPnt.Value:= ATEditorOptions.UnprintedTabPointerScale;
 
     //caret
-    chkCrBlinkEn.Checked:= ed.OptCaretBlinkEnabled;
-    edCrTime.Value:= ed.OptCaretBlinkTime;
-    chkCrVirt.Checked:= ed.OptCaretVirtual;
-    chkCrMul.Checked:= ed.OptCaretManyAllowed;
-    chkCrStopUnfocus.Checked:= ed.OptCaretStopUnfocused;
-    chkCrPreferLeft.Checked:= ed.OptCaretPreferLeftSide;
-    chkCrPrimitiveCol.Checked:= ed.OptCaretsPrimitiveColumnSelection;
-    edCrProxi.Value:= ed.OptCaretProximityVert;
+    chkCaretBlinkEn.Checked:= ed.OptCaretBlinkEnabled;
+    edCaretTime.Value:= ed.OptCaretBlinkTime;
+    chkCaretVirtual.Checked:= ed.OptCaretVirtual;
+    chkCaretMulti.Checked:= ed.OptCaretManyAllowed;
+    chkCaretStopUnfocus.Checked:= ed.OptCaretStopUnfocused;
+    chkCaretPreferLeft.Checked:= ed.OptCaretPreferLeftSide;
+    chkCaretPrimitiveCol.Checked:= ed.OptCaretsPrimitiveColumnSelection;
+    edCaretProximity.Value:= ed.OptCaretProximityVert;
 
-    edCrWidthNormal.Value:= ed.CaretShapeNormal.Width;
-    edCrHeightNormal.Value:= ed.CaretShapeNormal.Height;
-    chkCrEmptyNormal.Checked:= ed.CaretShapeNormal.EmptyInside;
-    chkCrRenderText.Checked:= ATEditorOptions.CaretTextOverInvertedRect;
+    edCaretWidthNormal.Value:= ed.CaretShapeNormal.Width;
+    edCaretHeightNormal.Value:= ed.CaretShapeNormal.Height;
+    chkCaretEmptyNormal.Checked:= ed.CaretShapeNormal.EmptyInside;
+    chkCaretRenderText.Checked:= ATEditorOptions.CaretTextOverInvertedRect;
 
     //gutter
     edNumStyle.ItemIndex:= Ord(ed.OptNumbersStyle);
@@ -397,19 +397,19 @@ begin
       ATEditorOptions.UnprintedEndSymbol:= TATEditorUnptintedEolSymbol(edUnpriEol.ItemIndex);
 
       //caret
-      ed.OptCaretBlinkEnabled:= chkCrBlinkEn.Checked;
-      ed.OptCaretBlinkTime:= edCrTime.Value;
-      ed.OptCaretVirtual:= chkCrVirt.Checked;
-      ed.OptCaretManyAllowed:= chkCrMul.Checked;
-      ed.OptCaretStopUnfocused:= chkCrStopUnfocus.Checked;
-      ed.OptCaretPreferLeftSide:= chkCrPreferLeft.Checked;
-      ed.OptCaretsPrimitiveColumnSelection:= chkCrPrimitiveCol.Checked;
-      ed.OptCaretProximityVert:= edCrProxi.Value;
+      ed.OptCaretBlinkEnabled:= chkCaretBlinkEn.Checked;
+      ed.OptCaretBlinkTime:= edCaretTime.Value;
+      ed.OptCaretVirtual:= chkCaretVirtual.Checked;
+      ed.OptCaretManyAllowed:= chkCaretMulti.Checked;
+      ed.OptCaretStopUnfocused:= chkCaretStopUnfocus.Checked;
+      ed.OptCaretPreferLeftSide:= chkCaretPreferLeft.Checked;
+      ed.OptCaretsPrimitiveColumnSelection:= chkCaretPrimitiveCol.Checked;
+      ed.OptCaretProximityVert:= edCaretProximity.Value;
 
-      ed.CaretShapeNormal.Width:= edCrWidthNormal.Value;
-      ed.CaretShapeNormal.Height:= edCrHeightNormal.Value;
-      ed.CaretShapeNormal.EmptyInside:= chkCrEmptyNormal.Checked;
-      ATEditorOptions.CaretTextOverInvertedRect:= chkCrRenderText.Checked;
+      ed.CaretShapeNormal.Width:= edCaretWidthNormal.Value;
+      ed.CaretShapeNormal.Height:= edCaretHeightNormal.Value;
+      ed.CaretShapeNormal.EmptyInside:= chkCaretEmptyNormal.Checked;
+      ATEditorOptions.CaretTextOverInvertedRect:= chkCaretRenderText.Checked;
 
       //gutter
       //ed.OptNumbersFontSizePercents:= edNumSize.Value;
