@@ -6299,7 +6299,7 @@ var
   bOnMain, bOnMinimap, bOnMicromap,
   bOnGutter, bOnGutterNumbers, bOnGutterBookmk,
   bSelecting, bSelectingGutterNumbers: boolean;
-  bSelectAdd, bSelectColumnLeft, bSelectColumnMiddle: boolean;
+  bSelectAdding, bSelectColumnLeft, bSelectColumnMiddle: boolean;
   bMovedMinimal: boolean;
   bUpdateForMinimap: boolean;
   bStartTimerScroll: boolean;
@@ -6318,9 +6318,9 @@ begin
   bSelecting:= (not FMouseDragDropping) and (FMouseDownPnt.X>=0);
   bSelectingGutterNumbers:= FMouseDownGutterLineNumber>=0;
 
-  bSelectAdd:= (ssLeft in Shift) and FMouseDownWithCtrl and not FMouseDownWithAlt and not FMouseDownWithShift;
-  bSelectColumnLeft:= (ssLeft in Shift) and not FMouseDownWithCtrl and FMouseDownWithAlt and not FMouseDownWithShift;
-  bSelectColumnMiddle:= (ssMiddle in Shift) and FMouseDownWithCtrl and not FMouseDownWithAlt and not FMouseDownWithShift;
+  bSelectAdding:= bSelecting and (ssLeft in Shift) and FMouseDownWithCtrl and not FMouseDownWithAlt and not FMouseDownWithShift;
+  bSelectColumnLeft:= bSelecting and (ssLeft in Shift) and not FMouseDownWithCtrl and FMouseDownWithAlt and not FMouseDownWithShift;
+  bSelectColumnMiddle:= bSelecting and (ssMiddle in Shift) and FMouseDownWithCtrl and not FMouseDownWithAlt and not FMouseDownWithShift;
 
   if bSelecting then
   begin
@@ -6529,7 +6529,7 @@ begin
             end;
 
             //drag with Ctrl pressed: add selection
-            if bSelectAdd then
+            if bSelectAdding then
             begin
               nIndex:= Carets.IndexOfPosXY(FMouseDownPnt.X, FMouseDownPnt.Y, true);
               DoSelect_CharRange(nIndex, P);
