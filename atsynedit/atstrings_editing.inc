@@ -100,6 +100,7 @@ var
   bAtLineEnd, bAtFileEnd, bAtEmptyLine,
   bBlockWithEol, bUseBlockFinalEol: boolean;
   BlockOriginalLineCount: integer;
+  NDeleteLen: integer;
 begin
   AShift.X:= 0;
   AShift.Y:= 0;
@@ -142,8 +143,13 @@ begin
     StrTail:= '';
   end;
 
-  if AOverwrite then
-    Delete(StrTail, 1, Length(AText));
+  if AOverwrite and (StrTail<>'') then
+  begin
+    NDeleteLen:= Length(AText);
+    if IsCharSurrogateHigh(StrTail[1]) then
+      Inc(NDeleteLen);
+    Delete(StrTail, 1, NDeleteLen);
+  end;
 
   //------------------
   //Insert single line
