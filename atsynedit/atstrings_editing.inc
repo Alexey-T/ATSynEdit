@@ -146,6 +146,7 @@ begin
   if AOverwrite and (StrTail<>'') then
   begin
     NDeleteLen:= Length(AText);
+    //if we type over emoji - delete 2 surrogate chars
     if IsCharSurrogateHigh(StrTail[1]) then
       Inc(NDeleteLen);
     Delete(StrTail, 1, NDeleteLen);
