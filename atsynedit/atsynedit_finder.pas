@@ -78,10 +78,10 @@ type
     FMatchPos: integer;
     FMatchLen: integer;
     FStrFind: UnicodeString;
-    FStrFindCompiled: UnicodeString;
-    FStrFindCompiled_Case: boolean;
     FStrReplace: UnicodeString;
     FStrFindUnicode: boolean;
+    FCachedText: UnicodeString;
+    FCachedOptCase: boolean;
     FRegex: TRegExpr;
     FRegexReplacer: TRegExpr;
     FRegexBad: boolean;
@@ -475,11 +475,11 @@ begin
   InitRegex;
 
   try
-    if (FStrFindCompiled<>StrFind) or
-      (FStrFindCompiled_Case<>OptCase) then
+    if (FCachedText<>StrFind) or
+      (FCachedOptCase<>OptCase) then
     begin
-      FStrFindCompiled:= StrFind;
-      FStrFindCompiled_Case:= OptCase;
+      FCachedText:= StrFind;
+      FCachedOptCase:= OptCase;
       FRegex.ModifierI:= not OptCase;
       FRegex.Expression:= StrFind;
       FRegex.Compile;
@@ -645,11 +645,11 @@ begin
   SNew:= '';
 
   try
-    if (FStrFindCompiled<>StrFind) or
-      (FStrFindCompiled_Case<>OptCase) then
+    if (FCachedText<>StrFind) or
+      (FCachedOptCase<>OptCase) then
     begin
-      FStrFindCompiled:= StrFind;
-      FStrFindCompiled_Case:= OptCase;
+      FCachedText:= StrFind;
+      FCachedOptCase:= OptCase;
       FRegex.ModifierI:= not OptCase;
       FRegex.Expression:= StrFind;
       FRegex.Compile;
