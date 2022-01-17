@@ -79,6 +79,7 @@ type
     FMatchLen: integer;
     FStrFind: UnicodeString;
     FStrFindCompiled: UnicodeString;
+    FStrFindCompiled_Case: boolean;
     FStrReplace: UnicodeString;
     FStrFindUnicode: boolean;
     FRegex: TRegExpr;
@@ -474,9 +475,11 @@ begin
   InitRegex;
 
   try
-    if FStrFindCompiled<>StrFind then
+    if (FStrFindCompiled<>StrFind) or
+      (FStrFindCompiled_Case<>OptCase) then
     begin
       FStrFindCompiled:= StrFind;
+      FStrFindCompiled_Case:= OptCase;
       FRegex.ModifierI:= not OptCase;
       FRegex.Expression:= StrFind;
       FRegex.Compile;
@@ -642,9 +645,11 @@ begin
   SNew:= '';
 
   try
-    if FStrFindCompiled<>StrFind then
+    if (FStrFindCompiled<>StrFind) or
+      (FStrFindCompiled_Case<>OptCase) then
     begin
       FStrFindCompiled:= StrFind;
+      FStrFindCompiled_Case:= OptCase;
       FRegex.ModifierI:= not OptCase;
       FRegex.Expression:= StrFind;
       FRegex.Compile;
