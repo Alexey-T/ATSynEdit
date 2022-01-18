@@ -9213,6 +9213,7 @@ procedure TATSynEdit.DoPaintTiming(C: TCanvas);
 const
   cFontSize = 8;
   cFontColor = clRed;
+  cBackColor = clCream;
   cMinEditorLines = 15;
 var
   S: string;
@@ -9223,6 +9224,7 @@ begin
   C.Font.Name:= Font.Name;
   C.Font.Color:= cFontColor;
   C.Font.Size:= cFontSize;
+  C.Brush.Color:= cBackColor;
 
   S:= Format('#%03d, %d ms', [FPaintCounter, FTickAll]);
   if FMinimapVisible then
