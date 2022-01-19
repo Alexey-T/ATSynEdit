@@ -6999,7 +6999,7 @@ begin
     CanvasInvertRect(C, ARect, ACaretColor);
   end
   else
-  if ATEditorOptions.CaretTextOverInvertedRect then
+  if ATEditorOptions.CaretTextOverInvertedRect and not ACaretShape.IsNarrow then
   begin
     if (ACaret.CharStr<>'') and (ACaret.CharColor<>clNone) and not IsCharUnicodeSpace(ACaret.CharStr[1]) then
     begin
