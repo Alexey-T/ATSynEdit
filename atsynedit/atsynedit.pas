@@ -3660,7 +3660,7 @@ begin
             NOutputMaximalChars:= StringItem^.CharLen
           else
             NOutputMaximalChars:= CanvasTextWidth(
-              StringItem^.Line,
+              StringItem^.Line, //Line getter is very slow for huge lines
               NLinesIndex,
               FTabHelper,
               1 //pass CharWidth=1px
