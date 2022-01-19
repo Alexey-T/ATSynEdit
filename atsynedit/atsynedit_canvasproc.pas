@@ -62,6 +62,7 @@ const
 type
   TATCanvasTextOutProps = record
     Editor: TObject;
+    EditorHasSelection: boolean;
     HasAsciiNoTabs: boolean;
     SuperFast: boolean;
     TabHelper: TATStringTabHelper;
@@ -1053,7 +1054,7 @@ begin
 
   if AProps.ShowUnprinted then
   begin
-    if AProps.ShowUnprintedSpacesOnlyInSelection then
+    if AProps.EditorHasSelection and AProps.ShowUnprintedSpacesOnlyInSelection then
     begin
       for i:= 1 to Length(AText) do
       begin
