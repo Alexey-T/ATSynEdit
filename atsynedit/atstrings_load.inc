@@ -403,14 +403,14 @@ var
   //------
   procedure _LoadItems;
   var
-    Len, NStart, NEnd, NCounted: integer;
+    Len, NStart, NEnd, NPrevProgressPos: integer;
     LineEnd: TATLineEnds;
     SA, SUtf8: string;
     SWide: UnicodeString;
     SQuad: UCS4String;
   begin
     NStart:= 0;
-    NCounted:= 0;
+    NPrevProgressPos:= 0;
 
     FProgressKind:= cStringsProgressLoading;
     FProgressValue:= 0;
@@ -421,9 +421,9 @@ var
 
       //call OnProgress each 1M chars
       //it's smooth enough progress, on 280Mb log, 10 seconds
-      if NStart-NCounted>TATEditorOptions.ProgressLoadChars then
+      if NStart-NPrevProgressPos>TATEditorOptions.ProgressLoadChars then
       begin
-        NCounted:= NStart;
+        NPrevProgressPos:= NStart;
         FProgressValue:= Int64(NStart)*100 div NStreamSize;
         if Assigned(FOnProgress) then
           FOnProgress(Self);
