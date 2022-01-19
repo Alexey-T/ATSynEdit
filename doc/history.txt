@@ -1,4 +1,7 @@
 
+2022.01.19
+* change: delete OptWrapMode enum value cWrapAtMargin, because it worked the same as cWrapAtWindowOrMargin
+
 2022.01.16
 + add: middle-button-click with Ctrl: add/remove caret (like Sublime Text)
 + add: middle-button-drag with Ctrl: make column selection (like Sublime Text)
