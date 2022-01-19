@@ -400,6 +400,10 @@ var
   begin
     NStart:= 0;
     NCounted:= 0;
+
+    FProgressKind:= cStringsProgressLoading;
+    FProgressValue:= 0;
+
     repeat
       _FindNextEol(NStart, NEnd, LineEnd);
       Len:= NEnd-NStart;
@@ -409,7 +413,6 @@ var
       if NStart-NCounted>TATEditorOptions.ProgressLoadChars then
       begin
         NCounted:= NStart;
-        FProgressKind:= cStringsProgressLoading;
         FProgressValue:= Int64(NStart)*100 div NStreamSize;
         if Assigned(FOnProgress) then
           FOnProgress(Self);
