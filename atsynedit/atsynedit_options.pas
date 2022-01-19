@@ -31,6 +31,12 @@ type
   public const
     ProgressLoadChars = 1024*1024;
     ProgressSaveLines = 128*1024;
+
+    //set it to number of editors, which share same Strings obj
+    //(needed when UI tab is splitted to N parts, for the same file).
+    //set to 1 to allow only one editor for Strings obj (saves memory).
+    MaxStringsClients = 2;
+
   public
     //force UTF8 for huge files on loading
     MaxFileSizeMbToDetectEncoding: integer;
@@ -38,6 +44,9 @@ type
     //if update count is less, do smarter wrapinfo update (find, replace items)
     //smart update used only if lines changed, not deleted/inserted
     MaxUpdatesCountEasy: integer;
+
+    DetectUtf8BufferKb: integer;
+    DetectUf16BufferWords: integer;
 
     ItalicFontLongerInPercents: integer;
     UnprintedTabCharLength: integer;
@@ -282,6 +291,9 @@ initialization
   begin
     MaxFileSizeMbToDetectEncoding:= 50;
     MaxUpdatesCountEasy:= 200;
+
+    DetectUtf8BufferKb:= 8;
+    DetectUf16BufferWords:= 5;
 
     ItalicFontLongerInPercents:= 40;
     UnprintedTabCharLength:= 1;

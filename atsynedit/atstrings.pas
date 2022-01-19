@@ -25,12 +25,6 @@ uses
   ATSynEdit_Options,
   EncConv;
 
-const
-  //set it to number of editors, which share same Strings obj
-  //(needed when UI tab is splitted to N parts, for the same file)
-  //set to 1 to allow only one editor for Strings obj (saves memory)
-  cMaxStringsClients = 2;
-
 type
   TATIntegerList = specialize TFPGList<integer>;
 
@@ -452,10 +446,6 @@ function ATStrings_To_StringList(AStr: TATStrings): TStringList;
 function DetectStreamUtf8NoBom(Stream: TStream; BufSizeKb: word): TBufferUTF8State;
 function DetectStreamUtf16NoBom(Stream: TStream; BufSizeWords: integer; out IsLE: boolean): boolean;
 
-var
-  GlobalDetectUtf8BufferKb: integer = 8;
-  GlobalDetectUf16BufferWords: integer = 5;
-
 implementation
 
 uses
@@ -473,7 +463,7 @@ const
 
 procedure DoEncError;
 begin
-  raise Exception.Create('Unknown enc value');
+  raise Exception.Create('Unknown encoding value');
 end;
 
 procedure _ReadFileToStream(AStream: TStream;
