@@ -1356,10 +1356,11 @@ end;
 { TATCaretShape }
 
 function TATCaretShape.IsNarrow: boolean;
+//negative values are in %, positive are in pixels
 begin
   Result:=
-    ((Width>=0) and (Width<=2)) or
-    ((Height>=0) and (Height<=3));
+    ((Width>=-25) and (Width<=2)) or
+    ((Height>=-25) and (Height<=3));
 end;
 
 procedure TATCaretShape.Assign(Obj: TATCaretShape);
