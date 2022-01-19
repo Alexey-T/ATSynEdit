@@ -77,6 +77,7 @@ type
     ShowUnprintedSpacesTrailing: boolean;
     ShowUnprintedSpacesBothEnds: boolean;
     ShowUnprintedSpacesOnlyInSelection: boolean;
+    ShowUnprintedSpacesAlsoInSelection: boolean;
     ShowFontLigatures: boolean;
     ColorNormalFont: TColor;
     ColorUnprintedFont: TColor;
@@ -742,6 +743,7 @@ var
   BufW: UnicodeString;
   NLen, NCharWidthScaled, i, iPart: integer;
   NLastPart: integer;
+  NPosFirstChar, NPosLastChar: integer;
   PartStr: atString;
   PartOffset, PartLen,
   PixOffset1, PixOffset2: integer;
@@ -1066,31 +1068,52 @@ begin
     else
     if AProps.ShowUnprintedSpacesBothEnds then
     begin
+      NPosFirstChar:= SGetIndentChars(AText);
+      NPosLastChar:= SGetNonSpaceLength(AText)+1;
       //paint leading
-      for i:= 1 to SGetIndentChars(AText) do
+      for i:= 1 to NPosFirstChar do
       begin
         ch:= AText[i];
         if IsCharUnicodeSpace(ch) then
           DoPaintUnprintedChar(C, ch, i, ListInt, APosX, APosY, AProps.CharSize, AProps.ColorUnprintedFont);
       end;
       //paint trailing
-      for i:= SGetNonSpaceLength(AText)+1 to Length(AText) do
+      for i:= NPosLastChar to Length(AText) do
       begin
         ch:= AText[i];
         if IsCharUnicodeSpace(ch) then
           DoPaintUnprintedChar(C, ch, i, ListInt, APosX, APosY, AProps.CharSize, AProps.ColorUnprintedFont);
       end;
+      //paint middle if "also in selection"
+      if AProps.ShowUnprintedSpacesAlsoInSelection then
+        for i:= NPosFirstChar+1 to NPosLastChar-1 do
+        begin
+          ch:= AText[i];
+          if IsCharUnicodeSpace(ch) then
+            if AProps.DetectIsPosSelected(i-2+AProps.CharIndexInLine, AProps.LineIndex) then
+              DoPaintUnprintedChar(C, ch, i, ListInt, APosX, APosY, AProps.CharSize, AProps.ColorUnprintedFont);
+        end;
     end
     else
     if AProps.ShowUnprintedSpacesTrailing then
     begin
+      NPosLastChar:= SGetNonSpaceLength(AText)+1;
       //paint trailing
       if not AProps.TrimmedTrailingNonSpaces then
-        for i:= SGetNonSpaceLength(AText)+1 to Length(AText) do
+        for i:= NPosLastChar to Length(AText) do
         begin
           ch:= AText[i];
           if IsCharUnicodeSpace(ch) then
             DoPaintUnprintedChar(C, ch, i, ListInt, APosX, APosY, AProps.CharSize, AProps.ColorUnprintedFont);
+        end;
+      //paint middle if "also in selection"
+      if AProps.ShowUnprintedSpacesAlsoInSelection then
+        for i:= 1 to NPosLastChar-1 do
+        begin
+          ch:= AText[i];
+          if IsCharUnicodeSpace(ch) then
+            if AProps.DetectIsPosSelected(i-2+AProps.CharIndexInLine, AProps.LineIndex) then
+              DoPaintUnprintedChar(C, ch, i, ListInt, APosX, APosY, AProps.CharSize, AProps.ColorUnprintedFont);
         end;
     end
     else
