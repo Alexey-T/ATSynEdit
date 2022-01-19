@@ -29,8 +29,8 @@ type
   private
     FClipboardColumnFormat: TClipboardFormat;
   public const
-    ProgressLoadChars = 1000*1000;
-    ProgressSaveLines = 100*1000;
+    ProgressLoadChars = 1024*1024;
+    ProgressSaveLines = 128*1024;
   public
     //force UTF8 for huge files on loading
     MaxFileSizeMbToDetectEncoding: integer;

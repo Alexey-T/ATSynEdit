@@ -361,18 +361,14 @@ var
   procedure _FindNextEol(AFromPos: integer;
     out AFoundPos: integer;
     out AEnding: TATLineEnds);
-  var
-    NPrevProgressPos: integer;
   begin
     AFoundPos:= AFromPos;
     AEnding:= cEndNone;
-    NPrevProgressPos:= AFromPos;
     repeat
       if AFoundPos>=BufSize then exit;
 
-      if AFoundPos-NPrevProgressPos>=TATEditorOptions.ProgressLoadChars then
+      if AFoundPos mod TATEditorOptions.ProgressLoadChars = 0 then
       begin
-        NPrevProgressPos:= AFoundPos;
         FProgressValue:= Int64(AFoundPos)*100 div NStreamSize;
         if Assigned(FOnProgress) then
           FOnProgress(Self);
