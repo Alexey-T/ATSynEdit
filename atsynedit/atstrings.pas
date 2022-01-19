@@ -22,6 +22,7 @@ uses
   ATSynEdit_Bookmarks,
   ATSynEdit_Gutter_Decor,
   ATSynEdit_Commands,
+  ATSynEdit_Options,
   EncConv;
 
 const
@@ -29,16 +30,6 @@ const
   //(needed when UI tab is splitted to N parts, for the same file)
   //set to 1 to allow only one editor for Strings obj (saves memory)
   cMaxStringsClients = 2;
-
-  //if update count is less, do smarter wrapinfo update (find, replace items)
-  //smart update used only if lines changed, not deleted/inserted
-  cMaxUpdatesCountEasy = 200;
-
-  cStringsProgressLoadChars = 1000*1000;
-  cStringsProgressSaveLines = 100*1000;
-
-  //force utf8 for huge files on loading
-  cMaxFileSizeMbToDetectEncoding: integer = 50;
 
 type
   TATIntegerList = specialize TFPGList<integer>;
@@ -2435,7 +2426,7 @@ begin
     Exit
   end;
 
-  if FListUpdates.Count>cMaxUpdatesCountEasy then
+  if FListUpdates.Count>ATEditorOptions.MaxUpdatesCountEasy then
   begin
     FListUpdatesHard:= true;
     Exit

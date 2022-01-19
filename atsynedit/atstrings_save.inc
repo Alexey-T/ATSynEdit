@@ -83,7 +83,7 @@ begin
         DoEncError;
     end;
 
-    if (i mod cStringsProgressSaveLines) = (cStringsProgressSaveLines div 2) then
+    if (i mod TATEditorOptions.ProgressSaveLines) = TATEditorOptions.ProgressSaveLines div 2 then
     begin
       FProgressKind:= cStringsProgressSaving;
       FProgressValue:= Int64(i)*100 div Count;

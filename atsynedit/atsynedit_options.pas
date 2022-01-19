@@ -28,7 +28,17 @@ type
   TATEditorOptions = record
   private
     FClipboardColumnFormat: TClipboardFormat;
+  public const
+    ProgressLoadChars = 1000*1000;
+    ProgressSaveLines = 100*1000;
   public
+    //force UTF8 for huge files on loading
+    MaxFileSizeMbToDetectEncoding: integer;
+
+    //if update count is less, do smarter wrapinfo update (find, replace items)
+    //smart update used only if lines changed, not deleted/inserted
+    MaxUpdatesCountEasy: integer;
+
     ItalicFontLongerInPercents: integer;
     UnprintedTabCharLength: integer;
     UnprintedTabPointerScale: integer;
@@ -270,6 +280,9 @@ initialization
   FillChar(ATEditorOptions, SizeOf(ATEditorOptions), 0);
   with ATEditorOptions do
   begin
+    MaxFileSizeMbToDetectEncoding:= 50;
+    MaxUpdatesCountEasy:= 200;
+
     ItalicFontLongerInPercents:= 40;
     UnprintedTabCharLength:= 1;
     UnprintedTabPointerScale:= 22;

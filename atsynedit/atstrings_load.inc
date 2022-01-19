@@ -406,7 +406,7 @@ var
 
       //call OnProgress each 1M chars
       //it's smooth enough progress, on 280Mb log, 10 seconds
-      if NStart-NCounted>cStringsProgressLoadChars then
+      if NStart-NCounted>TATEditorOptions.ProgressLoadChars then
       begin
         NCounted:= NStart;
         FProgressKind:= cStringsProgressLoading;
@@ -491,7 +491,7 @@ begin
     FEncoding:= cEncUTF8;
   end
   else
-  if NStreamSize>(cMaxFileSizeMbToDetectEncoding*1024*1024) then
+  if NStreamSize>ATEditorOptions.MaxFileSizeMbToDetectEncoding*1024*1024 then
   begin
     //detect encoding by signature, even for huge files
     DetectStreamEncoding(Stream, FEncoding, FEncodingCodepage, NSignatureLen, bWithBom,
