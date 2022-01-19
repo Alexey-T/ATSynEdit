@@ -399,14 +399,15 @@ var
   //------
   procedure _LoadItems;
   var
-    Len, NStart, NEnd, NPrevProgressPos: integer;
+    Len, NStart, NEnd: integer;
+    //NPrevProgressPos: integer;
     LineEnd: TATLineEnds;
     SA, SUtf8: string;
     SWide: UnicodeString;
     SQuad: UCS4String;
   begin
     NStart:= 0;
-    NPrevProgressPos:= 0;
+    //NPrevProgressPos:= 0;
 
     FProgressKind:= cStringsProgressLoading;
     FProgressValue:= 0;
@@ -415,8 +416,11 @@ var
       _FindNextEol(NStart, NEnd, LineEnd);
       Len:= NEnd-NStart;
 
+      {
       //call OnProgress each 1M chars
       //it's smooth enough progress, on 280Mb log, 10 seconds
+      //2022.01: not needed now, because we call OnProgress in _FindNextEol
+
       if NStart-NPrevProgressPos>TATEditorOptions.ProgressLoadChars then
       begin
         NPrevProgressPos:= NStart;
@@ -424,6 +428,7 @@ var
         if Assigned(FOnProgress) then
           FOnProgress(Self);
       end;
+      }
 
       if LineEnd=cEndWin then
         Inc(NEnd, CharSize*2)
