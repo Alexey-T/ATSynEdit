@@ -3751,7 +3751,6 @@ begin
       SetLength(StrOutput, NCount);
 
       TextOutProps.Editor:= Self;
-      TextOutProps.EditorHasSelection:= TempSel_IsSelection;
       TextOutProps.HasAsciiNoTabs:= St.LinesHasAsciiNoTabs[NLinesIndex];
       TextOutProps.SuperFast:= bLineHuge;
       TextOutProps.TabHelper:= FTabHelper;
@@ -3767,7 +3766,7 @@ begin
       TextOutProps.ShowUnprinted:= FUnprintedVisible and FUnprintedSpaces;
       TextOutProps.ShowUnprintedSpacesTrailing:= FUnprintedSpacesTrailing;
       TextOutProps.ShowUnprintedSpacesBothEnds:= FUnprintedSpacesBothEnds;
-      TextOutProps.ShowUnprintedSpacesOnlyInSelection:= FUnprintedSpacesOnlyInSelection;
+      TextOutProps.ShowUnprintedSpacesOnlyInSelection:= FUnprintedSpacesOnlyInSelection and TempSel_IsSelection;
       TextOutProps.DetectIsPosSelected:= @IsPosSelected;
 
       TextOutProps.ShowFontLigatures:= FOptShowFontLigatures and (not bLineWithCaret);
@@ -9042,7 +9041,6 @@ begin
     if FOptMaskCharUsed then
       SText:= StringOfCharW(FOptMaskChar, Length(SText));
 
-    TextOutProps.EditorHasSelection:= false;
     TextOutProps.HasAsciiNoTabs:= St.LinesHasAsciiNoTabs[WrapItem.NLineIndex];
     TextOutProps.SuperFast:= false;
     TextOutProps.LineIndex:= WrapItem.NLineIndex;
