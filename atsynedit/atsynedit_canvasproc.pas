@@ -734,6 +734,12 @@ procedure CanvasTextOut(C: TCanvas;
   AParts: PATLineParts;
   out ATextWidth: Int64;
   const AProps: TATCanvasTextOutProps);
+//
+  function _IsCharSelected(NColumn: integer): boolean; inline;
+  begin
+    Result:= AProps.DetectIsPosSelected(NColumn-2+AProps.CharIndexInLine, AProps.LineIndex);
+  end;
+//
 var
   {$ifndef windows}
   Buf: string;
@@ -1060,9 +1066,8 @@ begin
       for i:= 1 to Length(AText) do
       begin
         ch:= AText[i];
-        if IsCharUnicodeSpace(ch) then
-          if AProps.DetectIsPosSelected(i-2+AProps.CharIndexInLine, AProps.LineIndex) then
-            DoPaintUnprintedChar(C, ch, i, ListInt, APosX, APosY, AProps.CharSize, AProps.ColorUnprintedFont);
+        if IsCharUnicodeSpace(ch) and _IsCharSelected(i) then
+          DoPaintUnprintedChar(C, ch, i, ListInt, APosX, APosY, AProps.CharSize, AProps.ColorUnprintedFont);
       end;
     end
     else
@@ -1089,9 +1094,8 @@ begin
         for i:= NPosFirstChar+1 to NPosLastChar-1 do
         begin
           ch:= AText[i];
-          if IsCharUnicodeSpace(ch) then
-            if AProps.DetectIsPosSelected(i-2+AProps.CharIndexInLine, AProps.LineIndex) then
-              DoPaintUnprintedChar(C, ch, i, ListInt, APosX, APosY, AProps.CharSize, AProps.ColorUnprintedFont);
+          if IsCharUnicodeSpace(ch) and _IsCharSelected(i) then
+            DoPaintUnprintedChar(C, ch, i, ListInt, APosX, APosY, AProps.CharSize, AProps.ColorUnprintedFont);
         end;
     end
     else
@@ -1111,9 +1115,8 @@ begin
         for i:= 1 to NPosLastChar-1 do
         begin
           ch:= AText[i];
-          if IsCharUnicodeSpace(ch) then
-            if AProps.DetectIsPosSelected(i-2+AProps.CharIndexInLine, AProps.LineIndex) then
-              DoPaintUnprintedChar(C, ch, i, ListInt, APosX, APosY, AProps.CharSize, AProps.ColorUnprintedFont);
+          if IsCharUnicodeSpace(ch) and _IsCharSelected(i) then
+            DoPaintUnprintedChar(C, ch, i, ListInt, APosX, APosY, AProps.CharSize, AProps.ColorUnprintedFont);
         end;
     end
     else
