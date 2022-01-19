@@ -314,7 +314,6 @@ type
   TATEditorWrapMode = (
     cWrapOff,
     cWrapOn,
-    cWrapAtMargin,
     cWrapAtWindowOrMargin
     );
 
@@ -2299,7 +2298,7 @@ procedure TATSynEdit.SetMarginRight(AValue: integer);
 begin
   if AValue=FMarginRight then Exit;
   FMarginRight:= Max(AValue, ATEditorOptions.MinMarginRt);
-  if FWrapMode in [cWrapAtMargin, cWrapAtWindowOrMargin] then
+  if FWrapMode=cWrapAtWindowOrMargin then
     FWrapUpdateNeeded:= true;
 end;
 
@@ -2365,8 +2364,6 @@ begin
       FWrapInfo.WrapColumn:= 0;
     cWrapOn:
       FWrapInfo.WrapColumn:= Max(ATEditorOptions.MinWrapColumn, NNewVisibleColumns-FWrapAddSpace);
-    cWrapAtMargin:
-      FWrapInfo.WrapColumn:= Max(ATEditorOptions.MinWrapColumn, FMarginRight);
     cWrapAtWindowOrMargin:
       FWrapInfo.WrapColumn:= Max(ATEditorOptions.MinWrapColumn, Min(NNewVisibleColumns-FWrapAddSpace, FMarginRight));
   end;
@@ -3644,7 +3641,6 @@ begin
   case FWrapMode of
     cWrapOn:
       AScrollHorz.NMax:= GetVisibleColumns;
-    cWrapAtMargin,
     cWrapAtWindowOrMargin:
       AScrollHorz.NMax:= Min(GetVisibleColumns, FMarginRight);
     else

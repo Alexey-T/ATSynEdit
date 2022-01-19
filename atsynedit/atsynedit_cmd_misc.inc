@@ -14,11 +14,10 @@ begin
     cWrapOn:
       begin
         if AltOrder then
-          OptWrapMode:= cWrapAtMargin
+          OptWrapMode:= cWrapAtWindowOrMargin
         else
           OptWrapMode:= cWrapOff;
       end;
-    cWrapAtMargin,
     cWrapAtWindowOrMargin:
       OptWrapMode:= cWrapOff;
   end;
