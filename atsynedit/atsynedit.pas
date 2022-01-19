@@ -3547,6 +3547,7 @@ var
   bHiliteLinesWithSelection: boolean;
   bTrimmedNonSpaces: boolean;
   bUseColorOfCurrentLine: boolean;
+  bWrappedInWindow: boolean;
 begin
   St:= Strings;
   bHiliteLinesWithSelection:= false;
@@ -3641,22 +3642,36 @@ begin
 
   //horz scrollbar max: is calculated here, to make variable horz bar
   //vert scrollbar max: is calculated in UpdateScrollbars
-  if bLineHuge then
-    NOutputMaximalChars:= NLineLen //approximate, it don't consider CJK chars, but OK for huge lines
-  else
-  begin
-    StringItem:= St.GetItemPtr(NLinesIndex);
-    if StringItem^.HasAsciiNoTabs then
-      NOutputMaximalChars:= StringItem^.CharLen
-    else
-      NOutputMaximalChars:= CanvasTextWidth(
-        StringItem^.Line,
-        NLinesIndex,
-        FTabHelper,
-        1 //pass CharWidth=1px
-        );
+  bWrappedInWindow:= false;
+  case FWrapMode of
+    cWrapOn,
+    cWrapAtWindowOrMargin:
+      bWrappedInWindow:= true;
+    cWrapAtMargin:
+      bWrappedInWindow:= FMarginRight<=GetVisibleColumns;
   end;
-  AScrollHorz.NMax:= Max(AScrollHorz.NMax, NOutputMaximalChars + FOptScrollbarHorizontalAddSpace);
+
+  //don't do these calculations for huge line length=40M in wrapped mode, because
+  //getter of StringItem^.Line is slow
+  if not bWrappedInWindow then
+  begin
+    if bLineHuge then
+      NOutputMaximalChars:= NLineLen //approximate, it don't consider CJK chars, but OK for huge lines
+    else
+    begin
+      StringItem:= St.GetItemPtr(NLinesIndex);
+      if StringItem^.HasAsciiNoTabs then
+        NOutputMaximalChars:= StringItem^.CharLen
+      else
+        NOutputMaximalChars:= CanvasTextWidth(
+          StringItem^.Line,
+          NLinesIndex,
+          FTabHelper,
+          1 //pass CharWidth=1px
+          );
+    end;
+    AScrollHorz.NMax:= Max(AScrollHorz.NMax, NOutputMaximalChars + FOptScrollbarHorizontalAddSpace);
+  end;
 
   C.Brush.Color:= FColorBG;
   C.Font.Name:= Font.Name;
