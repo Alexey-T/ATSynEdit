@@ -204,10 +204,6 @@ procedure SAddStringToHistory(const S: string; List: TStrings; MaxItems: integer
 
 procedure TrimStringList(L: TStringList); inline;
 
-type
-  TATDecodeRec = record SFrom, STo: UnicodeString; end;
-function SDecodeRecords(const S: UnicodeString; const Decode: array of TATDecodeRec): UnicodeString;
-
 procedure SReplaceAll(var S: string; const SFrom, STo: string); inline;
 procedure SReplaceAllPercentChars(var S: string);
 procedure SDeleteFrom(var s: string; const SFrom: string); inline;
@@ -1151,32 +1147,6 @@ begin
   SetLength(Result, Len);
   for i:= 1 to Len do
     Result[i]:= ch;
-end;
-
-
-function SDecodeRecords(const S: UnicodeString; const Decode: array of TATDecodeRec): UnicodeString;
-var
-  DoDecode: Boolean;
-  i, iPart: integer;
-begin
-  Result := '';
-  i := 1;
-  repeat
-    if i > Length(S) then Break;
-    DoDecode := False;
-    for iPart := Low(Decode) to High(Decode) do
-      with Decode[iPart] do
-        if strlcomp(PChar(SFrom), @S[i], Length(SFrom)) = 0 then
-        begin
-          DoDecode := True;
-          Result := Result + STo;
-          Inc(i, Length(SFrom));
-          Break
-        end;
-    if DoDecode then Continue;
-    Result := Result + S[i];
-    Inc(i);
-  until False;
 end;
 
 
