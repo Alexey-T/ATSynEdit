@@ -4652,7 +4652,7 @@ begin
   FOverwrite:= false;
   FTabSize:= cInitTabSize;
   FMarginRight:= cInitMarginRight;
-  SetLength(FMarginList, 0);
+  FMarginList:= nil;
   FFoldedMarkList:= nil;
 
   FOptInputNumberOnly:= false;
@@ -5150,7 +5150,7 @@ var
   Sep: TATStringSeparator;
   N: integer;
 begin
-  SetLength(FMarginList, 0);
+  FMarginList:= nil;
   Sep.Init(AValue, ' ');
   repeat
     if not Sep.GetItemInt(N, 0) then Break;

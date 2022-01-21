@@ -189,9 +189,9 @@ begin
   if not ASetLenOnly then
     {
     for i:= High(FLineIndexer) downto 0 do
-      SetLength(FLineIndexer[i], 0);
+      FLineIndexer[i]:= nil;
     }
-    SetLength(FLineIndexer, 0); //it frees old memory? seems yes
+    FLineIndexer:= nil;
 
   SetLength(FLineIndexer, ALineCount);
 end;

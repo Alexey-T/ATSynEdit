@@ -2054,7 +2054,7 @@ begin
   StringArray_SetFromString(ListParts, SFind, OptBack);
   PartCount:= Length(ListParts);
   if PartCount=0 then exit;
-  SetLength(ListLooped, 0);
+  ListLooped:= nil;
 
   SLinePartW:= ListParts[0];
   SLinePart_Len:= Length(SLinePartW);

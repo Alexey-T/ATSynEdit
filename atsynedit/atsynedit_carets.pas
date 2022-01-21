@@ -215,7 +215,7 @@ end;
 
 procedure TATCaretSelections.Clear;
 begin
-  SetLength(Data, 0);
+  Data:= nil;
 end;
 
 function TATCaretSelections.IsEmpty: boolean;
@@ -361,13 +361,12 @@ begin
   until false;
 end;
 
-procedure TATCaretSelections.GetRangesInLineAfterPoint(AX, AY: integer; out
-  ARanges: TATSimpleRangeArray);
+procedure TATCaretSelections.GetRangesInLineAfterPoint(AX, AY: integer; out ARanges: TATSimpleRangeArray);
 var
   X1, Y1, X2, Y2, XFrom, XTo: integer;
   i: integer;
 begin
-  SetLength(ARanges, 0);
+  ARanges:= nil;
   for i:= 0 to High(Data) do
   begin
     X1:= Data[i].PosX;

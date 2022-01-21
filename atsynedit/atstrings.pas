@@ -1291,7 +1291,7 @@ begin
   FOneLine:= false;
   FProgressValue:= 0;
   FProgressKind:= cStringsProgressNone;
-  SetLength(CaretsAfterLastEdition, 0);
+  CaretsAfterLastEdition:= nil;
 
   ActionAddFakeLineIfNeeded;
   ClearUndo;
@@ -1992,7 +1992,7 @@ begin
   if Assigned(FOnGetCaretsArray) then
     Result:= FOnGetCaretsArray()
   else
-    SetLength(Result, 0);
+    Result:= nil;
 end;
 
 function TATStrings.GetMarkersArray: TATInt64Array;
@@ -2000,7 +2000,7 @@ begin
   if Assigned(FOnGetMarkersArray) then
     Result:= FOnGetMarkersArray()
   else
-    SetLength(Result, 0);
+    Result:= nil;
 end;
 
 procedure TATStrings.SetCaretsArray(const L: TATPointArray);

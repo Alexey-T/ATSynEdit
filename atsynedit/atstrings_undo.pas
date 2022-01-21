@@ -233,7 +233,7 @@ begin
   if SubItem<>'' then
     StringToInt64Array(ItemMarkers, SubItem)
   else
-    SetLength(ItemMarkers, 0);
+    ItemMarkers:= nil;
   //c) global_cnt
   Sep2.GetItemStr(SubItem);
   ItemGlobalCounter:= StrToDWordDef(SubItem, 0);
@@ -458,8 +458,8 @@ begin
   if Assigned(Item) then
     if Item.ItemAction=aeaClearModified then exit;
 
-  SetLength(Carets, 0);
-  SetLength(Markers, 0);
+  Carets:= nil;
+  Markers:= nil;
 
   Item:= TATUndoItem.Create(
     aeaClearModified, 0, '',
