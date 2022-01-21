@@ -205,7 +205,6 @@ procedure SAddStringToHistory(const S: string; List: TStrings; MaxItems: integer
 procedure TrimStringList(L: TStringList); inline;
 
 procedure SReplaceAll(var S: string; const SFrom, STo: string); inline;
-procedure SReplaceAllPercentChars(var S: string);
 procedure SDeleteFrom(var s: string; const SFrom: string); inline;
 procedure SDeleteFrom(var s: UnicodeString; const SFrom: UnicodeString); inline;
 procedure SDeleteFromEol(var S: string);
@@ -1153,17 +1152,6 @@ end;
 procedure SReplaceAll(var S: string; const SFrom, STo: string);
 begin
   S:= StringReplace(S, SFrom, STo, [rfReplaceAll]);
-end;
-
-procedure SReplaceAllPercentChars(var S: string);
-var
-  i: Integer;
-begin
-  for i:= $20 to $2F do
-    SReplaceAll(S, '%'+IntToHex(i, 2), Chr(i));
-
-  i:= $7C;
-  SReplaceAll(S, '%'+IntToHex(i, 2), Chr(i));
 end;
 
 procedure SDeleteFrom(var s: string; const SFrom: string);
