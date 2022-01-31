@@ -1,4 +1,7 @@
 
+2022.01.31
++ add: Colors members: MacroRecordBorder, DragDropMarker, GitMarkerBG (before, all they used the Markers member)
+
 2022.01.19
 + add: OptUnprintedSpacesAlsoInSelection
 * change: delete OptWrapMode enum value cWrapAtMargin, because it worked the same as cWrapAtWindowOrMargin

@@ -3110,8 +3110,8 @@ begin
 
   if FOptBorderMacroRecording and FIsMacroRecording then
   begin
-    DoPaintBorder(C, Colors.Markers, FOptBorderWidthMacro, true);
-    C.Brush.Color:= Colors.Markers;
+    DoPaintBorder(C, Colors.MacroRecordBorder, FOptBorderWidthMacro, true);
+    C.Brush.Color:= Colors.MacroRecordBorder;
     C.Font.Color:= Colors.TextSelFont;
     CanvasTextOutSimplest(C,
       FRectMain.Right-Length(cTextMacro)*FCharSize.XScaled div ATEditorCharXScale - FOptBorderWidthMacro,
@@ -7132,7 +7132,7 @@ begin
   R.Top:= PntCoord.Y;
   R.Bottom:= R.Top + FCharSize.Y; //100% height
 
-  C.Brush.Color:= Colors.Markers;
+  C.Brush.Color:= Colors.DragDropMarker;
   C.FillRect(R);
 
   //InvalidateRect(Handle, @R, false); //doens't work for CudaText issue #3784
