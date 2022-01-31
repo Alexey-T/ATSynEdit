@@ -917,7 +917,10 @@ end;
 procedure TATSynEdit.SetCaretsArray(const Ar: TATPointArray);
 begin
   if Assigned(FCarets) then
+  begin
     FCarets.AsArray:= Ar;
+    DoCaretsFixIncorrectPos(false);
+  end;
 end;
 
 procedure TATSynEdit.SetMarkersArray(const Ar: TATInt64Array);
