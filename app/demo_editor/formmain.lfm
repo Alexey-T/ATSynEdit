@@ -130,11 +130,11 @@ object fmMain: TfmMain
     end
     object gWrap: TGroupBox
       Left = 144
-      Height = 138
+      Height = 108
       Top = 4
       Width = 128
       Caption = 'wrap'
-      ClientHeight = 119
+      ClientHeight = 89
       ClientWidth = 124
       TabOrder = 15
       object chkWrapOff: TRadioButton
@@ -157,32 +157,23 @@ object fmMain: TfmMain
         OnChange = chkWrapOnChange
         TabOrder = 1
       end
-      object chkWrapMargin: TRadioButton
-        Left = 8
-        Height = 24
-        Top = 40
-        Width = 73
-        Caption = 'margin'
-        OnChange = chkWrapMarginChange
-        TabOrder = 2
-      end
       object chkWrapIndent: TCheckBox
         Left = 8
         Height = 24
-        Top = 88
+        Top = 64
         Width = 101
         Caption = 'with indent'
         OnChange = chkWrapIndentChange
-        TabOrder = 4
+        TabOrder = 3
       end
       object chkWrapWndMargin: TRadioButton
         Left = 8
         Height = 24
-        Top = 62
+        Top = 40
         Width = 115
         Caption = 'min wnd/mrg'
         OnChange = chkWrapWndMarginChange
-        TabOrder = 3
+        TabOrder = 2
       end
     end
     object edFontsize: TSpinEdit

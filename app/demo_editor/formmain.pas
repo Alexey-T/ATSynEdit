@@ -48,7 +48,6 @@ type
     chkUnprintSp: TCheckBox;
     chkUnprintVis: TCheckBox;
     chkWrapIndent: TCheckBox;
-    chkWrapMargin: TRadioButton;
     chkWrapOff: TRadioButton;
     chkWrapOn: TRadioButton;
     edFontsize: TSpinEdit;
@@ -525,9 +524,12 @@ begin
   edSpaceY.Value:= ed.OptSpacingY;
   edMarginFixed.Value:= ed.OptMarginRight;
   case ed.OptWrapMode of
-    cWrapOff: chkWrapOff.Checked:= true;
-    cWrapOn: chkWrapOn.Checked:= true;
-    cWrapAtMargin: chkWrapMargin.Checked:= true;
+    cWrapOff:
+      chkWrapOff.Checked:= true;
+    cWrapOn:
+      chkWrapOn.Checked:= true;
+    cWrapAtWindowOrMargin:
+      chkWrapWndMargin.Checked:= true;
   end;
   chkWrapIndent.Checked:= ed.OptWrapIndented;
   chkUnprintVis.Checked:= ed.OptUnprintedVisible;
@@ -1394,7 +1396,7 @@ end;
 procedure TfmMain.chkWrapMarginChange(Sender: TObject);
 begin
   if wait then Exit;
-  ed.OptWrapMode:= cWrapAtMargin;
+  ed.OptWrapMode:= cWrapAtWindowOrMargin;
 end;
 
 procedure TfmMain.chkWrapOffChange(Sender: TObject);
