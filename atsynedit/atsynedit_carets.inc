@@ -1136,12 +1136,14 @@ end;
 
 function TATSynEdit.DoCaretsFixIncorrectPos(AndLimitByLineEnds: boolean): boolean;
 var
+  St: TATStrings;
   Caret: TATCaretItem;
   NLast, NLen, i: integer;
 begin
   Result:= false;
+  St:= Strings;
 
-  NLast:= Strings.Count-1;
+  NLast:= St.Count-1;
   if NLast<0 then
   begin
     Result:= true;
@@ -1154,7 +1156,7 @@ begin
     Caret:= Carets[i];
 
     //fix position
-    if not Strings.IsIndexValid(Caret.PosY) then
+    if not St.IsIndexValid(Caret.PosY) then
     begin
       Result:= true;
       Caret.PosY:= NLast;
@@ -1164,7 +1166,7 @@ begin
 
     if AndLimitByLineEnds or not FCaretVirtual then
     begin
-      NLen:= Strings.LinesLen[Caret.PosY];
+      NLen:= St.LinesLen[Caret.PosY];
       if Caret.PosX>NLen then
       begin
         Result:= true;
@@ -1175,12 +1177,12 @@ begin
     //fix selection end
     if Caret.EndY>=0 then
     begin
-      if not Strings.IsIndexValid(Caret.EndY) then
+      if not St.IsIndexValid(Caret.EndY) then
       begin
         Result:= true;
         Caret.EndY:= NLast;
       end;
-      NLen:= Strings.LinesLen[Caret.EndY];
+      NLen:= St.LinesLen[Caret.EndY];
       if Caret.EndX>NLen then
       begin
         Result:= true;
