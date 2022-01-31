@@ -517,8 +517,7 @@ begin
   if not AKeepSel then
     DoSelect_None;
 
-  FMouseDragDropping:= false;
-  FMouseDragDroppingReal:= false;
+  ClearMouseDownVariables;
   UpdateCursor;
 
   Result:= [cResultCaretTop];
