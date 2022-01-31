@@ -114,7 +114,7 @@ begin
   ed.LoadFromFile(fn);
   ed.SetFocus;
 
-  an:= DoFindLexerForFilename(manager, fn);
+  an:= Lexer_FindForFilename(manager, fn);
   adapter.Lexer:= an;
 
   if Assigned(an) then
@@ -216,10 +216,12 @@ begin
 end;
 
 procedure TfmMain.EditorChangeCaretPos(Sender: TObject);
+var
+  NLine: integer;
 begin
   if ed.Carets.Count>0 then
     with ed.Carets[0] do
-      CodetreeSelectItemForPosition(Tree, PosX, PosY);
+      CodetreeSelectItemForPosition(Tree, PosX, PosY, NLine);
 end;
 
 procedure TfmMain.chkFullSelChange(Sender: TObject);
@@ -234,7 +236,7 @@ begin
   ed.Fold.Clear;
 
   if chkLexer.Checked then
-    adapter.Lexer:= DoFindLexerForFilename(manager, FFilename);
+    adapter.Lexer:= Lexer_FindForFilename(manager, FFilename);
   ed.Update;
 end;
 
