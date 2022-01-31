@@ -2241,6 +2241,7 @@ begin
   if Result then
   begin
     ActionAddFakeLineIfNeeded;
+    ClearUndo;
     ClearLineStates(false);
 
     DoEventChange(cLineChangeDeletedAll, -1, 1);
