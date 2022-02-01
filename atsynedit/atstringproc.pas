@@ -247,7 +247,7 @@ begin
   Result := CharCategoryArray[Ord(ch)] and 128 <> 0;
   if not Result then
   begin
-    if Ord(ch)<32 then
+    if Ord(ch)<=32 then
       exit(false);
 
     if IsCharUnicodeSpace(ch) then
