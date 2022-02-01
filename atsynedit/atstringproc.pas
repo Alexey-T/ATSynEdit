@@ -247,6 +247,9 @@ begin
   Result := CharCategoryArray[Ord(ch)] and 128 <> 0;
   if not Result then
   begin
+    if ch=#0 then //we have #0 when testing Ed.Strings.LineCharAt after line-end
+      exit(false);
+
     if IsCharUnicodeSpace(ch) then
       exit(false);
 
