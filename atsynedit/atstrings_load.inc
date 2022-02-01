@@ -367,7 +367,7 @@ var
     repeat
       if AFoundPos>=BufSize then exit;
 
-      if AFoundPos mod TATEditorOptions.ProgressLoadChars = 0 then
+      if (AFoundPos>0) and (AFoundPos mod TATEditorOptions.ProgressLoadChars = 0) then
       begin
         FProgressValue:= Int64(AFoundPos)*100 div NStreamSize;
         if Assigned(FOnProgress) then
