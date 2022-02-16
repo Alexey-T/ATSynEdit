@@ -1468,6 +1468,7 @@ type
     property ClientHeight: integer read FClientH;
     //updates
     procedure Invalidate; override;
+    procedure InvalidateEx(AForceRepaint, AForceOnScroll: boolean);
     procedure Update(AUpdateWrapInfo: boolean=false); reintroduce;
     procedure UpdateWrapInfo(AForceUpdate: boolean=false);
     procedure UpdateFoldedFromLinesHidden;
@@ -5835,7 +5836,7 @@ end;
 procedure TATSynEdit.WMVScroll(var Msg: TLMVScroll);
 begin
   UpdateScrollInfoFromMessage(FScrollVert, Msg);
-  Invalidate;
+  InvalidateEx(true, true);
 end;
 
 {$ifdef windows}
@@ -5873,7 +5874,7 @@ end;
 procedure TATSynEdit.WMHScroll(var Msg: TLMHScroll);
 begin
   UpdateScrollInfoFromMessage(FScrollHorz, Msg);
-  Invalidate;
+  InvalidateEx(true, true);
 end;
 
 procedure TATSynEdit.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
@@ -6813,29 +6814,38 @@ begin
     }
 end;
 
+
 procedure TATSynEdit.Invalidate;
+begin
+  InvalidateEx(false, false);
+end;
+
+procedure TATSynEdit.InvalidateEx(AForceRepaint, AForceOnScroll: boolean);
 begin
   if not IsRepaintEnabled then exit;
   //if not IsInvalidateAllowed then exit;
 
-  if ATEditorOptions.FlickerReducingPause>=1000 then
+  if not AForceRepaint then
   begin
-    if Assigned(AdapterForHilite) then
-      if not AdapterForHilite.IsDataReadyPartially then exit;
-  end
-  else
-  if ATEditorOptions.FlickerReducingPause>0 then
-  begin
-    FTimerFlicker.Enabled:= false;
-    FTimerFlicker.Interval:= ATEditorOptions.FlickerReducingPause;
-    FTimerFlicker.Enabled:= FTimersEnabled;
-    exit;
+    if ATEditorOptions.FlickerReducingPause>=1000 then
+    begin
+      if Assigned(AdapterForHilite) then
+        if not AdapterForHilite.IsDataReadyPartially then exit;
+    end
+    else
+    if ATEditorOptions.FlickerReducingPause>0 then
+    begin
+      FTimerFlicker.Enabled:= false;
+      FTimerFlicker.Interval:= ATEditorOptions.FlickerReducingPause;
+      FTimerFlicker.Enabled:= FTimersEnabled;
+      exit;
+    end;
   end;
 
   Include(FPaintFlags, cIntFlagBitmap);
-  inherited;
+  inherited Invalidate;
 
-  if cIntFlagScrolled in FPaintFlags then
+  if AForceOnScroll or (cIntFlagScrolled in FPaintFlags) then
   begin
     Exclude(FPaintFlags, cIntFlagScrolled);
     DoEventScroll;
