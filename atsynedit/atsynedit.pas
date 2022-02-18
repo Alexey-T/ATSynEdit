@@ -8666,6 +8666,9 @@ begin
     exit;
   end;
 
+  if FRegexLinks=nil then exit;
+  if not FRegexLinks.IsCompiled then exit;
+
   St:= Strings;
   NLineStart:= LineTop;
   NLineEnd:= NLineStart+GetVisibleLines;
@@ -8746,7 +8749,8 @@ begin
   Result:= '';
   if not Strings.IsIndexValid(AY) then exit;
 
-  Assert(Assigned(FRegexLinks), 'FRegexLinks not inited');
+  if FRegexLinks=nil then exit;
+  if not FRegexLinks.IsCompiled then exit;
   FRegexLinks.InputString:= Strings.Lines[AY];
   MatchPos:= 0;
   MatchLen:= 0;
@@ -9546,16 +9550,10 @@ begin
     FRegexLinks.ModifierM:= false; //M not needed
     FRegexLinks.ModifierI:= false; //I not needed to find links
     S:= FOptShowURLsRegex;
-    if S='' then
-      S:= cSafeRegex;
     FRegexLinks.Expression:= S{%H-};
     FRegexLinks.Compile;
-
     Result:= true;
   except
-    FRegexLinks.Expression:= cSafeRegex{%H-};
-    FRegexLinks.Compile;
-    Result:= false;
   end;
 end;
 
