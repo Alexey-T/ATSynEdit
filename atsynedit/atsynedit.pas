@@ -9534,10 +9534,6 @@ begin
 end;
 
 function TATSynEdit.UpdateLinksRegexObject: boolean;
-const
-  cSafeRegex = '\bhttps?://\S+';
-var
-  S: string;
 begin
   Result:= false;
 
@@ -9549,8 +9545,7 @@ begin
     FRegexLinks.ModifierS:= false;
     FRegexLinks.ModifierM:= false; //M not needed
     FRegexLinks.ModifierI:= false; //I not needed to find links
-    S:= FOptShowURLsRegex;
-    FRegexLinks.Expression:= S{%H-};
+    FRegexLinks.Expression:= FOptShowURLsRegex{%H-};
     FRegexLinks.Compile;
     Result:= true;
   except
