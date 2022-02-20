@@ -1441,6 +1441,7 @@ type
     property MouseNiceScroll: boolean read GetMouseNiceScroll write SetMouseNiceScroll;
     property ShowOsBarVert: boolean read FShowOsBarVert write SetShowOsBarVert;
     property ShowOsBarHorz: boolean read FShowOsBarHorz write SetShowOsBarHorz;
+    procedure InvalidateEx(AForceRepaint, AForceOnScroll: boolean);
 
   public
     TagString: string; //to store plugin specific data in CudaText
@@ -1468,8 +1469,7 @@ type
     property ClientHeight: integer read FClientH;
     //updates
     procedure Invalidate; override;
-    procedure InvalidateEx(AForceRepaint, AForceOnScroll: boolean);
-    procedure Update(AUpdateWrapInfo: boolean=false); reintroduce;
+    procedure Update(AUpdateWrapInfo: boolean=false; AForceRepaint: boolean=false; AForceOnScroll: boolean=false); reintroduce;
     procedure UpdateWrapInfo(AForceUpdate: boolean=false);
     procedure UpdateFoldedFromLinesHidden;
     procedure UpdateScrollInfoFromSmoothPos(var AInfo: TATEditorScrollInfo; const APos: Int64);
@@ -5009,7 +5009,7 @@ begin
   inherited;
 end;
 
-procedure TATSynEdit.Update(AUpdateWrapInfo: boolean=false);
+procedure TATSynEdit.Update(AUpdateWrapInfo: boolean=false; AForceRepaint: boolean=false; AForceOnScroll: boolean=false);
 begin
   if not IsRepaintEnabled then exit;
 
@@ -5018,7 +5018,7 @@ begin
   if AUpdateWrapInfo then
     FWrapUpdateNeeded:= true;
 
-  Invalidate;
+  InvalidateEx(AForceRepaint, AForceOnScroll);
 end;
 
 procedure TATSynEdit.SetFocus;
