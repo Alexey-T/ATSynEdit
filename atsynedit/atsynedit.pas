@@ -6825,12 +6825,13 @@ begin
   if not IsRepaintEnabled then exit;
   //if not IsInvalidateAllowed then exit;
 
-  if not AForceRepaint then
+  if Assigned(AdapterForHilite) and
+    AdapterForHilite.ImplementsDataReady and
+    not AForceRepaint then
   begin
     if ATEditorOptions.FlickerReducingPause>=1000 then
     begin
-      if Assigned(AdapterForHilite) then
-        if not AdapterForHilite.IsDataReadyPartially then exit;
+      if not AdapterForHilite.IsDataReadyPartially then exit;
     end
     else
     if ATEditorOptions.FlickerReducingPause>0 then

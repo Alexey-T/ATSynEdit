@@ -21,6 +21,7 @@ type
     FDynamicHiliteEnabled: boolean;
     FDynamicHiliteMaxLines: integer;
     FDynamicHiliteSupportedInCurrentSyntax: boolean;
+    FImplementsDataReady: boolean;
   public
     constructor Create(AOwner: TComponent); override;
     //
@@ -67,6 +68,7 @@ type
     function GetLexerName: string; virtual;
     //return lexer name
 
+    property ImplementsDataReady: boolean read FImplementsDataReady write FImplementsDataReady;
     function IsDataReady: boolean; virtual;
     function IsDataReadyPartially: boolean; virtual;
     //return False to prevent Minimap repainting (avoid Minimap flicker during typing)
@@ -154,6 +156,7 @@ begin
   FDynamicHiliteEnabled:= true;
   FDynamicHiliteSupportedInCurrentSyntax:= true;
   FDynamicHiliteMaxLines:= 1000;
+  FImplementsDataReady:= false;
 end;
 
 procedure TATAdapterHilite.OnEditorChange(Sender: TObject);
