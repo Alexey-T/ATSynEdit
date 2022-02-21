@@ -737,7 +737,7 @@ begin
   begin
     UpdateScrollbars(true);
     if AllowUpdate then
-      Update;
+      Update(false, true{AForceRepaint});
   end;
 end;
 
@@ -785,7 +785,7 @@ begin
     UpdateScrollbars(true);
 
   if AAllowUpdate then
-    Update;
+    Update(false, true{AForceRepaint});
 end;
 
 procedure TATSynEdit.DoGotoCaret(AEdge: TATCaretEdge; AUndoRedo: boolean=false;
