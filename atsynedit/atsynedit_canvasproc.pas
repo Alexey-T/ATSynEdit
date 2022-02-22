@@ -608,7 +608,7 @@ procedure DoPaintUnprintedEndSymbol(C: TCanvas;
   AColorFont, AColorBg: TColor);
 const
   // https://www.fileformat.info/info/unicode/char/B6/index.htm
-  cPilcrowString: PChar = #$C2#$B6;
+  cPilcrowString: string = #182;
 begin
   case ATEditorOptions.UnprintedEndSymbol of
     aeueDot:
