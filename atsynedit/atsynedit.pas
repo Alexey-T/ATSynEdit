@@ -4475,7 +4475,8 @@ begin
   inherited;
 
   //GlobalCharSizer should be created after MainForm is inited
-  if not Assigned(GlobalCharSizer) then
+  if ATEditorOptions.MultipleCharSizerObjects
+    or (GlobalCharSizer=nil) then
     GlobalCharSizer:= TATCharSizer.Create(AOwner);
 
   Caption:= '';

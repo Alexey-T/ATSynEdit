@@ -38,6 +38,8 @@ type
     MaxStringsClients = 2;
 
   public
+    MultipleCharSizerObjects: boolean;
+
     //force UTF8 for huge files on loading
     MaxFileSizeMbToDetectEncoding: integer;
 
@@ -289,6 +291,8 @@ initialization
   FillChar(ATEditorOptions, SizeOf(ATEditorOptions), 0);
   with ATEditorOptions do
   begin
+    MultipleCharSizerObjects:= false;
+
     MaxFileSizeMbToDetectEncoding:= 50;
     MaxUpdatesCountEasy:= 200;
 
