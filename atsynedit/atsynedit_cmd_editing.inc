@@ -208,6 +208,9 @@ begin
   if Carets.IsSelection then
   begin
     Result:= DoCommand_TextDeleteSelection;
+    //deletion of block by BkSpace needs undo-group, CudaText issue #3971
+    St.BeginUndoGroup;
+    St.EndUndoGroup;
     Exit
   end;
 
@@ -278,7 +281,12 @@ begin
     end;
 
   if bColBlock or Carets.IsSelection then
-    Result:= DoCommand_TextDeleteSelection
+  begin
+    Result:= DoCommand_TextDeleteSelection;
+    //deletion of block needs undo-group, CudaText issue #3971
+    Strings.BeginUndoGroup;
+    Strings.EndUndoGroup;
+  end
   else
     Result:= DoCommand_TextDeleteRight(1);
 end;
@@ -360,7 +368,10 @@ begin
   if Carets.IsSelection then
   begin
     Result:= DoCommand_TextDeleteSelection;
-    exit
+    //deletion of block needs undo-group, CudaText issue #3971
+    St.BeginUndoGroup;
+    St.EndUndoGroup;
+    Exit;
   end;
 
   bNeedGroup:= Carets.Count>1;
