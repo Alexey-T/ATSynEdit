@@ -217,6 +217,7 @@ begin
   FixedSizes[$061C]:= uw_hexshow;
 
   FixedSizes[$85]:= uw_hexshow; //white space
+  FixedSizes[$AD]:= uw_hexshow; //not space but Sublime shows it by code
   FixedSizes[$3164]:= uw_hexshow; //for Unicode attack: https://www.opennet.ru/opennews/art.shtml?num=56131
   FixedSizes[$01C3]:= uw_hexshow; //for Unicode attack: https://www.opennet.ru/opennews/art.shtml?num=56131
   FixedSizes[$FEFF]:= uw_hexshow;
