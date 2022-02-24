@@ -279,8 +279,7 @@ begin
   ATextChanged:= true;
   Str:= Lines[AY];
 
-  //must not create undo-group for usual BkSpace pressing (ALen=1)
-  bNeedGroup:= ALen>1;
+  bNeedGroup:= true; //ALen>1; //must not create undo-group for usual BkSpace pressing (ALen=1)
   if bNeedGroup then
     BeginUndoGroup;
 
@@ -361,8 +360,7 @@ begin
   if (AY=Count-1) and (Str='') and (LinesEnds[AY]=cEndNone) then
     Exit;
 
-  //must not create undo-group for usual Delete pressing
-  bNeedGroup:= ALen>1;
+  bNeedGroup:= true; //ALen>1; //must not create undo-group for usual Delete pressing
   if bNeedGroup then
     BeginUndoGroup;
 
