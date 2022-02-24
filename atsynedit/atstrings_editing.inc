@@ -347,7 +347,7 @@ procedure TATStrings.TextDeleteRight(AX, AY: integer; ALen: integer; out AShift,
   APosAfter: TPoint; ACanDelEol: boolean = true);
 var
   Str: atString;
-  DelEol: boolean;
+  bDelEol: boolean;
   bNeedGroup: boolean;
 begin
   AShift.X:= 0;
@@ -367,8 +367,7 @@ begin
     BeginUndoGroup;
 
   try
-
-    DelEol:= false;
+    bDelEol:= false;
     if AX<Length(Str) then
     begin
       System.Delete(Str, AX+1, ALen);
@@ -376,9 +375,9 @@ begin
       AShift.X:= -ALen;
     end
     else
-      DelEol:= ACanDelEol;
+      bDelEol:= ACanDelEol;
 
-    if DelEol then
+    if bDelEol then
       if Str='' then //handle for simpler line-states
       begin
         AShift.Y:= -1;
