@@ -348,6 +348,7 @@ procedure TATStrings.TextDeleteRight(AX, AY: integer; ALen: integer; out AShift,
 var
   Str: atString;
   DelEol: boolean;
+  bNeedGroup: boolean;
 begin
   AShift.X:= 0;
   AShift.Y:= 0;
@@ -360,7 +361,11 @@ begin
   if (AY=Count-1) and (Str='') and (LinesEnds[AY]=cEndNone) then
     Exit;
 
-  BeginUndoGroup;
+  //must not create undo-group for usual Delete pressing
+  bNeedGroup:= ALen>1;
+  if bNeedGroup then
+    BeginUndoGroup;
+
   try
 
     DelEol:= false;
@@ -420,7 +425,8 @@ begin
       end;
 
   finally
-    EndUndoGroup;
+    if bNeedGroup then
+      EndUndoGroup;
   end;
 end;
 
