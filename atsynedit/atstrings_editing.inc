@@ -267,6 +267,7 @@ procedure TATStrings.TextDeleteLeft(AX, AY: integer; ALen: integer;
   out ATextChanged: boolean);
 var
   Str, StrPrev: atString;
+  bNeedGroup: boolean;
 begin
   AShift.X:= 0;
   AShift.Y:= 0;
@@ -278,7 +279,11 @@ begin
   ATextChanged:= true;
   Str:= Lines[AY];
 
-  BeginUndoGroup;
+  //must not create undo-group for usual BkSpace pressing (ALen=1)
+  bNeedGroup:= ALen>1;
+  if bNeedGroup then
+    BeginUndoGroup;
+
   try
 
     //handle spec case: caret on last fake line, BkSp pressed:
@@ -333,7 +338,8 @@ begin
       ATextChanged:= false;
 
   finally
-    EndUndoGroup;
+    if bNeedGroup then
+      EndUndoGroup;
   end;
 end;
 
