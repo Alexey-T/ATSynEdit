@@ -634,6 +634,10 @@ begin
   bChange:= false;
   St:= Strings;
 
+  //also make undo-group to fix CudaText issue #3971
+  St.BeginUndoGroup;
+  St.EndUndoGroup;
+
   bNeedGroup:= Carets.Count>1;
   if bNeedGroup then
     St.BeginUndoGroup;
@@ -701,6 +705,10 @@ begin
 
   if bNeedGroup then
     St.EndUndoGroup;
+
+  //also make undo-group to fix CudaText issue #3971
+  St.BeginUndoGroup;
+  St.EndUndoGroup;
 
   //cResultCaretLazy is to fix CudaText #3065
   if ANext then
