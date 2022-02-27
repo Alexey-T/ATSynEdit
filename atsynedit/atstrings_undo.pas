@@ -122,10 +122,10 @@ type
     property AsString: string read GetAsString write SetAsString;
     property NewCommandMark: boolean read FNewCommandMark write FNewCommandMark;
       //NewCommandMark is set from ATSynEdit.DoCommand() or CudaText API.
-      //When it's set to True, Undo-list increases GlobalCounter for the next added Undo item.
-      //All Undo items with the same GlobalCounter
-      //are performed by a single command or single CudaText API call.
-      //So they must be undone with a single undo-action.
+      //When it's set to True, Undo list increases GlobalCounter for the next added Undo item.
+      //All Undo items with the same GlobalCounter are performed by a single command or single CudaText API call.
+      //So they must be undone with a single undo action.
+      //Also, this allows Undo list to support MaxCount _complex actions_ in the list, intead of MaxCount simple items.
   end;
 
 
