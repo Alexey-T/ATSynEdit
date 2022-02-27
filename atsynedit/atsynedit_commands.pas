@@ -270,8 +270,15 @@ implementation
 function IsCommandToUndoInOneStep(AValue: integer): boolean;
 begin
   case AValue and not cCmdFlag_ResetSel of
+    //TextInsert + BackSpace/Delete are here to fix CudaText #3972
+    cCommand_TextInsert,
+    cCommand_KeyBackspace,
+    cCommand_KeyDelete,
+
+    //"move lines up/down" were first who needed undo in single step
     cCommand_MoveSelectionUp,
     cCommand_MoveSelectionDown,
+
     cCommand_ClipboardPaste_Begin..
     cCommand_ClipboardPaste_End:
       Result:= true;

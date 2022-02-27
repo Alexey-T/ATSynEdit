@@ -54,7 +54,10 @@ begin
 
   try
     //bNeedGroup:= (Carets.Count>1) or (Carets.IsSelection);
-    bNeedGroup:= false; //CudaText issue #3274
+    bNeedGroup:= true;
+      //True - for CudaText issue #3972; all TextInsert commands will undo in 1 step because of IsCommandToUndoInOneStep()
+      //False - for CudaText issue #3274; but now True works too
+
     bInsertLinePerCaret:= false;
 
     if bNeedGroup then
