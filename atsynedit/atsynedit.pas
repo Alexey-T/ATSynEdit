@@ -9871,7 +9871,6 @@ begin
 end;
 }
 
-
 {$I atsynedit_carets.inc}
 {$I atsynedit_hilite.inc}
 {$I atsynedit_sel.inc}

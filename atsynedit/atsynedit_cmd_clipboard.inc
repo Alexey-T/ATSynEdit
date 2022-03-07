@@ -141,6 +141,8 @@ function TATSynEdit.DoCommand_ClipboardCopy(Append: boolean;
   AClipboardObject: TClipboard): TATCommandResults;
 var
   SNewText: string;
+  X1, Y1, X2, Y2, NIndentSize: Longint;
+  bSel: boolean;
 begin
   SNewText:= GetTextForClipboard;
 
@@ -167,6 +169,20 @@ begin
   if AClipboardObject=Clipboard then
     SClipboardCopy(AClipboardObject.AsText, PrimarySelection);
   {$endif}
+
+  if (Carets.Count=1) then
+  begin
+    Carets[0].GetRange(X1, Y1, X2, Y2, bSel);
+    if bSel and Strings.IsIndexValid(Y1) then
+    begin
+      NIndentSize:= SGetIndentChars(Strings.Lines[Y1]);
+      if NIndentSize>0 then
+        AClipboardObject.AddFormat(
+          ATEditorOptions.ClipboardIndentFormat,
+          NIndentSize,
+          SizeOf(NIndentSize));
+    end;
+  end;
 
   Result:= [];
 end;

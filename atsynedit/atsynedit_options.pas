@@ -10,7 +10,7 @@ unit ATSynEdit_Options;
 interface
 
 uses
-  SysUtils,
+  SysUtils, Classes,
   LCLType, LCLIntf,
   Graphics, Controls, Forms, Clipbrd;
 
@@ -28,6 +28,7 @@ type
   TATEditorOptions = record
   private
     FClipboardColumnFormat: TClipboardFormat;
+    FClipboardIndentFormat: TClipboardFormat;
   public const
     ProgressLoadChars = 1024*1024;
     ProgressSaveLines = 128*1024;
@@ -131,7 +132,7 @@ type
 
     ClipboardColumnSignature: integer;
     function ClipboardColumnFormat: TClipboardFormat;
-
+    function ClipboardIndentFormat: TClipboardFormat;
   end;
 
 type
@@ -168,6 +169,8 @@ var
 function ATEditorScale(AValue: integer): integer;
 function ATEditorScaleFont(AValue: integer): integer;
 
+function ATEditorClipboardIndent: LongInt;
+
 const
   crNiceScrollNone  = TCursor(-40);
   crNiceScrollUp    = TCursor(-41);
@@ -184,6 +187,13 @@ begin
   if FClipboardColumnFormat=0 then
     FClipboardColumnFormat:= RegisterClipboardFormat('Application/X-ATSynEdit-Block');
   Result:= FClipboardColumnFormat;
+end;
+
+function TATEditorOptions.ClipboardIndentFormat: TClipboardFormat;
+begin
+  if FClipboardIndentFormat=0 then
+    FClipboardIndentFormat:= RegisterClipboardFormat('Application/X-ATSynEdit-Indent');
+  Result:= FClipboardIndentFormat;
 end;
 
 { TATEditorBitmaps }
@@ -281,6 +291,25 @@ begin
     Result:= ATEditorScale(AValue)
   else
     Result:= AValue * ATEditorScaleFontPercents div 100;
+end;
+
+function ATEditorClipboardIndent: LongInt;
+var
+  Str: TMemoryStream;
+begin
+  Result:= 0;
+  if Clipboard.HasFormat(ATEditorOptions.ClipboardIndentFormat) then
+  begin
+    Str:= TMemoryStream.Create;
+    try
+      Clipboard.GetFormat(ATEditorOptions.ClipboardIndentFormat, Str);
+      Str.Position:= 0;
+      if Str.Size>=SizeOf(Result) then
+        Str.Read(Result, SizeOf(Result));
+    finally
+      FreeAndNil(Str);
+    end;
+  end;
 end;
 
 
