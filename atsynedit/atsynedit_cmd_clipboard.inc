@@ -118,9 +118,10 @@ end;
 function TATSynEdit.DoCommand_ClipboardPasteAndIndent: TATCommandResults;
 //Must mimic Sublime Text's command "Paste and Indent", if I (Alexey) understood its logic
 var
+  ClipExData: TATEditorClipboardExData;
   Caret: TATCaretItem;
   Lines: TStringList;
-  NIndentFirstChars, NIndentFirstColumns, NIndent: integer;
+  NIndent: integer;
   SNewText, SLineAll, SLineIndent, SLineText: string;
   X1, Y1, X2, Y2, XColumn, i: integer;
   bSel: boolean;
@@ -129,7 +130,7 @@ begin
   if ModeReadOnly then Exit;
   if Carets.Count<>1 then Exit;
 
-  ATEditorGetClipboardIndent(NIndentFirstChars, NIndentFirstColumns);
+  ATEditorGetClipboardExData(ClipExData);
 
   Caret:= Carets[0];
   Caret.GetRange(X1, Y1, X2, Y2, bSel);
@@ -156,7 +157,7 @@ begin
       SLineText:= Copy(SLineAll, NIndent+1, MaxInt);
       //support indent with tab-chars
       NIndent:= TabHelper.CharPosToColumnPos(Y1, SLineAll, NIndent);
-      SLineIndent:= StringOfChar(' ', Max(0, XColumn+NIndent-NIndentFirstColumns));
+      SLineIndent:= StringOfChar(' ', Max(0, XColumn+NIndent-ClipExData.FirstLineIndentColumns));
       if not FOptTabSpaces then
         SLineIndent:= StringReplace(SLineIndent, StringOfChar(' ', FTabSize), #9, [rfReplaceAll]);
       Lines[i]:= SLineIndent+SLineText;
@@ -198,7 +199,7 @@ end;
 function TATSynEdit.DoCommand_ClipboardCopy(Append: boolean;
   AClipboardObject: TClipboard): TATCommandResults;
 var
-  IndentData: TATEditorClipboardIndentData;
+  ClipExData: TATEditorClipboardExData;
   SLine: atString;
   SNewText: string;
   X1, Y1, X2, Y2: integer;
@@ -236,15 +237,13 @@ begin
     if bSel and Strings.IsIndexValid(Y1) then
     begin
       SLine:= Strings.Lines[Y1];
-      IndentData.NChars:= SGetIndentChars(SLine);
-      if IndentData.NChars>0 then
-      begin
-        IndentData.NColumns:= TabHelper.CharPosToColumnPos(Y1, SLine, IndentData.NChars);
-        AClipboardObject.AddFormat(
-          ATEditorOptions.ClipboardIndentFormat,
-          IndentData,
-          SizeOf(IndentData));
-      end;
+      ClipExData.FirstLineIndex:= Y1;
+      ClipExData.FirstLineIndentChars:= SGetIndentChars(SLine);
+      ClipExData.FirstLineIndentColumns:= TabHelper.CharPosToColumnPos(Y1, SLine, ClipExData.FirstLineIndentChars);
+      AClipboardObject.AddFormat(
+        ATEditorOptions.ClipboardExFormat,
+        ClipExData,
+        SizeOf(ClipExData));
     end;
   end;
 

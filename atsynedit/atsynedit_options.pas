@@ -132,7 +132,7 @@ type
 
     ClipboardColumnSignature: integer;
     function ClipboardColumnFormat: TClipboardFormat;
-    function ClipboardIndentFormat: TClipboardFormat;
+    function ClipboardExFormat: TClipboardFormat;
   end;
 
 type
@@ -169,8 +169,6 @@ var
 function ATEditorScale(AValue: integer): integer;
 function ATEditorScaleFont(AValue: integer): integer;
 
-procedure ATEditorGetClipboardIndent(out AChars, AColumns: integer);
-
 const
   crNiceScrollNone  = TCursor(-40);
   crNiceScrollUp    = TCursor(-41);
@@ -179,9 +177,14 @@ const
   crNiceScrollRight = TCursor(-44);
 
 type
-  TATEditorClipboardIndentData = record
-    NChars, NColumns: Longint;
+  TATEditorClipboardExData = record
+    FirstLineIndentChars,
+    FirstLineIndentColumns: integer;
+    FirstLineIndex: integer;
   end;
+
+procedure ATEditorGetClipboardExData(out AInfo: TATEditorClipboardExData);
+
 
 implementation
 
@@ -194,7 +197,7 @@ begin
   Result:= FClipboardColumnFormat;
 end;
 
-function TATEditorOptions.ClipboardIndentFormat: TClipboardFormat;
+function TATEditorOptions.ClipboardExFormat: TClipboardFormat;
 begin
   if FClipboardIndentFormat=0 then
     FClipboardIndentFormat:= RegisterClipboardFormat('Application/X-ATSynEdit-Indent');
@@ -298,25 +301,19 @@ begin
     Result:= AValue * ATEditorScaleFontPercents div 100;
 end;
 
-procedure ATEditorGetClipboardIndent(out AChars, AColumns: integer);
+procedure ATEditorGetClipboardExData(out AInfo: TATEditorClipboardExData);
 var
-  IndentData: TATEditorClipboardIndentData;
   Str: TMemoryStream;
 begin
-  AChars:= 0;
-  AColumns:= 0;
-  if Clipboard.HasFormat(ATEditorOptions.ClipboardIndentFormat) then
+  AInfo:= Default(TATEditorClipboardExData);
+  if Clipboard.HasFormat(ATEditorOptions.ClipboardExFormat) then
   begin
     Str:= TMemoryStream.Create;
     try
-      Clipboard.GetFormat(ATEditorOptions.ClipboardIndentFormat, Str);
+      Clipboard.GetFormat(ATEditorOptions.ClipboardExFormat, Str);
       Str.Position:= 0;
-      if Str.Size>=SizeOf(IndentData) then
-      begin
-        Str.Read(IndentData, SizeOf(IndentData));
-        AChars:= IndentData.NChars;
-        AColumns:= IndentData.NColumns;
-      end;
+      if Str.Size>=SizeOf(AInfo) then
+        Str.Read(AInfo, SizeOf(AInfo));
     finally
       FreeAndNil(Str);
     end;
