@@ -204,7 +204,7 @@ end;
 function TATEditorOptions.ClipboardExFormat: TClipboardFormat;
 begin
   if FClipboardIndentFormat=0 then
-    FClipboardIndentFormat:= RegisterClipboardFormat('Application/X-ATSynEdit-Indent');
+    FClipboardIndentFormat:= RegisterClipboardFormat('Application/X-ATSynEdit-Ex');
   Result:= FClipboardIndentFormat;
 end;
 
