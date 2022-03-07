@@ -241,6 +241,9 @@ begin
       ClipExData.FirstLineIndex:= Y1;
       ClipExData.FirstLineIndentChars:= SGetIndentChars(SLine);
       ClipExData.FirstLineIndentColumns:= TabHelper.CharPosToColumnPos(Y1, SLine, ClipExData.FirstLineIndentChars);
+      ClipExData.FileName:= Self.FileName;
+      ClipExData.ModifiedVersion:= Strings.ModifiedVersion;
+      ClipExData.TickOnCopy:= GetTickCount64;
       AClipboardObject.AddFormat(
         ATEditorOptions.ClipboardExFormat,
         ClipExData,

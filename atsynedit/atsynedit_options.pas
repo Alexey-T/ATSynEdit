@@ -181,6 +181,9 @@ type
     FirstLineIndentChars,
     FirstLineIndentColumns: integer;
     FirstLineIndex: integer;
+    FileName: ShortString; //AnsiString is harder to read from OS
+    ModifiedVersion: QWord;
+    TickOnCopy: QWord;
   end;
 
 procedure ATEditorGetClipboardExData(out AInfo: TATEditorClipboardExData);
