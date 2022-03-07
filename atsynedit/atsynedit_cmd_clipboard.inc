@@ -231,12 +231,13 @@ begin
     SClipboardCopy(AClipboardObject.AsText, PrimarySelection);
   {$endif}
 
-  if (Carets.Count=1) then
+  if Carets.Count>0 then
   begin
     Carets[0].GetRange(X1, Y1, X2, Y2, bSel);
-    if bSel and Strings.IsIndexValid(Y1) then
+    if Strings.IsIndexValid(Y1) then
     begin
       SLine:= Strings.Lines[Y1];
+      ClipExData:= Default(TATEditorClipboardExData);
       ClipExData.FirstLineIndex:= Y1;
       ClipExData.FirstLineIndentChars:= SGetIndentChars(SLine);
       ClipExData.FirstLineIndentColumns:= TabHelper.CharPosToColumnPos(Y1, SLine, ClipExData.FirstLineIndentChars);
