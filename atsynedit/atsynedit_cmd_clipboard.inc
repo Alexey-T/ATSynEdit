@@ -1,7 +1,8 @@
 {$ifdef nn}begin end;{$endif}
 
 function TATSynEdit.DoCommand_ClipboardPaste(AKeepCaret, ASelectThen: boolean;
-  AClipboardObject: TClipboard): TATCommandResults;
+  AClipboardHasColumnBlock: boolean; const AClipboardText: string
+  ): TATCommandResults;
 var
   St: TATStrings;
   Str: atString;
@@ -21,15 +22,15 @@ begin
   end;
 
   //column block
-  if AClipboardObject.HasFormat(ATEditorOptions.ClipboardColumnFormat) then
+  if AClipboardHasColumnBlock then
   begin
     if ModeOneLine then Exit;
-    Result:= DoCommand_ClipboardPasteColumnBlock(AKeepCaret, AClipboardObject);
+    Result:= DoCommand_ClipboardPasteColumnBlock(AKeepCaret, AClipboardText);
     Exit
   end;
 
   //usual text
-  Str:= UTF8Decode(AClipboardObject.AsText);
+  Str:= UTF8Decode(AClipboardText);
   bAtLineStart:= FOptPasteWithEolAtLineStart and not Carets.IsSelection and SEndsWithEol(Str);
   if ModeOneLine then
   begin
@@ -94,23 +95,20 @@ end;
 
 
 function TATSynEdit.DoCommand_ClipboardPasteColumnBlock(AKeepCaret: boolean;
-  AClipboardObject: TClipboard): TATCommandResults;
+  const AClipboardText: string): TATCommandResults;
 var
-  Str: string;
   Num64: Int64;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
 
-  Str:= AClipboardObject.AsText;
-
   if FOptInputNumberOnly then
-    if not TryStrToInt64(Str, Num64) then exit;
+    if not TryStrToInt64(AClipboardText, Num64) then exit;
 
   Strings.BeginUndoGroup;
   try
     DoCommand_TextDeleteSelection;
-    Result:= DoCommand_TextInsertColumnBlockOnce(Str, AKeepCaret);
+    Result:= DoCommand_TextInsertColumnBlockOnce(AClipboardText, AKeepCaret);
   finally
     Strings.EndUndoGroup;
   end;

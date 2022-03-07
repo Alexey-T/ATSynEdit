@@ -589,20 +589,38 @@ begin
     cCommand_ClipboardCut:             Result:= DoCommand_ClipboardCut(Clipboard);
 
     //use Clipboard:TClipboard
-    cCommand_ClipboardPaste:                 Result:= DoCommand_ClipboardPaste(false, false, Clipboard);
-    cCommand_ClipboardPaste_Select:          Result:= DoCommand_ClipboardPaste(false, true, Clipboard);
-    cCommand_ClipboardPaste_KeepCaret:       Result:= DoCommand_ClipboardPaste(true, false, Clipboard);
-    cCommand_ClipboardPaste_Column:          Result:= DoCommand_ClipboardPasteColumnBlock(false, Clipboard);
-    cCommand_ClipboardPaste_ColumnKeepCaret: Result:= DoCommand_ClipboardPasteColumnBlock(true, Clipboard);
+    cCommand_ClipboardPaste:                 Result:= DoCommand_ClipboardPaste(false, false,
+                                                        Clipboard.HasFormat(ATEditorOptions.ClipboardColumnFormat),
+                                                        Clipboard.AsText);
+    cCommand_ClipboardPaste_Select:          Result:= DoCommand_ClipboardPaste(false, true,
+                                                        Clipboard.HasFormat(ATEditorOptions.ClipboardColumnFormat),
+                                                        Clipboard.AsText);
+    cCommand_ClipboardPaste_KeepCaret:       Result:= DoCommand_ClipboardPaste(true, false,
+                                                        Clipboard.HasFormat(ATEditorOptions.ClipboardColumnFormat),
+                                                        Clipboard.AsText);
+    cCommand_ClipboardPaste_Column:          Result:= DoCommand_ClipboardPasteColumnBlock(false,
+                                                        Clipboard.AsText);
+    cCommand_ClipboardPaste_ColumnKeepCaret: Result:= DoCommand_ClipboardPasteColumnBlock(true,
+                                                        Clipboard.AsText);
 
     //use PrimarySelection:TClipboard
-    cCommand_ClipboardAltPaste:                 Result:= DoCommand_ClipboardPaste(false, false, PrimarySelection);
-    cCommand_ClipboardAltPaste_Select:          Result:= DoCommand_ClipboardPaste(false, true, PrimarySelection);
-    cCommand_ClipboardAltPaste_KeepCaret:       Result:= DoCommand_ClipboardPaste(true, false, PrimarySelection);
-    cCommand_ClipboardAltPaste_Column:          Result:= DoCommand_ClipboardPasteColumnBlock(false, PrimarySelection);
-    cCommand_ClipboardAltPaste_ColumnKeepCaret: Result:= DoCommand_ClipboardPasteColumnBlock(true, PrimarySelection);
+    cCommand_ClipboardAltPaste:                 Result:= DoCommand_ClipboardPaste(false, false,
+                                                           PrimarySelection.HasFormat(ATEditorOptions.ClipboardColumnFormat),
+                                                           PrimarySelection.AsText);
+    cCommand_ClipboardAltPaste_Select:          Result:= DoCommand_ClipboardPaste(false, true,
+                                                           PrimarySelection.HasFormat(ATEditorOptions.ClipboardColumnFormat),
+                                                           PrimarySelection.AsText);
+    cCommand_ClipboardAltPaste_KeepCaret:       Result:= DoCommand_ClipboardPaste(true, false,
+                                                           PrimarySelection.HasFormat(ATEditorOptions.ClipboardColumnFormat),
+                                                           PrimarySelection.AsText);
+    cCommand_ClipboardAltPaste_Column:          Result:= DoCommand_ClipboardPasteColumnBlock(false,
+                                                           PrimarySelection.AsText);
+    cCommand_ClipboardAltPaste_ColumnKeepCaret: Result:= DoCommand_ClipboardPasteColumnBlock(true,
+                                                           PrimarySelection.AsText);
     //use SecondarySelection:TClipboard
-    cCommand_ClipboardAltAltPaste:              Result:= DoCommand_ClipboardPaste(false, false, SecondarySelection);
+    cCommand_ClipboardAltAltPaste:              Result:= DoCommand_ClipboardPaste(false, false,
+                                                           SecondarySelection.HasFormat(ATEditorOptions.ClipboardColumnFormat),
+                                                           SecondarySelection.AsText);
 
     cCommand_MoveSelectionUp:          Result:= DoCommand_MoveSelectionUpDown(false);
     cCommand_MoveSelectiondown:        Result:= DoCommand_MoveSelectionUpDown(true);

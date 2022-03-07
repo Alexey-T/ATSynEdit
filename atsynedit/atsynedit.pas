@@ -1416,9 +1416,9 @@ type
     function DoCommand_GotoTextBegin: TATCommandResults;
     function DoCommand_GotoTextEnd: TATCommandResults;
     function DoCommand_ClipboardPaste(AKeepCaret, ASelectThen: boolean;
-      AClipboardObject: TClipboard): TATCommandResults;
+      AClipboardHasColumnBlock: boolean; const AClipboardText: string): TATCommandResults;
     function DoCommand_ClipboardPasteColumnBlock(AKeepCaret: boolean;
-      AClipboardObject: TClipboard): TATCommandResults;
+      const AClipboardText: string): TATCommandResults;
     function DoCommand_ClipboardCopy(Append: boolean;
       AClipboardObject: TClipboard): TATCommandResults;
     function DoCommand_ClipboardCut(
