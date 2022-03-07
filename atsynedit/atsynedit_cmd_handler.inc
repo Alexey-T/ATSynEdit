@@ -603,6 +603,8 @@ begin
     cCommand_ClipboardPaste_ColumnKeepCaret: Result:= DoCommand_ClipboardPasteColumnBlock(true,
                                                         Clipboard.AsText);
 
+    cCommand_ClipboardPasteAndIndent:        Result:= DoCommand_ClipboardPasteAndIndent;
+
     //use PrimarySelection:TClipboard
     cCommand_ClipboardAltPaste:                 Result:= DoCommand_ClipboardPaste(false, false,
                                                            PrimarySelection.HasFormat(ATEditorOptions.ClipboardColumnFormat),

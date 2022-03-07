@@ -115,6 +115,55 @@ begin
 end;
 
 
+function TATSynEdit.DoCommand_ClipboardPasteAndIndent: TATCommandResults;
+var
+  Caret: TATCaretItem;
+  Lines: TStringList;
+  NIndentFirst, NIndent: integer;
+  SNewText: string;
+  X1, Y1, X2, Y2, i: integer;
+  bSel: boolean;
+begin
+  Result:= [];
+  if ModeReadOnly then Exit;
+  if Carets.Count<>1 then Exit;
+
+  NIndentFirst:= ATEditorClipboardIndent;
+
+  Caret:= Carets[0];
+  Caret.GetRange(X1, Y1, X2, Y2, bSel);
+
+  Lines:= TStringList.Create;
+  try
+    Lines.TextLineBreakStyle:= tlbsLF;
+    Lines.Text:= Clipboard.AsText;
+    if Lines.Count=0 then Exit;
+
+    //correct 1st line of block: delete all indent chars
+    NIndent:= SGetIndentChars(Lines[0]);
+    Lines[0]:= Copy(Lines[0], NIndent+1, MaxInt);
+
+    //correct other lines of block
+    for i:= 1 to Lines.Count-1 do
+    begin
+      NIndent:= SGetIndentChars(Lines[i]);
+      Lines[i]:= StringOfChar(' ', Max(0, X1+NIndent-NIndentFirst))+
+                 Copy(Lines[i], Max(1, NIndent+1), MaxInt);
+    end;
+
+    SNewText:= Lines.Text;
+  finally
+    FreeAndNil(Lines);
+  end;
+
+  Result:= DoCommand_ClipboardPaste(
+    false,
+    false,
+    false,
+    SNewText);
+end;
+
+
 function TATSynEdit.DoCommand_ClipboardCut(AClipboardObject: TClipboard): TATCommandResults;
 begin
   Result:= [];

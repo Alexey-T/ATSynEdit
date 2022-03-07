@@ -1,4 +1,7 @@
 
+2022.03.07
++ add: command "clipboard: paste and indent" (mimics Sublime Text)
+
 2022.01.31
 + add: Colors members: MacroRecordBorder, DragDropMarker, GitMarkerBG (before, all they used the Markers member)
 

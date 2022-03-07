@@ -183,6 +183,7 @@ function STrimAll(const S: UnicodeString): UnicodeString;
 function STrimLeft(const S: UnicodeString): UnicodeString;
 function STrimRight(const S: UnicodeString): UnicodeString;
 
+function SGetIndentChars(const S: string): integer;
 function SGetIndentChars(const S: atString): integer;
 function SGetIndentCharsToOpeningBracket(const S: atString): integer;
 function SGetTrailingSpaceChars(const S: atString): integer;
@@ -446,6 +447,13 @@ begin
     Result:= N
   else
     Result:= NAvg;
+end;
+
+function SGetIndentChars(const S: string): integer;
+begin
+  Result:= 0;
+  while (Result<Length(S)) and IsCharSpace(S[Result+1]) do
+    Inc(Result);
 end;
 
 function SGetIndentChars(const S: atString): integer;

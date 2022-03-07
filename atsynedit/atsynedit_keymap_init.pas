@@ -170,7 +170,8 @@ begin
   M.Add(cCommand_ClipboardPaste_Column, 'clipboard: paste, force column block', [], []);
   M.Add(cCommand_ClipboardPaste_ColumnKeepCaret, 'clipboard: paste, force column block, keep caret', [], []);
 
-  M.Add(cCommand_ClipboardAltPaste, 'primary selection (Linux): paste', [], []);
+  M.Add(cCommand_ClipboardPasteAndIndent, 'clipboard: paste and indent', [], []);
+  M.Add(cCommand_ClipboardAltPaste, 'clipboard: paste from primary selection (Unix)', [], []);
 
   M.Add(cCommand_ScrollToBegin, 'scroll to document begin', [], []);
   M.Add(cCommand_ScrollToEnd, 'scroll to document end', [], []);
