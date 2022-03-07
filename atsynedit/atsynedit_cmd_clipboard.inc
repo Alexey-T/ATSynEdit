@@ -155,7 +155,7 @@ begin
       NIndent:= SGetIndentChars(SLineAll);
       SLineText:= Copy(SLineAll, NIndent+1, MaxInt);
       //support indent with tab-chars
-      NIndent:= TabHelper.CharPosToColumnPos(Y1+i, SLineAll, NIndent); //range check--TODO
+      NIndent:= TabHelper.CharPosToColumnPos(Y1, SLineAll, NIndent);
       SLineIndent:= StringOfChar(' ', Max(0, XColumn+NIndent-NIndentFirst));
       if not FOptTabSpaces then
         SLineIndent:= StringReplace(SLineIndent, StringOfChar(' ', FTabSize), #9, [rfReplaceAll]);
