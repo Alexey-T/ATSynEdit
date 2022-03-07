@@ -116,6 +116,7 @@ end;
 
 
 function TATSynEdit.DoCommand_ClipboardPasteAndIndent: TATCommandResults;
+//Must mimic Sublime Text's command "Paste and Indent", if I (Alexey) understood its logic
 var
   Caret: TATCaretItem;
   Lines: TStringList;
@@ -148,7 +149,7 @@ begin
     begin
       NIndent:= SGetIndentChars(Lines[i]);
       Lines[i]:= StringOfChar(' ', Max(0, X1+NIndent-NIndentFirst))+
-                 Copy(Lines[i], Max(1, NIndent+1), MaxInt);
+                 Copy(Lines[i], NIndent+1, MaxInt);
     end;
 
     SNewText:= Lines.Text;
