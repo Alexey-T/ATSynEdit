@@ -169,7 +169,7 @@ var
 function ATEditorScale(AValue: integer): integer;
 function ATEditorScaleFont(AValue: integer): integer;
 
-function ATEditorClipboardIndent: LongInt;
+procedure ATEditorGetClipboardIndent(out AChars, AColumns: integer);
 
 const
   crNiceScrollNone  = TCursor(-40);
@@ -177,6 +177,11 @@ const
   crNiceScrollDown  = TCursor(-42);
   crNiceScrollLeft  = TCursor(-43);
   crNiceScrollRight = TCursor(-44);
+
+type
+  TATEditorClipboardIndentData = record
+    NChars, NColumns: Longint;
+  end;
 
 implementation
 
@@ -293,19 +298,25 @@ begin
     Result:= AValue * ATEditorScaleFontPercents div 100;
 end;
 
-function ATEditorClipboardIndent: LongInt;
+procedure ATEditorGetClipboardIndent(out AChars, AColumns: integer);
 var
+  IndentData: TATEditorClipboardIndentData;
   Str: TMemoryStream;
 begin
-  Result:= 0;
+  AChars:= 0;
+  AColumns:= 0;
   if Clipboard.HasFormat(ATEditorOptions.ClipboardIndentFormat) then
   begin
     Str:= TMemoryStream.Create;
     try
       Clipboard.GetFormat(ATEditorOptions.ClipboardIndentFormat, Str);
       Str.Position:= 0;
-      if Str.Size>=SizeOf(Result) then
-        Str.Read(Result, SizeOf(Result));
+      if Str.Size>=SizeOf(IndentData) then
+      begin
+        Str.Read(IndentData, SizeOf(IndentData));
+        AChars:= IndentData.NChars;
+        AColumns:= IndentData.NColumns;
+      end;
     finally
       FreeAndNil(Str);
     end;

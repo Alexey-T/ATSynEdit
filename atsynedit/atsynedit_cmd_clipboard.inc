@@ -120,7 +120,7 @@ function TATSynEdit.DoCommand_ClipboardPasteAndIndent: TATCommandResults;
 var
   Caret: TATCaretItem;
   Lines: TStringList;
-  NIndentFirst, NIndent: integer;
+  NIndentFirstChars, NIndentFirstColumns, NIndent: integer;
   SNewText, SLineAll, SLineIndent, SLineText: string;
   X1, Y1, X2, Y2, XColumn, i: integer;
   bSel: boolean;
@@ -129,7 +129,7 @@ begin
   if ModeReadOnly then Exit;
   if Carets.Count<>1 then Exit;
 
-  NIndentFirst:= ATEditorClipboardIndent;
+  ATEditorGetClipboardIndent(NIndentFirstChars, NIndentFirstColumns);
 
   Caret:= Carets[0];
   Caret.GetRange(X1, Y1, X2, Y2, bSel);
@@ -156,7 +156,7 @@ begin
       SLineText:= Copy(SLineAll, NIndent+1, MaxInt);
       //support indent with tab-chars
       NIndent:= TabHelper.CharPosToColumnPos(Y1, SLineAll, NIndent);
-      SLineIndent:= StringOfChar(' ', Max(0, XColumn+NIndent-NIndentFirst));
+      SLineIndent:= StringOfChar(' ', Max(0, XColumn+NIndent-NIndentFirstColumns));
       if not FOptTabSpaces then
         SLineIndent:= StringReplace(SLineIndent, StringOfChar(' ', FTabSize), #9, [rfReplaceAll]);
       Lines[i]:= SLineIndent+SLineText;
@@ -198,8 +198,10 @@ end;
 function TATSynEdit.DoCommand_ClipboardCopy(Append: boolean;
   AClipboardObject: TClipboard): TATCommandResults;
 var
+  IndentData: TATEditorClipboardIndentData;
+  SLine: atString;
   SNewText: string;
-  X1, Y1, X2, Y2, NIndentSize: Longint;
+  X1, Y1, X2, Y2: integer;
   bSel: boolean;
 begin
   SNewText:= GetTextForClipboard;
@@ -233,12 +235,16 @@ begin
     Carets[0].GetRange(X1, Y1, X2, Y2, bSel);
     if bSel and Strings.IsIndexValid(Y1) then
     begin
-      NIndentSize:= SGetIndentChars(Strings.Lines[Y1]);
-      if NIndentSize>0 then
+      SLine:= Strings.Lines[Y1];
+      IndentData.NChars:= SGetIndentChars(SLine);
+      if IndentData.NChars>0 then
+      begin
+        IndentData.NColumns:= TabHelper.CharPosToColumnPos(Y1, SLine, IndentData.NChars);
         AClipboardObject.AddFormat(
           ATEditorOptions.ClipboardIndentFormat,
-          NIndentSize,
-          SizeOf(NIndentSize));
+          IndentData,
+          SizeOf(IndentData));
+      end;
     end;
   end;
 
