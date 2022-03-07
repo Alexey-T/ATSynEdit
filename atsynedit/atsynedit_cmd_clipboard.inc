@@ -239,6 +239,7 @@ begin
       SLine:= Strings.Lines[Y1];
       ClipExData:= Default(TATEditorClipboardExData);
       ClipExData.CaretPos:= Rect(X1, Y1, X2, Y2);
+      ClipExData.CaretCount:= Carets.Count;
       ClipExData.FirstLineIndentChars:= SGetIndentChars(SLine);
       ClipExData.FirstLineIndentColumns:= TabHelper.CharPosToColumnPos(Y1, SLine, ClipExData.FirstLineIndentChars);
       ClipExData.FileName:= Self.FileName;

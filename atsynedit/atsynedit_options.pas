@@ -179,6 +179,7 @@ const
 type
   TATEditorClipboardExData = record
     CaretPos: TRect;
+    CaretCount: integer;
     FirstLineIndentChars,
     FirstLineIndentColumns: integer;
     FileName: ShortString; //AnsiString is harder to read from OS
