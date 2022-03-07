@@ -121,8 +121,8 @@ var
   Caret: TATCaretItem;
   Lines: TStringList;
   NIndentFirst, NIndent: integer;
-  SNewText: string;
-  X1, Y1, X2, Y2, i: integer;
+  SNewText, SLineAll, SLineIndent, SLineText: string;
+  X1, Y1, X2, Y2, XColumn, i: integer;
   bSel: boolean;
 begin
   Result:= [];
@@ -133,6 +133,10 @@ begin
 
   Caret:= Carets[0];
   Caret.GetRange(X1, Y1, X2, Y2, bSel);
+  if not Strings.IsIndexValid(Y1) then Exit;
+
+  //support indents with tab-chars
+  XColumn:= TabHelper.CharPosToColumnPos(Y1, Strings.Lines[Y1], X1);
 
   Lines:= TStringList.Create;
   try
@@ -147,9 +151,15 @@ begin
     //correct other lines of block
     for i:= 1 to Lines.Count-1 do
     begin
-      NIndent:= SGetIndentChars(Lines[i]);
-      Lines[i]:= StringOfChar(' ', Max(0, X1+NIndent-NIndentFirst))+
-                 Copy(Lines[i], NIndent+1, MaxInt);
+      SLineAll:= Lines[i];
+      NIndent:= SGetIndentChars(SLineAll);
+      SLineText:= Copy(SLineAll, NIndent+1, MaxInt);
+      //support indent with tab-chars
+      NIndent:= TabHelper.CharPosToColumnPos(Y1+i, SLineAll, NIndent); //range check--TODO
+      SLineIndent:= StringOfChar(' ', Max(0, XColumn+NIndent-NIndentFirst));
+      if not FOptTabSpaces then
+        SLineIndent:= StringReplace(SLineIndent, StringOfChar(' ', FTabSize), #9, [rfReplaceAll]);
+      Lines[i]:= SLineIndent+SLineText;
     end;
 
     SNewText:= Lines.Text;

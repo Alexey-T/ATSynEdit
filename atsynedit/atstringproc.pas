@@ -526,7 +526,7 @@ begin
   if Assigned(OnCalcTabSize) then
     Result:= OnCalcTabSize(SenderObj, ALineIndex, APos)
   else
-  if Assigned(OnCalcLineLen) and (OnCalcLineLen(ALineIndex)>ATEditorOptions.MaxLineLenForAccurateCharWidths) then
+  if Assigned(OnCalcLineLen) and (ALineIndex>=0) and (OnCalcLineLen(ALineIndex)>ATEditorOptions.MaxLineLenForAccurateCharWidths) then
     Result:= 1
   else
   if APos>ATEditorOptions.MaxTabPositionToExpand then
