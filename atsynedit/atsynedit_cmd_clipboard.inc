@@ -235,6 +235,8 @@ begin
     end;
     Pnt:= CaretPosToClientPos(Pnt);
     Inc(Pnt.Y, FCharSize.Y);
+    Pnt.X:= Min(Width, Max(0, Pnt.X));
+    Pnt.Y:= Min(Height, Max(0, Pnt.Y));
     Pnt:= ClientToScreen(Pnt);
 
     menu.PopUp(Pnt.X, Pnt.Y);
