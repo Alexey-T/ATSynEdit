@@ -179,9 +179,6 @@ end;
 procedure TATSynEdit.MenuitemClipboardRecentsClick(Sender: TObject);
 var
   NTag: integer;
-  Res: TATCommandResults;
-  X1, Y1, X2, Y2: integer;
-  bSel: boolean;
 begin
   if ModeReadOnly then Exit;
   if Carets.Count=0 then Exit;
@@ -189,19 +186,11 @@ begin
   NTag:= (Sender as TComponent).Tag;
   if (NTag>=0) and (NTag<ATEditorClipboardRecents.Count) then
   begin
-    Carets[0].GetRange(X1, Y1, X2, Y2, bSel);
-
-    Res:= DoCommand_ClipboardPaste(
-      false,
-      false,
-      false,
-      ATEditorClipboardRecents[NTag]
+    DoCommand(
+      cCommand_TextInsert,
+      cInvokeInternal,
+      UTF8Decode(ATEditorClipboardRecents[NTag])
       );
-    DoCommandResults(cCommand_ClipboardPaste, Res);
-    DoEventChange(Y1);
-    Update(true);    //TOFIX: syntax not hilited!
-
-    //TODO: add action to invoke cmd history?
   end;
 end;
 
