@@ -332,9 +332,9 @@ begin
   end
   else
   begin
-    while ATEditorClipboardRecents.Count>=ATEditorOptions.MaxClipboardRecents do
-      ATEditorClipboardRecents.Delete(ATEditorClipboardRecents.Count-1);
     ATEditorClipboardRecents.Insert(0, AText);
+    while ATEditorClipboardRecents.Count>ATEditorOptions.MaxClipboardRecents do
+      ATEditorClipboardRecents.Delete(ATEditorClipboardRecents.Count-1);
   end;
 end;
 
