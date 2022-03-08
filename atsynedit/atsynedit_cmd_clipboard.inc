@@ -235,6 +235,7 @@ begin
     end;
     Pnt:= CaretPosToClientPos(Pnt);
     Inc(Pnt.Y, FCharSize.Y);
+    //caret can be scrolled away
     Pnt.X:= Min(Width, Max(0, Pnt.X));
     Pnt.Y:= Min(Height, Max(0, Pnt.Y));
     Pnt:= ClientToScreen(Pnt);
