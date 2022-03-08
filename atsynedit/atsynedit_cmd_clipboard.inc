@@ -229,6 +229,12 @@ begin
   end;
 end;
 
+function TATSynEdit.DoCommand_ClipboardClearRecents: TATCommandResults;
+begin
+  Result:= [];
+  if Assigned(ATEditorClipboardRecents) then
+    ATEditorClipboardRecents.Clear;
+end;
 
 function TATSynEdit.DoCommand_ClipboardCut(AClipboardObject: TClipboard): TATCommandResults;
 begin

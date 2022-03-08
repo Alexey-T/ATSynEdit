@@ -198,14 +198,11 @@ const
   cCommand_ClipboardAltPaste_KeepCaret = 1012;
   cCommand_ClipboardAltPaste_Column = 1013 or cCmdFlag_ResetSel;
   cCommand_ClipboardAltPaste_ColumnKeepCaret = 1014 or cCmdFlag_ResetSel;
-  //use SecondarySelection (has meaning in Linux)
-  cCommand_ClipboardAltAltPaste = 1015;
-  //others
+  cCommand_ClipboardAltAltPaste = 1015; //use SecondarySelection (has meaning in Linux)
   cCommand_ClipboardPasteFromRecents = 1016;
-
-  //last Paste command
-  cCommand_ClipboardPaste_End = 1016;
-  cCommand_Clipboard_End = 1016;
+  cCommand_ClipboardPaste_End = 1016; //last Paste command
+  cCommand_ClipboardClearRecents = 1017;
+  cCommand_Clipboard_End = 1017;
 
   cCommand_TextCaseLower = 1020;
   cCommand_TextCaseUpper = 1021;

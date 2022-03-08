@@ -1423,6 +1423,7 @@ type
       const AClipboardText: string): TATCommandResults;
     function DoCommand_ClipboardPasteAndIndent: TATCommandResults;
     function DoCommand_ClipboardPasteFromRecents: TATCommandResults;
+    function DoCommand_ClipboardClearRecents: TATCommandResults;
     function DoCommand_ClipboardCopy(Append: boolean;
       AClipboardObject: TClipboard): TATCommandResults;
     function DoCommand_ClipboardCut(

@@ -172,6 +172,7 @@ begin
 
   M.Add(cCommand_ClipboardPasteAndIndent, 'clipboard: paste and indent', [], []);
   M.Add(cCommand_ClipboardPasteFromRecents, 'clipboard: paste from history', [], []);
+  M.Add(cCommand_ClipboardClearRecents, 'clipboard: clear history', [], []);
   M.Add(cCommand_ClipboardAltPaste, 'clipboard: paste from primary selection (Unix)', [], []);
 
   M.Add(cCommand_ScrollToBegin, 'scroll to document begin', [], []);
