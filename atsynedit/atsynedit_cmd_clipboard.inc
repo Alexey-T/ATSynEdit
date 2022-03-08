@@ -199,11 +199,13 @@ function TATSynEdit.DoCommand_ClipboardPasteFromRecents: TATCommandResults;
 var
   menu: TPopupMenu;
   mi: TMenuItem;
+  Pnt: TPoint;
   S: string;
   i: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
+  if Carets.Count=0 then Exit;
 
   if ATEditorClipboardRecents=nil then Exit;
   if ATEditorOptions.MaxClipboardRecents<=0 then Exit;
@@ -223,7 +225,19 @@ begin
       menu.Items.Add(mi);
     end;
 
-    menu.PopUp;
+    //show popup at the caret position, like Sublime
+    with Carets[0] do
+      Pnt:= Point(PosX, PosY);
+    if not Strings.IsIndexValid(Pnt.Y) then
+    begin
+      Pnt.X:= 0;
+      Pnt.Y:= Strings.Count-1;
+    end;
+    Pnt:= CaretPosToClientPos(Pnt);
+    Inc(Pnt.Y, FCharSize.Y);
+    Pnt:= ClientToScreen(Pnt);
+
+    menu.PopUp(Pnt.X, Pnt.Y);
   finally
     FreeAndNil(menu);
   end;
