@@ -47,6 +47,7 @@ type
     MaxUpdatesCountEasy: integer;
 
     MaxClipboardRecents: integer;
+    MaxClipboardRecentsMenuitemLen: integer;
 
     DetectUtf8BufferKb: integer;
     DetectUf16BufferWords: integer;
@@ -339,6 +340,7 @@ initialization
     MaxUpdatesCountEasy:= 200;
 
     MaxClipboardRecents:= 0; //0 to disable
+    MaxClipboardRecentsMenuitemLen:= 60;
 
     DetectUtf8BufferKb:= 8;
     DetectUf16BufferWords:= 5;

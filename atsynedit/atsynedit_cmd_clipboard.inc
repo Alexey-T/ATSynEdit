@@ -196,8 +196,6 @@ end;
 
 
 function TATSynEdit.DoCommand_ClipboardPasteFromRecents: TATCommandResults;
-const
-  cMaxMenuitemLen = 50;
 var
   menu: TPopupMenu;
   mi: TMenuItem;
@@ -215,8 +213,10 @@ begin
     for i:= 0 to ATEditorClipboardRecents.Count-1 do
     begin
       mi:= TMenuItem.Create(menu);
-      S:= Copy(ATEditorClipboardRecents[i], 1, cMaxMenuitemLen);
+      S:= ATEditorClipboardRecents[i];
       SDeleteFrom(S, #10);
+      if Length(S)>ATEditorOptions.MaxClipboardRecentsMenuitemLen then
+        S:= Copy(S, 1, ATEditorOptions.MaxClipboardRecentsMenuitemLen)+'...';
       mi.Caption:= S;
       mi.Tag:= i;
       mi.OnClick:= @MenuitemClipboardRecentsClick;
