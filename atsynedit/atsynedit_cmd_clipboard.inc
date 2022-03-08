@@ -293,7 +293,7 @@ begin
   {$ifndef windows}
   //for Linux gtk2, not sure about Mac
   if AClipboardObject=Clipboard then
-    SClipboardCopy(AClipboardObject.AsText, PrimarySelection);
+    SClipboardCopy(SNewText, PrimarySelection);
   {$endif}
 
   if Carets.Count>0 then
