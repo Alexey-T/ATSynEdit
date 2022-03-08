@@ -1020,8 +1020,10 @@ type
     function IsCaretOnVisibleRect: boolean;
     function IsInvalidateAllowed: boolean; inline;
     function IsNormalLexerActive: boolean;
+    procedure MenuitemClipboardRecentsClick(Sender: TObject);
     procedure SetEditorIndex(AValue: integer);
     procedure SetOptScaleFont(AValue: integer);
+    procedure UpdateClipboardRecents(const AText: string);
     procedure UpdateGapForms(ABeforePaint: boolean);
     procedure UpdateAndWait(AUpdateWrapInfo: boolean; APause: integer);
     procedure SetFoldingAsString(const AValue: string);
@@ -1420,6 +1422,7 @@ type
     function DoCommand_ClipboardPasteColumnBlock(AKeepCaret: boolean;
       const AClipboardText: string): TATCommandResults;
     function DoCommand_ClipboardPasteAndIndent: TATCommandResults;
+    function DoCommand_ClipboardPasteFromRecents: TATCommandResults;
     function DoCommand_ClipboardCopy(Append: boolean;
       AClipboardObject: TClipboard): TATCommandResults;
     function DoCommand_ClipboardCut(

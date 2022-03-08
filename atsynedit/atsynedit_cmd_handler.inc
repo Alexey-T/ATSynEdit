@@ -604,6 +604,7 @@ begin
                                                         Clipboard.AsText);
 
     cCommand_ClipboardPasteAndIndent:        Result:= DoCommand_ClipboardPasteAndIndent;
+    cCommand_ClipboardPasteFromRecents:      Result:= DoCommand_ClipboardPasteFromRecents;
 
     //use PrimarySelection:TClipboard
     cCommand_ClipboardAltPaste:                 Result:= DoCommand_ClipboardPaste(false, false,

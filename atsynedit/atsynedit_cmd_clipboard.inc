@@ -176,6 +176,71 @@ begin
 end;
 
 
+procedure TATSynEdit.MenuitemClipboardRecentsClick(Sender: TObject);
+var
+  NTag: integer;
+  Res: TATCommandResults;
+  X1, Y1, X2, Y2: integer;
+  bSel: boolean;
+begin
+  if ModeReadOnly then Exit;
+  if Carets.Count=0 then Exit;
+
+  NTag:= (Sender as TComponent).Tag;
+  if (NTag>=0) and (NTag<ATEditorClipboardRecents.Count) then
+  begin
+    Carets[0].GetRange(X1, Y1, X2, Y2, bSel);
+
+    Res:= DoCommand_ClipboardPaste(
+      false,
+      false,
+      false,
+      ATEditorClipboardRecents[NTag]
+      );
+    DoCommandResults(cCommand_ClipboardPaste, Res);
+    DoEventChange(Y1);
+    Update(true);    //TOFIX: syntax not hilited!
+
+    //TODO: add action to invoke cmd history?
+  end;
+end;
+
+
+function TATSynEdit.DoCommand_ClipboardPasteFromRecents: TATCommandResults;
+const
+  cMaxMenuitemLen = 50;
+var
+  menu: TPopupMenu;
+  mi: TMenuItem;
+  S: string;
+  i: integer;
+begin
+  Result:= [];
+  if ModeReadOnly then Exit;
+
+  if ATEditorClipboardRecents=nil then Exit;
+  if ATEditorOptions.MaxClipboardRecents<=0 then Exit;
+
+  menu:= TPopupMenu.Create(nil);
+  try
+    for i:= 0 to ATEditorClipboardRecents.Count-1 do
+    begin
+      mi:= TMenuItem.Create(menu);
+      S:= Copy(ATEditorClipboardRecents[i], 1, cMaxMenuitemLen);
+      SDeleteFrom(S, #10);
+      mi.Caption:= S;
+      mi.Tag:= i;
+      mi.OnClick:= @MenuitemClipboardRecentsClick;
+      menu.Items.Add(mi);
+    end;
+
+    menu.PopUp;
+  finally
+    FreeAndNil(menu);
+  end;
+end;
+
+
 function TATSynEdit.DoCommand_ClipboardCut(AClipboardObject: TClipboard): TATCommandResults;
 begin
   Result:= [];
@@ -252,7 +317,36 @@ begin
     end;
   end;
 
+  UpdateClipboardRecents(SNewText);
+
   Result:= [];
+end;
+
+
+procedure TATSynEdit.UpdateClipboardRecents(const AText: string);
+var
+  i: integer;
+begin
+  if ATEditorOptions.MaxClipboardRecents<=0 then Exit;
+
+  if ATEditorClipboardRecents=nil then
+    ATEditorClipboardRecents:= TStringList.Create;
+
+  i:= ATEditorClipboardRecents.IndexOf(AText);
+  if i=0 then
+  begin
+  end
+  else
+  if i>0 then
+  begin
+    ATEditorClipboardRecents.Move(i, 0);
+  end
+  else
+  begin
+    while ATEditorClipboardRecents.Count>=ATEditorOptions.MaxClipboardRecents do
+      ATEditorClipboardRecents.Delete(ATEditorClipboardRecents.Count-1);
+    ATEditorClipboardRecents.Insert(0, AText);
+  end;
 end;
 
 

@@ -46,6 +46,8 @@ type
     //smart update used only if lines changed, not deleted/inserted
     MaxUpdatesCountEasy: integer;
 
+    MaxClipboardRecents: integer;
+
     DetectUtf8BufferKb: integer;
     DetectUf16BufferWords: integer;
 
@@ -188,6 +190,9 @@ type
   end;
 
 procedure ATEditorGetClipboardExData(out AInfo: TATEditorClipboardExData);
+
+var
+  ATEditorClipboardRecents: TStringList = nil;
 
 
 implementation
@@ -333,6 +338,8 @@ initialization
     MaxFileSizeMbToDetectEncoding:= 50;
     MaxUpdatesCountEasy:= 200;
 
+    MaxClipboardRecents:= 0; //0 to disable
+
     DetectUtf8BufferKb:= 8;
     DetectUf16BufferWords:= 5;
 
@@ -439,6 +446,9 @@ initialization
   end;
 
 finalization
+
+  if Assigned(ATEditorClipboardRecents) then
+    FreeAndNil(ATEditorClipboardRecents);
 
   with ATEditorBitmaps do
   begin
