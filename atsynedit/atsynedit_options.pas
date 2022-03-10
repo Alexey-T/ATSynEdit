@@ -190,7 +190,7 @@ type
     TickOnCopy: QWord;
   end;
 
-procedure ATEditorGetClipboardExData(out AInfo: TATEditorClipboardExData);
+function ATEditorGetClipboardExData(out AInfo: TATEditorClipboardExData): boolean;
 
 var
   ATEditorClipboardRecents: TStringList = nil;
@@ -311,10 +311,11 @@ begin
     Result:= AValue * ATEditorScaleFontPercents div 100;
 end;
 
-procedure ATEditorGetClipboardExData(out AInfo: TATEditorClipboardExData);
+function ATEditorGetClipboardExData(out AInfo: TATEditorClipboardExData): boolean;
 var
   Str: TMemoryStream;
 begin
+  Result:= false;
   AInfo:= Default(TATEditorClipboardExData);
   if Clipboard.HasFormat(ATEditorOptions.ClipboardExFormat) then
   begin
@@ -323,7 +324,10 @@ begin
       Clipboard.GetFormat(ATEditorOptions.ClipboardExFormat, Str);
       Str.Position:= 0;
       if Str.Size>=SizeOf(AInfo) then
+      begin
         Str.Read(AInfo, SizeOf(AInfo));
+        Result:= true;
+      end;
     finally
       FreeAndNil(Str);
     end;
