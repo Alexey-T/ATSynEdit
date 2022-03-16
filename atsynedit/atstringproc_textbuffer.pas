@@ -33,6 +33,7 @@ type
     procedure SetCount(AValue: integer);
     procedure SetupFromGenericList(L: TATGenericIntList);
   public
+    Valid: boolean;
     FText: UnicodeString;
     constructor Create; virtual;
     destructor Destroy; override;
@@ -83,6 +84,7 @@ begin
   SetCount(0);
   FVersion:= 0;
   FLocked:= false;
+  Valid:= false;
 end;
 
 destructor TATStringBuffer.Destroy;
@@ -101,6 +103,7 @@ begin
   Inc(FVersion);
   FText:= AText;
   //FLenEol:= ALenEol;
+  Valid:= false;
 
   SetCount(Length(ALineLens)+1);
   Pos:= 0;
@@ -140,6 +143,7 @@ begin
   Inc(FVersion);
 
   FText:= AText;
+  Valid:= false;
   if FText='' then
   begin
     SetCount(0);
@@ -210,6 +214,7 @@ begin
   Assert(not FLocked, 'Attempt to clear locked StringBuffer');
   FText:= '';
   SetCount(0);
+  Valid:= false;
 end;
 
 function TATStringBuffer.CaretToStr(constref APnt: TPoint): integer;
