@@ -6827,8 +6827,6 @@ begin
 end;
 
 procedure TATSynEdit.InvalidateEx(AForceRepaint, AForceOnScroll: boolean);
-const
-  cPauseBetweenInvalidates = 1200;
 var
   Tick: QWord;
 begin
@@ -6848,7 +6846,7 @@ begin
           FTickInvalidate:= Tick;
         //exit here only if not long pause was passed;
         //better refresh (call inherited Invalidate) for long pauses
-        if Tick-FTickInvalidate<cPauseBetweenInvalidates then
+        if Tick-FTickInvalidate<ATEditorOptions.PauseBetweenInvalidates then
           exit;
         FTickInvalidate:= Tick;
       end;

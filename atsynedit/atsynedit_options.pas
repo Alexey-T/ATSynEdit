@@ -49,6 +49,7 @@ type
     MaxClipboardRecents: integer;
     MaxClipboardRecentsMenuitemLen: integer;
 
+    PauseBetweenInvalidates: integer;
     DetectUtf8BufferKb: integer;
     DetectUf16BufferWords: integer;
 
@@ -346,6 +347,7 @@ initialization
     MaxClipboardRecents:= 0; //0 to disable
     MaxClipboardRecentsMenuitemLen:= 60;
 
+    PauseBetweenInvalidates:= 1200;
     DetectUtf8BufferKb:= 8;
     DetectUf16BufferWords:= 5;
 
