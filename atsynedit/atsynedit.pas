@@ -389,7 +389,7 @@ type
 const
   cInitTextOffsetLeft = 0;
   cInitTextOffsetTop = 2;
-  cInitHighlightGitConflicts = true;
+  cInitHighlightGitConflicts = false;
   cInitAutoPairForMultiCarets = true;
   cInitInputNumberAllowNegative = true;
   cInitMaskChar = '*';
