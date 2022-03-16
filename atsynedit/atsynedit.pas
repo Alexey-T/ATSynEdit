@@ -800,6 +800,7 @@ type
     FPaintStarted: boolean;
     FPaintWorking: boolean;
     FTickMinimap: QWord;
+    FTickInvalidate: QWord;
     FTickAll: QWord;
     FShowOsBarVert: boolean;
     FShowOsBarHorz: boolean;
@@ -6826,6 +6827,10 @@ begin
 end;
 
 procedure TATSynEdit.InvalidateEx(AForceRepaint, AForceOnScroll: boolean);
+const
+  cPauseBetweenInvalidates = 1200;
+var
+  Tick: QWord;
 begin
   if not IsRepaintEnabled then exit;
   //if not IsInvalidateAllowed then exit;
@@ -6836,7 +6841,12 @@ begin
   begin
     if ATEditorOptions.FlickerReducingPause>=1000 then
     begin
-      if not AdapterForHilite.IsDataReadyPartially then exit;
+      if not AdapterForHilite.IsDataReadyPartially then
+      begin
+        Tick:= GetTickCount64;
+        if Tick-FTickInvalidate<cPauseBetweenInvalidates then exit;
+        FTickInvalidate:= Tick;
+      end;
     end
     else
     if ATEditorOptions.FlickerReducingPause>0 then
