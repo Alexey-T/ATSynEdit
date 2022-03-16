@@ -6841,6 +6841,8 @@ begin
     begin
       if not AdapterForHilite.IsDataReadyPartially then
       begin
+        exit;
+        (* //commented, coz it's not perfect - the first edition after a pause, always does 'exit'
         Tick:= GetTickCount64;
         if FTickInvalidate=0 then
           FTickInvalidate:= Tick;
@@ -6849,6 +6851,7 @@ begin
         if Tick-FTickInvalidate<ATEditorOptions.PauseBetweenInvalidates then
           exit;
         FTickInvalidate:= Tick;
+        *)
       end;
     end
     else
