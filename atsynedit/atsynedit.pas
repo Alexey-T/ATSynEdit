@@ -6844,7 +6844,10 @@ begin
       if not AdapterForHilite.IsDataReadyPartially then
       begin
         Tick:= GetTickCount64;
-        if Tick-FTickInvalidate<cPauseBetweenInvalidates then exit;
+        //exit here only if not long pause was passed;
+        //better refresh (call inherited Invalidate) for long pauses
+        if (FTickInvalidate>0) and (Tick-FTickInvalidate<cPauseBetweenInvalidates) then
+          exit;
         FTickInvalidate:= Tick;
       end;
     end
