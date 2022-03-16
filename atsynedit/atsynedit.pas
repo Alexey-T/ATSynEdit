@@ -6827,8 +6827,6 @@ begin
 end;
 
 procedure TATSynEdit.InvalidateEx(AForceRepaint, AForceOnScroll: boolean);
-var
-  Tick: QWord;
 begin
   if not IsRepaintEnabled then exit;
   //if not IsInvalidateAllowed then exit;
@@ -6842,16 +6840,6 @@ begin
       if not AdapterForHilite.IsDataReadyPartially then
       begin
         exit;
-        (* //commented, coz it's not perfect - the first edition after a pause, always does 'exit'
-        Tick:= GetTickCount64;
-        if FTickInvalidate=0 then
-          FTickInvalidate:= Tick;
-        //exit here only if not long pause was passed;
-        //better refresh (call inherited Invalidate) for long pauses
-        if Tick-FTickInvalidate<ATEditorOptions.PauseBetweenInvalidates then
-          exit;
-        FTickInvalidate:= Tick;
-        *)
       end;
     end
     else
