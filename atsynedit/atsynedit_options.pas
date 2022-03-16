@@ -347,7 +347,7 @@ initialization
     MaxClipboardRecents:= 0; //0 to disable
     MaxClipboardRecentsMenuitemLen:= 60;
 
-    PauseBetweenInvalidates:= 1200;
+    PauseBetweenInvalidates:= 900;
     DetectUtf8BufferKb:= 8;
     DetectUf16BufferWords:= 5;
 
