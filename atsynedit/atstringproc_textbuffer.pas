@@ -56,7 +56,6 @@ type
     property Count: integer read FCount;
     property OnChange: TATStringBufferChange read FOnChange write FOnChange;
     property Version: integer read FVersion;
-    procedure IncreaseVersion;
   end;
 
 implementation
@@ -335,11 +334,6 @@ end;
 function TATStringBuffer.OffsetToOffsetOfLineEnd(APos: integer): integer; inline;
 begin
   Result:= APos+OffsetToDistanceFromLineEnd(APos);
-end;
-
-procedure TATStringBuffer.IncreaseVersion;
-begin
-  Inc(FVersion);
 end;
 
 function TATStringBuffer.OffsetToDistanceFromLineStart(APos: integer): integer;
