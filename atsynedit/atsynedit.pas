@@ -6836,6 +6836,7 @@ begin
     not AForceRepaint then
   begin
     if ATEditorOptions.FlickerReducingPause>=1000 then
+      //value 1000 is the special value of CudaText option "renderer_anti_flicker"
     begin
       if not AdapterForHilite.IsDataReadyPartially then
       begin
