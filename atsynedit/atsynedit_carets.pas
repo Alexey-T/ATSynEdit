@@ -427,7 +427,10 @@ begin
   if not bSel then
   begin
     if AllowNoSel then
-      begin AFrom:= PosY; ATo:= PosY; end;
+    begin
+      AFrom:= PosY;
+      ATo:= PosY;
+    end;
     Exit
   end;
 
