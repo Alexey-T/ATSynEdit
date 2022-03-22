@@ -2208,12 +2208,29 @@ end;
 
 procedure TATSynEdit.UpdateGutterAutosize;
 var
-  Str: string;
-  NLen: integer;
+  NCnt, NLen: integer;
 begin
-  Str:= IntToStr(Max(10, Strings.Count));
-  NLen:= Length(Str);
-  if FOptNumbersStyle=cNumbersRelative then //add space for '-' char
+  NCnt:= Strings.Count;
+
+  if NCnt>=1000000000 then NLen:= 10
+  else
+  if NCnt>=100000000 then NLen:= 9
+  else
+  if NCnt>=10000000 then NLen:= 8
+  else
+  if NCnt>=1000000 then NLen:= 7
+  else
+  if NCnt>=100000 then NLen:= 6
+  else
+  if NCnt>=10000 then NLen:= 5
+  else
+  if NCnt>=1000 then NLen:= 4
+  else
+  if NCnt>=100 then NLen:= 3
+  else
+    NLen:= 2;
+
+  if FOptNumbersStyle=cNumbersRelative then //add space for '-'
     Inc(NLen);
 
   FGutter[FGutterBandNumbers].Size:=
