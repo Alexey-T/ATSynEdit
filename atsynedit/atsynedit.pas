@@ -558,6 +558,7 @@ type
     FTabHelper: TATStringTabHelper;
     FAdapterHilite: TATAdapterHilite;
     FAdapterIME: TATAdapterIME;
+    FCharSizer: TATCharSizer;
     FFold: TATSynRanges;
     FFoldImageList: TImageList;
     FFoldStyle: TATEditorFoldStyle;
@@ -2341,7 +2342,7 @@ begin
   if FRectMain.Width=0 then
     UpdateInitialVars(Canvas);
 
-  GlobalCharSizer.Init(Font.Name, DoScaleFont(Font.Size));
+  FCharSizer.Init(Font.Name, DoScaleFont(Font.Size));
 
   //virtual mode allows faster usage of WrapInfo
   CurStrings:= Strings;
@@ -4480,9 +4481,15 @@ var
 begin
   inherited;
 
-  //GlobalCharSizer should be created after MainForm is inited
-  if GlobalCharSizer=nil then
-    GlobalCharSizer:= TATCharSizer.Create(AOwner);
+  if ATEditorOptions.UseGlobalCharSizer then
+  begin
+    //GlobalCharSizer should be created after MainForm is inited
+    if GlobalCharSizer=nil then
+      GlobalCharSizer:= TATCharSizer.Create(AOwner);
+    FCharSizer:= GlobalCharSizer;
+  end
+  else
+    FCharSizer:= TATCharSizer.Create(Self);
 
   Caption:= '';
   ControlStyle:= ControlStyle+[csOpaque, csDoubleClicks, csTripleClicks];
@@ -4556,6 +4563,8 @@ begin
   FCaretHideUnfocused:= true;
 
   FTabHelper:= TATStringTabHelper.Create;
+  FTabHelper.CharSizer:= FCharSizer;
+
   FMarkers:= nil;
   FAttribs:= nil;
   FMarkedRange:= nil;

@@ -115,6 +115,7 @@ type
     ListEnds: TATIntFixedArray;
     ListMid: TATIntFixedArray;
   public
+    CharSizer: TATCharSizer;
     TabSpaces: boolean;
     TabSize: integer;
     IndentSize: integer;
@@ -633,7 +634,7 @@ begin
     begin
       StrPair[1]:= ch;
       StrPair[2]:= S[i+1];
-      NPairSize:= GlobalCharSizer.GetStrWidth(StrPair);
+      NPairSize:= CharSizer.GetStrWidth(StrPair);
       NScalePercents:= NPairSize - NPairSize div 2;
     end
     }
@@ -643,7 +644,7 @@ begin
     end
     else
     begin
-      NScalePercents:= GlobalCharSizer.GetCharWidth(ch);
+      NScalePercents:= CharSizer.GetCharWidth(ch);
       //NPairSize:= 0;
     end;
 
@@ -691,7 +692,7 @@ begin
     end
     else
     begin
-      NScalePercents:= GlobalCharSizer.GetCharWidth(ch);
+      NScalePercents:= CharSizer.GetCharWidth(ch);
     end;
 
     if ch<>#9 then
