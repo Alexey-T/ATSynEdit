@@ -197,7 +197,6 @@ end;
 
 function TATSynEdit.DoCommand_ClipboardPasteFromRecents: TATCommandResults;
 var
-  menu: TPopupMenu;
   mi: TMenuItem;
   Pnt: TPoint;
   S: string;
@@ -210,11 +209,13 @@ begin
   if ATEditorClipboardRecents=nil then Exit;
   if ATEditorOptions.MaxClipboardRecents<=0 then Exit;
 
-  menu:= TPopupMenu.Create(nil);
-  try
+  if ATEditorClipboardRecentMenu=nil then
+    ATEditorClipboardRecentMenu:= TPopupMenu.Create(nil);
+  ATEditorClipboardRecentMenu.Items.Clear;
+
     for i:= 0 to ATEditorClipboardRecents.Count-1 do
     begin
-      mi:= TMenuItem.Create(menu);
+      mi:= TMenuItem.Create(ATEditorClipboardRecentMenu);
       S:= ATEditorClipboardRecents[i];
       SDeleteFrom(S, #10);
       if Length(S)>ATEditorOptions.MaxClipboardRecentsMenuitemLen then
@@ -222,7 +223,7 @@ begin
       mi.Caption:= S;
       mi.Tag:= i;
       mi.OnClick:= @MenuitemClipboardRecentsClick;
-      menu.Items.Add(mi);
+      ATEditorClipboardRecentMenu.Items.Add(mi);
     end;
 
     //show popup at the caret position, like Sublime
@@ -240,10 +241,7 @@ begin
     Pnt.Y:= Min(Height, Max(0, Pnt.Y));
     Pnt:= ClientToScreen(Pnt);
 
-    menu.PopUp(Pnt.X, Pnt.Y);
-  finally
-    FreeAndNil(menu);
-  end;
+    ATEditorClipboardRecentMenu.PopUp(Pnt.X, Pnt.Y);
 end;
 
 function TATSynEdit.DoCommand_ClipboardClearRecents: TATCommandResults;
@@ -339,6 +337,7 @@ procedure TATSynEdit.UpdateClipboardRecents(const AText: string);
 var
   i: integer;
 begin
+  if AText='' then Exit;
   if ATEditorOptions.MaxClipboardRecents<=0 then Exit;
 
   if ATEditorClipboardRecents=nil then

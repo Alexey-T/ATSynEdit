@@ -12,7 +12,7 @@ interface
 uses
   SysUtils, Classes,
   LCLType, LCLIntf,
-  Graphics, Controls, Forms, Clipbrd;
+  Graphics, Controls, Forms, Menus, Clipbrd;
 
 type
   TATEditorUnptintedEolSymbol = (
@@ -195,6 +195,7 @@ function ATEditorGetClipboardExData(out AInfo: TATEditorClipboardExData): boolea
 
 var
   ATEditorClipboardRecents: TStringList = nil;
+  ATEditorClipboardRecentMenu: TPopupMenu = nil;
 
 
 implementation
@@ -457,6 +458,9 @@ finalization
 
   if Assigned(ATEditorClipboardRecents) then
     FreeAndNil(ATEditorClipboardRecents);
+
+  if Assigned(ATEditorClipboardRecentMenu) then
+    FreeAndNil(ATEditorClipboardRecentMenu);
 
   with ATEditorBitmaps do
   begin
