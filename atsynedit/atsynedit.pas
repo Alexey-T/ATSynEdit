@@ -2209,10 +2209,15 @@ end;
 procedure TATSynEdit.UpdateGutterAutosize;
 var
   Str: string;
+  NLen: integer;
 begin
   Str:= IntToStr(Max(10, Strings.Count));
+  NLen:= Length(Str);
+  if FOptNumbersStyle=cNumbersRelative then //add space for '-' char
+    Inc(NLen);
+
   FGutter[FGutterBandNumbers].Size:=
-    Length(Str)*FCharSize.XScaled div ATEditorCharXScale + 2*FNumbersIndent;
+    NLen*FCharSize.XScaled div ATEditorCharXScale + 2*FNumbersIndent;
   FGutter.Update;
 end;
 
