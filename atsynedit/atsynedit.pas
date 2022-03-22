@@ -4562,9 +4562,7 @@ begin
   FCaretStopUnfocused:= true;
   FCaretHideUnfocused:= true;
 
-  FTabHelper:= TATStringTabHelper.Create;
-  FTabHelper.CharSizer:= FCharSizer;
-
+  FTabHelper:= TATStringTabHelper.Create(FCharSizer);
   FMarkers:= nil;
   FAttribs:= nil;
   FMarkedRange:= nil;

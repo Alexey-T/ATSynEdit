@@ -111,17 +111,18 @@ type
 
   TATStringTabHelper = class
   private
+    CharSizer: TATCharSizer;
     //these arrays are local vars, placed here to alloc 2*4Kb not in stack
     ListEnds: TATIntFixedArray;
     ListMid: TATIntFixedArray;
   public
-    CharSizer: TATCharSizer;
     TabSpaces: boolean;
     TabSize: integer;
     IndentSize: integer;
     SenderObj: TObject;
     OnCalcTabSize: TATStringTabCalcEvent;
     OnCalcLineLen: TATStringGetLenEvent;
+    constructor Create(ACharSizer: TATCharSizer);
     function CalcTabulationSize(ALineIndex, APos: integer): integer;
     function TabsToSpaces(ALineIndex: integer; const S: atString): atString;
     function TabsToSpaces_Length(ALineIndex: integer; const S: atString; AMaxLen: integer): integer;
@@ -520,6 +521,12 @@ var
 begin
   for i:= 0 to Length(S)-1 do
     S[i]:= SwapEndian(S[i]);
+end;
+
+constructor TATStringTabHelper.Create(ACharSizer: TATCharSizer);
+begin
+  inherited Create;
+  CharSizer:= ACharSizer;
 end;
 
 function TATStringTabHelper.CalcTabulationSize(ALineIndex, APos: integer): integer;
