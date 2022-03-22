@@ -22,7 +22,7 @@ uses
   ATCanvasPrimitives,
   ATStringProc,
   ATStrings,
-  ATSynEdit_Options,
+  ATSynEdit_Globals,
   ATSynEdit_LineParts,
   ATSynEdit_CharSizer;
 
@@ -1262,4 +1262,3 @@ begin
 end;
 
 end.
-

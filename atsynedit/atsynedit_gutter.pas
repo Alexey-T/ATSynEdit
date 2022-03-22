@@ -10,7 +10,7 @@ interface
 
 uses
   Classes, SysUtils,
-  ATSynEdit_Options;
+  ATSynEdit_Globals;
 
 type
   TATGutterItem = class
@@ -153,4 +153,3 @@ begin
 end;
 
 end.
-

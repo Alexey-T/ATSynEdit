@@ -22,7 +22,7 @@ uses
   ATSynEdit_Bookmarks,
   ATSynEdit_Gutter_Decor,
   ATSynEdit_Commands,
-  ATSynEdit_Options,
+  ATSynEdit_Globals,
   EncConv;
 
 type
@@ -2672,4 +2672,3 @@ end;
 {$I atstrings_save.inc}
 
 end.
-

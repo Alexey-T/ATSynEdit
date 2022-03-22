@@ -2,7 +2,7 @@
 Copyright (C) Alexey Torgashin, uvviewsoft.com
 License: MPL 2.0 or LGPL
 }
-unit ATSynEdit_Options;
+unit ATSynEdit_Globals;
 
 {$mode objfpc}{$H+}
 {$ModeSwitch advancedrecords}

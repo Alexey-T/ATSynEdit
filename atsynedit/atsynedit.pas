@@ -31,7 +31,7 @@ uses
   ATStrings,
   ATStringProc_WordJump,
   ATCanvasPrimitives,
-  ATSynEdit_Options,
+  ATSynEdit_Globals,
   ATSynEdit_CharSizer,
   {$ifdef USE_FPC_REGEXPR}
   RegExpr,
@@ -9941,4 +9941,3 @@ initialization
   {$endif}
 
 end.
-

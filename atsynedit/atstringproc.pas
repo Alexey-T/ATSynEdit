@@ -12,7 +12,7 @@ interface
 uses
   Classes, SysUtils, StrUtils,
   LCLType, LCLIntf, Clipbrd,
-  ATSynEdit_Options,
+  ATSynEdit_Globals,
   ATSynEdit_UnicodeData,
   ATSynEdit_RegExpr,
   ATSynEdit_CharSizer;
@@ -1396,4 +1396,3 @@ begin
 end;
 
 end.
-

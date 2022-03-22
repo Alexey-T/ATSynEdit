@@ -15,7 +15,7 @@ uses
   ATCanvasPrimitives,
   ATScrollbar,
   ATSynEdit,
-  ATSynEdit_Options,
+  ATSynEdit_Globals,
   ATStringProc;
 
 type
@@ -306,4 +306,3 @@ end;
 
 
 end.
-

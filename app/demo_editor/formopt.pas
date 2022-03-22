@@ -11,7 +11,7 @@ uses
   FileUtil,
   ATStringProc,
   ATSynEdit,
-  ATSynEdit_Options,
+  ATSynEdit_Globals,
   ATSynEdit_CharSizer;
 
 type
@@ -544,4 +544,3 @@ end;
 
 
 end.
-

@@ -28,7 +28,7 @@
     </CompilerOptions>
     <Description Value="Multi-line editor control, used in CudaText editor. Supports syntax highlighting using EControl engine or other engines."/>
     <License Value="MPL 2.0, LGPL"/>
-    <Version Major="2" Minor="4"/>
+    <Version Major="2" Minor="5"/>
     <Files Count="40">
       <Item1>
         <Filename Value="atsynedit_register.pas"/>
@@ -188,8 +188,8 @@
         <UnitName Value="ATStringProc_UTF8Decode"/>
       </Item39>
       <Item40>
-        <Filename Value="atsynedit_options.pas"/>
-        <UnitName Value="atsynedit_options"/>
+        <Filename Value="atsynedit_globals.pas"/>
+        <UnitName Value="ATSynEdit_Globals"/>
       </Item40>
     </Files>
     <CompatibilityMode Value="True"/>

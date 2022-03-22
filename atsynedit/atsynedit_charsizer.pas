@@ -57,7 +57,7 @@ function IsStringWithUnusualWidthChars(const S: UnicodeString): boolean;
 implementation
 
 uses
-  ATSynEdit_Options,
+  ATSynEdit_Globals,
   ATSynEdit_CharSizeArray;
 
 function IsCharAsciiControl(ch: WideChar): boolean; inline;
@@ -240,4 +240,3 @@ finalization
     FreeAndNil(GlobalCharSizer);
 
 end.
-
