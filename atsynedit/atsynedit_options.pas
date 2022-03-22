@@ -50,8 +50,8 @@ type
     MaxClipboardRecentsMenuitemLen: integer;
 
     UseGlobalCharSizer: boolean;
-    DetectUtf8BufferKb: integer;
-    DetectUf16BufferWords: integer;
+    DetectUTF8BufferKb: integer;
+    DetectUTF16BufferWords: integer;
 
     ItalicFontLongerInPercents: integer;
     UnprintedTabCharLength: integer;
@@ -348,8 +348,8 @@ initialization
     MaxClipboardRecentsMenuitemLen:= 60;
 
     UseGlobalCharSizer:= true;
-    DetectUtf8BufferKb:= 8;
-    DetectUf16BufferWords:= 5;
+    DetectUTF8BufferKb:= 8;
+    DetectUTF16BufferWords:= 5;
 
     ItalicFontLongerInPercents:= 40;
     UnprintedTabCharLength:= 1;

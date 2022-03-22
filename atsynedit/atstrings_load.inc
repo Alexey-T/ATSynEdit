@@ -526,8 +526,8 @@ begin
     else
       FEncoding:= cEncAnsi;
     DetectStreamEncoding(Stream, FEncoding, FEncodingCodepage, NSignatureLen, bWithBom,
-      ATEditorOptions.DetectUtf8BufferKb,
-      ATEditorOptions.DetectUf16BufferWords);
+      ATEditorOptions.DetectUTF8BufferKb,
+      ATEditorOptions.DetectUTF16BufferWords);
   end
   else
   begin
