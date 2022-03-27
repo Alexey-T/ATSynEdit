@@ -311,7 +311,7 @@ end;
 procedure CanvasUnprintedSpace(C: TCanvas; const ARect: TRect;
   AScale: integer; AFontColor: TColor);
 const
-  cMinDotSize = 1;
+  cMinDotSize = 1; //should be 1, VSCode paints unprinted-space as 1 pixel
 var
   R: TRect;
   NSize: integer;
