@@ -311,7 +311,7 @@ end;
 procedure CanvasUnprintedSpace(C: TCanvas; const ARect: TRect;
   AScale: integer; AFontColor: TColor);
 const
-  cMinDotSize = 2;
+  cMinDotSize = 1;
 var
   R: TRect;
   NSize: integer;
