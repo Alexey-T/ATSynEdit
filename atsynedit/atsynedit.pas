@@ -1557,13 +1557,13 @@ type
     property Gutter: TATGutter read FGutter;
     property GutterDecor: TATGutterDecor read GetGutterDecor;
     property GutterDecorAlignment: TAlignment read FGutterDecorAlignment write FGutterDecorAlignment;
-    property GutterBandBookmarks: integer read FGutterBandBookmarks write FGutterBandBookmarks;
-    property GutterBandNumbers: integer read FGutterBandNumbers write FGutterBandNumbers;
-    property GutterBandStates: integer read FGutterBandStates write FGutterBandStates;
-    property GutterBandFolding: integer read FGutterBandFolding write FGutterBandFolding;
-    property GutterBandSeparator: integer read FGutterBandSeparator write FGutterBandSeparator;
-    property GutterBandEmpty: integer read FGutterBandEmpty write FGutterBandEmpty;
-    property GutterBandDecor: integer read FGutterBandDecor write FGutterBandDecor;
+    property GutterBandBookmarks: integer read FGutterBandBookmarks;
+    property GutterBandNumbers: integer read FGutterBandNumbers;
+    property GutterBandStates: integer read FGutterBandStates;
+    property GutterBandFolding: integer read FGutterBandFolding;
+    property GutterBandSeparator: integer read FGutterBandSeparator;
+    property GutterBandEmpty: integer read FGutterBandEmpty;
+    property GutterBandDecor: integer read FGutterBandDecor;
     //files
     property FileName: string read FFileName write FFileName;
     procedure LoadFromFile(const AFilename: string; AKeepScroll: boolean=false); virtual;
@@ -4745,17 +4745,20 @@ begin
   FGutterBandEmpty:= 5;
   FGutterBandDecor:= -1;
 
-  for i:= 1 to ATEditorOptions.GutterBandsCount do
-    FGutter.Add(10);
-  FGutter[FGutterBandBookmarks].Size:= ATEditorOptions.GutterSizeBookmarks;
-  FGutter[FGutterBandBookmarks].Scaled:= true;
-  FGutter[FGutterBandNumbers].Size:= ATEditorOptions.GutterSizeNumbers;
-  FGutter[FGutterBandStates].Size:= ATEditorOptions.GutterSizeLineStates;
-  FGutter[FGutterBandStates].Scaled:= true;
-  FGutter[FGutterBandFolding].Size:= ATEditorOptions.GutterSizeFolding;
-  FGutter[FGutterBandFolding].Scaled:= true;
-  FGutter[FGutterBandSeparator].Size:= ATEditorOptions.GutterSizeSepar;
-  FGutter[FGutterBandEmpty].Size:= ATEditorOptions.GutterSizeEmpty;
+  FGutter.Add(-1, ATEditorOptions.GutterSizeBookmarks, ATEditorOptions.GutterTagBookmarks, true);
+  FGutter.Add(-1, ATEditorOptions.GutterSizeNumbers, ATEditorOptions.GutterTagNumbers, false);
+  FGutter.Add(-1, ATEditorOptions.GutterSizeLineStates, ATEditorOptions.GutterTagLineStates, true);
+  FGutter.Add(-1, ATEditorOptions.GutterSizeFolding, ATEditorOptions.GutterTagFolding, true);
+  FGutter.Add(-1, ATEditorOptions.GutterSizeSeparator, ATEditorOptions.GutterTagSeparator, false);
+  FGutter.Add(-1, ATEditorOptions.GutterSizeEmpty, ATEditorOptions.GutterTagEmpty, false);
+
+  FGutterBandBookmarks:= FGutter.FindIndexByTag(ATEditorOptions.GutterTagBookmarks);
+  FGutterBandNumbers:= FGutter.FindIndexByTag(ATEditorOptions.GutterTagNumbers);
+  FGutterBandStates:= FGutter.FindIndexByTag(ATEditorOptions.GutterTagLineStates);
+  FGutterBandFolding:= FGutter.FindIndexByTag(ATEditorOptions.GutterTagFolding);
+  FGutterBandSeparator:= FGutter.FindIndexByTag(ATEditorOptions.GutterTagSeparator);
+  FGutterBandEmpty:= FGutter.FindIndexByTag(ATEditorOptions.GutterTagEmpty);
+
   FGutter[FGutterBandSeparator].Visible:= false;
   FGutter.Update;
 

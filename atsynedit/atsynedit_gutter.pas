@@ -14,6 +14,8 @@ uses
 
 type
   TATGutterItem = class
+  public
+    Tag: Int64;
     Visible: boolean;
     Size: integer; //column width in pixels
     Scaled: boolean; //adjust column width using ATEditorScale()
@@ -33,7 +35,7 @@ type
     constructor Create; virtual;
     destructor Destroy; override;
     function IsIndexValid(N: integer): boolean; inline;
-    procedure Add(ASize: integer);
+    procedure Add(AIndex: integer; ASize: integer; ATag: Int64; AScaled: boolean);
     procedure Delete(N: integer);
     procedure Clear;
     function Count: integer; inline;
@@ -41,6 +43,7 @@ type
     function Width: integer;
     procedure Update;
     function FindIndexAtCoordX(AX: integer): integer;
+    function FindIndexByTag(ATag: Int64): integer;
   end;
 
 
@@ -74,15 +77,20 @@ begin
   inherited;
 end;
 
-procedure TATGutter.Add(ASize: integer);
+procedure TATGutter.Add(AIndex: integer; ASize: integer; ATag: Int64;
+  AScaled: boolean);
 var
   Item: TATGutterItem;
 begin
   Item:= TATGutterItem.Create;
-  Item.Size:= ASize;
   Item.Visible:= true;
-  FList.Add(Item);
-  Update;
+  Item.Size:= ASize;
+  Item.Tag:= ATag;
+  Item.Scaled:= AScaled;
+  if AIndex<0 then
+    FList.Add(Item)
+  else
+    FList.Insert(AIndex, Item);
 end;
 
 procedure TATGutter.Delete(N: integer);
@@ -147,6 +155,16 @@ begin
     with Items[i] do
       if (AX>=Left) and (AX<Right) then
         Exit(i);
+end;
+
+function TATGutter.FindIndexByTag(ATag: Int64): integer;
+var
+  i: integer;
+begin
+  Result:= -1;
+  for i:= 0 to Count-1 do
+    if Items[i].Tag=ATag then
+      Exit(i);
 end;
 
 end.

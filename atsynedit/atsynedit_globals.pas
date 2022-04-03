@@ -88,13 +88,19 @@ type
     TimerIntervalAutoScroll: integer;
     TimerIntervalNiceScroll: integer;
 
-    GutterBandsCount: integer;
     GutterSizeBookmarks: integer;
     GutterSizeNumbers: integer;
     GutterSizeFolding: integer;
     GutterSizeLineStates: integer;
-    GutterSizeSepar: integer;
+    GutterSizeSeparator: integer;
     GutterSizeEmpty: integer;
+
+    GutterTagBookmarks: Int64;
+    GutterTagNumbers: Int64;
+    GutterTagLineStates: Int64;
+    GutterTagFolding: Int64;
+    GutterTagSeparator: Int64;
+    GutterTagEmpty: Int64;
 
     UsePaintStatic: boolean;
     FoldedLenOfEmptyHint: integer;
@@ -399,13 +405,19 @@ initialization
     TimerIntervalAutoScroll:= 100;
     TimerIntervalNiceScroll:= 100;
 
-    GutterBandsCount:= 6;
     GutterSizeBookmarks:= 16;
     GutterSizeNumbers:= 10;
     GutterSizeFolding:= 14;
     GutterSizeLineStates:= 3;
-    GutterSizeSepar:= 1;
+    GutterSizeSeparator:= 1;
     GutterSizeEmpty:= 2;
+
+    GutterTagBookmarks:= 1;
+    GutterTagNumbers:= 2;
+    GutterTagLineStates:= 3;
+    GutterTagFolding:= 4;
+    GutterTagSeparator:= 8;
+    GutterTagEmpty:= 9;
 
     UsePaintStatic:= true;
     FoldedLenOfEmptyHint:= 50;
