@@ -15,9 +15,9 @@ uses
 type
   TATGutterItem = class
     Visible: boolean;
-    Size: integer;
-    Left, Right: integer;
-    Scaled: boolean;
+    Size: integer; //column width in pixels
+    Scaled: boolean; //adjust column width using ATEditorScale()
+    Left, Right: integer; //these are calculated by TATGutter.Update()
   end;
 
 type
