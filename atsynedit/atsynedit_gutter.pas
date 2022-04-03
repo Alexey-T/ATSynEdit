@@ -146,10 +146,7 @@ begin
   for i:= 0 to Count-1 do
     with Items[i] do
       if (AX>=Left) and (AX<Right) then
-      begin
-        Result:= i;
-        Exit
-      end;
+        Exit(i);
 end;
 
 end.
