@@ -34,10 +34,10 @@ object fmOpt: TfmOpt
     Height = 343
     Top = 6
     Width = 701
-    ActivePage = TabSheet4
+    ActivePage = TabSheet9
     Align = alClient
     BorderSpacing.Around = 6
-    TabIndex = 6
+    TabIndex = 2
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'show'
@@ -325,7 +325,7 @@ object fmOpt: TfmOpt
         Top = 4
         Width = 272
         Caption = 'sizes of columns'
-        ClientHeight = 244
+        ClientHeight = 229
         ClientWidth = 268
         TabOrder = 0
         object chkGutterBm: TCheckBox
@@ -475,6 +475,7 @@ object fmOpt: TfmOpt
           Height = 218
           Top = 0
           Width = 98
+          Enabled = False
           ItemHeight = 0
           ScrollWidth = 94
           TabOrder = 0
@@ -486,6 +487,7 @@ object fmOpt: TfmOpt
           Top = 0
           Width = 65
           Caption = 'up'
+          Enabled = False
           OnClick = bColUpClick
           TabOrder = 1
         end
@@ -495,6 +497,7 @@ object fmOpt: TfmOpt
           Top = 28
           Width = 66
           Caption = 'down'
+          Enabled = False
           OnClick = bColDownClick
           TabOrder = 2
         end

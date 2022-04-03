@@ -358,11 +358,13 @@ begin
 
     if ShowModal=mrOk then
     begin
+      {
       ed.GutterBandBookmarks:= ListCol.Items.IndexOf(nameBm);
       ed.GutterBandNumbers:= ListCol.Items.IndexOf(nameNums);
       ed.GutterBandStates:= ListCol.Items.IndexOf(nameState);
       ed.GutterBandFolding:= ListCol.Items.IndexOf(nameFold);
       ed.GutterBandSeparator:= ListCol.Items.IndexOf(nameSep);
+      }
 
       //general
       ed.OptShowCurLine:= chkCurLine.Checked;
