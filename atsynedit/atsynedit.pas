@@ -2997,7 +2997,7 @@ begin
     exit
   end;
 
-  Gutter.GutterLeft:= R.Left;
+  Gutter.GutterCoordLeft:= R.Left;
   Gutter.Update;
 end;
 
@@ -6091,7 +6091,7 @@ begin
   begin
     if ActionId=cMouseActionClickSimple then
     begin
-      Index:= FGutter.IndexAt(X);
+      Index:= FGutter.FindIndexAtCoordX(X);
       if Index=FGutterBandNumbers then
       begin
         if FOptMouseClickNumberSelectsLine then
@@ -6108,7 +6108,7 @@ begin
       end
       else
         //click on other bands- event
-        DoEventClickGutter(FGutter.IndexAt(X), PosTextClicked.Y);
+        DoEventClickGutter(FGutter.FindIndexAtCoordX(X), PosTextClicked.Y);
     end;
   end;
 
@@ -6256,7 +6256,7 @@ begin
   else
   if FOptGutterVisible and PtInRect(FRectGutter, Point(X, Y)) then
   begin
-    Index:= FGutter.IndexAt(X);
+    Index:= FGutter.FindIndexAtCoordX(X);
     if Index=FGutterBandBookmarks then
       if Assigned(FMenuGutterBm) then FMenuGutterBm.PopUp;
     if Index=FGutterBandNumbers then

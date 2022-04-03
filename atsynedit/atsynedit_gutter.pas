@@ -29,7 +29,7 @@ type
     FList: TFPList;
     function GetItem(N: integer): TATGutterItem;
   public
-    GutterLeft: integer;
+    GutterCoordLeft: integer;
     constructor Create; virtual;
     destructor Destroy; override;
     function IsIndexValid(N: integer): boolean; inline;
@@ -40,7 +40,7 @@ type
     property Items[N: integer]: TATGutterItem read GetItem; default;
     function Width: integer;
     procedure Update;
-    function IndexAt(AX: integer): integer;
+    function FindIndexAtCoordX(AX: integer): integer;
   end;
 
 
@@ -111,7 +111,7 @@ end;
 function TATGutter.Width: integer;
 begin
   if Count>0 then
-    Result:= Items[Count-1].Right - GutterLeft
+    Result:= Items[Count-1].Right - GutterCoordLeft
   else
     Result:= 0;
 end;
@@ -126,7 +126,7 @@ begin
       if i>0 then
         Left:= Items[i-1].Right
       else
-        Left:= GutterLeft;
+        Left:= GutterCoordLeft;
       Right:= Left;
       if Visible then
       begin
@@ -138,7 +138,7 @@ begin
     end;
 end;
 
-function TATGutter.IndexAt(AX: integer): integer;
+function TATGutter.FindIndexAtCoordX(AX: integer): integer;
 var
   i: integer;
 begin
