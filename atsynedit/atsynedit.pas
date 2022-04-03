@@ -1305,6 +1305,7 @@ type
     procedure SetUndoLimit(AValue: integer);
     procedure SetWrapMode(AValue: TATEditorWrapMode);
     procedure SetWrapIndented(AValue: boolean);
+    procedure UpdateGutterBandIndexes;
     procedure UpdateScrollbarVert;
     procedure UpdateScrollbarHorz;
     procedure UpdateSelRectFromPoints(const P1, P2: TPoint);
@@ -4737,12 +4738,6 @@ begin
   FOptGutterIcons:= cGutterIconsPlusMinus;
 
   FGutterDecorAlignment:= taCenter;
-  FGutterBandBookmarks:= 0;
-  FGutterBandNumbers:= 1;
-  FGutterBandStates:= 2;
-  FGutterBandFolding:= 3;
-  FGutterBandSeparator:= 4;
-  FGutterBandEmpty:= 5;
   FGutterBandDecor:= -1;
 
   FGutter.Add(-1, ATEditorOptions.GutterSizeBookmarks, ATEditorOptions.GutterTagBookmarks, true);
@@ -4751,13 +4746,7 @@ begin
   FGutter.Add(-1, ATEditorOptions.GutterSizeFolding, ATEditorOptions.GutterTagFolding, true);
   FGutter.Add(-1, ATEditorOptions.GutterSizeSeparator, ATEditorOptions.GutterTagSeparator, false);
   FGutter.Add(-1, ATEditorOptions.GutterSizeEmpty, ATEditorOptions.GutterTagEmpty, false);
-
-  FGutterBandBookmarks:= FGutter.FindIndexByTag(ATEditorOptions.GutterTagBookmarks);
-  FGutterBandNumbers:= FGutter.FindIndexByTag(ATEditorOptions.GutterTagNumbers);
-  FGutterBandStates:= FGutter.FindIndexByTag(ATEditorOptions.GutterTagLineStates);
-  FGutterBandFolding:= FGutter.FindIndexByTag(ATEditorOptions.GutterTagFolding);
-  FGutterBandSeparator:= FGutter.FindIndexByTag(ATEditorOptions.GutterTagSeparator);
-  FGutterBandEmpty:= FGutter.FindIndexByTag(ATEditorOptions.GutterTagEmpty);
+  UpdateGutterBandIndexes;
 
   FGutter[FGutterBandSeparator].Visible:= false;
   FGutter.Update;
@@ -9912,6 +9901,16 @@ begin
   end;
 end;
 }
+
+procedure TATSynEdit.UpdateGutterBandIndexes;
+begin
+  FGutterBandBookmarks:= FGutter.FindIndexByTag(ATEditorOptions.GutterTagBookmarks);
+  FGutterBandNumbers:=   FGutter.FindIndexByTag(ATEditorOptions.GutterTagNumbers);
+  FGutterBandStates:=    FGutter.FindIndexByTag(ATEditorOptions.GutterTagLineStates);
+  FGutterBandFolding:=   FGutter.FindIndexByTag(ATEditorOptions.GutterTagFolding);
+  FGutterBandSeparator:= FGutter.FindIndexByTag(ATEditorOptions.GutterTagSeparator);
+  FGutterBandEmpty:=     FGutter.FindIndexByTag(ATEditorOptions.GutterTagEmpty);
+end;
 
 {$I atsynedit_carets.inc}
 {$I atsynedit_hilite.inc}
