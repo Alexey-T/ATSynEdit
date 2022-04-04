@@ -32,6 +32,7 @@ type
   TATGutterDecorItem = record
     Data: TATGutterDecorData;
     procedure Init(const AData: TATGutterDecorData);
+    function IsBackgroundFill: boolean;
     class operator =(const a, b: TATGutterDecorItem): boolean;
   end;
 
@@ -80,6 +81,11 @@ end;
 procedure TATGutterDecorItem.Init(const AData: TATGutterDecorData);
 begin
   Data:= AData;
+end;
+
+function TATGutterDecorItem.IsBackgroundFill: boolean;
+begin
+  Result:= (Data.Text='') and (Data.ImageIndex=-1);
 end;
 
 class operator TATGutterDecorItem.=(const a, b: TATGutterDecorItem): boolean;
@@ -158,6 +164,7 @@ procedure TATGutterDecor.Add(const AData: TATGutterDecorData);
 var
   Item: TATGutterDecorItem;
   nLine, i: integer;
+  bBackfillerOld, bBackfillerNew: boolean;
 begin
   Item.Init(AData);
 
@@ -165,10 +172,22 @@ begin
   begin
     nLine:= FList.ItemPtr(i)^.Data.LineNum;
 
-    //item already exists: overwrite
+    //2 items can exist for the same line-number.
+    //make sure we put background-filler item to lower index.
     if nLine=AData.LineNum then
     begin
-      Items[i]:= Item;
+      bBackfillerOld:= Items[i].IsBackgroundFill;
+      bBackfillerNew:= Item.IsBackgroundFill;
+      if bBackfillerOld<>bBackfillerNew then
+      begin
+        if bBackfillerNew then
+          FList.Insert(i, Item)
+        else
+          FList.Insert(i+1, Item);
+      end
+      else
+        //overwrite old item
+        Items[i]:= Item;
       Exit
     end;
 
@@ -211,8 +230,15 @@ begin
     m:= (a+b+1) div 2;
 
     dif:= FList.ItemPtr(m)^.Data.LineNum-ALineNum;
+
     if dif=0 then
+    begin
+      //support several items for the same line number: return first of them
+      while (m>0) and (FList.ItemPtr(m-1)^.Data.LineNum=ALineNum) do
+        Dec(m);
       exit(m);
+    end;
+
     if dif>0 then
       b:= m-1
     else

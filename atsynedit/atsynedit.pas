@@ -8293,71 +8293,90 @@ begin
 end;
 
 procedure TATSynEdit.DoPaintGutterDecor(C: TCanvas; ALine: integer; const ARect: TRect);
+  //
+  procedure PaintDecorItem(const Decor: TATGutterDecorItem);
+  var
+    Style, StylePrev: TFontStyles;
+    Ext: TSize;
+    NText, NImageIndex: integer;
+    bPaintIcon: boolean;
+  begin
+    NImageIndex:= Decor.Data.ImageIndex;
+    bPaintIcon:= Assigned(FGutterDecorImages) and (NImageIndex>=0);
+
+    //paint decor text
+    if Decor.Data.Text<>'' then
+    begin
+      C.Font.Color:= Decor.Data.TextColor;
+      Style:= [];
+      if Decor.Data.TextBold then
+        Include(Style, fsBold);
+      if Decor.Data.TextItalic then
+        Include(Style, fsItalic);
+      StylePrev:= C.Font.Style;
+      C.Font.Style:= Style;
+
+      Ext:= C.TextExtent(Decor.Data.Text);
+      C.Brush.Color:= FColorGutterBG;
+
+      case FGutterDecorAlignment of
+        taCenter:
+          NText:= (ARect.Left+ARect.Right-Ext.cx) div 2;
+        taLeftJustify:
+          NText:= ARect.Left;
+        taRightJustify:
+          NText:= ARect.Right-Ext.cx;
+      end;
+
+      C.Brush.Style:= bsClear;
+      C.TextOut(
+        NText,
+        (ARect.Top+ARect.Bottom-Ext.cy) div 2,
+        Decor.Data.Text
+        );
+      C.Font.Style:= StylePrev;
+      C.Brush.Style:= bsSolid;
+    end
+    else
+    //paint decor icon
+    if bPaintIcon then
+    begin
+      if (NImageIndex>=0) and (NImageIndex<FGutterDecorImages.Count) then
+        FGutterDecorImages.Draw(C,
+          (ARect.Left+ARect.Right-FGutterDecorImages.Width) div 2,
+          (ARect.Top+ARect.Bottom-FGutterDecorImages.Height) div 2,
+          NImageIndex
+          );
+    end
+    else
+    //fill cell background
+    begin
+      C.Brush.Style:= bsSolid;
+      C.Brush.Color:= Decor.Data.TextColor;
+      C.FillRect(ARect);
+    end;
+  end;
+  //
 var
   Decor: TATGutterDecorItem;
-  Style, StylePrev: TFontStyles;
-  Ext: TSize;
-  NItem, NText, NImageIndex: integer;
-  bPaintIcon: boolean;
+  NItem: integer;
 begin
   if FGutterDecor=nil then exit;
   NItem:= FGutterDecor.Find(ALine);
   if NItem<0 then exit;
+
   Decor:= FGutterDecor[NItem];
+  PaintDecorItem(Decor);
 
-  NImageIndex:= Decor.Data.ImageIndex;
-  bPaintIcon:= Assigned(FGutterDecorImages) and (NImageIndex>=0);
-
-  //paint decor text
-  if Decor.Data.Text<>'' then
+  //paint next item, if current one is background-filler
+  if Decor.IsBackgroundFill then
   begin
-    C.Font.Color:= Decor.Data.TextColor;
-    Style:= [];
-    if Decor.Data.TextBold then
-      Include(Style, fsBold);
-    if Decor.Data.TextItalic then
-      Include(Style, fsItalic);
-    StylePrev:= C.Font.Style;
-    C.Font.Style:= Style;
-
-    Ext:= C.TextExtent(Decor.Data.Text);
-    C.Brush.Color:= FColorGutterBG;
-
-    case FGutterDecorAlignment of
-      taCenter:
-        NText:= (ARect.Left+ARect.Right-Ext.cx) div 2;
-      taLeftJustify:
-        NText:= ARect.Left;
-      taRightJustify:
-        NText:= ARect.Right-Ext.cx;
+    Inc(NItem);
+    if FGutterDecor.IsIndexValid(NItem) then
+    begin
+      Decor:= FGutterDecor[NItem];
+      PaintDecorItem(Decor);
     end;
-
-    C.Brush.Style:= bsClear;
-    C.TextOut(
-      NText,
-      (ARect.Top+ARect.Bottom-Ext.cy) div 2,
-      Decor.Data.Text
-      );
-    C.Font.Style:= StylePrev;
-    C.Brush.Style:= bsSolid;
-  end
-  else
-  //paint decor icon
-  if bPaintIcon then
-  begin
-    if (NImageIndex>=0) and (NImageIndex<FGutterDecorImages.Count) then
-      FGutterDecorImages.Draw(C,
-        (ARect.Left+ARect.Right-FGutterDecorImages.Width) div 2,
-        (ARect.Top+ARect.Bottom-FGutterDecorImages.Height) div 2,
-        NImageIndex
-        );
-  end
-  else
-  //fill cell background
-  begin
-    C.Brush.Style:= bsSolid;
-    C.Brush.Color:= Decor.Data.TextColor;
-    C.FillRect(ARect);
   end;
 end;
 
