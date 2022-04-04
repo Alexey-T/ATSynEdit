@@ -3017,11 +3017,14 @@ begin
 end;
 
 procedure TATSynEdit.GetRectGutterNumbers(out R: TRect);
+var
+  NBand: integer;
 begin
-  if FOptGutterVisible and FGutter[FGutterBandNumbers].Visible then
+  NBand:= FGutter.FindIndexByTag(ATEditorOptions.GutterTagNumbers);
+  if FOptGutterVisible and FGutter[NBand].Visible then
   begin
-    R.Left:= FGutter[FGutterBandNumbers].Left;
-    R.Right:= FGutter[FGutterBandNumbers].Right;
+    R.Left:= FGutter[NBand].Left;
+    R.Right:= FGutter[NBand].Right;
     R.Top:= FRectGutter.Top;
     R.Bottom:= FRectGutter.Bottom;
   end
@@ -3030,11 +3033,14 @@ begin
 end;
 
 procedure TATSynEdit.GetRectGutterBookmarks(out R: TRect);
+var
+  NBand: integer;
 begin
-  if FOptGutterVisible and FGutter[FGutterBandBookmarks].Visible then
+  NBand:= FGutter.FindIndexByTag(ATEditorOptions.GutterTagBookmarks);
+  if FOptGutterVisible and FGutter[NBand].Visible then
   begin
-    R.Left:= FGutter[FGutterBandBookmarks].Left;
-    R.Right:= FGutter[FGutterBandBookmarks].Right;
+    R.Left:= FGutter[NBand].Left;
+    R.Right:= FGutter[NBand].Right;
     R.Top:= FRectGutter.Top;
     R.Bottom:= FRectGutter.Bottom;
   end
