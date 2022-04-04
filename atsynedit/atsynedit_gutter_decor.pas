@@ -200,9 +200,7 @@ begin
         end;
       end
       else
-        //overwrite old item
         Items[i]:= NewItem;
-      Exit
     end
     else
       FList.Insert(i, NewItem);
