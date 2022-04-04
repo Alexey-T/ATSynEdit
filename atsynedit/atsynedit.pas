@@ -9888,20 +9888,6 @@ begin
   end;
 end;
 
-{
-procedure TATSynEdit.DoHandleWheelQueue;
-var
-  Rec: TATEditorWheelRecord;
-begin
-  while FWheelQueue.Size()>0 do
-  begin
-    Rec:= FWheelQueue.Front;
-    FWheelQueue.Pop();
-    DoHandleWheelRecord(Rec);
-  end;
-end;
-}
-
 procedure TATSynEdit.UpdateGutterBandIndexes;
 begin
   FGutterBandBookmarks:= FGutter.FindIndexByTag(ATEditorOptions.GutterTagBookmarks);
