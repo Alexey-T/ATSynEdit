@@ -101,7 +101,6 @@ begin
     TObject(FList[N]).Free;
     FList.Delete(N);
   end;
-  Update;
 end;
 
 procedure TATGutter.Move(AIndexCur, AIndexNew: integer);
