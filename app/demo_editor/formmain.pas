@@ -562,7 +562,7 @@ var
   NIndex: integer;
   Data: TATBookmarkData;
 begin
-  if ABand=ed.GutterBandBookmarks then
+  if ABand=ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagBookmarks) then
   begin
     NIndex:= ed.Strings.Bookmarks.Find(ALine);
     if NIndex>=0 then

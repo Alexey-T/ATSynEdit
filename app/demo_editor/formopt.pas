@@ -213,6 +213,7 @@ var
 begin
   with fmOpt do
   begin
+    {
     with ListCol do
     begin
       Items.Clear;
@@ -226,6 +227,7 @@ begin
       end;
       ItemIndex:= 0;
     end;
+    }
 
     //general
     chkCurLine.Checked:= ed.OptShowCurLine;
@@ -290,18 +292,18 @@ begin
     edRulerIndent.Value:= ed.OptRulerTopIndentPercents;
     comboRulerStyle.ItemIndex:= Ord(ed.OptRulerNumeration);
 
-    chkGutterBm.Checked:= ed.Gutter[ed.GutterBandBookmarks].Visible;
-    chkGutterNum.Checked:= ed.Gutter[ed.GutterBandNumbers].Visible;
-    chkGutterFold.Checked:= ed.Gutter[ed.GutterBandFolding].Visible;
-    chkGutterStat.Checked:= ed.Gutter[ed.GutterBandStates].Visible;
-    chkGutterSep.Checked:= ed.Gutter[ed.GutterBandSeparator].Visible;
-    chkGutterEmpty.Checked:= ed.Gutter[ed.GutterBandEmpty].Visible;
-    edSizeBm.Value:= ed.Gutter[ed.GutterBandBookmarks].Size;
-    edSizeFold.Value:= ed.Gutter[ed.GutterBandFolding].Size;
-    edSizeState.Value:= ed.Gutter[ed.GutterBandStates].Size;
-    edSizeSep.Value:= ed.Gutter[ed.GutterBandSeparator].Size;
-    edSizeEmpty.Value:= ed.Gutter[ed.GutterBandEmpty].Size;
-    edSizeNum.Value:= ed.Gutter[ed.GutterBandNumbers].Size;
+    chkGutterBm.Checked:= ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagBookmarks)].Visible;
+    chkGutterNum.Checked:= ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagNumbers)].Visible;
+    chkGutterFold.Checked:= ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagFolding)].Visible;
+    chkGutterStat.Checked:= ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagLineStates)].Visible;
+    chkGutterSep.Checked:= ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagSeparator)].Visible;
+    chkGutterEmpty.Checked:= ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagEmpty)].Visible;
+    edSizeBm.Value:= ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagBookmarks)].Size;
+    edSizeFold.Value:= ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagFolding)].Size;
+    edSizeState.Value:= ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagLineStates)].Size;
+    edSizeSep.Value:= ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagSeparator)].Size;
+    edSizeEmpty.Value:= ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagEmpty)].Size;
+    edSizeNum.Value:= ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagNumbers)].Size;
     edSizeNumIndent.Value:= ed.OptNumbersIndentPercents;
     chkGutterNumAuto.Checked:= ed.OptNumbersAutosize;
 
@@ -429,18 +431,18 @@ begin
       ed.OptRulerTopIndentPercents:= edRulerIndent.Value;
       ed.OptRulerNumeration:= TATEditorRulerNumeration(comboRulerStyle.ItemIndex);
 
-      ed.Gutter[ed.GutterBandBookmarks].Visible:= chkGutterBm.Checked;
-      ed.Gutter[ed.GutterBandNumbers].Visible:= chkGutterNum.Checked;
-      ed.Gutter[ed.GutterBandFolding].Visible:= chkGutterFold.Checked;
-      ed.Gutter[ed.GutterBandStates].Visible:= chkGutterStat.Checked;
-      ed.Gutter[ed.GutterBandSeparator].Visible:= chkGutterSep.Checked;
-      ed.Gutter[ed.GutterBandEmpty].Visible:= chkGutterEmpty.Checked;
-      ed.Gutter[ed.GutterBandBookmarks].Size:= edSizeBm.Value;
-      ed.Gutter[ed.GutterBandNumbers].Size:= edSizeNum.Value;
-      ed.Gutter[ed.GutterBandFolding].Size:= edSizeFold.Value;
-      ed.Gutter[ed.GutterBandStates].Size:= edSizeState.Value;
-      ed.Gutter[ed.GutterBandSeparator].Size:= edSizeSep.Value;
-      ed.Gutter[ed.GutterBandEmpty].Size:= edSizeEmpty.Value;
+      ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagBookmarks)].Visible:= chkGutterBm.Checked;
+      ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagNumbers)].Visible:= chkGutterNum.Checked;
+      ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagFolding)].Visible:= chkGutterFold.Checked;
+      ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagLineStates)].Visible:= chkGutterStat.Checked;
+      ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagSeparator)].Visible:= chkGutterSep.Checked;
+      ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagEmpty)].Visible:= chkGutterEmpty.Checked;
+      ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagBookmarks)].Size:= edSizeBm.Value;
+      ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagNumbers)].Size:= edSizeNum.Value;
+      ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagFolding)].Size:= edSizeFold.Value;
+      ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagLineStates)].Size:= edSizeState.Value;
+      ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagSeparator)].Size:= edSizeSep.Value;
+      ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagEmpty)].Size:= edSizeEmpty.Value;
       ed.OptNumbersAutosize:= chkGutterNumAuto.Checked;
       ed.OptNumbersIndentPercents:= edSizeNumIndent.Value;
 
