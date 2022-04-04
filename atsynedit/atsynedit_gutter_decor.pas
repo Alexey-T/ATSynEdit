@@ -63,7 +63,7 @@ type
     property Items[N: integer]: TATGutterDecorItem read GetItem write SetItem; default;
     function ItemPtr(N: integer): PATGutterDecorItem; inline;
     procedure Add(const AData: TATGutterDecorData);
-    function Find(ALineNum: integer): integer;
+    function Find(ALineNum: integer; AInsertionIndex: boolean=false): integer;
     procedure DeleteDups;
     procedure Update(AChange: TATLineChangeKind; ALine, AItemCount, ALineCount: integer);
   end;
@@ -169,18 +169,21 @@ end;
 procedure TATGutterDecor.Add(const AData: TATGutterDecorData);
 var
   NewItem: TATGutterDecorItem;
-  nLine, i: integer;
   bBackfillerOld, bBackfillerNew: boolean;
+  i: integer;
 begin
   NewItem.Init(AData);
 
-  for i:= 0 to Count-1 do
+  i:= Find(AData.LineNum, true{AInsertionIndex});
+  if not IsIndexValid(i) then
   begin
-    nLine:= ItemPtr(i)^.Data.LineNum;
-
+    FList.Add(NewItem);
+  end
+  else
+  begin
     //2 items can exist for the same line-number.
-    //make sure we put background-filler NewItem to lower index.
-    if nLine=AData.LineNum then
+    //make sure we put background-filler item to lower index.
+    if ItemPtr(i)^.Data.LineNum=AData.LineNum then
     begin
       bBackfillerOld:= ItemPtr(i)^.IsBackgroundFill;
       bBackfillerNew:= NewItem.IsBackgroundFill;
@@ -195,18 +198,10 @@ begin
         //overwrite old NewItem
         Items[i]:= NewItem;
       Exit
-    end;
-
-    //found NewItem for bigger line: insert before it
-    if nLine>AData.LineNum then
-    begin
+    end
+    else
       FList.Insert(i, NewItem);
-      Exit;
-    end;
   end;
-
-  //not found item for bigger line: append
-  FList.Add(NewItem);
 end;
 
 procedure TATGutterDecor.DeleteDups;
@@ -223,7 +218,8 @@ begin
   end;
 end;
 
-function TATGutterDecor.Find(ALineNum: integer): integer;
+function TATGutterDecor.Find(ALineNum: integer; AInsertionIndex: boolean=false): integer;
+//AInsertionIndex: find index to insert new item with ALineNum
 var
   a, b, m, dif: integer;
 begin
@@ -232,7 +228,13 @@ begin
   b:= Count-1;
 
   repeat
-    if a>b then exit;
+    if a>b then
+    begin
+      if AInsertionIndex then
+        exit(a)
+      else
+        exit(-1);
+    end;
     m:= (a+b+1) div 2;
 
     dif:= FList.ItemPtr(m)^.Data.LineNum-ALineNum;
