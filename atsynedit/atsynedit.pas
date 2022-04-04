@@ -3051,6 +3051,7 @@ end;
 procedure TATSynEdit.UpdateInitialVars(C: TCanvas);
 begin
   UpdateClientSizes;
+  UpdateGutterBandIndexes;
 
   C.Font.Name:= Font.Name;
   C.Font.Size:= DoScaleFont(Font.Size);
@@ -4740,16 +4741,12 @@ begin
   FGutterDecorAlignment:= taCenter;
   FGutterBandDecor:= -1;
 
-  FGutter.Add(-1, ATEditorOptions.GutterSizeBookmarks, ATEditorOptions.GutterTagBookmarks, true);
-  FGutter.Add(-1, ATEditorOptions.GutterSizeNumbers, ATEditorOptions.GutterTagNumbers, false);
-  FGutter.Add(-1, ATEditorOptions.GutterSizeLineStates, ATEditorOptions.GutterTagLineStates, true);
-  FGutter.Add(-1, ATEditorOptions.GutterSizeFolding, ATEditorOptions.GutterTagFolding, true);
-  FGutter.Add(-1, ATEditorOptions.GutterSizeSeparator, ATEditorOptions.GutterTagSeparator, false);
-  FGutter.Add(-1, ATEditorOptions.GutterSizeEmpty, ATEditorOptions.GutterTagEmpty, false);
-  UpdateGutterBandIndexes;
-
-  FGutter[FGutterBandSeparator].Visible:= false;
-  FGutter.Update;
+  FGutter.Add(-1, ATEditorOptions.GutterSizeBookmarks,  ATEditorOptions.GutterTagBookmarks,  true, true);
+  FGutter.Add(-1, ATEditorOptions.GutterSizeNumbers,    ATEditorOptions.GutterTagNumbers,    false, true);
+  FGutter.Add(-1, ATEditorOptions.GutterSizeLineStates, ATEditorOptions.GutterTagLineStates, true, true);
+  FGutter.Add(-1, ATEditorOptions.GutterSizeFolding,    ATEditorOptions.GutterTagFolding,    true, true);
+  FGutter.Add(-1, ATEditorOptions.GutterSizeSeparator,  ATEditorOptions.GutterTagSeparator,  false, false);
+  FGutter.Add(-1, ATEditorOptions.GutterSizeEmpty,      ATEditorOptions.GutterTagEmpty,      false, true);
 
   FOptNumbersAutosize:= true;
   FOptNumbersAlignment:= taRightJustify;

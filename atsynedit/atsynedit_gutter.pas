@@ -35,7 +35,7 @@ type
     constructor Create; virtual;
     destructor Destroy; override;
     function IsIndexValid(N: integer): boolean; inline;
-    procedure Add(AIndex: integer; ASize: integer; ATag: Int64; AScaled: boolean);
+    procedure Add(AIndex: integer; ASize: integer; ATag: Int64; AScaled, AVisible: boolean);
     procedure Delete(N: integer);
     procedure Clear;
     function Count: integer; inline;
@@ -77,16 +77,16 @@ begin
   inherited;
 end;
 
-procedure TATGutter.Add(AIndex: integer; ASize: integer; ATag: Int64;
-  AScaled: boolean);
+procedure TATGutter.Add(AIndex: integer; ASize: integer; ATag: Int64; AScaled,
+  AVisible: boolean);
 var
   Item: TATGutterItem;
 begin
   Item:= TATGutterItem.Create;
-  Item.Visible:= true;
   Item.Size:= ASize;
   Item.Tag:= ATag;
   Item.Scaled:= AScaled;
+  Item.Visible:= AVisible;
   if AIndex<0 then
     FList.Add(Item)
   else
