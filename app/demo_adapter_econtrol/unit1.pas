@@ -14,6 +14,7 @@ uses
   ATSynEdit_Carets,
   ATSynEdit_Bookmarks,
   ATSynEdit_Export_HTML,
+  ATSynEdit_Globals,
   ec_SyntAnal,
   ec_proc_lexer;
 
@@ -148,9 +149,6 @@ begin
   ed.OptRulerVisible:= false;
   ed.Colors.TextBG:= $e0f0f0;
   ed.Colors.CurrentLineBG:= clTeal;
-
-  ed.Gutter[ed.GutterBandNumbers].Visible:= false;
-  ed.Gutter.Update;
 
   ed.OnClickGutter:= @EditClickGutter;
   ed.OnCalcStaple:= @EditCalcStaple;
@@ -343,7 +341,7 @@ var
   NIndex: integer;
   Data: TATBookmarkData;
 begin
-  if ABand=ed.GutterBandBookmarks then
+  if ABand=ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagBookmarks) then
   begin
     NIndex:= ed.Strings.Bookmarks.Find(ALine);
     if NIndex>=0 then
