@@ -168,45 +168,45 @@ end;
 
 procedure TATGutterDecor.Add(const AData: TATGutterDecorData);
 var
-  Item: TATGutterDecorItem;
+  NewItem: TATGutterDecorItem;
   nLine, i: integer;
   bBackfillerOld, bBackfillerNew: boolean;
 begin
-  Item.Init(AData);
+  NewItem.Init(AData);
 
   for i:= 0 to Count-1 do
   begin
     nLine:= ItemPtr(i)^.Data.LineNum;
 
     //2 items can exist for the same line-number.
-    //make sure we put background-filler item to lower index.
+    //make sure we put background-filler NewItem to lower index.
     if nLine=AData.LineNum then
     begin
       bBackfillerOld:= ItemPtr(i)^.IsBackgroundFill;
-      bBackfillerNew:= Item.IsBackgroundFill;
+      bBackfillerNew:= NewItem.IsBackgroundFill;
       if bBackfillerOld<>bBackfillerNew then
       begin
         if bBackfillerNew then
-          FList.Insert(i, Item)
+          FList.Insert(i, NewItem)
         else
-          FList.Insert(i+1, Item);
+          FList.Insert(i+1, NewItem);
       end
       else
-        //overwrite old item
-        Items[i]:= Item;
+        //overwrite old NewItem
+        Items[i]:= NewItem;
       Exit
     end;
 
-    //found item for bigger line: insert before it
+    //found NewItem for bigger line: insert before it
     if nLine>AData.LineNum then
     begin
-      FList.Insert(i, Item);
+      FList.Insert(i, NewItem);
       Exit;
     end;
   end;
 
   //not found item for bigger line: append
-  FList.Add(Item);
+  FList.Add(NewItem);
 end;
 
 procedure TATGutterDecor.DeleteDups;
