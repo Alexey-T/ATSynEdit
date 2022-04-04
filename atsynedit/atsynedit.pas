@@ -8358,7 +8358,7 @@ procedure TATSynEdit.DoPaintGutterDecor(C: TCanvas; ALine: integer; const ARect:
   end;
   //
 var
-  Decor: TATGutterDecorItem;
+  Decor: PATGutterDecorItem;
   NItem: integer;
 begin
   if FGutterDecor=nil then exit;
@@ -8366,15 +8366,15 @@ begin
   if NItem<0 then exit;
 
   //paint first found item
-  Decor:= FGutterDecor[NItem];
-  PaintDecorItem(Decor);
+  Decor:= FGutterDecor.ItemPtr(NItem);
+  PaintDecorItem(Decor^);
 
   //paint next item, if first one is background-filler
-  if Decor.IsBackgroundFill and FGutterDecor.IsIndexValid(NItem+1) then
+  if Decor^.IsBackgroundFill and FGutterDecor.IsIndexValid(NItem+1) then
   begin
-    Decor:= FGutterDecor[NItem+1];
-    if Decor.Data.LineNum=ALine then
-      PaintDecorItem(Decor);
+    Decor:= FGutterDecor.ItemPtr(NItem+1);
+    if Decor^.Data.LineNum=ALine then
+      PaintDecorItem(Decor^);
   end;
 end;
 

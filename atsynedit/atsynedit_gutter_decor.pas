@@ -61,6 +61,7 @@ type
     function Count: integer; inline;
     function IsIndexValid(N: integer): boolean; inline;
     property Items[N: integer]: TATGutterDecorItem read GetItem write SetItem; default;
+    function ItemPtr(N: integer): PATGutterDecorItem; inline;
     procedure Add(const AData: TATGutterDecorData);
     function Find(ALineNum: integer): integer;
     procedure DeleteDups;
@@ -158,6 +159,11 @@ end;
 function TATGutterDecor.IsIndexValid(N: integer): boolean;
 begin
   Result:= (N>=0) and (N<FList.Count);
+end;
+
+function TATGutterDecor.ItemPtr(N: integer): PATGutterDecorItem;
+begin
+  Result:= FList.ItemPtr(N);
 end;
 
 procedure TATGutterDecor.Add(const AData: TATGutterDecorData);
