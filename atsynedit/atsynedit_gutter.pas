@@ -37,6 +37,7 @@ type
     function IsIndexValid(N: integer): boolean; inline;
     procedure Add(AIndex: integer; ASize: integer; ATag: Int64; AScaled, AVisible: boolean);
     procedure Delete(N: integer);
+    procedure Move(AIndexCur, AIndexNew: integer);
     procedure Clear;
     function Count: integer; inline;
     property Items[N: integer]: TATGutterItem read GetItem; default;
@@ -101,6 +102,11 @@ begin
     FList.Delete(N);
   end;
   Update;
+end;
+
+procedure TATGutter.Move(AIndexCur, AIndexNew: integer);
+begin
+  FList.Move(AIndexCur, AIndexNew);
 end;
 
 procedure TATGutter.Clear;
