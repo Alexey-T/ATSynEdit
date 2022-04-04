@@ -1,7 +1,7 @@
 
 2022.04.04
-+ add: ATEditorOptions has new members GutterTagNNNN
-+ add: TATGutter has new method FindIndexByTag, which you must use instead of reading GutterBandNNNN props
+* change: gutter bands are addressed by FindIndexByTag(ATag) now, added members ATEditorOptions.GutterTagNNNN
+* change: removed GutterBandNNNN props
 
 2022.03.22
 + add: ATEditorOptions.UseGlobalCharSizer

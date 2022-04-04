@@ -1558,6 +1558,7 @@ type
     property Gutter: TATGutter read FGutter;
     property GutterDecor: TATGutterDecor read GetGutterDecor;
     property GutterDecorAlignment: TAlignment read FGutterDecorAlignment write FGutterDecorAlignment;
+    {
     property GutterBandBookmarks: integer read FGutterBandBookmarks;
     property GutterBandNumbers: integer read FGutterBandNumbers;
     property GutterBandStates: integer read FGutterBandStates;
@@ -1565,6 +1566,7 @@ type
     property GutterBandSeparator: integer read FGutterBandSeparator;
     property GutterBandEmpty: integer read FGutterBandEmpty;
     property GutterBandDecor: integer read FGutterBandDecor;
+    }
     //files
     property FileName: string read FFileName write FFileName;
     procedure LoadFromFile(const AFilename: string; AKeepScroll: boolean=false); virtual;
@@ -4507,8 +4509,6 @@ begin
 end;
 
 constructor TATSynEdit.Create(AOwner: TComponent);
-var
-  i: integer;
 begin
   inherited;
 
@@ -4754,6 +4754,7 @@ begin
   FGutter.Add(-1, ATEditorOptions.GutterSizeFolding,    ATEditorOptions.GutterTagFolding,    true, true);
   FGutter.Add(-1, ATEditorOptions.GutterSizeSeparator,  ATEditorOptions.GutterTagSeparator,  false, false);
   FGutter.Add(-1, ATEditorOptions.GutterSizeEmpty,      ATEditorOptions.GutterTagEmpty,      false, true);
+  UpdateGutterBandIndexes;
 
   FOptNumbersAutosize:= true;
   FOptNumbersAlignment:= taRightJustify;
