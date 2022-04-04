@@ -195,7 +195,7 @@ begin
           FList.Insert(i+1, NewItem);
       end
       else
-        //overwrite old NewItem
+        //overwrite old item
         Items[i]:= NewItem;
       Exit
     end
