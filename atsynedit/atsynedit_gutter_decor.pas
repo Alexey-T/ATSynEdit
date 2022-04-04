@@ -176,13 +176,13 @@ begin
 
   for i:= 0 to Count-1 do
   begin
-    nLine:= FList.ItemPtr(i)^.Data.LineNum;
+    nLine:= ItemPtr(i)^.Data.LineNum;
 
     //2 items can exist for the same line-number.
     //make sure we put background-filler item to lower index.
     if nLine=AData.LineNum then
     begin
-      bBackfillerOld:= Items[i].IsBackgroundFill;
+      bBackfillerOld:= ItemPtr(i)^.IsBackgroundFill;
       bBackfillerNew:= Item.IsBackgroundFill;
       if bBackfillerOld<>bBackfillerNew then
       begin
