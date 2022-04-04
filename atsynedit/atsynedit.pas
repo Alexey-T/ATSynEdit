@@ -2209,7 +2209,7 @@ end;
 
 procedure TATSynEdit.UpdateGutterAutosize;
 var
-  NCnt, NLen: integer;
+  NCnt, NLen, NBandIndex: integer;
 begin
   NCnt:= Strings.Count;
 
@@ -2234,7 +2234,8 @@ begin
   if FOptNumbersStyle=cNumbersRelative then //add space for '-'
     Inc(NLen);
 
-  FGutter[FGutterBandNumbers].Size:=
+  NBandIndex:= FGutter.FindIndexByTag(ATEditorOptions.GutterTagNumbers);
+  FGutter[NBandIndex].Size:=
     NLen*FCharSize.XScaled div ATEditorCharXScale + 2*FNumbersIndent;
   FGutter.Update;
 end;
