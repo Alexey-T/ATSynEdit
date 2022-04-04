@@ -8297,12 +8297,16 @@ var
   Decor: TATGutterDecorItem;
   Style, StylePrev: TFontStyles;
   Ext: TSize;
-  N, NText: integer;
+  NItem, NText, NImageIndex: integer;
+  bPaintIcon: boolean;
 begin
   if FGutterDecor=nil then exit;
-  N:= FGutterDecor.Find(ALine);
-  if N<0 then exit;
-  Decor:= FGutterDecor[N];
+  NItem:= FGutterDecor.Find(ALine);
+  if NItem<0 then exit;
+  Decor:= FGutterDecor[NItem];
+
+  NImageIndex:= Decor.Data.ImageIndex;
+  bPaintIcon:= Assigned(FGutterDecorImages) and (NImageIndex>=0);
 
   //paint decor text
   if Decor.Data.Text<>'' then
@@ -8335,18 +8339,25 @@ begin
       Decor.Data.Text
       );
     C.Font.Style:= StylePrev;
+    C.Brush.Style:= bsSolid;
   end
   else
   //paint decor icon
-  if Assigned(FGutterDecorImages) then
+  if bPaintIcon then
   begin
-    N:= Decor.Data.ImageIndex;
-    if (N>=0) and (N<FGutterDecorImages.Count) then
+    if (NImageIndex>=0) and (NImageIndex<FGutterDecorImages.Count) then
       FGutterDecorImages.Draw(C,
         (ARect.Left+ARect.Right-FGutterDecorImages.Width) div 2,
         (ARect.Top+ARect.Bottom-FGutterDecorImages.Height) div 2,
-        N
+        NImageIndex
         );
+  end
+  else
+  //fill cell background
+  begin
+    C.Brush.Style:= bsSolid;
+    C.Brush.Color:= Decor.Data.TextColor;
+    C.FillRect(ARect);
   end;
 end;
 
