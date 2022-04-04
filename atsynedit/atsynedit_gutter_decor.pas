@@ -192,7 +192,12 @@ begin
         if bBackfillerNew then
           FList.Insert(i, NewItem)
         else
-          FList.Insert(i+1, NewItem);
+        begin
+          if IsIndexValid(i+1) and (ItemPtr(i+1)^.Data.LineNum=AData.LineNum) then
+            FList[i+1]:= NewItem
+          else
+            FList.Insert(i+1, NewItem);
+        end;
       end
       else
         //overwrite old item
