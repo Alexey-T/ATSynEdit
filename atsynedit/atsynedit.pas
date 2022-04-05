@@ -5917,11 +5917,27 @@ var
   ActionId: TATEditorMouseAction;
   bClickOnSelection: boolean;
   R: TRect;
+  NewKey: word;
 begin
   if not OptMouseEnableAll then exit;
   inherited;
   SetFocus;
   DoCaretForceShow;
+
+  case Button of
+    mbExtra1:
+      begin
+        NewKey:= VK_BROWSER_BACK;
+        KeyDown(NewKey, Shift);
+        Exit;
+      end;
+    mbExtra2:
+      begin
+        NewKey:= VK_BROWSER_FORWARD;
+        KeyDown(NewKey, Shift);
+        Exit;
+      end;
+  end;
 
   FMouseDownCoordOriginal.X:= X;
   FMouseDownCoordOriginal.Y:= Y;
