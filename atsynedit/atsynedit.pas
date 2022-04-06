@@ -2075,6 +2075,7 @@ procedure EditorOpenLink(const S: string);
 
 procedure InitEditorMouseActions(out M: TATEditorMouseActions; ANoCtrlClickForCaret: boolean);
 
+function HandleMouseDownToHandleExtraMouseButtons(Ctl: TCustomControl; Button: TMouseButton; Shift: TShiftState): boolean;
 
 implementation
 
@@ -5917,27 +5918,13 @@ var
   ActionId: TATEditorMouseAction;
   bClickOnSelection: boolean;
   R: TRect;
-  NewKey: word;
 begin
   if not OptMouseEnableAll then exit;
   inherited;
   SetFocus;
   DoCaretForceShow;
 
-  case Button of
-    mbExtra1:
-      begin
-        NewKey:= VK_BROWSER_BACK;
-        KeyDown(NewKey, Shift);
-        Exit;
-      end;
-    mbExtra2:
-      begin
-        NewKey:= VK_BROWSER_FORWARD;
-        KeyDown(NewKey, Shift);
-        Exit;
-      end;
-  end;
+  if HandleMouseDownToHandleExtraMouseButtons(Self, Button, Shift) then exit;
 
   FMouseDownCoordOriginal.X:= X;
   FMouseDownCoordOriginal.Y:= Y;
@@ -9945,6 +9932,31 @@ begin
   FGutterBandFolding:=   FGutter.FindIndexByTag(ATEditorOptions.GutterTagFolding);
   FGutterBandSeparator:= FGutter.FindIndexByTag(ATEditorOptions.GutterTagSeparator);
   FGutterBandEmpty:=     FGutter.FindIndexByTag(ATEditorOptions.GutterTagEmpty);
+end;
+
+type
+  TCustomControlHack = class(TCustomControl);
+
+function HandleMouseDownToHandleExtraMouseButtons(Ctl: TCustomControl; Button: TMouseButton; Shift: TShiftState): boolean;
+var
+  NewKey: word;
+begin
+  case Button of
+    mbExtra1:
+      begin
+        NewKey:= VK_BROWSER_BACK;
+        TCustomControlHack(Ctl).KeyDown(NewKey, Shift);
+        Result:= true;
+      end;
+    mbExtra2:
+      begin
+        NewKey:= VK_BROWSER_FORWARD;
+        TCustomControlHack(Ctl).KeyDown(NewKey, Shift);
+        Result:= true;
+      end;
+    else
+      Result:= false;
+  end;
 end;
 
 {$I atsynedit_carets.inc}
