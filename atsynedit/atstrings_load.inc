@@ -96,6 +96,54 @@ begin
   end;
 end;
 
+function DetectStreamEncodingByXmlId(Stream: TStream; var AEnc: TATFileEncoding; var AEncCodepage: TEncConvId): boolean;
+//detect in XML files by signature <?xml version="1.0" encoding="ISO-8859-9"?>
+const
+  cTagXML = '<?xml ';
+  cTagEnc = ' encoding="';
+var
+  Buf: array[0..70] of char;
+  TempEnc: TEncConvId;
+  S: string;
+  N: integer;
+begin
+  Result:= false;
+  FillChar(Buf, SizeOf(Buf), 0);
+  Stream.Position:= 0;
+  N:= Stream.Read(Buf, SizeOf(Buf)-1);
+  Stream.Position:= 0;
+  if N<=20 then exit;
+
+  SetString(S, Buf, N);
+  SDeleteFrom(S, #10);
+  SDeleteFrom(S, #13);
+
+  N:= Pos(cTagXML, S);
+  if N=0 then exit;
+  N:= Pos(cTagEnc, S);
+  if N=0 then exit;
+  Delete(S, 1, N-1+Length(cTagEnc));
+  SDeleteFrom(S, '"');
+
+  TempEnc:= EncConvFindEncoding(LowerCase(S));
+  case TempEnc of
+    eidUTF8:
+      begin
+        AEnc:= cEncUTF8;
+        Result:= true;
+      end;
+    eidUCS2LE,
+    eidUCS2BE:
+      exit;
+    else
+      begin
+        AEnc:= cEncAnsi;
+        AEncCodepage:= TempEnc;
+        Result:= true;
+      end;
+  end;
+end;
+
 function DetectStreamEncodingByPythonId(Stream: TStream; var AEnc: TATFileEncoding; var AEncCodepage: TEncConvId): boolean;
 // https://docs.python.org/3/reference/lexical_analysis.html#encoding-declarations
 const
@@ -217,6 +265,9 @@ begin
     end;
 
   if DetectStreamEncodingByPythonId(Stream, Enc, EncCodepage) then
+    Exit;
+
+  if DetectStreamEncodingByXmlId(Stream, Enc, EncCodepage) then
     Exit;
 
   if BufSizeUTF16>0 then
