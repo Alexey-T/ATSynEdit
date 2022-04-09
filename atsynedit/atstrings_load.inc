@@ -127,7 +127,8 @@ begin
 
   TempEnc:= EncConvFindEncoding(LowerCase(S));
   case TempEnc of
-    eidUTF8:
+    eidUTF8,
+    eidUTF8BOM:
       begin
         AEnc:= cEncUTF8;
         Result:= true;
