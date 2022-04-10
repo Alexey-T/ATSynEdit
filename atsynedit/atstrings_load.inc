@@ -149,6 +149,7 @@ function DetectStreamEncodingByPythonId(Stream: TStream; var AEnc: TATFileEncodi
 // https://docs.python.org/3/reference/lexical_analysis.html#encoding-declarations
 const
   BufSize = 100;
+  cLineCount = 2; //detect by first 2 lines, 2nd used if 1st is comment
   cRegex = '^.+coding[=:]\s*([-\w.]+)';
   cRegexGroup = 1;
 var
@@ -162,8 +163,7 @@ begin
   Stream.Read(Buf[1], Length(Buf));
   Sep.Init(Buf, #10); //don't support CR separator yet
 
-  //detect by first 2 lines, 2nd used if 1st is comment
-  for i:= 1 to 2 do
+  for i:= 1 to cLineCount do
     if Sep.GetItemStr(SLine) then
     begin
       if SLine='' then exit;
@@ -174,6 +174,9 @@ begin
         not SBeginsWith(SLine, ';') and
         not SBeginsWith(SLine, '//') and
         not SBeginsWith(SLine, '--') then exit;
+
+      //before RegEx, check by simple find
+      if Pos('coding', SLine)=0 then Continue;
 
       SEncId:= SFindRegexMatch(SLine, cRegex, cRegexGroup, false, false, false);
       if SEncId<>'' then
