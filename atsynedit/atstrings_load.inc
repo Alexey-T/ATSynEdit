@@ -155,6 +155,7 @@ const
 var
   Buf, SLine, SEncId: string;
   Sep: TATStringSeparator;
+  RegexObj: TRegExpr;
   i: integer;
 begin
   Result:= false;
@@ -162,6 +163,13 @@ begin
   Stream.Position:= 0;
   Stream.Read(Buf[1], Length(Buf));
   Sep.Init(Buf, #10); //don't support CR separator yet
+
+ RegexObj:= TRegExpr.Create;
+ try
+  RegexObj.ModifierS:= false;
+  RegexObj.ModifierM:= false;
+  RegexObj.ModifierI:= false;
+  RegexObj.Expression:= cRegex;
 
   for i:= 1 to cLineCount do
     if Sep.GetItemStr(SLine) then
@@ -175,29 +183,36 @@ begin
         not SBeginsWith(SLine, '//') and
         not SBeginsWith(SLine, '--') then exit;
 
-      //before RegEx, check by simple find
+      //before RegEx, check by simple search
       if Pos('coding', SLine)=0 then Continue;
 
-      SEncId:= SFindRegexMatch(SLine, cRegex, cRegexGroup, false, false, false);
-      if SEncId<>'' then
+      if RegexObj.Exec(SLine) then
       begin
-        AEncCodepage:= EncConvFindEncoding(SEncId);
-        case AEncCodepage of
-          eidUTF8,
-          eidUTF8BOM,
-          eidUCS2LE,
-          eidUCS2BE:
-            begin
-              AEnc:= cEncUTF8;
-              AEncCodepage:= eidUTF8;
-            end
-          else
-            AEnc:= cEncAnsi;
+        SEncId:= RegexObj.Match[cRegexGroup];
+        if SEncId<>'' then
+        begin
+          AEncCodepage:= EncConvFindEncoding(SEncId);
+          case AEncCodepage of
+            eidUTF8,
+            eidUTF8BOM,
+            eidUCS2LE,
+            eidUCS2BE:
+              begin
+                AEnc:= cEncUTF8;
+                AEncCodepage:= eidUTF8;
+              end
+            else
+              AEnc:= cEncAnsi;
+          end;
+          Result:= true;
+          exit;
         end;
-        Result:= true;
-        exit;
       end;
     end;
+
+ finally
+  FreeAndNil(RegexObj);
+ end;
 end;
 
 procedure DetectStreamEncoding(Stream: TStream;

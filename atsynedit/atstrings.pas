@@ -23,6 +23,7 @@ uses
   ATSynEdit_Gutter_Decor,
   ATSynEdit_Commands,
   ATSynEdit_Globals,
+  ATSynEdit_RegExpr,
   EncConv;
 
 type
