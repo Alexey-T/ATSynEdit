@@ -52,6 +52,8 @@ type
     UseGlobalCharSizer: boolean;
     DetectUTF8BufferKb: integer;
     DetectUTF16BufferWords: integer;
+    DetectEncodingByPythonSignature: boolean;
+    DetectEncodingByXmlSignature: boolean;
 
     ItalicFontLongerInPercents: integer;
     UnprintedTabCharLength: integer;
@@ -357,6 +359,8 @@ initialization
     UseGlobalCharSizer:= true;
     DetectUTF8BufferKb:= 8;
     DetectUTF16BufferWords:= 5;
+    DetectEncodingByPythonSignature:= true;
+    DetectEncodingByXmlSignature:= true;
 
     ItalicFontLongerInPercents:= 40;
     UnprintedTabCharLength:= 1;

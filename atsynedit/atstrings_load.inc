@@ -299,11 +299,13 @@ begin
         end;
     end;
 
-  if DetectStreamEncodingByPythonId(Stream, Enc, EncCodepage) then
-    Exit;
+  if ATEditorOptions.DetectEncodingByPythonSignature then
+    if DetectStreamEncodingByPythonId(Stream, Enc, EncCodepage) then
+      Exit;
 
-  if DetectStreamEncodingByXmlId(Stream, Enc, EncCodepage) then
-    Exit;
+  if ATEditorOptions.DetectEncodingByXmlSignature then
+    if DetectStreamEncodingByXmlId(Stream, Enc, EncCodepage) then
+      Exit;
 
   if BufSizeUTF16>0 then
     if DetectStreamUtf16NoBom(Stream, BufSizeUTF16, IsLE) then
