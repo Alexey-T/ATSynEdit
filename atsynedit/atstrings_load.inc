@@ -189,8 +189,7 @@ const
   cBufSize = 100;
   cLineCount = 2; //detect by first 2 lines, 2nd used if 1st is comment
 var
-  Buf, SLine1, SLine2, SEncId: string;
-  SArray: array[0..cLineCount-1] of string;
+  Buf, SLine, SEncId: string;
   Sep: TATStringSeparator;
   i: integer;
 begin
@@ -203,18 +202,14 @@ begin
 
   Buf:= StringReplace(Buf, #13#10, #10, [rfReplaceAll]);
   Buf:= StringReplace(Buf, #13, #10, [rfReplaceAll]);
-
   Sep.Init(Buf, #10);
-  Sep.GetItemStr(SLine1);
-  Sep.GetItemStr(SLine2);
-  SArray[0]:= SLine1;
-  SArray[1]:= SLine2;
 
   for i:= 0 to cLineCount-1 do
   begin
-    if SArray[i]='' then exit;
-    if not IsLineComment(SArray[i]) then exit;
-    SEncId:= LowerCase(GetEnc(SArray[i]));
+    Sep.GetItemStr(SLine);
+    if SLine='' then exit;
+    if not IsLineComment(SLine) then exit;
+    SEncId:= LowerCase(GetEnc(SLine));
     if SEncId<>'' then
     begin
       AEncCodepage:= EncConvFindEncoding(SEncId);
