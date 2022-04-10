@@ -214,7 +214,7 @@ begin
   begin
     if SArray[i]='' then exit;
     if not IsLineComment(SArray[i]) then exit;
-    SEncId:= GetEnc(SArray[i]);
+    SEncId:= LowerCase(GetEnc(SArray[i]));
     if SEncId<>'' then
     begin
       AEncCodepage:= EncConvFindEncoding(SEncId);
