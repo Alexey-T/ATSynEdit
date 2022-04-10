@@ -146,7 +146,18 @@ begin
 end;
 
 function DetectStreamEncodingByPythonId(Stream: TStream; var AEnc: TATFileEncoding; var AEncCodepage: TEncConvId): boolean;
-// https://docs.python.org/3/reference/lexical_analysis.html#encoding-declarations
+{
+https://docs.python.org/3/reference/lexical_analysis.html#encoding-declarations
+The recommended forms of an encoding expression are
+
+# -*- coding: <encoding-name> -*-
+
+which is recognized also by GNU Emacs, and
+
+# vim:fileencoding=<encoding-name>
+
+which is recognized by VIM.
+}
   //
   function IsLineComment(const S: string): boolean;
   begin
@@ -157,21 +168,30 @@ function DetectStreamEncodingByPythonId(Stream: TStream; var AEnc: TATFileEncodi
       SBeginsWith(S, '--');
   end;
   //
-  function IsLineNeeded(const S: string): boolean;
+  function GetEnc(const S: string): string;
+  var
+    N, N0: integer;
   begin
-    Result:= Pos('coding', S)>0;
+    Result:= '';
+    N:= Pos('coding', S);
+    if N=0 then exit;
+    if N+10>Length(S) then exit;
+    Inc(N, 6);
+    if not (S[N] in ['=', ':']) then exit;
+    Inc(N);
+    while (N<=Length(S)) and (S[N]=' ') do Inc(N);
+    N0:= N;
+    while (N<=Length(S)) and (S[N] in ['a'..'z', 'A'..'Z', '0'..'9', '-']) do Inc(N);
+    Result:= Copy(S, N0, N-N0);
   end;
   //
 const
   cBufSize = 100;
   cLineCount = 2; //detect by first 2 lines, 2nd used if 1st is comment
-  cRegex = '^.+coding[=:]\s*([-\w.]+)';
-  cRegexGroup = 1;
 var
   Buf, SLine1, SLine2, SEncId: string;
   SArray: array[0..cLineCount-1] of string;
   Sep: TATStringSeparator;
-  RegexObj: TRegExpr;
   i: integer;
 begin
   Result:= false;
@@ -190,49 +210,29 @@ begin
   SArray[0]:= SLine1;
   SArray[1]:= SLine2;
 
-  if not IsLineComment(SLine1) then exit;
-  if not IsLineNeeded(SLine1) and
-    not IsLineNeeded(SLine2) then exit;
-
-  RegexObj:= TRegExpr.Create;
-  try
-    RegexObj.ModifierS:= false;
-    RegexObj.ModifierM:= false;
-    RegexObj.ModifierI:= false;
-    RegexObj.Expression:= cRegex;
-
-    for i:= 0 to cLineCount-1 do
+  for i:= 0 to cLineCount-1 do
+  begin
+    if SArray[i]='' then exit;
+    if not IsLineComment(SArray[i]) then exit;
+    SEncId:= GetEnc(SArray[i]);
+    if SEncId<>'' then
     begin
-      if SArray[i]='' then exit;
-      if not IsLineComment(SArray[i]) then exit;
-      if not IsLineNeeded(SArray[i]) then Continue;
-
-      if RegexObj.Exec(SArray[i]) then
-      begin
-        SEncId:= RegexObj.Match[cRegexGroup];
-        if SEncId<>'' then
-        begin
-          AEncCodepage:= EncConvFindEncoding(SEncId);
-          case AEncCodepage of
-            eidUTF8,
-            eidUTF8BOM,
-            eidUCS2LE,
-            eidUCS2BE:
-              begin
-                AEnc:= cEncUTF8;
-                AEncCodepage:= eidUTF8;
-              end
-            else
-              AEnc:= cEncAnsi;
-          end;
-          Result:= true;
-          exit;
-        end;
+      AEncCodepage:= EncConvFindEncoding(SEncId);
+      case AEncCodepage of
+        eidUTF8,
+        eidUTF8BOM,
+        eidUCS2LE,
+        eidUCS2BE:
+          begin
+            AEnc:= cEncUTF8;
+            AEncCodepage:= eidUTF8;
+          end
+        else
+          AEnc:= cEncAnsi;
       end;
+      Result:= true;
+      exit;
     end;
-
-  finally
-    FreeAndNil(RegexObj);
   end;
 end;
 
