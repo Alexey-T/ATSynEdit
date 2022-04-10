@@ -147,22 +147,52 @@ end;
 
 function DetectStreamEncodingByPythonId(Stream: TStream; var AEnc: TATFileEncoding; var AEncCodepage: TEncConvId): boolean;
 // https://docs.python.org/3/reference/lexical_analysis.html#encoding-declarations
+  //
+  function IsLineComment(const S: string): boolean;
+  begin
+    Result:=
+      SBeginsWith(S, '#') or
+      SBeginsWith(S, ';') or
+      SBeginsWith(S, '//') or
+      SBeginsWith(S, '--');
+  end;
+  //
+  function IsLineNeeded(const S: string): boolean;
+  begin
+    Result:= Pos('coding', S)>0;
+  end;
+  //
 const
-  BufSize = 100;
+  cBufSize = 100;
   cLineCount = 2; //detect by first 2 lines, 2nd used if 1st is comment
   cRegex = '^.+coding[=:]\s*([-\w.]+)';
   cRegexGroup = 1;
 var
-  Buf, SLine, SEncId: string;
+  Buf, SLine1, SLine2, SEncId: string;
+  SArray: array[0..cLineCount-1] of string;
   Sep: TATStringSeparator;
   RegexObj: TRegExpr;
   i: integer;
 begin
   Result:= false;
-  Buf:= StringOfChar(' ', BufSize);
+  Buf:= StringOfChar(' ', cBufSize);
   Stream.Position:= 0;
-  Stream.Read(Buf[1], Length(Buf));
-  Sep.Init(Buf, #10); //don't support CR separator yet
+  i:= Stream.Read(Buf[1], Length(Buf));
+  SetLength(Buf, i);
+  Stream.Position:= 0;
+
+  Buf:= StringReplace(Buf, #13#10, #10, [rfReplaceAll]);
+  Buf:= StringReplace(Buf, #13, #10, [rfReplaceAll]);
+
+  Sep.Init(Buf, #10);
+  Sep.GetItemStr(SLine1);
+  Sep.GetItemStr(SLine2);
+  SArray[0]:= SLine1;
+  SArray[1]:= SLine2;
+
+  if not IsLineComment(SLine1) then exit;
+  if not IsLineNeeded(SLine1) and
+    not IsLineNeeded(SLine2) then exit;
 
   RegexObj:= TRegExpr.Create;
   try
@@ -171,44 +201,35 @@ begin
     RegexObj.ModifierI:= false;
     RegexObj.Expression:= cRegex;
 
-    for i:= 1 to cLineCount do
-      if Sep.GetItemStr(SLine) then
+    for i:= 0 to cLineCount-1 do
+    begin
+      if SArray[i]='' then exit;
+      if not IsLineComment(SArray[i]) then exit;
+      if not IsLineNeeded(SArray[i]) then Continue;
+
+      if RegexObj.Exec(SArray[i]) then
       begin
-        if SLine='' then exit;
-
-        //support several line comments, not all
-        if
-          not SBeginsWith(SLine, '#') and
-          not SBeginsWith(SLine, ';') and
-          not SBeginsWith(SLine, '//') and
-          not SBeginsWith(SLine, '--') then exit;
-
-        //before RegEx, check by simple search
-        if Pos('coding', SLine)=0 then Continue;
-
-        if RegexObj.Exec(SLine) then
+        SEncId:= RegexObj.Match[cRegexGroup];
+        if SEncId<>'' then
         begin
-          SEncId:= RegexObj.Match[cRegexGroup];
-          if SEncId<>'' then
-          begin
-            AEncCodepage:= EncConvFindEncoding(SEncId);
-            case AEncCodepage of
-              eidUTF8,
-              eidUTF8BOM,
-              eidUCS2LE,
-              eidUCS2BE:
-                begin
-                  AEnc:= cEncUTF8;
-                  AEncCodepage:= eidUTF8;
-                end
-              else
-                AEnc:= cEncAnsi;
-            end;
-            Result:= true;
-            exit;
+          AEncCodepage:= EncConvFindEncoding(SEncId);
+          case AEncCodepage of
+            eidUTF8,
+            eidUTF8BOM,
+            eidUCS2LE,
+            eidUCS2BE:
+              begin
+                AEnc:= cEncUTF8;
+                AEncCodepage:= eidUTF8;
+              end
+            else
+              AEnc:= cEncAnsi;
           end;
+          Result:= true;
+          exit;
         end;
       end;
+    end;
 
   finally
     FreeAndNil(RegexObj);
