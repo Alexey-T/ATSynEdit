@@ -1,4 +1,8 @@
 
+2022.04.10
++ add: ATEditorOptions.DetectEncodingByPythonId (on)
++ add: ATEditorOptions.DetectEncodingByXmlId (on)
+
 2022.04.04
 * change: gutter bands are addressed by FindIndexByTag(ATag) now, added members ATEditorOptions.GutterTagNNNN
 * change: removed GutterBandNNNN props
