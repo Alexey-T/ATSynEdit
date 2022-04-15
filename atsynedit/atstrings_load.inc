@@ -125,7 +125,13 @@ begin
   Delete(S, 1, N-1+Length(cTagEnc));
   SDeleteFrom(S, '"');
 
-  TempEnc:= EncConvFindEncoding(LowerCase(S));
+  S:= LowerCase(S);
+  S:= StringReplace(S, 'windows-', 'cp', []);
+  S:= StringReplace(S, 'ibm-', 'cp', []);
+  S:= StringReplace(S, 'ibm', 'cp', []);
+  S:= StringReplace(S, 'iso_', 'iso-', []);
+
+  TempEnc:= EncConvFindEncoding(S);
   case TempEnc of
     eidUTF8,
     eidUTF8BOM:
