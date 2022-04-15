@@ -134,6 +134,8 @@ begin
   S:= StringReplace(S, 'ibm', 'cp', []);
   S:= StringReplace(S, 'iso_', 'iso-', []);
   S:= StringReplace(S, 'utf-8', 'utf8', []);
+  if (S='us') or (S='us-ascii') then //this maps to cp367 but Lazarus don't have it
+    S:= 'cp437';
 
   TempEnc:= EncConvFindEncoding(S);
   case TempEnc of
