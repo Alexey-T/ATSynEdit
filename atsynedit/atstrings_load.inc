@@ -186,18 +186,19 @@ which is recognized by VIM.
   //
   function GetEnc(const S: string): string;
   var
-    N, N0: integer;
+    N, N0, Len: integer;
   begin
     Result:= '';
     N:= Pos('coding', S);
     if N=0 then exit;
-    if N+8>Length(S) then exit;
+    Len:= Length(S);
+    if N+8>Len then exit;
     Inc(N, 6);
     if not (S[N] in ['=', ':']) then exit;
     Inc(N);
-    while (N<=Length(S)) and (S[N]=' ') do Inc(N);
+    while (N<=Len) and (S[N]=' ') do Inc(N);
     N0:= N;
-    while (N<=Length(S)) and (S[N] in ['a'..'z', 'A'..'Z', '0'..'9', '-']) do Inc(N);
+    while (N<=Len) and (S[N] in ['a'..'z', 'A'..'Z', '0'..'9', '-']) do Inc(N);
     Result:= Copy(S, N0, N-N0);
 
     Result:= FixEncodingNameByIANAStandart(Result);
