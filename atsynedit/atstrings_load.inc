@@ -101,7 +101,7 @@ function FixEncodingNameByIANAStandart(const S: string): string;
 // IANA Registered Character Sets
 // https://www.iana.org/assignments/character-sets/character-sets.xhtml
 begin
-  Result:= S;
+  Result:= LowerCase(S);
   Result:= StringReplace(Result, 'windows-', 'cp', []);
   Result:= StringReplace(Result, 'ibm', 'cp', []);
   Result:= StringReplace(Result, 'iso_', 'iso-', []);
@@ -139,7 +139,6 @@ begin
   Delete(S, 1, N-1+Length(cTagEnc));
   SDeleteFrom(S, '"');
 
-  S:= LowerCase(S);
   S:= FixEncodingNameByIANAStandart(S);
 
   TempEnc:= EncConvFindEncoding(S);
@@ -192,7 +191,7 @@ which is recognized by VIM.
     Result:= '';
     N:= Pos('coding', S);
     if N=0 then exit;
-    if N+10>Length(S) then exit;
+    if N+8>Length(S) then exit;
     Inc(N, 6);
     if not (S[N] in ['=', ':']) then exit;
     Inc(N);
@@ -200,6 +199,8 @@ which is recognized by VIM.
     N0:= N;
     while (N<=Length(S)) and (S[N] in ['a'..'z', 'A'..'Z', '0'..'9', '-']) do Inc(N);
     Result:= Copy(S, N0, N-N0);
+
+    Result:= FixEncodingNameByIANAStandart(Result);
   end;
   //
 const
