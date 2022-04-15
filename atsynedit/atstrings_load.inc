@@ -130,6 +130,7 @@ begin
   S:= StringReplace(S, 'ibm-', 'cp', []);
   S:= StringReplace(S, 'ibm', 'cp', []);
   S:= StringReplace(S, 'iso_', 'iso-', []);
+  S:= StringReplace(S, 'utf-8', 'utf8', []);
 
   TempEnc:= EncConvFindEncoding(S);
   case TempEnc of
