@@ -126,6 +126,10 @@ begin
   SDeleteFrom(S, '"');
 
   S:= LowerCase(S);
+
+  //correct some names, we must support this standard:
+  // IANA Registered Character Sets
+  // https://www.iana.org/assignments/character-sets/character-sets.xhtml
   S:= StringReplace(S, 'windows-', 'cp', []);
   S:= StringReplace(S, 'ibm', 'cp', []);
   S:= StringReplace(S, 'iso_', 'iso-', []);
