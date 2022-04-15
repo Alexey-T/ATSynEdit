@@ -96,6 +96,20 @@ begin
   end;
 end;
 
+function FixEncodingNameByIANAStandart(const S: string): string;
+//correct some names according to this standard:
+// IANA Registered Character Sets
+// https://www.iana.org/assignments/character-sets/character-sets.xhtml
+begin
+  Result:= S;
+  Result:= StringReplace(Result, 'windows-', 'cp', []);
+  Result:= StringReplace(Result, 'ibm', 'cp', []);
+  Result:= StringReplace(Result, 'iso_', 'iso-', []);
+  Result:= StringReplace(Result, 'utf-8', 'utf8', []);
+  if (Result='us') or (Result='us-ascii') then //this maps to cp367 but Lazarus don't have it
+    Result:= 'cp437';
+end;
+
 function DetectStreamEncodingByXmlId(Stream: TStream; var AEnc: TATFileEncoding; var AEncCodepage: TEncConvId): boolean;
 //detect in XML files by signature <?xml version="1.0" encoding="ISO-8859-9"?>
 const
@@ -126,16 +140,7 @@ begin
   SDeleteFrom(S, '"');
 
   S:= LowerCase(S);
-
-  //correct some names, we must support this standard:
-  // IANA Registered Character Sets
-  // https://www.iana.org/assignments/character-sets/character-sets.xhtml
-  S:= StringReplace(S, 'windows-', 'cp', []);
-  S:= StringReplace(S, 'ibm', 'cp', []);
-  S:= StringReplace(S, 'iso_', 'iso-', []);
-  S:= StringReplace(S, 'utf-8', 'utf8', []);
-  if (S='us') or (S='us-ascii') then //this maps to cp367 but Lazarus don't have it
-    S:= 'cp437';
+  S:= FixEncodingNameByIANAStandart(S);
 
   TempEnc:= EncConvFindEncoding(S);
   case TempEnc of
