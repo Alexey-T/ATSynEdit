@@ -187,7 +187,7 @@ const
   cCommand_ClipboardPaste_KeepCaret = 1002;
   cCommand_ClipboardPaste_Column = 1003 or cCmdFlag_ResetSel;
   cCommand_ClipboardPaste_ColumnKeepCaret = 1004 or cCmdFlag_ResetSel;
-  cCommand_ClipboardPasteAndIndent = 1005 or cCmdFlag_ResetSel;
+  cCommand_ClipboardPasteAndIndent = 1005;
   cCommand_ClipboardCopy = 1006;
   cCommand_ClipboardCopyAdd = 1007;
   cCommand_ClipboardCut = 1008;

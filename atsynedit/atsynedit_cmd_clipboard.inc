@@ -136,6 +136,8 @@ begin
   Caret.GetRange(X1, Y1, X2, Y2, bSel);
   if not Strings.IsIndexValid(Y1) then Exit;
 
+  Result:= DoCommand_TextDeleteSelection; //like Sublime
+
   //support indents with tab-chars
   XColumn:= TabHelper.CharPosToColumnPos(Y1, Strings.Lines[Y1], X1);
 
