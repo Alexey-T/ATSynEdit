@@ -6000,7 +6000,8 @@ begin
           end;
         mcaPaste:
           begin
-            //don't set caret pos here, user needs to press middle-btn on any place to paste
+            //set caret to the clicked position, like Kate and VSCode do:
+            DoCaretSingle(PosTextClicked.X, PosTextClicked.Y);
             DoCommand(cCommand_ClipboardAltPaste, cInvokeInternal); //uses PrimarySelection:TClipboard
           end;
         mcaGotoDefinition:
