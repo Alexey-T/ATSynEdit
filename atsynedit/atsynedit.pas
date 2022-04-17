@@ -3599,11 +3599,13 @@ begin
   if IsFoldLineNeededBeforeWrapitem(AWrapIndex) then
   begin
     NCoordSep:= ARectLine.Top-1;
-    C.Pen.Color:= Colors.CollapseLine;
-    CanvasLineHorz(C,
+    CanvasLineHorz_Dashed(C,
+      Colors.CollapseLine,
       ARectLine.Left+FFoldUnderlineOffset,
       NCoordSep,
-      ARectLine.Right-FFoldUnderlineOffset
+      ARectLine.Right-FFoldUnderlineOffset,
+      12,
+      4
       );
   end;
 
