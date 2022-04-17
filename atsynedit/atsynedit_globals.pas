@@ -38,6 +38,9 @@ type
     //set to 1 to allow only one editor for Strings obj (saves memory).
     MaxStringsClients = 2;
 
+    LineHorz_DashLen = 12;
+    LineHorz_EmptyLen = 4;
+
   public
     //force UTF8 for huge files on loading
     MaxFileSizeMbToDetectEncoding: integer;

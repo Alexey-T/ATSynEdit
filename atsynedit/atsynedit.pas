@@ -3604,8 +3604,8 @@ begin
       ARectLine.Left+FFoldUnderlineOffset,
       NCoordSep,
       ARectLine.Right-FFoldUnderlineOffset,
-      12,
-      4
+      ATEditorOptions.LineHorz_DashLen,
+      ATEditorOptions.LineHorz_EmptyLen
       );
   end;
 
