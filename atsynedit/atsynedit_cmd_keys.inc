@@ -502,11 +502,11 @@ begin
 end;
 
 
-function TATSynEdit.DoCommand_Cancel(AKeepLast, AKeepSel: boolean): TATCommandResults;
+function TATSynEdit.DoCommand_Cancel(AKeepLastCaret, AKeepSelection: boolean): TATCommandResults;
 var
   i: integer;
 begin
-  if AKeepLast and (Carets.Count>0) then
+  if AKeepLastCaret and (Carets.Count>0) then
   begin
     for i:= Carets.Count-2 downto 0 do
       Carets.Delete(i);
@@ -514,7 +514,7 @@ begin
   else
     DoCaretSingleAsIs;
 
-  if not AKeepSel then
+  if not AKeepSelection then
     DoSelect_None;
 
   ClearMouseDownVariables;
