@@ -33,13 +33,13 @@ type
     ProgressLoadChars = 1024*1024;
     ProgressSaveLines = 128*1024;
 
-    //set it to number of editors, which share same Strings obj
-    //(needed when UI tab is splitted to N parts, for the same file).
+    //set it to number of editors, which share the same Strings object
+    //needed when UI tab is splitted to N parts, for the same file.
     //set to 1 to allow only one editor for Strings obj (saves memory).
     MaxStringsClients = 2;
 
-    LineHorz_DashLen = 12;
-    LineHorz_EmptyLen = 4;
+    DashedLine_DashLen = 12;
+    DashedLine_EmptyLen = 4;
 
   public
     //force UTF8 for huge files on loading
