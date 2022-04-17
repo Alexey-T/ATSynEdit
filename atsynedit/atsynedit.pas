@@ -1632,7 +1632,7 @@ type
     procedure DoRangeHideLines(ALineFrom, ALineTo: integer); inline;
     procedure DoFoldForLevel(ALevel: integer);
     procedure DoFoldForLevelEx(ALevel: integer; AOuterRange: integer);
-    procedure DoFoldUnfoldRangeAtCurLine(AOp: TATEditorFoldRangeCommand);
+    function DoFoldUnfoldRangeAtCurLine(AOp: TATEditorFoldRangeCommand): boolean;
     property FoldingAsString: string read GetFoldingAsString write SetFoldingAsString;
     property FoldingAsStringTodo: string read FFoldingAsStringTodo write FFoldingAsStringTodo;
     //markers

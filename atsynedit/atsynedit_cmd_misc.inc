@@ -178,8 +178,10 @@ end;
 
 function TATSynEdit.DoCommand_FoldRangeAtCurLine(ACommand: TATEditorFoldRangeCommand): TATCommandResults;
 begin
-  DoFoldUnfoldRangeAtCurLine(ACommand);
-  Result:= [cResultCaretAny, cResultScroll, cResultFoldChange];
+  Result:= [];
+  if Carets.Count<>1 then Exit; //we don't need this cmd for multi-carets
+  if DoFoldUnfoldRangeAtCurLine(ACommand) then
+    Result:= [cResultCaretAny, cResultScroll, cResultFoldChange];
 end;
 
 procedure TATSynEdit.UpdateFoldLineIndexer;

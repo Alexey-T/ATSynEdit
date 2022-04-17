@@ -444,44 +444,51 @@ begin
 end;
 
 
-procedure TATSynEdit.DoFoldUnfoldRangeAtCurLine(AOp: TATEditorFoldRangeCommand);
+function TATSynEdit.DoFoldUnfoldRangeAtCurLine(AOp: TATEditorFoldRangeCommand): boolean;
 var
-  NLine, NRange: integer;
-  bFolded: boolean;
+  X, Y, X2, Y2, NRange, iCaret: integer;
+  bSel, bFolded: boolean;
 begin
-  if Carets.Count<>1 then exit;
-  NLine:= Carets[0].PosY;
-  if not Strings.IsIndexValid(NLine) then exit;
+  Result:= false;
+  for iCaret:= Carets.Count-1 downto 0 do
+  begin
+    Carets[iCaret].GetRange(X, Y, X2, Y2, bSel);
+    if bSel then Continue;
+    if not Strings.IsIndexValid(Y) then Continue;
 
-  NRange:= Fold.FindDeepestRangeContainingLine(NLine, false{AWithStaple}, FFoldIconForMinimalRange);
-  if NRange<0 then exit;
-  bFolded:= Fold.Items[NRange].Folded;
+    NRange:= Fold.FindDeepestRangeContainingLine(Y, false{AWithStaple}, FFoldIconForMinimalRange);
+    if NRange<0 then Continue;
+    bFolded:= Fold.Items[NRange].Folded;
 
-  case AOp of
-    cFoldingFold:
-      begin
-        if not bFolded then
+    case AOp of
+      cFoldingFold:
         begin
-          DoRangeFold(NRange);
-          Update;
+          if not bFolded then
+          begin
+            DoRangeFold(NRange);
+            Update;
+            Result:= true;
+          end;
         end;
-      end;
-    cFoldingUnfold:
-      begin
-        if bFolded then
+      cFoldingUnfold:
         begin
-          DoRangeUnfold(NRange);
-          Update;
+          if bFolded then
+          begin
+            DoRangeUnfold(NRange);
+            Update;
+            Result:= true;
+          end;
         end;
-      end;
-    cFoldingToggle:
-      begin
-        if bFolded then
-          DoRangeUnfold(NRange)
-        else
-          DoRangeFold(NRange);
-        Update;
-      end;
+      cFoldingToggle:
+        begin
+          if bFolded then
+            DoRangeUnfold(NRange)
+          else
+            DoRangeFold(NRange);
+          Update;
+          Result:= true;
+        end;
+    end;
   end;
 end;
 
