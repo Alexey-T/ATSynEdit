@@ -1004,6 +1004,7 @@ type
     function DoCalcLineLen(ALineIndex: integer): integer;
     procedure DoChangeBookmarks;
     procedure DoHandleWheelRecord(const ARec: TATEditorWheelRecord);
+    procedure DoStringsOnUnfoldLine(Sender: TObject; ALine: integer);
     procedure FlushEditingChangeEx(AChange: TATLineChangeKind; ALine, AItemCount: integer);
     procedure FlushEditingChangeLog(ALine: integer);
     function GetActualDragDropIsCopying: boolean;
@@ -4667,6 +4668,7 @@ begin
   FStringsInt.OnChangeLog:= @DoStringsOnChangeLog;
   FStringsInt.OnUndoBefore:= @DoStringsOnUndoBefore;
   FStringsInt.OnUndoAfter:= @DoStringsOnUndoAfter;
+  FStringsInt.OnUnfoldLine:=@DoStringsOnUnfoldLine;
 
   FFold:= TATSynRanges.Create;
   FFoldStyle:= cInitFoldStyle;
@@ -9806,6 +9808,20 @@ begin
   if FOptUndoPauseHighlightLine then
     OptShowCurLine:= OldOption;
 end;
+
+procedure TATSynEdit.DoStringsOnUnfoldLine(Sender: TObject; ALine: integer);
+var
+  N: integer;
+begin
+  N:= Fold.FindRangeWithPlusAtLine(ALine);
+  if N>=0 then
+    if Fold.Items[N].Folded then
+    begin
+      DoRangeUnfold(N);
+      UpdateWrapInfo(true); //without this, WrapInfo is not updated somehow
+    end;
+end;
+
 
 procedure TATSynEdit.ActionAddJumpToUndo;
 var

@@ -168,6 +168,7 @@ type
   TATStringsChangeBlockEvent = procedure(Sender: TObject; const AStartPos, AEndPos: TPoint; 
                                  AChange: TATBlockChangeKind; ABlock: TStringList) of object;
   TATStringsUndoEvent = procedure(Sender: TObject; AX, AY: integer) of object;
+  TATStringsUnfoldLineEvent = procedure(Sender: TObject; ALine: integer) of object;
 
 type
   { TATStrings }
@@ -212,6 +213,7 @@ type
     FOnUndoBefore: TATStringsUndoEvent;
     FOnUndoAfter: TATStringsUndoEvent;
     FOnChangeBlock: TATStringsChangeBlockEvent;
+    FOnUnfoldLine: TATStringsUnfoldLineEvent;
     FChangeBlockActive: boolean;
       //to use with OnChangeBlock:
       //indicates that program can ignore separate line changes in OnChange,
@@ -437,6 +439,7 @@ type
     property OnChangeBlock: TATStringsChangeBlockEvent read FOnChangeBlock write FOnChangeBlock;
     property OnUndoBefore: TATStringsUndoEvent read FOnUndoBefore write FOnUndoBefore;
     property OnUndoAfter: TATStringsUndoEvent read FOnUndoAfter write FOnUndoAfter;
+    property OnUnfoldLine: TATStringsUnfoldLineEvent read FOnUnfoldLine write FOnUnfoldLine;
   end;
 
 type
@@ -1105,6 +1108,7 @@ end;
 procedure TATStrings.SetLine(AIndex: integer; const AValue: atString);
 var
   Item: PATStringItem;
+  bFolded0, bFolded1: boolean;
 begin
   //Assert(IsIndexValid(AIndex));
   if FReadOnly then Exit;
@@ -1118,13 +1122,21 @@ begin
   Item^.Line:= AValue;
 
   //fully unfold this line
-  Item^.Ex.FoldFrom_0:= 0;
-  Item^.Ex.FoldFrom_1:= 0;
+  bFolded0:= Item^.Ex.FoldFrom_0>0;
+  bFolded1:= Item^.Ex.FoldFrom_1>0;
+  if bFolded0 then
+    Item^.Ex.FoldFrom_0:= 0;
+  if bFolded1 then
+    Item^.Ex.FoldFrom_1:= 0;
 
   Item^.LineStateToChanged;
 
   Item^.Ex.Updated:= true;
   Item^.Ex.HasTab:= 0; //unknown
+
+  if bFolded0 or bFolded1 then
+    if Assigned(FOnUnfoldLine) then
+      FOnUnfoldLine(Self, AIndex);
 end;
 
 procedure TATStrings.SetLineSep(AIndex: integer; AValue: TATLineSeparator);
