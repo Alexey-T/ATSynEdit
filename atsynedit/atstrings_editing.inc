@@ -655,15 +655,17 @@ begin
   begin
     BeginUndoGroup;
 
+    if (LinesFoldFrom[AY, 0]>0) or
+      (LinesFoldFrom[AY, 1]>0) then
+      if Assigned(FOnUnfoldLine) then
+        FOnUnfoldLine(Self, AY);
+
     if AX<Length(Str) then
     begin
       StrMove:= Copy(Str, AX+1, MaxInt);
       Delete(Str, AX+1, MaxInt);
       Lines[AY]:= Str;
-    end
-    else
-    if Assigned(FOnUnfoldLine) then
-      FOnUnfoldLine(Self, AY);
+    end;
 
     //handle situation when we at non-eol line, this must give
     //inserted line also w/o eol
