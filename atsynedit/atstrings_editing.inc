@@ -660,7 +660,10 @@ begin
       StrMove:= Copy(Str, AX+1, MaxInt);
       Delete(Str, AX+1, MaxInt);
       Lines[AY]:= Str;
-    end;
+    end
+    else
+    if Assigned(FOnUnfoldLine) then
+      FOnUnfoldLine(Self, AY);
 
     //handle situation when we at non-eol line, this must give
     //inserted line also w/o eol
