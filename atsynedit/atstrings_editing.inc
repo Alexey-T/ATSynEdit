@@ -268,6 +268,8 @@ procedure TATStrings.TextDeleteLeft(AX, AY: integer; ALen: integer;
 var
   Str, StrPrev: atString;
   bNeedGroup: boolean;
+  bFold0, bFold1: boolean;
+  nFold0, nFold1: integer;
 begin
   AShift.X:= 0;
   AShift.Y:= 0;
@@ -326,9 +328,25 @@ begin
       //  nil);
 
       StrPrev:= Lines[AY-1];
-      if Str<>'' then
-        Lines[AY-1]:= StrPrev+Str;
-      LineDelete(AY);
+      if StrPrev='' then
+        LineDelete(AY-1)
+      else
+      begin
+        nFold0:= LinesFoldFrom[AY, 0];
+        nFold1:= LinesFoldFrom[AY, 1];
+        bFold0:= nFold0>0;
+        bFold1:= nFold1>0;
+
+        if Str<>'' then
+          Lines[AY-1]:= StrPrev+Str;
+        LineDelete(AY);
+
+        if bFold0 then
+          LinesFoldFrom[AY-1, 0]:= nFold0+Length(StrPrev);
+        if bFold1 then
+          LinesFoldFrom[AY-1, 1]:= nFold1+Length(StrPrev);
+      end;
+
       AShift.Y:= -1;
       APosAfter.X:= Length(StrPrev);
       APosAfter.Y:= AY-1;
