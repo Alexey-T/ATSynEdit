@@ -268,8 +268,6 @@ procedure TATStrings.TextDeleteLeft(AX, AY: integer; ALen: integer;
 var
   Str, StrPrev: atString;
   bNeedGroup: boolean;
-  bFold0, bFold1: boolean;
-  nFold0, nFold1: integer;
 begin
   AShift.X:= 0;
   AShift.Y:= 0;
@@ -327,20 +325,10 @@ begin
       //  cBlockDeleteLines,
       //  nil);
 
-      nFold0:= LinesFoldFrom[AY, 0];
-      nFold1:= LinesFoldFrom[AY, 1];
-      bFold0:= nFold0>0;
-      bFold1:= nFold1>0;
-
       StrPrev:= Lines[AY-1];
       if StrPrev<>'' then
-      begin
+        //better do changing of line AY (and delete AY-1), this will unfold block on this line
         Lines[AY]:= StrPrev+Str;
-        if bFold0 or bFold1 then
-          if Assigned(FOnUnfoldLine) then
-            FOnUnfoldLine(Self, AY);
-      end;
-
       LineDelete(AY-1);
 
       AShift.Y:= -1;
