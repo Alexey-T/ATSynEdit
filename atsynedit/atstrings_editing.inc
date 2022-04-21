@@ -327,25 +327,21 @@ begin
       //  cBlockDeleteLines,
       //  nil);
 
+      nFold0:= LinesFoldFrom[AY, 0];
+      nFold1:= LinesFoldFrom[AY, 1];
+      bFold0:= nFold0>0;
+      bFold1:= nFold1>0;
+
       StrPrev:= Lines[AY-1];
-      if StrPrev='' then
-        LineDelete(AY-1)
-      else
+      if StrPrev<>'' then
       begin
-        nFold0:= LinesFoldFrom[AY, 0];
-        nFold1:= LinesFoldFrom[AY, 1];
-        bFold0:= nFold0>0;
-        bFold1:= nFold1>0;
-
-        if Str<>'' then
-          Lines[AY-1]:= StrPrev+Str;
-        LineDelete(AY);
-
-        if bFold0 then
-          LinesFoldFrom[AY-1, 0]:= nFold0+Length(StrPrev);
-        if bFold1 then
-          LinesFoldFrom[AY-1, 1]:= nFold1+Length(StrPrev);
+        Lines[AY]:= StrPrev+Str;
+        if bFold0 or bFold1 then
+          if Assigned(FOnUnfoldLine) then
+            FOnUnfoldLine(Self, AY);
       end;
+
+      LineDelete(AY-1);
 
       AShift.Y:= -1;
       APosAfter.X:= Length(StrPrev);
