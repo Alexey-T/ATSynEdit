@@ -6148,7 +6148,6 @@ begin
   if FOptShowMouseSelFrame then
     if FMouseDragCoord.X>=0 then
     begin
-      FMouseDragCoord:= Point(-1, -1);
       bMovedMinimal:= IsPointsDiffByDelta(Point(X, Y), FMouseDownCoordOriginal, ATEditorOptions.MouseMoveSmallDelta);
       if bMovedMinimal then
         Invalidate;
@@ -6163,6 +6162,7 @@ begin
         DoMinimapClick(Y);
       FMouseDragMinimap:= false;
     end;
+    ClearMouseDownVariables;
     Exit
   end;
 
@@ -6240,6 +6240,8 @@ begin
   FMouseDragDropping:= false;
   FMouseDragDroppingReal:= false;
   FMouseDragMinimap:= false;
+  FMouseDragCoord:= Point(-1, -1);
+
   if Assigned(FTimerScroll) then
     FTimerScroll.Enabled:= false;
 end;
