@@ -256,7 +256,9 @@ procedure DetectStreamEncoding(Stream: TStream;
   out SignLen: integer;
   out EncWithBom: boolean;
   BufSizeUTF8: integer;
-  BufSizeUTF16: integer);
+  BufSizeUTF16: integer;
+  DetectByPythonSignature: boolean;
+  DetectByXmlSignature: boolean);
 var
   IsLE: boolean;
 begin
@@ -318,11 +320,11 @@ begin
         end;
     end;
 
-  if ATEditorOptions.DetectEncodingByPythonSignature then
+  if DetectByPythonSignature then
     if DetectStreamEncodingByPythonId(Stream, Enc, EncCodepage) then
       Exit;
 
-  if ATEditorOptions.DetectEncodingByXmlSignature then
+  if DetectByXmlSignature then
     if DetectStreamEncodingByXmlId(Stream, Enc, EncCodepage) then
       Exit;
 
@@ -617,8 +619,11 @@ begin
   begin
     //detect encoding by signature, even for huge files
     DetectStreamEncoding(Stream, FEncoding, FEncodingCodepage, NSignatureLen, bWithBom,
-      0, //buffer sizes=0
-      0);
+      0, //buffer size=0
+      0, //buffer size=0
+      ATEditorOptions.DetectEncodingByPythonSignature,
+      ATEditorOptions.DetectEncodingByXmlSignature
+      );
     //no signature?
     //it's safe to set here UTF8 even for binary files, later contents will be checked
     if not bWithBom then
@@ -634,14 +639,20 @@ begin
       FEncoding:= cEncAnsi;
     DetectStreamEncoding(Stream, FEncoding, FEncodingCodepage, NSignatureLen, bWithBom,
       ATEditorOptions.DetectUTF8BufferKb,
-      ATEditorOptions.DetectUTF16BufferWords);
+      ATEditorOptions.DetectUTF16BufferWords,
+      ATEditorOptions.DetectEncodingByPythonSignature,
+      ATEditorOptions.DetectEncodingByXmlSignature
+      );
   end
   else
   begin
     //detect encoding only by signature
     DetectStreamEncoding(Stream, FEncoding, FEncodingCodepage, NSignatureLen, bWithBom,
       0, //buffer sizes=0
-      0);
+      0,
+      false,
+      false
+      );
   end;
 
   case FEncoding of
