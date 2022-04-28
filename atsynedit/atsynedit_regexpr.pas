@@ -80,8 +80,8 @@ interface
 { off $DEFINE UseWordChars} // Use WordChars property, otherwise fixed list 'a'..'z','A'..'Z','0'..'9','_' 
 { off $DEFINE UseSpaceChars} // Use SpaceChars property, otherwise fixed list
 { off $DEFINE UseLineSep} // Use LineSeparators property, otherwise fixed line-break chars
-{$IFDEF FPC} // Not supported in FreePascal
-{$DEFINE FastUnicodeData} // Use arrays for UpperCase/LowerCase/IsWordChar, they take 320K more memory
+{$IFDEF FPC}
+  {$DEFINE FastUnicodeData} // Use arrays for UpperCase/LowerCase/IsWordChar, they take 320K more memory
 {$ENDIF}
 {$DEFINE UseFirstCharSet} // Enable optimization, which finds possible first chars of input string
 {$DEFINE RegExpPCodeDump} // Enable method Dump() to show opcode as string
@@ -93,6 +93,7 @@ interface
   {$UNDEF UnicodeEx}
   {$UNDEF FastUnicodeData}
 {$ENDIF}
+{.$DEFINE Compat} // Enable compatability methods/properties for forked version in Free Pascal 3.0
 // ======== Define Pascal-language options
 // Define 'UseAsserts' option (do not edit this definitions).
 // Asserts used to catch 'strange bugs' in TRegExpr implementation (when something goes
@@ -113,7 +114,11 @@ uses
   Classes, // TStrings in Split method
   SysUtils, // Exception
   {$IFDEF D2009}
-    {$IFDEF D_XE}System.{$ENDIF}Character,
+    {$IFDEF D_XE}
+    System.Character,
+    {$ELSE}
+    Character,
+    {$ENDIF}
   {$ENDIF}
   Math;
 
@@ -246,6 +251,10 @@ type
   end;
   TRegExprCharCheckerInfos = array of TRegExprCharCheckerInfo;
 
+  {$IFDEF Compat}
+  TRegExprInvertCaseFunction = function(const Ch: REChar): REChar of object;
+  {$ENDIF}
+
   { TRegExpr }
 
   TRegExpr = class
@@ -364,6 +373,17 @@ type
     fHelper: TRegExpr;
     fHelperLen: integer;
 
+    {$IFDEF Compat}
+    fUseUnicodeWordDetection: boolean;
+    fInvertCase: TRegExprInvertCaseFunction;
+    fEmptyInputRaisesError: boolean;
+    fUseOsLineEndOnReplace: boolean;
+    function OldInvertCase(const Ch: REChar): REChar;
+    function GetLinePairedSeparator: RegExprString;
+    procedure SetLinePairedSeparator(const AValue: RegExprString);
+    procedure SetUseOsLineEndOnReplace(AValue: boolean);
+    {$ENDIF}
+
     procedure InitCharCheckers;
     function CharChecker_Word(ch: REChar): boolean;
     function CharChecker_NotWord(ch: REChar): boolean;
@@ -465,7 +485,7 @@ type
 
     function HexDig(Ch: REChar): integer;
 
-    function UnQuoteChar(var APtr: PRegExprChar): REChar;
+    function UnQuoteChar(var APtr, AEnd: PRegExprChar): REChar;
 
     // the lowest level
     function ParseAtom(var FlagParse: integer): PRegExprChar;
@@ -580,6 +600,16 @@ type
     // so you can implement really complex functionality.
     function ReplaceEx(const AInputStr: RegExprString;
       AReplaceFunc: TRegExprReplaceFunction): RegExprString;
+
+    {$IFDEF Compat}
+    function ExecPos(AOffset: integer; ATryOnce: boolean): boolean; overload; deprecated 'Use modern form of ExecPos()';
+    class function InvertCaseFunction(const Ch: REChar): REChar; deprecated 'This has no effect now';
+    property InvertCase: TRegExprInvertCaseFunction read fInvertCase write fInvertCase; deprecated 'This has no effect now';
+    property UseUnicodeWordDetection: boolean read fUseUnicodeWordDetection write fUseUnicodeWordDetection; deprecated 'This has no effect, use {$DEFINE Unicode} instead';
+    property LinePairedSeparator: RegExprString read GetLinePairedSeparator write SetLinePairedSeparator; deprecated 'This has no effect now';
+    property EmptyInputRaisesError: boolean read fEmptyInputRaisesError write fEmptyInputRaisesError; deprecated 'This has no effect now';
+    property UseOsLineEndOnReplace: boolean read fUseOsLineEndOnReplace write SetUseOsLineEndOnReplace; deprecated 'Use property ReplaceLineEnd instead';
+    {$ENDIF}
 
     // Returns ID of last error, 0 if no errors (unusable if
     // Error method raises exception) and clear internal status
@@ -789,7 +819,7 @@ uses
 const
   // TRegExpr.VersionMajor/Minor return values of these constants:
   REVersionMajor = 1;
-  REVersionMinor = 153;
+  REVersionMinor = 155;
 
   OpKind_End = REChar(1);
   OpKind_MetaClass = REChar(2);
@@ -1730,6 +1760,10 @@ begin
   {$ENDIF}
 
   InitCharCheckers;
+
+  {$IFDEF Compat}
+  fInvertCase := OldInvertCase;
+  {$ENDIF}
 end; { of constructor TRegExpr.Create
   -------------------------------------------------------------- }
 
@@ -3378,7 +3412,7 @@ begin
   end;
 end;
 
-function TRegExpr.UnQuoteChar(var APtr: PRegExprChar): REChar;
+function TRegExpr.UnQuoteChar(var APtr, AEnd: PRegExprChar): REChar;
 var
   Ch: REChar;
 begin
@@ -3399,7 +3433,7 @@ begin
       begin // \cK => code for Ctrl+K
         Result := #0;
         Inc(APtr);
-        if APtr >= fRegexEnd then
+        if APtr >= AEnd then
           Error(reeNoLetterAfterBSlashC);
         Ch := APtr^;
         case Ch of
@@ -3415,7 +3449,7 @@ begin
       begin // \x: hex char
         Result := #0;
         Inc(APtr);
-        if APtr >= fRegexEnd then
+        if APtr >= AEnd then
         begin
           Error(reeNoHexCodeAfterBSlashX);
           Exit;
@@ -3424,7 +3458,7 @@ begin
         begin // \x{nnnn} //###0.936
           repeat
             Inc(APtr);
-            if APtr >= fRegexEnd then
+            if APtr >= AEnd then
             begin
               Error(reeNoHexCodeAfterBSlashX);
               Exit;
@@ -3448,7 +3482,7 @@ begin
           Result := REChar(HexDig(APtr^));
           // HexDig will cause Error if bad hex digit found
           Inc(APtr);
-          if APtr >= fRegexEnd then
+          if APtr >= AEnd then
           begin
             Error(reeNoHexCodeAfterBSlashX);
             Exit;
@@ -3659,7 +3693,7 @@ begin
                 Exit;
               end;
               Inc(regParse);
-              RangeEnd := UnQuoteChar(regParse);
+              RangeEnd := UnQuoteChar(regParse, fRegexEnd);
             end;
 
             // special handling for Russian range a-YA, add 2 ranges: a-ya and A-YA
@@ -3730,7 +3764,7 @@ begin
               else
               {$ENDIF}
               begin
-                TempChar := UnQuoteChar(regParse);
+                TempChar := UnQuoteChar(regParse, fRegexEnd);
                 // False if '-' is last char in []
                 DashForRange :=
                   (regParse + 2 < fRegexEnd) and
@@ -4173,7 +4207,7 @@ begin
             end;
           {$ENDIF}
         else
-          EmitExactly(UnQuoteChar(regParse));
+          EmitExactly(UnQuoteChar(regParse, fRegexEnd));
         end; { of case }
         Inc(regParse);
       end;
@@ -5712,10 +5746,11 @@ var
     APtr := p;
   end;
 
-  procedure FindSubstGroupIndex(var p: PRegExprChar; var Idx: integer);
+  procedure FindSubstGroupIndex(var p: PRegExprChar; var Idx: integer; var NumberFound: boolean);
   begin
     Idx := ParseVarName(p);
-    if (Idx >= 0) and (Idx <= High(GrpIndexes)) then
+    NumberFound := (Idx >= 0) and (Idx <= High(GrpIndexes));
+    if NumberFound then
       Idx := GrpIndexes[Idx];
   end;
 
@@ -5726,6 +5761,7 @@ var
   p, p0, p1, ResultPtr: PRegExprChar;
   ResultLen, n: integer;
   Ch, QuotedChar: REChar;
+  GroupFound: boolean;
 begin
   // Check programm and input string
   if not IsProgrammOk then
@@ -5747,11 +5783,13 @@ begin
     Ch := p^;
     Inc(p);
     n := -1;
+    GroupFound := False;
     if Ch = SubstituteGroupChar then
-      FindSubstGroupIndex(p, n);
-    if n >= 0 then
+      FindSubstGroupIndex(p, n, GroupFound);
+    if GroupFound then
     begin
-      Inc(ResultLen, GrpEnd[n] - GrpStart[n]);
+      if n >= 0 then
+        Inc(ResultLen, GrpEnd[n] - GrpStart[n]);
     end
     else
     begin
@@ -5802,12 +5840,18 @@ begin
     Inc(p);
     p1 := p;
     n := -1;
+    GroupFound := False;
     if Ch = SubstituteGroupChar then
-      FindSubstGroupIndex(p, n);
-    if (n >= 0) then
+      FindSubstGroupIndex(p, n, GroupFound);
+    if GroupFound then
     begin
-      p0 := GrpStart[n];
-      p1 := GrpEnd[n];
+      if n >= 0 then
+      begin
+        p0 := GrpStart[n];
+        p1 := GrpEnd[n];
+      end
+      else
+        p1 := p0;
     end
     else
     begin
@@ -5825,7 +5869,7 @@ begin
             begin
               p := p - 1;
               // UnquoteChar expects the escaped char under the pointer
-              QuotedChar := UnQuoteChar(p);
+              QuotedChar := UnQuoteChar(p, TemplateEnd);
               p := p + 1;
               // Skip after last part of the escaped sequence - UnquoteChar stops on the last symbol of it
               p0 := @QuotedChar;
@@ -6823,11 +6867,13 @@ end;
 {$ENDIF}
 
 procedure TRegExpr.Error(AErrorID: integer);
+  {$IFNDEF LINUX}
   {$IFDEF reRealExceptionAddr}
   function ReturnAddr: Pointer; // ###0.938
   asm
     mov  eax,[ebp+4]
   end;
+  {$ENDIF}
   {$ENDIF}
 var
   e: ERegExpr;
@@ -6842,10 +6888,55 @@ begin
   e.ErrorCode := AErrorID;
   e.CompilerErrorPos := CompilerErrorPos;
   raise e
+    {$IFNDEF LINUX}
     {$IFDEF reRealExceptionAddr}
     at ReturnAddr
+    {$ENDIF}
     {$ENDIF};
 end; { of procedure TRegExpr.Error
   -------------------------------------------------------------- }
+
+{$IFDEF Compat} // APIs needed only for users of old FPC 3.0
+function TRegExpr.ExecPos(AOffset: integer; ATryOnce: boolean): boolean; overload;
+begin
+  Result := ExecPrim(AOffset, ATryOnce, False, False);
+end;
+
+function TRegExpr.OldInvertCase(const Ch: REChar): REChar;
+begin
+  Result := _UpperCase(Ch);
+  if Result = Ch then
+    Result := _LowerCase(Ch);
+end;
+
+class function TRegExpr.InvertCaseFunction(const Ch: REChar): REChar;
+begin
+  Result := _UpperCase(Ch);
+  if Result = Ch then
+    Result := _LowerCase(Ch);
+end;
+
+function TRegExpr.GetLinePairedSeparator: RegExprString;
+begin
+  // not supported anymore
+  Result := '';
+end;
+
+procedure TRegExpr.SetLinePairedSeparator(const AValue: RegExprString);
+begin
+  // not supported anymore
+end;
+
+procedure TRegExpr.SetUseOsLineEndOnReplace(AValue: boolean);
+begin
+  if fUseOsLineEndOnReplace = AValue then
+    Exit;
+  fUseOsLineEndOnReplace := AValue;
+  if fUseOsLineEndOnReplace then
+    fReplaceLineEnd := sLineBreak
+  else
+    fReplaceLineEnd := #10;
+end;
+{$ENDIF}
 
 end.
