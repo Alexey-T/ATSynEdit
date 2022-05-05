@@ -144,6 +144,7 @@ begin
   Lines:= TStringList.Create;
   try
     Lines.TextLineBreakStyle:= tlbsLF;
+    Lines.TrailingLineBreak:= false; //ST4 doesn't force final newline
     Lines.Text:= Clipboard.AsText;
     if Lines.Count=0 then Exit;
 
