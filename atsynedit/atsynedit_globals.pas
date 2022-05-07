@@ -52,6 +52,7 @@ type
     MaxClipboardRecents: integer;
     MaxClipboardRecentsMenuitemLen: integer;
 
+    FontProportional: boolean;
     UseGlobalCharSizer: boolean;
     DetectUTF8BufferKb: integer;
     DetectUTF16BufferWords: integer;
@@ -359,6 +360,7 @@ initialization
     MaxClipboardRecents:= 0; //0 to disable
     MaxClipboardRecentsMenuitemLen:= 60;
 
+    FontProportional:= false;
     UseGlobalCharSizer:= true;
     DetectUTF8BufferKb:= 8;
     DetectUTF16BufferWords:= 5;

@@ -3266,6 +3266,13 @@ begin
 end;
 
 function TATSynEdit.GetCharSize(C: TCanvas; ACharSpacingY: integer): TATEditorCharSize;
+  //
+  procedure UpdateFontProportional(TempC: TCanvas);
+  begin
+    ATEditorOptions.FontProportional:=
+      TempC.TextWidth('.')<TempC.TextWidth('W');
+  end;
+  //
 const
   SampleChar = 'N';
 var
@@ -3285,6 +3292,7 @@ begin
   if C.HandleAllocated then
   begin
     Size:= C.TextExtent(SampleStr);
+    UpdateFontProportional(C);
   end
   else
   begin
@@ -3295,6 +3303,7 @@ begin
       TempC.Font.Name:= Self.Font.Name;
       TempC.Font.Size:= DoScaleFont(Self.Font.Size);
       Size:= TempC.TextExtent(SampleStr);
+      UpdateFontProportional(TempC);
       ReleaseDC(dc, 0);
     finally
       FreeAndNil(TempC);

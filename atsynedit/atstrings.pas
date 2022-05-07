@@ -679,7 +679,7 @@ begin
     Buf:= '';
   end
   else
-  if not IsStringWithUnicode(S) then
+  if (not ATEditorOptions.FontProportional) and not IsStringWithUnicode(S) then
   begin
     Ex.Wide:= false;
     SetLength(Buf, NLen);
@@ -703,6 +703,12 @@ procedure TATStringItem.SetLineA(const S: string);
 var
   NLen, N: integer;
 begin
+  if ATEditorOptions.FontProportional then
+  begin
+    SetLineW(UTF8Decode(S));
+    exit;
+  end;
+
   LineStateToChanged;
   Ex.HasTab:= 0; //cFlagUnknown
   Ex.HasAsciiNoTabs:= 0; //cFlagUnknown

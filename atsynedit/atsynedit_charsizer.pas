@@ -194,6 +194,11 @@ var
 begin
   Result:= 100;
 
+  if ATEditorOptions.FontProportional then
+  begin
+    exit(GetCharWidth_FromCache(ch));
+  end;
+
   case FixedSizes[n] of
     uw_normal: exit;
     uw_fullwidth: exit(ATEditorOptions.CharScaleFullWidth);
