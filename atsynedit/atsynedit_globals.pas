@@ -41,7 +41,7 @@ type
     DashedLine_DashLen = 12;
     DashedLine_EmptyLen = 4;
 
-    SampleChar = 'N';
+    SampleChar = '0';
 
   public
     //force UTF8 for huge files on loading
