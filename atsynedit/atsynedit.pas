@@ -2523,7 +2523,11 @@ begin
     Exit;
   end;
 
-  NVisColumns:= Max(AVisibleColumns, ATEditorOptions.MinWrapColumnAbs);
+  if ATEditorOptions.FontProportional then
+    NVisColumns:= 2000
+  else
+    NVisColumns:= Max(AVisibleColumns, ATEditorOptions.MinWrapColumnAbs);
+
   NPartOffset:= 1;
   NIndent:= 0;
   bInitialItem:= true;
