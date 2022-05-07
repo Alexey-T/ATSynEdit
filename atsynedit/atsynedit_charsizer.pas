@@ -197,10 +197,9 @@ begin
   if ATEditorOptions.FontProportional then
     case FixedSizes[n] of
       uw_normal,
-      uw_fullwidth:
-        exit(GetCharWidth_FromCache(ch));
+      uw_fullwidth,
       uw_space:
-        exit;
+        exit(GetCharWidth_FromCache(ch));
       uw_combined:
         exit(0);
       uw_hexshow:
