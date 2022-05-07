@@ -2523,17 +2523,16 @@ begin
     Exit;
   end;
 
-  if ATEditorOptions.FontProportional then
-    NVisColumns:= 2000
-  else
-    NVisColumns:= Max(AVisibleColumns, ATEditorOptions.MinWrapColumnAbs);
-
+  NVisColumns:= Max(AVisibleColumns, ATEditorOptions.MinWrapColumnAbs);
   NPartOffset:= 1;
   NIndent:= 0;
   bInitialItem:= true;
 
   repeat
-    StrPart:= AStrings.LineSub(ALineIndex, NPartOffset, NVisColumns);
+    if ATEditorOptions.FontProportional then
+      StrPart:= AStrings.LineSub(ALineIndex, NPartOffset, ATEditorOptions.MaxVisibleColumns)
+    else
+      StrPart:= AStrings.LineSub(ALineIndex, NPartOffset, NVisColumns);
     if StrPart='' then Break;
 
     NLen:= ATabHelper.FindWordWrapOffset(
@@ -3274,7 +3273,7 @@ function TATSynEdit.GetCharSize(C: TCanvas; ACharSpacingY: integer): TATEditorCh
   procedure UpdateFontProportional(TempC: TCanvas);
   begin
     ATEditorOptions.FontProportional:=
-      TempC.TextWidth('.')<TempC.TextWidth('W');
+      TempC.TextWidth('.')<TempC.TextWidth('N');
   end;
   //
 var
@@ -3645,7 +3644,10 @@ begin
   begin
     //little slow for huge lines
     NSubPos:= WrapItem.NCharIndex;
-    NSubLen:= Min(WrapItem.NLength, FVisibleColumns+AScrollHorz.NPos+1+6);
+    if ATEditorOptions.FontProportional then
+      NSubLen:= Min(WrapItem.NLength, ATEditorOptions.MaxVisibleColumns)
+    else
+      NSubLen:= Min(WrapItem.NLength, FVisibleColumns+AScrollHorz.NPos+1+6);
       //+1 because of NPixelOffset
       //+6 because of HTML color underlines
     StrOutput:= St.LineSub(NLinesIndex, NSubPos, NSubLen);
@@ -3673,7 +3675,10 @@ begin
     NOutputCellPercentsSkipped:= NOutputCharsSkipped*100;
 
     NSubPos:= WrapItem.NCharIndex + NOutputCharsSkipped;
-    NSubLen:= Min(WrapItem.NLength, FVisibleColumns+1+6);
+    if ATEditorOptions.FontProportional then
+      NSubLen:= Min(WrapItem.NLength, ATEditorOptions.MaxVisibleColumns)
+    else
+      NSubLen:= Min(WrapItem.NLength, FVisibleColumns+1+6);
       //+1 because of NPixelOffset
       //+6 because of HTML color underlines
     StrOutput:= St.LineSub(NLinesIndex, NSubPos, NSubLen);
@@ -3804,7 +3809,10 @@ begin
       SRemoveAsciiControlChars(StrOutput, WideChar(ATEditorOptions.UnprintedReplaceSpecToCode));
 
     //truncate text to not paint over screen
-    NCount:= ARectLine.Width * ATEditorCharXScale div ACharSize.XScaled + 2;
+    if ATEditorOptions.FontProportional then
+      NCount:= ATEditorOptions.MaxVisibleColumns
+    else
+      NCount:= ARectLine.Width * ATEditorCharXScale div ACharSize.XScaled + 2;
     if Length(StrOutput)>NCount then
       SetLength(StrOutput, NCount);
 
@@ -9108,7 +9116,10 @@ begin
   if AConsiderWrapInfo then
     NWrapIndex:= WrapInfo.FindIndexOfCaretPos(Point(0, ALineFrom));
 
-  NVisibleColumns:= GetVisibleColumns;
+  if ATEditorOptions.FontProportional then
+    NVisibleColumns:= ATEditorOptions.MaxVisibleColumns
+  else
+    NVisibleColumns:= GetVisibleColumns;
 
   for NLine:= ALineFrom to ALineTo do
   begin

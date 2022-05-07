@@ -42,6 +42,7 @@ type
     DashedLine_EmptyLen = 4;
 
     SampleChar = '0';
+    MaxVisibleColumns = 500;
 
   public
     //force UTF8 for huge files on loading
