@@ -8533,7 +8533,7 @@ procedure TATSynEdit.DoPaintStaples(C: TCanvas;
 var
   St: TATStrings;
   nLineFrom, nLineTo, nRangeDeepest, nMaxHeight: integer;
-  nIndent, nIndentBegin, nIndentEnd: integer;
+  nIndent, nIndentBegin, nIndentEnd, nSpaceWidth: integer;
   Indexes: TATIntArray;
   Range: PATSynRange;
   P1, P2: TPoint;
@@ -8549,6 +8549,11 @@ begin
   nLineTo:= LineBottom;
   nMaxHeight:= FRectMain.Height+2;
   nRangeDeepest:= -1;
+
+  if ATEditorOptions.FontProportional then
+    nSpaceWidth:= FCharSizer.GetSpaceWidth
+  else
+    nSpaceWidth:= 100; //100 percents
 
   Indexes:= FFold.FindRangesWithStaples(nLineFrom, nLineTo);
 
@@ -8592,8 +8597,9 @@ begin
     else
       nIndent:= nIndentBegin;
 
-    Inc(P1.X, nIndent*ACharSize.XScaled div ATEditorCharXScale);
-    Inc(P2.X, nIndent*ACharSize.XScaled div ATEditorCharXScale);
+    //nSpaceWidth is to consider FontProportional
+    Inc(P1.X, Int64(nIndent)*nSpaceWidth*ACharSize.XScaled div ATEditorCharXScale div 100);
+    Inc(P2.X, Int64(nIndent)*nSpaceWidth*ACharSize.XScaled div ATEditorCharXScale div 100);
 
     RSt.Left:= P1.X + FOptStapleIndent;
     RSt.Top:= P1.Y;

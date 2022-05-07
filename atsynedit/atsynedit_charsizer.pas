@@ -39,6 +39,7 @@ type
     destructor Destroy; override;
     procedure Init(const AFontName: string; AFontSize: integer);
     function GetCharWidth(ch: WideChar): integer;
+    function GetSpaceWidth: integer;
     //function GetStrWidth(const S: WideString): integer;
   end;
 
@@ -183,6 +184,11 @@ begin
   if Assigned(FPanel) then
     FreeAndNil(FPanel);
   inherited;
+end;
+
+function TATCharSizer.GetSpaceWidth: integer;
+begin
+  Result:= GetCharWidth_FromCache(' ');
 end;
 
 function TATCharSizer.GetCharWidth(ch: WideChar): integer;
