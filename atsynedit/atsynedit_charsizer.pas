@@ -195,10 +195,23 @@ begin
   Result:= 100;
 
   if ATEditorOptions.FontProportional then
-  begin
-    exit(GetCharWidth_FromCache(ch));
-  end;
-
+    case FixedSizes[n] of
+      uw_normal,
+      uw_fullwidth:
+        exit(GetCharWidth_FromCache(ch));
+      uw_space:
+        exit;
+      uw_combined:
+        exit(0);
+      uw_hexshow:
+        begin
+          if n<$100 then
+            exit(CharScaleHex_Small)
+          else
+            exit(CharScaleHex_Big);
+        end;
+     end
+  else
   case FixedSizes[n] of
     uw_normal: exit;
     uw_fullwidth: exit(ATEditorOptions.CharScaleFullWidth);
@@ -223,6 +236,9 @@ begin
     else
       exit(CharScaleHex_Big);
   end;
+
+  if ATEditorOptions.FontProportional then
+    exit(GetCharWidth_FromCache(ch));
 
   if ATEditorOptions.CharSizeProportional then
     if n>=128 then
