@@ -662,6 +662,8 @@ var
   St: TFontStyles;
 }
 begin
+  if ATEditorOptions.FontProportional then
+    exit(true);
   if ATEditorOptions.TextoutNeedsOffsets then
     exit(true);
 

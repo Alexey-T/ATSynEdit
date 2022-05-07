@@ -143,7 +143,7 @@ begin
     InitPanel;
 
     if SizeAvg=0 then
-      SizeAvg:= _WidestrWidth(FPanel.Canvas, 'N');
+      SizeAvg:= _WidestrWidth(FPanel.Canvas, ATEditorOptions.SampleChar);
 
     Result:= _WidestrWidth(FPanel.Canvas, ch) * 100 div SizeAvg;
     Sizes[Ord(ch)]:= Math.Min(255, Result div SaveScale);

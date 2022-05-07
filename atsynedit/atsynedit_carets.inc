@@ -456,7 +456,7 @@ begin
 
     if NLineLenOriginal>ATEditorOptions.MaxLineLenForAccurateCharWidths then
     begin
-      Str:= StringOfCharW('N', NLineLenOriginal); //fake to calc CharOffsets only
+      Str:= StringOfCharW(ATEditorOptions.SampleChar, NLineLenOriginal); //fake to calc CharOffsets only
       ATabHelper.CalcCharOffsets(Item.NLineIndex, Str, CharOffsets, 0);
       Str:= AStrings.LineSub(Item.NLineIndex, Item.NCharIndex, NLineLenTrimmed);
     end

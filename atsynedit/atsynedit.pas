@@ -3273,8 +3273,6 @@ function TATSynEdit.GetCharSize(C: TCanvas; ACharSpacingY: integer): TATEditorCh
       TempC.TextWidth('.')<TempC.TextWidth('W');
   end;
   //
-const
-  SampleChar = 'N';
 var
   SampleStrLen: integer;
   SampleStr: string;
@@ -3287,7 +3285,7 @@ begin
   else
     SampleStrLen:= 1;
 
-  SampleStr:= StringOfChar(SampleChar, SampleStrLen);
+  SampleStr:= StringOfChar(ATEditorOptions.SampleChar, SampleStrLen);
 
   if C.HandleAllocated then
   begin
