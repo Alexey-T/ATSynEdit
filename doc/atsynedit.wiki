@@ -1,6 +1,6 @@
 = About =
 
-'''ATSynEdit''' is the multi-line editor control, with fixed font.
+'''ATSynEdit''' is the multi-line editor control.
 
 * Homepage: https://github.com/Alexey-T/ATSynEdit
 * Support for EControl adapter: https://github.com/Alexey-T/EControl
@@ -94,10 +94,9 @@ Some details about this:
 
 = Help topics =
 == What limitations it has? ==
-* Cannot set different fonts for different parts 
 * All lines have the same height
-* Not supported RTL mode, limited support for Arabic text
-* Not supported Unicode code points >0xFFFF, caret pos incorrect
+* Cannot set different fonts for different parts 
+* No support for right-to-left mode, only limited support for Arabic text
 
 == What features it has? ==
 * Fast editing of big texts (tested 10M log) 
@@ -121,6 +120,7 @@ Some details about this:
 * Renders unprintable chars (space, tab, line end)
 * Can highlight URLs
 * Can set color attributes for ranges (to hilite brackets, words)
+* Supports proportional fonts (but all ATSynEdit controls must use the same font)
 
 == Difference from other components ==
 
