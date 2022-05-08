@@ -1,4 +1,7 @@
 
+2022.05.07
++ add: support for proportional fonts, it's enabled by ATEditorOptions.FontProportional=True; it's auto enabled when editor finds that TextWidth('N')>TextWidth('.')
+
 2022.04.10
 + add: ATEditorOptions.DetectEncodingByPythonId (on)
 + add: ATEditorOptions.DetectEncodingByXmlId (on)
