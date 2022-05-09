@@ -878,9 +878,6 @@ var
   NLen, NCode, i: integer;
   Ptr: PWideChar;
 begin
-  if ATEditorOptions.FontProportional then
-    exit(false);
-
   case TATLineFlag(Ex.HasAsciiNoTabs) of
     cFlagNo:
       exit(false);

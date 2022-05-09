@@ -82,6 +82,7 @@ type
     ColorNormalFont: TColor;
     ColorUnprintedFont: TColor;
     ColorUnprintedHexFont: TColor;
+    FontProportional: boolean;
     FontNormal_Name: string;
     FontNormal_Size: integer;
     FontItalic_Name: string;
@@ -143,7 +144,7 @@ procedure DoPaintUnprintedWrapMark(C: TCanvas;
   AColorFont: TColor);
 
 function CanvasTextWidth(const S: atString; ALineIndex: integer;
-  ATabHelper: TATStringTabHelper; ACharWidth: integer): Int64; inline;
+  ATabHelper: TATStringTabHelper; ACharWidth: integer; AFontProportional: boolean): Int64; inline;
 
 procedure UpdateWiderFlags(C: TCanvas; out Flags: TATWiderFlags);
 
@@ -649,9 +650,9 @@ end;
 
 
 function CanvasTextWidth(const S: atString; ALineIndex: integer;
-  ATabHelper: TATStringTabHelper; ACharWidth: integer): Int64;
+  ATabHelper: TATStringTabHelper; ACharWidth: integer; AFontProportional: boolean): Int64;
 begin
-  Result:= ATabHelper.CalcCharOffsetLast(ALineIndex, S) * ACharWidth div 100;
+  Result:= ATabHelper.CalcCharOffsetLast(ALineIndex, S, AFontProportional) * ACharWidth div 100;
 end;
 
 
@@ -662,8 +663,6 @@ var
   St: TFontStyles;
 }
 begin
-  if ATEditorOptions.FontProportional then
-    exit(true);
   if ATEditorOptions.TextoutNeedsOffsets then
     exit(true);
 
@@ -782,7 +781,7 @@ begin
   end
   else
   begin
-    AProps.TabHelper.CalcCharOffsets(AProps.LineIndex, AText, ListOffsets, AProps.CharsSkipped);
+    AProps.TabHelper.CalcCharOffsets(AProps.LineIndex, AText, ListOffsets, AProps.FontProportional, AProps.CharsSkipped);
 
     ListInt.Len:= ListOffsets.Len;
     Dx.Len:= ListOffsets.Len;
@@ -805,7 +804,7 @@ begin
     else
     begin
       BufW:= SRemoveHexDisplayedChars(AText);
-      if CanvasTextOutNeedsOffsets(C, AText) then
+      if AProps.FontProportional or CanvasTextOutNeedsOffsets(C, AText) then
         DxPointer:= @Dx.Data[0]
       else
         DxPointer:= nil;
@@ -939,7 +938,7 @@ begin
           AProps.ShowFontLigatures
           and not IsStringWithUnusualWidthChars(BufW); //disable ligatures if unicode chars
 
-        if CanvasTextOutNeedsOffsets(C, PartStr) then
+        if AProps.FontProportional or CanvasTextOutNeedsOffsets(C, PartStr) then
           DxPointer:= @Dx.Data[PartOffset]
         else
           DxPointer:= nil;
@@ -964,7 +963,7 @@ begin
         BufW:= PartStr;
         Buf:= UTF8Encode(SRemoveHexDisplayedChars(BufW));
 
-        if CanvasTextOutNeedsOffsets(C, PartStr) then
+        if AProps.FontProportional or CanvasTextOutNeedsOffsets(C, PartStr) then
         begin
           _CalcCharSizesUtf8FromWidestring(BufW, @Dx.Data[PartOffset], Dx.Len-PartOffset, DxUTF8);
           DxPointer:= @DxUTF8.Data[0];

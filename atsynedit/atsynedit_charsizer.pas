@@ -38,7 +38,7 @@ type
     constructor Create(AOwner: TComponent);
     destructor Destroy; override;
     procedure Init(const AFontName: string; AFontSize: integer);
-    function GetCharWidth(ch: WideChar): integer;
+    function GetCharWidth(ch: WideChar; AFontProportional: boolean): integer;
     function GetSpaceWidth: integer;
     //function GetStrWidth(const S: WideString): integer;
   end;
@@ -191,7 +191,7 @@ begin
   Result:= GetCharWidth_FromCache(' ');
 end;
 
-function TATCharSizer.GetCharWidth(ch: WideChar): integer;
+function TATCharSizer.GetCharWidth(ch: WideChar; AFontProportional: boolean): integer;
 const
   CharScaleHex_Small = 300; //width of 'xNN'
   CharScaleHex_Big = 500; //width of 'xNNNN'
@@ -200,7 +200,7 @@ var
 begin
   Result:= 100;
 
-  if ATEditorOptions.FontProportional then
+  if AFontProportional then
     case FixedSizes[n] of
       uw_normal,
       uw_fullwidth,
@@ -242,7 +242,7 @@ begin
       exit(CharScaleHex_Big);
   end;
 
-  if ATEditorOptions.FontProportional then
+  if AFontProportional then
     exit(GetCharWidth_FromCache(ch));
 
   if ATEditorOptions.CharSizeProportional then

@@ -220,7 +220,8 @@ function _DoCaretPosToClientPos(
   ATabHelper: TATStringTabHelper;
   const ARect: TRect;
   const AScrollHorz, AScrollVert: TATEditorScrollInfo;
-  APreferLeftSide: boolean): TPoint;
+  APreferLeftSide: boolean;
+  AFontProportional: boolean): TPoint;
 var
   Item: TATWrapItem;
   StringItem: PATStringItem;
@@ -262,7 +263,7 @@ begin
 
   //prepare optimization
   StringItem:= AStrings.GetItemPtr(P.Y);
-  bAsciiOnly:= StringItem^.HasAsciiNoTabs;
+  bAsciiOnly:= not AFontProportional and StringItem^.HasAsciiNoTabs;
 
   NScrolledHorzSmooth:= AScrollHorz.SmoothPos-AScrollHorz.NPixelOffset;
   NScrolledVert:= Max(0, AScrollVert.NPos);
@@ -287,7 +288,7 @@ begin
     else
     begin
       Str:= AStrings.LineSub(P.Y, Item.NCharIndex, Min(NFromStart, Item.NLength));
-      NWidth:= CanvasTextWidth(Str, P.Y, ATabHelper, ACharSize.XScaled) div ATEditorCharXScale;
+      NWidth:= CanvasTextWidth(Str, P.Y, ATabHelper, ACharSize.XScaled, AFontProportional) div ATEditorCharXScale;
     end;
 
     Result.X:= NWidth;
@@ -339,7 +340,8 @@ function _DoClientPosToCaretPos(
   out ADetails: TATEditorPosDetails;
   AGapCoordAction: TATEditorGapCoordAction;
   AAfterEofUsesLastLen: boolean;
-  AEditorIndex: integer): TPoint;
+  AEditorIndex: integer;
+  AFontProportional: boolean): TPoint;
 var
   CharOffsets: TATIntFixedArray;
   NLineLenOriginal, NLineLenTrimmed: integer;
@@ -457,13 +459,13 @@ begin
     if NLineLenOriginal>ATEditorOptions.MaxLineLenForAccurateCharWidths then
     begin
       Str:= StringOfCharW(ATEditorOptions.SampleChar, NLineLenOriginal); //fake to calc CharOffsets only
-      ATabHelper.CalcCharOffsets(Item.NLineIndex, Str, CharOffsets, 0);
+      ATabHelper.CalcCharOffsets(Item.NLineIndex, Str, CharOffsets, AFontProportional, 0);
       Str:= AStrings.LineSub(Item.NLineIndex, Item.NCharIndex, NLineLenTrimmed);
     end
     else
     begin
       Str:= AStrings.LineSub(Item.NLineIndex, Item.NCharIndex, NLineLenTrimmed);
-      ATabHelper.CalcCharOffsets(Item.NLineIndex, Str, CharOffsets, 0);
+      ATabHelper.CalcCharOffsets(Item.NLineIndex, Str, CharOffsets, AFontProportional, 0);
     end;
 
     if bGapGoesToEnd then
@@ -503,7 +505,8 @@ begin
     FRectMain,
     FScrollHorz,
     FScrollVert,
-    FCaretSpecPos or FOptCaretPreferLeftSide
+    FCaretSpecPos or FOptCaretPreferLeftSide,
+    FFontProportional
     );
 
   if Result.Y>=0 then
@@ -529,7 +532,8 @@ begin
     ADetails,
     AGapCoordAction,
     IsSelRectEmpty,
-    FEditorIndex);
+    FEditorIndex,
+    FFontProportional);
 end;
 
 procedure TATSynEdit.InitLengthArray(var Lens: TATIntArray);

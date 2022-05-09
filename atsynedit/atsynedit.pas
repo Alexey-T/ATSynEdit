@@ -532,6 +532,7 @@ type
 
   TATSynEdit = class(TCustomControl)
   private
+    FFontProportional: boolean;
     FFontItalic: TFont;
     FFontBold: TFont;
     FFontBoldItalic: TFont;
@@ -2478,7 +2479,8 @@ procedure _CalcWrapInfos(
   ALineIndex: integer;
   AIndentMaximal: integer;
   AItems: TATWrapItems;
-  AConsiderFolding: boolean);
+  AConsiderFolding: boolean;
+  AFontProportional: boolean);
 var
   WrapItem: TATWrapItem;
   NPartOffset, NLen, NIndent, NVisColumns: integer;
@@ -2529,7 +2531,7 @@ begin
   bInitialItem:= true;
 
   repeat
-    if ATEditorOptions.FontProportional then
+    if AFontProportional then
       StrPart:= AStrings.LineSub(ALineIndex, NPartOffset, ATEditorOptions.MaxVisibleColumns)
     else
       StrPart:= AStrings.LineSub(ALineIndex, NPartOffset, NVisColumns);
@@ -2542,7 +2544,8 @@ begin
       StrPart,
       Max(AWrapColumn-NIndent, ATEditorOptions.MinWrapColumnAbs),
       ANonWordChars,
-      AWrapIndented);
+      AWrapIndented,
+      AFontProportional);
 
     if NLen>=Length(StrPart) then
       FinalState:= cWrapItemFinal
@@ -2579,7 +2582,8 @@ begin
     ALine,
     AIndentMaximal,
     AItems,
-    AConsiderFolding);
+    AConsiderFolding,
+    FFontProportional);
 end;
 
 
@@ -3272,7 +3276,7 @@ function TATSynEdit.GetCharSize(C: TCanvas; ACharSpacingY: integer): TATEditorCh
   //
   procedure UpdateFontProportional(TempC: TCanvas);
   begin
-    ATEditorOptions.FontProportional:=
+    FFontProportional:=
       TempC.TextWidth('.')<TempC.TextWidth('N');
   end;
   //
@@ -3644,7 +3648,7 @@ begin
   begin
     //little slow for huge lines
     NSubPos:= WrapItem.NCharIndex;
-    if ATEditorOptions.FontProportional then
+    if FFontProportional then
       NSubLen:= Min(WrapItem.NLength, ATEditorOptions.MaxVisibleColumns)
     else
       NSubLen:= Min(WrapItem.NLength, FVisibleColumns+AScrollHorz.NPos+1+6);
@@ -3663,6 +3667,7 @@ begin
         StrOutput,
         AScrollHorz.SmoothPos,
         ACharSize.XScaled,
+        FFontProportional,
         NOutputCharsSkipped,
         NOutputCellPercentsSkipped);
       Delete(StrOutput, 1, NOutputCharsSkipped);
@@ -3675,7 +3680,7 @@ begin
     NOutputCellPercentsSkipped:= NOutputCharsSkipped*100;
 
     NSubPos:= WrapItem.NCharIndex + NOutputCharsSkipped;
-    if ATEditorOptions.FontProportional then
+    if FFontProportional then
       NSubLen:= Min(WrapItem.NLength, ATEditorOptions.MaxVisibleColumns)
     else
       NSubLen:= Min(WrapItem.NLength, FVisibleColumns+1+6);
@@ -3715,14 +3720,15 @@ begin
         else
         begin
           StringItem:= St.GetItemPtr(NLinesIndex);
-          if StringItem^.HasAsciiNoTabs then
+          if not FFontProportional and StringItem^.HasAsciiNoTabs then
             NOutputMaximalChars:= StringItem^.CharLen
           else
             NOutputMaximalChars:= CanvasTextWidth(
               StringItem^.Line, //Line getter is very slow for huge lines
               NLinesIndex,
               FTabHelper,
-              1 //pass CharWidth=1px
+              1, //pass CharWidth=1px
+              FFontProportional
               );
         end;
         AScrollHorz.NMax:= Max(
@@ -3809,7 +3815,7 @@ begin
       SRemoveAsciiControlChars(StrOutput, WideChar(ATEditorOptions.UnprintedReplaceSpecToCode));
 
     //truncate text to not paint over screen
-    if ATEditorOptions.FontProportional then
+    if FFontProportional then
       NCount:= ATEditorOptions.MaxVisibleColumns
     else
       NCount:= ARectLine.Width * ATEditorCharXScale div ACharSize.XScaled + 2;
@@ -3817,7 +3823,7 @@ begin
       SetLength(StrOutput, NCount);
 
       TextOutProps.Editor:= Self;
-      TextOutProps.HasAsciiNoTabs:= St.LinesHasAsciiNoTabs[NLinesIndex];
+      TextOutProps.HasAsciiNoTabs:= not FFontProportional and St.LinesHasAsciiNoTabs[NLinesIndex];
       TextOutProps.SuperFast:= bLineHuge;
       TextOutProps.TabHelper:= FTabHelper;
       TextOutProps.LineIndex:= NLinesIndex;
@@ -3840,6 +3846,8 @@ begin
       TextOutProps.ColorNormalFont:= Colors.TextFont;
       TextOutProps.ColorUnprintedFont:= Colors.UnprintedFont;
       TextOutProps.ColorUnprintedHexFont:= Colors.UnprintedHexFont;
+
+      TextOutProps.FontProportional:= FFontProportional;
 
       TextOutProps.FontNormal_Name:= Font.Name;
       TextOutProps.FontNormal_Size:= DoScaleFont(Font.Size);
@@ -8551,7 +8559,7 @@ begin
   nMaxHeight:= FRectMain.Height+2;
   nRangeDeepest:= -1;
 
-  if ATEditorOptions.FontProportional then
+  if FFontProportional then
     nSpaceWidth:= FCharSizer.GetSpaceWidth
   else
     nSpaceWidth:= 100; //100 percents
@@ -9108,6 +9116,8 @@ begin
   TextOutProps.ColorUnprintedFont:= Colors.UnprintedFont;
   TextOutProps.ColorUnprintedHexFont:= Colors.UnprintedHexFont;
 
+  TextOutProps.FontProportional:= FFontProportional;
+
   TextOutProps.FontNormal_Name:= Font.Name;
   TextOutProps.FontNormal_Size:= DoScaleFont(Font.Size);
 
@@ -9123,7 +9133,7 @@ begin
   if AConsiderWrapInfo then
     NWrapIndex:= WrapInfo.FindIndexOfCaretPos(Point(0, ALineFrom));
 
-  if ATEditorOptions.FontProportional then
+  if FFontProportional then
     NVisibleColumns:= ATEditorOptions.MaxVisibleColumns
   else
     NVisibleColumns:= GetVisibleColumns;
@@ -9163,10 +9173,11 @@ begin
     if FOptMaskCharUsed then
       SText:= StringOfCharW(FOptMaskChar, Length(SText));
 
-    TextOutProps.HasAsciiNoTabs:= St.LinesHasAsciiNoTabs[WrapItem.NLineIndex];
+    TextOutProps.HasAsciiNoTabs:= not FFontProportional and St.LinesHasAsciiNoTabs[WrapItem.NLineIndex];
     TextOutProps.SuperFast:= false;
     TextOutProps.LineIndex:= WrapItem.NLineIndex;
     TextOutProps.CharIndexInLine:= WrapItem.NCharIndex;
+
     CanvasTextOut(C,
       ATEditorOptions.SizeIndentTooltipX + WrapItem.NIndent*FCharSize.XScaled div ATEditorCharXScale,
       ATEditorOptions.SizeIndentTooltipY + FCharSize.Y*(NLine-ALineFrom),
