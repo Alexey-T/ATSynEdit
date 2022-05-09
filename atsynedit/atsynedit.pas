@@ -1517,6 +1517,7 @@ type
     property CaretShapeOverwrite: TATCaretShape read FCaretShapeOverwrite;
     property CaretShapeReadonly: TATCaretShape read FCaretShapeReadonly;
     //common
+    property FontProportional: boolean read FFontProportional;
     property EncodingName: string read GetEncodingName write SetEncodingName;
     property Modified: boolean read GetModified write SetModified;
     property AdapterForHilite: TATAdapterHilite read FAdapterHilite write FAdapterHilite;
