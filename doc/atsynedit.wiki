@@ -118,9 +118,9 @@ Some details about this:
 * Renders CJK chars with big width 
 * Renders some Unicode chars as "AABB" hex code
 * Renders unprintable chars (space, tab, line end)
-* Can highlight URLs
-* Can set color attributes for ranges (to hilite brackets, words)
-* Supports proportional fonts (but all ATSynEdit controls must use the same font)
+* Can highlight/activate URLs
+* Can set color attributes for ranges (to highlight pair brackets or same words)
+* Supports proportional fonts
 
 == Difference from other components ==
 
