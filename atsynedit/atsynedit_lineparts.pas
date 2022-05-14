@@ -50,11 +50,11 @@ type
   TATLineParts = array[0..cMaxLineParts-1] of TATLinePart;
   PATLineParts = ^TATLineParts;
 
-procedure DoPartFind(constref AParts: TATLineParts; APos: integer; out AIndex, AOffsetLeft: integer);
+procedure DoPartFind(var P: TATLineParts; APos: integer; out AIndex, AOffsetLeft: integer);
 function DoPartInsert(var AParts: TATLineParts; var APart: TATLinePart; AKeepFontStyles: boolean): boolean;
 procedure DoPartSetColorBG(var AParts: TATLineParts; AColor: TColor; AForceColor: boolean);
 
-function DoPartsGetCount(constref AParts: TATLineParts): integer;
+function DoPartsGetCount(var P: TATLineParts): integer;
 function DoPartsShow(var P: TATLineParts): string;
 procedure DoPartsDim(var P: TATLineParts; ADimLevel255: integer; AColorBG: TColor);
 procedure DoPartsCutFromOffset(var P: TATLineParts; AOffset: integer);
@@ -101,7 +101,7 @@ begin
 end;
 
 
-procedure DoPartFind(constref AParts: TATLineParts; APos: integer; out AIndex,
+procedure DoPartFind(var P: TATLineParts; APos: integer; out AIndex,
   AOffsetLeft: integer);
 var
   iStart, iEnd, i: integer;
@@ -109,27 +109,34 @@ begin
   AIndex:= -1;
   AOffsetLeft:= 0;
 
-  for i:= Low(AParts) to High(AParts)-1 do
+  for i:= Low(P) to High(P)-1 do
   begin
-    if AParts[i].Len=0 then
+    if P[i].Len=0 then
     begin
       //pos after last part?
-      if i>Low(AParts) then
-        if APos>=AParts[i-1].Offset+AParts[i-1].Len then
+      if i>Low(P) then
+        if APos>=P[i-1].Offset+P[i-1].Len then
           AIndex:= i;
       Break;
     end;
 
-    iStart:= AParts[i].Offset;
-    iEnd:= iStart+AParts[i].Len;
+    iStart:= P[i].Offset;
+    iEnd:= iStart+P[i].Len;
 
     //pos at part begin?
     if (APos=iStart) then
-      begin AIndex:= i; Break end;
+    begin
+      AIndex:= i;
+      Break
+    end;
 
     //pos at part middle?
     if (APos>=iStart) and (APos<iEnd) then
-      begin AIndex:= i; AOffsetLeft:= APos-iStart; Break end;
+    begin
+      AIndex:= i;
+      AOffsetLeft:= APos-iStart;
+      Break
+    end;
   end;
 end;
 
@@ -146,11 +153,11 @@ begin
     Result:= AParts[N-1].Offset+AParts[N-1].Len;
 end;
 
-function DoPartsGetCount(constref AParts: TATLineParts): integer;
+function DoPartsGetCount(var P: TATLineParts): integer;
 //func considers case when some middle part has Len=0
 begin
-  Result:= High(AParts)+1;
-  while (Result>0) and (AParts[Result-1].Len=0) do
+  Result:= High(P)+1;
+  while (Result>0) and (P[Result-1].Len=0) do
     Dec(Result);
 end;
 
