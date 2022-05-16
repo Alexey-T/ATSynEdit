@@ -3993,7 +3993,6 @@ var
   NOutputCharsSkipped: integer;
   WrapItem: TATWrapItem;
   NColorEntire, NColorAfter: TColor;
-  StrOutput: atString;
   CurrPoint, CurrPointText: TPoint;
   bLineColorForced: boolean;
   bUseSetPixel: boolean;
@@ -4020,15 +4019,6 @@ begin
                     + AScrollHorz.NPixelOffset;
   CurrPointText.Y:= CurrPoint.Y;
 
-  //work very fast for minimap, take LineSub from start
-  StrOutput:= St.LineSub(
-    NLinesIndex,
-    1,
-    Min(WrapItem.NLength, FVisibleColumns)
-    );
-
-  //FMinimapBmp.Canvas.Brush.Color:= FColorBG;
-
   bUseColorOfCurrentLine:= false;
 
   DoCalcLineEntireColor(
@@ -4042,7 +4032,7 @@ begin
   FillOneLine(NColorEntire, ARectLine.Left);
 
   //paint line
-  if StrOutput<>'' then
+  if WrapItem.NLength>0 then
   begin
     NColorAfter:= clNone;
 
@@ -4067,13 +4057,14 @@ begin
       if NColorAfter<>clNone then
         FillOneLine(NColorAfter, CurrPointText.X);
 
+    {
     //truncate text to not paint over screen
     NMaxStringLen:= ARectLine.Width div ACharSize.XScaled div ATEditorCharXScale + 2;
     if Length(StrOutput)>NMaxStringLen then
       SetLength(StrOutput, NMaxStringLen);
+      }
 
-    if StrOutput<>'' then
-      CanvasTextOutMinimap(
+    CanvasTextOutMinimap(
         FMinimapBmp,
         ARectLine,
         CurrPointText.X - FRectMinimap.Left,
