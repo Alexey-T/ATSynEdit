@@ -122,7 +122,6 @@ type
     MinTabSize: integer;
     MaxTabSize: integer;
     MinMinimapWidth: integer;
-    MaxMinimapTimeForHighlight: integer;
     MaxCharsForOutput: integer;
     MinWrapColumn: integer;
     MinWrapColumnAbs: integer;
@@ -131,6 +130,7 @@ type
     MaxCaretTime: integer;
     MinCharsAfterAnyIndent: integer;
     MaxLinesForOldWrapUpdate: integer;
+    MinimapColoringTime: integer;
     HintScrollDx: integer;
     HintBookmarkDx: integer;
     HintBookmarkDy: integer;
@@ -442,7 +442,6 @@ initialization
     MinTabSize:= 1;
     MaxTabSize:= 64;
     MinMinimapWidth:= 30;
-    MaxMinimapTimeForHighlight:= 15;
     MaxCharsForOutput:= 1000; //don't paint more chars in line
     MinWrapColumn:= 20; //too small width won't give smaller wrap-column
     MinWrapColumnAbs:= 4; //absolute min of wrap-column (leave n chars on line anyway)
@@ -451,6 +450,7 @@ initialization
     MaxCaretTime:= 2000;
     MinCharsAfterAnyIndent:= 20; //if indent is too big, leave 20 chrs in wrapped-parts anyway
     MaxLinesForOldWrapUpdate:= 100; //if less lines, force old wrapinfo update (fast)
+    MinimapColoringTime:= 15;
     HintScrollDx:= 5;
     HintBookmarkDx:= 6;
     HintBookmarkDy:= 16;

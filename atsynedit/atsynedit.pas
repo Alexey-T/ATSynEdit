@@ -4036,7 +4036,7 @@ begin
   begin
     NColorAfter:= clNone;
 
-    if GetTickCount64-FTickMinimap>=ATEditorOptions.MaxMinimapTimeForHighlight then
+    if GetTickCount64-FTickMinimap>=ATEditorOptions.MinimapColoringTime then
     begin
       FillChar(ATempParts, SizeOf(ATempParts), 0);
       ATempParts[0].Offset:= 0;
