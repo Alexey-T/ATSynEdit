@@ -1,4 +1,7 @@
 
+2022.05.16
++ add: ATEditorOptions.MinimapColoringTime (15 msec)
+
 2022.05.09
 + add: support for proportional fonts, it's auto enabled when editor finds that TextWidth('N')>TextWidth('.')
 
