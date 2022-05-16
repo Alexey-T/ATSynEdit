@@ -52,9 +52,10 @@ type
 
 procedure DoPartFind(var P: TATLineParts; APos: integer; out AIndex, AOffsetLeft: integer);
 function DoPartInsert(var AParts: TATLineParts; var APart: TATLinePart; AKeepFontStyles: boolean): boolean;
-procedure DoPartSetColorBG(var AParts: TATLineParts; AColor: TColor; AForceColor: boolean);
+procedure DoPartSetColorBG(var P: TATLineParts; AColor: TColor; AForceColor: boolean);
 
 function DoPartsGetCount(var P: TATLineParts): integer;
+function DoPartsGetLastCachedChar(var P: TATLineParts): integer;
 function DoPartsShow(var P: TATLineParts): string;
 procedure DoPartsDim(var P: TATLineParts; ADimLevel255: integer; AColorBG: TColor);
 procedure DoPartsCutFromOffset(var P: TATLineParts; AOffset: integer);
@@ -160,6 +161,18 @@ begin
   while (Result>0) and (P[Result-1].Len=0) do
     Dec(Result);
 end;
+
+function DoPartsGetLastCachedChar(var P: TATLineParts): integer;
+var
+  N: integer;
+begin
+  N:= DoPartsGetCount(P);
+  if N<=0 then
+    Result:= 0
+  else
+    Result:= P[N-1].Offset+P[N-1].Len;
+end;
+
 
 var
   ResultParts: TATLineParts; //size is huge, so not local var
@@ -316,15 +329,14 @@ begin
 end;
 
 
-procedure DoPartSetColorBG(var AParts: TATLineParts; AColor: TColor;
-  AForceColor: boolean);
+procedure DoPartSetColorBG(var P: TATLineParts; AColor: TColor; AForceColor: boolean);
 var
   PartPtr: PATLinePart;
   i: integer;
 begin
-  for i:= Low(AParts) to High(AParts) do
+  for i:= Low(P) to High(P) do
   begin
-    PartPtr:= @AParts[i];
+    PartPtr:= @P[i];
     if PartPtr^.Len=0 then Break; //comment to colorize all parts to hide possible bugs
     if AForceColor or (PartPtr^.ColorBG=clNone) then
       PartPtr^.ColorBG:= AColor;
