@@ -3989,7 +3989,7 @@ procedure TATSynEdit.DoPaintMinimapLine(
   //
 var
   St: TATStrings;
-  NLinesIndex, NMaxStringLen: integer;
+  NLinesIndex: integer;
   NOutputCharsSkipped: integer;
   WrapItem: TATWrapItem;
   NColorEntire, NColorAfter: TColor;
