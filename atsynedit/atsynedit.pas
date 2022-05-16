@@ -4350,9 +4350,7 @@ procedure TATSynEdit.DoPaintMinimapAllToBGRABitmap;
 begin
   //avoid too often minimap repainting
   if not FAdapterIsDataReady then exit;
-
-  if ATEditorOptions.DebugTiming then
-    FTickMinimap:= GetTickCount64;
+  FTickMinimap:= GetTickCount64;
 
   FScrollHorzMinimap.Clear;
   FScrollVertMinimap.Clear;
