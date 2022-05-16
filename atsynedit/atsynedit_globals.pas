@@ -122,6 +122,7 @@ type
     MinTabSize: integer;
     MaxTabSize: integer;
     MinMinimapWidth: integer;
+    MaxMinimapTimeForHighlight: integer;
     MaxCharsForOutput: integer;
     MinWrapColumn: integer;
     MinWrapColumnAbs: integer;
@@ -441,6 +442,7 @@ initialization
     MinTabSize:= 1;
     MaxTabSize:= 64;
     MinMinimapWidth:= 30;
+    MaxMinimapTimeForHighlight:= 15;
     MaxCharsForOutput:= 1000; //don't paint more chars in line
     MinWrapColumn:= 20; //too small width won't give smaller wrap-column
     MinWrapColumnAbs:= 4; //absolute min of wrap-column (leave n chars on line anyway)

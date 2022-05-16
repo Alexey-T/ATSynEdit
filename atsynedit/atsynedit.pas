@@ -4046,6 +4046,15 @@ begin
   begin
     NColorAfter:= clNone;
 
+    if GetTickCount64-FTickMinimap>=ATEditorOptions.MaxMinimapTimeForHighlight then
+    begin
+      FillChar(ATempParts, SizeOf(ATempParts), 0);
+      ATempParts[0].Offset:= 0;
+      ATempParts[0].Len:= WrapItem.NLength;
+      ATempParts[0].ColorBG:= NColorEntire;
+      ATempParts[0].ColorFont:= FColorFont;
+    end
+    else
     DoCalcLineHilite(
       WrapItem,
       ATempParts{%H-},
