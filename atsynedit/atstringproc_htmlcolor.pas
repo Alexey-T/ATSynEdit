@@ -23,6 +23,7 @@ type
     class function HexCodeToInt(ch: word): integer;
     class procedure SkipSpaces(const S: TStr; var N: integer);
     class procedure SkipComma(const S: TStr; var N: integer);
+    class procedure SkipCommaOrSlash(const S: TStr; var N: integer);
     class function SkipInt(const S: TStr; var N: integer): integer;
     class function SkipIntWithPercent(const S: TStr; var N: integer): integer;
     class function SkipFloat(const S: TStr; var N: integer): integer;
@@ -166,6 +167,12 @@ begin
     Inc(N);
 end;
 
+class procedure TATHtmlColorParser.SkipCommaOrSlash(const S: TStr; var N: integer); inline;
+begin
+  if (S[N]=',') or (S[N]='/') then
+    Inc(N);
+end;
+
 class function TATHtmlColorParser.SkipInt(const S: TStr; var N: integer): integer;
 begin
   Result:= -1;
@@ -250,9 +257,13 @@ begin
   if Val3<0 then exit;
   if Val3>255 then exit;
   if N>NLen then exit;
+  SkipSpaces(S, N);
+
+  //allow 'alpha' part always
+  bAlpha:= (S[N]=',') or (S[N]='/');
   if bAlpha then
   begin
-    SkipComma(S, N);
+    SkipCommaOrSlash(S, N);
     ValAlpha:= SkipFloat(S, N);
     if ValAlpha<0 then exit;
   end;
