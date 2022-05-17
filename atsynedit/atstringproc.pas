@@ -660,9 +660,14 @@ begin
       NSize:= 1
     else
     begin
-      NTabSize:= CalcTabulationSize(ALineIndex, NCharsSkipped);
-      NSize:= NTabSize;
-      Inc(NCharsSkipped, NTabSize-1);
+      if AFontProportional then
+        NSize:= TabSize
+      else
+      begin
+        NTabSize:= CalcTabulationSize(ALineIndex, NCharsSkipped);
+        NSize:= NTabSize;
+        Inc(NCharsSkipped, NTabSize-1);
+      end;
     end;
 
     if i=1 then

@@ -201,11 +201,18 @@ begin
   Result:= 100;
 
   if AFontProportional then
+  begin
     case FixedSizes[n] of
       uw_normal,
       uw_fullwidth,
       uw_space:
-        exit(GetCharWidth_FromCache(ch));
+        begin
+          if n<>9 then
+            Result:= GetCharWidth_FromCache(ch)
+          else
+            Result:= GetCharWidth_FromCache(' ')*2;
+          exit;
+        end;
       uw_combined:
         exit(0);
       uw_hexshow:
@@ -215,7 +222,8 @@ begin
           else
             exit(CharScaleHex_Big);
         end;
-     end
+     end;
+  end
   else
   case FixedSizes[n] of
     uw_normal: exit;
