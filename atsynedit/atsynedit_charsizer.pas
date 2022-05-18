@@ -207,11 +207,9 @@ begin
       uw_fullwidth,
       uw_space:
         begin
-          if n<>9 then
-            Result:= GetCharWidth_FromCache(ch)
-          else
-            Result:= GetCharWidth_FromCache(' ')*2;
-          exit;
+          //for tab-char, take width of average char
+          if ch=#9 then ch:= 'N';
+          exit(GetCharWidth_FromCache(ch));
         end;
       uw_combined:
         exit(0);
