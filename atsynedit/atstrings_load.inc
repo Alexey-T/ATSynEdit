@@ -472,7 +472,7 @@ var
     out AEnding: TATLineEnds);
   begin
     AFoundPos:= AFromPos;
-    AEnding:= cEndNone;
+    AEnding:= {$ifdef windows} cEndWin {$else} cEndUnix {$endif};
     repeat
       if AFoundPos>=BufSize then exit;
 
