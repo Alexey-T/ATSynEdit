@@ -522,7 +522,9 @@ begin
     if N<0 then
       exit(true);
     case Items[N].ItemAction of
-      aeaClearModified:
+      //ignore some kind of items for IsEmpty
+      aeaClearModified,
+      aeaCaretJump:
         Continue;
       else
         exit(false);
