@@ -3640,7 +3640,7 @@ begin
   CurrPoint.X:= ARectLine.Left;
   CurrPoint.Y:= ARectLine.Top;
   CurrPointText.X:= Int64(CurrPoint.X)
-                    + Int64(WrapItem.NIndent)*ACharSize.XScaled div ATEditorCharXScale
+                    + Int64(WrapItem.NIndent)*ACharSize.XScaled*ACharSize.XSpacePercents div ATEditorCharXScale div 100
                     - AScrollHorz.SmoothPos
                     + AScrollHorz.NPixelOffset;
   CurrPointText.Y:= CurrPoint.Y;
@@ -7271,7 +7271,7 @@ begin
       if i mod FTabSize = 0 then
         CanvasLine_DottedVertAlt(C,
           Colors.IndentVertLines,
-          ARect.Left + (i-AScrollPos)*ACharSize.XScaled div ATEditorCharXScale,
+          ARect.Left + (i-AScrollPos)*ACharSize.XScaled*ACharSize.XSpacePercents div ATEditorCharXScale div 100,
           ACoordY,
           ACoordY+ACharSize.Y);
 end;
@@ -9181,7 +9181,7 @@ begin
     TextOutProps.CharIndexInLine:= WrapItem.NCharIndex;
 
     CanvasTextOut(C,
-      ATEditorOptions.SizeIndentTooltipX + WrapItem.NIndent*FCharSize.XScaled div ATEditorCharXScale,
+      ATEditorOptions.SizeIndentTooltipX + WrapItem.NIndent*FCharSize.XScaled*FCharSize.XSpacePercents div ATEditorCharXScale div 100,
       ATEditorOptions.SizeIndentTooltipY + FCharSize.Y*(NLine-ALineFrom),
       SText,
       @FParts,

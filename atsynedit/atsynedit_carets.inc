@@ -296,7 +296,7 @@ begin
     if NFromStart>Item.NLength then
       Inc(Result.X, (NFromStart-Item.NLength)*ACharSize.XScaled div ATEditorCharXScale);
 
-    Inc(Result.X, Item.NIndent*ACharSize.XScaled div ATEditorCharXScale - NScrolledHorzSmooth);
+    Inc(Result.X, Item.NIndent*ACharSize.XScaled*ACharSize.XSpacePercents div ATEditorCharXScale div 100 - NScrolledHorzSmooth);
     Result.Y:= (i-NScrolledVert)*ACharSize.Y;
 
     //consider gaps
@@ -473,7 +473,7 @@ begin
     else
     begin
       AllowVirtual:= AVirtualPos and (Item.NFinal=cWrapItemFinal);
-      NPixels:= Int64(P.X)-ARect.Left + AScrollHorz.SmoothPos - ACharSize.XScaled*Item.NIndent div ATEditorCharXScale;
+      NPixels:= Int64(P.X)-ARect.Left + AScrollHorz.SmoothPos - ACharSize.XScaled*ACharSize.XSpacePercents*Item.NIndent div ATEditorCharXScale div 100;
       Result.X:= ATabHelper.FindClickedPosition(
         Result.Y,
         Str,
