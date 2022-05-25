@@ -1323,7 +1323,7 @@ type
     function DoFormatLineNumber(N: integer): string;
     function UpdateScrollInfoFromMessage(var AInfo: TATEditorScrollInfo; const AMsg: TLMScroll): boolean;
     procedure UpdateCaretsCoords(AOnlyLast: boolean = false);
-    function GetCharSize(C: TCanvas; ACharSpacingY: integer): TATEditorCharSize;
+    procedure UpdateCharSize(var ACharSize: TATEditorCharSize; C: TCanvas; ACharSpacingY: integer);
     function GetScrollbarVisible(bVertical: boolean): boolean;
     procedure SetMarginRight(AValue: integer);
 
@@ -2354,7 +2354,7 @@ var
   i, j: integer;
 begin
   //method can be called before 1st paint,
-  //so TCanvas.TextWidth (TATSynEdit.GetCharSize) will give exception "Control has no parent window"
+  //so TCanvas.TextWidth (TATSynEdit.UpdateCharSize) will give exception "Control has no parent window"
   //example: CudaText has user.json with "wrap_mode":1
 
   //2021.01.29:
@@ -2362,7 +2362,7 @@ begin
   //trying to restore Ed.LineTop.
   // https://github.com/Alexey-T/CudaText/issues/3112
   //to fix this issue, let's not Exit "if not HandleAllocated",
-  //but handle this in GetCharSize(), via GetDC(0)
+  //but handle this in UpdateCharSize(), via GetDC(0)
 
   if not HandleAllocated then
     if FWrapMode<>cWrapOff then
@@ -3075,7 +3075,7 @@ begin
   C.Font.Name:= Font.Name;
   C.Font.Size:= DoScaleFont(Font.Size);
 
-  FCharSize:= GetCharSize(C, FSpacingY);
+  UpdateCharSize(FCharSize, C, FSpacingY);
 
   if FSpacingY<0 then
     FTextOffsetFromTop:= FSpacingY
@@ -3273,7 +3273,8 @@ begin
   end;
 end;
 
-function TATSynEdit.GetCharSize(C: TCanvas; ACharSpacingY: integer): TATEditorCharSize;
+procedure TATSynEdit.UpdateCharSize(var ACharSize: TATEditorCharSize; C: TCanvas;
+  ACharSpacingY: integer);
   //
   procedure UpdateFontProportional(TempC: TCanvas);
   begin
@@ -3316,8 +3317,8 @@ begin
     end;
   end;
 
-  Result.XScaled:= Max(1, Size.cx) * ATEditorCharXScale div SampleStrLen;
-  Result.Y:= Max(1, Size.cy + ACharSpacingY);
+  ACharSize.XScaled:= Max(1, Size.cx) * ATEditorCharXScale div SampleStrLen;
+  ACharSize.Y:= Max(1, Size.cy + ACharSpacingY);
 end;
 
 procedure TATSynEdit.DoPaintGutterBandBG(C: TCanvas; AColor: TColor;
