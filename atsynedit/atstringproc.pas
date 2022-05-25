@@ -35,7 +35,7 @@ type
     XScaled: Int64;
     //SpaceWidth is the width of space-char in percents of average-char-width.
     //it's not calculated via XScaled if AFontProportional=True.
-    SpaceWidth: Int64;
+    XSpacePercents: Int64;
     //line height.
     //macOS height is still the integer number.
     Y: Int64;

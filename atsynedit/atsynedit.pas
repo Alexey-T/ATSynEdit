@@ -3322,9 +3322,9 @@ begin
   ACharSize.Y:= Max(1, Size.cy + ACharSpacingY);
 
   if FFontProportional then
-    ACharSize.SpaceWidth:= FCharSizer.GetSpaceWidth
+    ACharSize.XSpacePercents:= FCharSizer.GetSpaceWidth
   else
-    ACharSize.SpaceWidth:= 100;
+    ACharSize.XSpacePercents:= 100;
 end;
 
 procedure TATSynEdit.DoPaintGutterBandBG(C: TCanvas; AColor: TColor;
@@ -8607,7 +8607,7 @@ begin
     else
       nIndent:= nIndentBegin;
 
-    nSpaceShift:= Int64(nIndent)*ACharSize.SpaceWidth*ACharSize.XScaled div ATEditorCharXScale div 100;
+    nSpaceShift:= Int64(nIndent)*ACharSize.XSpacePercents*ACharSize.XScaled div ATEditorCharXScale div 100;
     Inc(P1.X, nSpaceShift);
     Inc(P2.X, nSpaceShift);
 
