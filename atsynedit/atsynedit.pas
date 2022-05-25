@@ -4833,6 +4833,7 @@ begin
 
   FSpacingY:= cInitSpacingY;
   FCharSizeMinimap.XScaled:= 1 * ATEditorCharXScale;
+  FCharSizeMinimap.XSpacePercents:= 100;
   FCharSizeMinimap.Y:= 2;
 
   FOptScrollStyleHorz:= aessAuto;
