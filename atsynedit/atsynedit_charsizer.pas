@@ -35,6 +35,7 @@ type
     procedure InitPanel;
     function GetCharWidth_FromCache(ch: WideChar): integer;
   public
+    TabSize: integer;
     constructor Create(AOwner: TComponent);
     destructor Destroy; override;
     procedure Init(const AFontName: string; AFontSize: integer);
@@ -154,6 +155,7 @@ end;
 constructor TATCharSizer.Create(AOwner: TComponent);
 begin
   FOwner:= AOwner;
+  TabSize:= 8;
 end;
 
 procedure TATCharSizer.InitPanel;
@@ -207,9 +209,10 @@ begin
       uw_fullwidth,
       uw_space:
         begin
-          //for tab-char, take width of average char
-          if ch=#9 then ch:= 'N';
-          exit(GetCharWidth_FromCache(ch));
+          if ch=#9 then
+            exit(GetSpaceWidth*TabSize)
+          else
+            exit(GetCharWidth_FromCache(ch));
         end;
       uw_combined:
         exit(0);

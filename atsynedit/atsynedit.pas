@@ -3325,6 +3325,8 @@ begin
     ACharSize.XSpacePercents:= FCharSizer.GetSpaceWidth
   else
     ACharSize.XSpacePercents:= 100;
+
+  FCharSizer.TabSize:= FTabSize;
 end;
 
 procedure TATSynEdit.DoPaintGutterBandBG(C: TCanvas; AColor: TColor;

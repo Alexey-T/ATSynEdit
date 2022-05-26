@@ -665,7 +665,7 @@ begin
     else
     begin
       if FontProportional then
-        NSize:= NScalePercents*TabSize
+        NSize:= NScalePercents
       else
       begin
         NTabSize:= CalcTabulationSize(ALineIndex, NCharsSkipped);
