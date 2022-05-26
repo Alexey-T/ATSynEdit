@@ -227,10 +227,14 @@ begin
   end
   else
   case FixedSizes[n] of
-    uw_normal: exit;
-    uw_fullwidth: exit(ATEditorOptions.CharScaleFullWidth);
-    uw_space: exit;
-    uw_combined: exit(0);
+    uw_normal:
+      exit;
+    uw_fullwidth:
+      exit(ATEditorOptions.CharScaleFullWidth);
+    uw_space:
+      exit;
+    uw_combined:
+      exit(0);
     uw_hexshow:
       begin
         if n<$100 then
