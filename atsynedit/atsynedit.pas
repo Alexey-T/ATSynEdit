@@ -2372,7 +2372,12 @@ begin
   if FRectMain.Width=0 then
     UpdateInitialVars(Canvas);
 
-  FCharSizer.Init(Font.Name, DoScaleFont(Font.Size));
+  FCharSizer.Init(
+    Font.Name,
+    DoScaleFont(Font.Size),
+    FTabSize,
+    FFontProportional
+    );
 
   //virtual mode allows faster usage of WrapInfo
   CurStrings:= Strings;
@@ -3325,8 +3330,6 @@ begin
     ACharSize.XSpacePercents:= FCharSizer.GetSpaceWidth
   else
     ACharSize.XSpacePercents:= 100;
-
-  FCharSizer.TabSize:= FTabSize;
 end;
 
 procedure TATSynEdit.DoPaintGutterBandBG(C: TCanvas; AColor: TColor;

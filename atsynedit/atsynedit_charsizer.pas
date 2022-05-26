@@ -28,6 +28,8 @@ type
     FontName: string;
     FontSize: integer;
     FontReset: boolean;
+    FFontProportional: boolean;
+    FTabSize: integer;
     SizeAvg: integer;
     FPanel: TPanel;
     FOwner: TComponent;
@@ -35,11 +37,10 @@ type
     procedure InitPanel;
     function GetCharWidth_FromCache(ch: WideChar): integer;
   public
-    TabSize: integer;
     constructor Create(AOwner: TComponent);
     destructor Destroy; override;
-    procedure Init(const AFontName: string; AFontSize: integer);
-    function GetCharWidth(ch: WideChar; AFontProportional: boolean): integer;
+    procedure Init(const AFontName: string; AFontSize: integer; ATabSize: integer; AFontProportional: boolean);
+    function GetCharWidth(ch: WideChar): integer;
     function GetSpaceWidth: integer;
     //function GetStrWidth(const S: WideString): integer;
   end;
@@ -125,7 +126,8 @@ end;
 
 { TATCharSizer }
 
-procedure TATCharSizer.Init(const AFontName: string; AFontSize: integer);
+procedure TATCharSizer.Init(const AFontName: string; AFontSize: integer;
+  ATabSize: integer; AFontProportional: boolean);
 begin
   if (FontName<>AFontName) or (FontSize<>AFontSize) then
   begin
@@ -135,6 +137,8 @@ begin
     FillChar(Sizes, SizeOf(Sizes), 0);
   end;
   SizeAvg:= 0;
+  FTabSize:= ATabSize;
+  FFontProportional:= AFontProportional;
 end;
 
 function TATCharSizer.GetCharWidth_FromCache(ch: WideChar): integer;
@@ -155,7 +159,7 @@ end;
 constructor TATCharSizer.Create(AOwner: TComponent);
 begin
   FOwner:= AOwner;
-  TabSize:= 8;
+  FTabSize:= 8;
 end;
 
 procedure TATCharSizer.InitPanel;
@@ -193,7 +197,7 @@ begin
   Result:= GetCharWidth_FromCache(' ');
 end;
 
-function TATCharSizer.GetCharWidth(ch: WideChar; AFontProportional: boolean): integer;
+function TATCharSizer.GetCharWidth(ch: WideChar): integer;
 const
   CharScaleHex_Small = 300; //width of 'xNN'
   CharScaleHex_Big = 500; //width of 'xNNNN'
@@ -202,7 +206,7 @@ var
 begin
   Result:= 100;
 
-  if AFontProportional then
+  if FFontProportional then
   begin
     case FixedSizes[n] of
       uw_normal,
@@ -210,7 +214,7 @@ begin
       uw_space:
         begin
           if ch=#9 then
-            exit(GetSpaceWidth*TabSize)
+            exit(GetSpaceWidth*FTabSize)
           else
             exit(GetCharWidth_FromCache(ch));
         end;
@@ -255,7 +259,7 @@ begin
       exit(CharScaleHex_Big);
   end;
 
-  if AFontProportional then
+  if FFontProportional then
     exit(GetCharWidth_FromCache(ch));
 
   if ATEditorOptions.CharSizeProportional then

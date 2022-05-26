@@ -656,7 +656,7 @@ begin
     end
     else
     begin
-      NScalePercents:= CharSizer.GetCharWidth(ch, FontProportional);
+      NScalePercents:= CharSizer.GetCharWidth(ch);
       //NPairSize:= 0;
     end;
 
@@ -709,7 +709,7 @@ begin
     end
     else
     begin
-      NScalePercents:= CharSizer.GetCharWidth(ch, FontProportional);
+      NScalePercents:= CharSizer.GetCharWidth(ch);
     end;
 
     if ch<>#9 then
