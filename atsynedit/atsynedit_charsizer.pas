@@ -129,13 +129,15 @@ end;
 procedure TATCharSizer.Init(const AFontName: string; AFontSize: integer;
   ATabSize: integer; AFontProportional: boolean);
 begin
-  if (FontName<>AFontName) or (FontSize<>AFontSize) then
+  if (FontName<>AFontName) or
+    (FontSize<>AFontSize) or
+    (FFontProportional<>AFontProportional) then
   begin
     FontReset:= true;
-    FontName:= AFontName;
-    FontSize:= AFontSize;
     FillChar(Sizes, SizeOf(Sizes), 0);
   end;
+  FontName:= AFontName;
+  FontSize:= AFontSize;
   SizeAvg:= 0;
   FTabSize:= ATabSize;
   FFontProportional:= AFontProportional;
