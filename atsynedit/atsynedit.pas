@@ -3674,7 +3674,6 @@ begin
         NLinesIndex,
         StrOutput,
         AScrollHorz.SmoothPos,
-        ACharSize.XScaled,
         NOutputCharsSkipped,
         NOutputCellPercentsSkipped);
       Delete(StrOutput, 1, NOutputCharsSkipped);

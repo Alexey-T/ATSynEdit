@@ -150,7 +150,6 @@ type
     procedure FindOutputSkipOffset(ALineIndex: integer;
       const S: atString;
       const AScrollPosSmooth: Int64;
-      const ACharSizeXScaled: Int64;
       out ACharsSkipped: Int64;
       out ACellPercentsSkipped: Int64);
   end;
@@ -785,7 +784,6 @@ end;
 procedure TATStringTabHelper.FindOutputSkipOffset(ALineIndex: integer;
   const S: atString;
   const AScrollPosSmooth: Int64;
-  const ACharSizeXScaled: Int64;
   out ACharsSkipped: Int64;
   out ACellPercentsSkipped: Int64);
 var
@@ -798,7 +796,7 @@ begin
 
   CalcCharOffsets(ALineIndex, S, Offsets);
 
-  NCheckedOffset:= AScrollPosSmooth * 100 * ATEditorCharXScale div ACharSizeXScaled;
+  NCheckedOffset:= AScrollPosSmooth * 100 * ATEditorCharXScale div CharSize.XScaled;
 
   while (ACharsSkipped<Offsets.Len) and
     (Offsets.Data[ACharsSkipped] < NCheckedOffset) do
