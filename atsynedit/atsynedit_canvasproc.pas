@@ -652,7 +652,7 @@ end;
 function CanvasTextWidth(const S: atString; ALineIndex: integer;
   ATabHelper: TATStringTabHelper; ACharWidth: integer; AFontProportional: boolean): Int64;
 begin
-  Result:= ATabHelper.CalcCharOffsetLast(ALineIndex, S, AFontProportional) * ACharWidth div 100;
+  Result:= ATabHelper.CalcCharOffsetLast(ALineIndex, S) * ACharWidth div 100;
 end;
 
 
@@ -781,7 +781,7 @@ begin
   end
   else
   begin
-    AProps.TabHelper.CalcCharOffsets(AProps.LineIndex, AText, ListOffsets, AProps.FontProportional, AProps.CharsSkipped);
+    AProps.TabHelper.CalcCharOffsets(AProps.LineIndex, AText, ListOffsets, AProps.CharsSkipped);
 
     ListInt.Len:= ListOffsets.Len;
     Dx.Len:= ListOffsets.Len;

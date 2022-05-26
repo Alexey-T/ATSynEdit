@@ -459,13 +459,13 @@ begin
     if NLineLenOriginal>ATEditorOptions.MaxLineLenForAccurateCharWidths then
     begin
       Str:= StringOfCharW(ATEditorOptions.SampleChar, NLineLenOriginal); //fake to calc CharOffsets only
-      ATabHelper.CalcCharOffsets(Item.NLineIndex, Str, CharOffsets, AFontProportional, 0);
+      ATabHelper.CalcCharOffsets(Item.NLineIndex, Str, CharOffsets, 0);
       Str:= AStrings.LineSub(Item.NLineIndex, Item.NCharIndex, NLineLenTrimmed);
     end
     else
     begin
       Str:= AStrings.LineSub(Item.NLineIndex, Item.NCharIndex, NLineLenTrimmed);
-      ATabHelper.CalcCharOffsets(Item.NLineIndex, Str, CharOffsets, AFontProportional, 0);
+      ATabHelper.CalcCharOffsets(Item.NLineIndex, Str, CharOffsets, 0);
     end;
 
     if bGapGoesToEnd then
@@ -479,7 +479,6 @@ begin
         Str,
         CharOffsets,
         NPixels,
-        ACharSize,
         AllowVirtual,
         ADetails.EndOfWrappedLine)
         + Item.NCharIndex - 2;

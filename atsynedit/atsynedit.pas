@@ -2545,8 +2545,8 @@ begin
       StrPart,
       Max(AWrapColumn-NIndent, ATEditorOptions.MinWrapColumnAbs),
       ANonWordChars,
-      AWrapIndented,
-      AFontProportional);
+      AWrapIndented
+      );
 
     if NLen>=Length(StrPart) then
       FinalState:= cWrapItemFinal
@@ -3675,7 +3675,6 @@ begin
         StrOutput,
         AScrollHorz.SmoothPos,
         ACharSize.XScaled,
-        FFontProportional,
         NOutputCharsSkipped,
         NOutputCellPercentsSkipped);
       Delete(StrOutput, 1, NOutputCharsSkipped);
@@ -9349,6 +9348,8 @@ begin
   FTabHelper.TabSpaces:= OptTabSpaces;
   FTabHelper.TabSize:= OptTabSize;
   FTabHelper.IndentSize:= OptIndentSize;
+  FTabHelper.CharSize:= FCharSize;
+  FTabHelper.FontProportional:= FFontProportional;
   FTabHelper.SenderObj:= Self;
   FTabHelper.OnCalcTabSize:= FOnCalcTabSize;
   FTabHelper.OnCalcLineLen:= @DoCalcLineLen;
