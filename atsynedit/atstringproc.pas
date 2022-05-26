@@ -661,23 +661,23 @@ begin
     end;
 
     if ch<>#9 then
-      NSize:= 1
+      NSize:= NScalePercents
     else
     begin
       if FontProportional then
-        NSize:= TabSize
+        NSize:= NScalePercents*TabSize
       else
       begin
         NTabSize:= CalcTabulationSize(ALineIndex, NCharsSkipped);
-        NSize:= NTabSize;
+        NSize:= NScalePercents*NTabSize;
         Inc(NCharsSkipped, NTabSize-1);
       end;
     end;
 
     if i=1 then
-      AInfo.Data[i-1]:= Int64(NSize)*NScalePercents
+      AInfo.Data[i-1]:= NSize
     else
-      AInfo.Data[i-1]:= AInfo.Data[i-2]+Int64(NSize)*NScalePercents;
+      AInfo.Data[i-1]:= AInfo.Data[i-2]+NSize;
   end;
 end;
 
