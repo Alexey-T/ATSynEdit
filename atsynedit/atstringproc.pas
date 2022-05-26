@@ -27,17 +27,17 @@ const
 
 type
   TATEditorCharSize = record
-    //XScaled is the average-char-width (usually 'N'),
+    //XScaled is the average-char-width (usually of 'N'),
     //multiplied by ATEditorCharXScale and truncated.
-    //on win32/gtk2, XScaled is multiple of ATEditorCharXScale; but not on Qt5/macOS.
+    //on Win32/Gtk2, XScaled is multiple of ATEditorCharXScale; but not on Qt5/macOS.
     //macOS has actually floating-number font width, e.g. 7.801 pixels of a single char in monospaced fonts
     //(all ASCII chars have the same width, it was tested on macOS).
     XScaled: Int64;
-    //SpaceWidth is the width of space-char in percents of average-char-width.
-    //it's not calculated via XScaled if AFontProportional=True.
+    //XSpacePercents is the width of space-char in percents (of average-char-width).
+    //if FontProportional=False, it is 100; otherwise it's different.
     XSpacePercents: Int64;
     //line height.
-    //macOS height is still the integer number.
+    //macOS height is still an integer number.
     Y: Int64;
   end;
 
