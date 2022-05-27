@@ -239,7 +239,6 @@ type
     function GetLine(AIndex: integer): atString;
     function GetLineAscii(AIndex: integer): boolean;
     function GetLineBlank(AIndex: integer): boolean;
-    function GetLineGitMarker(AIndex: integer): TATStringGitMarker;
     function GetLineEnd(AIndex: integer): TATLineEnds;
     function GetLineFoldFrom(ALine, AClient: integer): integer;
     function GetLineHasTab(AIndex: integer): boolean;
@@ -318,7 +317,6 @@ type
     property LinesHasTab[Index: integer]: boolean read GetLineHasTab;
     property LinesHasAsciiNoTabs[Index: integer]: boolean read GetLineHasAsciiNoTabs;
     property LinesBlank[Index: integer]: boolean read GetLineBlank;
-    property LinesGitMarker[Index: integer]: TATStringGitMarker read GetLineGitMarker;
     property LinesFoldFrom[IndexLine, IndexClient: integer]: integer read GetLineFoldFrom write SetLineFoldFrom;
     property LinesState[Index: integer]: TATLineState read GetLineState write SetLineState;
     property LinesUpdated[Index: integer]: boolean read GetLineUpdated write SetLineUpdated;
@@ -969,11 +967,6 @@ end;
 function TATStrings.GetLineBlank(AIndex: integer): boolean;
 begin
   Result:= FList.GetItem(AIndex)^.IsBlank;
-end;
-
-function TATStrings.GetLineGitMarker(AIndex: integer): TATStringGitMarker;
-begin
-  Result:= FList.GetItem(AIndex)^.IsGitMarker;
 end;
 
 function TATStrings.GetLineLen(AIndex: integer): integer;

@@ -39,11 +39,9 @@ procedure TATSynEdit.DoCalcLineHilite(const AData: TATWrapItem;
   var AColorAfter: TColor;
   AMainText: boolean);
 var
-  St: TATStrings;
   nMaxOffset, nCharIndex, nLineIndex, nLineLen: integer;
   bEnableHilite: boolean;
 begin
-  St:= Strings;
   nMaxOffset:= Min(ACharsMax, AData.NLength-ACharsSkipped);
   nLineIndex:= AData.NLineIndex;
   nLineLen:= AData.NLength;
@@ -56,6 +54,7 @@ begin
   FillChar(AParts, SizeOf(AParts), 0);
   if nLineLen=0 then exit;
 
+  (*
   if FHighlightGitConflicts then
     if (nLineLen>=7{Git marker len}) then
       if St.IsIndexValid(nLineIndex) and
@@ -67,6 +66,7 @@ begin
         AParts[0].ColorBG:= Colors.GitMarkerBG;
         AParts[0].ColorFont:= Colors.TextBG;
       end;
+      *)
 
   if bEnableHilite then
   begin
