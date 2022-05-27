@@ -1,4 +1,7 @@
 
+2022.05.27
+* deleted prop OptHighlightGitConflicts
+
 2022.05.16
 + add: ATEditorOptions.MinimapColoringTime (15 msec)
 
