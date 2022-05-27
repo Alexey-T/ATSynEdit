@@ -5083,8 +5083,6 @@ procedure TATSynEdit.Update(AUpdateWrapInfo: boolean=false; AForceRepaint: boole
 begin
   if not IsRepaintEnabled then exit;
 
-  UpdateCursor;
-
   if AUpdateWrapInfo then
     FWrapUpdateNeeded:= true;
 
