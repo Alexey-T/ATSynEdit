@@ -1,7 +1,6 @@
 unit formmain;
 
 {$mode objfpc}{$H+}
-{$define test_pro_font}
 
 interface
 
@@ -309,11 +308,6 @@ begin
   ed.Font.Name:= 'Courier New';
   if Screen.Fonts.IndexOf(cGoodFont)>=0 then
     ed.Font.Name:= cGoodFont;
-  {$endif}
-
-  {$ifdef test_pro_font}
-  ed.Font.Name:= 'DejaVu Serif';
-  ATEditorOptions.FontProportional:= true;
   {$endif}
 
   SetLength(ed.Micromap.Columns, 0);
