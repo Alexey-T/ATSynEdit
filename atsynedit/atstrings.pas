@@ -2627,9 +2627,18 @@ end;
 
 
 procedure TATStrings.ActionSort(AAction: TATStringsSortAction; AFrom, ATo: integer);
+  //
+  procedure RemoveEmptyLines;
+  var
+    i: integer;
+  begin
+    for i:= Count-1 downto 0 do
+      if LinesLen[i]=0 then
+        FList.Delete(i);
+  end;
+  //
 var
   Func: TFPSListCompareFunc;
-  i: integer;
 begin
   ActionEnsureFinalEol;
   ActionDeleteFakeLine;
@@ -2654,12 +2663,11 @@ begin
   ClearUndo;
   ClearLineStates(false);
 
-  for i:= Count-1 downto 0 do
-    if LinesLen[i]=0 then
-      FList.Delete(i);
-
   if AFrom<0 then
-    FList.Sort(Func)
+  begin
+    RemoveEmptyLines;
+    FList.Sort(Func);
+  end
   else
     FList.SortRange(AFrom, ATo, Func);
 
