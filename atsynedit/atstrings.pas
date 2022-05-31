@@ -276,7 +276,7 @@ type
     procedure DoLoadFromStream(Stream: TStream; AFromUTF8: boolean; out AForcedToANSI: boolean);
     procedure DoDetectEndings;
     procedure DoFinalizeLoading;
-    procedure ClearLineStates(ASaved: boolean);
+    procedure ClearLineStates(ASaved: boolean; AFrom: integer=-1; ATo: integer=-1);
     procedure SetModified(AValue: boolean);
     procedure SetRedoAsString(const AValue: string);
     procedure SetUndoAsString(const AValue: string);
@@ -1660,12 +1660,18 @@ begin
   FList.Clear;
 end;
 
-procedure TATStrings.ClearLineStates(ASaved: boolean);
+procedure TATStrings.ClearLineStates(ASaved: boolean; AFrom: integer=-1; ATo: integer=-1);
 var
   Item: PATStringItem;
   i: integer;
 begin
-  for i:= 0 to Count-1 do
+  if AFrom<0 then
+  begin
+    AFrom:= 0;
+    ATo:= Count-1;
+  end;
+
+  for i:= AFrom to ATo do
   begin
     Item:= FList.GetItem(i);
     if ASaved then
@@ -2639,14 +2645,19 @@ procedure TATStrings.ActionSort(AAction: TATStringsSortAction; AFrom, ATo: integ
   //
 var
   Func: TFPSListCompareFunc;
+  bAllText: boolean;
 begin
-  ActionEnsureFinalEol;
-  ActionDeleteFakeLine;
-
-  if Count<2 then
+  bAllText:= AFrom<0;
+  if bAllText then
   begin
-    ActionAddFakeLineIfNeeded;
-    exit;
+    ActionEnsureFinalEol;
+    ActionDeleteFakeLine;
+
+    if Count<2 then
+    begin
+      ActionAddFakeLineIfNeeded;
+      exit;
+    end;
   end;
 
   case AAction of
@@ -2661,18 +2672,17 @@ begin
   end;
 
   ClearUndo;
-  ClearLineStates(false);
 
-  if AFrom<0 then
+  if bAllText then
   begin
     RemoveEmptyLines;
     FList.Sort(Func);
+    ActionAddFakeLineIfNeeded;
   end
   else
     FList.SortRange(AFrom, ATo, Func);
 
-  ActionAddFakeLineIfNeeded;
-  ClearLineStates(false);
+  ClearLineStates(false, AFrom, ATo);
 
   //this clears all bookmarks, ranges, decors - it's ok
   DoEventChange(cLineChangeDeletedAll, -1, 1);
