@@ -277,6 +277,7 @@ type
     procedure DoDetectEndings;
     procedure DoFinalizeLoading;
     procedure ClearLineStates(ASaved: boolean; AFrom: integer=-1; ATo: integer=-1);
+    procedure ChangeLineStates(AFrom, ATo: integer);
     procedure SetModified(AValue: boolean);
     procedure SetRedoAsString(const AValue: string);
     procedure SetUndoAsString(const AValue: string);
@@ -1681,6 +1682,25 @@ begin
   end;
 end;
 
+procedure TATStrings.ChangeLineStates(AFrom, ATo: integer);
+var
+  Item: PATStringItem;
+  i: integer;
+begin
+  if AFrom<0 then
+  begin
+    AFrom:= 0;
+    ATo:= Count-1;
+  end;
+
+  for i:= AFrom to ATo do
+  begin
+    Item:= FList.GetItem(i);
+    Item^.LineStateToChanged;
+  end;
+end;
+
+
 procedure TATStrings.SetModified(AValue: boolean);
 begin
   FModified:= AValue;
@@ -2682,7 +2702,7 @@ begin
   else
     FList.SortRange(AFrom, ATo, Func);
 
-  ClearLineStates(false, AFrom, ATo);
+  ChangeLineStates(AFrom, ATo);
 
   //this clears all bookmarks, ranges, decors - it's ok
   DoEventChange(cLineChangeDeletedAll, -1, 1);
