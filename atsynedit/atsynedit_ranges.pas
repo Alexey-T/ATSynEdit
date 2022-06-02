@@ -539,12 +539,14 @@ begin
     NRange:= FLineIndexer[ALine][iItem];
     if not IsIndexValid(NRange) then Continue;
     Ptr:= ItemPtr(NRange);
+
     if Ptr^.IsSimple then
       Continue;
+
     if AWithStaple and not Ptr^.Staple then
       Continue;
 
-    //skip too small ranges, but don't skip _folded_ ranges
+    //skip small ranges, but don't skip _folded_ ranges; CudaText issue #4159
     if not Ptr^.Folded then
       if Ptr^.Y2-Ptr^.Y<AMinimalRangeHeight then
         Continue;
