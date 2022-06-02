@@ -543,8 +543,12 @@ begin
       Continue;
     if AWithStaple and not Ptr^.Staple then
       Continue;
-    if Ptr^.Y2-Ptr^.Y<AMinimalRangeHeight then
-      Continue;
+
+    //skip too small ranges, but don't skip _folded_ ranges
+    if not Ptr^.Folded then
+      if Ptr^.Y2-Ptr^.Y<AMinimalRangeHeight then
+        Continue;
+
     exit(NRange);
   end;
 end;
