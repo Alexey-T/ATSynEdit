@@ -393,6 +393,10 @@ begin
         Encoding:= cEncUTF8;
         EncodingDetect:= false;
         LoadFromStream(MS, true{AFromUTF8});
+
+        //fixing CudaText issue #4172
+        if not SEndsWithEol(AText) then
+          ActionDeleteFakeLineAndFinalEol;
       finally
         Encoding:= EncOld;
         ActionAddFakeLineIfNeeded;
