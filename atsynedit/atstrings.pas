@@ -177,7 +177,7 @@ type
   private
     FList: TATStringItemList;
     FListUpdates: TATIntegerList;
-    FEnableCachedWrapInfoUpdate: boolean;
+    FEnableCachedWrapinfoUpdate: boolean;
     FGaps: TATGaps;
     FBookmarks: TATBookmarks;
     FBookmarks2: TATBookmarks;
@@ -339,7 +339,7 @@ type
     property Endings: TATLineEnds read FEndings write SetEndings;
     property LoadingForcedANSI: boolean read FLoadingForcedANSI;
     property ListUpdates: TATIntegerList read FListUpdates; //if its Count>ATEditorOptions.MaxLinesForOldWrapUpdate, UpdateWrapInfo maybe performs cached update
-    property EnableCachedWrapInfoUpdate: boolean read FEnableCachedWrapInfoUpdate write FEnableCachedWrapInfoUpdate; //if False, UpdateWrapInfo cached update will be disabled for the next call
+    property EnableCachedWrapinfoUpdate: boolean read FEnableCachedWrapinfoUpdate write FEnableCachedWrapinfoUpdate; //if False, UpdateWrapInfo cached update will be disabled for the next call
     property Modified: boolean read FModified write SetModified;
     property ModifiedRecent: boolean read FModifiedRecent write FModifiedRecent;
     property ModifiedVersion: Int64 read FModifiedVersion;
@@ -1270,7 +1270,7 @@ constructor TATStrings.Create(AUndoLimit: integer);
 begin
   FList:= TATStringItemList.Create;
   FListUpdates:= TATIntegerList.Create;
-  FEnableCachedWrapInfoUpdate:= true;
+  FEnableCachedWrapinfoUpdate:= true;
   FUndoLimit:= AUndoLimit;
   FUndoList:= TATUndoList.Create(FUndoLimit);
   FRedoList:= TATUndoList.Create(FUndoLimit);
@@ -1660,7 +1660,7 @@ begin
 
   FList.Clear;
   ListUpdates.Clear;
-  EnableCachedWrapInfoUpdate:= false;
+  EnableCachedWrapinfoUpdate:= false;
 end;
 
 procedure TATStrings.ClearLineStates(ASaved: boolean; AFrom: integer=-1; ATo: integer=-1);
@@ -2210,7 +2210,7 @@ begin
   if Assigned(FListUpdates) then
   begin
     FListUpdates.Clear;
-    FEnableCachedWrapInfoUpdate:= true;
+    FEnableCachedWrapinfoUpdate:= true;
   end;
 end;
 
@@ -2446,13 +2446,13 @@ begin
 
   if AAction in [aeaDelete, aeaInsert] then
   begin
-    FEnableCachedWrapInfoUpdate:= false;
+    FEnableCachedWrapinfoUpdate:= false;
     Exit
   end;
 
   if FListUpdates.Count>ATEditorOptions.MaxUpdatesCountEasy then
   begin
-    FEnableCachedWrapInfoUpdate:= false;
+    FEnableCachedWrapinfoUpdate:= false;
     Exit
   end;
 
