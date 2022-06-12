@@ -1659,6 +1659,8 @@ begin
   end;
 
   FList.Clear;
+  ListUpdates.Clear;
+  EnableCachedWrapInfoUpdate:= false;
 end;
 
 procedure TATStrings.ClearLineStates(ASaved: boolean; AFrom: integer=-1; ATo: integer=-1);
