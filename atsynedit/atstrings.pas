@@ -176,7 +176,7 @@ type
   TATStrings = class
   private
     FList: TATStringItemList;
-    FListUpdates: TATIntegerList;
+    FIndexesOfEditedLines: TATIntegerList;
     FEnableCachedWrapinfoUpdate: boolean;
     FGaps: TATGaps;
     FBookmarks: TATBookmarks;
@@ -338,7 +338,7 @@ type
     property EncodingDetectDefaultUtf8: boolean read FEncodingDetectDefaultUtf8 write FEncodingDetectDefaultUtf8;
     property Endings: TATLineEnds read FEndings write SetEndings;
     property LoadingForcedANSI: boolean read FLoadingForcedANSI;
-    property ListUpdates: TATIntegerList read FListUpdates; //if its Count>ATEditorOptions.MaxLinesForOldWrapUpdate, UpdateWrapInfo maybe performs cached update
+    property IndexesOfEditedLines: TATIntegerList read FIndexesOfEditedLines; //list has line indexes of edited lines; UpdateWrapInfo maybe performs cached update
     property EnableCachedWrapinfoUpdate: boolean read FEnableCachedWrapinfoUpdate write FEnableCachedWrapinfoUpdate; //if False, UpdateWrapInfo cached update will be disabled for the next call
     property Modified: boolean read FModified write SetModified;
     property ModifiedRecent: boolean read FModifiedRecent write FModifiedRecent;
@@ -1269,7 +1269,7 @@ end;
 constructor TATStrings.Create(AUndoLimit: integer);
 begin
   FList:= TATStringItemList.Create;
-  FListUpdates:= TATIntegerList.Create;
+  FIndexesOfEditedLines:= TATIntegerList.Create;
   FEnableCachedWrapinfoUpdate:= true;
   FUndoLimit:= AUndoLimit;
   FUndoList:= TATUndoList.Create(FUndoLimit);
@@ -1325,7 +1325,7 @@ begin
   FreeAndNil(FBookmarks2);
   FreeAndNil(FBookmarks);
   FreeAndNil(FGaps);
-  FreeAndNil(FListUpdates);
+  FreeAndNil(FIndexesOfEditedLines);
   FreeAndNil(FUndoList);
   FreeAndNil(FRedoList);
 
@@ -1659,7 +1659,7 @@ begin
   end;
 
   FList.Clear;
-  ListUpdates.Clear;
+  IndexesOfEditedLines.Clear;
   EnableCachedWrapinfoUpdate:= false;
 end;
 
@@ -2207,9 +2207,9 @@ begin
     FRedoList.Locked:= ALocked;
   end;
 
-  if Assigned(FListUpdates) then
+  if Assigned(FIndexesOfEditedLines) then
   begin
-    FListUpdates.Clear;
+    FIndexesOfEditedLines.Clear;
     FEnableCachedWrapinfoUpdate:= true;
   end;
 end;
@@ -2442,7 +2442,7 @@ end;
 
 procedure TATStrings.AddUpdatesAction(N: integer; AAction: TATEditAction);
 begin
-  if not Assigned(FListUpdates) then Exit;
+  if not Assigned(FIndexesOfEditedLines) then Exit;
 
   if AAction in [aeaDelete, aeaInsert] then
   begin
@@ -2450,13 +2450,13 @@ begin
     Exit
   end;
 
-  if FListUpdates.Count>ATEditorOptions.MaxUpdatesCountEasy then
+  if FIndexesOfEditedLines.Count>ATEditorOptions.MaxUpdatesCountEasy then
   begin
     FEnableCachedWrapinfoUpdate:= false;
     Exit
   end;
 
-  with FListUpdates do
+  with FIndexesOfEditedLines do
     if IndexOf(N)<0 then
       Add(N);
 end;

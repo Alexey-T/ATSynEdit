@@ -2416,7 +2416,7 @@ begin
     (FWrapInfo.Count>0) and
     (NLinesCount>ATEditorOptions.MaxLinesForOldWrapUpdate) and
     CurStrings.EnableCachedWrapinfoUpdate and
-    (CurStrings.ListUpdates.Count>0);
+    (CurStrings.IndexesOfEditedLines.Count>0);
   //bUseCachedUpdate:= false;////to disable
 
   FWrapTemps.Clear;
@@ -2435,11 +2435,11 @@ begin
   end
   else
   begin
-    //cached WrapInfo update - calculate info only for changed lines (Strings.ListUpdates)
+    //cached WrapInfo update - calculate info only for changed lines (Strings.IndexesOfEditedLines)
     //and insert results into WrapInfo
     ListNums:= TATIntegerList.Create;
     try
-      ListNums.Assign(CurStrings.ListUpdates);
+      ListNums.Assign(CurStrings.IndexesOfEditedLines);
 
       for i:= 0 to ListNums.Count-1 do
       begin
@@ -2464,7 +2464,7 @@ begin
     end;
   end;
 
-  CurStrings.ListUpdates.Clear;
+  CurStrings.IndexesOfEditedLines.Clear;
   CurStrings.EnableCachedWrapinfoUpdate:= true;
 
   {$ifdef debug_findwrapindex}
