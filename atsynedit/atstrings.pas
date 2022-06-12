@@ -338,8 +338,8 @@ type
     property EncodingDetectDefaultUtf8: boolean read FEncodingDetectDefaultUtf8 write FEncodingDetectDefaultUtf8;
     property Endings: TATLineEnds read FEndings write SetEndings;
     property LoadingForcedANSI: boolean read FLoadingForcedANSI;
-    property ListUpdates: TATIntegerList read FListUpdates;
-    property ListUpdatesHard: boolean read FListUpdatesHard write FListUpdatesHard;
+    property ListUpdates: TATIntegerList read FListUpdates; //if its Count>ATEditorOptions.MaxLinesForOldWrapUpdate, UpdateWrapInfo maybe performs cached update
+    property ListUpdatesHard: boolean read FListUpdatesHard write FListUpdatesHard; //if True, UpdateWrapInfo cached update will be disabled for the next call
     property Modified: boolean read FModified write SetModified;
     property ModifiedRecent: boolean read FModifiedRecent write FModifiedRecent;
     property ModifiedVersion: Int64 read FModifiedVersion;
