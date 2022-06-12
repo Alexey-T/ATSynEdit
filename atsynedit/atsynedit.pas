@@ -1478,7 +1478,7 @@ type
     //updates
     procedure Invalidate; override;
     procedure Update(AUpdateWrapInfo: boolean=false; AForceRepaint: boolean=false; AForceOnScroll: boolean=false); reintroduce;
-    procedure UpdateWrapInfo(AForceUpdate: boolean=false);
+    procedure UpdateWrapInfo(AForceUpdate: boolean=false; AAllowCachedUpdate: boolean=true);
     procedure UpdateFoldedFromLinesHidden;
     procedure UpdateScrollInfoFromSmoothPos(var AInfo: TATEditorScrollInfo; const APos: Int64);
     procedure UpdateFoldLineIndexer;
@@ -2339,7 +2339,7 @@ begin
     FWrapUpdateNeeded:= true;
 end;
 
-procedure TATSynEdit.UpdateWrapInfo(AForceUpdate: boolean);
+procedure TATSynEdit.UpdateWrapInfo(AForceUpdate: boolean; AAllowCachedUpdate: boolean=true);
 var
   CurStrings: TATStrings;
   ListNums: TATIntegerList;
@@ -2347,7 +2347,7 @@ var
   bConsiderFolding: boolean;
   NNewVisibleColumns: integer;
   NIndentMaximal: integer;
-  NLine, NIndexFrom, NIndexTo: integer;
+  NLine, NLinesCount, NIndexFrom, NIndexTo: integer;
   i, j: integer;
 begin
   //method can be called before 1st paint,
@@ -2410,9 +2410,11 @@ begin
       FWrapInfo.WrapColumn:= Max(ATEditorOptions.MinWrapColumn, Min(NNewVisibleColumns-FWrapAddSpace, FMarginRight));
   end;
 
+  NLinesCount:= CurStrings.Count;
   UseCachedUpdate:=
+    AAllowCachedUpdate and
     (FWrapInfo.Count>0) and
-    (CurStrings.Count>ATEditorOptions.MaxLinesForOldWrapUpdate) and
+    (NLinesCount>ATEditorOptions.MaxLinesForOldWrapUpdate) and
     (not CurStrings.ListUpdatesHard) and
     (CurStrings.ListUpdates.Count>0);
   //UseCachedUpdate:= false;////to disable
@@ -2422,8 +2424,8 @@ begin
   if not UseCachedUpdate then
   begin
     FWrapInfo.Clear;
-    FWrapInfo.SetCapacity(CurStrings.Count);
-    for i:= 0 to CurStrings.Count-1 do
+    FWrapInfo.SetCapacity(NLinesCount);
+    for i:= 0 to NLinesCount-1 do
     begin
       DoCalcWrapInfos(i, NIndentMaximal, FWrapTemps, bConsiderFolding);
       for j:= 0 to FWrapTemps.Count-1 do
