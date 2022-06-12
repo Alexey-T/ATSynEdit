@@ -2343,7 +2343,7 @@ procedure TATSynEdit.UpdateWrapInfo(AForceUpdate: boolean; AAllowCachedUpdate: b
 var
   CurStrings: TATStrings;
   ListNums: TATIntegerList;
-  UseCachedUpdate: boolean;
+  bUseCachedUpdate: boolean;
   bConsiderFolding: boolean;
   NNewVisibleColumns: integer;
   NIndentMaximal: integer;
@@ -2411,17 +2411,17 @@ begin
   end;
 
   NLinesCount:= CurStrings.Count;
-  UseCachedUpdate:=
+  bUseCachedUpdate:=
     AAllowCachedUpdate and
     (FWrapInfo.Count>0) and
     (NLinesCount>ATEditorOptions.MaxLinesForOldWrapUpdate) and
     CurStrings.EnableCachedWrapInfoUpdate and
     (CurStrings.ListUpdates.Count>0);
-  //UseCachedUpdate:= false;////to disable
+  //bUseCachedUpdate:= false;////to disable
 
   FWrapTemps.Clear;
 
-  if not UseCachedUpdate then
+  if not bUseCachedUpdate then
   begin
     FWrapInfo.Clear;
     FWrapInfo.SetCapacity(NLinesCount);
