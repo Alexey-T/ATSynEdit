@@ -291,7 +291,7 @@ end;
 
 procedure TfmMain.AdapterParseDone(Sender: TObject);
 begin
-  adapter.TreeFill(Tree);
+  adapter.TreeFill(Tree, 1000);
   EditorChangeCaretPos(Self);
 end;
 
