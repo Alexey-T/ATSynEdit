@@ -2415,7 +2415,7 @@ begin
     AAllowCachedUpdate and
     (FWrapInfo.Count>0) and
     (NLinesCount>ATEditorOptions.MaxLinesForOldWrapUpdate) and
-    (not CurStrings.ListUpdatesHard) and
+    CurStrings.EnableCachedWrapInfoUpdate and
     (CurStrings.ListUpdates.Count>0);
   //UseCachedUpdate:= false;////to disable
 
@@ -2465,7 +2465,7 @@ begin
   end;
 
   CurStrings.ListUpdates.Clear;
-  CurStrings.ListUpdatesHard:= false;
+  CurStrings.EnableCachedWrapInfoUpdate:= true;
 
   {$ifdef debug_findwrapindex}
   DebugFindWrapIndex;

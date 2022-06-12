@@ -1,4 +1,7 @@
 
+2022.06.12
+* change: changed Strings.ListUpdatesHard to inverse option Strings.EnableCachedWrapInfoUpdate
+
 2022.05.27
 * deleted prop OptHighlightGitConflicts
 

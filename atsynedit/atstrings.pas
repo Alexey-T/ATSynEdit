@@ -177,7 +177,7 @@ type
   private
     FList: TATStringItemList;
     FListUpdates: TATIntegerList;
-    FListUpdatesHard: boolean;
+    FEnableCachedWrapInfoUpdate: boolean;
     FGaps: TATGaps;
     FBookmarks: TATBookmarks;
     FBookmarks2: TATBookmarks;
@@ -339,7 +339,7 @@ type
     property Endings: TATLineEnds read FEndings write SetEndings;
     property LoadingForcedANSI: boolean read FLoadingForcedANSI;
     property ListUpdates: TATIntegerList read FListUpdates; //if its Count>ATEditorOptions.MaxLinesForOldWrapUpdate, UpdateWrapInfo maybe performs cached update
-    property ListUpdatesHard: boolean read FListUpdatesHard write FListUpdatesHard; //if True, UpdateWrapInfo cached update will be disabled for the next call
+    property EnableCachedWrapInfoUpdate: boolean read FEnableCachedWrapInfoUpdate write FEnableCachedWrapInfoUpdate; //if False, UpdateWrapInfo cached update will be disabled for the next call
     property Modified: boolean read FModified write SetModified;
     property ModifiedRecent: boolean read FModifiedRecent write FModifiedRecent;
     property ModifiedVersion: Int64 read FModifiedVersion;
@@ -1270,7 +1270,7 @@ constructor TATStrings.Create(AUndoLimit: integer);
 begin
   FList:= TATStringItemList.Create;
   FListUpdates:= TATIntegerList.Create;
-  FListUpdatesHard:= false;
+  FEnableCachedWrapInfoUpdate:= true;
   FUndoLimit:= AUndoLimit;
   FUndoList:= TATUndoList.Create(FUndoLimit);
   FRedoList:= TATUndoList.Create(FUndoLimit);
@@ -2208,7 +2208,7 @@ begin
   if Assigned(FListUpdates) then
   begin
     FListUpdates.Clear;
-    FListUpdatesHard:= false;
+    FEnableCachedWrapInfoUpdate:= true;
   end;
 end;
 
@@ -2444,13 +2444,13 @@ begin
 
   if AAction in [aeaDelete, aeaInsert] then
   begin
-    FListUpdatesHard:= true;
+    FEnableCachedWrapInfoUpdate:= false;
     Exit
   end;
 
   if FListUpdates.Count>ATEditorOptions.MaxUpdatesCountEasy then
   begin
-    FListUpdatesHard:= true;
+    FEnableCachedWrapInfoUpdate:= false;
     Exit
   end;
 
