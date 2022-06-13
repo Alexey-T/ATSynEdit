@@ -2378,11 +2378,12 @@ begin
 
   //virtual mode allows faster usage of WrapInfo
   CurStrings:= Strings;
+  NLinesCount:= CurStrings.Count;
   FWrapInfo.StringsObj:= CurStrings;
   FWrapInfo.VirtualMode:=
     (FWrapMode=cWrapOff) and
     (Fold.Count=0) and
-    (CurStrings.Count>2);
+    (NLinesCount>2);
   if FWrapInfo.VirtualMode then exit;
 
   bConsiderFolding:= Fold.Count>0;
@@ -2410,7 +2411,6 @@ begin
       FWrapInfo.WrapColumn:= Max(ATEditorOptions.MinWrapColumn, Min(NNewVisibleColumns-FWrapAddSpace, FMarginRight));
   end;
 
-  NLinesCount:= CurStrings.Count;
   bUseCachedUpdate:=
     AAllowCachedUpdate and
     (FWrapInfo.Count>0) and
