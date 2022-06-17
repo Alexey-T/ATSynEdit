@@ -257,7 +257,6 @@ type
     function GetUndoEmpty: boolean;
     function GetUndoLimit: integer;
     function IsLastFakeLineUnneeded: boolean;
-    procedure LineAddEx(const AString: atString; AEnd: TATLineEnds);
     procedure LineInsertRaw(ALineIndex: integer; const AString: atString; AEnd: TATLineEnds;
       AWithEvent: boolean=true);
     procedure LineInsertEx(ALineIndex: integer; const AString: atString; AEnd: TATLineEnds;
@@ -303,6 +302,7 @@ type
     procedure LineAddRaw_NoUndo(const S: string; AEnd: TATLineEnds);
     procedure LineAddRaw_NoUndo(const S: UnicodeString; AEnd: TATLineEnds);
     procedure LineAddRaw(const AString: atString; AEnd: TATLineEnds; AWithEvent: boolean=true);
+    procedure LineAddEx(const AString: atString; AEnd: TATLineEnds);
     procedure LineAdd(const AString: atString);
     procedure LineInsert(ALineIndex: integer; const AString: atString; AWithEvent: boolean=true);
     procedure LineInsertStrings(ALineIndex: integer; ABlock: TATStrings; AWithFinalEol: boolean);
