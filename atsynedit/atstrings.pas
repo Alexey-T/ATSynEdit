@@ -257,10 +257,9 @@ type
     function GetUndoEmpty: boolean;
     function GetUndoLimit: integer;
     function IsLastFakeLineUnneeded: boolean;
-    procedure LineInsertRaw(ALineIndex: integer; const AString: atString; AEnd: TATLineEnds;
-      AWithEvent: boolean=true);
-    procedure LineInsertEx(ALineIndex: integer; const AString: atString; AEnd: TATLineEnds;
-      AWithEvent: boolean=true);
+    procedure LineInsertRaw(ALineIndex: integer; const AString: atString; AEnd: TATLineEnds; AWithEvent: boolean=true);
+    procedure LineInsertEx(ALineIndex: integer; const AString: atString; AEnd: TATLineEnds; AWithEvent: boolean=true);
+    procedure LineAddEx(const AString: atString; AEnd: TATLineEnds);
     function IsSavingWithSignature: boolean;
     procedure SetCaretsArray(const L: TATPointArray);
     procedure SetMarkersArray(const L: TATInt64Array);
@@ -302,7 +301,6 @@ type
     procedure LineAddRaw_NoUndo(const S: string; AEnd: TATLineEnds);
     procedure LineAddRaw_NoUndo(const S: UnicodeString; AEnd: TATLineEnds);
     procedure LineAddRaw(const AString: atString; AEnd: TATLineEnds; AWithEvent: boolean=true);
-    procedure LineAddEx(const AString: atString; AEnd: TATLineEnds);
     procedure LineAdd(const AString: atString);
     procedure LineInsert(ALineIndex: integer; const AString: atString; AWithEvent: boolean=true);
     procedure LineInsertStrings(ALineIndex: integer; ABlock: TATStrings; AWithFinalEol: boolean);
