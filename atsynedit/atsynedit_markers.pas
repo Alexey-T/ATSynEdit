@@ -88,6 +88,7 @@ type
       ALineLen: integer=0);
     procedure DeleteInRange(AX1, AY1, AX2, AY2: integer);
     function DeleteWithTag(const ATag: Int64): boolean;
+    function DeleteByPos(AX, AY: integer): boolean;
     procedure Find(AX, AY: integer; out AIndex: integer; out AExactMatch: boolean);
     function FindContaining(AX, AY: integer): integer;
     property AsArray: TATInt64Array read GetAsArray write SetAsArray;
@@ -374,6 +375,36 @@ begin
     begin
       Delete(i);
       Result:= true;
+    end;
+end;
+
+function TATMarkers.DeleteByPos(AX, AY: integer): boolean;
+// if AX=-1, delete all items for line AY
+var
+  Item: PATMarkerItem;
+  i: integer;
+begin
+  Result:= false;
+
+  if AX>=0 then
+    for i:= Count-1 downto 0 do
+    begin
+      Item:= ItemPtr(i);
+      if (Item^.PosX=AX) and (Item^.PosY=AY) then
+      begin
+        Delete(i);
+        Result:= true;
+      end;
+    end
+  else
+    for i:= Count-1 downto 0 do
+    begin
+      Item:= ItemPtr(i);
+      if (Item^.PosY=AY) then
+      begin
+        Delete(i);
+        Result:= true;
+      end;
     end;
 end;
 
