@@ -632,6 +632,7 @@ type
     FMouseDragCoord: TPoint;
     FMouseDownPnt: TPoint;
     FMouseDownGutterLineNumber: integer;
+    FMouseDownOnEditingArea: boolean;
     FMouseDownOnMinimap: boolean;
     FMouseDownDouble: boolean;
     FMouseDownWithCtrl: boolean;
@@ -5995,6 +5996,7 @@ begin
 
   PosTextClicked:= ClientPosToCaretPos(Point(X, Y), PosDetails);
   FCaretSpecPos:= false;
+  FMouseDownOnEditingArea:= false;
   FMouseDownOnMinimap:= false;
   FMouseDownGutterLineNumber:= -1;
   FMouseDragDropping:= false;
@@ -6016,6 +6018,7 @@ begin
 
   if PtInRect(FRectMain, Point(X, Y)) then
   begin
+    FMouseDownOnEditingArea:= true;
     FMouseDownPnt:= PosTextClicked;
     bClickOnSelection:= Carets.FindCaretContainingPos(FMouseDownPnt.X, FMouseDownPnt.Y)>=0;
 
@@ -6266,6 +6269,7 @@ begin
   FMouseDownGutterLineNumber:= -1;
   FMouseDownDouble:= false;
   FMouseDownAndColumnSelection:= false;
+  FMouseDownOnEditingArea:= false;
   FMouseDownOnMinimap:= false;
   FMouseDownWithCtrl:= false;
   FMouseDownWithAlt:= false;
@@ -6451,7 +6455,7 @@ begin
         if Shift=[ssLeft] then
           DoMinimapDrag(Y);
       Exit
-      end;
+    end;
   end;
 
   //detect cursor on gutter
