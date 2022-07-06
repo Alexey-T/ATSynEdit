@@ -6570,7 +6570,7 @@ begin
 
   //mouse dragged to select block
   if bSelecting then
-    if bOnMain or bOnGutter then
+    if bOnMain or bOnGutter or FMouseDownOnEditingArea then
     begin
       if (ssLeft in Shift) or bSelectColumnMiddle then
         if Carets.Count>0 then
