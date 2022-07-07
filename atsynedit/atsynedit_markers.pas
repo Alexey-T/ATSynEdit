@@ -327,6 +327,8 @@ begin
       begin
         while IsIndexValid(NIndex) and (Items[NIndex]=Item) do
           FList.Delete(NIndex);
+        while IsIndexValid(NIndex-1) and (Items[NIndex-1]=Item) do
+          FList.Delete(NIndex-1);
       end
       else
       repeat
