@@ -381,31 +381,29 @@ end;
 function TATMarkers.DeleteByPos(AX, AY: integer): boolean;
 // if AX=-1, delete all items for line AY
 var
-  Item: PATMarkerItem;
-  i: integer;
+  N: integer;
+  bExact: boolean;
 begin
   Result:= false;
 
-  if AX>=0 then
-    for i:= Count-1 downto 0 do
+  if AX<0 then
+  begin
+    Find(0, AY, N, bExact);
+    while IsIndexValid(N) and (ItemPtr(N)^.PosY=AY) do
     begin
-      Item:= ItemPtr(i);
-      if (Item^.PosX=AX) and (Item^.PosY=AY) then
-      begin
-        Delete(i);
-        Result:= true;
-      end;
-    end
-  else
-    for i:= Count-1 downto 0 do
-    begin
-      Item:= ItemPtr(i);
-      if (Item^.PosY=AY) then
-      begin
-        Delete(i);
-        Result:= true;
-      end;
+      Delete(N);
+      Result:= true;
     end;
+  end
+  else
+  begin
+    Find(AX, AY, N, bExact);
+    while IsIndexValid(N) and (ItemPtr(N)^.PosY=AY) and (ItemPtr(N)^.PosX=AX) do
+    begin
+      Delete(N);
+      Result:= true;
+    end;
+  end;
 end;
 
 function _ComparePoints(X1, Y1, X2, Y2: integer): integer; inline;
