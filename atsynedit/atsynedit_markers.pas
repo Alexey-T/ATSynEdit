@@ -324,7 +324,10 @@ begin
     if bExact then
     begin
       if not FDuplicates then
-        FList.Delete(NIndex)
+      begin
+        while IsIndexValid(NIndex) and (Items[NIndex]=Item) do
+          FList.Delete(NIndex);
+      end
       else
       repeat
         Inc(NIndex)
