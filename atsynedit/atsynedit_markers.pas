@@ -396,46 +396,38 @@ end;
 
 function TATMarkers.DeleteByPos(AX, AY: integer): boolean;
 // if AX=-1, delete all items for line AY
+  //
+  function IsMarkerOk(AIndex: integer): boolean; inline;
+  var
+    P: PATMarkerItem;
+  begin
+    P:= ItemPtr(AIndex);
+    Result:= (P^.PosY=AY) and ((AX<0) or (P^.PosX=AX));
+  end;
+  //
 var
-  N0, NFrom, NTo: integer;
+  N, NFrom, NTo: integer;
   bExact: boolean;
 begin
   Result:= false;
 
   if AX<0 then
-  begin
-    Find(0, AY, N0, bExact);
-    if N0>=0 then
-    begin
-      NFrom:= N0;
-      NTo:= N0-1;
-      while IsIndexValid(NTo+1) and (ItemPtr(NTo+1)^.PosY=AY) do
-        Inc(NTo);
-      while IsIndexValid(NFrom-1) and (ItemPtr(NFrom-1)^.PosY=AY) do
-        Dec(NFrom);
-      if NTo>=NFrom then
-      begin
-        FList.DeleteRange(NFrom, NTo);
-        Result:= true;
-      end;
-    end;
-  end
+    Find(0, AY, N, bExact)
   else
+    Find(AX, AY, N, bExact);
+
+  if N>=0 then
   begin
-    Find(AX, AY, N0, bExact);
-    if N0>=0 then
+    NFrom:= N;
+    NTo:= N-1;
+    while IsIndexValid(NTo+1) and IsMarkerOk(NTo+1) do
+      Inc(NTo);
+    while IsIndexValid(NFrom-1) and IsMarkerOk(NFrom-1) do
+      Dec(NFrom);
+    if NTo>=NFrom then
     begin
-      NFrom:= N0;
-      NTo:= N0-1;
-      while IsIndexValid(NTo+1) and (ItemPtr(NTo+1)^.PosY=AY) and (ItemPtr(NTo+1)^.PosX=AX) do
-        Inc(NTo);
-      while IsIndexValid(NFrom-1) and (ItemPtr(NFrom-1)^.PosY=AY) and (ItemPtr(NFrom-1)^.PosX=AX) do
-        Dec(NFrom);
-      if NTo>=NFrom then
-      begin
-        FList.DeleteRange(NFrom, NTo);
-        Result:= true;
-      end;
+      FList.DeleteRange(NFrom, NTo);
+      Result:= true;
     end;
   end;
 end;
