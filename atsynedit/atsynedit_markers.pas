@@ -325,8 +325,10 @@ begin
     begin
       if not FDuplicates then
       begin
+        //delete dups righter
         while IsIndexValid(NIndex) and (Items[NIndex]=Item) do
           FList.Delete(NIndex);
+        //delete dups lefter
         while IsIndexValid(NIndex-1) and (Items[NIndex-1]=Item) do
         begin
           Dec(NIndex);
@@ -397,8 +399,16 @@ begin
   if AX<0 then
   begin
     Find(0, AY, N, bExact);
+    //delete items righter
     while IsIndexValid(N) and (ItemPtr(N)^.PosY=AY) do
     begin
+      Delete(N);
+      Result:= true;
+    end;
+    //delete items lefter
+    while IsIndexValid(N-1) and (ItemPtr(N-1)^.PosY=AY) do
+    begin
+      Dec(N);
       Delete(N);
       Result:= true;
     end;
@@ -406,8 +416,16 @@ begin
   else
   begin
     Find(AX, AY, N, bExact);
+    //delete items righter
     while IsIndexValid(N) and (ItemPtr(N)^.PosY=AY) and (ItemPtr(N)^.PosX=AX) do
     begin
+      Delete(N);
+      Result:= true;
+    end;
+    //delete items lefter
+    while IsIndexValid(N-1) and (ItemPtr(N-1)^.PosY=AY) and (ItemPtr(N-1)^.PosX=AX) do
+    begin
+      Dec(N);
       Delete(N);
       Result:= true;
     end;
