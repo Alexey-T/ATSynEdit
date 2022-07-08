@@ -300,7 +300,7 @@ procedure TATMarkers.Add(APosX, APosY: integer; const ATag: Int64;
   AMicromapMode: TATMarkerMicromapMode; ALineLen: integer);
 var
   Item: TATMarkerItem;
-  NIndex: integer;
+  NIndex, NIndexFrom, NIndexTo: integer;
   bExact: boolean;
 begin
   FillChar(Item, SizeOf(Item), 0);
@@ -325,22 +325,28 @@ begin
     begin
       if not FDuplicates then
       begin
-        //delete dups righter
-        while IsIndexValid(NIndex) and (Items[NIndex]=Item) do
-          FList.Delete(NIndex);
-        //delete dups lefter
-        while IsIndexValid(NIndex-1) and (Items[NIndex-1]=Item) do
-        begin
-          Dec(NIndex);
-          FList.Delete(NIndex);
-        end;
+        NIndexFrom:= NIndex;
+        NIndexTo:= NIndex;
+        while IsIndexValid(NIndexTo+1) and (Items[NIndexTo+1]=Item) do
+          Inc(NIndexTo);
+        while IsIndexValid(NIndexFrom-1) and (Items[NIndexFrom-1]=Item) do
+          Dec(NIndexFrom);
+        //save 2 reallocs (delete, insert)
+        FList.Items[NIndexFrom]:= Item;
+        //delete other dups
+        if NIndexFrom+1<=NIndexTo then
+          FList.DeleteRange(NIndexFrom+1, NIndexTo);
       end
       else
-      repeat
-        Inc(NIndex)
-      until not IsIndexValid(NIndex) or (Items[NIndex]<>Item);
-    end;
-    FList.Insert(NIndex, Item);
+      begin
+        repeat
+          Inc(NIndex)
+        until not IsIndexValid(NIndex) or (Items[NIndex]<>Item);
+        FList.Insert(NIndex, Item);
+      end;
+    end
+    else
+      FList.Insert(NIndex, Item);
   end
   else
     FList.Add(Item);
