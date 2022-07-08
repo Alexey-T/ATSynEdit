@@ -397,43 +397,45 @@ end;
 function TATMarkers.DeleteByPos(AX, AY: integer): boolean;
 // if AX=-1, delete all items for line AY
 var
-  N: integer;
+  N0, NFrom, NTo: integer;
   bExact: boolean;
 begin
   Result:= false;
 
   if AX<0 then
   begin
-    Find(0, AY, N, bExact);
-    //delete items righter
-    while IsIndexValid(N) and (ItemPtr(N)^.PosY=AY) do
+    Find(0, AY, N0, bExact);
+    if N0>=0 then
     begin
-      Delete(N);
-      Result:= true;
-    end;
-    //delete items lefter
-    while IsIndexValid(N-1) and (ItemPtr(N-1)^.PosY=AY) do
-    begin
-      Dec(N);
-      Delete(N);
-      Result:= true;
+      NFrom:= N0;
+      NTo:= N0-1;
+      while IsIndexValid(NTo+1) and (ItemPtr(NTo+1)^.PosY=AY) do
+        Inc(NTo);
+      while IsIndexValid(NFrom-1) and (ItemPtr(NFrom-1)^.PosY=AY) do
+        Dec(NFrom);
+      if NTo>=NFrom then
+      begin
+        FList.DeleteRange(NFrom, NTo);
+        Result:= true;
+      end;
     end;
   end
   else
   begin
-    Find(AX, AY, N, bExact);
-    //delete items righter
-    while IsIndexValid(N) and (ItemPtr(N)^.PosY=AY) and (ItemPtr(N)^.PosX=AX) do
+    Find(AX, AY, N0, bExact);
+    if N0>=0 then
     begin
-      Delete(N);
-      Result:= true;
-    end;
-    //delete items lefter
-    while IsIndexValid(N-1) and (ItemPtr(N-1)^.PosY=AY) and (ItemPtr(N-1)^.PosX=AX) do
-    begin
-      Dec(N);
-      Delete(N);
-      Result:= true;
+      NFrom:= N0;
+      NTo:= N0-1;
+      while IsIndexValid(NTo+1) and (ItemPtr(NTo+1)^.PosY=AY) and (ItemPtr(NTo+1)^.PosX=AX) do
+        Inc(NTo);
+      while IsIndexValid(NFrom-1) and (ItemPtr(NFrom-1)^.PosY=AY) and (ItemPtr(NFrom-1)^.PosX=AX) do
+        Dec(NFrom);
+      if NTo>=NFrom then
+      begin
+        FList.DeleteRange(NFrom, NTo);
+        Result:= true;
+      end;
     end;
   end;
 end;
