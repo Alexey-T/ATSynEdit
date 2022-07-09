@@ -794,7 +794,11 @@ begin
     cCommand_KeyUp,
     cCommand_KeyUp_Sel,
     cCommand_KeyDown,
-    cCommand_KeyDown_Sel:
+    cCommand_KeyDown_Sel,
+    cCommand_KeyPageUp,
+    cCommand_KeyPageUp_Sel,
+    cCommand_KeyPageDown,
+    cCommand_KeyPageDown_Sel:
       Carets.UpdateMemory(cCaretMem_SaveX, true);
     else
       Carets.UpdateMemory(cCaretMem_ClearX, false);
