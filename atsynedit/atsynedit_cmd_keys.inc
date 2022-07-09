@@ -206,11 +206,13 @@ end;
 
 function TATSynEdit.DoCommand_KeyUpDown_NextLine(ADown: boolean; ALines: integer): TATCommandResults;
 var
+  St: TATStrings;
   Caret: TATCaretItem;
   NCount: integer;
   i, Y: integer;
 begin
-  NCount:= Strings.Count;
+  St:= Strings;
+  NCount:= St.Count;
   for i:= 0 to Carets.Count-1 do
   begin
     Caret:= Carets[i];
@@ -218,7 +220,7 @@ begin
 
     repeat
       Y:= Y+ALines*BoolToPlusMinusOne[ADown];
-    until not Strings.IsIndexValid(Y) or not IsLineFolded(Y);
+    until not St.IsIndexValid(Y) or not IsLineFolded(Y);
 
     if not IsLineFolded(Y) then
     begin
@@ -236,7 +238,7 @@ begin
         Y:= Unfolded_LastLineNumber;
         if Y=NCount-1 then
           if FOptKeyUpDownAllowToEdge then
-            Caret.PosX:= Strings.LinesLen[Y];
+            Caret.PosX:= St.LinesLen[Y];
       end;
       Caret.PosY:= Y;
     end;
