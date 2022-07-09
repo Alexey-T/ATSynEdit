@@ -729,7 +729,8 @@ begin
   //support CudaText #3084
   Strings.SetNewCommandMark;
 
-  Carets.UpdateMemory(cCaretMem_PrepareX, false);
+  if not FCaretVirtual then
+    Carets.UpdateMemory(cCaretMem_PrepareX, false);
   FIsRunningCommand:= true;
 
   bTooManyCarets:= Carets.Count>FOptUndoMaxCarets;
@@ -772,6 +773,7 @@ begin
   //this logic: to make like in SynWrite, option "Fixed column move".
   //arrows up/down must keep their column, even if sometimes they jump to shorter lines (caret_after_end: off).
   //and special handling for tab-key (for first press of tab-key).
+  if not FCaretVirtual then
   case ACmd of
     cCommand_KeyTab:
       begin

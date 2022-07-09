@@ -270,7 +270,7 @@ begin
     end;
 
     Pnt.X:= Caret.CoordX;
-    if FOptKeyUpDownKeepColumn and (Caret.SavedX>0) then
+    if FOptKeyUpDownKeepColumn and not FCaretVirtual and (Caret.SavedX>0) then
     begin
       Pnt.X:= Caret.SavedX;
       //needed for arrow-down on last line; w/o this, arrow-up (2 times) jumps weird
