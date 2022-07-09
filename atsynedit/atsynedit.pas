@@ -326,8 +326,9 @@ type
     );
 
   TATEditorInternalFlag = (
-    cIntFlagBitmap,
-    cIntFlagScrolled,
+    cIntFlagBitmap, //flag "bitmap should be repainted"
+    cIntFlagScrolled, //flag "any scrolling occured", ie ScrollInfo any member is changed
+    cIntFlagScrolledHorz, //flag "horizontal scroll _position_ is changed"
     cIntFlagResize
     );
   TATEditorInternalFlags = set of TATEditorInternalFlag;
@@ -2805,6 +2806,9 @@ begin
     FPrevHorz:= FScrollHorz;
     FPrevVert:= FScrollVert;
     Include(FPaintFlags, cIntFlagScrolled);
+
+    if FScrollHorz.NPos<>FPrevHorz.NPos then
+      Include(FPaintFlags, cIntFlagScrolledHorz);
   end;
 end;
 
@@ -7477,7 +7481,11 @@ procedure TATSynEdit.DoEventScroll;
 begin
   //horizontal scroll must clear CaretItem.SavedX values
   if not FCaretVirtual then
-    Carets.UpdateMemory(cCaretMem_ClearX, false);
+    if cIntFlagScrolledHorz in FPaintFlags then
+    begin
+      Exclude(FPaintFlags, cIntFlagScrolledHorz);
+      Carets.UpdateMemory(cCaretMem_ClearX, false);
+    end;
 
   if Assigned(FAdapterHilite) then
     FAdapterHilite.OnEditorScroll(Self);
