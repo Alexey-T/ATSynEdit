@@ -316,7 +316,7 @@ begin
     Caret.PosX:= Pnt.X;
     Caret.PosY:= Pnt.Y;
 
-    //PageDown key should keep column when we go after document end
+    //PageDown should keep column when we go after document end, CudaText issue #4213
     if FCaretVirtual then
       if (Caret.PosY=St.Count-1) and (Caret.PosX=St.LinesLen[Caret.PosY]) then
         Caret.PosX:= FTabHelper.ColumnPosToCharPos(Caret.PosY, St.Lines[Caret.PosY], NPrevColumn);
