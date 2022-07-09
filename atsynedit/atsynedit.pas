@@ -2803,12 +2803,12 @@ begin
   if (FPrevHorz<>FScrollHorz) or
     (FPrevVert<>FScrollVert) then
   begin
+    if FScrollHorz.NPos<>FPrevHorz.NPos then
+      Include(FPaintFlags, cIntFlagScrolledHorz);
+
     FPrevHorz:= FScrollHorz;
     FPrevVert:= FScrollVert;
     Include(FPaintFlags, cIntFlagScrolled);
-
-    if FScrollHorz.NPos<>FPrevHorz.NPos then
-      Include(FPaintFlags, cIntFlagScrolledHorz);
   end;
 end;
 
