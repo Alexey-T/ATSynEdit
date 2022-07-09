@@ -252,14 +252,17 @@ end;
 
 function TATSynEdit.DoCommand_KeyUpDown_Wrapped(ADown: boolean; ALines: integer): TATCommandResults;
 var
+  St: TATStrings;
   Caret: TATCaretItem;
   Pnt: TPoint;
   Details: TATEditorPosDetails;
   NWrapIndex, i: integer;
+  NPrevColumn: integer;
 const
   cGapActions: array[boolean] of TATEditorGapCoordAction =
     (cGapCoordIgnore, cGapCoordMoveDown);
 begin
+  St:= Strings;
   for i:= 0 to FCarets.Count-1 do
   begin
     Caret:= FCarets[i];
@@ -295,9 +298,12 @@ begin
     if ADown and (NWrapIndex=WrapInfo.Count-1) then
     begin
       if FOptKeyUpDownAllowToEdge then
-        Caret.PosX:= Strings.LinesLen[Strings.Count-1];
+        Caret.PosX:= St.LinesLen[St.Count-1];
       Continue;
     end;
+
+    if FCaretVirtual then
+      NPrevColumn:= FTabHelper.CharPosToColumnPos(Caret.PosY, St.Lines[Caret.PosY], Caret.PosX);
 
     //increase/decrease Caret.CoordY and calculate pos from it
     Pnt.Y:= Caret.CoordY + ALines*FCharSize.Y*BoolToPlusMinusOne[ADown];
@@ -309,6 +315,11 @@ begin
 
     Caret.PosX:= Pnt.X;
     Caret.PosY:= Pnt.Y;
+
+    //PageDown key should keep column when we go after document end
+    if FCaretVirtual then
+      if (Caret.PosY=St.Count-1) and (Caret.PosX=St.LinesLen[Caret.PosY]) then
+        Caret.PosX:= FTabHelper.ColumnPosToCharPos(Caret.PosY, St.Lines[Caret.PosY], NPrevColumn);
   end;
 
   if ADown then
