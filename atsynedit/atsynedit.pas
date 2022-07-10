@@ -8495,6 +8495,9 @@ begin
       begin
         Caret:= Carets[0];
         IM_Context_Set_Cursor_Pos(Caret.CoordX,Caret.CoordY+TextCharSize.Y);
+        // if symbol IM_Context_Set_Cursor_Pos cannot be compiled, you need to open IDE dialog
+        // "Tools / Configure 'Build Lazarus'", and there enable the define: WITH_GTK2_IM;
+        // then recompile the IDE.
       end;
     end;
     // valid string at composition & commit
