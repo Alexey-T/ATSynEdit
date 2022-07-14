@@ -5684,7 +5684,14 @@ begin
 end;
 
 procedure TATSynEdit.DoContextPopup(MousePos: TPoint; var Handled: Boolean);
+var
+  Form: TCustomForm;
 begin
+  //Qt5 allows popup menu even for disabled form, if "always on top" is on.
+  //here is workaround:
+  Form:= GetParentForm(Self);
+  if not Form.Enabled then exit;
+
   InitMenuStd;
   inherited;
   if not Handled then
