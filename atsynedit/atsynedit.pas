@@ -5685,9 +5685,11 @@ end;
 
 procedure TATSynEdit.DoContextPopup(MousePos: TPoint; var Handled: Boolean);
 begin
-  //Qt5 allows popup menu even for disabled form, if "always on top" is on.
-  //workaround:
-  if not IsEnabled then exit;
+  if not IsEnabled then //prevent popup menu if form is disabled, for CudaText plugins on Qt5
+  begin
+    Handled:= true;
+    exit;
+  end;
 
   InitMenuStd;
   inherited;
