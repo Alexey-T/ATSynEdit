@@ -8702,21 +8702,23 @@ begin
     Pnt.Y:= Mark.CoordY+FCharSize.Y;
 
     if PtInRect(FRectMain, Pnt) then
+    begin
       CanvasPaintTriangleUp(C, Colors.Markers, Pnt, NMarkSize);
 
-    if (Mark.LineLen<>0) and (Mark.CoordY=Mark.CoordY2) then
-    begin
-      R.Left:= Min(Pnt.X, Mark.CoordX2);
-      R.Right:= Max(Pnt.X, Mark.CoordX2)+1;
-      R.Bottom:= Pnt.Y+NMarkSize+1;
-      R.Top:= R.Bottom-NLineW;
+      if (Mark.LineLen<>0) and (Mark.CoordY=Mark.CoordY2) then
+      begin
+        R.Left:= Min(Pnt.X, Mark.CoordX2);
+        R.Right:= Max(Pnt.X, Mark.CoordX2)+1;
+        R.Bottom:= Pnt.Y+NMarkSize+1;
+        R.Top:= R.Bottom-NLineW;
 
-      //avoid painting part of the line over minimap/gutter
-      R.Left:= Max(R.Left, FRectMain.Left);
-      R.Right:= Min(R.Right, FRectMain.Right);
+        //avoid painting part of the line over minimap/gutter
+        R.Left:= Max(R.Left, FRectMain.Left);
+        R.Right:= Min(R.Right, FRectMain.Right);
 
-      C.Brush.Color:= Colors.Markers;
-      C.FillRect(R);
+        C.Brush.Color:= Colors.Markers;
+        C.FillRect(R);
+      end;
     end;
   end;
 end;
