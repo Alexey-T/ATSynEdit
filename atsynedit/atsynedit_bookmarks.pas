@@ -189,13 +189,12 @@ var
   N: integer;
   bExact: boolean;
 begin
-  FillChar(Item, SizeOf(Item), 0);
-  Item.Assign(AData);
-
   N:= FindNearest(AData.LineNum, bExact);
   if N<0 then
   begin
     //not found bookmark for bigger line: append
+    Item:= Default(TATBookmarkItem);
+    Item.Assign(AData);
     FList.Add(Item);
   end
   else
@@ -206,11 +205,19 @@ begin
       if AToggle then
         FList.Delete(N)
       else
+      begin
+        Item:= Default(TATBookmarkItem);
+        Item.Assign(AData);
         ItemPtr[N]^.Assign(AData);
+      end;
     end
     else
+    begin
       //found bookmark for bigger line: insert before it
+      Item:= Default(TATBookmarkItem);
+      Item.Assign(AData);
       FList.Insert(N, Item);
+    end;
   end;
 end;
 
