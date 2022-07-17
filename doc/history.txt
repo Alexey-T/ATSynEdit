@@ -2,8 +2,8 @@
 2022.07.17
 - fix/optimization: rendering with 100k+ 'markers' was very slow
 - fix/optimization: during mass replacement, OnCaret must not activate
-- fix/optimization: command "Inverse bookmarks" was very slow in 100k+ lines documents
-- fix/optimization: deleting of 10k+ gutter-decor items was very slow
+- fix/optimization: "Inverse bookmarks" was very slow in 100k+ lines documents
+- fix/optimization: DeleteByTag of 10k+ gutter-decor items was very slow
 
 2022.06.12
 * change: changed Strings.ListUpdatesHard to inverse option Strings.EnableCachedWrapInfoUpdate
