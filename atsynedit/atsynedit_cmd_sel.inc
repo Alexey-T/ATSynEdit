@@ -152,6 +152,7 @@ end;
 
 function TATSynEdit.DoCommand_SelectColumnToLineEdge(AToEnd: boolean): TATCommandResults;
 var
+  St: TATStrings;
   NPos, i, Y1, Y2: integer;
 begin
   Result:= [];
@@ -160,6 +161,8 @@ begin
   if not IsSelColumn then Exit;
   //maybe todo: make column sel if normal sel active here
   //like DoCommand_SelectColumnToDirection
+
+  St:= Strings;
 
   if not AToEnd then
   begin
@@ -173,8 +176,8 @@ begin
     if Y1>Y2 then
       SwapInt(Y1, Y2);
     for i:= Y1 to Y2 do
-      if Strings.IsIndexValid(i) then
-        NPos:= Max(NPos, FTabHelper.TabsToSpaces_Length(i, Strings.Lines[i], -1));
+      if St.IsIndexValid(i) then
+        NPos:= Max(NPos, FTabHelper.TabsToSpaces_Length(i, St.Lines[i], -1));
     FSelRectEnd.X:= NPos;
   end;
 
