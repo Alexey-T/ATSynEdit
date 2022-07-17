@@ -367,31 +367,23 @@ end;
 
 function TATMarkers.DeleteWithTag(const ATag: Int64): boolean;
 var
-  bAllTagged: boolean;
-  i: integer;
+  i, j: integer;
 begin
   Result:= false;
-
-  bAllTagged:= true;
-  for i:= 0 to Count-1 do
-    if ItemPtr(i)^.Tag<>ATag then
-    begin
-      bAllTagged:= false;
-      Break;
-    end;
-
-  if bAllTagged then
-  begin
-    Clear;
-    Result:= true;
-  end
-  else
-  for i:= Count-1 downto 0 do
+  i:= Count;
+  repeat
+    Dec(i);
+    if i<0 then Break;
     if ItemPtr(i)^.Tag=ATag then
     begin
-      Delete(i);
       Result:= true;
+      j:= i;
+      while (j>0) and (ItemPtr(j-1)^.Tag=ATag) do
+        Dec(j);
+      FList.DeleteRange(j, i);
+      i:= j;
     end;
+  until false;
 end;
 
 function TATMarkers.DeleteByPos(AX, AY: integer): boolean;
