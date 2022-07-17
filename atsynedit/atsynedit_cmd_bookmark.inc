@@ -320,6 +320,7 @@ end;
 
 procedure TATSynEdit.BookmarkPlaceBookmarksOnCarets;
 var
+  St: TATStrings;
   Caret: TATCaretItem;
   Data: TATBookmarkData;
   i: integer;
@@ -330,13 +331,15 @@ begin
   Data.AutoDelete:= bmadOption;
 
   BookmarkDeleteAll(false);
+
+  St:= Strings;
   for i:= 0 to Carets.Count-1 do
   begin
     Caret:= Carets[i];
-    if Strings.IsIndexValid(Caret.PosY) then
+    if St.IsIndexValid(Caret.PosY) then
     begin
       Data.LineNum:= Caret.PosY;
-      Strings.Bookmarks.Add(Data);
+      St.Bookmarks.Add(Data);
     end;
   end;
 
