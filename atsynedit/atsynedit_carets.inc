@@ -122,11 +122,13 @@ end;
 
 procedure TATSynEdit.UpdateCaretsCoords(AOnlyLast: boolean = false);
 var
+  St: TATStrings;
   NCaretCount, NStart, i: integer;
   Caret: TATCaretItem;
   Marker: PATMarkerItem;
   PntCaret, PntCoord: TPoint;
 begin
+  St:= Strings;
   NCaretCount:= Carets.Count;
   if AOnlyLast then
     NStart:= NCaretCount-1
@@ -139,7 +141,7 @@ begin
     PntCaret.X:= Caret.PosX;
     PntCaret.Y:= Caret.PosY;
 
-    if not Strings.IsIndexValid(PntCaret.Y) then
+    if not St.IsIndexValid(PntCaret.Y) then
     begin
       Caret.CoordX:= -1;
       Caret.CoordY:= -1;
@@ -163,9 +165,9 @@ begin
       Caret.CharStr:= '';
       Caret.CharColor:= clNone;
       Caret.CharStyles:= [];
-      if Caret.PosX<Strings.LinesLen[Caret.PosY] then
+      if Caret.PosX<St.LinesLen[Caret.PosY] then
       begin
-        Caret.CharStr:= Strings.LineSub(Caret.PosY, Caret.PosX+1, 1);
+        Caret.CharStr:= St.LineSub(Caret.PosY, Caret.PosX+1, 1);
 
         if not DoCalcForegroundFromAttribs(
                  Caret.PosX,
@@ -1111,24 +1113,26 @@ end;
 
 procedure TATSynEdit.DoCaretsFixIfInsideFolded;
 var
+  St: TATStrings;
   Caret: TATCaretItem;
   NFoldFrom, i: integer;
   bHidden: boolean;
 begin
+  St:= Strings;
   for i:= Carets.Count-1 downto 0 do
   begin
     Caret:= Carets[i];
     if Caret.EndY>=0 then Continue;
-    if not Strings.IsIndexValid(Caret.PosY) then Continue;
+    if not St.IsIndexValid(Caret.PosY) then Continue;
 
-    bHidden:= Strings.LinesHidden[Caret.PosY, FEditorIndex];
+    bHidden:= St.LinesHidden[Caret.PosY, FEditorIndex];
     if bHidden then
     begin
       Caret.PosX:= 0;
       Continue;
     end;
 
-    NFoldFrom:= Strings.LinesFoldFrom[Caret.PosY, FEditorIndex];
+    NFoldFrom:= St.LinesFoldFrom[Caret.PosY, FEditorIndex];
     if NFoldFrom=0 then
       Continue
     else
