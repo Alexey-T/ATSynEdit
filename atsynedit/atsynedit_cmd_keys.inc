@@ -149,6 +149,7 @@ end;
 
 function TATSynEdit.DoCommand_KeyRight(ASelCommand: boolean): TATCommandResults;
 var
+  St: TATStrings;
   Caret: TATCaretItem;
   bMultiCarets: boolean;
   i: integer;
@@ -156,19 +157,20 @@ begin
   //changed because of issue CudaText#3065
   Result:= [cResultCaretRight, cResultCaretLazy];
 
+  St:= Strings;
   bMultiCarets:= FCarets.Count>1;
 
   for i:= 0 to FCarets.Count-1 do
   begin
     Caret:= FCarets[i];
-    if not Strings.IsIndexValid(Caret.PosY) then Continue;
+    if not St.IsIndexValid(Caret.PosY) then Continue;
 
     if not ASelCommand and FOptKeyLeftRightSwapSel and DoCaretSwapEdge(Caret, false) then
     begin
       //none
     end
     else
-    if (Caret.PosX<Strings.LinesLen[Caret.PosY]) or FCaretVirtual then
+    if (Caret.PosX<St.LinesLen[Caret.PosY]) or FCaretVirtual then
       Inc(Caret.PosX)
     else
     if bMultiCarets and not FOptKeyLeftRightGoToNextLineWithCarets then
@@ -176,7 +178,7 @@ begin
       //none
     end
     else
-    if (Caret.PosY<Strings.Count-1) then
+    if (Caret.PosY<St.Count-1) then
     begin
       Caret.PosX:= 0;
       Inc(Caret.PosY);
