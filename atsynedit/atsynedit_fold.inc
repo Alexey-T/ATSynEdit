@@ -219,21 +219,23 @@ end;
 
 procedure TATSynEdit.UpdateFoldedFromLinesHidden;
 var
+  St: TATStrings;
   NFoldFrom, NPosAfterEnd: integer;
   NMaxLine, iRange: integer;
   R: PATSynRange;
   bOk: boolean;
 begin
-  NMaxLine:= Strings.Count-1;
+  St:= Strings;
+  NMaxLine:= St.Count-1;
   for iRange:= 0 to Fold.Count-1 do
   begin
     R:= Fold.ItemPtr(iRange);
     if R^.IsSimple then Continue;
-    if R^.Y>NMaxLine then Continue; //same as "if not Strings.IsIndexValid"
-    if Strings.LinesHidden[R^.Y, FEditorIndex] then Continue;
-    NFoldFrom:= Strings.LinesFoldFrom[R^.Y, FEditorIndex];
+    if R^.Y>NMaxLine then Continue; //same as "if not St.IsIndexValid"
+    if St.LinesHidden[R^.Y, FEditorIndex] then Continue;
+    NFoldFrom:= St.LinesFoldFrom[R^.Y, FEditorIndex];
 
-    NPosAfterEnd:= Strings.LinesLen[R^.Y]+1;
+    NPosAfterEnd:= St.LinesLen[R^.Y]+1;
     if (OptFoldStyle in [cFoldFromEndOfLine, cFoldFromEndOfLineAlways]) and
       (NFoldFrom=NPosAfterEnd) then
       bOk:= true
