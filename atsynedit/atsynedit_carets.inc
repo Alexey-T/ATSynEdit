@@ -189,9 +189,14 @@ procedure TATSynEdit.UpdateMarkersCoords;
 var
   Marker: PATMarkerItem;
   PntCaret, PntCoord: TPoint;
+  NLineTop, NLineBottom: integer;
   i: integer;
 begin
   if FMarkers=nil then exit;
+
+  NLineTop:= LineTop;
+  NLineBottom:= LineBottom;
+
   for i:= 0 to FMarkers.Count-1 do
   begin
     Marker:= FMarkers.ItemPtr(i);
@@ -199,8 +204,13 @@ begin
     Marker^.CoordY:= -1;
     Marker^.CoordX2:= -1;
     Marker^.CoordY2:= -1;
+
+    if Marker^.PosY<NLineTop then Continue;
+    if Marker^.PosY>NLineBottom then Continue;
+
     PntCaret.X:= Marker^.PosX;
     PntCaret.Y:= Marker^.PosY;
+
     if not IsPosFolded(PntCaret.X, PntCaret.Y) then
     begin
       PntCoord:= CaretPosToClientPos(PntCaret);
