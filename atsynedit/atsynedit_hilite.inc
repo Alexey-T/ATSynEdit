@@ -113,21 +113,23 @@ end;
 procedure TATSynEdit.DoPartCalc_CreateNew(var AParts: TATLineParts;
   AOffsetMax, ALineIndex, ACharIndex: integer; AColorBG: TColor);
 var
+  St: TATStrings;
   bSel, bSelPrev, bAdd: boolean;
   nPart, nOffset, nLen, nIndex, i: integer;
   ch: WideChar;
 begin
+  St:= Strings;
   if not TempSel_IsLineWithSelection(ALineIndex) then
   begin
     nOffset:= 0;
-    nLen:= Min(Strings.LinesLen[ALineIndex], AOffsetMax);
+    nLen:= Min(St.LinesLen[ALineIndex], AOffsetMax);
     nPart:= 0;
 
     //split leading tab-chars to separate part
     //this is much needed for gtk2, which paints ExtTextOut with Dx much slower
     repeat
       if nLen=0 then Break;
-      ch:= Strings.LineCharAt(ALineIndex, ACharIndex+nOffset+1);
+      ch:= St.LineCharAt(ALineIndex, ACharIndex+nOffset+1);
       if ch<>#9 then Break;
       AParts[0].Offset:= 0;
       Inc(AParts[0].Len);
@@ -303,9 +305,11 @@ procedure TATSynEdit.DoCalcLineEntireColor(ALine: integer;
   out AColor: TColor; out AColorForced: boolean;
   AHiliteLineWithSelection: boolean);
 var
+  St: TATStrings;
   NIndex, BmKind: integer;
 begin
   AColor:= clNone;
+  St:= Strings;
 
   if AUseColorOfCurrentLine then
     AColor:= Colors.CurrentLineBG
@@ -314,20 +318,20 @@ begin
     AColor:= Colors.CurrentLineBG
   else
   begin
-    NIndex:= Strings.Bookmarks.Find(ALine);
+    NIndex:= St.Bookmarks.Find(ALine);
     if NIndex>=0 then
     begin
-      BmKind:= Strings.Bookmarks[NIndex]^.Data.Kind;
+      BmKind:= St.Bookmarks[NIndex]^.Data.Kind;
       AColor:= Colors.BookmarkBG;
       if Assigned(FOnCalcBookmarkColor) then
         FOnCalcBookmarkColor(Self, BmKind, AColor);
     end
     else
     begin
-      NIndex:= Strings.Bookmarks2.Find(ALine);
+      NIndex:= St.Bookmarks2.Find(ALine);
       if NIndex>=0 then
       begin
-        BmKind:= Strings.Bookmarks2[NIndex]^.Data.Kind;
+        BmKind:= St.Bookmarks2[NIndex]^.Data.Kind;
         AColor:= Colors.BookmarkBG;
         if Assigned(FOnCalcBookmarkColor) then
           FOnCalcBookmarkColor(Self, BmKind, AColor);
