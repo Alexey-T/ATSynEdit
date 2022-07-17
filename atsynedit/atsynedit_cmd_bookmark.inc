@@ -128,20 +128,59 @@ begin
 end;
 
 
+function _FindInListOfNumbers(L: TFPList; AValue: PtrInt): integer;
+var
+  a, b, m: integer;
+  dif: PtrInt;
+begin
+  Result:= -1;
+  a:= 0;
+  b:= L.Count-1;
+
+  repeat
+    if a>b then exit;
+
+    m:= (a+b+1) div 2;
+    dif:= PtrInt(L[m])-AValue;
+    if dif=0 then
+      exit(m)
+    else
+    if dif>0 then
+      b:= m-1
+    else
+      a:= m+1;
+  until false;
+end;
+
 procedure TATSynEdit.BookmarkInvertAll;
 var
+  St: TATStrings;
   Data: TATBookmarkData;
+  L: TFPList;
   i: integer;
 begin
-  FillChar(Data{%H-}, SizeOf(Data), 0);
+  St:= Strings;
+
+  Data:= Default(TATBookmarkData);
   Data.Kind:= 1;
   Data.ShowInBookmarkList:= true;
   Data.AutoDelete:= bmadOption;
 
-  for i:= 0 to Strings.Count-1 do
-  begin
-    Data.LineNum:= i;
-    Strings.Bookmarks.Add(Data, true{AToggle});
+  L:= TFPList.Create;
+  try
+    for i:= 0 to St.Bookmarks.Count-1 do
+      L.Add(pointer(PtrInt(St.Bookmarks.ItemPtr[i]^.Data.LineNum)));
+
+    St.Bookmarks.Clear;
+
+    for i:= 0 to St.Count-1 do
+      if _FindInListOfNumbers(L, i)<0 then
+      begin
+        Data.LineNum:= i;
+        St.Bookmarks.Add(Data);
+      end
+  finally
+    FreeAndNil(L);
   end;
 
   DoChangeBookmarks;
