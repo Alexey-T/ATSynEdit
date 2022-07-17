@@ -67,6 +67,7 @@ type
     property ItemPtr[N: integer]: PATBookmarkItem read GetItemPtr; default;
     procedure Add(const AData: TATBookmarkData);
     function Find(ALineNum: integer): integer;
+    function FindNearest(ALineNum: integer; out AExactMatch: boolean): integer;
     procedure DeleteDups;
     procedure Update(AChange: TATLineChangeKind; ALine, AItemCount, ALineCount: integer);
   end;
@@ -177,33 +178,25 @@ end;
 procedure TATBookmarks.Add(const AData: TATBookmarkData);
 var
   Item: TATBookmarkItem;
-  nLine, i: integer;
+  N: integer;
+  bExact: boolean;
 begin
   FillChar(Item, SizeOf(Item), 0);
-
-  for i:= 0 to Count-1 do
-  begin
-    nLine:= FList.ItemPtr(i)^.Data.LineNum;
-
-    //bookmark already exists: overwrite
-    if nLine=AData.LineNum then
-    begin
-      ItemPtr[i]^.Assign(AData);
-      Exit
-    end;
-
-    //found bookmark for bigger line: insert before it
-    if nLine>AData.LineNum then
-    begin
-      Item.Assign(AData);
-      FList.Insert(i, Item);
-      Exit;
-    end;
-  end;
-
-  //not found bookmark for bigger line: append
   Item.Assign(AData);
-  FList.Add(Item);
+
+  N:= FindNearest(AData.LineNum, bExact);
+  if N<0 then
+    //not found bookmark for bigger line: append
+    FList.Add(Item)
+  else
+  begin
+    if bExact then
+      //bookmark already exists: overwrite
+      ItemPtr[N]^.Assign(AData)
+    else
+      //found bookmark for bigger line: insert before it
+      FList.Insert(N, Item);
+  end;
 end;
 
 procedure TATBookmarks.DeleteDups;
@@ -235,6 +228,41 @@ begin
     dif:= FList.ItemPtr(m)^.Data.LineNum-ALineNum;
     if dif=0 then
       exit(m);
+    if dif>0 then
+      b:= m-1
+    else
+      a:= m+1;
+  until false;
+end;
+
+function TATBookmarks.FindNearest(ALineNum: integer; out AExactMatch: boolean): integer;
+var
+  a, b, m, dif: integer;
+begin
+  Result:= -1;
+  AExactMatch:= false;
+
+  a:= 0;
+  b:= Count-1;
+
+  repeat
+    if a>b then
+    begin
+      while IsIndexValid(a-1) and (FList.ItemPtr(a-1)^.Data.LineNum>=ALineNum) do
+        Dec(a);
+      if IsIndexValid(a) then
+        Result:= a;
+      exit;
+    end;
+
+    m:= (a+b+1) div 2;
+
+    dif:= FList.ItemPtr(m)^.Data.LineNum-ALineNum;
+    if dif=0 then
+    begin
+      AExactMatch:= true;
+      exit(m);
+    end;
     if dif>0 then
       b:= m-1
     else
