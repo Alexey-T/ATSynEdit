@@ -1322,7 +1322,8 @@ type
     procedure UpdateClientSizes;
     function DoFormatLineNumber(N: integer): string;
     function UpdateScrollInfoFromMessage(var AInfo: TATEditorScrollInfo; const AMsg: TLMScroll): boolean;
-    procedure UpdateCaretsCoords(AOnlyLast: boolean = false);
+    procedure UpdateCaretsCoords(AOnlyLast: boolean=false);
+    procedure UpdateMarkersCoords;
     procedure UpdateCharSize(var ACharSize: TATEditorCharSize; C: TCanvas; ACharSpacingY: integer);
     function GetScrollbarVisible(bVertical: boolean): boolean;
     procedure SetMarginRight(AValue: integer);
@@ -5480,6 +5481,7 @@ begin
     DoPaintRulerCaretMarks(C);
   end;
 
+  UpdateMarkersCoords;
   DoPaintMarkersTo(C);
 end;
 

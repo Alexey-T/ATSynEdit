@@ -120,12 +120,11 @@ begin
   end;
 end;
 
-procedure TATSynEdit.UpdateCaretsCoords(AOnlyLast: boolean = false);
+procedure TATSynEdit.UpdateCaretsCoords(AOnlyLast: boolean=false);
 var
   St: TATStrings;
   NCaretCount, NStart, i: integer;
   Caret: TATCaretItem;
-  Marker: PATMarkerItem;
   PntCaret, PntCoord: TPoint;
 begin
   St:= Strings;
@@ -184,8 +183,15 @@ begin
       end;
     end;
   end;
+end;
 
-  if Assigned(FMarkers) then
+procedure TATSynEdit.UpdateMarkersCoords;
+var
+  Marker: PATMarkerItem;
+  PntCaret, PntCoord: TPoint;
+  i: integer;
+begin
+  if FMarkers=nil then exit;
   for i:= 0 to FMarkers.Count-1 do
   begin
     Marker:= FMarkers.ItemPtr(i);
