@@ -14,6 +14,7 @@ uses
   LCLType,
   ATCanvasPrimitives,
   ATScrollbar,
+  ATStrings,
   ATSynEdit,
   ATSynEdit_Globals,
   ATStringProc;
@@ -91,13 +92,16 @@ begin
 end;
 
 procedure TATEdit.DoEventChange(ALineIndex: integer; AllowOnChange: boolean);
+var
+  St: TATStrings;
 begin
   inherited;
   DoCaretSingleAsIs;
+  St:= Strings;
 
-  if Strings.Count=0 then
+  if St.Count=0 then
   begin
-    Strings.LineAdd('');
+    St.LineAdd('');
     Update(true);
   end;
 
@@ -112,10 +116,10 @@ begin
     end;
 
     if OptMaxLen>0 then
-      if Strings.LinesLen[0]>OptMaxLen then
+      if St.LinesLen[0]>OptMaxLen then
       begin
-        Strings.Lines[0]:= Strings.LineSub(0, 1, OptMaxLen);
-        DoCaretSingle(Strings.LinesLen[0], 0);
+        St.Lines[0]:= St.LineSub(0, 1, OptMaxLen);
+        DoCaretSingle(St.LinesLen[0], 0);
         Update(true);
       end;
   end;

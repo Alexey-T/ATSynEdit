@@ -287,16 +287,18 @@ end;
 
 function TATSynEdit.DoCommand_SelectWords: TATCommandResults;
 var
+  St: TATStrings;
   Item: TATCaretItem;
   i, NOffset1, NOffset2: integer;
   Str: atString;
 begin
+  St:= Strings;
   for i:= FCarets.Count-1 downto 0 do
   begin
     Item:= FCarets[i];
-    if not Strings.IsIndexValid(Item.PosY) then Continue;
+    if not St.IsIndexValid(Item.PosY) then Continue;
 
-    Str:= Strings.Lines[Item.PosY];
+    Str:= St.Lines[Item.PosY];
     SFindWordBounds(Str, Item.PosX, NOffset1, NOffset2, FOptNonWordChars);
     if NOffset1<>NOffset2 then
     begin
