@@ -300,7 +300,7 @@ begin
              Caret.CoordY,
              NProximityVert,
              NProximityVert) then
-          UpdateCaretsCoords
+          UpdateCaretsCoords(false, true);
       end
       else
       if (Carets.Count>1) and (Res*[cResultCaretBottom]<>[]) then
@@ -311,14 +311,14 @@ begin
              Caret.CoordY,
              NProximityVert,
              NProximityVert) then
-          UpdateCaretsCoords;
+          UpdateCaretsCoords(false, true);
       end;
     end;
   end
   else
   //scroll should do UpdateCaretsCoords, CudaText issue #3777
   if cResultScroll in Res then
-    UpdateCaretsCoords;
+    UpdateCaretsCoords(false, true);
 
 
   if bTextChanged then

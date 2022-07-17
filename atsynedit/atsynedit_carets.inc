@@ -120,12 +120,14 @@ begin
   end;
 end;
 
-procedure TATSynEdit.UpdateCaretsCoords(AOnlyLast: boolean=false);
+procedure TATSynEdit.UpdateCaretsCoords(AOnlyLast: boolean=false; ASkipInvisible: boolean=false);
 var
   St: TATStrings;
-  NCaretCount, NStart, i: integer;
   Caret: TATCaretItem;
   PntCaret, PntCoord: TPoint;
+  NCaretCount, NStart: integer;
+  NLineTop, NLineBottom: integer;
+  i: integer;
 begin
   St:= Strings;
   NCaretCount:= Carets.Count;
@@ -134,25 +136,31 @@ begin
   else
     NStart:= 0;
 
+  if ASkipInvisible then
+  begin
+    NLineTop:= LineTop;
+    NLineBottom:= LineBottom;
+  end;
+
   for i:= NStart to NCaretCount-1 do
   begin
     Caret:= Carets[i];
+    Caret.CoordX:= -1;
+    Caret.CoordY:= -1;
+
     PntCaret.X:= Caret.PosX;
     PntCaret.Y:= Caret.PosY;
 
     if not St.IsIndexValid(PntCaret.Y) then
-    begin
-      Caret.CoordX:= -1;
-      Caret.CoordY:= -1;
       Continue;
+
+    if ASkipInvisible then
+    begin
+      if PntCaret.Y<NLineTop then Continue;
+      if PntCaret.Y>NLineBottom then Continue;
     end;
 
-    if IsPosFolded(PntCaret.X, PntCaret.Y) then
-    begin
-      Caret.CoordX:= -1;
-      Caret.CoordY:= -1;
-    end
-    else
+    if not IsPosFolded(PntCaret.X, PntCaret.Y) then
     begin
       PntCoord:= CaretPosToClientPos(PntCaret);
       Caret.CoordX:= PntCoord.X;
@@ -1342,7 +1350,7 @@ function TATSynEdit.IsCaretOnVisibleRect: boolean;
 begin
   //must refresh carets' CoordX/CoordY first, otherwise 1st carets' move out of
   //visible rect will not be detected
-  UpdateCaretsCoords;
+  UpdateCaretsCoords(false, true);
 
   Result:= Carets.IsAnyCaretInVisibleRect(FRectMain);
 end;
