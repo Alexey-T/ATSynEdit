@@ -140,15 +140,23 @@ end;
 
 function TATGutterDecor.DeleteByTag(const ATag: Int64): boolean;
 var
-  i: integer;
+  i, j: integer;
 begin
   Result:= false;
-  for i:= FList.Count-1 downto 0 do
+  i:= FList.Count;
+  repeat
+    Dec(i);
+    if i<0 then Break;
     if FList.ItemPtr(i)^.Data.Tag=ATag then
     begin
       Result:= true;
-      Delete(i);
+      j:= i;
+      while (j>0) and (FList.ItemPtr(j-1)^.Data.Tag=ATag) do
+        Dec(j);
+      FList.DeleteRange(j, i);
+      i:= j;
     end;
+  until false;
 end;
 
 function TATGutterDecor.Count: integer;
