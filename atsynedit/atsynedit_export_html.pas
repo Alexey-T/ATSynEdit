@@ -10,6 +10,7 @@ interface
 
 uses
   Classes, SysUtils, Graphics, StrUtils,
+  ATStrings,
   ATSynEdit,
   ATSynEdit_LineParts,
   ATStringProc_HtmlColor;
@@ -86,6 +87,7 @@ procedure DoEditorExportToHTML(Ed: TATSynEdit; const AFilename, APageTitle,
   AFontName: string; AFontSize: integer; AWithNumbers: boolean; AColorBg,
   AColorNumbers: TColor);
 var
+  St: TATStrings;
   L, LStyles, LCode, LNums: TStringList;
   Parts: TATLineParts;
   PPart: ^TATLinePart;
@@ -96,7 +98,8 @@ var
   StyleName, StyleText: string;
   i, j: integer;
 begin
-  if Ed.Strings.Count=0 then exit;
+  St:= Ed.Strings;
+  if St.Count=0 then exit;
 
   NColorFont:= clBlack;
   FillChar(Parts, Sizeof(Parts), 0);
@@ -112,11 +115,11 @@ begin
   try
     LStyles.UseLocale:= false; //speedup IndexOf
 
-    for i:= 0 to Ed.Strings.Count-1 do
+    for i:= 0 to St.Count-1 do
       LNums.Add(IntToStr(i+1)+'&nbsp;');
     _AddPreToStrings(LNums);
 
-    for i:= 0 to Ed.Strings.Count-1 do
+    for i:= 0 to St.Count-1 do
     begin
       S:= '';
       if not Ed.DoCalcLineHiliteEx(i, Parts, AColorBG, NColorAfter) then break;
@@ -129,7 +132,7 @@ begin
         NeedStyleBg:= PPart^.ColorBG<>AColorBG;
         NeedStyle:= NeedStyleFont or NeedStyleBg;
 
-        StrText:= Ed.Strings.LineSub(i, PPart^.Offset+1, PPart^.Len);
+        StrText:= St.LineSub(i, PPart^.Offset+1, PPart^.Len);
         EscapeSpecChars(StrText);
 
         if _IsSpaces(StrText) and not NeedStyleBg then
