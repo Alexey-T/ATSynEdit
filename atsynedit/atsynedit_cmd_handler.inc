@@ -673,6 +673,7 @@ end;
 procedure TATSynEdit.DoCommand(ACmd: integer; AInvoke: TATEditorCommandInvoke; const AText: atString = '');
 // AInvoke is used only by CudaText, you may pass any value here
 var
+  St: TATStrings;
   Caret: TATCaretItem;
   Res: TATCommandResults;
   Str: string;
@@ -685,6 +686,7 @@ begin
   LastCommandChangedLines:= 0;
   FLastCommandMakesColumnSel:= false;
   DoHotspotsExit;
+  St:= Strings;
 
   if AText<>'' then
     Str:= UTF8Encode(AText)
@@ -700,7 +702,7 @@ begin
     NCommandCode:= ACmd
   else
     NCommandCode:= 0;
-  Strings.CommandCode:= NCommandCode;
+  St.CommandCode:= NCommandCode;
 
   FCaretSpecPos:= false;
 
@@ -723,11 +725,11 @@ begin
 
   if ACmd and cCmdFlag_Caret <> 0 then
   begin
-    Strings.SetGroupMark;
+    St.SetGroupMark;
   end;
 
   //support CudaText #3084
-  Strings.SetNewCommandMark;
+  St.SetNewCommandMark;
 
   if not FCaretVirtual then
     Carets.UpdateMemory(cCaretMem_PrepareX, false);
@@ -805,7 +807,7 @@ begin
   end;
 
   if NCommandCode<>0 then
-    Strings.CommandCode:= 0;
+    St.CommandCode:= 0;
   if bCaretFarFromVertEdge then
     Include(Res, cResultCaretFarFromEdge);
 

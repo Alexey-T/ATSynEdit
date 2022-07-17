@@ -26,13 +26,19 @@ end;
 
 function TATSynEdit.Unfolded_NextLineNumber(ALine: integer; ADown: boolean): integer;
 var
+  St: TATStrings;
   N: integer;
 begin
   Result:= ALine;
   N:= Result;
-  while IsLineFolded(N) and Strings.IsIndexValid(N) do
-    N:= N+BoolToPlusMinusOne[ADown];
-  if Strings.IsIndexValid(N) then Result:= N;
+  St:= Strings;
+  while IsLineFolded(N) and St.IsIndexValid(N) do
+    if ADown then
+      Inc(N)
+    else
+      Dec(N);
+  if St.IsIndexValid(N) then
+    Result:= N;
 end;
 
 function TATSynEdit.IsPosFolded(AX, AY: integer): boolean;
@@ -118,8 +124,10 @@ end;
 
 procedure TATSynEdit.DoRangeFold(ARangeIndex: integer);
 var
+  St: TATStrings;
   Range: PATSynRange;
 begin
+  St:= Strings;
   Range:= Fold.ItemPtr(ARangeIndex);
   Range^.Folded:= true;
   FWrapUpdateNeeded:= true;
@@ -128,24 +136,24 @@ begin
   case FFoldStyle of
     cFoldHereWithDots:
     begin
-      Strings.LinesFoldFrom[Range^.Y, FEditorIndex]:= Range^.X;
+      St.LinesFoldFrom[Range^.Y, FEditorIndex]:= Range^.X;
     end;
     cFoldHereWithTruncatedText:
     begin
-      Strings.LinesFoldFrom[Range^.Y, FEditorIndex]:= Range^.X;
+      St.LinesFoldFrom[Range^.Y, FEditorIndex]:= Range^.X;
       if Range^.Hint='' then
-        Range^.Hint:= Strings.LineSub(Range^.Y, Range^.X, ATEditorOptions.FoldedLenOfEmptyHint)+'...';
+        Range^.Hint:= St.LineSub(Range^.Y, Range^.X, ATEditorOptions.FoldedLenOfEmptyHint)+'...';
     end;
     cFoldFromEndOfLine:
     begin
       if Range^.Hint<>'' then
-        Strings.LinesFoldFrom[Range^.Y, FEditorIndex]:= Range^.X
+        St.LinesFoldFrom[Range^.Y, FEditorIndex]:= Range^.X
       else
-        Strings.LinesFoldFrom[Range^.Y, FEditorIndex]:= Strings.LinesLen[Range^.Y]+1;
+        St.LinesFoldFrom[Range^.Y, FEditorIndex]:= St.LinesLen[Range^.Y]+1;
     end;
     cFoldFromEndOfLineAlways:
     begin
-      Strings.LinesFoldFrom[Range^.Y, FEditorIndex]:= Strings.LinesLen[Range^.Y]+1;
+      St.LinesFoldFrom[Range^.Y, FEditorIndex]:= St.LinesLen[Range^.Y]+1;
       Range^.Hint:= '...';
     end;
     cFoldFromNextLine:
@@ -167,10 +175,12 @@ end;
 
 procedure TATSynEdit.DoRangeHideLines(ALineFrom, ALineTo: integer);
 var
+  St: TATStrings;
   i: integer;
 begin
+  St:= Strings;
   for i:= ALineFrom to ALineTo do
-    Strings.LinesHidden[i, FEditorIndex]:= true;
+    St.LinesHidden[i, FEditorIndex]:= true;
 end;
 
 procedure TATSynEdit.DoUnfoldLine(ALine: integer);

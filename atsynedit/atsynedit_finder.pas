@@ -1001,6 +1001,7 @@ end;
 procedure TATEditorFinder.DoAction_ExtractAll(AWithEvent: boolean; AMatches: TStringList;
   ASorted, ACaseSens: boolean; ADuplicates: TDuplicates);
 var
+  St: TATStrings;
   ListRes: TATFinderResults;
   Res: TATFinderResult;
   Str: UnicodeString;
@@ -1012,6 +1013,7 @@ begin
   UpdateBuffer;
   BeginTiming;
 
+  St:= Editor.Strings;
   AMatches.Clear;
   ListRes:= TATFinderResults.Create;
   try
@@ -1024,7 +1026,7 @@ begin
     for i:= 0 to ListRes.Count-1 do
     begin
       Res:= ListRes[i];
-      Str:= Editor.Strings.TextSubstring(
+      Str:= St.TextSubstring(
         Res.FPos.X,
         Res.FPos.Y,
         Res.FEnd.X,
@@ -1077,6 +1079,7 @@ end;
 
 function TATEditorFinder.DoReplace_InFragment: integer;
 var
+  St: TATStrings;
   L: TATFinderResults;
   Res: TATFinderResult;
   Str: UnicodeString;
@@ -1085,6 +1088,7 @@ var
   Ok: boolean;
 begin
   Result:= 0;
+  St:= Editor.Strings;
 
   L:= TATFinderResults.Create;
   try
@@ -1108,7 +1112,7 @@ begin
       end;
 
       if OptRegex then
-        Str:= GetRegexReplacement(Editor.Strings.TextSubstring(P1.X, P1.Y, P2.X, P2.Y))
+        Str:= GetRegexReplacement(St.TextSubstring(P1.X, P1.Y, P2.X, P2.Y))
       else
         Str:= StrReplace;
 

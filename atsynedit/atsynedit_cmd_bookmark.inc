@@ -62,14 +62,16 @@ procedure TATSynEdit.BookmarkToggleForLine(ALine, ABmKind: integer;
   const AHint: string; AAutoDelete: TATBookmarkAutoDelete;
   AShowInList: boolean; const ATag: Int64);
 var
+  St: TATStrings;
   NIndex: integer;
   Data: TATBookmarkData;
 begin
-  if not Strings.IsIndexValid(ALine) then exit;
+  St:= Strings;
+  if not St.IsIndexValid(ALine) then exit;
 
-  NIndex:= Strings.Bookmarks.Find(ALine);
+  NIndex:= St.Bookmarks.Find(ALine);
   if NIndex>=0 then
-    Strings.Bookmarks.Delete(NIndex)
+    St.Bookmarks.Delete(NIndex)
   else
   begin
     FillChar(Data, SizeOf(Data), 0);
@@ -79,7 +81,7 @@ begin
     Data.AutoDelete:= AAutoDelete;
     Data.ShowInBookmarkList:= AShowInList;
     Data.Tag:= ATag;
-    Strings.Bookmarks.Add(Data);
+    St.Bookmarks.Add(Data);
   end;
 
   DoChangeBookmarks;
@@ -252,16 +254,18 @@ end;
 
 procedure TATSynEdit.BookmarkCopyMarkedLines;
 var
+  St: TATStrings;
   List: TStringList;
   NLine, i: integer;
 begin
+  St:= Strings;
   List:= TStringList.Create;
   try
-    for i:= 0 to Strings.Bookmarks.Count-1 do
+    for i:= 0 to St.Bookmarks.Count-1 do
     begin
-      NLine:= Strings.Bookmarks[i]^.Data.LineNum;
-      if Strings.IsIndexValid(NLine) then
-        List.Add(UTF8Encode(Strings.Lines[NLine]));
+      NLine:= St.Bookmarks[i]^.Data.LineNum;
+      if St.IsIndexValid(NLine) then
+        List.Add(UTF8Encode(St.Lines[NLine]));
     end;
     SClipboardCopy(List.Text);
   finally
@@ -272,31 +276,35 @@ end;
 
 procedure TATSynEdit.BookmarkDeleteMarkedLines;
 var
+  St: TATStrings;
   NCount, NLine, i: integer;
 begin
-  NCount:= Strings.Bookmarks.Count;
+  St:= Strings;
+  NCount:= St.Bookmarks.Count;
   if NCount=0 then exit;
 
   for i:= NCount-1 downto 0 do
   begin
-    NLine:= Strings.Bookmarks[i]^.Data.LineNum;
-    Strings.LineDelete(NLine);
+    NLine:= St.Bookmarks[i]^.Data.LineNum;
+    St.LineDelete(NLine);
   end;
 
   DoCaretsFixIncorrectPos(false);
   Update(true);
   DoEventChange;
 
-  if NCount<>Strings.Bookmarks.Count then
+  if NCount<>St.Bookmarks.Count then
     DoChangeBookmarks;
 end;
 
 
 procedure TATSynEdit.BookmarkPlaceCaretsOnBookmarks;
 var
+  St: TATStrings;
   X1, Y1, X2, Y2: integer;
   NLine, i: integer;
 begin
+  St:= Strings;
   if Carets.Count=0 then exit;
   with Carets[0] do
   begin
@@ -307,9 +315,9 @@ begin
   end;
 
   Carets.Clear;
-  for i:= 0 to Strings.Bookmarks.Count-1 do
+  for i:= 0 to St.Bookmarks.Count-1 do
   begin
-    NLine:= Strings.Bookmarks[i]^.Data.LineNum;
+    NLine:= St.Bookmarks[i]^.Data.LineNum;
     Carets.Add(0, NLine);
   end;
 

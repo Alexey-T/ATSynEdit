@@ -383,6 +383,7 @@ end;
 
 function TATSynEdit.GetTextForClipboard: string;
 var
+  St: TATStrings;
   ListNum: TATIntegerList;
   ListStr: TStringList;
   Caret: TATCaretItem;
@@ -393,7 +394,8 @@ var
 begin
   Result:= '';
 
-  //EolString:= cLineEndStrings[Strings.Endings]; //gives incorrect result with MacOS lineends on Linux
+  St:= Strings;
+  //EolString:= cLineEndStrings[St.Endings]; //gives incorrect result with MacOS lineends on Linux
   EolString:= System.LineEnding;
 
   //make text from column selection
@@ -401,9 +403,9 @@ begin
   begin
     for i:= FSelRect.Top to FSelRect.Bottom do
     begin
-      X1:= Strings.ColumnPosToCharPos(i, FSelRect.Left, FTabHelper);
-      X2:= Strings.ColumnPosToCharPos(i, FSelRect.Right, FTabHelper);
-      Str:= Strings.TextSubstring(X1, i, X2, i);
+      X1:= St.ColumnPosToCharPos(i, FSelRect.Left, FTabHelper);
+      X2:= St.ColumnPosToCharPos(i, FSelRect.Right, FTabHelper);
+      Str:= St.TextSubstring(X1, i, X2, i);
       if FOptCopyColumnBlockAlignedBySpaces then
       begin
         NLen:= X2-X1-Length(Str);
@@ -425,7 +427,7 @@ begin
     for i:= 0 to Carets.Count-1 do
     begin
       Caret:= Carets[i];
-      if not Strings.IsIndexValid(Caret.PosY) then
+      if not St.IsIndexValid(Caret.PosY) then
         Continue;
       if ListNum.IndexOf(Caret.PosY)<0 then
         ListNum.Add(Caret.PosY);
@@ -438,7 +440,7 @@ begin
       begin
         for i:= 0 to ListNum.Count-1 do
         begin
-          STemp:= Strings.Lines[ListNum[i]];
+          STemp:= St.Lines[ListNum[i]];
           if STemp<>'' then
             ListStr.Add(UTF8Encode(STemp));
         end;
@@ -454,7 +456,7 @@ begin
         Caret.GetRange(X1, Y1, X2, Y2, bSel);
         if not bSel then Continue;
 
-        Str:= Strings.TextSubstring(X1, Y1, X2, Y2, EolString{%H-});
+        Str:= St.TextSubstring(X1, Y1, X2, Y2, EolString{%H-});
         if Str<>'' then
           ListStr.Add(UTF8Encode(Str));
       end;
