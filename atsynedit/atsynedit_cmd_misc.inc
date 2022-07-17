@@ -224,22 +224,24 @@ end;
 
 procedure TATSynEdit.DoConvertTabsToSpaces;
 var
+  St: TATStrings;
   S1, S2: atString;
   i: integer;
 begin
-  Strings.BeginUndoGroup;
+  St:= Strings;
+  St.BeginUndoGroup;
   try
-    for i:= 0 to Strings.Count-1 do
+    for i:= 0 to St.Count-1 do
     begin
-      S1:= Strings.Lines[i];
+      S1:= St.Lines[i];
       if not SStringHasTab(S1) then Continue;
 
       S2:= FTabHelper.TabsToSpaces(i, S1);
       if S1<>S2 then
-        Strings.Lines[i]:= S2;
+        St.Lines[i]:= S2;
     end;
   finally
-    Strings.EndUndoGroup;
+    St.EndUndoGroup;
     Update(true);
     DoEventChange;
   end;
@@ -247,14 +249,16 @@ end;
 
 procedure TATSynEdit.DoConvertIndentation(ASpacesToTabs: boolean);
 var
+  St: TATStrings;
   S1, SBegin, SBegin2, SEnd: atString;
   N, i: integer;
 begin
-  Strings.BeginUndoGroup;
+  St:= Strings;
+  St.BeginUndoGroup;
   try
-    for i:= 0 to Strings.Count-1 do
+    for i:= 0 to St.Count-1 do
     begin
-      S1:= Strings.Lines[i];
+      S1:= St.Lines[i];
 
       N:= SGetIndentChars(S1);
       if N=0 then Continue;
@@ -267,10 +271,10 @@ begin
         SBegin2:= FTabHelper.TabsToSpaces(i, SBegin);
 
       if SBegin2<>SBegin then
-        Strings.Lines[i]:= SBegin2+SEnd;
+        St.Lines[i]:= SBegin2+SEnd;
     end;
   finally
-    Strings.EndUndoGroup;
+    St.EndUndoGroup;
     Update(true);
     DoEventChange;
   end;
