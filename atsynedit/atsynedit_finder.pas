@@ -164,6 +164,7 @@ type
     FReplacedAtLine: integer;
     FLastTick: QWord;
     FLastActionTime: QWord;
+    FEnableCaretEvent: boolean;
     //FReplacedAtEndOfText: boolean;
     //
     function IsSelStartsAtMatch: boolean;
@@ -825,6 +826,7 @@ begin
   FinderCarets:= TATCarets.Create;
   //FReplacedAtEndOfText:= false;
   FMaxLineLen:= MaxInt;
+  FEnableCaretEvent:= true;
 
   OptFromCaret:= false;
   OptConfirmReplace:= false;
@@ -1050,6 +1052,7 @@ begin
   BeginTiming;
   if Editor.ModeReadOnly then exit;
   Editor.Strings.SetNewCommandMark;
+  FEnableCaretEvent:= false;
 
   UpdateCarets(false);
   UpdateFragments;
@@ -1070,8 +1073,13 @@ begin
     CurrentFragmentIndex:= 0;
   end;
 
+  FEnableCaretEvent:= true;
+
   if FReplacedAtLine<>MaxInt then
+  begin
     Editor.DoEventChange(FReplacedAtLine);
+    Editor.DoEventCarets;
+  end;
 
   EndTiming;
 end;
@@ -1683,7 +1691,8 @@ begin
   else
   begin
     Editor.DoCaretSingle(APosX, APosY, AEndX, AEndY);
-    Editor.DoEventCarets;
+    if FEnableCaretEvent then
+      Editor.DoEventCarets;
 
     //solve CudaText issue #3261:
     Editor.ActionAddJumpToUndo;
