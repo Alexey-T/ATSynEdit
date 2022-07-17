@@ -86,7 +86,7 @@ type
       AValue: Int64=0;
       AMicromapMode: TATMarkerMicromapMode=mmmShowInTextOnly;
       ALineLen: integer=0);
-    procedure DeleteInRange(AX1, AY1, AX2, AY2: integer);
+    function DeleteInRange(AX1, AY1, AX2, AY2: integer): boolean;
     function DeleteWithTag(const ATag: Int64): boolean;
     function DeleteByPos(AX, AY: integer): boolean;
     procedure Find(AX, AY: integer; out AIndex: integer; out AExactMatch: boolean);
@@ -352,17 +352,31 @@ begin
     FList.Add(Item);
 end;
 
-procedure TATMarkers.DeleteInRange(AX1, AY1, AX2, AY2: integer);
-var
-  Item: PATMarkerItem;
-  i: integer;
-begin
-  for i:= Count-1 downto 0 do
+function TATMarkers.DeleteInRange(AX1, AY1, AX2, AY2: integer): boolean;
+  //
+  function IsMarkerOk(Item: PATMarkerItem): boolean; inline;
   begin
-    Item:= ItemPtr(i);
-    if IsPosInRange(Item^.PosX, Item^.PosY, AX1, AY1, AX2, AY2)=cRelateInside then
-      Delete(i);
+    Result:= IsPosInRange(Item^.PosX, Item^.PosY, AX1, AY1, AX2, AY2)=cRelateInside;
   end;
+  //
+var
+  i, j: integer;
+begin
+  Result:= false;
+  i:= Count;
+  repeat
+    Dec(i);
+    if i<0 then Break;
+    if IsMarkerOk(ItemPtr(i)) then
+    begin
+      Result:= true;
+      j:= i;
+      while (j>0) and IsMarkerOk(ItemPtr(j-1)) do
+        Dec(j);
+      FList.DeleteRange(j, i);
+      i:= j;
+    end;
+  until false;
 end;
 
 function TATMarkers.DeleteWithTag(const ATag: Int64): boolean;
