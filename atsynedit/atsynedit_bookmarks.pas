@@ -65,7 +65,7 @@ type
     function Count: integer;
     function IsIndexValid(N: integer): boolean;
     property ItemPtr[N: integer]: PATBookmarkItem read GetItemPtr; default;
-    procedure Add(const AData: TATBookmarkData);
+    procedure Add(const AData: TATBookmarkData; AToggle: boolean=false);
     function Find(ALineNum: integer): integer;
     function FindNearest(ALineNum: integer; out AExactMatch: boolean): integer;
     procedure DeleteDups;
@@ -175,7 +175,7 @@ begin
   Result:= (N>=0) and (N<FList.Count);
 end;
 
-procedure TATBookmarks.Add(const AData: TATBookmarkData);
+procedure TATBookmarks.Add(const AData: TATBookmarkData; AToggle: boolean=false);
 var
   Item: TATBookmarkItem;
   N: integer;
@@ -186,13 +186,20 @@ begin
 
   N:= FindNearest(AData.LineNum, bExact);
   if N<0 then
+  begin
     //not found bookmark for bigger line: append
-    FList.Add(Item)
+    FList.Add(Item);
+  end
   else
   begin
     if bExact then
-      //bookmark already exists: overwrite
-      ItemPtr[N]^.Assign(AData)
+    begin
+      //bookmark exists
+      if AToggle then
+        FList.Delete(N)
+      else
+        ItemPtr[N]^.Assign(AData);
+    end
     else
       //found bookmark for bigger line: insert before it
       FList.Insert(N, Item);

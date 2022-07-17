@@ -130,8 +130,8 @@ end;
 
 procedure TATSynEdit.BookmarkInvertAll;
 var
-  NIndex, i: integer;
   Data: TATBookmarkData;
+  i: integer;
 begin
   FillChar(Data{%H-}, SizeOf(Data), 0);
   Data.Kind:= 1;
@@ -140,14 +140,8 @@ begin
 
   for i:= 0 to Strings.Count-1 do
   begin
-    NIndex:= Strings.Bookmarks.Find(i);
-    if NIndex>=0 then
-      Strings.Bookmarks.Delete(NIndex)
-    else
-    begin
-      Data.LineNum:= i;
-      Strings.Bookmarks.Add(Data);
-    end;
+    Data.LineNum:= i;
+    Strings.Bookmarks.Add(Data, true{AToggle});
   end;
 
   DoChangeBookmarks;
