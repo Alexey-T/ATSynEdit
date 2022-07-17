@@ -58,26 +58,28 @@ end;
 
 function TATSynEdit.DoCommand_KeyEnd: TATCommandResults;
 var
+  St: TATStrings;
   Caret: TATCaretItem;
   Pnt: TPoint;
   NLine, NLenTotal, NLen, NWrapped, i: integer;
   Details: TATEditorPosDetails;
 begin
   if FCarets.Count=0 then exit([]);
+  St:= Strings;
 
   if ModeOneLine then
   begin
     Caret:= FCarets[0];
-    Caret.PosX:= Strings.LinesLen[0];
+    Caret.PosX:= St.LinesLen[0];
   end
   else
   for i:= 0 to FCarets.Count-1 do
   begin
     Caret:= FCarets[i];
     NLine:= Caret.PosY;
-    if not Strings.IsIndexValid(NLine) then Continue;
+    if not St.IsIndexValid(NLine) then Continue;
 
-    NLenTotal:= Strings.LinesLen[NLine];
+    NLenTotal:= St.LinesLen[NLine];
     NLen:= 0;
     NWrapped:= 0;
 
@@ -93,7 +95,7 @@ begin
     end;
 
     if FOptKeyEndToNonSpace then
-      NLen:= Strings.LineLenWithoutSpace(NLine);
+      NLen:= St.LineLenWithoutSpace(NLine);
 
     if (NWrapped>0) and (Caret.PosX<NWrapped) then
       Caret.PosX:= NWrapped

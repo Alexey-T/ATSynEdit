@@ -112,10 +112,13 @@ begin
 end;
 
 procedure TATSynEdit.DoSelect_WordRange(ACaretIndex: integer; P1, P2: TPoint);
+var
+  St: TATStrings;
 begin
+  St:= Strings;
   if not Carets.IsIndexValid(ACaretIndex) then Exit;
-  if not Strings.IsIndexValid(P1.Y) then Exit;
-  if not Strings.IsIndexValid(P2.Y) then Exit;
+  if not St.IsIndexValid(P1.Y) then Exit;
+  if not St.IsIndexValid(P2.Y) then Exit;
 
   if not IsPosSorted(P1.X, P1.Y, P2.X, P2.Y, true) then
   begin
@@ -123,8 +126,8 @@ begin
     SwapInt(P1.Y, P2.Y);
   end;
 
-  P1.X:= SFindWordOffset(Strings.Lines[P1.Y], P1.X, cWordjumpToPrev, false, FOptNonWordChars);
-  P2.X:= SFindWordOffset(Strings.Lines[P2.Y], P2.X, cWordjumpToNext, false, FOptNonWordChars);
+  P1.X:= SFindWordOffset(St.Lines[P1.Y], P1.X, cWordjumpToPrev, false, FOptNonWordChars);
+  P2.X:= SFindWordOffset(St.Lines[P2.Y], P2.X, cWordjumpToNext, false, FOptNonWordChars);
 
   with Carets[ACaretIndex] do
   begin
@@ -214,11 +217,13 @@ end;
 
 procedure TATSynEdit.DoSelect_SplitSelectionToLines;
 var
+  St: TATStrings;
   NewCarets: TATCarets;
   X1, Y1, X2, Y2: integer;
   i, j, NLen: integer;
   Sel: boolean;
 begin
+  St:= Strings;
   NewCarets:= TATCarets.Create;
   try
     for i:= 0 to Carets.Count-1 do
@@ -237,7 +242,7 @@ begin
       end;
 
       //add first part
-      NLen:= Strings.LinesLen[Y1];
+      NLen:= St.LinesLen[Y1];
       if X1<NLen then
         NewCarets.Add(NLen, Y1, X1, Y1)
       else
@@ -246,7 +251,7 @@ begin
       //add middle parts
       for j:= Y1+1 to Y2-1 do
       begin
-        NLen:= Strings.LinesLen[j];
+        NLen:= St.LinesLen[j];
         if NLen=0 then
           NewCarets.Add(0, j)
         else
@@ -576,26 +581,28 @@ end;
 
 procedure TATSynEdit.DoSelectionDeleteColumnBlock;
 var
+  St: TATStrings;
   X1, X2, i: Integer;
   Str, StrNew: atString;
 begin
   if IsSelRectEmpty then exit;
 
-  Strings.BeginUndoGroup;
+  St:= Strings;
+  St.BeginUndoGroup;
   try
     for i:= FSelRect.Top to FSelRect.Bottom do
     begin
-      Str:= Strings.Lines[i];
-      X1:= Strings.ColumnPosToCharPos(i, FSelRect.Left, FTabHelper);
-      X2:= Strings.ColumnPosToCharPos(i, FSelRect.Right, FTabHelper);
+      Str:= St.Lines[i];
+      X1:= St.ColumnPosToCharPos(i, FSelRect.Left, FTabHelper);
+      X2:= St.ColumnPosToCharPos(i, FSelRect.Right, FTabHelper);
 
       StrNew:= Str;
       Delete(StrNew, X1+1, X2-X1);
       if StrNew<>Str then
-        Strings.Lines[i]:= StrNew;
+        St.Lines[i]:= StrNew;
     end;
   finally
-    Strings.EndUndoGroup;
+    St.EndUndoGroup;
   end;
 
   DoSelect_None;
