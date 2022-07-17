@@ -241,7 +241,9 @@ begin
   for i:= 0 to FList.Count-1 do
   begin
     Item:= Items[i];
-    if (Item.LineIndex=ALineIndex) and ((ATag<0) or (Item.Tag=ATag)) then exit(Item);
+    if (Item.LineIndex=ALineIndex) and
+      ((ATag<0) or (Item.Tag=ATag)) then
+      exit(Item);
   end;
 end;
 
