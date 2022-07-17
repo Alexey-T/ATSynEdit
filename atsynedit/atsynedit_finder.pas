@@ -564,6 +564,7 @@ end;
 
 procedure TATEditorFinder.DoCollect_Usual(AList: TATFinderResults; AWithEvent, AWithConfirm: boolean);
 var
+  St: TATStrings;
   IndexLineMax: integer;
   PosStart, PosEnd: TPoint;
   bOk, bContinue: boolean;
@@ -575,7 +576,8 @@ begin
   if StrFind='' then exit;
   SNew:= '';
 
-  IndexLineMax:= Editor.Strings.Count-1;
+  St:= Editor.Strings;
+  IndexLineMax:= St.Count-1;
   InitProgress;
 
   if FFragments.Count=0 then
@@ -583,7 +585,7 @@ begin
     PosStart.X:= 0;
     PosStart.Y:= 0;
     PosEnd.Y:= IndexLineMax;
-    PosEnd.X:= Editor.Strings.LinesLen[IndexLineMax];
+    PosEnd.X:= St.LinesLen[IndexLineMax];
   end
   else
   begin
@@ -596,10 +598,10 @@ begin
 
   repeat
     if Application.Terminated then Break;
-    if not Editor.Strings.IsIndexValid(PosStart.Y) then Break;
+    if not St.IsIndexValid(PosStart.Y) then Break;
     if not FindMatch_InEditor(PosStart, PosEnd, AWithEvent) then Break;
 
-    if FMatchEdPos.X < Editor.Strings.LinesLen[FMatchEdPos.Y] then
+    if FMatchEdPos.X < St.LinesLen[FMatchEdPos.Y] then
     begin
       PosStart.X:= FMatchEdEnd.X;
       PosStart.Y:= FMatchEdEnd.Y;
@@ -2387,6 +2389,7 @@ function TATEditorFinder.DoAction_HighlightAllEditorMatches(
   AColorBorder: TColor; AStyleBorder: TATLineStyle; ATagValue,
   AMaxLines: integer): integer;
 var
+  St: TATStrings;
   Results: TATFinderResults;
   Res: TATFinderResult;
   PosX, PosY, SelX, SelY: integer;
@@ -2409,7 +2412,8 @@ begin
   if Editor=nil then exit;
   bMatchVisible:= false;
   if StrFind='' then exit;
-  if Editor.Strings.Count>=AMaxLines then exit;
+  St:= Editor.Strings;
+  if St.Count>=AMaxLines then exit;
 
   Results:= TATFinderResults.Create;
   try
@@ -2450,7 +2454,7 @@ begin
       else
       //add N attrs per each line of a match
       for iLine:= Res.FPos.Y to Res.FEnd.Y do
-        if Editor.Strings.IsIndexValid(iLine) then
+        if St.IsIndexValid(iLine) then
         begin
           PosY:= iLine;
           SelY:= 0;
@@ -2458,7 +2462,7 @@ begin
           if iLine=Res.FPos.Y then
           begin
             PosX:= Res.FPos.X;
-            SelX:= Editor.Strings.LinesLen[iLine];
+            SelX:= St.LinesLen[iLine];
           end
           else
           //attr in final line
@@ -2471,7 +2475,7 @@ begin
           //attr on middle line
           begin
             PosX:= 0;
-            SelX:= Editor.Strings.LinesLen[iLine];
+            SelX:= St.LinesLen[iLine];
           end;
 
           Editor.Attribs.Add(PosX, PosY, ATagValue, SelX, SelY, GetAttrObj, 0, MicromapMode);
