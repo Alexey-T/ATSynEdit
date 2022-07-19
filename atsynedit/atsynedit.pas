@@ -3095,13 +3095,13 @@ begin
 
   if FMinimapCustomScale<100 then
   begin
-    FCharSizeMinimap.XScaled:= ATEditorScale(1) * ATEditorCharXScale;
-    FCharSizeMinimap.Y:= ATEditorScale(2);
+    FCharSizeMinimap.XScaled:= Max(1, ATEditorScale(1) * ATEditorCharXScale);
+    FCharSizeMinimap.Y:=       Max(2, ATEditorScale(2));
   end
   else
   begin
-    FCharSizeMinimap.XScaled:= 1 * FMinimapCustomScale div 100 * ATEditorCharXScale;
-    FCharSizeMinimap.Y:= 2 * FMinimapCustomScale div 100;
+    FCharSizeMinimap.XScaled:= Max(1,     FMinimapCustomScale div 100 * ATEditorCharXScale);
+    FCharSizeMinimap.Y:=       Max(2, 2 * FMinimapCustomScale div 100);
   end;
 
   FNumbersIndent:= FCharSize.XScaled * FOptNumbersIndentPercents div 100 div ATEditorCharXScale;
