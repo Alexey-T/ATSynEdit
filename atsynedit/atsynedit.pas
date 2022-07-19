@@ -3858,7 +3858,8 @@ begin
       TextOutProps.ShowUnprintedSpacesAlsoInSelection:= not FUnprintedSpacesOnlyInSelection and FUnprintedSpacesAlsoInSelection and TempSel_IsSelection;
       TextOutProps.DetectIsPosSelected:= @IsPosSelected;
 
-      TextOutProps.ShowFontLigatures:= FOptShowFontLigatures and (not bLineWithCaret);
+      TextOutProps.ShowFontLigatures:= FOptShowFontLigatures and
+                                       (ATEditorOptions.EnableLigaturesOnLineWithCaret or not bLineWithCaret);
       TextOutProps.ColorNormalFont:= Colors.TextFont;
       TextOutProps.ColorUnprintedFont:= Colors.UnprintedFont;
       TextOutProps.ColorUnprintedHexFont:= Colors.UnprintedHexFont;
