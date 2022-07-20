@@ -509,10 +509,13 @@ begin
         ADetails.EndOfWrappedLine)
         + Item.NCharIndex - 2;
 
-      //position after end of partially folded line? return line length
+      //position after end of partially folded line? return position of fold begin
       if ADetails.EndOfWrappedLine then
-        if AStrings.LinesFoldFrom[Result.Y, AEditorIndex]>0 then
-          Result.X:= AStrings.LinesLen[Result.Y];
+      begin
+        NIndex:= AStrings.LinesFoldFrom[Result.Y, AEditorIndex];
+        if NIndex>0 then
+          Result.X:= NIndex-1;
+      end;
     end;
 
     if Item.NFinal=cWrapItemFinal then //don't set AWrappedEnd for real eol
