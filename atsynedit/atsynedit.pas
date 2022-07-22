@@ -5975,7 +5975,12 @@ begin
   SetFocus;
   DoCaretForceShow;
 
-  if Button=mbRight then exit;
+  if Button=mbRight then
+  begin
+    MouseUp(mbLeft, [], X, Y);
+    exit;
+  end;
+
   if HandleMouseDownToHandleExtraMouseButtons(Self, Button, Shift) then exit;
 
   FMouseDownCoordOriginal.X:= X;
