@@ -5977,6 +5977,7 @@ begin
 
   if Button=mbRight then
   begin
+    //right click during mouse selection: cancel the selection
     MouseUp(mbLeft, [], X, Y);
     exit;
   end;
