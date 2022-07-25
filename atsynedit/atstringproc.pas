@@ -736,11 +736,13 @@ var
   i: integer;
 begin
   AEndOfLinePos:= false;
+
   if Str='' then
   begin
     Result:= 1;
     if AAllowVirtualPos then
-      Inc(Result, APixelsFromLeft * ATEditorCharXScale div CharSize.XScaled);
+      Inc(Result, Round(APixelsFromLeft * ATEditorCharXScale / CharSize.XScaled));
+      //use Round() to fix CudaText issue #4240
     Exit;
   end;
 
@@ -772,7 +774,9 @@ begin
 
   AEndOfLinePos:= true;
 
-  Result:= ListEnds.Len + (APixelsFromLeft - ListEnds.Data[ListEnds.Len-1]) * ATEditorCharXScale div CharSize.XScaled + 1;
+  Result:= ListEnds.Len + Round((APixelsFromLeft - ListEnds.Data[ListEnds.Len-1]) * ATEditorCharXScale / CharSize.XScaled) + 1;
+  //use Round() to fix CudaText issue #4240
+
   ////this works
   ////a) better if clicked after line end, far
   ////b) bad if clicked exactly on line end (shifted to right by 1)
