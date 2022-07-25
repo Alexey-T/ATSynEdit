@@ -474,52 +474,52 @@ begin
   end;
 
   //click in text
-    Item:= AWrapInfo[NIndex];
-    Result.Y:= Item.NLineIndex;
-    if not AStrings.IsIndexValid(Result.Y) then
-      exit(Point(-1, -1));
+  Item:= AWrapInfo[NIndex];
+  Result.Y:= Item.NLineIndex;
+  if not AStrings.IsIndexValid(Result.Y) then
+    exit(Point(-1, -1));
 
-    NLineLenOriginal:= Item.NLength;
-    NLineLenTrimmed:= Min(Item.NLength, (AScrollHorz.SmoothPos + ARect.Width) * ATEditorCharXScale div ACharSize.XScaled);
+  NLineLenOriginal:= Item.NLength;
+  NLineLenTrimmed:= Min(Item.NLength, (AScrollHorz.SmoothPos + ARect.Width) * ATEditorCharXScale div ACharSize.XScaled);
 
-    if NLineLenOriginal>ATEditorOptions.MaxLineLenForAccurateCharWidths then
+  if NLineLenOriginal>ATEditorOptions.MaxLineLenForAccurateCharWidths then
+  begin
+    Str:= StringOfCharW(ATEditorOptions.SampleChar, NLineLenOriginal); //fake to calc CharOffsets only
+    ATabHelper.CalcCharOffsets(Item.NLineIndex, Str, CharOffsets, 0);
+    Str:= AStrings.LineSub(Item.NLineIndex, Item.NCharIndex, NLineLenTrimmed);
+  end
+  else
+  begin
+    Str:= AStrings.LineSub(Item.NLineIndex, Item.NCharIndex, NLineLenTrimmed);
+    ATabHelper.CalcCharOffsets(Item.NLineIndex, Str, CharOffsets, 0);
+  end;
+
+  if bGapGoesToEnd then
+    Result.X:= Length(Str) + Item.NCharIndex-1
+  else
+  begin
+    AllowVirtual:= AVirtualPos and (Item.NFinal=cWrapItemFinal);
+    NPixels:= Int64(P.X)-ARect.Left + AScrollHorz.SmoothPos - ACharSize.XScaled*ACharSize.XSpacePercents*Item.NIndent div ATEditorCharXScale div 100;
+    Result.X:= ATabHelper.FindClickedPosition(
+      Result.Y,
+      Str,
+      CharOffsets,
+      NPixels,
+      AllowVirtual,
+      ADetails.EndOfWrappedLine)
+      + Item.NCharIndex - 2;
+
+    //position after end of partially folded line? return position of fold begin
+    if ADetails.EndOfWrappedLine then
     begin
-      Str:= StringOfCharW(ATEditorOptions.SampleChar, NLineLenOriginal); //fake to calc CharOffsets only
-      ATabHelper.CalcCharOffsets(Item.NLineIndex, Str, CharOffsets, 0);
-      Str:= AStrings.LineSub(Item.NLineIndex, Item.NCharIndex, NLineLenTrimmed);
-    end
-    else
-    begin
-      Str:= AStrings.LineSub(Item.NLineIndex, Item.NCharIndex, NLineLenTrimmed);
-      ATabHelper.CalcCharOffsets(Item.NLineIndex, Str, CharOffsets, 0);
+      NIndex:= AStrings.LinesFoldFrom[Result.Y, AEditorIndex];
+      if NIndex>0 then
+        Result.X:= NIndex-1;
     end;
+  end;
 
-    if bGapGoesToEnd then
-      Result.X:= Length(Str) + Item.NCharIndex-1
-    else
-    begin
-      AllowVirtual:= AVirtualPos and (Item.NFinal=cWrapItemFinal);
-      NPixels:= Int64(P.X)-ARect.Left + AScrollHorz.SmoothPos - ACharSize.XScaled*ACharSize.XSpacePercents*Item.NIndent div ATEditorCharXScale div 100;
-      Result.X:= ATabHelper.FindClickedPosition(
-        Result.Y,
-        Str,
-        CharOffsets,
-        NPixels,
-        AllowVirtual,
-        ADetails.EndOfWrappedLine)
-        + Item.NCharIndex - 2;
-
-      //position after end of partially folded line? return position of fold begin
-      if ADetails.EndOfWrappedLine then
-      begin
-        NIndex:= AStrings.LinesFoldFrom[Result.Y, AEditorIndex];
-        if NIndex>0 then
-          Result.X:= NIndex-1;
-      end;
-    end;
-
-    if Item.NFinal=cWrapItemFinal then //don't set AWrappedEnd for real eol
-      ADetails.EndOfWrappedLine:= false;
+  if Item.NFinal=cWrapItemFinal then //don't set AWrappedEnd for real eol
+    ADetails.EndOfWrappedLine:= false;
 end;
 
 function TATSynEdit.CaretPosToClientPos(P: TPoint): TPoint;
