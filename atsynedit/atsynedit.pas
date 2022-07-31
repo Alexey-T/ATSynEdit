@@ -5977,6 +5977,19 @@ begin
 
   if Button=mbRight then
   begin
+    if FOptMouseRightClickMovesCaret then
+    begin
+      PosTextClicked:= ClientPosToCaretPos(Point(X, Y), PosDetails);
+      bClickOnSelection:= Carets.FindCaretContainingPos(PosTextClicked.X, PosTextClicked.Y)>=0;
+      if not bClickOnSelection then //click over selection must never reset that selection, like in Notepad++
+        if Strings.IsIndexValid(PosTextClicked.Y) then
+        begin
+          DoCaretSingle(PosTextClicked.X, PosTextClicked.Y);
+          DoSelect_None;
+          Invalidate;
+         end;
+    end;
+
     //right click during mouse selection: cancel the selection
     MouseUp(mbLeft, [], X, Y);
     exit;
@@ -6135,6 +6148,8 @@ begin
       DoCaretsColumnToPoint(FMouseDownPnt.X, FMouseDownPnt.Y);
     end;
 
+    {
+    //right-click is already handled in the MouseDown beginning
     if ActionId=cMouseActionClickRight then
     begin
       if FOptMouseRightClickMovesCaret then
@@ -6146,6 +6161,7 @@ begin
             Invalidate;
            end;
     end;
+    }
   end;
 
   if FOptGutterVisible and PtInRect(FRectGutter, Point(X, Y)) then
