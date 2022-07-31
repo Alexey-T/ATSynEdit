@@ -7138,7 +7138,7 @@ var
   Caret: TATCaretItem;
   CaretShape: TATCaretShape;
   NCaretColor: TColor;
-  R: TRect;
+  R, R2: TRect;
   NCharWidth: integer;
   i: integer;
 begin
@@ -7202,11 +7202,18 @@ begin
       //CudaText issue #3167
       if not FCaretShown then
       begin
-        if Caret.OldRect.Width>0 then
+        R2:= Caret.OldRect;
+        if R2.Width>0 then
         begin
-          CanvasInvertRect(C, Caret.OldRect, NCaretColor);
+          CanvasInvertRect(C, R2, NCaretColor);
           if AWithInvalidate then
-            InvalidateRect(Handle, @Caret.OldRect, false);
+          begin
+            {$ifdef darwin}
+            //CudaText issue #4250
+            InflateRect(R2, 1, 1);
+            {$endif}
+            InvalidateRect(Handle, @R2, false);
+          end;
         end;
       end;
 
@@ -7223,7 +7230,7 @@ begin
     begin
       {$ifdef darwin}
       //CudaText issue #4250
-      InflateRect(R);
+      InflateRect(R, 1, 1);
       {$endif}
       InvalidateRect(Handle, @R, false);
     end;
