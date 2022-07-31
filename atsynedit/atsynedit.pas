@@ -7220,7 +7220,13 @@ begin
     Caret.OldRect:= R;
 
     if AWithInvalidate then
+    begin
+      {$ifdef darwin}
+      //CudaText issue #4250
+      InflateRect(R);
+      {$endif}
       InvalidateRect(Handle, @R, false);
+    end;
   end;
 end;
 
