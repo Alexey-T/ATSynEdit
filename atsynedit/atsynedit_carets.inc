@@ -943,14 +943,14 @@ function TATSynEdit.GetMarkersArray: TATInt64Array;
 begin
   SetLength(Result{%H-}, 0);
   if Assigned(FMarkers) then
-    Result:= FMarkers.AsArray;
+    Result:= FMarkers.AsArray_Markers;
 end;
 
 function TATSynEdit.GetAttribsArray: TATInt64Array;
 begin
   SetLength(Result{%H-}, 0);
   if Assigned(FAttribs) then
-    Result:= FAttribs.AsArray_Attr;
+    Result:= FAttribs.AsArray_Attribs;
 end;
 
 procedure TATSynEdit.SetCaretsArray(const Ar: TATPointArray);
@@ -966,14 +966,14 @@ procedure TATSynEdit.SetMarkersArray(const Ar: TATInt64Array);
 begin
   InitMarkers; //FMarkers can be nil
   if Assigned(FMarkers) then
-    FMarkers.AsArray:= Ar;
+    FMarkers.AsArray_Markers:= Ar;
 end;
 
 procedure TATSynEdit.SetAttribsArray(const Ar: TATInt64Array);
 begin
   InitAttribs; //FAttribs can be nil
   if Assigned(FAttribs) then
-    FAttribs.AsArray_Attr:= Ar;
+    FAttribs.AsArray_Attribs:= Ar;
 end;
 
 procedure TATSynEdit.DoCaretsExtend(ADown: boolean; ALines: integer);

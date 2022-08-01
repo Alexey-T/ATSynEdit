@@ -94,8 +94,8 @@ type
     function DeleteByPos(AX, AY: integer): boolean;
     procedure Find(AX, AY: integer; out AIndex: integer; out AExactMatch: boolean);
     function FindContaining(AX, AY: integer): integer;
-    property AsArray: TATInt64Array read GetAsArray write SetAsArray; //for Markers object
-    property AsArray_Attr: TATInt64Array read GetAsArray_Attr write SetAsArray_Attr; //for Attribs object
+    property AsArray_Markers: TATInt64Array read GetAsArray write SetAsArray; //for Markers object
+    property AsArray_Attribs: TATInt64Array read GetAsArray_Attr write SetAsArray_Attr; //for Attribs object
     property AsString: string read GetAsString write SetAsString;
   end;
 
@@ -353,7 +353,7 @@ var
   i: integer;
 begin
   Result:= '';
-  Ar:= AsArray;
+  Ar:= AsArray_Markers;
   for i:= 0 to High(Ar) do
     Result+= IntToStr(Ar[i])+',';
 end;
@@ -383,7 +383,7 @@ begin
     Ar[i]:= N;
   end;
 
-  AsArray:= Ar;
+  AsArray_Markers:= Ar;
 end;
 
 procedure TATMarkers.SetItem(N: integer; const AItem: TATMarkerItem);
