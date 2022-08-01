@@ -94,8 +94,8 @@ type
     function DeleteByPos(AX, AY: integer): boolean;
     procedure Find(AX, AY: integer; out AIndex: integer; out AExactMatch: boolean);
     function FindContaining(AX, AY: integer): integer;
-    property AsArray: TATInt64Array read GetAsArray write SetAsArray;
-    property AsArray_Attr: TATInt64Array read GetAsArray_Attr write SetAsArray_Attr;
+    property AsArray: TATInt64Array read GetAsArray write SetAsArray; //for Markers object
+    property AsArray_Attr: TATInt64Array read GetAsArray_Attr write SetAsArray_Attr; //for Attribs object
     property AsString: string read GetAsString write SetAsString;
   end;
 
