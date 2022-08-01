@@ -1048,9 +1048,6 @@ type
     procedure DoCaretsFixForSurrogatePairs(AMoveRight: boolean);
     function DoCaretsKeepOnScreen(AMoveDown: boolean): boolean;
     procedure DoCaretsAssign(NewCarets: TATCarets);
-    procedure DoCaretsShift_MarkerItem(AMarkerObj: TATMarkers;
-      AMarkerIndex: integer; APosX, APosY, AShiftX, AShiftY,
-      AShiftBelowX: integer; APosAfter: TPoint);
     procedure DoDropText(AndDeleteSelection: boolean);
     procedure DoFoldbarClick(ALine: integer);
     function DoGetFoldedMarkLinesCount(ALine: integer): integer;

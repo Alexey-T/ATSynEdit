@@ -1065,52 +1065,6 @@ begin
 end;
 
 
-procedure TATSynEdit.DoCaretsShift_MarkerItem(
-  AMarkerObj: TATMarkers;
-  AMarkerIndex: integer;
-  APosX, APosY, AShiftX, AShiftY, AShiftBelowX: integer;
-  APosAfter: TPoint);
-var
-  Mark: TATMarkerItem;
-begin
-  Mark:= AMarkerObj[AMarkerIndex];
-  //marker below src, apply ShiftY/ShiftBelowX
-  if Mark.PosY>APosY then
-  begin
-    if AShiftY=0 then exit;
-
-    if Mark.PosY=APosY+1 then
-      Inc(Mark.PosX, AShiftBelowX);
-
-    Inc(Mark.PosY, AShiftY);
-  end
-  else
-  //marker on same line as src
-  if Mark.PosY=APosY then
-  begin
-    if Mark.PosX=APosX then
-    begin
-      Mark.PosX:= APosAfter.X;
-      Mark.PosY:= APosAfter.Y;
-    end
-    else
-    if Mark.PosX>=APosX then
-      if AShiftY=0 then
-        Inc(Mark.PosX, AShiftX)
-      else
-      begin
-        Inc(Mark.PosX, -APosX+APosAfter.X);
-        Inc(Mark.PosY, AShiftY);
-      end;
-  end;
-
-  if Mark.PosX<0 then Mark.PosX:= 0;
-  if Mark.PosY<0 then Mark.PosY:= 0;
-
-  AMarkerObj[AMarkerIndex]:= Mark;
-end;
-
-
 procedure TATSynEdit.DoCaretsFixIfInsideFolded;
 var
   St: TATStrings;
@@ -1206,6 +1160,7 @@ procedure TATSynEdit.DoCaretsShift(AFromCaret: integer; APosX, APosY: integer;
 //AShiftBelowX: used in Del key command, it's set to the length of line,
 //to shift (to right) carets in the line below
 var
+  Mark: PATMarkerItem;
   i: integer;
   {$ifdef debug_markers_shift}
   S: string;
@@ -1231,21 +1186,27 @@ begin
   {$endif}
 
   //adjust markers
-  //(cannot optimize, markers not sorted)
+  //(cannot optimize, markers are not sorted)
   if Assigned(FMarkers) then
     for i:= 0 to FMarkers.Count-1 do
-      DoCaretsShift_MarkerItem(FMarkers, i,
-        APosX, APosY, AShiftX, AShiftY, AShiftBelowX, APosAfter);
+    begin
+      Mark:= FMarkers.ItemPtr(i);
+      Mark^.UpdateOnEditing(APosX, APosY, AShiftX, AShiftY, AShiftBelowX, APosAfter);
+    end;
 
   if Assigned(FAttribs) then
     for i:= 0 to FAttribs.Count-1 do
-      DoCaretsShift_MarkerItem(FAttribs, i,
-        APosX, APosY, AShiftX, AShiftY, AShiftBelowX, APosAfter);
+    begin
+      Mark:= FAttribs.ItemPtr(i);
+      Mark^.UpdateOnEditing(APosX, APosY, AShiftX, AShiftY, AShiftBelowX, APosAfter);
+    end;
 
   if Assigned(FMarkedRange) then
     for i:= 0 to FMarkedRange.Count-1 do
-      DoCaretsShift_MarkerItem(FMarkedRange, i,
-        APosX, APosY, AShiftX, AShiftY, AShiftBelowX, APosAfter);
+    begin
+      Mark:= FMarkedRange.ItemPtr(i);
+      Mark^.UpdateOnEditing(APosX, APosY, AShiftX, AShiftY, AShiftBelowX, APosAfter);
+    end;
 end;
 
 

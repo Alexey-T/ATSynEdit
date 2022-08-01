@@ -47,6 +47,8 @@ type
     class operator=(const A, B: TATMarkerItem): boolean;
     function SelContains(AX, AY: integer): boolean;
     function SelEnd: TPoint;
+    procedure UpdateOnEditing(APosX, APosY, AShiftX, AShiftY,
+      AShiftBelowX: integer; APosAfter: TPoint);
   end;
   
 type
@@ -136,6 +138,44 @@ begin
     Result.X:= SelX;
     Result.Y:= PosY+SelY;
   end;
+end;
+
+procedure TATMarkerItem.UpdateOnEditing(
+  APosX, APosY, AShiftX, AShiftY, AShiftBelowX: integer;
+  APosAfter: TPoint);
+begin
+  //marker below src, apply ShiftY/ShiftBelowX
+  if PosY>APosY then
+  begin
+    if AShiftY=0 then exit;
+
+    if PosY=APosY+1 then
+      Inc(PosX, AShiftBelowX);
+
+    Inc(PosY, AShiftY);
+  end
+  else
+  //marker on same line as src
+  if PosY=APosY then
+  begin
+    if PosX=APosX then
+    begin
+      PosX:= APosAfter.X;
+      PosY:= APosAfter.Y;
+    end
+    else
+    if PosX>=APosX then
+      if AShiftY=0 then
+        Inc(PosX, AShiftX)
+      else
+      begin
+        Inc(PosX, -APosX+APosAfter.X);
+        Inc(PosY, AShiftY);
+      end;
+  end;
+
+  if PosX<0 then PosX:= 0;
+  if PosY<0 then PosY:= 0;
 end;
 
 { TATMarkers }
