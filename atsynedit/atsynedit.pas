@@ -1128,7 +1128,7 @@ type
     procedure InitTimerNiceScroll;
     procedure StartTimerDelayedParsing;
     function IsWrapItemWithCaret(constref AWrapItem: TATWrapItem): boolean;
-    procedure MenuClick(Sender: TObject);
+    procedure MenuStdClick(Sender: TObject);
     procedure MenuStdPopup(Sender: TObject);
     procedure DoCalcWrapInfos(ALine: integer; AIndentMaximal: integer;
       AItems: TATWrapItems; AConsiderFolding: boolean);
@@ -7650,7 +7650,7 @@ begin
   _Delta(FScrollVert, ADeltaY);
 end;
 
-procedure TATSynEdit.MenuClick(Sender: TObject);
+procedure TATSynEdit.MenuStdClick(Sender: TObject);
 var
   Cmd: integer;
 begin
@@ -7723,7 +7723,7 @@ procedure TATSynEdit.InitMenuStd;
     MI:= TMenuItem.Create(FMenuStd);
     MI.Caption:= SName;
     MI.Tag:= Cmd;
-    MI.OnClick:= @MenuClick;
+    MI.OnClick:= @MenuStdClick;
     Result:= MI;
     FMenuStd.Items.Add(MI);
   end;
