@@ -67,6 +67,7 @@ type
     function IsInVisibleRect(const R: TRect): boolean;
     function FirstTouchedLine: integer;
     procedure UpdateMemory(AMode: TATCaretMemoryAction; AArrowUpDown: boolean);
+    procedure UpdateOnEditing(APosX, APosY, AShiftX, AShiftY, AShiftBelowX: integer);
   end;
 
 type
@@ -549,6 +550,45 @@ begin
         SavedX:= 0;
       end;
   end;
+end;
+
+procedure TATCaretItem.UpdateOnEditing(APosX, APosY, AShiftX, AShiftY, AShiftBelowX: integer);
+begin
+  //carets below src, apply ShiftY/ShiftBelowX
+  if PosY>APosY then
+  begin
+    if AShiftY=0 then exit;
+
+    if PosY=APosY+1 then
+      Inc(PosX, AShiftBelowX);
+
+    Inc(PosY, AShiftY);
+  end
+  else
+  //carets on same line as src, apply ShiftX
+  if PosY=APosY then
+  begin
+    if PosX>APosX then
+      Inc(PosX, AShiftX);
+  end;
+
+  //same, but for EndX/EndY
+  if EndY>APosY then
+  begin
+    if EndY=APosY+1 then
+      Inc(EndX, AShiftBelowX);
+
+    Inc(EndY, AShiftY);
+  end
+  else
+  if EndY=APosY then
+  begin
+    if EndX>APosX then
+      Inc(EndX, AShiftX);
+  end;
+
+  if PosX<0 then PosX:= 0;
+  if PosY<0 then PosY:= 0;
 end;
 
 procedure TATCaretItem.SelectNone;

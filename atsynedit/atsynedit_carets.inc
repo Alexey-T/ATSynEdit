@@ -1065,47 +1065,6 @@ begin
 end;
 
 
-procedure TATSynEdit.DoCaretsShift_CaretItem(Caret: TATCaretItem;
-  APosX, APosY, AShiftX, AShiftY, AShiftBelowX: integer);
-begin
-  //carets below src, apply ShiftY/ShiftBelowX
-  if Caret.PosY>APosY then
-  begin
-    if AShiftY=0 then exit;
-
-    if Caret.PosY=APosY+1 then
-      Inc(Caret.PosX, AShiftBelowX);
-
-    Inc(Caret.PosY, AShiftY);
-  end
-  else
-  //carets on same line as src, apply ShiftX
-  if Caret.PosY=APosY then
-  begin
-    if Caret.PosX>APosX then
-      Inc(Caret.PosX, AShiftX);
-  end;
-
-  //same, but for EndX/EndY
-  if Caret.EndY>APosY then
-  begin
-    if Caret.EndY=APosY+1 then
-      Inc(Caret.EndX, AShiftBelowX);
-
-    Inc(Caret.EndY, AShiftY);
-  end
-  else
-  if Caret.EndY=APosY then
-  begin
-    if Caret.EndX>APosX then
-      Inc(Caret.EndX, AShiftX);
-  end;
-
-  if Caret.PosX<0 then Caret.PosX:= 0;
-  if Caret.PosY<0 then Caret.PosY:= 0;
-end;
-
-
 procedure TATSynEdit.DoCaretsShift_MarkerItem(
   AMarkerObj: TATMarkers;
   AMarkerIndex: integer;
@@ -1260,8 +1219,7 @@ begin
 
   if AFromCaret>=0 then
     for i:= AFromCaret to Carets.Count-1 do
-      DoCaretsShift_CaretItem(Carets[i],
-        APosX, APosY, AShiftX, AShiftY, AShiftBelowX);
+      Carets[i].UpdateOnEditing(APosX, APosY, AShiftX, AShiftY, AShiftBelowX);
 
   {$ifdef debug_markers_shift}
   S:= '';
