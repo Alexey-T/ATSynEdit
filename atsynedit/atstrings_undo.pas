@@ -67,14 +67,18 @@ type
     ItemLineState: TATLineState; //line-state of that editor line
     ItemCarets: TATPointArray; //carets packed into array
     ItemMarkers: TATInt64Array; //simple markers packed into array
+    ItemAttribs: TATInt64Array;
     ItemSoftMark: boolean; //undo soft-mark. logic is described in ATSynEdit Wiki page
     ItemHardMark: boolean; //undo hard-mark
 
     constructor Create(AAction: TATEditAction; AIndex: integer;
       const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState;
       ASoftMark, AHardMark: boolean;
-      const ACarets: TATPointArray; const AMarkers: TATInt64Array;
-      ACommandCode: integer; const ATickCount: QWord); virtual;
+      const ACarets: TATPointArray;
+      const AMarkers: TATInt64Array;
+      const AAttribs: TATInt64Array;
+      ACommandCode: integer;
+      const ATickCount: QWord); virtual;
     constructor CreateEmpty;
     procedure Assign(const D: TATUndoItem);
     property AsString: string read GetAsString write SetAsString;
@@ -116,7 +120,9 @@ type
     procedure DeleteTrailingCaretJumps;
     procedure Add(AAction: TATEditAction; AIndex: integer; const AText: atString;
       AEnd: TATLineEnds; ALineState: TATLineState;
-      const ACarets: TATPointArray; const AMarkers: TATInt64Array;
+      const ACarets: TATPointArray;
+      const AMarkers: TATInt64Array;
+      const AAttribs: TATInt64Array;
       ACommandCode: integer);
     procedure AddUnmodifiedMark;
     function DebugText: string;
@@ -277,7 +283,9 @@ end;
 constructor TATUndoItem.Create(AAction: TATEditAction; AIndex: integer;
   const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState;
   ASoftMark, AHardMark: boolean;
-  const ACarets: TATPointArray; const AMarkers: TATInt64Array;
+  const ACarets: TATPointArray;
+  const AMarkers: TATInt64Array;
+  const AAttribs: TATInt64Array;
   ACommandCode: integer;
   const ATickCount: QWord);
 var
@@ -301,6 +309,10 @@ begin
   SetLength(ItemMarkers, Length(AMarkers));
   for i:= 0 to High(AMarkers) do
     ItemMarkers[i]:= AMarkers[i];
+
+  SetLength(ItemAttribs, Length(AAttribs));
+  for i:= 0 to High(AAttribs) do
+    ItemAttribs[i]:= AAttribs[i];
 end;
 
 constructor TATUndoItem.CreateEmpty;
@@ -385,7 +397,9 @@ end;
 
 procedure TATUndoList.Add(AAction: TATEditAction; AIndex: integer;
   const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState;
-  const ACarets: TATPointArray; const AMarkers: TATInt64Array;
+  const ACarets: TATPointArray;
+  const AMarkers: TATInt64Array;
+  const AAttribs: TATInt64Array;
   ACommandCode: integer);
 var
   Item: TATUndoItem;
@@ -437,7 +451,9 @@ begin
 
   Item:= TATUndoItem.Create(AAction, AIndex, AText, AEnd, ALineState,
                             FSoftMark, FHardMark,
-                            ACarets, AMarkers,
+                            ACarets,
+                            AMarkers,
+                            AAttribs,
                             ACommandCode,
                             NewTick);
   Item.ItemGlobalCounter:= NGlobalCounter;
@@ -457,6 +473,7 @@ var
   Item: TATUndoItem;
   Carets: TATPointArray;
   Markers: TATInt64Array;
+  Attribs: TATInt64Array;
 begin
   //if FLocked then exit; //on load file called with Locked=true
 
@@ -467,11 +484,22 @@ begin
 
   Carets:= nil;
   Markers:= nil;
+  Attribs:= nil;
 
   Item:= TATUndoItem.Create(
-    aeaClearModified, 0, '',
-    cEndNone, cLineStateNone,
-    false, false, Carets, Markers, 0, 0);
+    aeaClearModified,
+    0,
+    '',
+    cEndNone,
+    cLineStateNone,
+    false,
+    false,
+    Carets,
+    Markers,
+    Attribs,
+    0,
+    0
+    );
   FList.Add(Item);
 end;
 

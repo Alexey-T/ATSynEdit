@@ -14,7 +14,8 @@ uses
   ATStringProc,
   ATStringProc_Separator,
   ATSynEdit_fgl,
-  ATSynEdit_Carets;
+  ATSynEdit_Carets,
+  ATSynEdit_LineParts;
 
 type
   TATMarkerMicromapMode = (
@@ -62,9 +63,11 @@ type
     FSorted: boolean;
     FDuplicates: boolean;
     function GetAsArray: TATInt64Array;
+    function GetAsArray_Attr: TATInt64Array;
     function GetAsString: string;
     function GetItem(N: integer): TATMarkerItem;
     procedure SetAsArray(const AValue: TATInt64Array);
+    procedure SetAsArray_Attr(const AValue: TATInt64Array);
     procedure SetAsString(const AValue: string);
     procedure SetItem(N: integer; const AItem: TATMarkerItem);
   public
@@ -92,6 +95,7 @@ type
     procedure Find(AX, AY: integer; out AIndex: integer; out AExactMatch: boolean);
     function FindContaining(AX, AY: integer): integer;
     property AsArray: TATInt64Array read GetAsArray write SetAsArray;
+    property AsArray_Attr: TATInt64Array read GetAsArray_Attr write SetAsArray_Attr;
     property AsString: string read GetAsString write SetAsString;
   end;
 
@@ -219,6 +223,53 @@ begin
   end;
 end;
 
+function TATMarkers.GetAsArray_Attr: TATInt64Array;
+const
+  NN = 14;
+var
+  Item: PATMarkerItem;
+  Obj: TATLinePartClass;
+  i: integer;
+begin
+  SetLength(Result{%H-}, Count*NN);
+  for i:= 0 to Count-1 do
+  begin
+    Item:= ItemPtr(i);
+    Result[i*NN]:= Item^.Tag;
+    Result[i*NN+1]:= Item^.PosX;
+    Result[i*NN+2]:= Item^.PosY;
+    Result[i*NN+3]:= Item^.SelX;
+
+    if Assigned(Item^.Ptr) then
+    begin
+      Obj:= TATLinePartClass(Item^.Ptr);
+      Result[i*NN+4]:= Obj.Data.ColorFont;
+      Result[i*NN+5]:= Obj.Data.ColorBG;
+      Result[i*NN+6]:= Obj.Data.ColorBorder;
+      Result[i*NN+7]:= Obj.Data.FontStyles;
+      Result[i*NN+8]:= Ord(Obj.Data.BorderLeft);
+      Result[i*NN+9]:= Ord(Obj.Data.BorderRight);
+      Result[i*NN+10]:= Ord(Obj.Data.BorderDown);
+      Result[i*NN+11]:= Ord(Obj.Data.BorderUp);
+      Result[i*NN+12]:= Obj.ColumnTag;
+      Result[i*NN+13]:= Ord(Item^.MicromapMode);
+    end
+    else
+    begin
+      Result[i*NN+4]:= 0;
+      Result[i*NN+5]:= 0;
+      Result[i*NN+6]:= 0;
+      Result[i*NN+7]:= 0;
+      Result[i*NN+8]:= 0;
+      Result[i*NN+9]:= 0;
+      Result[i*NN+10]:= 0;
+      Result[i*NN+11]:= 0;
+      Result[i*NN+12]:= 0;
+      Result[i*NN+13]:= 0;
+    end;
+  end;
+end;
+
 procedure TATMarkers.SetAsArray(const AValue: TATInt64Array);
 const
   NN = 7;
@@ -246,6 +297,51 @@ begin
       NLenY,
       nil,
       NValue,
+      MicromapMode
+      );
+  end;
+end;
+
+procedure TATMarkers.SetAsArray_Attr(const AValue: TATInt64Array);
+const
+  NN = 14;
+var
+  NTag: Int64;
+  NPosX, NPosY, NSelX: integer;
+  Obj: TATLinePartClass;
+  MicromapMode: TATMarkerMicromapMode;
+  i: integer;
+begin
+  Clear;
+  for i:= 0 to Length(AValue) div NN - 1 do
+  begin
+    NTag:= AValue[i*NN];
+    NPosX:= AValue[i*NN+1];
+    NPosY:= AValue[i*NN+2];
+    NSelX:= AValue[i*NN+3];
+
+    Obj:= TATLinePartClass.Create;
+    FillChar(Obj.Data, SizeOf(Obj.Data), 0);
+
+    Obj.Data.ColorFont:= AValue[i*NN+4];
+    Obj.Data.ColorBG:= AValue[i*NN+5];
+    Obj.Data.ColorBorder:= AValue[i*NN+6];
+    Obj.Data.FontStyles:= AValue[i*NN+7];
+    Obj.Data.BorderLeft:= TATLineStyle(AValue[i*NN+8]);
+    Obj.Data.BorderRight:= TATLineStyle(AValue[i*NN+9]);
+    Obj.Data.BorderDown:= TATLineStyle(AValue[i*NN+10]);
+    Obj.Data.BorderUp:= TATLineStyle(AValue[i*NN+11]);
+    Obj.ColumnTag:= AValue[i*NN+12];
+    MicromapMode:= TATMarkerMicromapMode(AValue[i*NN+13]);
+
+    Add(
+      NPosX,
+      NPosY,
+      NTag,
+      NSelX,
+      0,
+      Obj,
+      0,
       MicromapMode
       );
   end;
