@@ -99,6 +99,8 @@ type
     property AsArray_Markers: TATInt64Array read GetAsArray write SetAsArray; //for Markers object
     property AsArray_Attribs: TATInt64Array read GetAsArray_Attr write SetAsArray_Attr; //for Attribs object
     property AsString: string read GetAsString write SetAsString;
+    procedure UpdateOnEditing(APosX, APosY, AShiftX, AShiftY, AShiftBelowX: integer;
+      APosAfter: TPoint);
   end;
 
 implementation
@@ -648,6 +650,20 @@ begin
     Item:= ItemPtr(NIndex);
     if Item^.SelContains(AX, AY) then
       exit(NIndex);
+  end;
+end;
+
+
+procedure TATMarkers.UpdateOnEditing(APosX, APosY, AShiftX, AShiftY, AShiftBelowX: integer;
+  APosAfter: TPoint);
+var
+  Item: PATMarkerItem;
+  i: integer;
+begin
+  for i:= 0 to Count-1 do
+  begin
+    Item:= ItemPtr(i);
+    Item^.UpdateOnEditing(APosX, APosY, AShiftX, AShiftY, AShiftBelowX, APosAfter);
   end;
 end;
 

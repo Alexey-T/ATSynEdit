@@ -1189,27 +1189,14 @@ begin
   {$endif}
 
   //adjust markers
-  //(cannot optimize, markers are not sorted)
   if Assigned(FMarkers) then
-    for i:= 0 to FMarkers.Count-1 do
-    begin
-      Mark:= FMarkers.ItemPtr(i);
-      Mark^.UpdateOnEditing(APosX, APosY, AShiftX, AShiftY, AShiftBelowX, APosAfter);
-    end;
+    FMarkers.UpdateOnEditing(APosX, APosY, AShiftX, AShiftY, AShiftBelowX, APosAfter);
 
   if Assigned(FAttribs) then
-    for i:= 0 to FAttribs.Count-1 do
-    begin
-      Mark:= FAttribs.ItemPtr(i);
-      Mark^.UpdateOnEditing(APosX, APosY, AShiftX, AShiftY, AShiftBelowX, APosAfter);
-    end;
+    FAttribs.UpdateOnEditing(APosX, APosY, AShiftX, AShiftY, AShiftBelowX, APosAfter);
 
   if Assigned(FMarkedRange) then
-    for i:= 0 to FMarkedRange.Count-1 do
-    begin
-      Mark:= FMarkedRange.ItemPtr(i);
-      Mark^.UpdateOnEditing(APosX, APosY, AShiftX, AShiftY, AShiftBelowX, APosAfter);
-    end;
+    FMarkedRange.UpdateOnEditing(APosX, APosY, AShiftX, AShiftY, AShiftBelowX, APosAfter);
 end;
 
 
