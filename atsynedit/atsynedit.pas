@@ -1483,6 +1483,9 @@ type
     procedure UpdateScrollInfoFromSmoothPos(var AInfo: TATEditorScrollInfo; const APos: Int64);
     procedure UpdateFoldLineIndexer;
     function UpdateScrollbars(AdjustSmoothPos: boolean): boolean;
+    procedure UpdateCaretsAndMarkersOnEditing(
+      AFromCaret: integer; APosX, APosY: integer; AShiftX, AShiftY: integer;
+      APosAfter: TPoint; AShiftBelowX: integer = 0);
     procedure DoEventCarets; virtual;
     procedure DoEventScroll; virtual;
     procedure DoEventChange(ALineIndex: integer=-1; AllowOnChange: boolean=true); virtual;
@@ -1581,8 +1584,6 @@ type
     procedure DoCaretSingleAsIs;
     function DoCaretsFixIncorrectPos(AndLimitByLineEnds: boolean): boolean;
     procedure DoCaretsFixIfInsideFolded;
-    procedure DoCaretsShift(AFromCaret: integer; APosX, APosY: integer; AShiftX, AShiftY: integer;
-      APosAfter: TPoint; AShiftBelowX: integer = 0);
     procedure DoCaretForceShow;
     function CaretPosToClientPos(P: TPoint): TPoint;
     function ClientPosToCaretPos(P: TPoint;
@@ -7820,7 +7821,7 @@ begin
     if AndDeleteSelection then
     begin
       St.TextDeleteRange(X1, Y1, X2, Y2, Shift, PosAfter);
-      DoCaretsShift(0, X1, Y1, Shift.X, Shift.Y, PosAfter);
+      UpdateCaretsAndMarkersOnEditing(0, X1, Y1, Shift.X, Shift.Y, PosAfter);
     end;
   end;
 

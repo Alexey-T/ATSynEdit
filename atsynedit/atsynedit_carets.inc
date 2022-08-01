@@ -1156,7 +1156,8 @@ begin
 end;
 
 
-procedure TATSynEdit.DoCaretsShift(AFromCaret: integer; APosX, APosY: integer;
+procedure TATSynEdit.UpdateCaretsAndMarkersOnEditing(
+  AFromCaret: integer; APosX, APosY: integer;
   AShiftX, AShiftY: integer; APosAfter: TPoint; AShiftBelowX: integer);
 //for text change at unknown caret, pass AFromCaret=0
 //AShiftBelowX: used in Del key command, it's set to the length of line,
