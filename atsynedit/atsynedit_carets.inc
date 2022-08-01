@@ -1163,7 +1163,6 @@ procedure TATSynEdit.UpdateCaretsAndMarkersOnEditing(
 //AShiftBelowX: used in Del key command, it's set to the length of line,
 //to shift (to right) carets in the line below
 var
-  Mark: PATMarkerItem;
   i: integer;
   {$ifdef debug_markers_shift}
   S: string;
