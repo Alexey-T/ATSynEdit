@@ -576,11 +576,11 @@ begin
     Str:= St.Lines[Caret.PosY];
     if Str='' then Continue;
 
-    UpdateMarkersOnDeleting(0, Caret.PosY, Caret.PosX, Caret.PosY);
-
     Delete(Str, 1, Caret.PosX);
     St.Lines[Caret.PosY]:= Str;
     Caret.PosX:= 0;
+
+    UpdateMarkersOnDeleting(0, Caret.PosY, Caret.PosX, Caret.PosY);
     bChange:= true;
   end;
 
@@ -610,11 +610,11 @@ begin
     NLen:= St.LinesLen[Caret.PosY];
     if Caret.PosX<NLen then
     begin
-      UpdateMarkersOnDeleting(Caret.PosX, Caret.PosY, NLen, Caret.PosY);
-
       Str:= St.Lines[Caret.PosY];
       SetLength(Str, Caret.PosX);
       St.Lines[Caret.PosY]:= Str;
+
+      UpdateMarkersOnDeleting(Caret.PosX, Caret.PosY, NLen, Caret.PosY);
       bChange:= true;
     end;
   end;
