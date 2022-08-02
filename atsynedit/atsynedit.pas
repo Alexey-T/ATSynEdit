@@ -1054,7 +1054,7 @@ type
     procedure DoHandleRightClick(X, Y: integer);
     function DoHandleClickEvent(AEvent: TATSynEditClickEvent): boolean;
     procedure DoHotspotsExit;
-    procedure DoHintShow;
+    procedure DoHintShowForScrolling;
     procedure DoHintHide;
     procedure DoHintShowForBookmark(ALine: integer);
     procedure DoMenuGutterFold_AddDynamicItems(Menu: TPopupMenu);
@@ -5711,7 +5711,7 @@ begin
   Msg.Result:= 1;
 end;
 
-procedure TATSynEdit.DoHintShow;
+procedure TATSynEdit.DoHintShowForScrolling;
 var
   S: string;
   P: TPoint;
@@ -5751,7 +5751,10 @@ begin
 
   S:= Strings.Bookmarks[NIndex]^.Data.Hint;
   if S='' then
-    begin DoHintHide; exit end;
+  begin
+    DoHintHide;
+    exit
+  end;
 
   R:= FHintWnd.CalcHintRect(500, S, nil);
 
@@ -5902,7 +5905,7 @@ begin
       begin
         UpdateScrollInfoFromSmoothPos(AInfo, AMsg.Pos);
         if AInfo.Vertical then
-          DoHintShow;
+          DoHintShowForScrolling;
       end;
 
     SB_ENDSCROLL:
@@ -9011,7 +9014,7 @@ begin
   end;
 
   //show scroll hint
-  DoHintShow;
+  DoHintShowForScrolling;
 end;
 
 procedure TATSynEdit.OnNewScrollbarHorzChanged(Sender: TObject);
