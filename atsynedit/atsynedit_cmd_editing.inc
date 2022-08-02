@@ -572,8 +572,12 @@ begin
     Caret:= FCarets[i];
     if not St.IsIndexValid(Caret.PosY) then Continue;
     if Caret.PosX=0 then Continue;
+
     Str:= St.Lines[Caret.PosY];
     if Str='' then Continue;
+
+    UpdateMarkersOnDeleting(0, Caret.PosY, Caret.PosX, Caret.PosY);
+
     Delete(Str, 1, Caret.PosX);
     St.Lines[Caret.PosY]:= Str;
     Caret.PosX:= 0;
@@ -591,7 +595,7 @@ var
   Str: atString;
   Caret: TATCaretItem;
   bChange: boolean;
-  i: integer;
+  NLen, i: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
@@ -603,8 +607,11 @@ begin
   begin
     Caret:= FCarets[i];
     if not St.IsIndexValid(Caret.PosY) then Continue;
-    if Caret.PosX<St.LinesLen[Caret.PosY] then
+    NLen:= St.LinesLen[Caret.PosY];
+    if Caret.PosX<NLen then
     begin
+      UpdateMarkersOnDeleting(Caret.PosX, Caret.PosY, NLen, Caret.PosY);
+
       Str:= St.Lines[Caret.PosY];
       SetLength(Str, Caret.PosX);
       St.Lines[Caret.PosY]:= Str;
