@@ -1486,6 +1486,8 @@ type
     procedure UpdateCaretsAndMarkersOnEditing(
       AFromCaret: integer; APosX, APosY: integer; AShiftX, AShiftY: integer;
       APosAfter: TPoint; AShiftBelowX: integer = 0);
+    procedure UpdateMarkersOnDeleting(AX1, AY1, AX2, AY2: integer);
+    //events
     procedure DoEventCarets; virtual;
     procedure DoEventScroll; virtual;
     procedure DoEventChange(ALineIndex: integer=-1; AllowOnChange: boolean=true); virtual;

@@ -324,11 +324,7 @@ begin
       Caret:= Carets[i];
       Caret.GetRange(X1, Y1, X2, Y2, bSel);
 
-      if Assigned(FMarkers) then
-        FMarkers.DeleteInRange(X1, Y1, X2, Y2);
-
-      if Assigned(FAttribs) then
-        FAttribs.DeleteInRange(X1, Y1, X2, Y2);
+      UpdateMarkersOnDeleting(X1, Y1, X2, Y2);
 
       St.TextDeleteRange(X1, Y1, X2, Y2, Shift, PosAfter);
 
@@ -501,6 +497,8 @@ begin
       Caret.PosY:= NLineFrom;
       Caret.EndX:= -1;
       Caret.EndY:= -1;
+
+      UpdateMarkersOnDeleting(0, NLineFrom, 0, NLineTo+1);
 
       for iLine:= NLineTo downto NLineFrom do
       begin

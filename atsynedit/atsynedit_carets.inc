@@ -1200,6 +1200,18 @@ begin
 end;
 
 
+procedure TATSynEdit.UpdateMarkersOnDeleting(AX1, AY1, AX2, AY2: integer);
+begin
+  if Assigned(FMarkers) then
+    FMarkers.DeleteInRange(AX1, AY1, AX2, AY2);
+
+  if Assigned(FAttribs) then
+    FAttribs.DeleteInRange(AX1, AY1, AX2, AY2);
+
+  if Assigned(FMarkedRange) then
+    FMarkedRange.DeleteInRange(AX1, AY1, AX2, AY2);
+end;
+
 procedure TATSynEdit.DoCaretForceShow; inline;
 begin
   FCaretAllowNextBlink:= true;
