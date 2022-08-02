@@ -635,6 +635,7 @@ var
   Shift, PosAfter: TPoint;
   bNeedGroup: boolean;
   bChange, bChangeOne: boolean;
+  NPosX, NLen: integer;
   iCaret: integer;
 begin
   Result:= [];
@@ -688,10 +689,14 @@ begin
       PosAfter.X:= SFindWordOffset(Str, Caret.PosX, cWordJumps[ANext], false, FOptNonWordChars);
       if PosAfter.X<>Caret.PosX then
       begin
-        System.Delete(Str, Min(Caret.PosX, PosAfter.X)+1, Abs(Caret.PosX-PosAfter.X));
+        NPosX:= Min(Caret.PosX, PosAfter.X);
+        NLen:= Abs(Caret.PosX-PosAfter.X);
+        System.Delete(Str, NPosX+1, NLen);
         St.Lines[Caret.PosY]:= Str;
-        Shift.X:= -Abs(Caret.PosX-PosAfter.X);
-        PosAfter.X:= Min(Caret.PosX, PosAfter.X);
+        Shift.X:= -NLen;
+        PosAfter.X:= NPosX;
+
+        UpdateMarkersOnDeleting(NPosX, Caret.PosY, NPosX+NLen, Caret.PosY);
         bChange:= true;
       end;
     end;
