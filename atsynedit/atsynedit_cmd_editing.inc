@@ -1119,6 +1119,8 @@ begin
     nil
     );
 
+  UpdateMarkersOnDeleting(0, 0, Caret.PosX, Caret.PosY);
+
   if Caret.PosX>0 then
   begin
     Str:= St.Lines[Caret.PosY];
@@ -1159,6 +1161,8 @@ begin
     cBlockDeleteLines,
     nil
     );
+
+  UpdateMarkersOnDeleting(Caret.PosX, Caret.PosY, 0, St.Count);
 
   St.TextDeleteRange(Caret.PosX, Caret.PosY, 0, St.Count, Shift, PosAfter);
 
