@@ -5897,7 +5897,7 @@ begin
       begin
         //must ignore message with AMsg.Msg set: LM_VSCROLL, LM_HSCROLL;
         //we get it on macOS during window resize, not expected! moves v-scroll pos to 0.
-        if AMsg.Msg=0 then
+        //if AMsg.Msg=0 then //commented, it causes bug on macOS 11: CudaText #4258
           UpdateScrollInfoFromSmoothPos(AInfo, AMsg.Pos);
       end;
 
