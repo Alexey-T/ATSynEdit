@@ -792,6 +792,7 @@ begin
     PosAfter.Y:= Caret.PosY;
     Caret.PosX:= N1;
 
+    UpdateMarkersOnDeleting(N1, Caret.PosY, N2, Caret.PosY);
     UpdateCaretsAndMarkersOnEditing(i, Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
   end;
 
