@@ -1119,8 +1119,6 @@ begin
     nil
     );
 
-  UpdateMarkersOnDeleting(0, 0, Caret.PosX, Caret.PosY);
-
   if Caret.PosX>0 then
   begin
     Str:= St.Lines[Caret.PosY];
@@ -1133,6 +1131,9 @@ begin
     St.TextDeleteRange(0, 0, 0, Caret.PosY, Shift, PosAfter);
 
   St.ChangeBlockActive:= false;
+
+  UpdateMarkersOnDeleting(0, 0, Caret.PosX, Caret.PosY);
+  UpdateCaretsAndMarkersOnEditing(0, Caret.PosX, Caret.PosY, -Caret.PosX, -Caret.PosY, PosAfter);
 
   //move caret to beginning
   DoCaretSingle(0, 0);
@@ -1162,9 +1163,9 @@ begin
     nil
     );
 
-  UpdateMarkersOnDeleting(Caret.PosX, Caret.PosY, 0, St.Count);
-
   St.TextDeleteRange(Caret.PosX, Caret.PosY, 0, St.Count, Shift, PosAfter);
+
+  UpdateMarkersOnDeleting(Caret.PosX, Caret.PosY, 0, St.Count);
 
   if Caret.PosY>=St.Count-1 then
     St.LinesEnds[Caret.PosY]:= cEndNone;
