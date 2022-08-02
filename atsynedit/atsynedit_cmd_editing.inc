@@ -740,7 +740,7 @@ var
   Str: atString;
   Shift, PosAfter: TPoint;
   bNeedGroup: boolean;
-  NLen, N1, N2, i: integer;
+  NLen, N1, N2, iCaret: integer;
   bChange: boolean;
 begin
   Result:= [];
@@ -752,9 +752,9 @@ begin
   if bNeedGroup then
     St.BeginUndoGroup;
 
-  for i:= FCarets.Count-1 downto 0 do
+  for iCaret:= FCarets.Count-1 downto 0 do
   begin
-    Caret:= FCarets[i];
+    Caret:= FCarets[iCaret];
     if not St.IsIndexValid(Caret.PosY) then Continue;
     Str:= St.Lines[Caret.PosY];
     NLen:= Length(Str);
@@ -793,7 +793,7 @@ begin
     Caret.PosX:= N1;
 
     UpdateMarkersOnDeleting(N1, Caret.PosY, N2, Caret.PosY);
-    UpdateCaretsAndMarkersOnEditing(i, Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
+    UpdateCaretsAndMarkersOnEditing(iCaret, Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
   end;
 
   if bNeedGroup then
