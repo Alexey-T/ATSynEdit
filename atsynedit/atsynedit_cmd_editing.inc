@@ -324,8 +324,6 @@ begin
       Caret:= Carets[i];
       Caret.GetRange(X1, Y1, X2, Y2, bSel);
 
-      UpdateMarkersOnDeleting(X1, Y1, X2, Y2);
-
       St.TextDeleteRange(X1, Y1, X2, Y2, Shift, PosAfter);
 
       Caret.PosX:= X1;
@@ -336,6 +334,7 @@ begin
       //tested on these cases:
       //CudaText issue #1615
       //CudaText issue #2261
+      UpdateMarkersOnDeleting(X1, Y1, X2, Y2);
       UpdateCaretsAndMarkersOnEditing(i, X1, Y1, Shift.X, Shift.Y, PosAfter);
     end;
   finally
@@ -498,11 +497,10 @@ begin
       Caret.EndX:= -1;
       Caret.EndY:= -1;
 
-      UpdateMarkersOnDeleting(0, NLineFrom, 0, NLineTo+1);
-
       for iLine:= NLineTo downto NLineFrom do
       begin
         St.TextDeleteLine(0, iLine, Shift, PosAfter);
+        UpdateMarkersOnDeleting(0, iLine, 0, iLine+1);
         UpdateCaretsAndMarkersOnEditing(iCaret, 0, iLine, Shift.X, Shift.Y, PosAfter);
       end;
     end;
