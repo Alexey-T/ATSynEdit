@@ -1181,9 +1181,10 @@ begin
   {$ifdef debug_markers_shift}
   S:= '';
   for i:= 0 to Markers.Count-1 do
-    S:= S+Format('mark[%d] %d %d, ', [i, Markers[i].PosX, Markers[i].PosY]);
-  Application.Mainform.Caption:= S+' -- '+Format(
-    'pos %d %d, shift %d %d, posafter %d %d',
+    with Markers[i] do
+      S+= Format('Mark[%d] %d %d, ', [i, PosX, PosY]);
+  Application.MainForm.Caption:= S+' -- '+Format(
+    'Pos %d %d, Shift %d %d, PosAfter %d %d',
     [APosX, APosY, AShiftX, AShiftY, APosAfter.X, APosAfter.Y]);
   {$endif}
 
