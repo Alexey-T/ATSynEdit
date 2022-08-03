@@ -65,13 +65,13 @@ type
     FList: TATMarkerItems;
     FSorted: boolean;
     FDuplicates: boolean;
-    function GetAsArray_Markers: TATMarkerMarkerArray;
-    function GetAsArray_Attribs: TATMarkerAttribArray;
-    function GetAsString: string;
+    function GetAsMarkerArray: TATMarkerMarkerArray;
+    function GetAsAttribArray: TATMarkerAttribArray;
+    function GetAsMarkerString: string;
     function GetItem(N: integer): TATMarkerItem;
-    procedure SetAsArray_Markers(const AValue: TATMarkerMarkerArray);
-    procedure SetAsArray_Attribs(const AValue: TATMarkerAttribArray);
-    procedure SetAsString(const AValue: string);
+    procedure SetAsMarkerArray(const AValue: TATMarkerMarkerArray);
+    procedure SetAsAttribArray(const AValue: TATMarkerAttribArray);
+    procedure SetAsMarkerString(const AValue: string);
     procedure SetItem(N: integer; const AItem: TATMarkerItem);
   public
     constructor Create; virtual;
@@ -97,11 +97,10 @@ type
     function DeleteByPos(AX, AY: integer): boolean;
     procedure Find(AX, AY: integer; out AIndex: integer; out AExactMatch: boolean);
     function FindContaining(AX, AY: integer): integer;
-    property AsArray_Markers: TATMarkerMarkerArray read GetAsArray_Markers write SetAsArray_Markers;
-    property AsArray_Attribs: TATMarkerAttribArray read GetAsArray_Attribs write SetAsArray_Attribs;
-    property AsString: string read GetAsString write SetAsString;
-    procedure UpdateOnEditing(APosX, APosY, AShiftX, AShiftY, AShiftBelowX: integer;
-      APosAfter: TPoint);
+    procedure UpdateOnEditing(APosX, APosY, AShiftX, AShiftY, AShiftBelowX: integer; APosAfter: TPoint);
+    property AsMarkerArray: TATMarkerMarkerArray read GetAsMarkerArray write SetAsMarkerArray;
+    property AsAttribArray: TATMarkerAttribArray read GetAsAttribArray write SetAsAttribArray;
+    property AsMarkerString: string read GetAsMarkerString write SetAsMarkerString;
   end;
 
 implementation
@@ -245,7 +244,7 @@ begin
   Result:= FList._GetItemPtr(AIndex);
 end;
 
-function TATMarkers.GetAsArray_Markers: TATMarkerMarkerArray;
+function TATMarkers.GetAsMarkerArray: TATMarkerMarkerArray;
 var
   Item: PATMarkerItem;
   i: integer;
@@ -264,7 +263,7 @@ begin
   end;
 end;
 
-function TATMarkers.GetAsArray_Attribs: TATMarkerAttribArray;
+function TATMarkers.GetAsAttribArray: TATMarkerAttribArray;
 var
   Item: PATMarkerItem;
   Obj: TATLinePartClass;
@@ -309,7 +308,7 @@ begin
   end;
 end;
 
-procedure TATMarkers.SetAsArray_Markers(const AValue: TATMarkerMarkerArray);
+procedure TATMarkers.SetAsMarkerArray(const AValue: TATMarkerMarkerArray);
 var
   i: integer;
 begin
@@ -329,7 +328,7 @@ begin
   end;
 end;
 
-procedure TATMarkers.SetAsArray_Attribs(const AValue: TATMarkerAttribArray);
+procedure TATMarkers.SetAsAttribArray(const AValue: TATMarkerAttribArray);
 var
   NTag: Int64;
   NPosX, NPosY, NSelX: integer;
@@ -372,17 +371,17 @@ begin
   end;
 end;
 
-function TATMarkers.GetAsString: string;
+function TATMarkers.GetAsMarkerString: string;
 begin
-  Result:= MarkerArrayToString(AsArray_Markers);
+  Result:= MarkerArrayToString(AsMarkerArray);
 end;
 
-procedure TATMarkers.SetAsString(const AValue: string);
+procedure TATMarkers.SetAsMarkerString(const AValue: string);
 var
   Ar: TATMarkerMarkerArray;
 begin
   StringToMarkerArray(Ar, AValue);
-  AsArray_Markers:= Ar;
+  AsMarkerArray:= Ar;
 end;
 
 procedure TATMarkers.SetItem(N: integer; const AItem: TATMarkerItem);
