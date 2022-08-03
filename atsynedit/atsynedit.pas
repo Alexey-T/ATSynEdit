@@ -1442,10 +1442,10 @@ type
       AForceHorz: boolean): boolean;
     function GetCaretsArray: TATPointArray;
     function GetMarkersArray: TATInt64Array;
-    function GetAttribsArray: TATInt64Array;
+    function GetAttribsArray: TATMarkerAttribArray;
     procedure SetCaretsArray(const Ar: TATPointArray);
     procedure SetMarkersArray(const Ar: TATInt64Array);
-    procedure SetAttribsArray(const Ar: TATInt64Array);
+    procedure SetAttribsArray(const Ar: TATMarkerAttribArray);
     property MouseNiceScroll: boolean read GetMouseNiceScroll write SetMouseNiceScroll;
     property ShowOsBarVert: boolean read FShowOsBarVert write SetShowOsBarVert;
     property ShowOsBarHorz: boolean read FShowOsBarHorz write SetShowOsBarHorz;

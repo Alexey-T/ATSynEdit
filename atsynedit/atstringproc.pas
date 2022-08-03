@@ -54,6 +54,25 @@ type
   TATPointArray = array of TPoint;
   TATInt64Array = array of Int64;
 
+type
+  TATMarkerAttribRecord = record
+    Tag: Int64;
+    ColumnTag: Int64;
+    PosX: integer;
+    PosY: integer;
+    SelX: integer;
+    ColorFont: integer;
+    ColorBG: integer;
+    ColorBorder: integer;
+    FontStyles: integer;
+    BorderLeft: integer;
+    BorderRight: integer;
+    BorderUp: integer;
+    BorderDown: integer;
+    MicromapMode: integer;
+  end;
+  TATMarkerAttribArray = array of TATMarkerAttribRecord;
+
 const
   //must be >= OptMaxLineLenForAccurateCharWidths
   cMaxFixedArray = 1024;

@@ -161,8 +161,10 @@ type
 type
   TATStringsGetCarets = function: TATPointArray of object;
   TATStringsGetMarkers = function: TATInt64Array of object;
+  TATStringsGetAttribs = function: TATMarkerAttribArray of object;
   TATStringsSetCarets = procedure(const ACarets: TATPointArray) of object;
   TATStringsSetMarkers = procedure(const AMarkers: TATInt64Array) of object;
+  TATStringsSetAttribs = procedure(const AMarkers: TATMarkerAttribArray) of object;
   TATStringsChangeLogEvent = procedure(Sender: TObject; ALine: integer) of object;
   TATStringsChangeExEvent = procedure(Sender: TObject; AChange: TATLineChangeKind; ALine, AItemCount: integer) of object;
   TATStringsChangeBlockEvent = procedure(Sender: TObject; const AStartPos, AEndPos: TPoint; 
@@ -205,10 +207,10 @@ type
     FProgressKind: TATStringsProgressKind;
     FOnGetCaretsArray: TATStringsGetCarets;
     FOnGetMarkersArray: TATStringsGetMarkers;
-    FOnGetAttribsArray: TATStringsGetMarkers;
+    FOnGetAttribsArray: TATStringsGetAttribs;
     FOnSetCaretsArray: TATStringsSetCarets;
     FOnSetMarkersArray: TATStringsSetMarkers;
-    FOnSetAttribsArray: TATStringsSetMarkers;
+    FOnSetAttribsArray: TATStringsSetAttribs;
     FOnProgress: TNotifyEvent;
     FOnChangeLog: TATStringsChangeLogEvent;
     FOnChangeEx: TATStringsChangeExEvent;
@@ -238,7 +240,7 @@ type
     procedure DoFinalizeSaving;
     function GetCaretsArray: TATPointArray;
     function GetMarkersArray: TATInt64Array;
-    function GetAttribsArray: TATInt64Array;
+    function GetAttribsArray: TATMarkerAttribArray;
     function GetLine(AIndex: integer): atString;
     function GetLineAscii(AIndex: integer): boolean;
     function GetLineBlank(AIndex: integer): boolean;
@@ -266,7 +268,7 @@ type
     function IsSavingWithSignature: boolean;
     procedure SetCaretsArray(const L: TATPointArray);
     procedure SetMarkersArray(const L: TATInt64Array);
-    procedure SetAttribsArray(const L: TATInt64Array);
+    procedure SetAttribsArray(const L: TATMarkerAttribArray);
     procedure SetEndings(AValue: TATLineEnds);
     procedure SetLine(AIndex: integer; const AValue: atString);
     procedure SetLineEnd(AIndex: integer; AValue: TATLineEnds);
@@ -408,10 +410,10 @@ type
     //undo
     property OnGetCaretsArray: TATStringsGetCarets read FOnGetCaretsArray write FOnGetCaretsArray;
     property OnGetMarkersArray: TATStringsGetMarkers read FOnGetMarkersArray write FOnGetMarkersArray;
-    property OnGetAttribsArray: TATStringsGetMarkers read FOnGetAttribsArray write FOnGetAttribsArray;
+    property OnGetAttribsArray: TATStringsGetAttribs read FOnGetAttribsArray write FOnGetAttribsArray;
     property OnSetCaretsArray: TATStringsSetCarets read FOnSetCaretsArray write FOnSetCaretsArray;
     property OnSetMarkersArray: TATStringsSetMarkers read FOnSetMarkersArray write FOnSetMarkersArray;
-    property OnSetAttribsArray: TATStringsSetMarkers read FOnSetAttribsArray write FOnSetAttribsArray;
+    property OnSetAttribsArray: TATStringsSetAttribs read FOnSetAttribsArray write FOnSetAttribsArray;
     procedure SetGroupMark;
     procedure SetNewCommandMark;
     procedure BeginUndoGroup;
@@ -1848,7 +1850,7 @@ var
   CurLineState: TATLineState;
   CurCaretsArray: TATPointArray;
   CurMarkersArray: TATInt64Array;
-  CurAttribsArray: TATInt64Array;
+  CurAttribsArray: TATMarkerAttribArray;
   OtherList: TATUndoList;
   NCount: integer;
   NEventX, NEventY: integer;
@@ -2055,7 +2057,7 @@ begin
     Result:= nil;
 end;
 
-function TATStrings.GetAttribsArray: TATInt64Array;
+function TATStrings.GetAttribsArray: TATMarkerAttribArray;
 begin
   if Assigned(FOnGetAttribsArray) then
     Result:= FOnGetAttribsArray()
@@ -2075,7 +2077,7 @@ begin
     FOnSetMarkersArray(L);
 end;
 
-procedure TATStrings.SetAttribsArray(const L: TATInt64Array);
+procedure TATStrings.SetAttribsArray(const L: TATMarkerAttribArray);
 begin
   if Assigned(FOnSetAttribsArray) then
     FOnSetAttribsArray(L);

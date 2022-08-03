@@ -67,7 +67,7 @@ type
     ItemLineState: TATLineState; //line-state of that editor line
     ItemCarets: TATPointArray; //carets packed into array
     ItemMarkers: TATInt64Array; //simple markers packed into array
-    ItemAttribs: TATInt64Array;
+    ItemAttribs: TATMarkerAttribArray;
     ItemSoftMark: boolean; //undo soft-mark. logic is described in ATSynEdit Wiki page
     ItemHardMark: boolean; //undo hard-mark
 
@@ -76,7 +76,7 @@ type
       ASoftMark, AHardMark: boolean;
       const ACarets: TATPointArray;
       const AMarkers: TATInt64Array;
-      const AAttribs: TATInt64Array;
+      const AAttribs: TATMarkerAttribArray;
       ACommandCode: integer;
       const ATickCount: QWord); virtual;
     constructor CreateEmpty;
@@ -122,7 +122,7 @@ type
       AEnd: TATLineEnds; ALineState: TATLineState;
       const ACarets: TATPointArray;
       const AMarkers: TATInt64Array;
-      const AAttribs: TATInt64Array;
+      const AAttribs: TATMarkerAttribArray;
       ACommandCode: integer);
     procedure AddUnmodifiedMark;
     function DebugText: string;
@@ -285,7 +285,7 @@ constructor TATUndoItem.Create(AAction: TATEditAction; AIndex: integer;
   ASoftMark, AHardMark: boolean;
   const ACarets: TATPointArray;
   const AMarkers: TATInt64Array;
-  const AAttribs: TATInt64Array;
+  const AAttribs: TATMarkerAttribArray;
   ACommandCode: integer;
   const ATickCount: QWord);
 var
@@ -399,7 +399,7 @@ procedure TATUndoList.Add(AAction: TATEditAction; AIndex: integer;
   const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState;
   const ACarets: TATPointArray;
   const AMarkers: TATInt64Array;
-  const AAttribs: TATInt64Array;
+  const AAttribs: TATMarkerAttribArray;
   ACommandCode: integer);
 var
   Item: TATUndoItem;
@@ -473,7 +473,7 @@ var
   Item: TATUndoItem;
   Carets: TATPointArray;
   Markers: TATInt64Array;
-  Attribs: TATInt64Array;
+  Attribs: TATMarkerAttribArray;
 begin
   //if FLocked then exit; //on load file called with Locked=true
 
