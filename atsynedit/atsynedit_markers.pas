@@ -330,20 +330,12 @@ end;
 
 procedure TATMarkers.SetAsAttribArray(const AValue: TATMarkerAttribArray);
 var
-  NTag: Int64;
-  NPosX, NPosY, NSelX: integer;
   Obj: TATLinePartClass;
-  MicromapMode: TATMarkerMicromapMode;
   i: integer;
 begin
   Clear;
   for i:= 0 to Length(AValue)-1 do
   begin
-    NTag:= AValue[i].Tag;
-    NPosX:= AValue[i].PosX;
-    NPosY:= AValue[i].PosY;
-    NSelX:= AValue[i].SelX;
-
     Obj:= TATLinePartClass.Create;
     FillChar(Obj.Data, SizeOf(Obj.Data), 0);
 
@@ -356,17 +348,16 @@ begin
     Obj.Data.BorderDown:= TATLineStyle(AValue[i].BorderDown);
     Obj.Data.BorderUp:= TATLineStyle(AValue[i].BorderUp);
     Obj.ColumnTag:= AValue[i].ColumnTag;
-    MicromapMode:= TATMarkerMicromapMode(AValue[i].MicromapMode);
 
     Add(
-      NPosX,
-      NPosY,
-      NTag,
-      NSelX,
+      AValue[i].PosX,
+      AValue[i].PosY,
+      AValue[i].Tag,
+      AValue[i].SelX,
       0,
       Obj,
       0,
-      MicromapMode
+      TATMarkerMicromapMode(AValue[i].MicromapMode)
       );
   end;
 end;
