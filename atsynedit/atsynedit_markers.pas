@@ -64,12 +64,12 @@ type
     FList: TATMarkerItems;
     FSorted: boolean;
     FDuplicates: boolean;
-    function GetAsArray: TATInt64Array;
-    function GetAsArray_Attr: TATInt64Array;
+    function GetAsArray_Markers: TATInt64Array;
+    function GetAsArray_Attribs: TATInt64Array;
     function GetAsString: string;
     function GetItem(N: integer): TATMarkerItem;
-    procedure SetAsArray(const AValue: TATInt64Array);
-    procedure SetAsArray_Attr(const AValue: TATInt64Array);
+    procedure SetAsArray_Markers(const AValue: TATInt64Array);
+    procedure SetAsArray_Attribs(const AValue: TATInt64Array);
     procedure SetAsString(const AValue: string);
     procedure SetItem(N: integer; const AItem: TATMarkerItem);
   public
@@ -96,8 +96,8 @@ type
     function DeleteByPos(AX, AY: integer): boolean;
     procedure Find(AX, AY: integer; out AIndex: integer; out AExactMatch: boolean);
     function FindContaining(AX, AY: integer): integer;
-    property AsArray_Markers: TATInt64Array read GetAsArray write SetAsArray; //for Markers object
-    property AsArray_Attribs: TATInt64Array read GetAsArray_Attr write SetAsArray_Attr; //for Attribs object
+    property AsArray_Markers: TATInt64Array read GetAsArray_Markers write SetAsArray_Markers;
+    property AsArray_Attribs: TATInt64Array read GetAsArray_Attribs write SetAsArray_Attribs;
     property AsString: string read GetAsString write SetAsString;
     procedure UpdateOnEditing(APosX, APosY, AShiftX, AShiftY, AShiftBelowX: integer;
       APosAfter: TPoint);
@@ -244,7 +244,7 @@ begin
   Result:= FList._GetItemPtr(AIndex);
 end;
 
-function TATMarkers.GetAsArray: TATInt64Array;
+function TATMarkers.GetAsArray_Markers: TATInt64Array;
 const
   NN = 7;
 var
@@ -265,7 +265,7 @@ begin
   end;
 end;
 
-function TATMarkers.GetAsArray_Attr: TATInt64Array;
+function TATMarkers.GetAsArray_Attribs: TATInt64Array;
 const
   NN = 14;
 var
@@ -312,7 +312,7 @@ begin
   end;
 end;
 
-procedure TATMarkers.SetAsArray(const AValue: TATInt64Array);
+procedure TATMarkers.SetAsArray_Markers(const AValue: TATInt64Array);
 const
   NN = 7;
 var
@@ -344,7 +344,7 @@ begin
   end;
 end;
 
-procedure TATMarkers.SetAsArray_Attr(const AValue: TATInt64Array);
+procedure TATMarkers.SetAsArray_Attribs(const AValue: TATInt64Array);
 const
   NN = 14;
 var
