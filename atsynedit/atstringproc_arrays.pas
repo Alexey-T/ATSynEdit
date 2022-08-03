@@ -24,14 +24,24 @@ implementation
 
 function PointsArrayToString(const A: TATPointArray): string;
 var
-  j: integer;
-  Pnt: TPoint;
+  L: TStringList;
+  i: integer;
 begin
-  Result:= '';
-  for j:= 0 to Length(A)-1 do
-  begin
-    Pnt:= A[j];
-    Result+= IntToStr(Pnt.X)+','+IntToStr(Pnt.Y)+';';
+  if Length(A)=0 then
+    exit('');
+
+  if Length(A)=1 then
+    exit(IntToStr(A[0].X)+','+IntToStr(A[0].Y)+';');
+
+  L:= TStringList.Create;
+  try
+    L.LineBreak:= ';';
+    L.TrailingLineBreak:= true;
+    for i:= 0 to Length(A)-1 do
+      L.Add(IntToStr(A[i].X)+','+IntToStr(A[i].Y));
+    Result:= L.Text;
+  finally
+    FreeAndNil(L);
   end;
 end;
 
