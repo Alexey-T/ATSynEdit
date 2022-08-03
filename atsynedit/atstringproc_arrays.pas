@@ -15,13 +15,10 @@ uses
   ATStringProc_Separator;
 
 function PointsArrayToString(const A: TATPointArray): string;
-function Int64ArrayToString(const A: TATInt64Array): string;
 function MarkerArrayToString(const Ar: TATMarkerMarkerArray): string;
 
 procedure StringToMarkerArray(var Ar: TATMarkerMarkerArray; const AStr: string);
 procedure StringToPointsArray(var A: TATPointArray; const AStr: string);
-procedure StringToInt64Array(var A: TATInt64Array; const AStr: string);
-
 
 implementation
 
@@ -38,14 +35,6 @@ begin
   end;
 end;
 
-function Int64ArrayToString(const A: TATInt64Array): string;
-var
-  i: integer;
-begin
-  Result:= '';
-  for i:= 0 to High(A) do
-    Result+= IntToStr(A[i])+',';
-end;
 
 function MarkerArrayToString(const Ar: TATMarkerMarkerArray): string;
 var
