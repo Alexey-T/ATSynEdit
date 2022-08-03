@@ -5115,14 +5115,14 @@ begin
   if FOptScrollbarsNew then //better check this instead of FScrollbarVert.Visible
   begin
     Dec(W, FScrollbarVert.Width);
+    if FScrollbarHorz.Visible then
+      Dec(H, FScrollbarHorz.Height);
   end
   else
   begin
     W:= inherited ClientWidth;
+    H:= inherited ClientHeight;
   end;
-
-  if FScrollbarHorz.Visible then
-    Dec(H, FScrollbarHorz.Height);
 
   if W<1 then W:= 1;
   if H<1 then H:= 1;
