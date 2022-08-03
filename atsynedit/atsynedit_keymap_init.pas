@@ -41,23 +41,23 @@ begin
   M.Add(cCommand_KeyUp_Sel,       'caret line up + select',        ['Shift+Up'], []);
   M.Add(cCommand_KeyDown,         'caret line down',               ['Down'], []);
   M.Add(cCommand_KeyDown_Sel,     'caret line down + select',      ['Shift+Down'], []);
-  M.Add(cCommand_KeyHome,         'caret to line begin',           ['Home'], []);
-  M.Add(cCommand_KeyHome_Sel,     'caret to line begin + select',  ['Shift+Home'], []);
-  M.Add(cCommand_KeyEnd,          'caret to line end',             ['End'], []);
-  M.Add(cCommand_KeyEnd_Sel,      'caret to line end + select',    ['Shift+End'], []);
+  M.Add(cCommand_KeyHome,         'caret to line begin',           {$ifndef darwin} ['Home'],       {$else} ['Meta+Left'],        {$endif} []);
+  M.Add(cCommand_KeyHome_Sel,     'caret to line begin + select',  {$ifndef darwin} ['Shift+Home'], {$else} ['Meta+Shift+Left'],  {$endif} []);
+  M.Add(cCommand_KeyEnd,          'caret to line end',             {$ifndef darwin} ['End'],        {$else} ['Meta+Right'],       {$endif} []);
+  M.Add(cCommand_KeyEnd_Sel,      'caret to line end + select',    {$ifndef darwin} ['Shift+End'],  {$else} ['Meta+Shift+Right'], {$endif} []);
   M.Add(cCommand_KeyPageUp,       'caret page up',                 ['PgUp'], []);
   M.Add(cCommand_KeyPageUp_Sel,   'caret page up + select',        ['Shift+PgUp'], []);
   M.Add(cCommand_KeyPageDown,     'caret page down',               ['PgDn'], []);
   M.Add(cCommand_KeyPageDown_Sel, 'caret page down + select',      ['Shift+PgDn'], []);
 
-  M.Add(cCommand_ColSelectLeft,        'column select: left',          ['Shift+Alt+Left'], []);
-  M.Add(cCommand_ColSelectRight,       'column select: right',         ['Shift+Alt+Right'], []);
-  M.Add(cCommand_ColSelectUp,          'column select: up',            ['Shift+Alt+Up'], []);
-  M.Add(cCommand_ColSelectDown,        'column select: down',          ['Shift+Alt+Down'], []);
-  M.Add(cCommand_ColSelectPageUp,      'column select: page up',       ['Shift+Alt+PgUp'], []);
-  M.Add(cCommand_ColSelectPageDown,    'column select: page down',     ['Shift+Alt+PgDn'], []);
-  M.Add(cCommand_ColSelectToLineBegin, 'column select: to line begin', ['Shift+Alt+Home'], []);
-  M.Add(cCommand_ColSelectToLineEnd,   'column select: to line end',   ['Shift+Alt+End'], []);
+  M.Add(cCommand_ColSelectLeft,        'column select: left',          {$ifndef darwin} ['Shift+Alt+Left'],  {$else} [], {$endif} []);
+  M.Add(cCommand_ColSelectRight,       'column select: right',         {$ifndef darwin} ['Shift+Alt+Right'], {$else} [], {$endif} []);
+  M.Add(cCommand_ColSelectUp,          'column select: up',            {$ifndef darwin} ['Shift+Alt+Up'],    {$else} [], {$endif} []);
+  M.Add(cCommand_ColSelectDown,        'column select: down',          {$ifndef darwin} ['Shift+Alt+Down'],  {$else} [], {$endif} []);
+  M.Add(cCommand_ColSelectPageUp,      'column select: page up',       {$ifndef darwin} ['Shift+Alt+PgUp'],  {$else} [], {$endif} []);
+  M.Add(cCommand_ColSelectPageDown,    'column select: page down',     {$ifndef darwin} ['Shift+Alt+PgDn'],  {$else} [], {$endif} []);
+  M.Add(cCommand_ColSelectToLineBegin, 'column select: to line begin', {$ifndef darwin} ['Shift+Alt+Home'],  {$else} [], {$endif} []);
+  M.Add(cCommand_ColSelectToLineEnd,   'column select: to line end',   {$ifndef darwin} ['Shift+Alt+End'],   {$else} [], {$endif} []);
 
   M.Add(cCommand_KeyBackspace, 'delete char left (backspace)', ['Bksp'], ['Shift+Bksp']);
   M.Add(cCommand_KeyDelete, 'delete char right (delete)', ['Del'], []);
@@ -71,19 +71,21 @@ begin
   M.Add(cCommand_TextDeleteLine, 'delete line(s)', [cXControl+'+Y'], []);
   M.Add(cCommand_TextDuplicateLine, 'duplicate line(s)', [cXControl+'+D'], []);
 
-  M.Add(cCommand_GotoTextBegin,      'go to text begin',          [cXControl+'+Home'], []);
-  M.Add(cCommand_GotoTextBegin_Sel,  'go to text begin + select', [cXControl+'+Shift+Home'], []);
-  M.Add(cCommand_GotoTextEnd,        'go to text end',            [cXControl+'+End'], []);
-  M.Add(cCommand_GotoTextEnd_Sel,    'go to text end + select',   [cXControl+'+Shift+End'], []);
+  M.Add(cCommand_GotoTextBegin,      'go to text begin',          {$ifndef darwin} [cXControl+'+Home'],       [] {$else} ['Home'], ['Meta+Up']  {$endif});
+  M.Add(cCommand_GotoTextBegin_Sel,  'go to text begin + select', {$ifndef darwin} [cXControl+'+Shift+Home'], [] {$else} ['Shift+Home'], []     {$endif});
+  M.Add(cCommand_GotoTextEnd,        'go to text end',            {$ifndef darwin} [cXControl+'+End'],        [] {$else} ['End'], ['Meta+Down'] {$endif});
+  M.Add(cCommand_GotoTextEnd_Sel,    'go to text end + select',   {$ifndef darwin} [cXControl+'+Shift+End'],  [] {$else} ['Shift+End'], []      {$endif});
 
-  M.Add(cCommand_GotoWordPrev,       'go to word previous',           [cXControl+'+Left'], []);
-  M.Add(cCommand_GotoWordPrev_Sel,   'go to word previous + select',  [cXControl+'+Shift+Left'], []);
-  M.Add(cCommand_GotoWordNext,       'go to word next',          [], []);
-  M.Add(cCommand_GotoWordNext_Sel,   'go to word next + select', [], []);
+  M.Add(cCommand_GotoWordPrev,       'go to word previous',          {$ifndef darwin} [cXControl+'+Left'],       {$else} ['Alt+Left'],        {$endif} []);
+  M.Add(cCommand_GotoWordPrev_Sel,   'go to word previous + select', {$ifndef darwin} [cXControl+'+Shift+Left'], {$else} ['Alt+Shift+Left'],  {$endif} []);
+  M.Add(cCommand_GotoWordNext,       'go to word next',              {$ifndef darwin} [],                        {$else} ['Alt+Right'],       {$endif} []);
+  M.Add(cCommand_GotoWordNext_Sel,   'go to word next + select',     {$ifndef darwin} [],                        {$else} ['Alt+Shift+Right'], {$endif} []);
+
   M.Add(cCommand_GotoWordPrev_Simple,     'go to word previous, simple',          [], []);
   M.Add(cCommand_GotoWordPrev_Simple_Sel, 'go to word previous, simple + select', [], []);
   M.Add(cCommand_GotoWordNext_Simple,     'go to word next, simple',          [], []);
   M.Add(cCommand_GotoWordNext_Simple_Sel, 'go to word next, simple + select', [], []);
+
   M.Add(cCommand_GotoWordEnd,        'go to word end',            [cXControl+'+Right'], []);
   M.Add(cCommand_GotoWordEnd_Sel,    'go to word end + select',   [cXControl+'+Shift+Right'], []);
 
@@ -177,8 +179,8 @@ begin
 
   M.Add(cCommand_ScrollToBegin, 'scroll to document begin', [], []);
   M.Add(cCommand_ScrollToEnd, 'scroll to document end', [], []);
-  M.Add(cCommand_ScrollLineUp, 'scroll line up', [cXControl+'+Up'], []);
-  M.Add(cCommand_ScrollLineDown, 'scroll line down', [cXControl+'+Down'], []);
+  M.Add(cCommand_ScrollLineUp, 'scroll line up',     {$ifndef darwin} [cXControl+'+Up'], {$else} [], {$endif} []);
+  M.Add(cCommand_ScrollLineDown, 'scroll line down', {$ifndef darwin} [cXControl+'+Down'], {$else} [], {$endif} []);
   M.Add(cCommand_ScrollPageUp, 'scroll page up', [], []);
   M.Add(cCommand_ScrollPageDown, 'scroll page down', [], []);
   M.Add(cCommand_ScrollColumnLeft, 'scroll column left', [], []);
