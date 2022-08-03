@@ -52,10 +52,11 @@ var
   L: TStringList;
   i: integer;
 begin
-  Result:= '';
+  if Length(Ar)=0 then
+    exit('');
   L:= TStringList.Create;
   try
-    L.TextLineBreakStyle:= tlbsLF;
+    L.LineBreak:= ',';
     L.TrailingLineBreak:= true;
     for i:= 0 to High(Ar) do
     begin
@@ -68,10 +69,6 @@ begin
       L.Add(IntToStr(Ar[i].MicromapMode));
     end;
     Result:= L.Text;
-    //we need comma-separator (+trailing one)
-    for i:= 1 to Length(Result) do
-      if Result[i]=#10 then
-        Result[i]:= ',';
   finally
     FreeAndNil(L);
   end;
