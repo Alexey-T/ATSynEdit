@@ -11,7 +11,8 @@ interface
 uses
   Classes, SysUtils,
   ATStringProc,
-  ATStringProc_Separator;
+  ATStringProc_Separator,
+  ATStringProc_Arrays;
 
 type
   TATEditAction = (
@@ -66,7 +67,7 @@ type
     ItemEnd: TATLineEnds; //line-ending of that editor line
     ItemLineState: TATLineState; //line-state of that editor line
     ItemCarets: TATPointArray; //carets packed into array
-    ItemMarkers: TATInt64Array; //simple markers packed into array
+    ItemMarkers: TATMarkerMarkerArray;
     ItemAttribs: TATMarkerAttribArray;
     ItemSoftMark: boolean; //undo soft-mark. logic is described in ATSynEdit Wiki page
     ItemHardMark: boolean; //undo hard-mark
@@ -75,7 +76,7 @@ type
       const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState;
       ASoftMark, AHardMark: boolean;
       const ACarets: TATPointArray;
-      const AMarkers: TATInt64Array;
+      const AMarkers: TATMarkerMarkerArray;
       const AAttribs: TATMarkerAttribArray;
       ACommandCode: integer;
       const ATickCount: QWord); virtual;
@@ -121,7 +122,7 @@ type
     procedure Add(AAction: TATEditAction; AIndex: integer; const AText: atString;
       AEnd: TATLineEnds; ALineState: TATLineState;
       const ACarets: TATPointArray;
-      const AMarkers: TATInt64Array;
+      const AMarkers: TATMarkerMarkerArray;
       const AAttribs: TATMarkerAttribArray;
       ACommandCode: integer);
     procedure AddUnmodifiedMark;
@@ -142,60 +143,6 @@ implementation
 uses
   Math, Dialogs;
 
-function PointsArrayToString(const A: TATPointArray): string;
-var
-  j: integer;
-  Pnt: TPoint;
-begin
-  Result:= '';
-  for j:= 0 to Length(A)-1 do
-  begin
-    Pnt:= A[j];
-    Result+= IntToStr(Pnt.X)+','+IntToStr(Pnt.Y)+';';
-  end;
-end;
-
-function Int64ArrayToString(const A: TATInt64Array): string;
-var
-  i: integer;
-begin
-  Result:= '';
-  for i:= 0 to High(A) do
-    Result+= IntToStr(A[i])+',';
-end;
-
-procedure StringToPointsArray(var A: TATPointArray; const AStr: string);
-var
-  Sep: TATStringSeparator;
-  SItem, S1, S2: string;
-  i, NLen: integer;
-begin
-  NLen:= SFindCharCount(AStr, ';');
-  SetLength(A, NLen);
-  Sep.Init(AStr, ';');
-  for i:= 0 to NLen-1 do
-  begin
-    Sep.GetItemStr(SItem);
-    SSplitByChar(SItem, ',', S1, S2);
-    A[i].X:= StrToIntDef(S1, 0);
-    A[i].Y:= StrToIntDef(S2, 0);
-  end;
-end;
-
-procedure StringToInt64Array(var A: TATInt64Array; const AStr: string);
-var
-  Sep: TATStringSeparator;
-  i, NLen: integer;
-begin
-  NLen:= SFindCharCount(AStr, ',');
-  SetLength(A, NLen);
-  Sep.Init(AStr, ',');
-  for i:= 0 to NLen-1 do
-  begin
-    Sep.GetItemInt64(A[i], 0);
-  end;
-end;
-
 { TATUndoItem }
 
 function TATUndoItem.GetAsString: string;
@@ -207,7 +154,7 @@ begin
     IntToStr(Ord(ItemEnd))+PartSep+
     IntToStr(Ord(ItemLineState))+PartSep+
     PointsArrayToString(ItemCarets)+MarkersSep+
-      Int64ArrayToString(ItemMarkers)+MarkersSep+
+      MarkerArrayToString(ItemMarkers)+MarkersSep+
       IntToStr(ItemGlobalCounter)+MarkersSep+
       IntToStr(ItemTickCount)+PartSep+
     IntToStr(Ord(ItemSoftMark))+PartSep+
@@ -244,7 +191,7 @@ begin
   //b) markers
   Sep2.GetItemStr(SubItem);
   if SubItem<>'' then
-    StringToInt64Array(ItemMarkers, SubItem)
+    StringToMarkerArray(ItemMarkers, SubItem)
   else
     ItemMarkers:= nil;
   //c) global_cnt
@@ -284,7 +231,7 @@ constructor TATUndoItem.Create(AAction: TATEditAction; AIndex: integer;
   const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState;
   ASoftMark, AHardMark: boolean;
   const ACarets: TATPointArray;
-  const AMarkers: TATInt64Array;
+  const AMarkers: TATMarkerMarkerArray;
   const AAttribs: TATMarkerAttribArray;
   ACommandCode: integer;
   const ATickCount: QWord);
@@ -398,7 +345,7 @@ end;
 procedure TATUndoList.Add(AAction: TATEditAction; AIndex: integer;
   const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState;
   const ACarets: TATPointArray;
-  const AMarkers: TATInt64Array;
+  const AMarkers: TATMarkerMarkerArray;
   const AAttribs: TATMarkerAttribArray;
   ACommandCode: integer);
 var
@@ -472,7 +419,7 @@ procedure TATUndoList.AddUnmodifiedMark;
 var
   Item: TATUndoItem;
   Carets: TATPointArray;
-  Markers: TATInt64Array;
+  Markers: TATMarkerMarkerArray;
   Attribs: TATMarkerAttribArray;
 begin
   //if FLocked then exit; //on load file called with Locked=true

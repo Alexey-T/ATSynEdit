@@ -1441,10 +1441,10 @@ type
     function DoMouseWheelAction(Shift: TShiftState; AWheelDelta: integer;
       AForceHorz: boolean): boolean;
     function GetCaretsArray: TATPointArray;
-    function GetMarkersArray: TATInt64Array;
+    function GetMarkersArray: TATMarkerMarkerArray;
     function GetAttribsArray: TATMarkerAttribArray;
     procedure SetCaretsArray(const Ar: TATPointArray);
-    procedure SetMarkersArray(const Ar: TATInt64Array);
+    procedure SetMarkersArray(const Ar: TATMarkerMarkerArray);
     procedure SetAttribsArray(const Ar: TATMarkerAttribArray);
     property MouseNiceScroll: boolean read GetMouseNiceScroll write SetMouseNiceScroll;
     property ShowOsBarVert: boolean read FShowOsBarVert write SetShowOsBarVert;

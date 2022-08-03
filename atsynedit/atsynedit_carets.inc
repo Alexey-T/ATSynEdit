@@ -941,7 +941,7 @@ begin
     Result:= FCarets.AsArray;
 end;
 
-function TATSynEdit.GetMarkersArray: TATInt64Array;
+function TATSynEdit.GetMarkersArray: TATMarkerMarkerArray;
 begin
   SetLength(Result{%H-}, 0);
   if Assigned(FMarkers) then
@@ -964,7 +964,7 @@ begin
   end;
 end;
 
-procedure TATSynEdit.SetMarkersArray(const Ar: TATInt64Array);
+procedure TATSynEdit.SetMarkersArray(const Ar: TATMarkerMarkerArray);
 begin
   InitMarkers; //FMarkers can be nil
   if Assigned(FMarkers) then

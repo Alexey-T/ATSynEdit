@@ -55,6 +55,18 @@ type
   TATInt64Array = array of Int64;
 
 type
+  TATMarkerMarkerRecord = record
+    Tag: Int64;
+    Value: Int64;
+    PosX: integer;
+    PosY: integer;
+    SelX: integer;
+    SelY: integer;
+    MicromapMode: integer;
+  end;
+  TATMarkerMarkerArray = array of TATMarkerMarkerRecord;
+
+type
   TATMarkerAttribRecord = record
     Tag: Int64;
     ColumnTag: Int64;
@@ -1426,5 +1438,6 @@ begin
       Result:= 0;
   end;
 end;
+
 
 end.

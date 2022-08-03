@@ -13,6 +13,7 @@ uses
   Classes, SysUtils,
   ATStringProc,
   ATStringProc_Separator,
+  ATStringProc_Arrays,
   ATSynEdit_fgl,
   ATSynEdit_Carets,
   ATSynEdit_LineParts;
@@ -64,11 +65,11 @@ type
     FList: TATMarkerItems;
     FSorted: boolean;
     FDuplicates: boolean;
-    function GetAsArray_Markers: TATInt64Array;
+    function GetAsArray_Markers: TATMarkerMarkerArray;
     function GetAsArray_Attribs: TATMarkerAttribArray;
     function GetAsString: string;
     function GetItem(N: integer): TATMarkerItem;
-    procedure SetAsArray_Markers(const AValue: TATInt64Array);
+    procedure SetAsArray_Markers(const AValue: TATMarkerMarkerArray);
     procedure SetAsArray_Attribs(const AValue: TATMarkerAttribArray);
     procedure SetAsString(const AValue: string);
     procedure SetItem(N: integer; const AItem: TATMarkerItem);
@@ -96,7 +97,7 @@ type
     function DeleteByPos(AX, AY: integer): boolean;
     procedure Find(AX, AY: integer; out AIndex: integer; out AExactMatch: boolean);
     function FindContaining(AX, AY: integer): integer;
-    property AsArray_Markers: TATInt64Array read GetAsArray_Markers write SetAsArray_Markers;
+    property AsArray_Markers: TATMarkerMarkerArray read GetAsArray_Markers write SetAsArray_Markers;
     property AsArray_Attribs: TATMarkerAttribArray read GetAsArray_Attribs write SetAsArray_Attribs;
     property AsString: string read GetAsString write SetAsString;
     procedure UpdateOnEditing(APosX, APosY, AShiftX, AShiftY, AShiftBelowX: integer;
@@ -244,24 +245,22 @@ begin
   Result:= FList._GetItemPtr(AIndex);
 end;
 
-function TATMarkers.GetAsArray_Markers: TATInt64Array;
-const
-  NN = 7;
+function TATMarkers.GetAsArray_Markers: TATMarkerMarkerArray;
 var
   Item: PATMarkerItem;
   i: integer;
 begin
-  SetLength(Result{%H-}, Count*NN);
+  SetLength(Result{%H-}, Count);
   for i:= 0 to Count-1 do
   begin
     Item:= ItemPtr(i);
-    Result[i*NN]:= Item^.PosX;
-    Result[i*NN+1]:= Item^.PosY;
-    Result[i*NN+2]:= Item^.SelX;
-    Result[i*NN+3]:= Item^.SelY;
-    Result[i*NN+4]:= Item^.Tag;
-    Result[i*NN+5]:= Item^.Value;
-    Result[i*NN+6]:= Ord(Item^.MicromapMode);
+    Result[i].PosX:= Item^.PosX;
+    Result[i].PosY:= Item^.PosY;
+    Result[i].SelX:= Item^.SelX;
+    Result[i].SelY:= Item^.SelY;
+    Result[i].Tag:= Item^.Tag;
+    Result[i].Value:= Item^.Value;
+    Result[i].MicromapMode:= Ord(Item^.MicromapMode);
   end;
 end;
 
@@ -310,34 +309,22 @@ begin
   end;
 end;
 
-procedure TATMarkers.SetAsArray_Markers(const AValue: TATInt64Array);
-const
-  NN = 7;
+procedure TATMarkers.SetAsArray_Markers(const AValue: TATMarkerMarkerArray);
 var
-  NPosX, NPosY, NLenX, NLenY: integer;
-  NTag, NValue: Int64;
-  MicromapMode: TATMarkerMicromapMode;
   i: integer;
 begin
   Clear;
-  for i:= 0 to Length(AValue) div NN - 1 do
+  for i:= 0 to Length(AValue)-1 do
   begin
-    NPosX:= AValue[i*NN];
-    NPosY:= AValue[i*NN+1];
-    NLenX:= AValue[i*NN+2];
-    NLenY:= AValue[i*NN+3];
-    NTag:= AValue[i*NN+4];
-    NValue:= AValue[i*NN+5];
-    MicromapMode:= TATMarkerMicromapMode(AValue[i*NN+6]);
     Add(
-      NPosX,
-      NPosY,
-      NTag,
-      NLenX,
-      NLenY,
+      AValue[i].PosX,
+      AValue[i].PosY,
+      AValue[i].Tag,
+      AValue[i].SelX,
+      AValue[i].SelY,
       nil,
-      NValue,
-      MicromapMode
+      AValue[i].Value,
+      TATMarkerMicromapMode(AValue[i].MicromapMode)
       );
   end;
 end;
@@ -386,41 +373,15 @@ begin
 end;
 
 function TATMarkers.GetAsString: string;
-var
-  Ar: TATInt64Array;
-  i: integer;
 begin
-  Result:= '';
-  Ar:= AsArray_Markers;
-  for i:= 0 to High(Ar) do
-    Result+= IntToStr(Ar[i])+',';
+  Result:= MarkerArrayToString(AsArray_Markers);
 end;
 
 procedure TATMarkers.SetAsString(const AValue: string);
 var
-  Sep: TATStringSeparator;
-  Ar: TATInt64Array;
-  Len: integer;
-  N: Int64;
-  i: integer;
+  Ar: TATMarkerMarkerArray;
 begin
-  if AValue='' then
-  begin
-    Clear;
-    exit;
-  end;
-
-  Len:= SFindCharCount(AValue, ',');
-  if Len=0 then exit;
-  SetLength(Ar, Len);
-
-  Sep.Init(AValue);
-  for i:= 0 to Len-1 do
-  begin
-    Sep.GetItemInt64(N, 0);
-    Ar[i]:= N;
-  end;
-
+  StringToMarkerArray(Ar, AValue);
   AsArray_Markers:= Ar;
 end;
 
