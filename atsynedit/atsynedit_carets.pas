@@ -54,6 +54,7 @@ type
     CharColor: TColor;
     CharStyles: TFontStyles;
     procedure SelectNone;
+    procedure SelectNoneIfEmptySelection;
     procedure SelectToPoint(AX, AY: integer);
     procedure GetRange(out AX1, AY1, AX2, AY2: integer; out ASel: boolean);
     procedure GetSelLines(out AFrom, ATo: integer; AllowNoSel: boolean=false);
@@ -595,6 +596,12 @@ procedure TATCaretItem.SelectNone;
 begin
   EndX:= -1;
   EndY:= -1;
+end;
+
+procedure TATCaretItem.SelectNoneIfEmptySelection;
+begin
+  if (PosY=EndY) and (PosX=EndX) then
+    SelectNone;
 end;
 
 procedure TATCaretItem.SelectToPoint(AX, AY: integer);
