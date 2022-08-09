@@ -432,6 +432,10 @@ begin
     Caret:= FCarets[i];
     if not St.IsIndexValid(Caret.PosY) then Continue;
 
+    //discard empty selection on Enter command, fixing CudaText issue #4271
+    if (Caret.PosY=Caret.EndY) and (Caret.PosX=Caret.EndX) then
+      Caret.SelectNone;
+
     NShiftX:= 0;
     NShiftY:= 0;
     bBetterBrackets:= false;
