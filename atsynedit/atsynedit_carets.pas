@@ -50,7 +50,7 @@ type
     OldRect: TRect; //screen rect, but before running the last command
     SavedX, SavedX_Pre: integer; //memory of last column, to use with arrows Up/Down
     BeforeExtendX: integer; //memory for commands "carets extend: up/down/..."
-    CharStr: UnicodeString; //str is rendered above the inverted-rect, if TATSynEdit.CaretShape's option is on
+    CharStr: UnicodeString; //str is rendered above the inverted-rect, if ATEditorOptions.CaretTextOverInvertedRect
     CharColor: TColor;
     CharStyles: TFontStyles;
     procedure SelectNone;
