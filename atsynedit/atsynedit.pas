@@ -8303,6 +8303,9 @@ begin
   if not FOptGutterShowFoldAlways then
     if not FCursorOnGutter then exit;
 
+  //fixing CudaText issue #4285, needed only for macOS
+  C.AntialiasingMode:= amOff;
+
   //FFoldbarCache removes flickering of the folding-bar on fast editing
   if FFoldCacheEnabled then
   begin
