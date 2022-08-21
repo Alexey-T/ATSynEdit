@@ -111,13 +111,13 @@ type
 
   TATStringItem = packed record
   private
-    Buf: string;
     function GetLine: UnicodeString;
     function GetLineEnds: TATLineEnds;
     function GetLineState: TATLineState;
     procedure SetLineW(const S: UnicodeString);
     procedure SetLineA(const S: string);
   public
+    Buf: string;
     Ex: TATStringItemEx;
     function CharLen: integer;
     property Line: UnicodeString read GetLine write SetLineW;
