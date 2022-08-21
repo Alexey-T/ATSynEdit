@@ -661,9 +661,11 @@ begin
   end;
 
   case FEncoding of
-    cEncUTF8: SaveSignUtf8:= bWithBom;
+    cEncUTF8:
+      SaveSignUtf8:= bWithBom;
     cEncWideBE,
-    cEncWideLE: SaveSignWide:= bWithBom;
+    cEncWideLE:
+      SaveSignWide:= bWithBom;
   end;
 
   CharSize:= cEncodingSize[FEncoding];
