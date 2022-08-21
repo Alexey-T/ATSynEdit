@@ -1290,7 +1290,7 @@ begin
   FEncodingDetect:= true;
   FEncodingDetectDefaultUtf8:= true;
   FEncodingCodepage:= EncConvGetANSI;
-  FEndings:= cEndWin;
+  FEndings:= cLineEndDefault;
 
   FModified:= false;
   FModifiedRecent:= false;
@@ -1740,9 +1740,9 @@ end;
 procedure TATStrings.DoDetectEndings;
 begin
   if not IsIndexValid(0) then Exit;
-  FEndings:= LinesEnds[0]; //no range-chk
+  FEndings:= LinesEnds[0]; //no range-check needed
   if FEndings=cEndNone then
-    FEndings:= cEndWin;
+    FEndings:= cLineEndDefault;
 end;
 
 function TATStrings.TextSubstring(AX1, AY1, AX2, AY2: integer;
