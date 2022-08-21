@@ -1,5 +1,13 @@
 {$ifdef nn}begin end;{$endif}
 
+const
+  cLineEndMatrix: array[TATLineEnds, TATFileEncoding] of string = (
+    ('', '', '', '', '', ''),
+    (#13#10, #13#10, #13#0#10#0, #0#13#0#10, #13#0#0#0#10#0#0#0, #0#0#0#13#0#0#0#10),
+    (#10, #10, #10#0, #0#10, #10#0#0#0, #0#0#0#10),
+    (#13, #13, #13#0, #0#13, #13#0#0#0, #0#0#0#13)
+  );
+
 procedure TATStrings.SaveToStream(AStream: TStream; AEncoding: TATFileEncoding; AWithSignature: boolean);
 var
   Item: PATStringItem;
@@ -39,13 +47,8 @@ begin
   begin
     Item:= FList.GetItem(i);
 
-    ItemEnd:= Item^.LineEnds;
-    //don't break file if ending of some non-last line is unset
-    if (ItemEnd=cEndNone) and (i<NLast) then
-      ItemEnd:= FEndings;
-
-    SWide:= Item^.Line + cLineEndStrings[ItemEnd];
-
+    //write line without line-end
+    SWide:= Item^.Line;
     if SWide<>'' then
     case AEncoding of
       cEncAnsi:
@@ -80,6 +83,18 @@ begin
 
       else
         DoEncError;
+    end;
+
+    //write line-end as additional string
+    ItemEnd:= Item^.LineEnds;
+    //don't break file if ending of some non-last line is unset
+    if (ItemEnd=cEndNone) and (i<NLast) then
+      ItemEnd:= FEndings;
+
+    if ItemEnd<>cEndNone then
+    begin
+      SAnsi:= cLineEndMatrix[ItemEnd, AEncoding];
+      AStream.WriteBuffer(SAnsi[1], Length(SAnsi));
     end;
 
     if (i mod TATEditorOptions.ProgressSaveLines) = TATEditorOptions.ProgressSaveLines div 2 then
