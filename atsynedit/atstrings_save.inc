@@ -41,9 +41,8 @@ begin
 
     ItemEnd:= Item^.LineEnds;
     //don't break file if ending of some non-last line is unset
-    if i<NLast then
-      if ItemEnd=cEndNone then
-        ItemEnd:= FEndings;
+    if (ItemEnd=cEndNone) and (i<NLast) then
+      ItemEnd:= FEndings;
 
     SWide:= Item^.Line + cLineEndStrings[ItemEnd];
 
