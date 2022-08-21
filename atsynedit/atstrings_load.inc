@@ -490,6 +490,7 @@ var
       case _GetBufferEnding(Buf, AFoundPos, FEncoding) of
         cCharNotEnding:
           begin
+            AEnding:= cEndNone;
             Inc(AFoundPos, CharSize);
           end;
         cCharEnding10:
