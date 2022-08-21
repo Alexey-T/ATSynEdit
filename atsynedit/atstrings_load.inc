@@ -476,7 +476,7 @@ var
     out AEnding: TATLineEnds);
   begin
     AFoundPos:= AFromPos;
-    AEnding:= {$ifdef windows} cEndWin {$else} cEndUnix {$endif};
+    AEnding:= cEndNone;
     repeat
       if AFoundPos>=BufSize then exit;
 
@@ -490,7 +490,6 @@ var
       case _GetBufferEnding(Buf, AFoundPos, FEncoding) of
         cCharNotEnding:
           begin
-            AEnding:= cEndNone;
             Inc(AFoundPos, CharSize);
           end;
         cCharEnding10:
