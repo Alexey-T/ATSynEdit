@@ -15,15 +15,23 @@ uses
   ATSynEdit_FGL;
 
 type
+
+  { TATGutterDecorData }
+
   TATGutterDecorData = packed record
+  private
+    function GetText: string;
+    procedure SetText(const AValue: string);
+  public
     Tag: Int64;
+    TextBuffer: PChar;
     LineNum: integer;
     ImageIndex: integer;
-    Text: string[15]; //at least 2-3 UTF8 chars
     TextColor: TColor;
     TextBold: boolean;
     TextItalic: boolean;
     DeleteOnDelLine: boolean;
+    property Text: string read GetText write SetText;
   end;
 
   { TATGutterDecorItem }
@@ -41,6 +49,7 @@ type
   TATGutterDecorItems = class(specialize TFPGList<TATGutterDecorItem>)
   public
     function ItemPtr(AIndex: integer): PATGutterDecorItem; inline;
+    procedure Deref(Item: Pointer); override;
   end;
 
 type
@@ -70,11 +79,45 @@ type
 
 implementation
 
+{ TATGutterDecorData }
+
+function TATGutterDecorData.GetText: string;
+begin
+  if TextBuffer<>nil then
+    Result:= StrPas(TextBuffer)
+  else
+    Result:= '';
+end;
+
+procedure TATGutterDecorData.SetText(const AValue: string);
+begin
+  if TextBuffer<>nil then
+  begin
+    StrDispose(TextBuffer);
+    TextBuffer:= nil;
+  end;
+  if AValue<>'' then
+    TextBuffer:= StrNew(PChar(AValue));
+end;
+
 { TATGutterDecorItems }
 
 function TATGutterDecorItems.ItemPtr(AIndex: integer): PATGutterDecorItem;
 begin
   Result:= PATGutterDecorItem(InternalGet(AIndex));
+end;
+
+procedure TATGutterDecorItems.Deref(Item: Pointer);
+var
+  DecorPtr: PATGutterDecorItem;
+begin
+  DecorPtr:= PATGutterDecorItem(Item);
+  if Assigned(DecorPtr^.Data.TextBuffer) then
+  begin
+    StrDispose(DecorPtr^.Data.TextBuffer);
+    DecorPtr^.Data.TextBuffer:= nil;
+  end;
+  //inherited Deref(Item);
 end;
 
 { TATGutterDecorItem }
