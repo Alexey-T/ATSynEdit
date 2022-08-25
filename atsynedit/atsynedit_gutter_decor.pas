@@ -19,7 +19,7 @@ type
     Tag: Int64;
     LineNum: integer;
     ImageIndex: integer;
-    Text: string[15]; //at last 2-3 UTF8 chars
+    Text: string[15]; //at least 2-3 UTF8 chars
     TextColor: TColor;
     TextBold: boolean;
     TextItalic: boolean;
