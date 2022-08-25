@@ -1,4 +1,7 @@
 
+2022.08.24
+* change: renamed Decor property Text to TextAll; added Decor read-only props TextCaption, TextHint; TextAll now contains caption+chr(1)+hint
+
 2022.07.17
 - fix/optimization: rendering with 100k+ 'markers' was very slow
 - fix/optimization: during mass replacement, OnCaret must not activate
