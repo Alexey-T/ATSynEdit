@@ -8400,12 +8400,14 @@ procedure TATSynEdit.DoPaintGutterDecor(C: TCanvas; ALine: integer; const ARect:
     Ext: TSize;
     NText, NImageIndex: integer;
     bPaintIcon: boolean;
+    DecorText: string;
   begin
     NImageIndex:= Decor.Data.ImageIndex;
     bPaintIcon:= Assigned(FGutterDecorImages) and (NImageIndex>=0);
 
     //paint decor text
-    if Decor.Data.Text<>'' then
+    DecorText:= Decor.Data.Text;
+    if DecorText<>'' then
     begin
       C.Font.Color:= Decor.Data.TextColor;
       Style:= [];
@@ -8416,7 +8418,7 @@ procedure TATSynEdit.DoPaintGutterDecor(C: TCanvas; ALine: integer; const ARect:
       StylePrev:= C.Font.Style;
       C.Font.Style:= Style;
 
-      Ext:= C.TextExtent(Decor.Data.Text);
+      Ext:= C.TextExtent(DecorText);
       C.Brush.Color:= FColorGutterBG;
 
       case FGutterDecorAlignment of
@@ -8432,7 +8434,7 @@ procedure TATSynEdit.DoPaintGutterDecor(C: TCanvas; ALine: integer; const ARect:
       C.TextOut(
         NText,
         (ARect.Top+ARect.Bottom-Ext.cy) div 2,
-        Decor.Data.Text
+        DecorText
         );
       C.Font.Style:= StylePrev;
       C.Brush.Style:= bsSolid;
