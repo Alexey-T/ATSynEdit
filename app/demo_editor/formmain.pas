@@ -1081,7 +1081,7 @@ begin
 
   FillChar(decor, SizeOf(decor), 0);
   decor.DeleteOnDelLine:= true;
-  decor.Text:= V[1];
+  decor.TextAll:= V[1];
   decor.TextItalic:= true;
   decor.TextBold:= true;
   decor.TextColor:= Random($ffffff);
