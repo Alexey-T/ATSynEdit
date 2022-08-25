@@ -8419,7 +8419,7 @@ procedure TATSynEdit.DoPaintGutterDecor(C: TCanvas; ALine: integer; const ARect:
     bPaintIcon:= Assigned(FGutterDecorImages) and (NImageIndex>=0);
 
     //paint decor text
-    DecorText:= Decor.Data.Text;
+    DecorText:= Decor.Data.TextCaption;
     if DecorText<>'' then
     begin
       C.Font.Color:= Decor.Data.TextColor;

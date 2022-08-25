@@ -20,9 +20,10 @@ type
 
   TATGutterDecorData = packed record
   private
-    function GetText: string;
+    function GetTextAll: string;
+    function GetTextCaption: string;
     function GetTextHint: string;
-    procedure SetText(const AValue: string);
+    procedure SetTextAll(const AValue: string);
   public
     Tag: Int64;
     TextBuffer: PChar;
@@ -32,7 +33,8 @@ type
     TextBold: boolean;
     TextItalic: boolean;
     DeleteOnDelLine: boolean;
-    property Text: string read GetText write SetText;
+    property TextAll: string read GetTextAll write SetTextAll;
+    property TextCaption: string read GetTextCaption;
     property TextHint: string read GetTextHint;
   end;
 
@@ -83,20 +85,26 @@ implementation
 
 { TATGutterDecorData }
 
-function TATGutterDecorData.GetText: string;
+function TATGutterDecorData.GetTextAll: string;
+begin
+  if TextBuffer=nil then
+    Result:= ''
+  else
+    Result:= StrPas(TextBuffer);
+end;
+
+function TATGutterDecorData.GetTextCaption: string;
 var
   N: integer;
   S: string;
 begin
-  Result:= '';
-  if TextBuffer=nil then exit;
-  S:= StrPas(TextBuffer);
-  if S='' then exit;
+  S:= GetTextAll;
+  if S='' then exit('');
   N:= Pos(#1, S);
-  if N=0 then
-    Result:= S
+  if N>0 then
+    Result:= Copy(S, 1, N-1)
   else
-    Result:= Copy(S, 1, N-1);
+    Result:= S;
 end;
 
 function TATGutterDecorData.GetTextHint: string;
@@ -104,16 +112,16 @@ var
   N: integer;
   S: string;
 begin
-  Result:= '';
-  if TextBuffer=nil then exit;
-  S:= StrPas(TextBuffer);
-  if S='' then exit;
+  S:= GetTextAll;
+  if S='' then exit('');
   N:= Pos(#1, S);
   if N>0 then
-    Result:= Copy(S, N+1, MaxInt);
+    Result:= Copy(S, N+1, MaxInt)
+  else
+    Result:= '';
 end;
 
-procedure TATGutterDecorData.SetText(const AValue: string);
+procedure TATGutterDecorData.SetTextAll(const AValue: string);
 begin
   if TextBuffer<>nil then
   begin
@@ -153,7 +161,7 @@ end;
 
 function TATGutterDecorItem.IsBackgroundFill: boolean;
 begin
-  Result:= (Data.Text='') and (Data.ImageIndex=-1);
+  Result:= (Data.TextCaption='') and (Data.ImageIndex=-1);
 end;
 
 class operator TATGutterDecorItem.=(const a, b: TATGutterDecorItem): boolean;
