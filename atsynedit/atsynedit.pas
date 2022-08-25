@@ -5736,6 +5736,7 @@ end;
 
 procedure TATSynEdit.DoHintShowForBookmark(ALine: integer);
 var
+  St: TATStrings;
   S: string;
   P: TPoint;
   R: TRect;
@@ -5746,10 +5747,22 @@ begin
   if FHintWnd=nil then
     FHintWnd:= THintWindow.Create(Self);
 
-  NIndex:= Strings.Bookmarks.Find(ALine);
-  if NIndex<0 then exit;
+  S:= '';
+  St:= Strings;
 
-  S:= Strings.Bookmarks[NIndex]^.Data.Hint;
+  //get hint of bookmark
+  NIndex:= St.Bookmarks.Find(ALine);
+  if NIndex>=0 then
+    S:= St.Bookmarks[NIndex]^.Data.Hint;
+
+  //get hint of decor
+  if S='' then
+  begin
+    NIndex:= St.GutterDecor1.Find(ALine);
+    if NIndex>=0 then
+      S:= St.GutterDecor1.ItemPtr(NIndex)^.Data.TextHint;
+  end;
+
   if S='' then
   begin
     DoHintHide;

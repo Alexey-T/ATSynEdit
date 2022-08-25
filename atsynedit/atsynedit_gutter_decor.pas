@@ -21,6 +21,7 @@ type
   TATGutterDecorData = packed record
   private
     function GetText: string;
+    function GetTextHint: string;
     procedure SetText(const AValue: string);
   public
     Tag: Int64;
@@ -32,6 +33,7 @@ type
     TextItalic: boolean;
     DeleteOnDelLine: boolean;
     property Text: string read GetText write SetText;
+    property TextHint: string read GetTextHint;
   end;
 
   { TATGutterDecorItem }
@@ -82,11 +84,33 @@ implementation
 { TATGutterDecorData }
 
 function TATGutterDecorData.GetText: string;
+var
+  N: integer;
+  S: string;
 begin
-  if TextBuffer<>nil then
-    Result:= StrPas(TextBuffer)
+  Result:= '';
+  if TextBuffer=nil then exit;
+  S:= StrPas(TextBuffer);
+  if S='' then exit;
+  N:= Pos(#1, S);
+  if N=0 then
+    Result:= S
   else
-    Result:= '';
+    Result:= Copy(S, 1, N-1);
+end;
+
+function TATGutterDecorData.GetTextHint: string;
+var
+  N: integer;
+  S: string;
+begin
+  Result:= '';
+  if TextBuffer=nil then exit;
+  S:= StrPas(TextBuffer);
+  if S='' then exit;
+  N:= Pos(#1, S);
+  if N>0 then
+    Result:= Copy(S, N+1, MaxInt);
 end;
 
 procedure TATGutterDecorData.SetText(const AValue: string);
