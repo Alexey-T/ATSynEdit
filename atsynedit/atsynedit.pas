@@ -5756,7 +5756,7 @@ begin
     S:= St.Bookmarks[NIndex]^.Data.Hint;
 
   //get hint of decor
-  if S='' then
+  if (S='') and Assigned(St.GutterDecor1) then
   begin
     NIndex:= St.GutterDecor1.Find(ALine);
     if NIndex>=0 then
