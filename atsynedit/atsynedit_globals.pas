@@ -135,6 +135,7 @@ type
     HintScrollDx: integer;
     HintBookmarkDx: integer;
     HintBookmarkDy: integer;
+    HintBookmarkMaxWidth: integer;
     UrlMarkerTag: integer;
 
     //UI strings
@@ -456,6 +457,7 @@ initialization
     HintScrollDx:= 5;
     HintBookmarkDx:= 6;
     HintBookmarkDy:= 16;
+    HintBookmarkMaxWidth:= 700;
     UrlMarkerTag:= -100;
 
     //UI strings

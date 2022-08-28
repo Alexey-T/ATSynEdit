@@ -5769,7 +5769,7 @@ begin
     exit
   end;
 
-  R:= FHintWnd.CalcHintRect(500, S, nil);
+  R:= FHintWnd.CalcHintRect(ATEditorOptions.HintBookmarkMaxWidth, S, nil);
 
   P:= Mouse.CursorPos;
   OffsetRect(R, P.X+ATEditorOptions.HintBookmarkDx, P.Y+ATEditorOptions.HintBookmarkDy);
