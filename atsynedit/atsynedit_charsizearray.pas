@@ -133,6 +133,10 @@ begin
   for i:= $10A0 to $10FF do
     FixedSizes[i]:= uw_normal;
 
+  //Latin extended additional
+  for i:= $1EA0 to $1EF9 do
+    FixedSizes[i]:= uw_normal;
+
   for i:= $2010 to $2027 do
     FixedSizes[i]:= uw_normal;
   FixedSizes[$2026]:= 0; //ellipsis char should be full-width? but user wants normal width, CudaText issue #3873
