@@ -306,7 +306,7 @@ const
   cMaxDegrees=1500.0;
 var
   NLen: integer;
-  Val1: double;
+  ValAngle: double;
   Val2, Val3: integer;
   ValAlpha: double;
   bAlpha, bOk: boolean;
@@ -335,7 +335,7 @@ begin
   Inc(N);
 
   //H component
-  Val1:= SkipFloat(S, N, bOk);
+  ValAngle:= SkipFloat(S, N, bOk);
   if not bOk then exit;
   if N>NLen then exit;
   if N+4<=NLen then
@@ -347,28 +347,28 @@ begin
     else
     if (S[N]='r') and (S[N+1]='a') and (S[N+2]='d') then
     begin
-      Val1:= Val1*(360.0/2/Pi);
+      ValAngle:= ValAngle*(360.0/2/Pi);
       Inc(N, 3);
     end
     else
     if (S[N]='g') and (S[N+1]='r') and (S[N+2]='a') and (S[N+3]='d') then
     begin
-      Val1:= Val1*(360.0/400.0);
+      ValAngle:= ValAngle*(360.0/400.0);
       Inc(N, 4);
     end
     else
     if (S[N]='t') and (S[N+1]='u') and (S[N+2]='r') and (S[N+3]='n') then
     begin
-      Val1:= Val1*360.0;
+      ValAngle:= ValAngle*360.0;
       Inc(N, 4);
     end;
   end;
-  if Val1>cMaxDegrees then exit;
-  if Val1<-cMaxDegrees then exit;
-  while Val1<0.0 do
-    Val1:= Val1+360.0;
-  while Val1>360.0 do
-    Val1:= Val1-360.0;
+  if ValAngle>cMaxDegrees then exit;
+  if ValAngle<-cMaxDegrees then exit;
+  while ValAngle<0.0 do
+    ValAngle:= ValAngle+360.0;
+  while ValAngle>360.0 do
+    ValAngle:= ValAngle-360.0;
   SkipComma(S, N);
 
   //S component
@@ -397,7 +397,7 @@ begin
   if S[N]<>')' then exit;
 
   Result:= HLStoColor(
-    byte(Round(Val1*(255.0/360.0))),
+    byte(Round(ValAngle*(255.0/360.0))),
     byte(Val3 * 255 div 100),
     byte(Val2 * 255 div 100)
     );
