@@ -180,7 +180,7 @@ type
     function ConvertCaretPosToBufferPos(APos: TPoint): integer;
     function GetOffsetOfCaret: integer;
     function GetOffsetStartPos: integer;
-    function GetRegexSkipIncrement: integer; inline;
+    function GetRegexSkipIncrement: integer;
     procedure GetMarkerPos(out AX, AY: integer);
     procedure GetEditorSelRange(out AX1, AY1, AX2, AY2: integer; out ASelText: UnicodeString);
     procedure DoFixCaretSelectionDirection;
@@ -306,6 +306,7 @@ var
   Sep: TATStringSeparator;
 begin
   NCount:= SFindCharCount(Str, #10)+1;
+  L:= nil;
   SetLength(L, NCount);
   if NCount=1 then
     L[0]:= Str
@@ -615,6 +616,8 @@ begin
 
     if AWithConfirm then
     begin
+      bOk:= true;
+      bContinue:= true;
       DoConfirmReplace(FMatchEdPos, FMatchEdEnd, bOk, bContinue, SNew);
       if not bContinue then exit;
       if not bOk then Continue;
@@ -676,6 +679,7 @@ begin
   P2:= ConvertBufferPosToCaretPos(FRegex.MatchPos[0]+FRegex.MatchLen[0]);
 
   bOk:= true;
+  bContinue:= true;
 
   if bOk then
     if not CheckTokensEd(P1.X, P1.Y, P2.X, P2.Y) then
@@ -2438,7 +2442,7 @@ begin
     end;
     if Results.Count=0 then exit;
 
-    FillChar(AttrRec, SizeOf(AttrRec), 0);
+    FillChar(AttrRec{%H-}, SizeOf(AttrRec), 0);
     AttrRec.ColorBG:= clNone;
     AttrRec.ColorFont:= clNone;
     AttrRec.ColorBorder:= AColorBorder;
