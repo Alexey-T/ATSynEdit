@@ -192,9 +192,10 @@ begin
   Result:= SkipInt(S, N);
   if N>Length(S) then exit(-1);
   if S[N]='%' then
-    Inc(N)
-  else
-    exit(-1);
+  begin
+    Inc(N);
+    Result:= Result*255 div 100;
+  end;
   SkipSpaces(S, N);
 end;
 
@@ -241,19 +242,19 @@ begin
   if S[N]<>'(' then exit;
   Inc(N);
 
-  Val1:= SkipInt(S, N);
+  Val1:= SkipIntWithPercent(S, N);
   if Val1<0 then exit;
   if Val1>255 then exit;
   if N>NLen then exit;
   SkipComma(S, N);
 
-  Val2:= SkipInt(S, N);
+  Val2:= SkipIntWithPercent(S, N);
   if Val2<0 then exit;
   if Val2>255 then exit;
   if N>NLen then exit;
   SkipComma(S, N);
 
-  Val3:= SkipInt(S, N);
+  Val3:= SkipIntWithPercent(S, N);
   if Val3<0 then exit;
   if Val3>255 then exit;
   if N>NLen then exit;
