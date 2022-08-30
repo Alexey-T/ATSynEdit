@@ -27,7 +27,7 @@ type
     class function SkipInt(const S: TStr; var N: integer): integer;
     class function SkipIntMaybeInPercents(const S: TStr; var N: integer): integer;
     class function SkipIntWithPercent(const S: TStr; var N: integer): integer;
-    class function SkipFloat(const S: TStr; var N: integer): integer;
+    class function SkipFloat(const S: TStr; var N: integer): double;
   public
     //convert TColor -> HTML color string #rrggbb
     class function ColorToHtmlString(Color: TColor): string;
@@ -212,14 +212,14 @@ begin
 end;
 
 
-class function TATHtmlColorParser.SkipFloat(const S: TStr; var N: integer): integer;
+class function TATHtmlColorParser.SkipFloat(const S: TStr; var N: integer): double;
 begin
-  Result:= -1;
+  Result:= -1.0;
   SkipSpaces(S, N);
   while (N<=Length(S)) and (IsCodeDigit(ord(S[N])) or (S[N]='.')) do
   begin
     Inc(N);
-    Result:= 1; //ignore the value
+    Result:= 1.0; //ignore the value
   end;
   SkipSpaces(S, N);
 end;
@@ -229,7 +229,8 @@ class function TATHtmlColorParser.ParseFunctionRGB(const S: TStr; FromPos: integ
 var
   NLen: integer;
 var
-  Val1, Val2, Val3, ValAlpha: integer;
+  Val1, Val2, Val3: integer;
+  ValAlpha: double;
   bAlpha: boolean;
   N: integer;
 begin
@@ -291,7 +292,8 @@ end;
 class function TATHtmlColorParser.ParseFunctionHSL(const S: TStr; FromPos: integer; out LenOfColor: integer): TColor;
 var
   NLen: integer;
-  Val1, Val2, Val3, ValAlpha: integer;
+  Val1, Val2, Val3: integer;
+  ValAlpha: double;
   bAlpha: boolean;
   N: integer;
 begin
@@ -321,6 +323,9 @@ begin
   if Val1<0 then exit;
   if Val1>360 then exit;
   if N>NLen then exit;
+  if N+4<NLen then
+    if (S[N]='d') and (S[N+1]='e') and (S[N+2]='g') then
+      Inc(N, 3);
   SkipComma(S, N);
 
   Val2:= SkipIntWithPercent(S, N);
@@ -333,11 +338,16 @@ begin
   if Val3<0 then exit;
   if Val3>100 then exit;
   if N>NLen then exit;
-  if bAlpha then
+  if bAlpha and (S[N]<>')') then
   begin
-    SkipComma(S, N);
+    SkipCommaOrSlash(S, N);
     ValAlpha:= SkipFloat(S, N);
     if ValAlpha<0 then exit;
+    if S[N]='%' then
+    begin
+      //ValAlpha:= ValAlpha div 100;
+      Inc(N);
+    end;
   end;
   if S[N]<>')' then exit;
 
