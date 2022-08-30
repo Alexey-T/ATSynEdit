@@ -303,7 +303,7 @@ end;
 
 class function TATHtmlColorParser.ParseFunctionHSL(const S: TStr; FromPos: integer; out LenOfColor: integer): TColor;
 const
-  cMaxAngle=1000.0;
+  cMaxDegrees=1500.0;
 var
   NLen: integer;
   Val1: double;
@@ -351,14 +351,20 @@ begin
       Inc(N, 3);
     end
     else
+    if (S[N]='g') and (S[N+1]='r') and (S[N+2]='a') and (S[N+3]='d') then
+    begin
+      Val1:= Val1*(360.0/400.0);
+      Inc(N, 4);
+    end
+    else
     if (S[N]='t') and (S[N+1]='u') and (S[N+2]='r') and (S[N+3]='n') then
     begin
       Val1:= Val1*360.0;
       Inc(N, 4);
     end;
   end;
-  if Val1>cMaxAngle then exit;
-  if Val1<-cMaxAngle then exit;
+  if Val1>cMaxDegrees then exit;
+  if Val1<-cMaxDegrees then exit;
   while Val1<0.0 do
     Val1:= Val1+360.0;
   while Val1>360.0 do
