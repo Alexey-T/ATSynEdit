@@ -227,7 +227,7 @@ begin
   if Buf='' then exit;
   if Buf[1]='.' then
     Insert('0', Buf, 1);
-  Result:= StrToFloat(Buf);
+  Result:= StrToFloatDef(Buf, -1.0);
 
   N:= NEnd;
   SkipSpaces(S, N);
