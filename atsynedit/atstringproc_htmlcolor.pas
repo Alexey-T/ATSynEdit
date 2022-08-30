@@ -25,6 +25,7 @@ type
     class procedure SkipComma(const S: TStr; var N: integer);
     class procedure SkipCommaOrSlash(const S: TStr; var N: integer);
     class function SkipInt(const S: TStr; var N: integer): integer;
+    class function SkipIntMaybeInPercents(const S: TStr; var N: integer): integer;
     class function SkipIntWithPercent(const S: TStr; var N: integer): integer;
     class function SkipFloat(const S: TStr; var N: integer): integer;
   public
@@ -187,7 +188,7 @@ begin
   SkipSpaces(S, N);
 end;
 
-class function TATHtmlColorParser.SkipIntWithPercent(const S: TStr; var N: integer): integer;
+class function TATHtmlColorParser.SkipIntMaybeInPercents(const S: TStr; var N: integer): integer;
 begin
   Result:= SkipInt(S, N);
   if N>Length(S) then exit(-1);
@@ -198,6 +199,18 @@ begin
   end;
   SkipSpaces(S, N);
 end;
+
+class function TATHtmlColorParser.SkipIntWithPercent(const S: TStr; var N: integer): integer;
+begin
+  Result:= SkipInt(S, N);
+  if N>Length(S) then exit(-1);
+  if S[N]='%' then
+    Inc(N)
+  else
+    exit(-1);
+  SkipSpaces(S, N);
+end;
+
 
 class function TATHtmlColorParser.SkipFloat(const S: TStr; var N: integer): integer;
 begin
@@ -242,19 +255,19 @@ begin
   if S[N]<>'(' then exit;
   Inc(N);
 
-  Val1:= SkipIntWithPercent(S, N);
+  Val1:= SkipIntMaybeInPercents(S, N);
   if Val1<0 then exit;
   if Val1>255 then exit;
   if N>NLen then exit;
   SkipComma(S, N);
 
-  Val2:= SkipIntWithPercent(S, N);
+  Val2:= SkipIntMaybeInPercents(S, N);
   if Val2<0 then exit;
   if Val2>255 then exit;
   if N>NLen then exit;
   SkipComma(S, N);
 
-  Val3:= SkipIntWithPercent(S, N);
+  Val3:= SkipIntMaybeInPercents(S, N);
   if Val3<0 then exit;
   if Val3>255 then exit;
   if N>NLen then exit;
