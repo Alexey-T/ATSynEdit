@@ -213,14 +213,23 @@ end;
 
 
 class function TATHtmlColorParser.SkipFloat(const S: TStr; var N: integer): double;
+var
+  Buf: string;
+  NEnd: integer;
 begin
   Result:= -1.0;
   SkipSpaces(S, N);
-  while (N<=Length(S)) and (IsCodeDigit(ord(S[N])) or (S[N]='.')) do
-  begin
-    Inc(N);
-    Result:= 1.0; //ignore the value
-  end;
+  NEnd:= N;
+
+  while (NEnd<=Length(S)) and (IsCodeDigit(ord(S[NEnd])) or (S[NEnd]='.')) do
+    Inc(NEnd);
+  Buf:= Copy(S, N, NEnd-N);
+  if Buf='' then exit;
+  if Buf[1]='.' then
+    Insert('0', Buf, 1);
+  Result:= StrToFloat(Buf);
+
+  N:= NEnd;
   SkipSpaces(S, N);
 end;
 
@@ -292,7 +301,8 @@ end;
 class function TATHtmlColorParser.ParseFunctionHSL(const S: TStr; FromPos: integer; out LenOfColor: integer): TColor;
 var
   NLen: integer;
-  Val1, Val2, Val3: integer;
+  Val1: double;
+  Val2, Val3: integer;
   ValAlpha: double;
   bAlpha: boolean;
   N: integer;
@@ -319,21 +329,40 @@ begin
   if S[N]<>'(' then exit;
   Inc(N);
 
-  Val1:= SkipInt(S, N);
-  if Val1<0 then exit;
-  if Val1>360 then exit;
+  //H component
+  Val1:= SkipFloat(S, N);
   if N>NLen then exit;
-  if N+4<NLen then
+  if N+4<=NLen then
+  begin
     if (S[N]='d') and (S[N+1]='e') and (S[N+2]='g') then
+    begin
       Inc(N, 3);
+    end
+    else
+    if (S[N]='r') and (S[N+1]='a') and (S[N+2]='d') then
+    begin
+      Val1:= Val1*(360.0/2/Pi);
+      Inc(N, 3);
+    end
+    else
+    if (S[N]='t') and (S[N+1]='u') and (S[N+2]='r') and (S[N+3]='n') then
+    begin
+      Val1:= Val1*360.0;
+      Inc(N, 4);
+    end;
+  end;
+  if Val1<0.0 then exit;
+  if Val1>360.0 then exit;
   SkipComma(S, N);
 
+  //S component
   Val2:= SkipIntWithPercent(S, N);
   if Val2<0 then exit;
   if Val2>100 then exit;
   if N>NLen then exit;
   SkipComma(S, N);
 
+  //L component
   Val3:= SkipIntWithPercent(S, N);
   if Val3<0 then exit;
   if Val3>100 then exit;
@@ -352,7 +381,7 @@ begin
   if S[N]<>')' then exit;
 
   Result:= HLStoColor(
-    byte(Val1 * 255 div 360),
+    byte(Round(Val1*(255.0/360.0))),
     byte(Val3 * 255 div 100),
     byte(Val2 * 255 div 100)
     );
