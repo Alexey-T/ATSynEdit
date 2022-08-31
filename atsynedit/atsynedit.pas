@@ -5737,6 +5737,7 @@ end;
 procedure TATSynEdit.DoHintShowForBookmark(ALine: integer);
 var
   St: TATStrings;
+  Decor: TATGutterDecor;
   S: string;
   P: TPoint;
   R: TRect;
@@ -5756,11 +5757,21 @@ begin
     S:= St.Bookmarks[NIndex]^.Data.Hint;
 
   //get hint of decor
-  if (S='') and Assigned(St.GutterDecor1) then
+  if S='' then
   begin
-    NIndex:= St.GutterDecor1.Find(ALine);
-    if NIndex>=0 then
-      S:= St.GutterDecor1.ItemPtr(NIndex)^.Data.TextHint;
+    Decor:= St.GutterDecor1;
+    if Assigned(Decor) then
+    begin
+      NIndex:= Decor.Find(ALine);
+      if NIndex>=0 then
+      begin
+        S:= Decor.ItemPtr(NIndex)^.Data.TextHint;
+        //it may be not the first item for given line, try next one too
+        if S='' then
+          if (NIndex+1<Decor.Count) and (Decor.ItemPtr(NIndex+1)^.Data.LineNum=ALine) then
+            S:= Decor.ItemPtr(NIndex+1)^.Data.TextHint;
+      end;
+    end;
   end;
 
   if S='' then
