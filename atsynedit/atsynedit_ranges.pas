@@ -576,7 +576,7 @@ begin
 end;
 
 function TATSynRanges.FindRangeWithPlusAtLine(ALine: integer): integer;
-// issue https://github.com/Alexey-T/CudaText/issues/2566
+// CudaText issue #2566
 // because of this, we must skip all one-line ranges
 var
   a, b, m, dif, NCount: integer;
