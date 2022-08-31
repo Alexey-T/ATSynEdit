@@ -206,7 +206,7 @@ begin
   Result:= [];
   if Carets.Count<>1 then exit;
   Caret:= Carets[0];
-  if Caret.EndY<0 then exit;
+  if not Caret.IsSelection then exit;
   Caret.GetSelLines(Y1, Y2);
 
   //better clear the selection
