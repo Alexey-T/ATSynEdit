@@ -68,6 +68,7 @@ type
     procedure Add(const AData: TATBookmarkData; AToggle: boolean=false);
     function Find(ALineNum: integer): integer;
     function FindNearest(ALineNum: integer; out AExactMatch: boolean): integer;
+    function FindHintForLine(ALineNum: integer): string;
     procedure DeleteDups;
     procedure Update(AChange: TATLineChangeKind; ALine, AItemCount, ALineCount: integer);
   end;
@@ -290,6 +291,16 @@ begin
     else
       a:= m+1;
   until false;
+end;
+
+function TATBookmarks.FindHintForLine(ALineNum: integer): string;
+var
+  N: integer;
+begin
+  Result:= '';
+  N:= Find(ALineNum);
+  if N>=0 then
+    Result:= GetItemPtr(N)^.Data.Hint;
 end;
 
 
