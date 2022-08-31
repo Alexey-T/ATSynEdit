@@ -5761,17 +5761,7 @@ begin
   begin
     Decor:= St.GutterDecor1;
     if Assigned(Decor) then
-    begin
-      NIndex:= Decor.Find(ALine);
-      if NIndex>=0 then
-      begin
-        S:= Decor.ItemPtr(NIndex)^.Data.TextHint;
-        //it may be not the first item for given line, try next one too
-        if S='' then
-          if (NIndex+1<Decor.Count) and (Decor.ItemPtr(NIndex+1)^.Data.LineNum=ALine) then
-            S:= Decor.ItemPtr(NIndex+1)^.Data.TextHint;
-      end;
-    end;
+      S:= Decor.FindHintForLine(ALine);
   end;
 
   if S='' then

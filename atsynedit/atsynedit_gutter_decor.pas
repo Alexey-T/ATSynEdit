@@ -77,6 +77,7 @@ type
     function ItemPtr(N: integer): PATGutterDecorItem; inline;
     procedure Add(const AData: TATGutterDecorData);
     function Find(ALineNum: integer; AInsertionIndex: boolean=false): integer;
+    function FindHintForLine(ALineNum: integer): string;
     procedure DeleteDups;
     procedure Update(AChange: TATLineChangeKind; ALine, AItemCount, ALineCount: integer);
   end;
@@ -338,6 +339,22 @@ begin
     else
       a:= m+1;
   until false;
+end;
+
+function TATGutterDecor.FindHintForLine(ALineNum: integer): string;
+var
+  N: integer;
+begin
+  Result:= '';
+  N:= Find(ALineNum);
+  if N>=0 then
+  begin
+    Result:= ItemPtr(N)^.Data.TextHint;
+    //it may be not the first item for given line, try next one too
+    if Result='' then
+      if (N+1<Count) and (ItemPtr(N+1)^.Data.LineNum=ALineNum) then
+        Result:= ItemPtr(N+1)^.Data.TextHint;
+  end;
 end;
 
 
