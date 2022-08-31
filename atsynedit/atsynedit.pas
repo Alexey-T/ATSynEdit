@@ -8406,12 +8406,15 @@ procedure TATSynEdit.DoPaintGutterDecor(C: TCanvas; ALine: integer; const ARect:
   var
     Style, StylePrev: TFontStyles;
     Ext: TSize;
-    NText, NImageIndex: integer;
+    NText, NImageIndex, NImageCount: integer;
     bPaintIcon: boolean;
     DecorText: string;
   begin
     NImageIndex:= Decor.Data.ImageIndex;
-    bPaintIcon:= Assigned(FGutterDecorImages) and (NImageIndex>=0);
+    NImageCount:= 0;
+    if Assigned(FGutterDecorImages) then
+      NImageCount:= FGutterDecorImages.Count;
+    bPaintIcon:= (NImageIndex>=0) and (NImageIndex<NImageCount);
 
     //paint decor text
     DecorText:= Decor.Data.TextCaption;
@@ -8451,8 +8454,7 @@ procedure TATSynEdit.DoPaintGutterDecor(C: TCanvas; ALine: integer; const ARect:
     //paint decor icon
     if bPaintIcon then
     begin
-      if (NImageIndex>=0) and (NImageIndex<FGutterDecorImages.Count) then
-        FGutterDecorImages.Draw(C,
+      FGutterDecorImages.Draw(C,
           (ARect.Left+ARect.Right-FGutterDecorImages.Width) div 2,
           (ARect.Top+ARect.Bottom-FGutterDecorImages.Height) div 2,
           NImageIndex
@@ -8460,6 +8462,7 @@ procedure TATSynEdit.DoPaintGutterDecor(C: TCanvas; ALine: integer; const ARect:
     end
     else
     //fill cell background
+    if Decor.Data.TextColor<>clNone then
     begin
       C.Brush.Style:= bsSolid;
       C.Brush.Color:= Decor.Data.TextColor;
