@@ -213,7 +213,10 @@ begin
   Caret.SelectNone;
 
   UpdateFoldLineIndexer;
-  if Fold.FindRangeWithPlusAtLine(Y1)>=0 then exit;
+
+  //don't use FindRangeWithPlusAtLine because it uses binary search, while
+  //range 'for selection' is added unsorted
+  if Fold.FindRangeWithPlusAtLine_ViaIndexer(Y1)>=0 then exit;
 
   Fold.Add(1, Y1, Y2, false, '', cTagPersistentFoldRange);
   DoRangeFold(Fold.Count-1);
