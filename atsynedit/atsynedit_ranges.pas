@@ -399,6 +399,10 @@ begin
       NItemIndex
       );
     ItemPtr(NItemIndex)^.Folded:= ItemFrom^.Folded;
+
+    FHasTagPersist:= true;
+    if ItemFrom^.Staple then
+      FHasStaples:= true;
   end;
 
   FListPersist.Clear;
