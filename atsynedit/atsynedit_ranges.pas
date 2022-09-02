@@ -398,6 +398,7 @@ begin
       Item^.Tag,
       NItemIndex
       );
+    ItemPtr(NItemIndex)^.Folded:= Item^.Folded;
   end;
 
   FListPersist.Clear;
