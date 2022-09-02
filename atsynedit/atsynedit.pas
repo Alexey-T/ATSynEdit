@@ -9075,10 +9075,7 @@ var
   St: TATStrings;
 begin
   St:= Strings;
-  if St.EditingActive then
-  begin
-  end
-  else
+  if not St.EditingActive then
     FlushEditingChangeLog(ALine);
 end;
 
