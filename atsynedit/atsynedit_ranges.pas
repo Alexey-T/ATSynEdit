@@ -46,6 +46,7 @@ type
   TATSynRanges = class
   private
     FList: TATSynRangeList;
+    FListPersist: TATSynRangeList; //for BackupPersistentRanges/RestorePersistentRanges
     FLineIndexer: array of array of integer;
     FHasTagPersist: boolean;
     FHasStaples: boolean;
@@ -73,6 +74,8 @@ type
     procedure Delete(AIndex: integer);
     procedure DeleteAllByTag(const ATag: Int64);
     procedure DeleteAllExceptTag(const ATag: Int64);
+    procedure BackupPersistentRanges;
+    procedure RestorePersistentRanges;
     property Items[Index: integer]: TATSynRange read GetItems write SetItems; default;
     function ItemPtr(AIndex: integer): PATSynRange;
     function IsRangeInsideOther(R1, R2: PATSynRange): boolean;
@@ -204,13 +207,16 @@ constructor TATSynRanges.Create;
 begin
   FList:= TATSynRangeList.Create;
   FList.Capacity:= 2*1024;
+  FListPersist:= TATSynRangeList.Create;
   FHasTagPersist:= false;
   FHasStaples:= false;
 end;
 
 destructor TATSynRanges.Destroy;
 begin
+  FListPersist.Clear;
   Clear;
+  FreeAndNil(FListPersist);
   FreeAndNil(FList);
   inherited;
 end;
@@ -358,6 +364,43 @@ begin
     FHasTagPersist:= false;
 
   UpdateLineIndexer;
+end;
+
+procedure TATSynRanges.BackupPersistentRanges;
+var
+  Item: PATSynRange;
+  i: integer;
+begin
+  FListPersist.Clear;
+
+  for i:= 0 to Count-1 do
+  begin
+    Item:= ItemPtr(i);
+    if Item^.Tag=cTagPersistentFoldRange then
+      FListPersist.Add(Item^);
+  end;
+end;
+
+procedure TATSynRanges.RestorePersistentRanges;
+var
+  Item: PATSynRange;
+  NItemIndex, i: integer;
+begin
+  for i:= 0 to FListPersist.Count-1 do
+  begin
+    Item:= FListPersist.ItemPtr(i);
+    AddSorted(
+      Item^.X,
+      Item^.Y,
+      Item^.Y2,
+      Item^.Staple,
+      Item^.Hint,
+      Item^.Tag,
+      NItemIndex
+      );
+  end;
+
+  FListPersist.Clear;
 end;
 
 function TATSynRanges.ItemPtr(AIndex: integer): PATSynRange;
