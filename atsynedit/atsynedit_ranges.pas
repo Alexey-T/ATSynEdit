@@ -49,7 +49,8 @@ type
     FLineIndexer: array of array of integer;
     FHasTagPersist: boolean;
     FHasStaples: boolean;
-    procedure AddToLineIndexer(ALine1, ALine2, AIndex: integer); inline;
+    procedure AddToLineIndexer(ALine1, ALine2, AIndex: integer);
+    procedure AdjustLineIndexerForInsertion(ARangeIndex: integer);
     function GetItems(Index: integer): TATSynRange;
     procedure SetItems(Index: integer; const AValue: TATSynRange);
     //function MessageTextForIndexList(const L: TATIntArray): string;
@@ -62,6 +63,9 @@ type
     function IsRangesTouch(N1, N2: integer): boolean;
     function Add(AX, AY, AY2: integer; AWithStaple: boolean; const AHint: string;
       const ATag: Int64=0): TATSynRange;
+    function AddSorted(AX, AY, AY2: integer; AWithStaple: boolean;
+      const AHint: string; const ATag: Int64;
+      out AItemIndex: integer): TATSynRange;
     function Insert(AIndex: integer; AX, AY, AY2: integer; AWithStaple: boolean;
       const AHint: string; const ATag: Int64=0): TATSynRange;
     procedure Clear;
@@ -236,6 +240,43 @@ begin
   AddToLineIndexer(AY, AY2, NIndex);
 end;
 
+function TATSynRanges.AddSorted(AX, AY, AY2: integer; AWithStaple: boolean;
+  const AHint: string;
+  const ATag: Int64;
+  out AItemIndex: integer): TATSynRange;
+var
+  Item: PATSynRange;
+  i: integer;
+begin
+  AItemIndex:= -1;
+  Result.Init(AX, AY, AY2, AWithStaple, AHint, ATag);
+
+  for i:= 0 to Count-1 do
+  begin
+    Item:= ItemPtr(i);
+    if Item^.Y>=AY then
+    begin
+      AItemIndex:= i;
+      Break;
+    end;
+  end;
+
+  if AItemIndex>=0 then
+  begin
+    FList.Insert(AItemIndex, Result);
+    AdjustLineIndexerForInsertion(AItemIndex);
+  end
+  else
+    AItemIndex:= FList.Add(Result);
+
+  if ATag=cTagPersistentFoldRange then
+    FHasTagPersist:= true;
+  if AWithStaple then
+    FHasStaples:= true;
+
+  AddToLineIndexer(AY, AY2, AItemIndex);
+end;
+
 procedure TATSynRanges.AddToLineIndexer(ALine1, ALine2, AIndex: integer);
 var
   NItemLen, i: integer;
@@ -248,6 +289,16 @@ begin
         SetLength(FLineIndexer[i], NItemLen+1);
         FLineIndexer[i][NItemLen]:= AIndex;
       end;
+end;
+
+procedure TATSynRanges.AdjustLineIndexerForInsertion(ARangeIndex: integer);
+var
+  i, j: integer;
+begin
+  for i:= 0 to High(FLineIndexer) do
+    for j:= 0 to High(FLineIndexer[i]) do
+      if FLineIndexer[i][j]>=ARangeIndex then
+        Inc(FLineIndexer[i][j]);
 end;
 
 function TATSynRanges.Insert(AIndex: integer; AX, AY, AY2: integer;

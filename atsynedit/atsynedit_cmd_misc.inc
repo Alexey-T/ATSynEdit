@@ -201,7 +201,7 @@ end;
 function TATSynEdit.DoCommand_FoldSelection: TATCommandResults;
 var
   Caret: TATCaretItem;
-  Y1, Y2: integer;
+  Y1, Y2, NRangeIndex: integer;
 begin
   Result:= [];
   if Carets.Count<>1 then exit;
@@ -218,8 +218,8 @@ begin
   //range 'for selection' is added unsorted
   if Fold.FindRangeWithPlusAtLine_ViaIndexer(Y1)>=0 then exit;
 
-  Fold.Add(1, Y1, Y2, false, '', cTagPersistentFoldRange);
-  DoRangeFold(Fold.Count-1);
+  Fold.AddSorted(1, Y1, Y2, false, '', cTagPersistentFoldRange, NRangeIndex);
+  DoRangeFold(NRangeIndex);
 
   Result:= [cResultCaretAny, cResultFoldChange];
 end;
