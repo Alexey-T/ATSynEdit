@@ -383,22 +383,22 @@ end;
 
 procedure TATSynRanges.RestorePersistentRanges;
 var
-  Item: PATSynRange;
+  ItemFrom: PATSynRange;
   NItemIndex, i: integer;
 begin
   for i:= 0 to FListPersist.Count-1 do
   begin
-    Item:= FListPersist.ItemPtr(i);
+    ItemFrom:= FListPersist.ItemPtr(i);
     AddSorted(
-      Item^.X,
-      Item^.Y,
-      Item^.Y2,
-      Item^.Staple,
-      Item^.Hint,
-      Item^.Tag,
+      ItemFrom^.X,
+      ItemFrom^.Y,
+      ItemFrom^.Y2,
+      ItemFrom^.Staple,
+      ItemFrom^.Hint,
+      ItemFrom^.Tag,
       NItemIndex
       );
-    ItemPtr(NItemIndex)^.Folded:= Item^.Folded;
+    ItemPtr(NItemIndex)^.Folded:= ItemFrom^.Folded;
   end;
 
   FListPersist.Clear;
