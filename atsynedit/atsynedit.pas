@@ -9063,11 +9063,10 @@ procedure TATSynEdit.DoStringsOnChangeEx(Sender: TObject; AChange: TATLineChange
 var
   St: TATStrings;
 begin
+  Fold.Update(AChange, ALine, AItemCount);
+
   St:= Strings;
-  if St.EditingActive then
-  begin
-  end
-  else
+  if not St.EditingActive then
     FlushEditingChangeEx(AChange, ALine, AItemCount);
 end;
 
@@ -9085,8 +9084,6 @@ end;
 
 procedure TATSynEdit.FlushEditingChangeEx(AChange: TATLineChangeKind; ALine, AItemCount: integer);
 begin
-  Fold.Update(AChange, ALine, AItemCount);
-
   if Assigned(FAdapterHilite) then
     FAdapterHilite.OnEditorChangeEx(Self, AChange, ALine, AItemCount);
 end;
