@@ -327,7 +327,6 @@ type
 
   TATEditorInternalFlag = (
     cIntFlagBitmap, //flag "bitmap should be repainted"
-    cIntFlagScrolled, //flag "any scrolling occured", ie ScrollInfo any member is changed
     cIntFlagScrolledHorz, //flag "horizontal scroll _position_ is changed"
     cIntFlagResize
     );
@@ -2809,7 +2808,8 @@ begin
 
     FPrevHorz:= FScrollHorz;
     FPrevVert:= FScrollVert;
-    Include(FPaintFlags, cIntFlagScrolled);
+
+    DoEventScroll;
   end;
 end;
 
@@ -6968,11 +6968,8 @@ begin
   Include(FPaintFlags, cIntFlagBitmap);
   inherited Invalidate;
 
-  if AForceOnScroll or (cIntFlagScrolled in FPaintFlags) then
-  begin
-    Exclude(FPaintFlags, cIntFlagScrolled);
+  if AForceOnScroll then
     DoEventScroll;
-  end;
 end;
 
 function TATSynEdit._IsFocused: boolean;
