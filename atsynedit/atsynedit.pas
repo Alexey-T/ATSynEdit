@@ -8848,7 +8848,9 @@ begin
   end;
 
   if FRegexLinks=nil then exit;
+  {$ifndef USE_FPC_REGEXPR}
   if not FRegexLinks.IsCompiled then exit;
+  {$endif}
 
   St:= Strings;
   NLineStart:= LineTop;
@@ -8931,7 +8933,10 @@ begin
   if not Strings.IsIndexValid(AY) then exit;
 
   if FRegexLinks=nil then exit;
+  {$ifndef USE_FPC_REGEXPR}
   if not FRegexLinks.IsCompiled then exit;
+  {$endif}
+
   FRegexLinks.InputString:= Strings.Lines[AY];
   MatchPos:= 0;
   MatchLen:= 0;

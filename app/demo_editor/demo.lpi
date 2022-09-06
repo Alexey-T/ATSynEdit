@@ -216,6 +216,9 @@
         </Win32>
       </Options>
     </Linking>
+    <Other>
+      <CustomOptions Value="-dUSE_FPC_REGEXPR"/>
+    </Other>
   </CompilerOptions>
   <Debugging>
     <Exceptions Count="4">
