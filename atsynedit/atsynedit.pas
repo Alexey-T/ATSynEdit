@@ -7004,6 +7004,7 @@ begin
   while Assigned(C.Parent) do
     C:= C.Parent;
 
+  //added IFNDEF because of CudaText issue #4350
   {$ifndef LCLGTK2}
   if C is TForm then
     if not (C as TForm).Active then
