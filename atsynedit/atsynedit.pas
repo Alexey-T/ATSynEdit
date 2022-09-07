@@ -2759,8 +2759,8 @@ begin
     SmoothPage:= NPage * CharSizeScaled div ATEditorCharXScale;
     SmoothPosLast:= Max(0, SmoothMax - SmoothPage);
     if AdjustSmoothPos then
-      SmoothPos:= TotalOffset + NGapPos;
-
+      SmoothPos:= TotalOffset + NGapPos
+    else
     //fix CudaText #4342
     if CharSizeScaled_Prev<>CharSizeScaled then
       SmoothPos:= SmoothPos*CharSizeScaled div CharSizeScaled_Prev;
@@ -2781,8 +2781,8 @@ begin
     SmoothPage:= NPage * CharSizeScaled div ATEditorCharXScale;
     SmoothPosLast:= Max(0, SmoothMax - SmoothPage);
     if AdjustSmoothPos then
-      SmoothPos:= TotalOffset;
-
+      SmoothPos:= TotalOffset
+    else
     //fix CudaText #4342
     if CharSizeScaled_Prev<>CharSizeScaled then
       SmoothPos:= SmoothPos*CharSizeScaled div CharSizeScaled_Prev;
