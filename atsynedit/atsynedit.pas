@@ -2715,6 +2715,7 @@ var
   bVertOur1, bVertOur2, bHorzOur1, bHorzOur2: boolean;
   bChangedBarsOs, bChangedBarsOur: boolean;
   NPos, NLineIndex, NGapPos, NGapAll: integer;
+  CharSizeScaled_Prev: integer;
 begin
   Result:= false;
 
@@ -2752,12 +2753,17 @@ begin
       Inc(NMax, NPage);
     NPosLast:= Max(0, NMax-NPage);
 
+    CharSizeScaled_Prev:= CharSizeScaled;
     CharSizeScaled:= FCharSize.Y * ATEditorCharXScale;
     SmoothMax:= NMax * CharSizeScaled div ATEditorCharXScale + NGapAll;
     SmoothPage:= NPage * CharSizeScaled div ATEditorCharXScale;
     SmoothPosLast:= Max(0, SmoothMax - SmoothPage);
     if AdjustSmoothPos then
       SmoothPos:= TotalOffset + NGapPos;
+
+    //fix CudaText #4342
+    if CharSizeScaled_Prev<>CharSizeScaled then
+      SmoothPos:= SmoothPos*CharSizeScaled div CharSizeScaled_Prev;
   end;
 
   with FScrollHorz do
@@ -2769,12 +2775,17 @@ begin
       NMax:= NPage;
     NPosLast:= Max(0, NMax-NPage);
 
+    CharSizeScaled_Prev:= CharSizeScaled;
     CharSizeScaled:= FCharSize.XScaled;
     SmoothMax:= NMax * CharSizeScaled div ATEditorCharXScale;
     SmoothPage:= NPage * CharSizeScaled div ATEditorCharXScale;
     SmoothPosLast:= Max(0, SmoothMax - SmoothPage);
     if AdjustSmoothPos then
       SmoothPos:= TotalOffset;
+
+    //fix CudaText #4342
+    if CharSizeScaled_Prev<>CharSizeScaled then
+      SmoothPos:= SmoothPos*CharSizeScaled div CharSizeScaled_Prev;
   end;
 
   //don't need further code for OneLine
