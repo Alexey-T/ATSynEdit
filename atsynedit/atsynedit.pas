@@ -6989,14 +6989,29 @@ var
   C: TControl;
 begin
   Result:= false;
-  if not FIsEntered then exit;
-  if not Application.Active then exit;
+  if not FIsEntered then
+  begin
+    //WriteLn('not focused 1');
+    exit;
+  end;
+  if not Application.Active then
+  begin
+    //WriteLn('not focused 2');
+    exit;
+  end;
 
   C:= Self;
   while Assigned(C.Parent) do
     C:= C.Parent;
+
+  {$ifndef LCLGTK2}
   if C is TForm then
-    if not (C as TForm).Active then exit;
+    if not (C as TForm).Active then
+    begin
+      //WriteLn('not focused 3');
+      exit;
+    end;
+  {$endif}
 
   Result:= true;
 end;
