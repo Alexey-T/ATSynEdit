@@ -6784,9 +6784,8 @@ begin
           //FWheelQueue.Push(WheelRecord);
           DoHandleWheelRecord(WheelRecord);
           Update;
-
-          Result:= true;
         end;
+        Result:= true;
       end;
 
     aWheelModeHoriz:
@@ -6798,9 +6797,8 @@ begin
           //FWheelQueue.Push(WheelRecord);
           DoHandleWheelRecord(WheelRecord);
           Update;
-
-          Result:= true;
         end;
+        Result:= true;
       end;
 
     aWheelModeZoom:
@@ -6812,9 +6810,8 @@ begin
           //FWheelQueue.Push(WheelRecord);
           DoHandleWheelRecord(WheelRecord);
           Update;
-
-          Result:= true;
         end;
+        Result:= true;
       end;
   end;
 
