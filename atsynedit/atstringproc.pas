@@ -438,7 +438,6 @@ begin
 end;
 
 {
-http://www.unicode.org/faq/han_cjk.html
     Blocks Containing Han Ideographs
     Han ideographic characters are found in five main blocks of the Unicode Standard, as shown in Table 12-2
 Table 12-2. Blocks Containing Han Ideographs
