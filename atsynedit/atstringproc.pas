@@ -437,6 +437,22 @@ begin
   ShowMessage('Offsets'#10+s);
 end;
 
+{
+http://www.unicode.org/faq/han_cjk.html
+    Blocks Containing Han Ideographs
+    Han ideographic characters are found in five main blocks of the Unicode Standard, as shown in Table 12-2
+Table 12-2. Blocks Containing Han Ideographs
+Block                                   Range       Comment
+CJK Unified Ideographs                  4E00-9FFF   Common
+CJK Unified Ideographs Extension A      3400-4DBF   Rare
+CJK Unified Ideographs Extension B      20000-2A6DF Rare, historic
+CJK Unified Ideographs Extension C      2A700–2B73F Rare, historic
+CJK Unified Ideographs Extension D      2B740–2B81F Uncommon, some in current use
+CJK Unified Ideographs Extension E      2B820–2CEAF Rare, historic
+CJK Compatibility Ideographs            F900-FAFF   Duplicates, unifiable variants, corporate characters
+CJK Compatibility Ideographs Supplement 2F800-2FA1F Unifiable variants
+}
+
 function TATStringTabHelper.FindWordWrapOffset(ALineIndex: integer; const S: atString; AColumns: Int64;
   const ANonWordChars: atString; AWrapIndented: boolean): integer;
   //
@@ -444,6 +460,14 @@ function TATStringTabHelper.FindWordWrapOffset(ALineIndex: integer; const S: atS
   //to wrap them with wordchars
   function _IsWord(ch: widechar): boolean; inline;
   begin
+    //CJK: allow wrapping at almost any char
+    case Ord(ch) of
+      $4E00..$9FFF,
+      $3400..$4DBF,
+      $F900..$FAFF:
+        exit(false);
+    end;
+
     if Pos(ch, ATEditorOptions.CommaCharsWrapWithWords)>0 then
       Result:= true
     else
