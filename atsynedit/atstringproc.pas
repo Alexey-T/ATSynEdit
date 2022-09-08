@@ -453,21 +453,43 @@ CJK Compatibility Ideographs            F900-FAFF   Duplicates, unifiable varian
 CJK Compatibility Ideographs Supplement 2F800-2FA1F Unifiable variants
 }
 
+function _IsCJKText(ch: widechar): boolean; inline;
+begin
+  case Ord(ch) of
+    $4E00..$9FFF,
+    $3400..$4DBF,
+    $F900..$FAFF:
+      Result:= true;
+    else
+      Result:= false;
+  end;
+end;
+
+function _IsCJKPunctuation(ch: widechar): boolean; inline;
+begin
+  case Ord(ch) of
+    $3002,
+    $ff01,
+    $ff0c,
+    $ff1a,
+    $ff1b,
+    $ff1f:
+      Result:= true;
+    else
+      Result:= false;
+  end;
+end;
+
 function TATStringTabHelper.FindWordWrapOffset(ALineIndex: integer; const S: atString; AColumns: Int64;
   const ANonWordChars: atString; AWrapIndented: boolean): integer;
   //
   //override IsCharWord to check also commas,dots,quotes
   //to wrap them with wordchars
-  function _IsWord(ch: widechar): boolean; inline;
+  function _IsWord(ch: widechar): boolean;
   begin
-    //CJK: allow wrapping at almost any char
-    case Ord(ch) of
-      $4E00..$9FFF,
-      $3400..$4DBF,
-      $F900..$FAFF:
-        exit(false);
-    end;
-
+    if _IsCJKText(ch) then
+      Result:= false
+    else
     if Pos(ch, ATEditorOptions.CommaCharsWrapWithWords)>0 then
       Result:= true
     else
@@ -501,6 +523,7 @@ begin
   NMin:= SGetIndentChars(S)+1;
   while (N>NMin) and
     (IsCharSurrogateLow(S[N+1]) or
+     (_IsCJKText(S[N]) and _IsCJKPunctuation(S[N+1])) or
      (_IsWord(S[N]) and _IsWord(S[N+1])) or
      (AWrapIndented and IsCharSpace(S[N+1])))
     do Dec(N);
