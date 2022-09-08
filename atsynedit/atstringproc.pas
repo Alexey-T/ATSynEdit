@@ -518,13 +518,13 @@ begin
     Exit(ATEditorOptions.MinWordWrapOffset);
 
   //find correct offset: not allowed at edge
-  //a) 2 wordchars,
-  //b) space as 2nd char (not nice look for Python src)
+  //a) 2 word-chars
+  //b) space as 2nd char (gives not nice look for Python sources)
   NMin:= SGetIndentChars(S)+1;
   while (N>NMin) and
-    (IsCharSurrogateLow(S[N+1]) or
-     (_IsCJKText(S[N]) and _IsCJKPunctuation(S[N+1])) or
-     (_IsWord(S[N]) and _IsWord(S[N+1])) or
+    (IsCharSurrogateLow(S[N+1]) or //don't wrap inside surrogate pair
+     (_IsCJKText(S[N]) and _IsCJKPunctuation(S[N+1])) or //don't wrap between CJK char and CJK punctuation
+     (_IsWord(S[N]) and _IsWord(S[N+1])) or //don't wrap between 2 word-chars
      (AWrapIndented and IsCharSpace(S[N+1])))
     do Dec(N);
 
