@@ -1025,8 +1025,10 @@ type
     function IsNormalLexerActive: boolean;
     procedure MenuitemClipboardRecentsClick(Sender: TObject);
     procedure SetEditorIndex(AValue: integer);
-    function GetEnableMarkersInUndo: boolean;
-    procedure SetEnableMarkersInUndo(AValue: boolean);
+    function GetUndoForMarkers: boolean;
+    procedure SetUndoForMarkers(AValue: boolean);
+    function GetUndoForAttribs: boolean;
+    procedure SetUndoForAttribs(AValue: boolean);
     procedure SetOptScaleFont(AValue: integer);
     procedure UpdateClipboardRecents(const AText: string);
     procedure UpdateGapForms(ABeforePaint: boolean);
@@ -1833,7 +1835,6 @@ type
 
     //options
     property OptThemed: boolean read FOptThemed write FOptThemed default false;
-    property OptEnableMarkersInUndo: boolean read GetEnableMarkersInUndo write SetEnableMarkersInUndo default true;
     property OptAutoPairForMultiCarets: boolean read FOptAutoPairForMultiCarets write FOptAutoPairForMultiCarets default cInitAutoPairForMultiCarets;
     property OptAutoPairChars: string read FOptAutoPairChars write FOptAutoPairChars stored false;
     property OptAutocompleteAutoshowCharCount: integer read FOptAutocompleteAutoshowCharCount write FOptAutocompleteAutoshowCharCount default 0;
@@ -2051,6 +2052,8 @@ type
     property OptUndoPause2: integer read FOptUndoPause2 write FOptUndoPause2 default cInitUndoPause2;
     property OptUndoPauseHighlightLine: boolean read FOptUndoPauseHighlightLine write FOptUndoPauseHighlightLine default cInitUndoPauseHighlightLine;
     property OptUndoForCaretJump: boolean read FOptUndoForCaretJump write FOptUndoForCaretJump default cInitUndoForCaretJump;
+    property OptUndoForMarkers: boolean read GetUndoForMarkers write SetUndoForMarkers default true;
+    property OptUndoForAttribs: boolean read GetUndoForAttribs write SetUndoForAttribs default true;
     property OptSavingForceFinalEol: boolean read FOptSavingForceFinalEol write FOptSavingForceFinalEol default false;
     property OptSavingTrimSpaces: boolean read FOptSavingTrimSpaces write FOptSavingTrimSpaces default false;
     property OptSavingTrimFinalEmptyLines: boolean read FOptSavingTrimFinalEmptyLines write FOptSavingTrimFinalEmptyLines default false;
@@ -10121,25 +10124,40 @@ begin
   end;
 end;
 
-function TATSynEdit.GetEnableMarkersInUndo: boolean;
+function TATSynEdit.GetUndoForMarkers: boolean;
 begin
   Result:= Assigned(FStringsInt.OnGetMarkersArray);
 end;
 
-procedure TATSynEdit.SetEnableMarkersInUndo(AValue: boolean);
+procedure TATSynEdit.SetUndoForMarkers(AValue: boolean);
 begin
   if AValue then
   begin
     FStringsInt.OnGetMarkersArray:= @GetMarkersArray;
-    FStringsInt.OnGetAttribsArray:= @GetAttribsArray;
     FStringsInt.OnSetMarkersArray:= @SetMarkersArray;
-    FStringsInt.OnSetAttribsArray:= @SetAttribsArray;
   end
   else
   begin
     FStringsInt.OnGetMarkersArray:= nil;
-    FStringsInt.OnGetAttribsArray:= nil;
     FStringsInt.OnSetMarkersArray:= nil;
+  end;
+end;
+
+function TATSynEdit.GetUndoForAttribs: boolean;
+begin
+  Result:= Assigned(FStringsInt.OnGetAttribsArray);
+end;
+
+procedure TATSynEdit.SetUndoForAttribs(AValue: boolean);
+begin
+  if AValue then
+  begin
+    FStringsInt.OnGetAttribsArray:= @GetAttribsArray;
+    FStringsInt.OnSetAttribsArray:= @SetAttribsArray;
+  end
+  else
+  begin
+    FStringsInt.OnGetAttribsArray:= nil;
     FStringsInt.OnSetAttribsArray:= nil;
   end;
 end;
