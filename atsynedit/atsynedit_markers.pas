@@ -38,21 +38,37 @@ type
 
   PATMarkerItem = ^TATMarkerItem;
   TATMarkerItem = record
+    //text position of marker
     PosX, PosY: integer;
-    LineLen: integer; //render underline near the marker, if <>0
-    CoordX, CoordY: integer; //screen coords
-    CoordX2, CoordY2: integer; //screen coords for LineLen end
+
+    //render underline near the marker, when LineLen<>0
+    LineLen: integer;
+
+    //screen coords
+    CoordX, CoordY: integer;
+    //screen coords of line end, when LineLen<>0
+    CoordX2, CoordY2: integer;
+
+    //used in CudaText: when "Collect marker" runs, for all markers
+    //with the same Tag>0 multi-carets are placed
     Tag: Int64;
-      //used in CudaText: when "collect marker" runs, for all markers
-      //with the same Tag>0 multi-carets placed
+
+    //used in CudaText: when "Collect marker" gets this marker, caret will be with selection
+    //if SelY=0 - LenX is length of sel (single line)
+    //if SelY>0 - LenY is Y-delta of sel-end,
+    //            LenX is absolute X of sel-end
     SelX, SelY: integer;
-      //used in CudaText: when "collect marker" gets this marker, caret will be with selection
-      //if SelY=0 - LenX is length of sel (single line)
-      //if SelY>0 - LenY is Y-delta of sel-end,
-      //            LenX is absolute X of sel-end
+
+    //used in DimRanges list, holds dim value
     Value: Int64;
+
+    //used to place marker on micromap column, with given Tag
     ColumnTag: Int64;
-    LinePart: TATLinePart; //used in Attribs object
+
+    //used in Attribs object
+    LinePart: TATLinePart;
+
+    //enables to show marker on micromap
     MicromapMode: TATMarkerMicromapMode;
 
     class operator=(const A, B: TATMarkerItem): boolean;
