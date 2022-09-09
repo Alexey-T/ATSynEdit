@@ -53,7 +53,7 @@ type
       AShiftBelowX: integer; APosAfter: TPoint);
   end;
 
-function IsMarkerItemsEqual(A, B: PATMarkerItem): boolean;
+function IsMarkerPositionsEqual(A, B: PATMarkerItem): boolean;
 
 type
   { TATMarkerItems }
@@ -109,7 +109,7 @@ type
 
 implementation
 
-function IsMarkerItemsEqual(A, B: PATMarkerItem): boolean;
+function IsMarkerPositionsEqual(A, B: PATMarkerItem): boolean;
 begin
   Result:= (A^.PosX=B^.PosX) and (A^.PosY=B^.PosY);
 end;
@@ -391,9 +391,9 @@ begin
       begin
         NIndexFrom:= NIndex;
         NIndexTo:= NIndex;
-        while IsIndexValid(NIndexTo+1) and IsMarkerItemsEqual(ItemPtr(NIndexTo+1), @Item) do
+        while IsIndexValid(NIndexTo+1) and IsMarkerPositionsEqual(ItemPtr(NIndexTo+1), @Item) do
           Inc(NIndexTo);
-        while IsIndexValid(NIndexFrom-1) and IsMarkerItemsEqual(ItemPtr(NIndexFrom-1), @Item) do
+        while IsIndexValid(NIndexFrom-1) and IsMarkerPositionsEqual(ItemPtr(NIndexFrom-1), @Item) do
           Dec(NIndexFrom);
         //save 2 reallocs (delete, insert)
         //FList.Deref(FList._GetItemPtr(NIndexFrom));
@@ -406,7 +406,7 @@ begin
       begin
         repeat
           Inc(NIndex)
-        until not IsIndexValid(NIndex) or not IsMarkerItemsEqual(ItemPtr(NIndex), @Item);
+        until not IsIndexValid(NIndex) or not IsMarkerPositionsEqual(ItemPtr(NIndex), @Item);
         FList.Insert(NIndex, Item);
       end;
     end
