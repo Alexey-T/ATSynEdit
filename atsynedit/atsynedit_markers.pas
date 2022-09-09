@@ -12,7 +12,6 @@ interface
 uses
   Classes, SysUtils,
   ATStringProc,
-  ATStringProc_Separator,
   ATStringProc_Arrays,
   ATSynEdit_fgl,
   ATSynEdit_Carets,
@@ -55,7 +54,10 @@ type
 type
   { TATMarkerItems }
 
-  TATMarkerItems = specialize TFPGList<TATMarkerItem>;
+  TATMarkerItems = class(specialize TFPGList<TATMarkerItem>)
+  protected
+    procedure Deref(Item: Pointer); override;
+  end;
 
 type
   { TATMarkers }
@@ -104,6 +106,14 @@ type
   end;
 
 implementation
+
+{ TATMarkerItems }
+
+procedure TATMarkerItems.Deref(Item: Pointer);
+begin
+  if Assigned(PATMarkerItem(Item)^.Ptr) then
+    FreeAndNil(PATMarkerItem(Item)^.Ptr);
+end;
 
 { TATMarkerItem }
 
@@ -198,30 +208,14 @@ begin
 end;
 
 procedure TATMarkers.Clear;
-var
-  Item: PATMarkerItem;
-  i: integer;
 begin
-  for i:= FList.Count-1 downto 0 do
-  begin
-    Item:= ItemPtr(i);
-    if Assigned(Item^.Ptr) then
-      Item^.Ptr.Free;
-  end;
   FList.Clear;
 end;
 
 procedure TATMarkers.Delete(AIndex: integer);
-var
-  Item: PATMarkerItem;
 begin
   if IsIndexValid(AIndex) then
-  begin
-    Item:= ItemPtr(AIndex);
-    if Assigned(Item^.Ptr) then
-      Item^.Ptr.Free;
     FList.Delete(AIndex);
-  end;
 end;
 
 function TATMarkers.Count: integer; inline;
@@ -417,6 +411,7 @@ begin
         while IsIndexValid(NIndexFrom-1) and (Items[NIndexFrom-1]=Item) do
           Dec(NIndexFrom);
         //save 2 reallocs (delete, insert)
+        FList.Deref(FList._GetItemPtr(NIndexFrom));
         FList.Items[NIndexFrom]:= Item;
         //delete other dups
         if NIndexFrom+1<=NIndexTo then
