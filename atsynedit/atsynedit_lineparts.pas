@@ -39,13 +39,6 @@ type
 
 procedure InitLinePart(out Part: TATLinePart);
 
-type
-  TATLinePartClass = class
-  public
-    Data: TATLinePart;
-    ColumnTag: Int64;
-  end;
-
 const
   cMaxLineParts = 210;
 type
