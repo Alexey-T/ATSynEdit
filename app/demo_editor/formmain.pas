@@ -717,7 +717,7 @@ begin
     ed.Markers.Add(
       ed.Carets[0].PosX,
       ed.Carets[0].PosY,
-      TATMarkerTags.Init(0, 0, 0)
+      TATMarkerTags.Init(0, 0)
       );
     ed.Update;
   end;
@@ -1644,7 +1644,7 @@ begin
     ed.Markers.Add(
       APos1.X,
       APos1.Y,
-      TATMarkerTags.Init(0, 0, 0),
+      TATMarkerTags.Init(0, 0),
       Abs(APos2.X-APos1.X),
       0
       );
