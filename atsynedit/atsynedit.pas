@@ -8838,8 +8838,16 @@ begin
   FMarkedRange.Clear;
   if (ALine1>=0) and (ALine2>=ALine1) then
   begin
-    FMarkedRange.Add(0, ALine1);
-    FMarkedRange.Add(0, ALine2);
+    FMarkedRange.Add(
+      0,
+      ALine1,
+      TATMarkerTags.Init(0, 0, 0)
+      );
+    FMarkedRange.Add(
+      0,
+      ALine2,
+      TATMarkerTags.Init(0, 0, 0)
+      );
   end;
 end;
 
@@ -8942,9 +8950,8 @@ begin
       FAttribs.Add(
         MatchPos-1,
         iLine,
-        ATEditorOptions.UrlMarkerTag,
+        TATMarkerTags.Init(ATEditorOptions.UrlMarkerTag, 0, 0),
         MatchLen,
-        0,
         0,
         @LinePart
         );

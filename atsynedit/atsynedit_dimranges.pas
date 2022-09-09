@@ -36,10 +36,9 @@ begin
   inherited Add(
     0,
     ALineFrom,
+    TATMarkerTags.Init(0, 0, ADimValue),
     0,
-    0,
-    ALineTo-ALineFrom+1,
-    ADimValue
+    ALineTo-ALineFrom+1
     );
 end;
 

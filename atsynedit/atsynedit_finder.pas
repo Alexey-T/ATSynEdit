@@ -1690,7 +1690,16 @@ begin
     else
       NLineLen:= 0;
     Editor.Markers.Clear;
-    Editor.Markers.Add(APosX, APosY, cTag, 0, 0, 0, nil, 0, mmmShowInTextOnly, NLineLen);
+    Editor.Markers.Add(
+      APosX,
+      APosY,
+      TATMarkerTags.Init(cTag, 0, 0),
+      0,
+      0,
+      nil,
+      mmmShowInTextOnly,
+      NLineLen
+      );
   end
   else
   begin
@@ -2459,7 +2468,15 @@ begin
         PosY:= Res.FPos.Y;
         SelY:= 0;
         SelX:= Abs(Res.FEnd.X-Res.FPos.X);
-        Editor.Attribs.Add(PosX, PosY, ATagValue, SelX, SelY, 0, @AttrRec, MicromapColumnTag, MicromapMode);
+        Editor.Attribs.Add(
+          PosX,
+          PosY,
+          TATMarkerTags.Init(ATagValue, MicromapColumnTag, 0),
+          SelX,
+          SelY,
+          @AttrRec,
+          MicromapMode
+          );
       end
       else
       //add N attrs per each line of a match
@@ -2488,7 +2505,15 @@ begin
             SelX:= St.LinesLen[iLine];
           end;
 
-          Editor.Attribs.Add(PosX, PosY, ATagValue, SelX, SelY, 0, @AttrRec, MicromapColumnTag, MicromapMode);
+          Editor.Attribs.Add(
+            PosX,
+            PosY,
+            TATMarkerTags.Init(ATagValue, MicromapColumnTag, 0),
+            SelX,
+            SelY,
+            @AttrRec,
+            MicromapMode
+            );
         end;
     end;
   finally

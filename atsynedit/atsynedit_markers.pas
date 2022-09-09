@@ -25,6 +25,15 @@ type
     );
 
 type
+
+  { TATMarkerTags }
+
+  TATMarkerTags = record
+    Tag, ColumnTag, Value: Int64;
+    constructor Init(const ATag, AColumnTag, AValue: Int64);
+  end;
+
+type
   { TATMarkerItem }
 
   PATMarkerItem = ^TATMarkerItem;
@@ -87,13 +96,12 @@ type
     property Items[AIndex: integer]: TATMarkerItem read GetItem write SetItem; default;
     property Sorted: boolean read FSorted write FSorted;
     property Duplicates: boolean read FDuplicates write FDuplicates;
-    procedure Add(APosX, APosY: integer;
-      const ATag: Int64=0;
+    procedure Add(
+      APosX, APosY: integer;
+      const ATags: TATMarkerTags;
       ASelX: integer=0;
       ASelY: integer=0;
-      const AValue: Int64=0;
       ALinePart: PATLinePart=nil;
-      const AColumnTag: Int64=0;
       AMicromapMode: TATMarkerMicromapMode=mmmShowInTextOnly;
       ALineLen: integer=0);
     function DeleteInRange(AX1, AY1, AX2, AY2: integer): boolean;
@@ -112,6 +120,15 @@ implementation
 function IsMarkerPositionsEqual(A, B: PATMarkerItem): boolean;
 begin
   Result:= (A^.PosX=B^.PosX) and (A^.PosY=B^.PosY);
+end;
+
+{ TATMarkerTags }
+
+constructor TATMarkerTags.Init(const ATag, AColumnTag, AValue: Int64);
+begin
+  Tag:= ATag;
+  ColumnTag:= AColumnTag;
+  Value:= AValue;
 end;
 
 { TATMarkerItem }
@@ -293,12 +310,10 @@ begin
     Add(
       AValue[i].PosX,
       AValue[i].PosY,
-      AValue[i].Tag,
+      TATMarkerTags.Init(AValue[i].Tag, 0, AValue[i].Value),
       AValue[i].SelX,
       AValue[i].SelY,
-      AValue[i].Value,
       nil,
-      0,
       TATMarkerMicromapMode(AValue[i].MicromapMode)
       );
   end;
@@ -325,12 +340,10 @@ begin
     Add(
       AValue[i].PosX,
       AValue[i].PosY,
-      AValue[i].Tag,
+      TATMarkerTags.Init(AValue[i].Tag, AValue[i].ColumnTag, 0),
       AValue[i].SelX,
       0,
-      0,
       @LinePart,
-      AValue[i].ColumnTag,
       TATMarkerMicromapMode(AValue[i].MicromapMode)
       );
   end;
@@ -354,10 +367,9 @@ begin
   FList[N]:= AItem;
 end;
 
-procedure TATMarkers.Add(APosX, APosY: integer; const ATag: Int64;
-  ASelX: integer; ASelY: integer; const AValue: Int64; ALinePart: PATLinePart;
-  const AColumnTag: Int64; AMicromapMode: TATMarkerMicromapMode;
-  ALineLen: integer);
+procedure TATMarkers.Add(APosX, APosY: integer; const ATags: TATMarkerTags;
+  ASelX: integer; ASelY: integer; ALinePart: PATLinePart;
+  AMicromapMode: TATMarkerMicromapMode; ALineLen: integer);
 var
   Item: TATMarkerItem;
   NIndex, NIndexFrom, NIndexTo: integer;
@@ -370,13 +382,14 @@ begin
   Item.CoordY:= -1;
   Item.CoordX2:= -1;
   Item.CoordY2:= -1;
-  Item.Tag:= ATag;
   Item.SelX:= ASelX;
   Item.SelY:= ASelY;
   Item.LineLen:= ALineLen;
-  Item.ColumnTag:= AColumnTag;
-  Item.Value:= AValue;
   Item.MicromapMode:= AMicromapMode;
+
+  Item.Tag:= ATags.Tag;
+  Item.ColumnTag:= ATags.ColumnTag;
+  Item.Value:= ATags.Value;
 
   if Assigned(ALinePart) then
     Item.LinePart:= ALinePart^
