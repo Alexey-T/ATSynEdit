@@ -10,7 +10,7 @@ begin
   FMarkers.Add(
     Caret.PosX,
     Caret.PosY,
-    TATMarkerTags.Init(0, 0, 0)
+    TATMarkerTags.Init(0, 0)
     );
   Update;
 end;

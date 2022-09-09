@@ -57,7 +57,7 @@ type
 type
   TATMarkerMarkerRecord = record
     Tag: Int64;
-    Value: Int64;
+    ColumnTag: Int64;
     PosX: integer;
     PosY: integer;
     SelX: integer;

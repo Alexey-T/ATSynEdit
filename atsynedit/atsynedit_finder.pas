@@ -1693,7 +1693,7 @@ begin
     Editor.Markers.Add(
       APosX,
       APosY,
-      TATMarkerTags.Init(cTag, 0, 0),
+      TATMarkerTags.Init(cTag, 0),
       0,
       0,
       nil,
@@ -2471,7 +2471,7 @@ begin
         Editor.Attribs.Add(
           PosX,
           PosY,
-          TATMarkerTags.Init(ATagValue, MicromapColumnTag, 0),
+          TATMarkerTags.Init(ATagValue, MicromapColumnTag),
           SelX,
           SelY,
           @AttrRec,
@@ -2508,7 +2508,7 @@ begin
           Editor.Attribs.Add(
             PosX,
             PosY,
-            TATMarkerTags.Init(ATagValue, MicromapColumnTag, 0),
+            TATMarkerTags.Init(ATagValue, MicromapColumnTag),
             SelX,
             SelY,
             @AttrRec,

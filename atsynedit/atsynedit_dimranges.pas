@@ -36,7 +36,7 @@ begin
   inherited Add(
     0,
     ALineFrom,
-    TATMarkerTags.Init(0, 0, ADimValue),
+    TATMarkerTags.Init(0, ADimValue),
     0,
     ALineTo-ALineFrom+1
     );
@@ -49,7 +49,7 @@ begin
   Result:= ADefValue;
   NIndex:= FindContaining(0, ALine);
   if IsIndexValid(NIndex) then
-    Result:= Items[NIndex].Value;
+    Result:= Items[NIndex].ColumnTag;
 end;
 
 

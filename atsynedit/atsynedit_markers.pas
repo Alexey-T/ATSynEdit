@@ -29,8 +29,8 @@ type
   { TATMarkerTags }
 
   TATMarkerTags = record
-    Tag, ColumnTag, Value: Int64;
-    constructor Init(const ATag, AColumnTag, AValue: Int64);
+    Tag, ColumnTag: Int64;
+    constructor Init(const ATag, AColumnTag: Int64);
   end;
 
 type
@@ -59,10 +59,8 @@ type
     //            LenX is absolute X of sel-end
     SelX, SelY: integer;
 
-    //used in DimRanges list, holds dim value
-    Value: Int64;
-
     //used to place marker on micromap column, with given Tag
+    //used in DimRanges list, holds dim value
     ColumnTag: Int64;
 
     //used in Attribs object
@@ -140,11 +138,10 @@ end;
 
 { TATMarkerTags }
 
-constructor TATMarkerTags.Init(const ATag, AColumnTag, AValue: Int64);
+constructor TATMarkerTags.Init(const ATag, AColumnTag: Int64);
 begin
   Tag:= ATag;
   ColumnTag:= AColumnTag;
-  Value:= AValue;
 end;
 
 { TATMarkerItem }
@@ -284,7 +281,7 @@ begin
     Result[i].SelX:= Item^.SelX;
     Result[i].SelY:= Item^.SelY;
     Result[i].Tag:= Item^.Tag;
-    Result[i].Value:= Item^.Value;
+    Result[i].ColumnTag:= Item^.ColumnTag;
     Result[i].MicromapMode:= Ord(Item^.MicromapMode);
   end;
 end;
@@ -326,7 +323,7 @@ begin
     Add(
       AValue[i].PosX,
       AValue[i].PosY,
-      TATMarkerTags.Init(AValue[i].Tag, 0, AValue[i].Value),
+      TATMarkerTags.Init(AValue[i].Tag, AValue[i].ColumnTag),
       AValue[i].SelX,
       AValue[i].SelY,
       nil,
@@ -356,7 +353,7 @@ begin
     Add(
       AValue[i].PosX,
       AValue[i].PosY,
-      TATMarkerTags.Init(AValue[i].Tag, AValue[i].ColumnTag, 0),
+      TATMarkerTags.Init(AValue[i].Tag, AValue[i].ColumnTag),
       AValue[i].SelX,
       0,
       @LinePart,
@@ -405,7 +402,6 @@ begin
 
   Item.Tag:= ATags.Tag;
   Item.ColumnTag:= ATags.ColumnTag;
-  Item.Value:= ATags.Value;
 
   if Assigned(ALinePart) then
     Item.LinePart:= ALinePart^

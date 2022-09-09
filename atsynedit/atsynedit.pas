@@ -8841,12 +8841,12 @@ begin
     FMarkedRange.Add(
       0,
       ALine1,
-      TATMarkerTags.Init(0, 0, 0)
+      TATMarkerTags.Init(0, 0)
       );
     FMarkedRange.Add(
       0,
       ALine2,
-      TATMarkerTags.Init(0, 0, 0)
+      TATMarkerTags.Init(0, 0)
       );
   end;
 end;
@@ -8950,7 +8950,7 @@ begin
       FAttribs.Add(
         MatchPos-1,
         iLine,
-        TATMarkerTags.Init(ATEditorOptions.UrlMarkerTag, 0, 0),
+        TATMarkerTags.Init(ATEditorOptions.UrlMarkerTag, 0),
         MatchLen,
         0,
         @LinePart
