@@ -8839,13 +8839,13 @@ begin
   if (ALine1>=0) and (ALine2>=ALine1) then
   begin
     FMarkedRange.Add(
-      0,
-      ALine1,
+      Point(0, ALine1),
+      Point(0, 0),
       TATMarkerTags.Init(0, 0)
       );
     FMarkedRange.Add(
-      0,
-      ALine2,
+      Point(0, ALine2),
+      Point(0, 0),
       TATMarkerTags.Init(0, 0)
       );
   end;
@@ -8948,11 +8948,9 @@ begin
       LinePart.BorderDown:= cLineStyleSolid;
 
       FAttribs.Add(
-        MatchPos-1,
-        iLine,
+        Point(MatchPos-1, iLine),
+        Point(MatchLen, 0),
         TATMarkerTags.Init(ATEditorOptions.UrlMarkerTag, 0),
-        MatchLen,
-        0,
         @LinePart
         );
     end;

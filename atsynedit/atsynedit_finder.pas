@@ -1691,11 +1691,9 @@ begin
       NLineLen:= 0;
     Editor.Markers.Clear;
     Editor.Markers.Add(
-      APosX,
-      APosY,
+      Point(APosX, APosY),
+      Point(0, 0),
       TATMarkerTags.Init(cTag, 0),
-      0,
-      0,
       nil,
       mmmShowInTextOnly,
       NLineLen
@@ -2469,11 +2467,9 @@ begin
         SelY:= 0;
         SelX:= Abs(Res.FEnd.X-Res.FPos.X);
         Editor.Attribs.Add(
-          PosX,
-          PosY,
+          Point(PosX, PosY),
+          Point(SelX, SelY),
           TATMarkerTags.Init(ATagValue, MicromapColumnTag),
-          SelX,
-          SelY,
           @AttrRec,
           MicromapMode
           );
@@ -2506,11 +2502,9 @@ begin
           end;
 
           Editor.Attribs.Add(
-            PosX,
-            PosY,
+            Point(PosX, PosY),
+            Point(SelX, SelY),
             TATMarkerTags.Init(ATagValue, MicromapColumnTag),
-            SelX,
-            SelY,
             @AttrRec,
             MicromapMode
             );

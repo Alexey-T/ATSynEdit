@@ -34,11 +34,9 @@ end;
 procedure TATDimRanges.Add(ALineFrom, ALineTo: integer; ADimValue: integer);
 begin
   inherited Add(
-    0,
-    ALineFrom,
-    TATMarkerTags.Init(0, ADimValue),
-    0,
-    ALineTo-ALineFrom+1
+    Point(0, ALineFrom),
+    Point(0, ALineTo-ALineFrom+1),
+    TATMarkerTags.Init(0, ADimValue)
     );
 end;
 

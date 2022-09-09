@@ -111,10 +111,9 @@ type
     property Sorted: boolean read FSorted write FSorted;
     property Duplicates: boolean read FDuplicates write FDuplicates;
     procedure Add(
-      APosX, APosY: integer;
+      APos: TPoint;
+      ASel: TPoint;
       const ATags: TATMarkerTags;
-      ASelX: integer=0;
-      ASelY: integer=0;
       ALinePart: PATLinePart=nil;
       AMicromapMode: TATMarkerMicromapMode=mmmShowInTextOnly;
       ALineLen: integer=0);
@@ -321,11 +320,9 @@ begin
   for i:= 0 to Length(AValue)-1 do
   begin
     Add(
-      AValue[i].PosX,
-      AValue[i].PosY,
+      Point(AValue[i].PosX, AValue[i].PosY),
+      Point(AValue[i].SelX, AValue[i].SelY),
       TATMarkerTags.Init(AValue[i].Tag, AValue[i].ColumnTag),
-      AValue[i].SelX,
-      AValue[i].SelY,
       nil,
       TATMarkerMicromapMode(AValue[i].MicromapMode)
       );
@@ -351,11 +348,9 @@ begin
     LinePart.BorderUp:= TATLineStyle(AValue[i].BorderUp);
 
     Add(
-      AValue[i].PosX,
-      AValue[i].PosY,
+      Point(AValue[i].PosX, AValue[i].PosY),
+      Point(AValue[i].SelX, 0),
       TATMarkerTags.Init(AValue[i].Tag, AValue[i].ColumnTag),
-      AValue[i].SelX,
-      0,
       @LinePart,
       TATMarkerMicromapMode(AValue[i].MicromapMode)
       );
@@ -380,8 +375,8 @@ begin
   FList[N]:= AItem;
 end;
 
-procedure TATMarkers.Add(APosX, APosY: integer; const ATags: TATMarkerTags;
-  ASelX: integer; ASelY: integer; ALinePart: PATLinePart;
+procedure TATMarkers.Add(APos: TPoint; ASel: TPoint;
+  const ATags: TATMarkerTags; ALinePart: PATLinePart;
   AMicromapMode: TATMarkerMicromapMode; ALineLen: integer);
 var
   Item: TATMarkerItem;
@@ -389,14 +384,14 @@ var
   bExact: boolean;
 begin
   FillChar(Item, SizeOf(Item), 0);
-  Item.PosX:= APosX;
-  Item.PosY:= APosY;
+  Item.PosX:= APos.X;
+  Item.PosY:= APos.Y;
   Item.CoordX:= -1;
   Item.CoordY:= -1;
   Item.CoordX2:= -1;
   Item.CoordY2:= -1;
-  Item.SelX:= ASelX;
-  Item.SelY:= ASelY;
+  Item.SelX:= ASel.X;
+  Item.SelY:= ASel.Y;
   Item.LineLen:= ALineLen;
   Item.MicromapMode:= AMicromapMode;
 
@@ -410,7 +405,7 @@ begin
 
   if FSorted then
   begin
-    Find(APosX, APosY, NIndex, bExact);
+    Find(APos.X, APos.Y, NIndex, bExact);
     if bExact then
     begin
       if not FDuplicates then
