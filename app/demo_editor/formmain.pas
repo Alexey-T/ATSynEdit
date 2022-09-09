@@ -711,12 +711,15 @@ begin
 end;
 
 procedure TfmMain.btnMarkerClick(Sender: TObject);
+var
+  Caret: TATCaretItem;
 begin
   if ed.Carets.Count=1 then
   begin
+    Caret:= ed.Carets[0];
     ed.Markers.Add(
-      ed.Carets[0].PosX,
-      ed.Carets[0].PosY,
+      Point(Caret.PosX, Caret.PosY),
+      Point(0, 0),
       TATMarkerTags.Init(0, 0)
       );
     ed.Update;
@@ -1642,11 +1645,9 @@ begin
   if FFindMarkAll then
   begin
     ed.Markers.Add(
-      APos1.X,
-      APos1.Y,
-      TATMarkerTags.Init(0, 0),
-      Abs(APos2.X-APos1.X),
-      0
+      Point(APos1.X, APos1.Y),
+      Point(Abs(APos2.X-APos1.X), 0),
+      TATMarkerTags.Init(0, 0)
       );
   end;
 end;
