@@ -8853,9 +8853,9 @@ end;
 procedure TATSynEdit.UpdateLinksAttribs;
 var
   St: TATStrings;
-  AtrObj: TATLinePartClass;
   NLineStart, NLineEnd, NLineLen: integer;
   MatchPos, MatchLen, iLine: integer;
+  LinePart: TATLinePart;
   LinkArrayPtr: PATLinkArray;
   LinkArray: TATLinkArray;
   LinkIndex: integer;
@@ -8882,6 +8882,7 @@ begin
 
   InitAttribs;
   FAttribs.DeleteWithTag(ATEditorOptions.UrlMarkerTag);
+  InitLinePart(LinePart);
 
   FLinkCache.DeleteDataOutOfRange(NLineStart, NLineEnd);
   NRegexRuns:= 0;
@@ -8927,11 +8928,10 @@ begin
       if MatchLen=0 then Break;
       MatchPos:= LinkArrayPtr^[LinkIndex].NFrom;
 
-      AtrObj:= TATLinePartClass.Create;
-      AtrObj.Data.ColorFont:= Colors.Links;
-      AtrObj.Data.ColorBG:= clNone;
-      AtrObj.Data.ColorBorder:= Colors.Links;
-      AtrObj.Data.BorderDown:= cLineStyleSolid;
+      LinePart.ColorFont:= Colors.Links;
+      LinePart.ColorBG:= clNone;
+      LinePart.ColorBorder:= Colors.Links;
+      LinePart.BorderDown:= cLineStyleSolid;
 
       FAttribs.Add(
         MatchPos-1,
@@ -8939,7 +8939,8 @@ begin
         ATEditorOptions.UrlMarkerTag,
         MatchLen,
         0,
-        AtrObj
+        0,
+        @LinePart
         );
     end;
   end;

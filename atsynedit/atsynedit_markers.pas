@@ -42,8 +42,10 @@ type
       //if SelY>0 - LenY is Y-delta of sel-end,
       //            LenX is absolute X of sel-end
     Value: Int64;
-    Ptr: TObject; //used in Attribs object of ATSynEdit
+    ColumnTag: Int64;
+    LinePart: TATLinePart; //used in Attribs object
     MicromapMode: TATMarkerMicromapMode;
+
     class operator=(const A, B: TATMarkerItem): boolean;
     function SelContains(AX, AY: integer): boolean;
     function SelEnd: TPoint;
@@ -54,10 +56,7 @@ type
 type
   { TATMarkerItems }
 
-  TATMarkerItems = class(specialize TFPGList<TATMarkerItem>)
-  protected
-    procedure Deref(Item: Pointer); override;
-  end;
+  TATMarkerItems = specialize TFPGList<TATMarkerItem>;
 
 type
   { TATMarkers }
@@ -90,8 +89,9 @@ type
       const ATag: Int64=0;
       ASelX: integer=0;
       ASelY: integer=0;
-      APtr: TObject=nil;
       AValue: Int64=0;
+      ALinePart: PATLinePart=nil;
+      AColumnTag: Int64=0;
       AMicromapMode: TATMarkerMicromapMode=mmmShowInTextOnly;
       ALineLen: integer=0);
     function DeleteInRange(AX1, AY1, AX2, AY2: integer): boolean;
@@ -106,14 +106,6 @@ type
   end;
 
 implementation
-
-{ TATMarkerItems }
-
-procedure TATMarkerItems.Deref(Item: Pointer);
-begin
-  if Assigned(PATMarkerItem(Item)^.Ptr) then
-    FreeAndNil(PATMarkerItem(Item)^.Ptr);
-end;
 
 { TATMarkerItem }
 
@@ -260,7 +252,6 @@ end;
 function TATMarkers.GetAsAttribArray: TATMarkerAttribArray;
 var
   Item: PATMarkerItem;
-  Obj: TATLinePartClass;
   i: integer;
 begin
   SetLength(Result{%H-}, Count);
@@ -272,33 +263,16 @@ begin
     Result[i].PosY:= Item^.PosY;
     Result[i].SelX:= Item^.SelX;
 
-    if Assigned(Item^.Ptr) then
-    begin
-      Obj:= TATLinePartClass(Item^.Ptr);
-      Result[i].ColorFont:= Obj.Data.ColorFont;
-      Result[i].ColorBG:= Obj.Data.ColorBG;
-      Result[i].ColorBorder:= Obj.Data.ColorBorder;
-      Result[i].FontStyles:= Obj.Data.FontStyles;
-      Result[i].BorderLeft:= Ord(Obj.Data.BorderLeft);
-      Result[i].BorderRight:= Ord(Obj.Data.BorderRight);
-      Result[i].BorderDown:= Ord(Obj.Data.BorderDown);
-      Result[i].BorderUp:= Ord(Obj.Data.BorderUp);
-      Result[i].ColumnTag:= Obj.ColumnTag;
-      Result[i].MicromapMode:= Ord(Item^.MicromapMode);
-    end
-    else
-    begin
-      Result[i].ColorFont:= 0;
-      Result[i].ColorBG:= 0;
-      Result[i].ColorBorder:= 0;
-      Result[i].FontStyles:= 0;
-      Result[i].BorderLeft:= 0;
-      Result[i].BorderRight:= 0;
-      Result[i].BorderDown:= 0;
-      Result[i].BorderUp:= 0;
-      Result[i].ColumnTag:= 0;
-      Result[i].MicromapMode:= 0;
-    end;
+    Result[i].ColorFont:= Item^.LinePart.ColorFont;
+    Result[i].ColorBG:= Item^.LinePart.ColorBG;
+    Result[i].ColorBorder:= Item^.LinePart.ColorBorder;
+    Result[i].FontStyles:= Item^.LinePart.FontStyles;
+    Result[i].BorderLeft:= Ord(Item^.LinePart.BorderLeft);
+    Result[i].BorderRight:= Ord(Item^.LinePart.BorderRight);
+    Result[i].BorderDown:= Ord(Item^.LinePart.BorderDown);
+    Result[i].BorderUp:= Ord(Item^.LinePart.BorderUp);
+    Result[i].ColumnTag:= Item^.ColumnTag;
+    Result[i].MicromapMode:= Ord(Item^.MicromapMode);
   end;
 end;
 
@@ -315,8 +289,9 @@ begin
       AValue[i].Tag,
       AValue[i].SelX,
       AValue[i].SelY,
-      nil,
       AValue[i].Value,
+      nil,
+      0,
       TATMarkerMicromapMode(AValue[i].MicromapMode)
       );
   end;
@@ -324,24 +299,21 @@ end;
 
 procedure TATMarkers.SetAsAttribArray(const AValue: TATMarkerAttribArray);
 var
-  Obj: TATLinePartClass;
+  LinePart: TATLinePart;
   i: integer;
 begin
   Clear;
+  InitLinePart(LinePart);
   for i:= 0 to Length(AValue)-1 do
   begin
-    Obj:= TATLinePartClass.Create;
-    FillChar(Obj.Data, SizeOf(Obj.Data), 0);
-
-    Obj.Data.ColorFont:= AValue[i].ColorFont;
-    Obj.Data.ColorBG:= AValue[i].ColorBG;
-    Obj.Data.ColorBorder:= AValue[i].ColorBorder;
-    Obj.Data.FontStyles:= AValue[i].FontStyles;
-    Obj.Data.BorderLeft:= TATLineStyle(AValue[i].BorderLeft);
-    Obj.Data.BorderRight:= TATLineStyle(AValue[i].BorderRight);
-    Obj.Data.BorderDown:= TATLineStyle(AValue[i].BorderDown);
-    Obj.Data.BorderUp:= TATLineStyle(AValue[i].BorderUp);
-    Obj.ColumnTag:= AValue[i].ColumnTag;
+    LinePart.ColorFont:= AValue[i].ColorFont;
+    LinePart.ColorBG:= AValue[i].ColorBG;
+    LinePart.ColorBorder:= AValue[i].ColorBorder;
+    LinePart.FontStyles:= AValue[i].FontStyles;
+    LinePart.BorderLeft:= TATLineStyle(AValue[i].BorderLeft);
+    LinePart.BorderRight:= TATLineStyle(AValue[i].BorderRight);
+    LinePart.BorderDown:= TATLineStyle(AValue[i].BorderDown);
+    LinePart.BorderUp:= TATLineStyle(AValue[i].BorderUp);
 
     Add(
       AValue[i].PosX,
@@ -349,8 +321,9 @@ begin
       AValue[i].Tag,
       AValue[i].SelX,
       0,
-      Obj,
       0,
+      @LinePart,
+      AValue[i].ColumnTag,
       TATMarkerMicromapMode(AValue[i].MicromapMode)
       );
   end;
@@ -375,8 +348,8 @@ begin
 end;
 
 procedure TATMarkers.Add(APosX, APosY: integer; const ATag: Int64;
-  ASelX: integer; ASelY: integer; APtr: TObject; AValue: Int64;
-  AMicromapMode: TATMarkerMicromapMode; ALineLen: integer);
+  ASelX: integer; ASelY: integer; AValue: Int64; ALinePart: PATLinePart;
+  AColumnTag: Int64; AMicromapMode: TATMarkerMicromapMode; ALineLen: integer);
 var
   Item: TATMarkerItem;
   NIndex, NIndexFrom, NIndexTo: integer;
@@ -393,9 +366,14 @@ begin
   Item.SelX:= ASelX;
   Item.SelY:= ASelY;
   Item.LineLen:= ALineLen;
-  Item.Ptr:= APtr;
+  Item.ColumnTag:= AColumnTag;
   Item.Value:= AValue;
   Item.MicromapMode:= AMicromapMode;
+
+  if Assigned(ALinePart) then
+    Item.LinePart:= ALinePart^
+  else
+    InitLinePart(Item.LinePart);
 
   if FSorted then
   begin

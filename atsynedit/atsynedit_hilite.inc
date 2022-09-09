@@ -356,7 +356,6 @@ procedure TATSynEdit.DoPartCalc_ApplyAttribsOver(var AParts: TATLineParts;
 var
   Attr: TATMarkerItem;
   Part: TATLinePart;
-  PartObj: TATLinePartClass;
   nAttrIndex, nOffset, i: integer;
   bExact: boolean;
 begin
@@ -375,9 +374,6 @@ begin
     if Attr.PosY<ALineIndex then Continue;
     if Attr.PosY>ALineIndex then Break;
 
-    PartObj:= TATLinePartClass(Attr.Ptr);
-    if Assigned(PartObj) then
-      begin
         //must check offset, for part of wrapped line
         nOffset:= Attr.PosX-ACharIndex;
         if (nOffset>=AOffsetMax) then Continue;
@@ -399,12 +395,11 @@ begin
           AParts[0].ColorFont:= FColorFont;
         end;
 
-        Part:= PartObj.Data;
+        Part:= Attr.LinePart;
         Part.Len:= Attr.SelX;
         Part.Offset:= nOffset;
         //note: don't change Part.ColorBG here
         DoPartInsert(AParts, Part, false);
-      end;
   end;
 end;
 

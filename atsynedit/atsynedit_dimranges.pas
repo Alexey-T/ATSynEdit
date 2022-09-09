@@ -10,7 +10,8 @@ interface
 
 uses
   Classes, SysUtils,
-  ATSynEdit_Markers;
+  ATSynEdit_Markers,
+  ATSynEdit_LineParts;
   
 type
   { TATDimRanges }
@@ -38,7 +39,6 @@ begin
     0,
     0,
     ALineTo-ALineFrom+1,
-    nil,
     ADimValue
     );
 end;

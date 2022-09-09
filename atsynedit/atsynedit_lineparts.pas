@@ -37,6 +37,8 @@ type
   end;
   PATLinePart = ^TATLinePart;
 
+procedure InitLinePart(out Part: TATLinePart);
+
 type
   TATLinePartClass = class
   public
@@ -101,6 +103,13 @@ begin
   Result := (b shl 16) + (g shl 8) + r;
 end;
 
+procedure InitLinePart(out Part: TATLinePart);
+begin
+  FillChar(Part, SizeOf(Part), 0);
+  Part.ColorBG:= clNone;
+  Part.ColorFont:= clNone;
+  Part.ColorBorder:= clNone;
+end;
 
 procedure DoPartFind(var P: TATLineParts; APos: integer; out AIndex,
   AOffsetLeft: integer);
