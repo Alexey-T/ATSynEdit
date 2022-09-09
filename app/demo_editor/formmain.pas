@@ -15,6 +15,7 @@ uses
   ATSynEdit_LineParts,
   ATSynEdit_Carets,
   ATSynEdit_Bookmarks,
+  ATSynEdit_Markers,
   ATSynEdit_Gaps,
   ATSynEdit_Finder,
   ATSynEdit_Export_HTML,
@@ -713,7 +714,11 @@ procedure TfmMain.btnMarkerClick(Sender: TObject);
 begin
   if ed.Carets.Count=1 then
   begin
-    ed.Markers.Add(ed.Carets[0].PosX, ed.Carets[0].PosY);
+    ed.Markers.Add(
+      ed.Carets[0].PosX,
+      ed.Carets[0].PosY,
+      TATMarkerTags.Init(0, 0, 0)
+      );
     ed.Update;
   end;
 end;
@@ -1636,7 +1641,13 @@ procedure TfmMain.FinderFound(Sender: TObject; APos1, APos2: TPoint);
 begin
   if FFindMarkAll then
   begin
-    ed.Markers.Add(APos1.X, APos1.Y, 0, Abs(APos2.X-APos1.X), 0);
+    ed.Markers.Add(
+      APos1.X,
+      APos1.Y,
+      TATMarkerTags.Init(0, 0, 0),
+      Abs(APos2.X-APos1.X),
+      0
+      );
   end;
 end;
 
