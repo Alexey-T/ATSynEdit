@@ -91,9 +91,9 @@ type
       const ATag: Int64=0;
       ASelX: integer=0;
       ASelY: integer=0;
-      AValue: Int64=0;
+      const AValue: Int64=0;
       ALinePart: PATLinePart=nil;
-      AColumnTag: Int64=0;
+      const AColumnTag: Int64=0;
       AMicromapMode: TATMarkerMicromapMode=mmmShowInTextOnly;
       ALineLen: integer=0);
     function DeleteInRange(AX1, AY1, AX2, AY2: integer): boolean;
@@ -355,8 +355,9 @@ begin
 end;
 
 procedure TATMarkers.Add(APosX, APosY: integer; const ATag: Int64;
-  ASelX: integer; ASelY: integer; AValue: Int64; ALinePart: PATLinePart;
-  AColumnTag: Int64; AMicromapMode: TATMarkerMicromapMode; ALineLen: integer);
+  ASelX: integer; ASelY: integer; const AValue: Int64; ALinePart: PATLinePart;
+  const AColumnTag: Int64; AMicromapMode: TATMarkerMicromapMode;
+  ALineLen: integer);
 var
   Item: TATMarkerItem;
   NIndex, NIndexFrom, NIndexTo: integer;
