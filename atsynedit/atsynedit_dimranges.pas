@@ -47,7 +47,7 @@ begin
   Result:= ADefValue;
   NIndex:= FindContaining(0, ALine);
   if IsIndexValid(NIndex) then
-    Result:= Items[NIndex].ColumnTag;
+    Result:= Items[NIndex].TagEx;
 end;
 
 

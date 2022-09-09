@@ -29,7 +29,8 @@ type
   { TATMarkerTags }
 
   TATMarkerTags = record
-    Tag, ColumnTag: Int64;
+    Tag,
+    TagEx: Int64;
     constructor Init(const ATag, AColumnTag: Int64);
   end;
 
@@ -49,19 +50,19 @@ type
     //screen coords of line end, when LineLen<>0
     CoordX2, CoordY2: integer;
 
-    //used in CudaText: when "Collect marker" runs, for all markers
-    //with the same Tag>0 multi-carets are placed
-    Tag: Int64;
-
     //used in CudaText: when "Collect marker" gets this marker, caret will be with selection
     //if SelY=0 - LenX is length of sel (single line)
     //if SelY>0 - LenY is Y-delta of sel-end,
     //            LenX is absolute X of sel-end
     SelX, SelY: integer;
 
-    //used to place marker on micromap column, with given Tag
+    //used in CudaText: when "Collect marker" runs, for all markers
+    //with the same Tag>0 multi-carets are placed
+    Tag: Int64;
+
+    //used to place marker on micromap column with given Tag
     //used in DimRanges list, holds dim value
-    ColumnTag: Int64;
+    TagEx: Int64;
 
     //used in Attribs object
     LinePart: TATLinePart;
@@ -140,7 +141,7 @@ end;
 constructor TATMarkerTags.Init(const ATag, AColumnTag: Int64);
 begin
   Tag:= ATag;
-  ColumnTag:= AColumnTag;
+  TagEx:= AColumnTag;
 end;
 
 { TATMarkerItem }
@@ -280,7 +281,7 @@ begin
     Result[i].SelX:= Item^.SelX;
     Result[i].SelY:= Item^.SelY;
     Result[i].Tag:= Item^.Tag;
-    Result[i].ColumnTag:= Item^.ColumnTag;
+    Result[i].TagEx:= Item^.TagEx;
     Result[i].MicromapMode:= Ord(Item^.MicromapMode);
   end;
 end;
@@ -307,7 +308,7 @@ begin
     Result[i].BorderRight:= Ord(Item^.LinePart.BorderRight);
     Result[i].BorderDown:= Ord(Item^.LinePart.BorderDown);
     Result[i].BorderUp:= Ord(Item^.LinePart.BorderUp);
-    Result[i].ColumnTag:= Item^.ColumnTag;
+    Result[i].TagEx:= Item^.TagEx;
     Result[i].MicromapMode:= Ord(Item^.MicromapMode);
   end;
 end;
@@ -322,7 +323,7 @@ begin
     Add(
       Point(AValue[i].PosX, AValue[i].PosY),
       Point(AValue[i].SelX, AValue[i].SelY),
-      TATMarkerTags.Init(AValue[i].Tag, AValue[i].ColumnTag),
+      TATMarkerTags.Init(AValue[i].Tag, AValue[i].TagEx),
       nil,
       TATMarkerMicromapMode(AValue[i].MicromapMode)
       );
@@ -350,7 +351,7 @@ begin
     Add(
       Point(AValue[i].PosX, AValue[i].PosY),
       Point(AValue[i].SelX, 0),
-      TATMarkerTags.Init(AValue[i].Tag, AValue[i].ColumnTag),
+      TATMarkerTags.Init(AValue[i].Tag, AValue[i].TagEx),
       @LinePart,
       TATMarkerMicromapMode(AValue[i].MicromapMode)
       );
@@ -396,7 +397,7 @@ begin
   Item.MicromapMode:= AMicromapMode;
 
   Item.Tag:= ATags.Tag;
-  Item.ColumnTag:= ATags.ColumnTag;
+  Item.TagEx:= ATags.TagEx;
 
   if Assigned(ALinePart) then
     Item.LinePart:= ALinePart^
