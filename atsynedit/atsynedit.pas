@@ -1025,6 +1025,8 @@ type
     function IsNormalLexerActive: boolean;
     procedure MenuitemClipboardRecentsClick(Sender: TObject);
     procedure SetEditorIndex(AValue: integer);
+    function GetEnableMarkersInUndo: boolean;
+    procedure SetEnableMarkersInUndo(AValue: boolean);
     procedure SetOptScaleFont(AValue: integer);
     procedure UpdateClipboardRecents(const AText: string);
     procedure UpdateGapForms(ABeforePaint: boolean);
@@ -1831,6 +1833,7 @@ type
 
     //options
     property OptThemed: boolean read FOptThemed write FOptThemed default false;
+    property OptEnableMarkersInUndo: boolean read GetEnableMarkersInUndo write SetEnableMarkersInUndo default true;
     property OptAutoPairForMultiCarets: boolean read FOptAutoPairForMultiCarets write FOptAutoPairForMultiCarets default cInitAutoPairForMultiCarets;
     property OptAutoPairChars: string read FOptAutoPairChars write FOptAutoPairChars stored false;
     property OptAutocompleteAutoshowCharCount: integer read FOptAutocompleteAutoshowCharCount write FOptAutocompleteAutoshowCharCount default 0;
@@ -10115,6 +10118,29 @@ begin
       end;
     else
       Result:= false;
+  end;
+end;
+
+function TATSynEdit.GetEnableMarkersInUndo: boolean;
+begin
+  Result:= Assigned(FStringsInt.OnGetMarkersArray);
+end;
+
+procedure TATSynEdit.SetEnableMarkersInUndo(AValue: boolean);
+begin
+  if AValue then
+  begin
+    FStringsInt.OnGetMarkersArray:= @GetMarkersArray;
+    FStringsInt.OnGetAttribsArray:= @GetAttribsArray;
+    FStringsInt.OnSetMarkersArray:= @SetMarkersArray;
+    FStringsInt.OnSetAttribsArray:= @SetAttribsArray;
+  end
+  else
+  begin
+    FStringsInt.OnGetMarkersArray:= nil;
+    FStringsInt.OnGetAttribsArray:= nil;
+    FStringsInt.OnSetMarkersArray:= nil;
+    FStringsInt.OnSetAttribsArray:= nil;
   end;
 end;
 

@@ -1,4 +1,7 @@
 
+2022.09.09
++ add: prop OptEnableMarkersInUndo
+
 2022.08.24
 * change: renamed Decor property Text to TextAll; added Decor read-only props TextCaption, TextHint; TextAll now contains caption+chr(1)+hint
 
