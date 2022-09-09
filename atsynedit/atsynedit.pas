@@ -3004,7 +3004,8 @@ procedure TATSynEdit.GetRectMicromap(out R: TRect);
 var
   NSize: integer;
 begin
-  NSize:= FMicromap.UpdateSizes(ATEditorScale(FCharSize.XScaled) div ATEditorCharXScale);
+  //don't use ATEditorScale() here, will be too wide
+  NSize:= FMicromap.UpdateSizes(FCharSize.XScaled div ATEditorCharXScale);
 
   if not FMicromapVisible or FMicromapOnScrollbar then
   begin
