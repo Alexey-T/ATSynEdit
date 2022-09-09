@@ -374,32 +374,32 @@ begin
     if Attr.PosY<ALineIndex then Continue;
     if Attr.PosY>ALineIndex then Break;
 
-        //must check offset, for part of wrapped line
-        nOffset:= Attr.PosX-ACharIndex;
-        if (nOffset>=AOffsetMax) then Continue;
-        if (nOffset+Attr.SelX<=0) then Continue;
+    //must check offset, for part of wrapped line
+    nOffset:= Attr.PosX-ACharIndex;
+    if (nOffset>=AOffsetMax) then Continue;
+    if (nOffset+Attr.SelX<=0) then Continue;
 
-        //fix part visible partly, because of horz scroll
-        if (nOffset<0) then
-        begin
-          Inc(Attr.SelX, nOffset);
-          nOffset:= 0;
-        end;
+    //fix part visible partly, because of horz scroll
+    if (nOffset<0) then
+    begin
+      Inc(Attr.SelX, nOffset);
+      nOffset:= 0;
+    end;
 
-        //empty parts? init part for whole line, for DoPartInsert to work
-        if AParts[0].Len=0 then
-        begin
-          AParts[0].Offset:= 0;
-          AParts[0].Len:= AOffsetMax;
-          AParts[0].ColorBG:= AColorBG;
-          AParts[0].ColorFont:= FColorFont;
-        end;
+    //empty parts? init part for whole line, for DoPartInsert to work
+    if AParts[0].Len=0 then
+    begin
+      AParts[0].Offset:= 0;
+      AParts[0].Len:= AOffsetMax;
+      AParts[0].ColorBG:= AColorBG;
+      AParts[0].ColorFont:= FColorFont;
+    end;
 
-        Part:= Attr.LinePart;
-        Part.Len:= Attr.SelX;
-        Part.Offset:= nOffset;
-        //note: don't change Part.ColorBG here
-        DoPartInsert(AParts, Part, false);
+    Part:= Attr.LinePart;
+    Part.Len:= Attr.SelX;
+    Part.Offset:= nOffset;
+    //note: don't change Part.ColorBG here
+    DoPartInsert(AParts, Part, false);
   end;
 end;
 
