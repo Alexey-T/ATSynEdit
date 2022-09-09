@@ -17,6 +17,7 @@ uses
   ec_SyntAnal,
   ec_syntax_format,
   ATSynEdit,
+  ATSynEdit_Globals,
   ATSynEdit_Adapter_EControl;
 
 type
@@ -233,8 +234,8 @@ begin
 
     F.edSample.Font.Name:= AFontName;
     F.edSample.Font.Size:= AFontSize;
-    F.edSample.Gutter[F.edSample.GutterBandBookmarks].Visible:= false;
-    F.edSample.Gutter[F.edSample.GutterBandNumbers].Visible:= false;
+    F.edSample.Gutter[F.edSample.Gutter.FindIndexByTag(ATEditorOptions.GutterTagBookmarks)].Visible:= false;
+    F.edSample.Gutter[F.edSample.Gutter.FindIndexByTag(ATEditorOptions.GutterTagNumbers)].Visible:= false;
     F.Adapter.Lexer:= an;
     if Assigned(an.SampleText) then
     begin
