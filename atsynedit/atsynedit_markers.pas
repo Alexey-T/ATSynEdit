@@ -52,7 +52,9 @@ type
     procedure UpdateOnEditing(APosX, APosY, AShiftX, AShiftY,
       AShiftBelowX: integer; APosAfter: TPoint);
   end;
-  
+
+function IsMarkerItemsEqual(A, B: PATMarkerItem): boolean;
+
 type
   { TATMarkerItems }
 
@@ -106,6 +108,11 @@ type
   end;
 
 implementation
+
+function IsMarkerItemsEqual(A, B: PATMarkerItem): boolean;
+begin
+  Result:= (A^.PosX=B^.PosX) and (A^.PosY=B^.PosY);
+end;
 
 { TATMarkerItem }
 
@@ -384,12 +391,12 @@ begin
       begin
         NIndexFrom:= NIndex;
         NIndexTo:= NIndex;
-        while IsIndexValid(NIndexTo+1) and (Items[NIndexTo+1]=Item) do
+        while IsIndexValid(NIndexTo+1) and IsMarkerItemsEqual(ItemPtr(NIndexTo+1), @Item) do
           Inc(NIndexTo);
-        while IsIndexValid(NIndexFrom-1) and (Items[NIndexFrom-1]=Item) do
+        while IsIndexValid(NIndexFrom-1) and IsMarkerItemsEqual(ItemPtr(NIndexFrom-1), @Item) do
           Dec(NIndexFrom);
         //save 2 reallocs (delete, insert)
-        FList.Deref(FList._GetItemPtr(NIndexFrom));
+        //FList.Deref(FList._GetItemPtr(NIndexFrom));
         FList.Items[NIndexFrom]:= Item;
         //delete other dups
         if NIndexFrom+1<=NIndexTo then
@@ -399,7 +406,7 @@ begin
       begin
         repeat
           Inc(NIndex)
-        until not IsIndexValid(NIndex) or (Items[NIndex]<>Item);
+        until not IsIndexValid(NIndex) or not IsMarkerItemsEqual(ItemPtr(NIndex), @Item);
         FList.Insert(NIndex, Item);
       end;
     end
