@@ -318,14 +318,14 @@ begin
     if Pnt.Y<0 then Continue;
 
     if Details.EndOfWrappedLine and (Pnt.X>0) then
-      Dec(Pnt.X); //-1 so up/down won't jump to eol pos (caret may paint on next line)
+      Dec(Pnt.X); //-1 so Up/Down won't jump to EOL pos (caret may paint on next line)
 
     Caret.PosX:= Pnt.X;
     Caret.PosY:= Pnt.Y;
 
     //PageDown should keep column when we go after document end, CudaText issue #4213
     if ADown and FCaretVirtual and (NPrevColumn>0) then
-      if (Caret.PosX>0) and (Caret.PosY=St.Count-1) and (Caret.PosX=St.LinesLen[Caret.PosY]) then
+      if (Caret.PosY=St.Count-1) and (Caret.PosX=St.LinesLen[Caret.PosY]) then
         Caret.PosX:= FTabHelper.ColumnPosToCharPos(Caret.PosY, St.Lines[Caret.PosY], NPrevColumn);
   end;
 
