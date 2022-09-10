@@ -307,7 +307,7 @@ begin
       Continue;
     end;
 
-    if FCaretVirtual and (FWrapMode=cWrapOff) then
+    if ADown and (ALines>1) and FCaretVirtual and (FWrapMode=cWrapOff) then
       NPrevColumn:= FTabHelper.CharPosToColumnPos(Caret.PosY, St.Lines[Caret.PosY], Caret.PosX)
     else
       NPrevColumn:= -1;
@@ -324,7 +324,7 @@ begin
     Caret.PosY:= Pnt.Y;
 
     //PageDown should keep column when we go after document end, CudaText issue #4213
-    if ADown and (ALines>1) and FCaretVirtual and (NPrevColumn>0) then
+    if (NPrevColumn>0) then
       if (Caret.PosY=St.Count-1) and (Caret.PosX=St.LinesLen[Caret.PosY]) then
         Caret.PosX:= FTabHelper.ColumnPosToCharPos(Caret.PosY, St.Lines[Caret.PosY], NPrevColumn);
   end;
