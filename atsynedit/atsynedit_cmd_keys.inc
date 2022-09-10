@@ -258,18 +258,17 @@ function TATSynEdit.DoCommand_KeyUpDown_Wrapped(ADown: boolean; ALines: integer)
 var
   St: TATStrings;
   Caret: TATCaretItem;
-  PosText, PosCoord: TPoint;
+  PosText, PosCoord, PosCoord2: TPoint;
   Details: TATEditorPosDetails;
-  NPrevColumn: integer;
-  NWrapIndex, i: integer;
+  NWrapIndex, iCaret: integer;
 const
   cGapActions: array[boolean] of TATEditorGapCoordAction =
     (cGapCoordIgnore, cGapCoordMoveDown);
 begin
   St:= Strings;
-  for i:= 0 to FCarets.Count-1 do
+  for iCaret:= 0 to FCarets.Count-1 do
   begin
-    Caret:= FCarets[i];
+    Caret:= FCarets[iCaret];
     PosCoord.X:= Caret.CoordX;
     PosCoord.Y:= Caret.CoordY;
 
@@ -307,11 +306,6 @@ begin
       Continue;
     end;
 
-    if ADown and (ALines>1) and FCaretVirtual and (FWrapMode=cWrapOff) then
-      NPrevColumn:= FTabHelper.CharPosToColumnPos(Caret.PosY, St.Lines[Caret.PosY], Caret.PosX)
-    else
-      NPrevColumn:= -1;
-
     //increase/decrease PosCoord.Y and calculate pos from it
     PosCoord.Y+= ALines*FCharSize.Y*BoolToPlusMinusOne[ADown];
     PosText:= ClientPosToCaretPos(PosCoord, Details, cGapActions[ADown]);
@@ -320,10 +314,14 @@ begin
     if Details.EndOfWrappedLine and (PosText.X>0) then
       Dec(PosText.X); //-1 so Up/Down won't jump to EOL pos (caret may paint on next line)
 
-    //PageDown should keep column when we go after document end, CudaText issue #4213
-    if (NPrevColumn>0) then
+    //PageDown should keep column when we go after document end, CudaText issues #4213 and #4359
+    if ADown and (ALines>1) and FCaretVirtual then
       if (PosText.Y=St.Count-1) and (PosText.X=St.LinesLen[PosText.Y]) then
-        PosText.X:= FTabHelper.ColumnPosToCharPos(PosText.Y, St.Lines[PosText.Y], NPrevColumn);
+      begin
+        PosCoord2:= CaretPosToClientPos(PosText);
+        PosCoord2.X:= PosCoord.X;
+        PosText:= ClientPosToCaretPos(PosCoord2, Details, cGapCoordIgnore);
+      end;
 
     Caret.PosX:= PosText.X;
     Caret.PosY:= PosText.Y;
