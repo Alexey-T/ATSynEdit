@@ -271,7 +271,7 @@ begin
   begin
     Caret:= FCarets[i];
     PosCoord.X:= Caret.CoordX;
-    PosCoord.Y:= 0;
+    PosCoord.Y:= Caret.CoordY;
 
     if IsPosFolded(Caret.PosX, Caret.PosY) then
     begin
@@ -312,8 +312,8 @@ begin
     else
       NPrevColumn:= -1;
 
-    //increase/decrease Caret.CoordY and calculate pos from it
-    PosCoord.Y:= Caret.CoordY + ALines*FCharSize.Y*BoolToPlusMinusOne[ADown];
+    //increase/decrease PosCoord.Y and calculate pos from it
+    PosCoord.Y+= ALines*FCharSize.Y*BoolToPlusMinusOne[ADown];
     PosText:= ClientPosToCaretPos(PosCoord, Details, cGapActions[ADown]);
     if PosText.Y<0 then Continue;
 
