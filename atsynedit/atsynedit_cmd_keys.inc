@@ -270,6 +270,8 @@ begin
   for i:= 0 to FCarets.Count-1 do
   begin
     Caret:= FCarets[i];
+    Pnt.X:= Caret.CoordX;
+    Pnt.Y:= 0;
 
     if IsPosFolded(Caret.PosX, Caret.PosY) then
     begin
@@ -278,7 +280,6 @@ begin
       Continue;
     end;
 
-    Pnt.X:= Caret.CoordX;
     if FOptKeyUpDownKeepColumn and not FCaretVirtual and (Caret.SavedX>0) then
     begin
       Pnt.X:= Caret.SavedX;
@@ -306,8 +307,10 @@ begin
       Continue;
     end;
 
-    if FCaretVirtual then
-      NPrevColumn:= FTabHelper.CharPosToColumnPos(Caret.PosY, St.Lines[Caret.PosY], Caret.PosX);
+    if FCaretVirtual and (FWrapMode=cWrapOff) then
+      NPrevColumn:= FTabHelper.CharPosToColumnPos(Caret.PosY, St.Lines[Caret.PosY], Caret.PosX)
+    else
+      NPrevColumn:= -1;
 
     //increase/decrease Caret.CoordY and calculate pos from it
     Pnt.Y:= Caret.CoordY + ALines*FCharSize.Y*BoolToPlusMinusOne[ADown];
@@ -321,8 +324,8 @@ begin
     Caret.PosY:= Pnt.Y;
 
     //PageDown should keep column when we go after document end, CudaText issue #4213
-    if FCaretVirtual then
-      if (Caret.PosY=St.Count-1) and (Caret.PosX=St.LinesLen[Caret.PosY]) then
+    if ADown and FCaretVirtual and (NPrevColumn>0) then
+      if (Caret.PosX>0) and (Caret.PosY=St.Count-1) and (Caret.PosX=St.LinesLen[Caret.PosY]) then
         Caret.PosX:= FTabHelper.ColumnPosToCharPos(Caret.PosY, St.Lines[Caret.PosY], NPrevColumn);
   end;
 
