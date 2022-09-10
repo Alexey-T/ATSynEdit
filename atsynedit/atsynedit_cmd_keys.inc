@@ -258,10 +258,10 @@ function TATSynEdit.DoCommand_KeyUpDown_Wrapped(ADown: boolean; ALines: integer)
 var
   St: TATStrings;
   Caret: TATCaretItem;
-  Pnt: TPoint;
+  PosText, PosCoord: TPoint;
   Details: TATEditorPosDetails;
-  NWrapIndex, i: integer;
   NPrevColumn: integer;
+  NWrapIndex, i: integer;
 const
   cGapActions: array[boolean] of TATEditorGapCoordAction =
     (cGapCoordIgnore, cGapCoordMoveDown);
@@ -270,8 +270,8 @@ begin
   for i:= 0 to FCarets.Count-1 do
   begin
     Caret:= FCarets[i];
-    Pnt.X:= Caret.CoordX;
-    Pnt.Y:= 0;
+    PosCoord.X:= Caret.CoordX;
+    PosCoord.Y:= 0;
 
     if IsPosFolded(Caret.PosX, Caret.PosY) then
     begin
@@ -282,7 +282,7 @@ begin
 
     if FOptKeyUpDownKeepColumn and not FCaretVirtual and (Caret.SavedX>0) then
     begin
-      Pnt.X:= Caret.SavedX;
+      PosCoord.X:= Caret.SavedX;
       //needed for arrow-down on last line; w/o this, arrow-up (2 times) jumps weird
       Caret.SavedX_Pre:= 0;
     end;
@@ -313,15 +313,15 @@ begin
       NPrevColumn:= -1;
 
     //increase/decrease Caret.CoordY and calculate pos from it
-    Pnt.Y:= Caret.CoordY + ALines*FCharSize.Y*BoolToPlusMinusOne[ADown];
-    Pnt:= ClientPosToCaretPos(Pnt, Details, cGapActions[ADown]);
-    if Pnt.Y<0 then Continue;
+    PosCoord.Y:= Caret.CoordY + ALines*FCharSize.Y*BoolToPlusMinusOne[ADown];
+    PosText:= ClientPosToCaretPos(PosCoord, Details, cGapActions[ADown]);
+    if PosText.Y<0 then Continue;
 
-    if Details.EndOfWrappedLine and (Pnt.X>0) then
-      Dec(Pnt.X); //-1 so Up/Down won't jump to EOL pos (caret may paint on next line)
+    if Details.EndOfWrappedLine and (PosText.X>0) then
+      Dec(PosText.X); //-1 so Up/Down won't jump to EOL pos (caret may paint on next line)
 
-    Caret.PosX:= Pnt.X;
-    Caret.PosY:= Pnt.Y;
+    Caret.PosX:= PosText.X;
+    Caret.PosY:= PosText.Y;
 
     //PageDown should keep column when we go after document end, CudaText issue #4213
     if (NPrevColumn>0) then
