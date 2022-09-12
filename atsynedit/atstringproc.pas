@@ -498,6 +498,7 @@ function TATStringTabHelper.FindWordWrapOffset(ALineIndex: integer; const S: atS
 var
   N, NMin, NAvg: integer;
   Offsets: TATIntFixedArray;
+  ch, ch_next: widechar;
 begin
   if S='' then
     Exit(0);
@@ -520,12 +521,20 @@ begin
   //a) 2 word-chars
   //b) space as 2nd char (gives not nice look for Python sources)
   NMin:= SGetIndentChars(S)+1;
-  while (N>NMin) and
-    (IsCharSurrogateLow(S[N+1]) or //don't wrap inside surrogate pair
-     (_IsCJKText(S[N]) and _IsCJKPunctuation(S[N+1])) or //don't wrap between CJK char and CJK punctuation
-     (_IsWord(S[N]) and _IsWord(S[N+1])) or //don't wrap between 2 word-chars
-     (AWrapIndented and IsCharSpace(S[N+1])))
-    do Dec(N);
+  repeat
+    ch:= S[N];
+    ch_next:= S[N+1];
+
+    if (N>NMin) and
+    (IsCharSurrogateLow(ch_next) or //don't wrap inside surrogate pair
+     (_IsCJKText(ch) and _IsCJKPunctuation(ch_next)) or //don't wrap between CJK char and CJK punctuation
+     (_IsWord(ch) and _IsWord(ch_next)) or //don't wrap between 2 word-chars
+     (AWrapIndented and IsCharSpace(ch_next)))
+    then
+      Dec(N)
+    else
+      Break;
+  until false;
 
   //use correct of avg offset
   if N>NMin then
