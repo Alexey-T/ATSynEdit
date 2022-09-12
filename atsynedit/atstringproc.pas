@@ -695,8 +695,6 @@ procedure TATStringTabHelper.CalcCharOffsets(ALineIndex: integer; const S: atStr
 var
   NLen, NSize, NTabSize, NCharsSkipped: integer;
   NScalePercents: integer;
-  //NPairSize: integer;
-  //StrPair: WideString;
   ch: widechar;
   i: integer;
 begin
@@ -706,8 +704,6 @@ begin
   if NLen=0 then Exit;
 
   NCharsSkipped:= ACharsSkipped;
-  //NPairSize:= 0;
-  //StrPair:= 'ab';
 
   if NLen>ATEditorOptions.MaxLineLenForAccurateCharWidths then
   begin
@@ -721,31 +717,10 @@ begin
     ch:= S[i];
     Inc(NCharsSkipped);
 
-    {
-    ////if used GetStrWidth, then strange bug on Win32, Emoji wrap pos is not ok
-    if (NPairSize>0) and IsCharSurrogateLow(ch) then
-    begin
-      NScalePercents:= NPairSize div 2;
-      NPairSize:= 0;
-    end
-    else
-    if IsCharSurrogateHigh(ch) and (i<Length(S)) then
-    begin
-      StrPair[1]:= ch;
-      StrPair[2]:= S[i+1];
-      NPairSize:= CharSizer.GetStrWidth(StrPair);
-      NScalePercents:= NPairSize - NPairSize div 2;
-    end
-    }
     if IsCharSurrogateAny(ch) then
-    begin
-      NScalePercents:= ATEditorOptions.EmojiWidthPercents div 2;
-    end
+      NScalePercents:= ATEditorOptions.EmojiWidthPercents div 2
     else
-    begin
       NScalePercents:= CharSizer.GetCharWidth(ch);
-      //NPairSize:= 0;
-    end;
 
     if ch<>#9 then
       NSize:= 1
