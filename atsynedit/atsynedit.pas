@@ -2496,8 +2496,8 @@ procedure _CalcWrapInfos(
   AFontProportional: boolean);
 var
   WrapItem: TATWrapItem;
-  NPartOffset, NLen, NIndent, NVisColumns: integer;
-  NFoldFrom: integer;
+  NLineLen, NPartLen, NFoldFrom: integer;
+  NPartOffset, NIndent, NVisColumns: integer;
   FinalState: TATWrapItemFinal;
   bInitialItem: boolean;
   StrPart: atString;
@@ -2508,9 +2508,9 @@ begin
   if AConsiderFolding then
     if AStrings.LinesHidden[ALineIndex, AEditorIndex] then Exit;
 
-  NLen:= AStrings.LinesLen[ALineIndex];
+  NLineLen:= AStrings.LinesLen[ALineIndex];
 
-  if NLen=0 then
+  if NLineLen=0 then
   begin
     WrapItem.Init(ALineIndex, 1, 0, 0, cWrapItemFinal, true);
     AItems.Add(WrapItem);
@@ -2524,7 +2524,7 @@ begin
     NFoldFrom:= AStrings.LinesFoldFrom[ALineIndex, AEditorIndex];
     if NFoldFrom>0 then
     begin
-      WrapItem.Init(ALineIndex, 1, Min(NLen, NFoldFrom-1), 0, cWrapItemCollapsed, true);
+      WrapItem.Init(ALineIndex, 1, Min(NLineLen, NFoldFrom-1), 0, cWrapItemCollapsed, true);
       AItems.Add(WrapItem);
       Exit;
     end;
@@ -2533,7 +2533,7 @@ begin
   //line not wrapped?
   if (AWrapColumn<ATEditorOptions.MinWrapColumnAbs) then
   begin
-    WrapItem.Init(ALineIndex, 1, NLen, 0, cWrapItemFinal, true);
+    WrapItem.Init(ALineIndex, 1, NLineLen, 0, cWrapItemFinal, true);
     AItems.Add(WrapItem);
     Exit;
   end;
@@ -2550,7 +2550,7 @@ begin
       StrPart:= AStrings.LineSub(ALineIndex, NPartOffset, NVisColumns);
     if StrPart='' then Break;
 
-    NLen:= ATabHelper.FindWordWrapOffset(
+    NPartLen:= ATabHelper.FindWordWrapOffset(
       ALineIndex,
       //very slow to calc for entire line (eg len=70K),
       //calc for first NVisColumns chars
@@ -2560,12 +2560,12 @@ begin
       AWrapIndented
       );
 
-    if NLen>=Length(StrPart) then
+    if NPartLen>=Length(StrPart) then
       FinalState:= cWrapItemFinal
     else
       FinalState:= cWrapItemMiddle;
 
-    WrapItem.Init(ALineIndex, NPartOffset, NLen, NIndent, FinalState, bInitialItem);
+    WrapItem.Init(ALineIndex, NPartOffset, NPartLen, NIndent, FinalState, bInitialItem);
     AItems.Add(WrapItem);
     bInitialItem:= false;
 
@@ -2576,7 +2576,7 @@ begin
         NIndent:= Min(NIndent, AIndentMaximal);
       end;
 
-    Inc(NPartOffset, NLen);
+    Inc(NPartOffset, NPartLen);
   until false;
 end;
 
