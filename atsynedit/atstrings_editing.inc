@@ -503,7 +503,10 @@ begin
 
   if AToY<0 then Exit;
   if AToY>=Count then
-    begin AToY:= Count-1; AToX:= LinesLen[AToY]; end;
+  begin
+    AToY:= Count-1;
+    AToX:= LinesLen[AToY];
+  end;
 
   if (AFromX=AToX) and (AFromY=AToY) then Exit;
   if (AFromY>AToY) then Exit;
