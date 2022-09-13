@@ -526,10 +526,11 @@ begin
     ch_next:= S[N+1];
 
     if (N>NMin) and
-    (IsCharSurrogateLow(ch_next) or //don't wrap inside surrogate pair
-     (_IsCJKText(ch) and _IsCJKPunctuation(ch_next)) or //don't wrap between CJK char and CJK punctuation
-     (_IsWord(ch) and _IsWord(ch_next)) or //don't wrap between 2 word-chars
-     (AWrapIndented and IsCharSpace(ch_next)))
+     (IsCharSurrogateLow(ch_next) or //don't wrap inside surrogate pair
+      (_IsCJKText(ch) and _IsCJKPunctuation(ch_next)) or //don't wrap between CJK char and CJK punctuation
+      (_IsWord(ch) and _IsWord(ch_next)) or //don't wrap between 2 word-chars
+      (AWrapIndented and IsCharSpace(ch_next))
+     )
     then
       Dec(N)
     else
