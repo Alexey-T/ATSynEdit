@@ -517,9 +517,6 @@ begin
   if NAvg<ATEditorOptions.MinWordWrapOffset then
     Exit(ATEditorOptions.MinWordWrapOffset);
 
-  //find correct offset: not allowed at edge
-  //a) 2 word-chars
-  //b) space as 2nd char (gives not nice look for Python sources)
   NMin:= SGetIndentChars(S)+1;
   repeat
     ch:= S[N];
@@ -529,7 +526,7 @@ begin
      (IsCharSurrogateLow(ch_next) or //don't wrap inside surrogate pair
       (_IsCJKText(ch) and _IsCJKPunctuation(ch_next)) or //don't wrap between CJK char and CJK punctuation
       (_IsWord(ch) and _IsWord(ch_next)) or //don't wrap between 2 word-chars
-      (AWrapIndented and IsCharSpace(ch_next))
+      (AWrapIndented and IsCharSpace(ch_next)) //space as 2nd char looks bad with Python sources
      )
     then
       Dec(N)
