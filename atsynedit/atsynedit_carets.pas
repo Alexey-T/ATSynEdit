@@ -560,10 +560,10 @@ begin
   begin
     if AShiftY=0 then exit;
 
-    if PosY=APosY+1 then
-      Inc(PosX, AShiftBelowX);
-
-    Inc(PosX, AShiftX);
+    if (PosY=APosY+1) and (AShiftBelowX>0) then
+      Inc(PosX, AShiftBelowX)
+    else
+      Inc(PosX, AShiftX);
     Inc(PosY, AShiftY);
   end
   else
@@ -577,10 +577,10 @@ begin
   //same, but for EndX/EndY
   if EndY>APosY then
   begin
-    if EndY=APosY+1 then
-      Inc(EndX, AShiftBelowX);
-
-    //Inc(EndX, AShiftX) too? unknown yet
+    if (EndY=APosY+1) and (AShiftBelowX>0) then
+      Inc(EndX, AShiftBelowX)
+    else
+      Inc(EndX, AShiftX); //needed too?
     Inc(EndY, AShiftY);
   end
   else
