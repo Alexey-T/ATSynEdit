@@ -59,15 +59,12 @@ begin
       not SEndsWithEol(Str);
 
   //paste
-  St.BeginUndoGroup;
-  DoCommand_TextDeleteSelection;
   Result:= DoCommand_TextInsertAtCarets(Str,
              AKeepCaret,
              FOverwrite and FOptOverwriteAllowedOnPaste,
              ASelectThen,
              bAtLineStart
              );
-  St.EndUndoGroup;
 
   //solve CudaText #3270
   St.SetGroupMark;

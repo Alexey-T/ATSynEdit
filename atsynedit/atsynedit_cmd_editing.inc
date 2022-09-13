@@ -63,6 +63,9 @@ begin
     if bNeedGroup then
       St.BeginUndoGroup;
 
+    if Carets.IsSelection then
+      Result:= DoCommand_TextDeleteSelection;
+
     //TextItems allows to insert each clipboard line into its own caret
     //when count of carets = count of clipboard lines
     if FOptPasteMultilineTextSpreadsToCarets then
