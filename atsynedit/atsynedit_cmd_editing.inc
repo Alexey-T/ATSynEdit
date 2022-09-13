@@ -135,7 +135,7 @@ var
   St: TATStrings;
   Shift, PosAfter: TPoint;
   StrSpaces: atString;
-  i: integer;
+  iCaret: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
@@ -146,12 +146,12 @@ begin
   try
     DoSelectionDeleteOrReset;
 
-    for i:= Carets.Count-1 downto 0 do
+    for iCaret:= Carets.Count-1 downto 0 do
     begin
-      Caret:= Carets[i];
+      Caret:= Carets[iCaret];
       StrSpaces:= StringOfCharW(' ', FTabSize - Caret.PosX mod FTabSize);
       St.TextInsert(Caret.PosX, Caret.PosY, StrSpaces, AOvrMode, Shift, PosAfter);
-      UpdateCaretsAndMarkersOnEditing(i, Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
+      UpdateCaretsAndMarkersOnEditing(iCaret, Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
 
       Caret.PosX:= PosAfter.X;
       Caret.PosY:= PosAfter.Y;
@@ -204,7 +204,7 @@ var
   bNeedGroup: boolean;
   bChange, bChangeOne: boolean;
   ch: WideChar;
-  i: integer;
+  iCaret: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
@@ -226,9 +226,9 @@ begin
 
   bChange:= false;
 
-  for i:= 0 to Carets.Count-1 do
+  for iCaret:= 0 to Carets.Count-1 do
   begin
-    Caret:= Carets[i];
+    Caret:= Carets[iCaret];
     if not St.IsIndexValid(Caret.PosY) then Continue;
     NDeleteLen:= ADeleteLen;
 
@@ -251,7 +251,7 @@ begin
     end;
 
     St.TextDeleteLeft(Caret.PosX, Caret.PosY, NDeleteLen, Shift, PosAfter, FOptKeyBackspaceGoesToPrevLine, bChangeOne);
-    UpdateCaretsAndMarkersOnEditing(i, Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
+    UpdateCaretsAndMarkersOnEditing(iCaret, Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
     Caret.PosX:= PosAfter.X;
     Caret.PosY:= PosAfter.Y;
     Caret.EndX:= -1;
@@ -360,7 +360,7 @@ var
   Shift, PosAfter: TPoint;
   bNeedGroup: boolean;
   ch: WideChar;
-  i: integer;
+  iCaret: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
@@ -380,9 +380,9 @@ begin
   if bNeedGroup then
     St.BeginUndoGroup;
 
-  for i:= 0 to Carets.Count-1 do
+  for iCaret:= 0 to Carets.Count-1 do
   begin
-    Caret:= Carets[i];
+    Caret:= Carets[iCaret];
     if not St.IsIndexValid(Caret.PosY) then Continue;
 
     //offsetX for carets in line[PosY+1]
@@ -399,7 +399,7 @@ begin
       Inc(NDeleteLen);
 
     St.TextDeleteRight(Caret.PosX, Caret.PosY, NDeleteLen, Shift, PosAfter);
-    UpdateCaretsAndMarkersOnEditing(i, Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter, ShiftBelowX);
+    UpdateCaretsAndMarkersOnEditing(iCaret, Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter, ShiftBelowX);
     Caret.PosX:= PosAfter.X;
     Caret.PosY:= PosAfter.Y;
   end;
@@ -417,7 +417,7 @@ var
   Shift, PosAfter: TPoint;
   Str: atString;
   bNeedGroup, bBetterBrackets: boolean;
-  NShiftX, NShiftY, i: integer;
+  NShiftX, NShiftY, iCaret: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
@@ -431,9 +431,9 @@ begin
 
   DoSelectionDeleteOrReset;
 
-  for i:= FCarets.Count-1 downto 0 do
+  for iCaret:= FCarets.Count-1 downto 0 do
   begin
-    Caret:= FCarets[i];
+    Caret:= FCarets[iCaret];
     if not St.IsIndexValid(Caret.PosY) then Continue;
 
     //reset empty selection, fixing CudaText issue #4271
@@ -464,7 +464,7 @@ begin
       NShiftY:= 1;
     end;
 
-    UpdateCaretsAndMarkersOnEditing(i, Caret.PosX, Caret.PosY, Shift.X+NShiftX, Shift.Y+NShiftY, PosAfter);
+    UpdateCaretsAndMarkersOnEditing(iCaret, Caret.PosX, Caret.PosY, Shift.X+NShiftX, Shift.Y+NShiftY, PosAfter);
     Caret.PosX:= PosAfter.X+NShiftX;
     Caret.PosY:= PosAfter.Y;
     //on Enter reset prev column for up/down
@@ -1191,22 +1191,22 @@ function TATSynEdit.DoCommand_TextInsertEmptyAboveBelow(ADown: boolean): TATComm
 var
   Caret: TATCaretItem;
   PosAfter: TPoint;
-  i: integer;
+  iCaret: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
 
   DoCaretsDeleteOnSameLines;
 
-  for i:= Carets.Count-1 downto 0 do
+  for iCaret:= Carets.Count-1 downto 0 do
   begin
-    Caret:= Carets[i];
+    Caret:= Carets[iCaret];
     Strings.LineInsert(Caret.PosY + IfThen(ADown, 1), '');
 
     PosAfter.X:= 0;
     PosAfter.Y:= Caret.PosY+IfThen(ADown, 1);
 
-    UpdateCaretsAndMarkersOnEditing(i, 0, Caret.PosY, 0, 1, PosAfter);
+    UpdateCaretsAndMarkersOnEditing(iCaret, 0, Caret.PosY, 0, 1, PosAfter);
 
     Caret.PosX:= PosAfter.X;
     Caret.PosY:= PosAfter.Y;
