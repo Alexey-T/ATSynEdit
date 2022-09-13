@@ -45,7 +45,7 @@ var
   TextItem: atString;
   X1, Y1, X2, Y2, X_saved: integer;
   bSel, bNeedGroup, bInsertLinePerCaret: boolean;
-  i: integer;
+  iCaret: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
@@ -84,9 +84,9 @@ begin
     if bInsertLinePerCaret then
       AInsertAtLineStarts:= false;
 
-    for i:= Carets.Count-1 downto 0 do
+    for iCaret:= Carets.Count-1 downto 0 do
     begin
-      Caret:= Carets[i];
+      Caret:= Carets[iCaret];
       Caret.GetRange(X1, Y1, X2, Y2, bSel);
 
       X_saved:= -1;
@@ -98,7 +98,7 @@ begin
       end;
 
       if bInsertLinePerCaret then
-        TextItem:= UTF8Decode(TextItems[i])
+        TextItem:= UTF8Decode(TextItems[iCaret])
       else
         TextItem:= AText;
 
@@ -106,7 +106,7 @@ begin
         St.TextReplaceRange(X1, Y1, X2, Y2, TextItem, Shift, PosAfter, false)
       else
         St.TextInsert(X1, Y1, TextItem, AOvrMode, Shift, PosAfter);
-      UpdateCaretsAndMarkersOnEditing(i+1, X1, Y1, Shift.X, Shift.Y, PosAfter);
+      UpdateCaretsAndMarkersOnEditing(iCaret+1, X1, Y1, Shift.X, Shift.Y, PosAfter);
 
       if not AKeepCaret then
       begin
