@@ -302,7 +302,7 @@ var
   Shift, PosAfter: TPoint;
   X1, Y1, X2, Y2: integer;
   bSel: boolean;
-  i: integer;
+  iCaret: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
@@ -319,10 +319,11 @@ begin
 
   St.BeginUndoGroup;
   try
-    for i:= Carets.Count-1 downto 0 do
+    for iCaret:= Carets.Count-1 downto 0 do
     begin
-      Caret:= Carets[i];
+      Caret:= Carets[iCaret];
       Caret.GetRange(X1, Y1, X2, Y2, bSel);
+      if not bSel then Continue;
 
       St.TextDeleteRange(X1, Y1, X2, Y2, Shift, PosAfter);
 
@@ -335,7 +336,7 @@ begin
       //CudaText issue #1615
       //CudaText issue #2261
       UpdateMarkersOnDeleting(X1, Y1, X2, Y2);
-      UpdateCaretsAndMarkersOnEditing(i, X1, Y1, Shift.X, Shift.Y, PosAfter);
+      UpdateCaretsAndMarkersOnEditing(iCaret, X1, Y1, Shift.X, Shift.Y, PosAfter);
     end;
   finally
     St.EndUndoGroup;
