@@ -534,7 +534,6 @@ begin
       Break;
   until false;
 
-  //use correct of avg offset
   if N>NMin then
     Result:= N
   else
