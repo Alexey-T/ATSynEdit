@@ -336,7 +336,7 @@ begin
       //CudaText issue #1615
       //CudaText issue #2261
       UpdateMarkersOnDeleting(X1, Y1, X2, Y2);
-      UpdateCaretsAndMarkersOnEditing(iCaret, X1, Y1, Shift.X, Shift.Y, PosAfter);
+      UpdateCaretsAndMarkersOnEditing(iCaret+1, X1, Y1, Shift.X, Shift.Y, PosAfter);
     end;
   finally
     St.EndUndoGroup;

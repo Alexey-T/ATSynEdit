@@ -585,6 +585,7 @@ begin
       ActionDeleteFakeLineAndFinalEol;
     end;
 
+    AShift.X:= AFromX;
     AShift.Y:= -(AToY-AFromY);
   end;
 

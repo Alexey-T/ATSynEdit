@@ -555,7 +555,7 @@ end;
 
 procedure TATCaretItem.UpdateOnEditing(APosX, APosY, AShiftX, AShiftY, AShiftBelowX: integer);
 begin
-  //carets below src, apply ShiftY/ShiftBelowX
+  //carets below src, apply ShiftX/ShiftY/ShiftBelowX
   if PosY>APosY then
   begin
     if AShiftY=0 then exit;
@@ -563,6 +563,7 @@ begin
     if PosY=APosY+1 then
       Inc(PosX, AShiftBelowX);
 
+    Inc(PosX, AShiftX);
     Inc(PosY, AShiftY);
   end
   else
@@ -579,6 +580,7 @@ begin
     if EndY=APosY+1 then
       Inc(EndX, AShiftBelowX);
 
+    //Inc(EndX, AShiftX) too? unknown yet
     Inc(EndY, AShiftY);
   end
   else
