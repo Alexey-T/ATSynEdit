@@ -73,7 +73,7 @@ type
     class operator=(const A, B: TATMarkerItem): boolean;
     function SelContains(AX, AY: integer): boolean;
     function SelEnd: TPoint;
-    procedure UpdateOnEditing(APosX, APosY, AShiftX, AShiftY,
+    procedure UpdateOnEditing(APos, AShift: TPoint;
       AShiftBelowX: integer; APosAfter: TPoint);
   end;
 
@@ -182,37 +182,36 @@ begin
   end;
 end;
 
-procedure TATMarkerItem.UpdateOnEditing(
-  APosX, APosY, AShiftX, AShiftY, AShiftBelowX: integer;
-  APosAfter: TPoint);
+procedure TATMarkerItem.UpdateOnEditing(APos, AShift: TPoint;
+  AShiftBelowX: integer; APosAfter: TPoint);
 begin
   //marker below src, apply ShiftY/ShiftBelowX
-  if PosY>APosY then
+  if PosY>APos.Y then
   begin
-    if AShiftY=0 then exit;
+    if AShift.Y=0 then exit;
 
-    if PosY=APosY+1 then
+    if PosY=APos.Y+1 then
       Inc(PosX, AShiftBelowX);
 
-    Inc(PosY, AShiftY);
+    Inc(PosY, AShift.Y);
   end
   else
   //marker on same line as src
-  if PosY=APosY then
+  if PosY=APos.Y then
   begin
-    if PosX=APosX then
+    if PosX=APos.X then
     begin
       PosX:= APosAfter.X;
       PosY:= APosAfter.Y;
     end
     else
-    if PosX>=APosX then
-      if AShiftY=0 then
-        Inc(PosX, AShiftX)
+    if PosX>=APos.X then
+      if AShift.Y=0 then
+        Inc(PosX, AShift.X)
       else
       begin
-        Inc(PosX, -APosX+APosAfter.X);
-        Inc(PosY, AShiftY);
+        Inc(PosX, -APos.X+APosAfter.X);
+        Inc(PosY, AShift.Y);
       end;
   end;
 
@@ -613,7 +612,7 @@ begin
   for i:= 0 to Count-1 do
   begin
     Item:= ItemPtr(i);
-    Item^.UpdateOnEditing(APos.X, APos.Y, AShift.X, AShift.Y, AShiftBelowX, APosAfter);
+    Item^.UpdateOnEditing(APos, AShift, AShiftBelowX, APosAfter);
   end;
 end;
 
