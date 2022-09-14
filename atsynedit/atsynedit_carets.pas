@@ -68,7 +68,7 @@ type
     function IsInVisibleRect(const R: TRect): boolean;
     function FirstTouchedLine: integer;
     procedure UpdateMemory(AMode: TATCaretMemoryAction; AArrowUpDown: boolean);
-    procedure UpdateOnEditing(APosX, APosY, AShiftX, AShiftY, AShiftBelowX: integer);
+    procedure UpdateOnEditing(APos, APosEnd, AShift: TPoint; AShiftBelowX: integer);
   end;
 
 type
@@ -553,41 +553,41 @@ begin
   end;
 end;
 
-procedure TATCaretItem.UpdateOnEditing(APosX, APosY, AShiftX, AShiftY, AShiftBelowX: integer);
+procedure TATCaretItem.UpdateOnEditing(APos, APosEnd, AShift: TPoint; AShiftBelowX: integer);
 begin
   //carets below src, apply ShiftX/ShiftY/ShiftBelowX
-  if PosY>APosY then
+  if PosY>APos.Y then
   begin
-    if AShiftY=0 then exit;
+    if AShift.Y=0 then exit;
 
-    if (PosY=APosY+1) and (AShiftBelowX>0) then
+    if (PosY=APos.Y+1) and (AShiftBelowX>0) then
       Inc(PosX, AShiftBelowX)
     else
-      Inc(PosX, AShiftX);
-    Inc(PosY, AShiftY);
+      Inc(PosX, AShift.X);
+    Inc(PosY, AShift.Y);
   end
   else
   //carets on same line as src, apply ShiftX
-  if PosY=APosY then
+  if PosY=APos.Y then
   begin
-    if PosX>APosX then
-      Inc(PosX, AShiftX);
+    if PosX>APos.X then
+      Inc(PosX, AShift.X);
   end;
 
   //same, but for EndX/EndY
-  if EndY>APosY then
+  if EndY>APos.Y then
   begin
-    if (EndY=APosY+1) and (AShiftBelowX>0) then
+    if (EndY=APos.Y+1) and (AShiftBelowX>0) then
       Inc(EndX, AShiftBelowX)
     else
-      Inc(EndX, AShiftX); //needed too?
-    Inc(EndY, AShiftY);
+      Inc(EndX, AShift.X); //needed too?
+    Inc(EndY, AShift.Y);
   end
   else
-  if EndY=APosY then
+  if EndY=APos.Y then
   begin
-    if EndX>APosX then
-      Inc(EndX, AShiftX);
+    if EndX>APos.X then
+      Inc(EndX, AShift.X);
   end;
 
   if PosX<0 then PosX:= 0;

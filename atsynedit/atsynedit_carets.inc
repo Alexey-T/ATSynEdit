@@ -1152,8 +1152,7 @@ end;
 
 
 procedure TATSynEdit.UpdateCaretsAndMarkersOnEditing(
-  AFromCaret: integer; APosX, APosY: integer;
-  AShiftX, AShiftY: integer; APosAfter: TPoint; AShiftBelowX: integer);
+  AFromCaret: integer; APos, APosEnd, AShift, APosAfter: TPoint; AShiftBelowX: integer);
 //for text change at unknown caret, pass AFromCaret=0
 //AShiftBelowX: used in Del key command, it's set to the length of line,
 //to shift (to right) carets in the line below
@@ -1163,15 +1162,15 @@ var
   S: string;
   {$endif}
 begin
-  if APosX<0 then Exit;
-  if APosY<0 then Exit;
+  if APos.X<0 then Exit;
+  if APos.Y<0 then Exit;
 
   //if AFromCaret<0 then
   //  AFromCaret:= Carets.IndexOfPosYAvg(APosY);
 
   if AFromCaret>=0 then
     for i:= AFromCaret to Carets.Count-1 do
-      Carets[i].UpdateOnEditing(APosX, APosY, AShiftX, AShiftY, AShiftBelowX);
+      Carets[i].UpdateOnEditing(APos, APosEnd, AShift, AShiftBelowX);
 
   {$ifdef debug_markers_shift}
   S:= '';
@@ -1180,18 +1179,18 @@ begin
       S+= Format('Mark[%d] %d %d, ', [i, PosX, PosY]);
   Application.MainForm.Caption:= S+' -- '+Format(
     'Pos %d %d, Shift %d %d, PosAfter %d %d',
-    [APosX, APosY, AShiftX, AShiftY, APosAfter.X, APosAfter.Y]);
+    [APos.X, APos.Y, AShift.X, AShift.Y, APosAfter.X, APosAfter.Y]);
   {$endif}
 
   //adjust markers
   if Assigned(FMarkers) then
-    FMarkers.UpdateOnEditing(APosX, APosY, AShiftX, AShiftY, AShiftBelowX, APosAfter);
+    FMarkers.UpdateOnEditing(APos, AShift, AShiftBelowX, APosAfter);
 
   if Assigned(FAttribs) then
-    FAttribs.UpdateOnEditing(APosX, APosY, AShiftX, AShiftY, AShiftBelowX, APosAfter);
+    FAttribs.UpdateOnEditing(APos, AShift, AShiftBelowX, APosAfter);
 
   if Assigned(FMarkedRange) then
-    FMarkedRange.UpdateOnEditing(APosX, APosY, AShiftX, AShiftY, AShiftBelowX, APosAfter);
+    FMarkedRange.UpdateOnEditing(APos, AShift, AShiftBelowX, APosAfter);
 end;
 
 

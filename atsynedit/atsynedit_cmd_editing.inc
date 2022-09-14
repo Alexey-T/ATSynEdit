@@ -106,7 +106,11 @@ begin
         St.TextReplaceRange(X1, Y1, X2, Y2, TextItem, Shift, PosAfter, false)
       else
         St.TextInsert(X1, Y1, TextItem, AOvrMode, Shift, PosAfter);
-      UpdateCaretsAndMarkersOnEditing(iCaret+1, X1, Y1, Shift.X, Shift.Y, PosAfter);
+      UpdateCaretsAndMarkersOnEditing(iCaret+1,
+        Point(X1, Y1),
+        Point(X1, Y1),
+        Shift,
+        PosAfter);
 
       if not AKeepCaret then
       begin
@@ -151,7 +155,11 @@ begin
       Caret:= Carets[iCaret];
       StrSpaces:= StringOfCharW(' ', FTabSize - Caret.PosX mod FTabSize);
       St.TextInsert(Caret.PosX, Caret.PosY, StrSpaces, AOvrMode, Shift, PosAfter);
-      UpdateCaretsAndMarkersOnEditing(iCaret+1, Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
+      UpdateCaretsAndMarkersOnEditing(iCaret+1,
+        Point(Caret.PosX, Caret.PosY),
+        Point(Caret.PosX, Caret.PosY),
+        Shift,
+        PosAfter);
 
       Caret.PosX:= PosAfter.X;
       Caret.PosY:= PosAfter.Y;
@@ -251,7 +259,11 @@ begin
     end;
 
     St.TextDeleteLeft(Caret.PosX, Caret.PosY, NDeleteLen, Shift, PosAfter, FOptKeyBackspaceGoesToPrevLine, bChangeOne);
-    UpdateCaretsAndMarkersOnEditing(iCaret+1, Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
+    UpdateCaretsAndMarkersOnEditing(iCaret+1,
+      Point(Caret.PosX, Caret.PosY),
+      Point(Caret.PosX, Caret.PosY),
+      Shift,
+      PosAfter);
     Caret.PosX:= PosAfter.X;
     Caret.PosY:= PosAfter.Y;
     Caret.EndX:= -1;
@@ -339,7 +351,11 @@ begin
       //CudaText issue #1615
       //CudaText issue #2261
       UpdateMarkersOnDeleting(X1, Y1, X2, Y2);
-      UpdateCaretsAndMarkersOnEditing(iCaret+1, X1, Y1, Shift.X, Shift.Y, PosAfter);
+      UpdateCaretsAndMarkersOnEditing(iCaret+1,
+        Point(X1, Y1),
+        Point(X2, Y2),
+        Shift,
+        PosAfter);
     end;
   finally
     St.EndUndoGroup;
@@ -399,7 +415,12 @@ begin
       Inc(NDeleteLen);
 
     St.TextDeleteRight(Caret.PosX, Caret.PosY, NDeleteLen, Shift, PosAfter);
-    UpdateCaretsAndMarkersOnEditing(iCaret+1, Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter, ShiftBelowX);
+    UpdateCaretsAndMarkersOnEditing(iCaret+1,
+      Point(Caret.PosX, Caret.PosY),
+      Point(Caret.PosX+NDeleteLen, Caret.PosY),
+      Shift,
+      PosAfter,
+      ShiftBelowX);
     Caret.PosX:= PosAfter.X;
     Caret.PosY:= PosAfter.Y;
   end;
@@ -464,7 +485,11 @@ begin
       NShiftY:= 1;
     end;
 
-    UpdateCaretsAndMarkersOnEditing(iCaret+1, Caret.PosX, Caret.PosY, Shift.X+NShiftX, Shift.Y+NShiftY, PosAfter);
+    UpdateCaretsAndMarkersOnEditing(iCaret+1,
+      Point(Caret.PosX, Caret.PosY),
+      Point(Caret.PosX, Caret.PosY),
+      Point(Shift.X+NShiftX, Shift.Y+NShiftY),
+      PosAfter);
     Caret.PosX:= PosAfter.X+NShiftX;
     Caret.PosY:= PosAfter.Y;
     //on Enter reset prev column for up/down
@@ -508,7 +533,11 @@ begin
       begin
         St.TextDeleteLine(0, iLine, Shift, PosAfter);
         UpdateMarkersOnDeleting(0, iLine, 0, iLine+1);
-        UpdateCaretsAndMarkersOnEditing(iCaret+1, 0, iLine, Shift.X, Shift.Y, PosAfter);
+        UpdateCaretsAndMarkersOnEditing(iCaret+1,
+          Point(0, iLine),
+          Point(0, iLine+1),
+          Shift,
+          PosAfter);
       end;
     end;
 
@@ -549,7 +578,11 @@ begin
         St.LinesEnds[Line2+1]:= St.Endings;
       end;
 
-      UpdateCaretsAndMarkersOnEditing(iCaret+1, Caret.PosX, Caret.PosY, 0, (Line2-Line1+1), Point(0, 0));
+      UpdateCaretsAndMarkersOnEditing(iCaret+1,
+        Point(Caret.PosX, Caret.PosY),
+        Point(Caret.PosX, Caret.PosY),
+        Point(0, Line2-Line1+1),
+        Point(0, 0));
     end;
   finally
     St.EndUndoGroup;
@@ -706,7 +739,11 @@ begin
       end;
     end;
 
-    UpdateCaretsAndMarkersOnEditing(iCaret+1, Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
+    UpdateCaretsAndMarkersOnEditing(iCaret+1,
+      Point(Caret.PosX, Caret.PosY),
+      Point(Caret.PosX+NLen, Caret.PosY),
+      Shift,
+      PosAfter);
 
     if ((Caret.PosX<>PosAfter.X) or (Caret.PosY<>PosAfter.Y)) and
       (FCarets.IndexOfPosXY(PosAfter.X, PosAfter.Y)>=0) then
@@ -798,7 +835,11 @@ begin
     Caret.PosX:= N1;
 
     UpdateMarkersOnDeleting(N1, Caret.PosY, N2, Caret.PosY);
-    UpdateCaretsAndMarkersOnEditing(iCaret+1, Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
+    UpdateCaretsAndMarkersOnEditing(iCaret+1,
+      Point(N1, Caret.PosY),
+      Point(N2, Caret.PosY),
+      Shift,
+      PosAfter);
   end;
 
   if bNeedGroup then
@@ -1144,7 +1185,11 @@ begin
   St.ChangeBlockActive:= false;
 
   UpdateMarkersOnDeleting(0, 0, Caret.PosX, Caret.PosY);
-  UpdateCaretsAndMarkersOnEditing(0, Caret.PosX, Caret.PosY, -Caret.PosX, -Caret.PosY, PosAfter);
+  UpdateCaretsAndMarkersOnEditing(0,
+    Point(Caret.PosX, Caret.PosY),
+    Point(Caret.PosX, Caret.PosY),
+    Point(-Caret.PosX, -Caret.PosY),
+    PosAfter);
 
   //move caret to beginning
   DoCaretSingle(0, 0);
@@ -1206,7 +1251,11 @@ begin
     PosAfter.X:= 0;
     PosAfter.Y:= Caret.PosY+IfThen(ADown, 1);
 
-    UpdateCaretsAndMarkersOnEditing(iCaret+1, 0, Caret.PosY, 0, 1, PosAfter);
+    UpdateCaretsAndMarkersOnEditing(iCaret+1,
+      Point(0, Caret.PosY),
+      Point(0, Caret.PosY),
+      Point(0, 1),
+      PosAfter);
 
     Caret.PosX:= PosAfter.X;
     Caret.PosY:= PosAfter.Y;

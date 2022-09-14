@@ -123,7 +123,8 @@ type
     function DeleteByPos(AX, AY: integer): boolean;
     procedure Find(AX, AY: integer; out AIndex: integer; out AExactMatch: boolean);
     function FindContaining(AX, AY: integer): integer;
-    procedure UpdateOnEditing(APosX, APosY, AShiftX, AShiftY, AShiftBelowX: integer; APosAfter: TPoint);
+    procedure UpdateOnEditing(APos, AShift: TPoint; AShiftBelowX: integer;
+      APosAfter: TPoint);
     property AsMarkerArray: TATMarkerMarkerArray read GetAsMarkerArray write SetAsMarkerArray;
     property AsAttribArray: TATMarkerAttribArray read GetAsAttribArray write SetAsAttribArray;
     property AsMarkerString: string read GetAsMarkerString write SetAsMarkerString;
@@ -603,7 +604,7 @@ begin
 end;
 
 
-procedure TATMarkers.UpdateOnEditing(APosX, APosY, AShiftX, AShiftY, AShiftBelowX: integer;
+procedure TATMarkers.UpdateOnEditing(APos, AShift: TPoint; AShiftBelowX: integer;
   APosAfter: TPoint);
 var
   Item: PATMarkerItem;
@@ -612,7 +613,7 @@ begin
   for i:= 0 to Count-1 do
   begin
     Item:= ItemPtr(i);
-    Item^.UpdateOnEditing(APosX, APosY, AShiftX, AShiftY, AShiftBelowX, APosAfter);
+    Item^.UpdateOnEditing(APos.X, APos.Y, AShift.X, AShift.Y, AShiftBelowX, APosAfter);
   end;
 end;
 
