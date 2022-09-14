@@ -414,7 +414,8 @@ begin
 
     St.TextDeleteRight(Caret.PosX, Caret.PosY, NDeleteLen, Shift, PosAfter);
 
-    //Del pressed on line end? then adjust PosEnd to the beginning of next line
+    //Del pressed on line end? then adjust PosEnd to the beginning of next line,
+    //that is needed to shift carets on the [PosY+1]-th line
     if Caret.PosX>=NLineLen then
     begin
       PosEnd.X:= 0;
