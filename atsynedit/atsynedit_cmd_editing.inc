@@ -409,9 +409,6 @@ begin
     if IsCharSurrogateHigh(ch) then
       Inc(NDeleteLen);
 
-    PosEnd.X:= Caret.PosX+NDeleteLen;
-    PosEnd.Y:= Caret.PosY;
-
     St.TextDeleteRight(Caret.PosX, Caret.PosY, NDeleteLen, Shift, PosAfter);
 
     //Del pressed on line end? then adjust PosEnd to the beginning of next line,
@@ -419,9 +416,14 @@ begin
     if Caret.PosX>=NLineLen then
     begin
       PosEnd.X:= 0;
-      PosEnd.Y:= PosEnd.Y+1;
+      PosEnd.Y:= Caret.PosY+1;
       Shift.X:= Caret.PosX;
       Shift.Y:= -1;
+    end
+    else
+    begin
+      PosEnd.X:= Caret.PosX+NDeleteLen;
+      PosEnd.Y:= Caret.PosY;
     end;
 
     UpdateCaretsAndMarkersOnEditing(iCaret+1,
