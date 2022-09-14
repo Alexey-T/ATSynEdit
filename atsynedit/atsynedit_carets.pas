@@ -563,6 +563,7 @@ begin
     if (PosY=APos.Y+1) and (AShiftBelowX>0) then
       Inc(PosX, AShiftBelowX)
     else
+    if (PosY=APosEnd.Y) then
       Inc(PosX, AShift.X);
     Inc(PosY, AShift.Y);
   end
@@ -580,7 +581,8 @@ begin
     if (EndY=APos.Y+1) and (AShiftBelowX>0) then
       Inc(EndX, AShiftBelowX)
     else
-      Inc(EndX, AShift.X); //needed too?
+    if (EndY=APosEnd.Y) then
+      Inc(EndX, AShift.X);
     Inc(EndY, AShift.Y);
   end
   else
