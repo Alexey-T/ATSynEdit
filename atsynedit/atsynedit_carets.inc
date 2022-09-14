@@ -1152,10 +1152,8 @@ end;
 
 
 procedure TATSynEdit.UpdateCaretsAndMarkersOnEditing(
-  AFromCaret: integer; APos, APosEnd, AShift, APosAfter: TPoint; AShiftBelowX: integer);
+  AFromCaret: integer; APos, APosEnd, AShift, APosAfter: TPoint);
 //for text change at unknown caret, pass AFromCaret=0
-//AShiftBelowX: used in Del key command, it's set to the length of line,
-//to shift (to right) carets in the line below
 var
   i: integer;
   {$ifdef debug_markers_shift}
@@ -1170,7 +1168,7 @@ begin
 
   if AFromCaret>=0 then
     for i:= AFromCaret to Carets.Count-1 do
-      Carets[i].UpdateOnEditing(APos, APosEnd, AShift, AShiftBelowX);
+      Carets[i].UpdateOnEditing(APos, APosEnd, AShift);
 
   {$ifdef debug_markers_shift}
   S:= '';
@@ -1184,13 +1182,13 @@ begin
 
   //adjust markers
   if Assigned(FMarkers) then
-    FMarkers.UpdateOnEditing(APos, AShift, AShiftBelowX, APosAfter);
+    FMarkers.UpdateOnEditing(APos, APosEnd, AShift, APosAfter);
 
   if Assigned(FAttribs) then
-    FAttribs.UpdateOnEditing(APos, AShift, AShiftBelowX, APosAfter);
+    FAttribs.UpdateOnEditing(APos, APosEnd, AShift, APosAfter);
 
   if Assigned(FMarkedRange) then
-    FMarkedRange.UpdateOnEditing(APos, AShift, AShiftBelowX, APosAfter);
+    FMarkedRange.UpdateOnEditing(APos, APosEnd, AShift, APosAfter);
 end;
 
 

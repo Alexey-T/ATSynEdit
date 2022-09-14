@@ -73,8 +73,7 @@ type
     class operator=(const A, B: TATMarkerItem): boolean;
     function SelContains(AX, AY: integer): boolean;
     function SelEnd: TPoint;
-    procedure UpdateOnEditing(APos, AShift: TPoint;
-      AShiftBelowX: integer; APosAfter: TPoint);
+    procedure UpdateOnEditing(APos, APosEnd, AShift, APosAfter: TPoint);
   end;
 
 function IsMarkerPositionsEqual(A, B: PATMarkerItem): boolean;
@@ -123,8 +122,7 @@ type
     function DeleteByPos(AX, AY: integer): boolean;
     procedure Find(AX, AY: integer; out AIndex: integer; out AExactMatch: boolean);
     function FindContaining(AX, AY: integer): integer;
-    procedure UpdateOnEditing(APos, AShift: TPoint; AShiftBelowX: integer;
-      APosAfter: TPoint);
+    procedure UpdateOnEditing(APos, APosEnd, AShift, APosAfter: TPoint);
     property AsMarkerArray: TATMarkerMarkerArray read GetAsMarkerArray write SetAsMarkerArray;
     property AsAttribArray: TATMarkerAttribArray read GetAsAttribArray write SetAsAttribArray;
     property AsMarkerString: string read GetAsMarkerString write SetAsMarkerString;
@@ -182,16 +180,15 @@ begin
   end;
 end;
 
-procedure TATMarkerItem.UpdateOnEditing(APos, AShift: TPoint;
-  AShiftBelowX: integer; APosAfter: TPoint);
+procedure TATMarkerItem.UpdateOnEditing(APos, APosEnd, AShift, APosAfter: TPoint);
 begin
   //marker below src, apply ShiftY/ShiftBelowX
   if PosY>APos.Y then
   begin
     if AShift.Y=0 then exit;
 
-    if PosY=APos.Y+1 then
-      Inc(PosX, AShiftBelowX);
+    if PosY=APosEnd.Y then
+      Inc(PosX, AShift.X);
 
     Inc(PosY, AShift.Y);
   end
@@ -603,8 +600,7 @@ begin
 end;
 
 
-procedure TATMarkers.UpdateOnEditing(APos, AShift: TPoint; AShiftBelowX: integer;
-  APosAfter: TPoint);
+procedure TATMarkers.UpdateOnEditing(APos, APosEnd, AShift, APosAfter: TPoint);
 var
   Item: PATMarkerItem;
   i: integer;
@@ -612,7 +608,7 @@ begin
   for i:= 0 to Count-1 do
   begin
     Item:= ItemPtr(i);
-    Item^.UpdateOnEditing(APos, AShift, AShiftBelowX, APosAfter);
+    Item^.UpdateOnEditing(APos, APosEnd, AShift, APosAfter);
   end;
 end;
 

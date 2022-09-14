@@ -372,8 +372,8 @@ function TATSynEdit.DoCommand_TextDeleteRight(ADeleteLen: integer): TATCommandRe
 var
   Caret: TATCaretItem;
   St: TATStrings;
-  NLineLen, NDeleteLen, ShiftBelowX: integer;
-  Shift, PosAfter: TPoint;
+  NLineLen, NDeleteLen: integer;
+  Shift, PosEnd, PosAfter: TPoint;
   bNeedGroup: boolean;
   ch: WideChar;
   iCaret: integer;
@@ -401,12 +401,7 @@ begin
     Caret:= Carets[iCaret];
     if not St.IsIndexValid(Caret.PosY) then Continue;
 
-    //offsetX for carets in line[PosY+1]
-    ShiftBelowX:= 0;
     NLineLen:= St.LinesLen[Caret.PosY];
-    if Caret.PosX=NLineLen then
-      ShiftBelowX:= NLineLen;
-
     NDeleteLen:= ADeleteLen;
 
     //handle deletion of emoji (2 surrogate chars: high+low)
@@ -414,13 +409,26 @@ begin
     if IsCharSurrogateHigh(ch) then
       Inc(NDeleteLen);
 
+    PosEnd.X:= Caret.PosX+NDeleteLen;
+    PosEnd.Y:= Caret.PosY;
+
     St.TextDeleteRight(Caret.PosX, Caret.PosY, NDeleteLen, Shift, PosAfter);
+
+    //Del pressed on line end? then adjust PosEnd to the beginning of next line
+    if Caret.PosX>=NLineLen then
+    begin
+      PosEnd.X:= 0;
+      PosEnd.Y:= PosEnd.Y+1;
+      Shift.X:= Caret.PosX;
+      Shift.Y:= -1;
+    end;
+
     UpdateCaretsAndMarkersOnEditing(iCaret+1,
       Point(Caret.PosX, Caret.PosY),
-      Point(Caret.PosX+NDeleteLen, Caret.PosY),
+      PosEnd,
       Shift,
-      PosAfter,
-      ShiftBelowX);
+      PosAfter);
+
     Caret.PosX:= PosAfter.X;
     Caret.PosY:= PosAfter.Y;
   end;

@@ -1486,8 +1486,7 @@ type
     procedure UpdateScrollInfoFromSmoothPos(var AInfo: TATEditorScrollInfo; const APos: Int64);
     procedure UpdateFoldLineIndexer;
     function UpdateScrollbars(AdjustSmoothPos: boolean): boolean;
-    procedure UpdateCaretsAndMarkersOnEditing(AFromCaret: integer; APos, APosEnd,
-      AShift, APosAfter: TPoint; AShiftBelowX: integer=0);
+    procedure UpdateCaretsAndMarkersOnEditing(AFromCaret: integer; APos, APosEnd, AShift, APosAfter: TPoint);
     procedure UpdateMarkersOnDeleting(AX1, AY1, AX2, AY2: integer);
     //events
     procedure DoEventCarets; virtual;
