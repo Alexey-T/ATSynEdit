@@ -162,7 +162,7 @@ begin
   St:= Strings;
   bMultiCarets:= FCarets.Count>1;
 
-  for i:= 0 to FCarets.Count-1 do
+  for i:= FCarets.Count-1 downto 0 do
   begin
     Caret:= FCarets[i];
     if not St.IsIndexValid(Caret.PosY) then Continue;
