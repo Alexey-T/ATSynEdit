@@ -155,11 +155,13 @@ begin
   end;
 
   //some chars after '#rrggbb' must break the parsing, e.g. for this case: "#add-some-value"
-  Inc(S, Len);
-  if S^='-' then
-    exit(Default);
-  if S^='+' then
-    exit(Default);
+  ch:= ord(S[Len]);
+  case ch of
+    ord('-'),
+    ord('+'),
+    ord('$'):
+      Result:= Default;
+  end;
 end;
 
 
