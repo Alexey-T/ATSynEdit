@@ -222,8 +222,8 @@ begin
   begin
     Caret:= Carets[0];
     if St.IsIndexValid(Caret.PosY) then
-      if (ATEditorOptions.MaxLineLenForEditingWhichKeepsLexer>0) and
-        (St.LinesLen[Caret.PosY]>=ATEditorOptions.MaxLineLenForEditingWhichKeepsLexer) then
+      if (ATEditorOptions.MaxLineLenForEditingKeepingLexer>0) and
+        (St.LinesLen[Caret.PosY]>=ATEditorOptions.MaxLineLenForEditingKeepingLexer) then
         begin
           AdapterForHiliteBackup:= AdapterForHilite;
           AdapterForHilite:= nil;
