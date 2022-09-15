@@ -153,6 +153,13 @@ begin
         Result:= RGBToColor(N1, N2, N3);
       end;
   end;
+
+  //some chars after '#rrggbb' must break the parsing, e.g. for this case: "#add-some-value"
+  Inc(S, Len);
+  if S^='-' then
+    exit(Default);
+  if S^='+' then
+    exit(Default);
 end;
 
 
