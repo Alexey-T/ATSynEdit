@@ -217,19 +217,6 @@ begin
       Include(Res, cResultCaretTop);
     end;
 
-  //temporary turn off lexer, when editing too long line (must be restored by app)
-  if bTextChanged and Assigned(AdapterForHilite) and (Carets.Count>0) then
-  begin
-    Caret:= Carets[0];
-    if St.IsIndexValid(Caret.PosY) then
-      if (ATEditorOptions.MaxLineLenForEditingKeepingLexer>0) and
-        (St.LinesLen[Caret.PosY]>=ATEditorOptions.MaxLineLenForEditingKeepingLexer) then
-        begin
-          AdapterForHiliteBackup:= AdapterForHilite;
-          AdapterForHilite:= nil;
-        end;
-  end;
-
   if bTextChanged or
      (cResultFoldChange in Res) then
   begin

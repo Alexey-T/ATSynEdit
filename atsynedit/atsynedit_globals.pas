@@ -52,11 +52,6 @@ type
     //smart update used only if lines changed, not deleted/inserted
     MaxUpdatesCountEasy: integer;
 
-    //when some command changes text, and caret is on the too long line,
-    //clear AdapterForHilite (ie lexer), it must be restored in OnChangeSlow in the app
-    //0: disabled
-    MaxLineLenForEditingKeepingLexer: integer;
-
     MaxClipboardRecents: integer;
     MaxClipboardRecentsMenuitemLen: integer;
 
@@ -366,7 +361,6 @@ initialization
   begin
     MaxFileSizeMbToDetectEncoding:= 50;
     MaxUpdatesCountEasy:= 200;
-    MaxLineLenForEditingKeepingLexer:= 2000;
 
     MaxClipboardRecents:= 0; //0 to disable
     MaxClipboardRecentsMenuitemLen:= 60;

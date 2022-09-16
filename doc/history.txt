@@ -1,7 +1,4 @@
 
-2022.09.15
-+ add: ATEditorOptions.MaxLineLenForEditingKeepingLexer (default 2000)
-
 2022.09.09
 * change: changed signature of TATMarkers.Add to make it more readable
 + add: prop UndoForMarkers, UndoForAttribs
