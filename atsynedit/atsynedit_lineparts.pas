@@ -28,10 +28,12 @@ const
   afsFontCrossed = 4;
 
 type
-  TATLinePart = packed record
-    Offset: integer; //4 bytes, 2 bytes are not enough (app will crash on line length 120K, with wrap=off)
-    Len: word; //2 bytes
+  //packed record: sizeof=35 bytes
+  //bitpacked: sizeof=21 bytes
+  TATLinePart = bitpacked record
+    Offset: Longint; //4 bytes, 2 bytes are not enough (app will crash on line length 120K, with wrap=off)
     ColorFont, ColorBG, ColorBorder: TColor;
+    Len: word; //2 bytes
     FontStyles: byte;
     BorderUp, BorderDown, BorderLeft, BorderRight: TATLineStyle;
   end;
