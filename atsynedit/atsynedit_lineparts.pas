@@ -40,7 +40,7 @@ type
 procedure InitLinePart(out Part: TATLinePart);
 
 const
-  cMaxLineParts = 210;
+  cMaxLineParts = 230;
 type
   TATLineParts = array[0..cMaxLineParts-1] of TATLinePart;
   PATLineParts = ^TATLineParts;
