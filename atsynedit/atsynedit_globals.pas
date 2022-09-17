@@ -79,7 +79,6 @@ type
     SpeedScrollAutoHorz: integer; //auto-scroll (drag out of control): speed x
     SpeedScrollAutoVert: integer; //... speed y
     DebugTiming: boolean;
-    FlickerReducingPause: integer;
     PreciseCalculationOfCharWidth: boolean;
     BookmarksAutoDelete: boolean;
     MouseMoveSmallDelta: integer;
@@ -389,7 +388,6 @@ initialization
     SpeedScrollAutoHorz:= 10;
     SpeedScrollAutoVert:= 1;
     DebugTiming:= false;
-    FlickerReducingPause:= 0;
     PreciseCalculationOfCharWidth:= {$ifdef darwin} true {$else} false {$endif};
     BookmarksAutoDelete:= false;
     MouseMoveSmallDelta:= 5;

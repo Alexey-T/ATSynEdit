@@ -1,4 +1,7 @@
 
+2022.09.17
+* change: ATEditorOptions.FlickerReducingPause replaced with TATSynEdit.OptFlickerReducingPause
+
 2022.09.09
 * change: changed signature of TATMarkers.Add to make it more readable
 + add: prop UndoForMarkers, UndoForAttribs

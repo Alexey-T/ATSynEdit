@@ -826,6 +826,7 @@ type
     FOptAutocompleteCommitIfSingleItem: boolean;
 
     //options
+    FOptFlickerReducingPause: integer;
     FOptInputNumberOnly: boolean;
     FOptInputNumberAllowNegative: boolean;
     FOptMaskChar: WideChar;
@@ -1843,6 +1844,7 @@ type
     property OptAutocompleteUpDownAtEdge: integer read FOptAutocompleteUpDownAtEdge write FOptAutocompleteUpDownAtEdge default 1;
     property OptAutocompleteCommitIfSingleItem: boolean read FOptAutocompleteCommitIfSingleItem write FOptAutocompleteCommitIfSingleItem default false;
 
+    property OptFlickerReducingPause: integer read FOptFlickerReducingPause write FOptFlickerReducingPause default 0;
     property OptInputNumberOnly: boolean read FOptInputNumberOnly write FOptInputNumberOnly default false;
     property OptInputNumberAllowNegative: boolean read FOptInputNumberAllowNegative write FOptInputNumberAllowNegative default cInitInputNumberAllowNegative;
     property OptMaskChar: WideChar read FOptMaskChar write FOptMaskChar default cInitMaskChar;
@@ -4765,6 +4767,7 @@ begin
   FMarginList:= nil;
   FFoldedMarkList:= nil;
 
+  FOptFlickerReducingPause:= 0;
   FOptInputNumberOnly:= false;
   FOptInputNumberAllowNegative:= cInitInputNumberAllowNegative;
   FOptMaskChar:= cInitMaskChar;
@@ -6960,7 +6963,7 @@ begin
     AdapterForHilite.ImplementsDataReady and
     not AForceRepaint then
   begin
-    if ATEditorOptions.FlickerReducingPause>=1000 then
+    if FOptFlickerReducingPause>=1000 then
       //value 1000 is the special value of CudaText option "renderer_anti_flicker"
     begin
       if not AdapterForHilite.IsDataReadyPartially then
@@ -6969,10 +6972,10 @@ begin
       end;
     end
     else
-    if ATEditorOptions.FlickerReducingPause>0 then
+    if FOptFlickerReducingPause>0 then
     begin
       FTimerFlicker.Enabled:= false;
-      FTimerFlicker.Interval:= ATEditorOptions.FlickerReducingPause;
+      FTimerFlicker.Interval:= FOptFlickerReducingPause;
       FTimerFlicker.Enabled:= FTimersEnabled;
       exit;
     end;
