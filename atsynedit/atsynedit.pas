@@ -557,7 +557,6 @@ type
     FStringsExternal: TATStrings;
     FTabHelper: TATStringTabHelper;
     FAdapterHilite: TATAdapterHilite;
-    FAdapterHiliteBackup: TATAdapterHilite;
     FAdapterIME: TATAdapterIME;
     FCharSizer: TATCharSizer;
     FFold: TATSynRanges;
@@ -1526,7 +1525,6 @@ type
     property EncodingName: string read GetEncodingName write SetEncodingName;
     property Modified: boolean read GetModified write SetModified;
     property AdapterForHilite: TATAdapterHilite read FAdapterHilite write FAdapterHilite;
-    property AdapterForHiliteBackup: TATAdapterHilite read FAdapterHiliteBackup write FAdapterHiliteBackup;
     property AdapterIME: TATAdapterIME read FAdapterIME write FAdapterIME;
     property EditorIndex: integer read FEditorIndex write SetEditorIndex;
     property LineTop: integer read GetLineTop write SetLineTop;
