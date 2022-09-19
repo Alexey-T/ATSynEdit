@@ -9766,12 +9766,12 @@ end;
 function TATSynEdit.UpdateLinksRegexObject: boolean;
 begin
   Result:= false;
+  if FOptShowURLsRegex='' then exit;
 
   if FRegexLinks=nil then
     FRegexLinks:= TRegExpr.Create;
 
   try
-    //FRegexLinks.UseUnicodeWordDetection:= false; //faster for links
     FRegexLinks.ModifierS:= false;
     FRegexLinks.ModifierM:= false; //M not needed
     FRegexLinks.ModifierI:= false; //I not needed to find links
