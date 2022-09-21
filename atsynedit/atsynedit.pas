@@ -456,12 +456,12 @@ const
   cUrlRegex_Email = '\b(mailto:)?\w[\w\-\+\.]*@\w[\w\-\.]*\.\w{2,}\b';
   cUrlRegex_WebBegin = 'https?://|ftp://|magnet:\?|www\.|ftp\.';
   cUrlRegex_WebSite = '\w[\w\-\.@]*(:\d+)?'; // @ for password; :\d+ is port
-  cUrlRegex_WebAnchor = '(\#[\w\-/]*)?';
+  cUrlRegex_WebAnchor = '(\#[\w\-%]*)?';
   cUrlRegex_WebParams = '(\?[^<>''"\s]+)?';
   cUrlRegex_Web =
     '\b(' + cUrlRegex_WebBegin + ')'
     + cUrlRegex_WebSite
-    + '(/[~\w\.\-\+\/%@]*)?' //folders
+    + '(/[~\w\.\-\+\/%@!%\#]*)?' //folders
     + cUrlRegex_WebParams
     + cUrlRegex_WebAnchor;
   cUrlRegexInitial = cUrlRegex_Email + '|' + cUrlRegex_Web;
