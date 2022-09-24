@@ -6961,9 +6961,10 @@ begin
 
   if Assigned(AdapterForHilite) and
     AdapterForHilite.ImplementsDataReady and
-    not AForceRepaint then
+    not AForceRepaint and
+    not (cIntFlagResize in FPaintFlags) then
   begin
-    if (FOptFlickerReducingPause>=1000) then
+    if FOptFlickerReducingPause>=1000 then
       //value 1000 is the special value of CudaText option "renderer_anti_flicker"
     begin
       if not AdapterForHilite.IsDataReadyPartially then
@@ -6972,7 +6973,7 @@ begin
       end;
     end
     else
-    if (FOptFlickerReducingPause>0) and not (cIntFlagResize in FPaintFlags) then
+    if FOptFlickerReducingPause>0 then
     begin
       FTimerFlicker.Enabled:= false;
       FTimerFlicker.Interval:= FOptFlickerReducingPause;
