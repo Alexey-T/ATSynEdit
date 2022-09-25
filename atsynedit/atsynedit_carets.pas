@@ -569,7 +569,10 @@ begin
   if PosY=APos.Y then
   begin
     if PosX>APos.X then
+    begin
       Inc(PosX, AShift.X);
+      Inc(PosY, AShift.Y);
+    end;
   end;
 
   //same, but for EndX/EndY
@@ -583,7 +586,10 @@ begin
   if EndY=APos.Y then
   begin
     if EndX>APos.X then
+    begin
       Inc(EndX, AShift.X);
+      Inc(EndY, AShift.Y);
+    end;
   end;
 
   if PosX<0 then PosX:= 0;
