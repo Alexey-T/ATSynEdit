@@ -555,7 +555,7 @@ end;
 
 procedure TATCaretItem.UpdateOnEditing(APos, APosEnd, AShift: TPoint);
 begin
-  //carets below src, apply ShiftX/ShiftY/ShiftBelowX
+  //carets below src
   if PosY>APos.Y then
   begin
     if AShift.Y=0 then exit;
@@ -565,13 +565,17 @@ begin
     Inc(PosY, AShift.Y);
   end
   else
-  //carets on same line as src, apply ShiftX
+  //carets on same line as src
   if PosY=APos.Y then
   begin
     if PosX>APos.X then
     begin
       Inc(PosX, AShift.X);
       Inc(PosY, AShift.Y);
+      //CudaText issue #4384
+      if AShift.Y=0 then
+        if PosX<APos.X then
+          PosX:= APos.X;
     end;
   end;
 
