@@ -5294,7 +5294,6 @@ begin
     OptWrapMode:= cWrapOff;
     OptScrollStyleHorz:= aessHide;
     OptScrollStyleVert:= aessHide;
-    OptMouseMiddleClickAction:= mcaNone;
     OptMouseDragDrop:= false;
     OptMarginRight:= 1000;
     OptUndoLimit:= 200;
@@ -6105,8 +6104,11 @@ begin
       case FOptMouseMiddleClickAction of
         mcaScrolling:
           begin
-            FMouseNiceScrollPos:= Point(X, Y);
-            MouseNiceScroll:= true;
+            if not ModeOneLine then
+            begin
+              FMouseNiceScrollPos:= Point(X, Y);
+              MouseNiceScroll:= true;
+            end;
           end;
         mcaPaste:
           begin
@@ -6116,7 +6118,7 @@ begin
           end;
         mcaGotoDefinition:
           begin
-            if cCommand_GotoDefinition>0 then
+            if (not ModeOneLine) and (cCommand_GotoDefinition>0) then
             begin
               DoCaretSingle(PosTextClicked.X, PosTextClicked.Y);
               DoCommand(cCommand_GotoDefinition, cInvokeInternal);
