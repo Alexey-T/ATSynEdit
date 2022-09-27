@@ -700,6 +700,7 @@ type
     FOnDrawRuler: TATSynEditDrawRectEvent;
     FOnCommand: TATSynEditCommandEvent;
     FOnCommandAfter: TATSynEditCommandAfterEvent;
+    FOnCalcCaretsCoords: TNotifyEvent;
     FOnCalcHilite: TATSynEditCalcHiliteEvent;
     FOnCalcStaple: TATSynEditCalcStapleEvent;
     FOnCalcBookmarkColor: TATSynEditCalcBookmarkColorEvent;
@@ -1811,6 +1812,7 @@ type
     property OnDrawMicromap: TATSynEditDrawRectEvent read FOnDrawMicromap write FOnDrawMicromap;
     property OnDrawEditor: TATSynEditDrawRectEvent read FOnDrawEditor write FOnDrawEditor;
     property OnDrawRuler: TATSynEditDrawRectEvent read FOnDrawRuler write FOnDrawRuler;
+    property OnCalcCaretsCoords: TNotifyEvent read FOnCalcCaretsCoords write FOnCalcCaretsCoords;
     property OnCalcHilite: TATSynEditCalcHiliteEvent read FOnCalcHilite write FOnCalcHilite;
     property OnCalcStaple: TATSynEditCalcStapleEvent read FOnCalcStaple write FOnCalcStaple;
     property OnCalcTabSize: TATStringTabCalcEvent read FOnCalcTabSize write FOnCalcTabSize;

@@ -126,6 +126,9 @@ var
   NLineTop, NLineBottom: integer;
   i: integer;
 begin
+  if Assigned(FOnCalcCaretsCoords) then
+    FOnCalcCaretsCoords(Self);
+
   St:= Strings;
   NCaretCount:= Carets.Count;
   if AOnlyLast then
