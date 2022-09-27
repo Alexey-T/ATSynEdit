@@ -1816,6 +1816,7 @@ type
     property OnCalcTabSize: TATStringTabCalcEvent read FOnCalcTabSize write FOnCalcTabSize;
     property OnCalcBookmarkColor: TATSynEditCalcBookmarkColorEvent read FOnCalcBookmarkColor write FOnCalcBookmarkColor;
     property OnBeforeCalcHilite: TNotifyEvent read FOnBeforeCalcHilite write FOnBeforeCalcHilite;
+    property OnPaint;
     property OnPaste: TATSynEditPasteEvent read FOnPaste write FOnPaste;
     property OnHotspotEnter: TATSynEditHotspotEvent read FOnHotspotEnter write FOnHotspotEnter;
     property OnHotspotExit: TATSynEditHotspotEvent read FOnHotspotExit write FOnHotspotExit;
@@ -5580,6 +5581,9 @@ var
   NLine: integer;
 begin
   if not HandleAllocated then exit;
+
+  if Assigned(OnPaint) then
+    OnPaint(Self);
 
   FPaintWorking:= true;
   try
