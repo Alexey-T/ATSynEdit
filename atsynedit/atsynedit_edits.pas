@@ -297,6 +297,8 @@ begin
   Text:= Utf8Decode(FItems[FItemIndex]);
   ModeReadOnly:= bPrevRO;
 
+  ScrollHorz.SetZero;
+
   DoEventChange(0);
   DoCommand(cCommand_SelectAll, cInvokeInternal);
 end;
