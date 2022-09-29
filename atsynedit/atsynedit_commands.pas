@@ -27,6 +27,9 @@ const
   cCommand_KeyDown         = _base_KeyDown or cCmdFlag_ResetSel;
   cCommand_KeyLeft         = _base_KeyLeft; //handles sel
   cCommand_KeyRight        = _base_KeyRight; //handles sel
+    //why KeyLeft/KeyRight don't have cCmdFlag_ResetSel? because we need to support this feature:
+    //Left with selection moves caret to left sel edge;
+    //Right with selection moves caret to right sel edge.
   cCommand_KeyHome         = _base_KeyHome or cCmdFlag_ResetSel;
   cCommand_KeyEnd          = _base_KeyEnd or cCmdFlag_ResetSel;
   cCommand_KeyPageUp       = _base_KeyPageUp or cCmdFlag_ResetSel;

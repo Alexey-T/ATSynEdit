@@ -146,6 +146,10 @@ begin
       Dec(Caret.PosY);
       Caret.PosX:= Strings.LinesLen[Caret.PosY];
     end;
+
+    //fixing CudaText #4391
+    if not ASelCommand then
+      Caret.SelectNone;
   end;
 end;
 
@@ -185,6 +189,10 @@ begin
       Caret.PosX:= 0;
       Inc(Caret.PosY);
     end;
+
+    //fixing CudaText #4391
+    if not ASelCommand then
+      Caret.SelectNone;
   end;
 end;
 
