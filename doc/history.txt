@@ -1,4 +1,9 @@
 
+2022.09.29
++ add: ATEditorOptions.AutoCopyToClipboard
++ add: ATEditorOptions.AutoCopyToPrimarySel
++ add: ATEditorOptions.AutoCopyMaxTextSize (default 500k)
+
 2022.09.28
 + add: OnPaint
 + add: OnCalcCaretsCoords

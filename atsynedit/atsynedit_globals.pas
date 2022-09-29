@@ -150,6 +150,10 @@ type
     TextMenuitemUndo: string;
     TextMenuitemRedo: string;
 
+    AutoCopyToClipboard: boolean;
+    AutoCopyToPrimarySel: boolean;
+    AutoCopyMaxTextSize: integer;
+
     ClipboardColumnSignature: integer;
     function ClipboardColumnFormat: TClipboardFormat;
     function ClipboardExFormat: TClipboardFormat;
@@ -470,6 +474,10 @@ initialization
     TextMenuitemSelectAll:= 'Select all';
     TextMenuitemUndo:= 'Undo';
     TextMenuitemRedo:= 'Redo';
+
+    AutoCopyToClipboard:= false;
+    AutoCopyToPrimarySel:= false;
+    AutoCopyMaxTextSize:= 500*1024;
 
     ClipboardColumnSignature:= $1000;
   end;

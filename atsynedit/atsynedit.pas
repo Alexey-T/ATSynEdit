@@ -7555,12 +7555,28 @@ end;
 
 
 procedure TATSynEdit.DoEventCarets;
+var
+  SClip: string;
 begin
   if Assigned(FAdapterHilite) then
     FAdapterHilite.OnEditorCaretMove(Self);
 
   if Assigned(FOnChangeCaretPos) then
     FOnChangeCaretPos(Self);
+
+  if ATEditorOptions.AutoCopyToClipboard or
+    ATEditorOptions.AutoCopyToPrimarySel then
+    if (Carets.Count=1) and Carets.IsSelection then
+    begin
+      SClip:= GetTextForClipboard;
+      if Length(SClip)<=ATEditorOptions.AutoCopyMaxTextSize then
+      begin
+        if ATEditorOptions.AutoCopyToClipboard then
+          SClipboardCopy(SClip);
+        if ATEditorOptions.AutoCopyToPrimarySel then
+          SClipboardCopy(SClip, PrimarySelection);
+      end;
+    end;
 end;
 
 procedure TATSynEdit.DoEventScroll;
