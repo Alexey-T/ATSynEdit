@@ -713,6 +713,13 @@ var
   NChars: Int64;
 begin
   Result:= false;
+
+  //not yet inited FRectMain? do exit
+  if FRectMain=cRectEmpty then
+  begin
+    exit;
+  end;
+
   if ACaretCoordX < FRectMain.Left + AProximity*FCharSize.XScaled div ATEditorCharXScale then
   begin
     NChars:= Int64(FRectMain.Left-ACaretCoordX) * ATEditorCharXScale div FCharSize.XScaled + 1 + AIndentHorz;
@@ -787,7 +794,7 @@ begin
   //fixing CudaText #4383
   //if called with not yet painted control, we should not calculate any coords,
   //should not update scrollbars, etc
-  if not FPaintStarted then
+  if (not FPaintStarted) or (FRectMain=cRectEmpty) then
   begin
     if APlaceCaret then
       DoCaretSingle(APos.X, APos.Y, APosEnd.X, APosEnd.Y);
