@@ -118,6 +118,14 @@ begin
 end;
 
 procedure TATSynEdit.UpdateCaretsCoords(AOnlyLast: boolean=false; ASkipInvisible: boolean=false);
+{
+UpdateCaretsCoords is called 2 times per each keypress. too often? no, cannot call it less.
+a) UpdateCaretsCoords is called from DoCommand (which calls DoCommandResults). call is required for
+  CudaText macros: macro can run N commands, each command can scroll the editor, so UpdateCaretsCoords
+  call is needed to do the carets correct moving from macros.
+b) UpdateCaretsCoords is called from DoPaintAll. it is not related to DoCommand/DoCommandResults,
+  repaint occurs from user mouse actions, scrollbar moving.
+}
 var
   St: TATStrings;
   Caret: TATCaretItem;
