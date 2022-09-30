@@ -784,6 +784,16 @@ var
 begin
   if not Strings.IsIndexValid(APos.Y) then exit;
 
+  //fixing CudaText #4383
+  //if called with not yet painted control, we should not calculate any coords,
+  //should not update scrollbars, etc
+  if not FPaintStarted then
+  begin
+    if APlaceCaret then
+      DoCaretSingle(APos.X, APos.Y, APosEnd.X, APosEnd.Y);
+    exit;
+  end;
+
   //if IsPosFolded(APos.X, APos.Y) - better?
   if IsLineFolded(APos.Y, true) then
   begin
