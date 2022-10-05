@@ -43,10 +43,10 @@ type
     FItems: TStringList;
     FItemIndex: integer;
     FMenu: TPopupMenu;
+    procedure DoComboMenu;
     procedure DoComboUpDown(ADown: boolean);
     procedure MicromapClick(Sender: TObject; AX, AY: integer);
     procedure MicromapDraw(Sender: TObject; C: TCanvas; const ARect: TRect);
-    procedure DoMenu;
     procedure MenuItemClick(Sender: TObject);
   protected
     function DoMouseWheel(Shift: TShiftState; WheelDelta: integer; MousePos: TPoint): boolean; override;
@@ -179,7 +179,7 @@ end;
 
 procedure TATComboEdit.MicromapClick(Sender: TObject; AX, AY: integer);
 begin
-  DoMenu;
+  DoComboMenu;
 end;
 
 procedure TATComboEdit.MicromapDraw(Sender: TObject; C: TCanvas;
@@ -195,7 +195,7 @@ begin
     ATEditorScale(ATScrollbarTheme.ArrowSize));
 end;
 
-procedure TATComboEdit.DoMenu;
+procedure TATComboEdit.DoComboMenu;
 var
   mi: TMenuItem;
   P: TPoint;
@@ -265,7 +265,7 @@ begin
     cCommand_MoveSelectionDown,
     cCommand_ComboboxRecentsMenu:
       begin
-        DoMenu;
+        DoComboMenu;
       end;
     cCommand_KeyDown,
     cCommand_KeyUp:
