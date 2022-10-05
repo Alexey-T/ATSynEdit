@@ -261,6 +261,8 @@ procedure TATComboEdit.DoCommand(ACmd: integer;
 begin
   inherited;
   case ACmd of
+    cCommand_MoveSelectionUp,
+    cCommand_MoveSelectionDown,
     cCommand_ComboboxRecentsMenu:
       begin
         DoMenu;
