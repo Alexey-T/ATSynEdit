@@ -209,6 +209,7 @@ var
 begin
   Result:= [];
   if ModeReadOnly then Exit;
+  if ModeOneLine then Exit;
   St:= Strings;
 
   DoCaretSingleAsIs;
