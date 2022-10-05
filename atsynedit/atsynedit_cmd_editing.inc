@@ -568,6 +568,7 @@ var
 begin
   Result:= [];
   if ModeReadOnly then Exit;
+  if ModeOneLine then Exit;
 
   DoCaretsDeleteOnSameLines;
 
@@ -586,7 +587,8 @@ begin
       for iLine:= Line2 downto Line1 do
       begin
         St.LineInsert(Line2+1, St.Lines[iLine]);
-        St.LinesEnds[Line2+1]:= St.Endings;
+        if St.IsIndexValid(Line2+1) then
+          St.LinesEnds[Line2+1]:= St.Endings;
       end;
 
       UpdateCaretsAndMarkersOnEditing(iCaret+1,
