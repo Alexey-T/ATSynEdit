@@ -251,7 +251,6 @@ begin
 
   M.Add(cCommand_KeyBackspace, 'delete char left (backspace)', ['Bksp'], []);
   M.Add(cCommand_KeyDelete, 'delete char right (delete)', ['Del'], []);
-  M.Add(cCommand_KeyEnter, 'insert line-break (enter, ctrl+enter)', ['Enter'], [cXControl+'+Enter']);
   M.Add(cCommand_KeyTab, 'tabulation key', [], []);
 
   M.Add(cCommand_GotoWordPrev,       'go to word left',           [cXControl+'+Left'], []);
@@ -277,11 +276,6 @@ begin
   M.Add(cCommand_ClipboardPaste, 'clipboard: paste', [cXControl+'+V'], ['Shift+Ins']);
 
   M.Add(cCommand_ComboboxRecentsMenu, 'combobox: recent items menu', ['Alt+Down'], [cXControl+'+Down']);
-
-  M.Add(cCommand_KeyUp,        'blocked: caret line up',   ['Up'], []);
-  M.Add(cCommand_KeyDown,      'blocked: caret line down', ['Down'], []);
-  M.Add(cCommand_KeyPageUp,    'blocked: caret page up',   ['PgUp'], []);
-  M.Add(cCommand_KeyPageDown,  'blocked: caret page down', ['PgDn'], []);
 end;
 
 
