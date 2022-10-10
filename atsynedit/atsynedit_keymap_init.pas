@@ -10,8 +10,8 @@ uses
   ATSynEdit_Keymap,
   ATSynEdit_Commands;
 
-procedure InitKeymapFull(var M: TATKeymap);
-procedure InitKeymapCombo(var M: TATKeymap);
+procedure InitKeymapFull(M: TATKeymap);
+procedure InitKeymapCombo(M: TATKeymap);
 
 var
   KeymapFull: TATKeymap = nil;
@@ -29,10 +29,8 @@ const
   cXControl = {$ifdef darwin} 'Meta' {$else} 'Ctrl' {$endif};
 
 
-procedure InitKeymapFull(var M: TATKeymap);
+procedure InitKeymap_Arrows(M: TATKeyMap);
 begin
-  M.Clear;
-
   M.Add(cCommand_KeyLeft,         'caret char left',               ['Left'], []);
   M.Add(cCommand_KeyLeft_Sel,     'caret char left + select',      ['Shift+Left'], []);
   M.Add(cCommand_KeyRight,        'caret char right',              ['Right'], []);
@@ -41,14 +39,31 @@ begin
   M.Add(cCommand_KeyUp_Sel,       'caret line up + select',        ['Shift+Up'], []);
   M.Add(cCommand_KeyDown,         'caret line down',               ['Down'], []);
   M.Add(cCommand_KeyDown_Sel,     'caret line down + select',      ['Shift+Down'], []);
+end;
+
+procedure InitKeymap_HomeEnd(M: TATKeyMap);
+begin
   M.Add(cCommand_KeyHome,         'caret to line begin',           {$ifndef darwin} ['Home'],       {$else} ['Meta+Left'],        {$endif} []);
   M.Add(cCommand_KeyHome_Sel,     'caret to line begin + select',  {$ifndef darwin} ['Shift+Home'], {$else} ['Meta+Shift+Left'],  {$endif} []);
   M.Add(cCommand_KeyEnd,          'caret to line end',             {$ifndef darwin} ['End'],        {$else} ['Meta+Right'],       {$endif} []);
   M.Add(cCommand_KeyEnd_Sel,      'caret to line end + select',    {$ifndef darwin} ['Shift+End'],  {$else} ['Meta+Shift+Right'], {$endif} []);
+end;
+
+procedure InitKeymap_PageUpDown(M: TATKeyMap);
+begin
   M.Add(cCommand_KeyPageUp,       'caret page up',                 ['PgUp'], []);
   M.Add(cCommand_KeyPageUp_Sel,   'caret page up + select',        ['Shift+PgUp'], []);
   M.Add(cCommand_KeyPageDown,     'caret page down',               ['PgDn'], []);
   M.Add(cCommand_KeyPageDown_Sel, 'caret page down + select',      ['Shift+PgDn'], []);
+end;
+
+procedure InitKeymapFull(M: TATKeymap);
+begin
+  M.Clear;
+
+  InitKeymap_Arrows(M);
+  InitKeymap_HomeEnd(M);
+  InitKeymap_PageUpDown(M);
 
   M.Add(cCommand_ColSelectLeft,        'column select: left',          {$ifndef darwin} ['Shift+Alt+Left'],  {$else} [], {$endif} []);
   M.Add(cCommand_ColSelectRight,       'column select: right',         {$ifndef darwin} ['Shift+Alt+Right'], {$else} [], {$endif} []);
@@ -236,18 +251,13 @@ begin
   M.Add(cCommand_FoldingFoldSelection, 'folding: fold selected lines', [], []);
 end;
 
-procedure InitKeymapCombo(var M: TATKeymap);
+procedure InitKeymapCombo(M: TATKeymap);
 begin
   M.Clear;
 
-  M.Add(cCommand_KeyLeft,         'caret char left',               ['Left'], []);
-  M.Add(cCommand_KeyLeft_Sel,     'caret char left + select',      ['Shift+Left'], []);
-  M.Add(cCommand_KeyRight,        'caret char right',              ['Right'], []);
-  M.Add(cCommand_KeyRight_Sel,    'caret char right + select',     ['Shift+Right'], []);
-  M.Add(cCommand_KeyHome,         'caret to line begin',           ['Home'], []);
-  M.Add(cCommand_KeyHome_Sel,     'caret to line begin + select',  ['Shift+Home'], []);
-  M.Add(cCommand_KeyEnd,          'caret to line end',             ['End'], []);
-  M.Add(cCommand_KeyEnd_Sel,      'caret to line end + select',    ['Shift+End'], []);
+  InitKeymap_Arrows(M);
+  InitKeymap_HomeEnd(M);
+  InitKeymap_PageUpDown(M);
 
   M.Add(cCommand_KeyBackspace, 'delete char left (backspace)', ['Bksp'], []);
   M.Add(cCommand_KeyDelete, 'delete char right (delete)', ['Del'], []);
