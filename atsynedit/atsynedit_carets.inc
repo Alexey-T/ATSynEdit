@@ -144,11 +144,17 @@ begin
   else
     NStart:= 0;
 
+  //fixing CudaText #4427, always update all carets
+  ASkipInvisible:= false;
+  NLineTop:= 0;
+  NLineBottom:= 0;
+  {
   if ASkipInvisible then
   begin
     NLineTop:= LineTop;
     NLineBottom:= LineBottom;
   end;
+  }
 
   for i:= NStart to NCaretCount-1 do
   begin
