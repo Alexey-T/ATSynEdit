@@ -131,8 +131,8 @@ var
   Caret: TATCaretItem;
   PntCaret, PntCoord: TPoint;
   NCaretCount, NStart: integer;
-  NLineTop, NLineBottom: integer;
-  i: integer;
+  //NLineTop, NLineBottom: integer;
+  iCaret: integer;
 begin
   if Assigned(FOnCalcCaretsCoords) then
     FOnCalcCaretsCoords(Self);
@@ -145,9 +145,6 @@ begin
     NStart:= 0;
 
   //fixing CudaText #4427, always update all carets
-  ASkipInvisible:= false;
-  NLineTop:= 0;
-  NLineBottom:= 0;
   {
   if ASkipInvisible then
   begin
@@ -156,9 +153,9 @@ begin
   end;
   }
 
-  for i:= NStart to NCaretCount-1 do
+  for iCaret:= NStart to NCaretCount-1 do
   begin
-    Caret:= Carets[i];
+    Caret:= Carets[iCaret];
     Caret.CoordX:= -1;
     Caret.CoordY:= -1;
 
@@ -168,11 +165,14 @@ begin
     if not St.IsIndexValid(PntCaret.Y) then
       Continue;
 
+    {
+    //fixing CudaText #4427
     if ASkipInvisible then
     begin
       if PntCaret.Y<NLineTop then Continue;
       if PntCaret.Y>NLineBottom then Continue;
     end;
+    }
 
     if not IsPosFolded(PntCaret.X, PntCaret.Y) then
     begin
