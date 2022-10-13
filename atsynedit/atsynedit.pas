@@ -7978,10 +7978,13 @@ begin
 end;
 
 procedure TATSynEdit.SetModified(AValue: boolean);
+var
+  bChange: boolean;
 begin
+  bChange:= Strings.Modified<>AValue;
   Strings.Modified:= AValue;
   FPrevModified:= AValue;
-  if AValue then
+  if bChange and AValue then
     DoEventChangeModified;
 end;
 
