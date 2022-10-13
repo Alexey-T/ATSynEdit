@@ -1503,7 +1503,8 @@ type
     property Strings: TATStrings read GetStrings write SetStrings;
     property Fold: TATSynRanges read FFold;
     property Carets: TATCarets read FCarets;
-    property CaretsSel: TATCaretSelections read FSel; //not used by apps (at 2021.02), but let's publish, to not forget
+    property CaretsSel: TATCaretSelections read FSel;
+    property CaretShowEnabled: boolean read FCaretShowEnabled;
     property Markers: TATMarkers read GetMarkers;
     property Attribs: TATMarkers read GetAttribs;
     property Micromap: TATMicromap read FMicromap;
