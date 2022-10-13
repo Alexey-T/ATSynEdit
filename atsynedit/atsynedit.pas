@@ -7980,10 +7980,9 @@ end;
 procedure TATSynEdit.SetModified(AValue: boolean);
 begin
   Strings.Modified:= AValue;
+  FPrevModified:= AValue;
   if AValue then
-    DoEventChangeModified
-  else
-    FPrevModified:= false;
+    DoEventChangeModified;
 end;
 
 function TATSynEdit.GetOneLine: boolean;
