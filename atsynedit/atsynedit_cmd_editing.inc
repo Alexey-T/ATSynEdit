@@ -510,6 +510,9 @@ begin
   if bNeedGroup then
     St.EndUndoGroup;
 
+  if Assigned(FOnCommandKeyEnter) then
+    FOnCommandKeyEnter(Self);
+
   Result:= [cResultText, cResultCaretBottom];
 end;
 

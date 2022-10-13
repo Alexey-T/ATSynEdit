@@ -1,4 +1,7 @@
 
+2022.10.13
++ add: OnCommandKeyEnter
+
 2022.09.29
 + add: ATEditorOptions.AutoCopyToClipboard
 + add: ATEditorOptions.AutoCopyToPrimarySel

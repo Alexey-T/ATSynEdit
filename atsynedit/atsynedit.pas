@@ -700,6 +700,7 @@ type
     FOnDrawRuler: TATSynEditDrawRectEvent;
     FOnCommand: TATSynEditCommandEvent;
     FOnCommandAfter: TATSynEditCommandAfterEvent;
+    FOnCommandKeyEnter: TNotifyEvent;
     FOnCalcCaretsCoords: TNotifyEvent;
     FOnCalcHilite: TATSynEditCalcHiliteEvent;
     FOnCalcStaple: TATSynEditCalcStapleEvent;
@@ -1808,6 +1809,7 @@ type
     property OnScroll: TNotifyEvent read FOnScroll write FOnScroll;
     property OnCommand: TATSynEditCommandEvent read FOnCommand write FOnCommand;
     property OnCommandAfter: TATSynEditCommandAfterEvent read FOnCommandAfter write FOnCommandAfter;
+    property OnCommandKeyEnter: TNotifyEvent read FOnCommandKeyEnter write FOnCommandKeyEnter;
     property OnDrawBookmarkIcon: TATSynEditDrawBookmarkEvent read FOnDrawBookmarkIcon write FOnDrawBookmarkIcon;
     property OnDrawLine: TATSynEditDrawLineEvent read FOnDrawLine write FOnDrawLine;
     property OnDrawGap: TATSynEditDrawGapEvent read FOnDrawGap write FOnDrawGap;
