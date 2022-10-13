@@ -1494,6 +1494,7 @@ type
     procedure DoEventCarets; virtual;
     procedure DoEventScroll; virtual;
     procedure DoEventChange(ALineIndex: integer=-1; AllowOnChange: boolean=true); virtual;
+    procedure DoEventChangeModified;
     procedure DoEventState; virtual;
     procedure DoEventZoom;
     procedure TimersStart;
@@ -7596,6 +7597,13 @@ begin
     FOnScroll(Self);
 end;
 
+procedure TATSynEdit.DoEventChangeModified;
+begin
+  FPrevModified:= Modified;
+  if Assigned(FOnChangeModified) then
+    FOnChangeModified(Self);
+end;
+
 procedure TATSynEdit.DoEventChange(ALineIndex: integer; AllowOnChange: boolean);
 var
   HandlerChangeLog: TATStringsChangeLogEvent;
@@ -7620,11 +7628,7 @@ begin
       FOnChange(Self);
 
     if FPrevModified<>Modified then
-    begin
-      FPrevModified:= Modified;
-      if Assigned(FOnChangeModified) then
-        FOnChangeModified(Self);
-    end;
+      DoEventChangeModified;
   end;
 
   //fire OnIdle after pause after change
@@ -7976,7 +7980,7 @@ procedure TATSynEdit.SetModified(AValue: boolean);
 begin
   Strings.Modified:= AValue;
   if AValue then
-    DoEventChange
+    DoEventChangeModified
   else
     FPrevModified:= false;
 end;
