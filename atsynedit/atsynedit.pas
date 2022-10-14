@@ -1505,7 +1505,7 @@ type
     property Fold: TATSynRanges read FFold;
     property Carets: TATCarets read FCarets;
     property CaretsSel: TATCaretSelections read FSel;
-    property CaretShowEnabled: boolean read FCaretShowEnabled;
+    property CaretShowEnabled: boolean read FCaretShowEnabled write FCaretShowEnabled;
     property Markers: TATMarkers read GetMarkers;
     property Attribs: TATMarkers read GetAttribs;
     property Micromap: TATMicromap read FMicromap;
