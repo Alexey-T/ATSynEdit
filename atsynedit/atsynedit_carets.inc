@@ -256,7 +256,6 @@ function _DoCaretPosToClientPos(
   AWrapInfo: TATWrapInfo;
   AStrings: TATStrings;
   AGaps: TATGaps;
-  const ACharSize: TATEditorCharSize;
   ATabHelper: TATStringTabHelper;
   const ARect: TRect;
   const AScrollHorz, AScrollVert: TATEditorScrollInfo;
@@ -322,21 +321,21 @@ begin
 
     if bAsciiOnly or bLineHuge then
     begin
-      NWidth:= Min(NFromStart, Item.NLength) * ACharSize.XScaled div ATEditorCharXScale;
+      NWidth:= Min(NFromStart, Item.NLength) * ATabHelper.CharSize.XScaled div ATEditorCharXScale;
     end
     else
     begin
       Str:= AStrings.LineSub(P.Y, Item.NCharIndex, Min(NFromStart, Item.NLength));
-      NWidth:= CanvasTextWidth(Str, P.Y, ATabHelper, ACharSize.XScaled, ATabHelper.FontProportional) div ATEditorCharXScale;
+      NWidth:= CanvasTextWidth(Str, P.Y, ATabHelper, ATabHelper.CharSize.XScaled, ATabHelper.FontProportional) div ATEditorCharXScale;
     end;
 
     Result.X:= NWidth;
 
     if NFromStart>Item.NLength then
-      Inc(Result.X, (NFromStart-Item.NLength)*ACharSize.XScaled div ATEditorCharXScale);
+      Inc(Result.X, (NFromStart-Item.NLength)*ATabHelper.CharSize.XScaled div ATEditorCharXScale);
 
-    Inc(Result.X, Item.NIndent*ACharSize.XScaled*ACharSize.XSpacePercents div ATEditorCharXScale div 100 - NScrolledHorzSmooth);
-    Result.Y:= (i-NScrolledVert)*ACharSize.Y;
+    Inc(Result.X, Item.NIndent*ATabHelper.CharSize.XScaled*ATabHelper.CharSize.XSpacePercents div ATEditorCharXScale div 100 - NScrolledHorzSmooth);
+    Result.Y:= (i-NScrolledVert)*ATabHelper.CharSize.Y;
 
     //consider gaps
     if (AGaps.Count>0) and AWrapInfo.IsIndexValid(NScrolledVert) then
@@ -358,7 +357,7 @@ begin
     if bAfterEnd then
     begin
       Result.X:= ARect.Left;
-      Inc(Result.Y, ACharSize.Y);
+      Inc(Result.Y, ATabHelper.CharSize.Y);
     end;
 
     Exit
@@ -371,7 +370,6 @@ function _DoClientPosToCaretPos(
   AWrapInfo: TATWrapInfo;
   AStrings: TATStrings;
   AGaps: TATGaps;
-  const ACharSize: TATEditorCharSize;
   ATabHelper: TATStringTabHelper;
   const ARect: TRect;
   const AScrollHorz, AScrollVert: TATEditorScrollInfo;
@@ -394,7 +392,7 @@ begin
   Result.Y:= -1;
   FillChar(ADetails, SizeOf(ADetails), 0);
 
-  if (ACharSize.XScaled div ATEditorCharXScale <=0) or (ACharSize.Y<=0) then Exit;
+  if (ATabHelper.CharSize.XScaled div ATEditorCharXScale <=0) or (ATabHelper.CharSize.Y<=0) then Exit;
   P.X:= Max(P.X, ARect.Left);
 
   //find index in WrapInfo for P.Y
@@ -408,9 +406,9 @@ begin
     begin
       //start later loop, but from decremented NIndex
       //todo: this not correct if upper (not visible) lines have gaps...
-      NIndexDecrement:= Min((ARect.Top-P.Y) div ACharSize.Y + 1, NIndex);
+      NIndexDecrement:= Min((ARect.Top-P.Y) div ATabHelper.CharSize.Y + 1, NIndex);
       Dec(NIndex, NIndexDecrement);
-      Dec(NPixels, NIndexDecrement*ACharSize.Y);
+      Dec(NPixels, NIndexDecrement*ATabHelper.CharSize.Y);
     end;
 
   //support gap before 1st line
@@ -421,7 +419,7 @@ begin
     if not AWrapInfo.IsIndexValid(NIndex) then
       Break;
 
-    Inc(NPixels, ACharSize.Y);
+    Inc(NPixels, ATabHelper.CharSize.Y);
     if NPixels>P.Y then Break;
 
     //consider gap
@@ -495,7 +493,7 @@ begin
   if ATabHelper.FontProportional then
     NLineLenTrimmed:= Min(Item.NLength, (AScrollHorz.SmoothPos + ARect.Width) div 2) //use min char width 2px
   else
-    NLineLenTrimmed:= Min(Item.NLength, (AScrollHorz.SmoothPos + ARect.Width) * ATEditorCharXScale div ACharSize.XScaled);
+    NLineLenTrimmed:= Min(Item.NLength, (AScrollHorz.SmoothPos + ARect.Width) * ATEditorCharXScale div ATabHelper.CharSize.XScaled);
 
   if NLineLenOriginal>ATEditorOptions.MaxLineLenForAccurateCharWidths then
   begin
@@ -514,7 +512,7 @@ begin
   else
   begin
     AllowVirtual:= AVirtualPos and (Item.NFinal=cWrapItemFinal);
-    NPixels:= Int64(P.X)-ARect.Left + AScrollHorz.SmoothPos - ACharSize.XScaled*ACharSize.XSpacePercents*Item.NIndent div ATEditorCharXScale div 100;
+    NPixels:= Int64(P.X)-ARect.Left + AScrollHorz.SmoothPos - ATabHelper.CharSize.XScaled*ATabHelper.CharSize.XSpacePercents*Item.NIndent div ATEditorCharXScale div 100;
     Result.X:= ATabHelper.FindClickedPosition(
       Result.Y,
       Str,
@@ -543,7 +541,6 @@ begin
     FWrapInfo,
     Strings,
     Gaps,
-    FCharSize,
     FTabHelper,
     FRectMain,
     FScrollHorz,
@@ -565,7 +562,6 @@ begin
     FWrapInfo,
     Strings,
     Gaps,
-    FCharSize,
     FTabHelper,
     FRectMain,
     FScrollHorz,
