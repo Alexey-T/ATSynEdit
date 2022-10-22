@@ -250,12 +250,14 @@ begin
     Ok:= true;
 
   N:= NEnd;
+  SkipSpaces(S, N);
 
   if SkipPercent then
     if S[N]='%' then
+    begin
       Inc(N);
-
-  SkipSpaces(S, N);
+      SkipSpaces(S, N);
+    end;
 end;
 
 
