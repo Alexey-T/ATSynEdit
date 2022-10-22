@@ -260,8 +260,7 @@ function _DoCaretPosToClientPos(
   ATabHelper: TATStringTabHelper;
   const ARect: TRect;
   const AScrollHorz, AScrollVert: TATEditorScrollInfo;
-  APreferLeftSide: boolean;
-  AFontProportional: boolean): TPoint;
+  APreferLeftSide: boolean): TPoint;
 var
   Item: TATWrapItem;
   StringItem: PATStringItem;
@@ -303,7 +302,7 @@ begin
 
   //prepare optimization
   StringItem:= AStrings.GetItemPtr(P.Y);
-  bAsciiOnly:= not AFontProportional and StringItem^.HasAsciiNoTabs;
+  bAsciiOnly:= not ATabHelper.FontProportional and StringItem^.HasAsciiNoTabs;
 
   NScrolledHorzSmooth:= AScrollHorz.SmoothPos-AScrollHorz.NPixelOffset;
   NScrolledVert:= Max(0, AScrollVert.NPos);
@@ -328,7 +327,7 @@ begin
     else
     begin
       Str:= AStrings.LineSub(P.Y, Item.NCharIndex, Min(NFromStart, Item.NLength));
-      NWidth:= CanvasTextWidth(Str, P.Y, ATabHelper, ACharSize.XScaled, AFontProportional) div ATEditorCharXScale;
+      NWidth:= CanvasTextWidth(Str, P.Y, ATabHelper, ACharSize.XScaled, ATabHelper.FontProportional) div ATEditorCharXScale;
     end;
 
     Result.X:= NWidth;
@@ -380,8 +379,7 @@ function _DoClientPosToCaretPos(
   out ADetails: TATEditorPosDetails;
   AGapCoordAction: TATEditorGapCoordAction;
   AAfterEofUsesLastLen: boolean;
-  AEditorIndex: integer;
-  AFontProportional: boolean): TPoint;
+  AEditorIndex: integer): TPoint;
 var
   CharOffsets: TATIntFixedArray;
   NLineLenOriginal, NLineLenTrimmed: integer;
@@ -494,7 +492,7 @@ begin
     exit(Point(-1, -1));
 
   NLineLenOriginal:= Item.NLength;
-  if AFontProportional then
+  if ATabHelper.FontProportional then
     NLineLenTrimmed:= Min(Item.NLength, (AScrollHorz.SmoothPos + ARect.Width) div 2) //use min char width 2px
   else
     NLineLenTrimmed:= Min(Item.NLength, (AScrollHorz.SmoothPos + ARect.Width) * ATEditorCharXScale div ACharSize.XScaled);
@@ -550,8 +548,7 @@ begin
     FRectMain,
     FScrollHorz,
     FScrollVert,
-    FCaretSpecPos or FOptCaretPreferLeftSide,
-    FFontProportional
+    FCaretSpecPos or FOptCaretPreferLeftSide
     );
 
   if Result.Y>=0 then
@@ -577,8 +574,7 @@ begin
     ADetails,
     AGapCoordAction,
     IsSelRectEmpty,
-    FEditorIndex,
-    FFontProportional);
+    FEditorIndex);
 end;
 
 procedure TATSynEdit.InitLengthArray(var Lens: TATIntArray);
