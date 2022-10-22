@@ -27,7 +27,8 @@ type
     class function SkipInt(const S: TStr; var N: integer): integer;
     class function SkipIntMaybeInPercents(const S: TStr; var N: integer): integer;
     class function SkipIntWithPercent(const S: TStr; var N: integer): integer;
-    class function SkipFloat(const S: TStr; var N: integer; out Ok: boolean): double;
+    class function SkipFloat(const S: TStr; var N: integer;
+      CalcValue, SkipPercent: boolean; out Ok: boolean): double;
   public
     //convert TColor -> HTML color string #rrggbb
     class function ColorToHtmlString(Color: TColor): string;
@@ -221,7 +222,8 @@ begin
 end;
 
 
-class function TATHtmlColorParser.SkipFloat(const S: TStr; var N: integer; out Ok: boolean): double;
+class function TATHtmlColorParser.SkipFloat(const S: TStr; var N: integer;
+  CalcValue, SkipPercent: boolean; out Ok: boolean): double;
 var
   Buf: string;
   NEnd: integer;
@@ -235,13 +237,24 @@ begin
     Inc(NEnd);
   while (NEnd<=Length(S)) and (IsCodeDigit(ord(S[NEnd])) or (S[NEnd]='.')) do
     Inc(NEnd);
-  Buf:= Copy(S, N, NEnd-N);
-  if Buf='' then exit;
-  if Buf[1]='.' then
-    Insert('0', Buf, 1);
-  Ok:= TryStrToFloat(Buf, Result);
+
+  if CalcValue then
+  begin
+    Buf:= Copy(S, N, NEnd-N);
+    if Buf='' then exit;
+    if Buf[1]='.' then
+      Insert('0', Buf, 1);
+    Ok:= TryStrToFloat(Buf, Result);
+  end
+  else
+    Ok:= true;
 
   N:= NEnd;
+
+  if SkipPercent then
+    if S[N]='%' then
+      Inc(N);
+
   SkipSpaces(S, N);
 end;
 
@@ -300,11 +313,8 @@ begin
   if bAlpha then
   begin
     SkipCommaOrSlash(S, N);
-    ValAlpha:= SkipFloat(S, N, bOk);
+    ValAlpha:= SkipFloat(S, N, false, true, bOk);
     if ValAlpha<0 then exit;
-    //allow 'rgb(10 20 30 / 40%)'
-    if S[N]='%' then Inc(N);
-    SkipSpaces(S, N);
   end;
 
   if S[N]<>')' then exit;
@@ -348,7 +358,7 @@ begin
   Inc(N);
 
   //H component
-  ValAngle:= SkipFloat(S, N, bOk);
+  ValAngle:= SkipFloat(S, N, true, false, bOk);
   if not bOk then exit;
   if N>NLen then exit;
   if N+4<=NLen then
@@ -400,16 +410,13 @@ begin
   if Val3<0 then exit;
   if Val3>100 then exit;
   if N>NLen then exit;
+
+  //Alpha
   if bAlpha and (S[N]<>')') then
   begin
     SkipCommaOrSlash(S, N);
-    ValAlpha:= SkipFloat(S, N, bOk);
+    ValAlpha:= SkipFloat(S, N, false, true, bOk);
     if ValAlpha<0 then exit;
-    if S[N]='%' then
-    begin
-      //ValAlpha:= ValAlpha div 100;
-      Inc(N);
-    end;
   end;
   if S[N]<>')' then exit;
 
