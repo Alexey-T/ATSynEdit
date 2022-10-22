@@ -494,7 +494,10 @@ begin
     exit(Point(-1, -1));
 
   NLineLenOriginal:= Item.NLength;
-  NLineLenTrimmed:= Min(Item.NLength, (AScrollHorz.SmoothPos + ARect.Width) * ATEditorCharXScale div ACharSize.XScaled);
+  if AFontProportional then
+    NLineLenTrimmed:= Min(Item.NLength, (AScrollHorz.SmoothPos + ARect.Width) div 2) //use min char width 2px
+  else
+    NLineLenTrimmed:= Min(Item.NLength, (AScrollHorz.SmoothPos + ARect.Width) * ATEditorCharXScale div ACharSize.XScaled);
 
   if NLineLenOriginal>ATEditorOptions.MaxLineLenForAccurateCharWidths then
   begin
