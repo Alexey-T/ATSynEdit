@@ -302,11 +302,10 @@ begin
     SkipCommaOrSlash(S, N);
     ValAlpha:= SkipFloat(S, N, bOk);
     if ValAlpha<0 then exit;
+    //allow 'rgb(10 20 30 / 40%)'
+    if S[N]='%' then Inc(N);
+    SkipSpaces(S, N);
   end;
-
-  //allow 'rgb(10 20 30 / 40%)'
-  if S[N]='%' then Inc(N);
-  SkipSpaces(S, N);
 
   if S[N]<>')' then exit;
 
