@@ -2862,7 +2862,7 @@ begin
     //if option "minimap on scrollbar" on, scrollbar shows all lines (from 0 to St.Count-1)
     //including folded lines.
     //if option is off, it shows smaller range, if lines are folded.
-    if FMicromapOnScrollbar then
+    if FMicromapVisible and FMicromapOnScrollbar then
     begin
       if FOptScrollSmooth then
         NDelta:= FCharSize.Y
@@ -9097,7 +9097,7 @@ var
 begin
   if FScrollbarLock then exit;
 
-  if FMicromapOnScrollbar then
+  if FMicromapVisible and FMicromapOnScrollbar then
   begin
     NPos:= FScrollbarVert.Position
            div FScrollbarVert.SmallChange; //this supports OptScrollSmooth
