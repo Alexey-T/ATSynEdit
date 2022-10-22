@@ -303,6 +303,11 @@ begin
     ValAlpha:= SkipFloat(S, N, bOk);
     if ValAlpha<0 then exit;
   end;
+
+  //allow 'rgb(10 20 30 / 40%)'
+  if S[N]='%' then Inc(N);
+  SkipSpaces(S, N);
+
   if S[N]<>')' then exit;
 
   Result:= RGBToColor(byte(Val1), byte(Val2), byte(Val3));
