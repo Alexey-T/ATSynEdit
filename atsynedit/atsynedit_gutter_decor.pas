@@ -19,6 +19,8 @@ type
   { TATGutterDecorData }
 
   TATGutterDecorData = packed record
+  private const
+    cHintSeparator = #1;
   private
     function GetTextAll: string;
     function GetTextCaption: string;
@@ -101,7 +103,7 @@ var
 begin
   S:= GetTextAll;
   if S='' then exit('');
-  N:= Pos(#1, S);
+  N:= Pos(cHintSeparator, S);
   if N>0 then
     Result:= Copy(S, 1, N-1)
   else
@@ -115,7 +117,7 @@ var
 begin
   S:= GetTextAll;
   if S='' then exit('');
-  N:= Pos(#1, S);
+  N:= Pos(cHintSeparator, S);
   if N>0 then
     Result:= Copy(S, N+1, MaxInt)
   else
