@@ -207,7 +207,8 @@ begin
   Sep.GetItemStr(S);
   ItemHardMark:= S='1';
 
-  Sep.GetItemStr(S);
+  //use Sep.GetRect for last item, because line can contain tab-chars
+  Sep.GetRest(S);
   ItemText:= UTF8Decode(S);
 end;
 
