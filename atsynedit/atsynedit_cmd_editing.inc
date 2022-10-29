@@ -1251,18 +1251,21 @@ end;
 function TATSynEdit.DoCommand_TextInsertEmptyAboveBelow(ADown: boolean): TATCommandResults;
 var
   Caret: TATCaretItem;
+  St: TATStrings;
   PosAfter: TPoint;
   iCaret: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
+  St:= Strings;
 
   DoCaretsDeleteOnSameLines;
 
   for iCaret:= Carets.Count-1 downto 0 do
   begin
     Caret:= Carets[iCaret];
-    Strings.LineInsert(Caret.PosY + IfThen(ADown, 1), '');
+
+    St.LineInsert(Caret.PosY + IfThen(ADown, 1), '');
 
     PosAfter.X:= 0;
     PosAfter.Y:= Caret.PosY+IfThen(ADown, 1);

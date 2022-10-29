@@ -1476,7 +1476,11 @@ begin
     LineInsertRaw(ALineIndex, AString, AEnd, AWithEvent)
   else
   if ALineIndex=Count then
+  begin
+    if AString='' then //avoid adding _two_ lines at end
+      AEnd:= cEndNone;
     LineAddEx(AString, AEnd);
+  end;
   //else
   //  raise Exception.Create('Incorrect Insert index: '+IntToStr(ALineIndex));
 end;
