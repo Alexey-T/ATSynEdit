@@ -203,6 +203,7 @@ function TATCharSizer.GetCharWidth(ch: WideChar): integer;
 const
   CharScaleHex_Small = 300; //width of 'xNN'
   CharScaleHex_Big = 500; //width of 'xNNNN'
+  CharScale_Combined = 100;
 var
   n: word absolute ch;
 begin
@@ -221,7 +222,7 @@ begin
             exit(GetCharWidth_FromCache(ch));
         end;
       uw_combined:
-        exit(0);
+        exit(CharScale_Combined);
       uw_hexshow:
         begin
           if n<$100 then
@@ -240,7 +241,7 @@ begin
     uw_space:
       exit;
     uw_combined:
-      exit(0);
+      exit(CharScale_Combined);
     uw_hexshow:
       begin
         if n<$100 then
