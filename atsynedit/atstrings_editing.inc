@@ -692,6 +692,8 @@ begin
 end;
 
 procedure TATStrings.TextDeleteLine(AX, AY: integer; out AShift, APosAfter: TPoint);
+var
+  bOnLastLine: boolean;
 begin
   AShift.X:= 0;
   AShift.Y:= 0;
@@ -700,10 +702,19 @@ begin
   if not IsIndexValid(AY) then Exit;
 
   AShift.Y:= -1;
+  bOnLastLine:= AY=Count-1;
 
-  LineDelete(AY);
-  if AY>=Count then
-    LineAddEx('', cEndNone);
+  LineDelete(AY, false{AForceLast});
+
+  if Count=0 then
+    LineAddEx('', cEndNone)
+  else
+  if bOnLastLine then
+  begin
+    Dec(AY);
+    if AY>=0 then
+      LinesEnds[AY]:= cEndNone;
+  end;
 end;
 
 
