@@ -9631,11 +9631,15 @@ begin
       Continue;
     end;
 
+    {
+    //now we don't need to adjust caret pos for accent chars,
+    //they have separate char-cell like letters
     while IsCharAccent(ch) do
     begin
       Caret.PosX:= Caret.PosX+BoolToPlusMinusOne[AMoveRight];
       ch:= St.LineCharAt(Caret.PosY, Caret.PosX+1);
     end;
+    }
   end;
 end;
 
