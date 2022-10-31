@@ -271,6 +271,7 @@ begin
     cCommand_KeyUp:
       begin
         //make Up-arrow go down in history, like in Sublime Text
+        //CudaText issue #4504
         if ModeOneLine then
           DoComboUpDown(ACmd=cCommand_KeyUp);
       end;
