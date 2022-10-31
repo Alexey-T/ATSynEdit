@@ -149,6 +149,7 @@ type
     function IsLineWithCaret(APosY: integer; ADisableSelected: boolean=false): boolean;
     function IsLineWithSelection(APosY: integer): boolean;
     function IsSelection: boolean;
+    function IsSelectionWithTouching: boolean;
     function IsAnyCaretInVisibleRect(const R: TRect): boolean;
     procedure GetSelections(var D: TATCaretSelections);
     function CaretAtEdge(AEdge: TATCaretEdge): TPoint;
@@ -912,6 +913,37 @@ begin
   for i:= 0 to Count-1 do
     if Items[i].IsSelection then
       exit(true);
+  Result:= false;
+end;
+
+function TATCarets.IsSelectionWithTouching: boolean;
+var
+  X1, Y1, X2, Y2: integer;
+  X1prev, Y1prev, X2prev, Y2prev: integer;
+  i: integer;
+begin
+  for i:= 1{>0} to Count-1 do
+    if Items[i].IsSelection and Items[i-1].IsSelection then
+    begin
+      X1:= Items[i].PosX;
+      Y1:= Items[i].PosY;
+      X2:= Items[i].EndX;
+      Y2:= Items[i].EndY;
+      if not IsPosSorted(X1, Y1, X2, Y2, true) then
+      begin
+        SwapInt(X1, X2);
+        SwapInt(Y1, Y2);
+      end;
+
+      //is this caret touching previous caret?
+      X1prev:= Items[i-1].PosX;
+      Y1prev:= Items[i-1].PosY;
+      X2prev:= Items[i-1].EndX;
+      Y2prev:= Items[i-1].EndY;
+      if ((X1=X1prev) and (Y1=Y1prev)) or
+        ((X1=X2prev) and (Y1=Y2prev)) then
+        exit(true);
+    end;
   Result:= false;
 end;
 

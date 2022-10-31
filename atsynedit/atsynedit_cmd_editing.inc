@@ -63,7 +63,8 @@ begin
     if bNeedGroup then
       St.BeginUndoGroup;
 
-    if Carets.IsSelection then
+    //this causes CudaText issue #4506
+    if Carets.IsSelection and not Carets.IsSelectionWithTouching then
       Result:= DoCommand_TextDeleteSelection;
 
     //TextItems allows to insert each clipboard line into its own caret
