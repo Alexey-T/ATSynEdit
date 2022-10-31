@@ -64,7 +64,7 @@ begin
       St.BeginUndoGroup;
 
     {
-    delete selections only if we don't have _touching_ selections.
+    delete selections, but except the _touching_ selections.
     both cases must work OK:
     1) 3 multi-selections '[dd][dd][dd]', and typing 'a' -
        must produce 'aaa', not single 'a'.
