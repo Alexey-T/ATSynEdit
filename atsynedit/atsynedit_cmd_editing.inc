@@ -63,7 +63,15 @@ begin
     if bNeedGroup then
       St.BeginUndoGroup;
 
-    //this causes CudaText issue #4506
+    {
+    delete selections only if we don't have _touching_ selections.
+    both cases must work OK:
+    1) 3 multi-selections '[dd][dd][dd]', and typing 'a' -
+       must produce 'aaa', not single 'a'.
+    2) "caret_after_end" off, place 3 carets at line ends, press Shift+Right -
+       it makes 3 selections containing line-breaks. now type 'a'.
+       it must produce correct long line with 3 carets.
+    }
     if Carets.IsSelection and not Carets.IsSelectionWithTouching then
       Result:= DoCommand_TextDeleteSelection;
 
