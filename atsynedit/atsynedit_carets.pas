@@ -162,6 +162,7 @@ type
     procedure UpdateMemory(AMode: TATCaretMemoryAction; AArrowUpDown: boolean);
     procedure UpdateAfterRangeFolded(ARangeX, ARangeY, ARangeY2: integer);
     procedure DoChanged;
+    class function IsCaretsHaveTouchingSelections(Item1, Item2: TATCaretItem): boolean;
   end;
 
 
@@ -916,34 +917,40 @@ begin
   Result:= false;
 end;
 
+class function TATCarets.IsCaretsHaveTouchingSelections(Item1, Item2: TATCaretItem): boolean;
+var
+  X1, Y1, X2, Y2,
+  X1p, Y1p, X2p, Y2p: integer;
+begin
+  if Item1.IsSelection and Item2.IsSelection then
+  begin
+    X1:= Item1.PosX;
+    Y1:= Item1.PosY;
+    X2:= Item1.EndX;
+    Y2:= Item1.EndY;
+
+    X1p:= Item2.PosX;
+    Y1p:= Item2.PosY;
+    X2p:= Item2.EndX;
+    Y2p:= Item2.EndY;
+
+    Result:=
+      ((X1=X1p) and (Y1=Y1p)) or
+      ((X1=X2p) and (Y1=Y2p)) or
+      ((X2=X1p) and (Y2=Y1p)) or
+      ((X2=X2p) and (Y2=Y2p));
+  end
+  else
+    Result:= false;
+end;
+
 function TATCarets.IsSelectionWithTouching: boolean;
 var
-  X1, Y1, X2, Y2: integer;
-  X1prev, Y1prev, X2prev, Y2prev: integer;
   i: integer;
 begin
   for i:= 1{>0} to Count-1 do
-    if Items[i].IsSelection and Items[i-1].IsSelection then
-    begin
-      X1:= Items[i].PosX;
-      Y1:= Items[i].PosY;
-      X2:= Items[i].EndX;
-      Y2:= Items[i].EndY;
-      if not IsPosSorted(X1, Y1, X2, Y2, true) then
-      begin
-        SwapInt(X1, X2);
-        SwapInt(Y1, Y2);
-      end;
-
-      //is this caret touching previous caret?
-      X1prev:= Items[i-1].PosX;
-      Y1prev:= Items[i-1].PosY;
-      X2prev:= Items[i-1].EndX;
-      Y2prev:= Items[i-1].EndY;
-      if ((X1=X1prev) and (Y1=Y1prev)) or
-        ((X1=X2prev) and (Y1=Y2prev)) then
-        exit(true);
-    end;
+    if IsCaretsHaveTouchingSelections(Items[i], Items[i-1]) then
+      exit(true);
   Result:= false;
 end;
 
