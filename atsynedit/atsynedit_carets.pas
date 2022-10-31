@@ -162,7 +162,7 @@ type
     procedure UpdateMemory(AMode: TATCaretMemoryAction; AArrowUpDown: boolean);
     procedure UpdateAfterRangeFolded(ARangeX, ARangeY, ARangeY2: integer);
     procedure DoChanged;
-    class function IsCaretsHaveTouchingSelections(Item1, Item2: TATCaretItem): boolean;
+    class function IsTouchingSelections(Item1, Item2: TATCaretItem): boolean;
   end;
 
 
@@ -917,7 +917,7 @@ begin
   Result:= false;
 end;
 
-class function TATCarets.IsCaretsHaveTouchingSelections(Item1, Item2: TATCaretItem): boolean;
+class function TATCarets.IsTouchingSelections(Item1, Item2: TATCaretItem): boolean;
 var
   X1, Y1, X2, Y2,
   X1p, Y1p, X2p, Y2p: integer;
@@ -949,7 +949,7 @@ var
   i: integer;
 begin
   for i:= 1{>0} to Count-1 do
-    if IsCaretsHaveTouchingSelections(Items[i], Items[i-1]) then
+    if IsTouchingSelections(Items[i], Items[i-1]) then
       exit(true);
   Result:= false;
 end;
