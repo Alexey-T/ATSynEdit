@@ -270,8 +270,9 @@ begin
     cCommand_KeyDown,
     cCommand_KeyUp:
       begin
+        //make Up-arrow go down in history, like in Sublime Text
         if ModeOneLine then
-          DoComboUpDown(ACmd=cCommand_KeyDown);
+          DoComboUpDown(ACmd=cCommand_KeyUp);
       end;
   end;
 end;
