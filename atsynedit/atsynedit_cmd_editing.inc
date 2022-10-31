@@ -72,8 +72,8 @@ begin
        it makes 3 selections containing line-breaks. now type 'a'.
        it must produce correct long line with 3 carets.
     }
-    if Carets.IsSelection and not Carets.IsSelectionWithTouching then
-      Result:= DoCommand_TextDeleteSelection;
+    if Carets.IsSelection then
+      Result:= DoCommand_TextDeleteSelection(true);
 
     //TextItems allows to insert each clipboard line into its own caret
     //when count of carets = count of clipboard lines
@@ -319,13 +319,14 @@ begin
 end;
 
 
-function TATSynEdit.DoCommand_TextDeleteSelection: TATCommandResults;
+function TATSynEdit.DoCommand_TextDeleteSelection(ASkipTouchingSel: boolean=false): TATCommandResults;
 var
   Caret: TATCaretItem;
   St: TATStrings;
   Shift, PosAfter: TPoint;
+  NCaretCount: integer;
   X1, Y1, X2, Y2: integer;
-  bSel: boolean;
+  bSel, bSelTouch: boolean;
   iCaret: integer;
 begin
   Result:= [];
@@ -343,9 +344,20 @@ begin
 
   St.BeginUndoGroup;
   try
-    for iCaret:= Carets.Count-1 downto 0 do
+    NCaretCount:= Carets.Count;
+    for iCaret:= NCaretCount-1 downto 0 do
     begin
       Caret:= Carets[iCaret];
+
+      if ASkipTouchingSel then
+      begin
+        bSelTouch:=
+          ((iCaret>0) and Carets.IsTouchingSelections(Caret, Carets[iCaret-1])) or
+          ((iCaret<NCaretCount-1) and Carets.IsTouchingSelections(Caret, Carets[iCaret+1]));
+        if bSelTouch then
+          Continue;
+      end;
+
       Caret.GetRange(X1, Y1, X2, Y2, bSel);
       if not bSel then Continue;
 
