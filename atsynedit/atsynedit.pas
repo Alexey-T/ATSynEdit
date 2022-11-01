@@ -2869,7 +2869,7 @@ begin
       else
         NDelta:= 1;
       FScrollbarVert.Min:= 0;
-      FScrollbarVert.Max:= NDelta * Max(0, Strings.Count-1);
+      FScrollbarVert.Max:= NDelta * Max(Max(0, Strings.Count-1), WrapInfo.Count-1); //WrapInfo.Count is to partially fix CudaText #4512
       FScrollbarVert.SmallChange:= NDelta;
       FScrollbarVert.PageSize:= NDelta * Max(1, GetVisibleLines);
       FScrollbarVert.Position:= NDelta * LineTop;
