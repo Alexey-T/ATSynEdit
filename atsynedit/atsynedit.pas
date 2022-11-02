@@ -10133,6 +10133,7 @@ begin
     wqkZoom:
       begin
         DoScaleFontDelta(ARec.Delta>0, false);
+        UpdateCharSize(FCharSize, Canvas, FSpacingY);
         DoEventZoom;
       end;
   end;
