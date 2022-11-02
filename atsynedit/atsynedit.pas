@@ -8158,6 +8158,7 @@ begin
 
   //NTop:= LineTop;
   FOptScaleFont:= FOptScaleFont+cStep*BoolToPlusMinusOne[AInc];
+  UpdateCharSize(FCharSize, Canvas, FSpacingY); //fixes wrong caret coords after Ctrl+MouseWheel zoom
   //LineTop:= NTop;
 
   if AllowUpdate then
@@ -10133,7 +10134,6 @@ begin
     wqkZoom:
       begin
         DoScaleFontDelta(ARec.Delta>0, false);
-        UpdateCharSize(FCharSize, Canvas, FSpacingY); //fixes wrong caret coords after Ctrl+MouseWheel to zoom in/out
         DoEventZoom;
       end;
   end;

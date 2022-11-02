@@ -112,6 +112,7 @@ end;
 function TATSynEdit.DoCommand_ScaleReset: TATCommandResults;
 begin
   FOptScaleFont:= 0;
+  UpdateCharSize(FCharSize, Canvas, FSpacingY); //fixes wrong caret coords
   Result:= [cResultState];
 end;
 
