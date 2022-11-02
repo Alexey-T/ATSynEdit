@@ -8143,23 +8143,22 @@ procedure TATSynEdit.DoScaleFontDelta(AInc: boolean; AllowUpdate: boolean);
 const
   cMinScale = 60;
   cStep = 10;
-//var
-//  NTop: integer;
+var
+  NScale: integer;
 begin
-  if FOptScaleFont=0 then
+  NScale:= OptScaleFont;
+  if NScale=0 then
   begin
-    FOptScaleFont:= ATEditorScaleFontPercents;
-    if FOptScaleFont=0 then
-      FOptScaleFont:= ATEditorScalePercents;
+    NScale:= ATEditorScaleFontPercents;
+    if NScale=0 then
+      NScale:= ATEditorScalePercents;
   end;
 
   if not AInc then
-    if FOptScaleFont<=cMinScale then Exit;
+    if NScale<=cMinScale then Exit;
 
-  //NTop:= LineTop;
-  FOptScaleFont:= FOptScaleFont+cStep*BoolToPlusMinusOne[AInc];
-  UpdateCharSize(FCharSize, Canvas, FSpacingY); //fixes wrong caret coords after Ctrl+MouseWheel zoom
-  //LineTop:= NTop;
+  //use OptScaleFont setter, not FOptScaleFont
+  OptScaleFont:= NScale+cStep*BoolToPlusMinusOne[AInc];
 
   if AllowUpdate then
     Update;
