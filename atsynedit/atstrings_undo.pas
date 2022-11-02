@@ -380,6 +380,10 @@ begin
         Exit;
   end;
 
+  {
+  //why it is commented: it was optimization, but it is risky, it caused
+  //this issue: after Alt+Up / Alt+Down -> Undo runs with error (loosing one line)
+
   //not insert/delete same index?
   if bNotEmpty and (AAction=aeaDelete) then
   begin
@@ -393,6 +397,7 @@ begin
         Exit
       end;
   end;
+  }
 
   NewTick:= GetTickCount64;
   if (FLastTick>0) and (NewTick-FLastTick>=FPauseForMakingGroup) then
