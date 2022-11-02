@@ -10133,7 +10133,7 @@ begin
     wqkZoom:
       begin
         DoScaleFontDelta(ARec.Delta>0, false);
-        UpdateCharSize(FCharSize, Canvas, FSpacingY);
+        UpdateCharSize(FCharSize, Canvas, FSpacingY); //fixes wrong caret coords after Ctrl+MouseWheel to zoom in/out
         DoEventZoom;
       end;
   end;
