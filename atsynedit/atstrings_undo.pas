@@ -386,7 +386,8 @@ begin
     Item:= Last;
     if (Item.ItemAction=aeaInsert) and
       (Item.ItemIndex=AIndex) and
-      (Item.ItemCommandCode=ACommandCode) then
+      (Item.ItemCommandCode=ACommandCode) and
+      (GetTickCount64-Item.ItemTickCount<FPauseForMakingGroup) then
       begin
         DeleteLast;
         Exit
