@@ -370,13 +370,14 @@ begin
   else
     NGlobalCounter:= 0;
 
-  //not dup change?
+  //not duplicate change?
   if bNotEmpty and (AAction in [aeaChange, aeaChangeEol]) then
   begin
     Item:= Last;
     if (Item.ItemAction=AAction) and
       (Item.ItemIndex=AIndex) and
-      (Item.ItemText=AText) then
+      (Item.ItemText=AText) and
+      (Item.ItemCommandCode=ACommandCode) then
         Exit;
   end;
 
@@ -384,7 +385,7 @@ begin
   //why it is commented: it was optimization, but it is risky, it caused
   //this issue: after Alt+Up / Alt+Down -> Undo runs with error (loosing one line)
 
-  //not insert/delete same index?
+  //optimization: not insert+delete of the same index?
   if bNotEmpty and (AAction=aeaDelete) then
   begin
     Item:= Last;
