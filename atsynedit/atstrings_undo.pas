@@ -385,7 +385,8 @@ begin
   begin
     Item:= Last;
     if (Item.ItemAction=aeaInsert) and
-      (Item.ItemIndex=AIndex) then
+      (Item.ItemIndex=AIndex) and
+      (Item.ItemCommandCode=ACommandCode) then
       begin
         DeleteLast;
         Exit
