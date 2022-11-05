@@ -1468,6 +1468,7 @@ type
     IsModifiedGutterNumbersVisible: boolean;
     IsModifiedGutterFoldingVisible: boolean;
     IsModifiedGutterBookmarksVisible: boolean;
+    IsModifiedGutterLineStatesVisible: boolean;
     IsModifiedUnprintedVisible: boolean;
     IsModifiedUnprintedSpaces: boolean;
     IsModifiedUnprintedTrailingOnly: boolean;
