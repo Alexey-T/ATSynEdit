@@ -703,6 +703,7 @@ function TATSynEdit.DoCommand_TextDeleteWord(ANext: boolean): TATCommandResults;
 const
   cWordJumps: array[boolean] of TATWordJump =
     (cWordjumpToPrev, cWordjumpToNext);
+  bBigJump = true;
 var
   Caret: TATCaretItem;
   St: TATStrings;
@@ -761,7 +762,7 @@ begin
     //delete inside line?
     if (Caret.PosX<=Length(Str)) then
     begin
-      PosAfter.X:= SFindWordOffset(Str, Caret.PosX, cWordJumps[ANext], false, FOptNonWordChars);
+      PosAfter.X:= SFindWordOffset(Str, Caret.PosX, cWordJumps[ANext], bBigJump, FOptNonWordChars);
       if PosAfter.X<>Caret.PosX then
       begin
         NPosX:= Min(Caret.PosX, PosAfter.X);
