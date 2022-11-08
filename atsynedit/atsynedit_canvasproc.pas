@@ -607,9 +607,6 @@ procedure DoPaintUnprintedEndSymbol(C: TCanvas;
   AX, AY: integer;
   const ACharSize: TATEditorCharSize;
   AColorFont, AColorBg: TColor);
-const
-  // https://www.compart.com/en/unicode/U+00B6
-  cPilcrowString: string = #$C2#$B6;
 begin
   case ATEditorOptions.UnprintedEndSymbol of
     aeueDot:
@@ -625,12 +622,9 @@ begin
         ATEditorOptions.UnprintedTabPointerScale
         );
     aeuePilcrow:
-      begin
-        C.Font.Color:= AColorFont;
-        C.Brush.Style:= bsClear;
-        CanvasTextOutSimplest(C, AX, AY, cPilcrowString);
-        C.Brush.Style:= bsSolid;
-      end;
+      CanvasPilcrowChar(C,
+        Rect(AX, AY, AX+ACharSize.XScaled div ATEditorCharXScale, AY+ACharSize.Y),
+        AColorFont);
   end;
 end;
 
