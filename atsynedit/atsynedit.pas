@@ -3879,7 +3879,7 @@ begin
       TextOutProps.ShowUnprinted:= FUnprintedVisible and FUnprintedSpaces;
       TextOutProps.ShowUnprintedSpacesTrailing:= FUnprintedSpacesTrailing;
       TextOutProps.ShowUnprintedSpacesBothEnds:= FUnprintedSpacesBothEnds;
-      TextOutProps.ShowUnprintedSpacesOnlyInSelection:= FUnprintedSpacesOnlyInSelection and TempSel_IsSelection;
+      TextOutProps.ShowUnprintedSpacesOnlyInSelection:= FUnprintedSpacesOnlyInSelection {and TempSel_IsSelection}; //careful, CudaText #4541
       TextOutProps.ShowUnprintedSpacesAlsoInSelection:= not FUnprintedSpacesOnlyInSelection and FUnprintedSpacesAlsoInSelection and TempSel_IsSelection;
       TextOutProps.DetectIsPosSelected:= @IsPosSelected;
 
