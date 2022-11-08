@@ -703,7 +703,9 @@ function TATSynEdit.DoCommand_TextDeleteWord(ANext: boolean): TATCommandResults;
 const
   cWordJumps: array[boolean] of TATWordJump =
     (cWordjumpToPrev, cWordjumpToNext);
+const
   bBigJump = true;
+  //False value is OK, but True value makes 'delete word' working more similar to Sublime Text
 var
   Caret: TATCaretItem;
   St: TATStrings;
