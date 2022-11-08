@@ -609,7 +609,7 @@ procedure DoPaintUnprintedEndSymbol(C: TCanvas;
   AColorFont, AColorBg: TColor);
 const
   // https://www.compart.com/en/unicode/U+00B6
-  cPilcrowString: string = #$B6;
+  cPilcrowString: string = #$C2#$B6;
 begin
   case ATEditorOptions.UnprintedEndSymbol of
     aeueDot:
