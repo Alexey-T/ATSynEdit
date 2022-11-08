@@ -3961,25 +3961,25 @@ begin
 
     //paint EOL mark
     if FUnprintedVisible and FUnprintedEnds then
-    //should UnprintedSpacesOnlyInSelection affect EOL marks? if yes, we need the following "if":
-    if (not FUnprintedSpacesOnlyInSelection) or bLineEolSelected then
-    begin
-      if OptUnprintedEndsDetails then
-        DoPaintUnprintedSymbols(C,
-          cLineEndsToSymbols[St.LinesEnds[WrapItem.NLineIndex]],
-          CoordAfterText.X,
-          CoordAfterText.Y,
-          ACharSize,
-          Colors.UnprintedFont,
-          Colors.UnprintedBG)
-      else
-        DoPaintUnprintedEndSymbol(C,
-          CoordAfterText.X,
-          CoordAfterText.Y,
-          ACharSize,
-          Colors.UnprintedFont,
-          Colors.TextBG);
-    end;
+      //should UnprintedSpacesOnlyInSelection affect EOL marks? if yes, we need the following "if":
+      if (not FUnprintedSpacesOnlyInSelection) or bLineEolSelected then
+      begin
+        if OptUnprintedEndsDetails then
+          DoPaintUnprintedSymbols(C,
+            cLineEndsToSymbols[St.LinesEnds[WrapItem.NLineIndex]],
+            CoordAfterText.X,
+            CoordAfterText.Y,
+            ACharSize,
+            Colors.UnprintedFont,
+            Colors.UnprintedBG)
+        else
+          DoPaintUnprintedEndSymbol(C,
+            CoordAfterText.X,
+            CoordAfterText.Y,
+            ACharSize,
+            Colors.UnprintedFont,
+            Colors.TextBG);
+      end;
   end
   else
   begin
