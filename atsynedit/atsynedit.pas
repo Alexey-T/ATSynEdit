@@ -3959,8 +3959,10 @@ begin
         CoordAfterText.Y+ACharSize.Y);
     end;
 
-    //paint eol mark
+    //paint EOL mark
     if FUnprintedVisible and FUnprintedEnds then
+    //should UnprintedSpacesOnlyInSelection affect EOL marks? if yes, we need the following "if":
+    if (not FUnprintedSpacesOnlyInSelection) or bLineEolSelected then
     begin
       if OptUnprintedEndsDetails then
         DoPaintUnprintedSymbols(C,
