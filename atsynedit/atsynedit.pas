@@ -445,7 +445,7 @@ const
   cInitFoldTooltipWidthPercents = 80;
   cInitMaxLineLenToTokenize = 4000;
   cInitMinLineLenToCalcURL = 4;
-  cInitMaxLineLenToCalcURL = 700; //AliExpress has URLs of len 520
+  cInitMaxLineLenToCalcURL = 1200; //AliExpress has URLs of len 520
   cInitDragDropMarkerWidth = 4;
   cInitStapleHiliteAlpha = 180;
   cInitZebraAlphaBlend = 235;
