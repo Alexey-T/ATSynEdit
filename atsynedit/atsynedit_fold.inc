@@ -245,11 +245,23 @@ begin
     if St.LinesHidden[R^.Y, FEditorIndex] then Continue;
 
     bFold:= false;
+    NFoldFrom:= St.LinesFoldFrom[R^.Y, FEditorIndex];
+
     case OptFoldStyle of
-      cFoldFromEndOfLine,
+      cFoldFromEndOfLine:
+        begin
+          if R^.Hint='' then
+          begin
+            NPosAfterEnd:= St.LinesLen[R^.Y]+1;
+            bFold:= NFoldFrom=NPosAfterEnd;
+          end
+          else
+          begin
+            bFold:= R^.X=NFoldFrom;
+          end;
+        end;
       cFoldFromEndOfLineAlways:
         begin
-          NFoldFrom:= St.LinesFoldFrom[R^.Y, FEditorIndex];
           NPosAfterEnd:= St.LinesLen[R^.Y]+1;
           bFold:= NFoldFrom=NPosAfterEnd;
         end;
