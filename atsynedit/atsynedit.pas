@@ -1055,6 +1055,7 @@ type
     function DoCaretsKeepOnScreen(AMoveDown: boolean): boolean;
     procedure DoCaretsAssign(NewCarets: TATCarets);
     procedure DoDropText(AndDeleteSelection: boolean);
+    procedure DoFoldMarkAllRangesUnfolded;
     procedure DoFoldbarClick(ALine: integer);
     function DoGetFoldedMarkLinesCount(ALine: integer): integer;
     procedure DoHandleRightClick(X, Y: integer);
@@ -9861,9 +9862,9 @@ var
   NLineTop, NLine, NRange: integer;
   bChange: boolean;
 begin
-  DoCommand(cCommand_UnfoldAll, cInvokeInternal);
+  DoCommand_FoldUnAll;
+  bChange:= FWrapUpdateNeeded;
   NLineTop:= LineTop;
-  bChange:= false;
 
   St:= Strings;
   Sep.Init(AValue);
@@ -9875,7 +9876,7 @@ begin
     NRange:= Fold.FindRangeWithPlusAtLine(NLine);
     if NRange<0 then Continue;
 
-    if not Fold.ItemPtr(NRange)^.Folded then
+    //if not Fold.ItemPtr(NRange)^.Folded then
     begin
       bChange:= true;
       DoRangeFold(NRange);
