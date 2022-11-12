@@ -135,35 +135,32 @@ begin
   //partially hide first line
   case FFoldStyle of
     cFoldHereWithDots:
-    begin
-      St.LinesFoldFrom[Range^.Y, FEditorIndex]:= Range^.X;
-    end;
+      begin
+        St.LinesFoldFrom[Range^.Y, FEditorIndex]:= Range^.X;
+      end;
     cFoldHereWithTruncatedText:
-    begin
-      St.LinesFoldFrom[Range^.Y, FEditorIndex]:= Range^.X;
-      if Range^.Hint='' then
-        Range^.Hint:= St.LineSub(Range^.Y, Range^.X, ATEditorOptions.FoldedLenOfEmptyHint)+'...';
-    end;
+      begin
+        St.LinesFoldFrom[Range^.Y, FEditorIndex]:= Range^.X;
+        if Range^.Hint='' then
+          Range^.Hint:= St.LineSub(Range^.Y, Range^.X, ATEditorOptions.FoldedLenOfEmptyHint)+'...';
+      end;
     cFoldFromEndOfLine:
-    begin
-      if Range^.Hint<>'' then
-        St.LinesFoldFrom[Range^.Y, FEditorIndex]:= Range^.X
-      else
-        St.LinesFoldFrom[Range^.Y, FEditorIndex]:= St.LinesLen[Range^.Y]+1;
-    end;
+      begin
+        if Range^.Hint<>'' then
+          St.LinesFoldFrom[Range^.Y, FEditorIndex]:= Range^.X
+        else
+          St.LinesFoldFrom[Range^.Y, FEditorIndex]:= St.LinesLen[Range^.Y]+1;
+      end;
     cFoldFromEndOfLineAlways:
-    begin
-      St.LinesFoldFrom[Range^.Y, FEditorIndex]:= St.LinesLen[Range^.Y]+1;
-      Range^.Hint:= '...';
-    end;
+      begin
+        St.LinesFoldFrom[Range^.Y, FEditorIndex]:= St.LinesLen[Range^.Y]+1;
+        Range^.Hint:= '...';
+      end;
     cFoldFromNextLine:
-    begin
-      //don't fold line
-    end;
+      begin
+        //don't fold line
+      end;
   end;
-
-  //write to Fold list (after changed Range.Folded, Range.Hint)
-  //Fold.Items[ARangeIndex]:= Range;
 
   //fully hide other lines of range
   DoRangeHideLines(Range^.Y+1, Range^.Y2);
