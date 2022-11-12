@@ -1055,7 +1055,8 @@ type
     function DoCaretsKeepOnScreen(AMoveDown: boolean): boolean;
     procedure DoCaretsAssign(NewCarets: TATCarets);
     procedure DoDropText(AndDeleteSelection: boolean);
-    procedure DoFoldMarkAllRangesUnfolded;
+    procedure DoMarkAllRangesUnfolded;
+    procedure DoMarkAllLinesVisible;
     procedure DoFoldbarClick(ALine: integer);
     function DoGetFoldedMarkLinesCount(ALine: integer): integer;
     procedure DoHandleRightClick(X, Y: integer);

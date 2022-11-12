@@ -142,7 +142,7 @@ begin
   Result:= [cResultCaretTop, cResultScroll, cResultFoldChange];
 end;
 
-procedure TATSynEdit.DoFoldMarkAllRangesUnfolded;
+procedure TATSynEdit.DoMarkAllRangesUnfolded;
 var
   R: PATSynRange;
   i: integer;
@@ -158,19 +158,23 @@ begin
   end;
 end;
 
-function TATSynEdit.DoCommand_FoldUnAll: TATCommandResults;
+procedure TATSynEdit.DoMarkAllLinesVisible;
 var
   St: TATStrings;
   i: integer;
 begin
-  DoFoldMarkAllRangesUnfolded;
-
   St:= Strings;
   for i:= 0 to St.Count-1 do
   begin
     St.LinesHidden[i, EditorIndex]:= false;
     St.LinesFoldFrom[i, EditorIndex]:= 0;
   end;
+end;
+
+function TATSynEdit.DoCommand_FoldUnAll: TATCommandResults;
+begin
+  DoMarkAllRangesUnfolded;
+  DoMarkAllLinesVisible;
 
   Result:= [cResultCaretTop, cResultScroll, cResultFoldChange];
 end;
