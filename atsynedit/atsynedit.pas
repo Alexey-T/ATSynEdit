@@ -8377,6 +8377,7 @@ var
   NColorLine, NColorPlus: TColor;
   NCacheIndex: integer;
   bOk: boolean;
+  OldPenWidth: integer;
 begin
   if not FOptGutterShowFoldAlways then
     if not FCursorOnGutter then exit;
@@ -8415,6 +8416,10 @@ begin
   else
     NColorLine:= FColorGutterFoldBG;
   C.Pen.Color:= NColorLine;
+
+  OldPenWidth:= C.Pen.Width;
+  C.Pen.Width:= DoScaleFont(1);
+  C.Pen.EndCap:= pecFlat;
 
   CoordXCenter:= (ACoordX1+ACoordX2) div 2;
   CoordYCenter:= (ACoordY1+ACoordY2) div 2;
@@ -8468,6 +8473,8 @@ begin
         DrawDown;
       end;
   end;
+
+  C.Pen.Width:= OldPenWidth;
 end;
 
 procedure TATSynEdit.DoPaintGutterDecor(C: TCanvas; ALine: integer; const ARect: TRect);
