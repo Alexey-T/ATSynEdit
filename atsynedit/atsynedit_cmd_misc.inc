@@ -196,17 +196,12 @@ begin
 end;
 
 procedure TATSynEdit.UpdateFoldLineIndexer;
-//if called w/o lexer active (EControl adapter inits LineIndexer),
-//init LineIndexer
 var
   NCount: integer;
 begin
   NCount:= Strings.Count;
   if Fold.CountOfLineIndexer<NCount then
-  begin
     Fold.ClearLineIndexer(NCount, true);
-    //Fold.UpdateLineIndexer; //Fold methods auto update all
-  end;
 end;
 
 function TATSynEdit.DoCommand_FoldSelection: TATCommandResults;
