@@ -8856,6 +8856,7 @@ begin
           FColorGutterFoldBG,
           Point(AX, AY),
           DoScaleFont(FOptGutterPlusSize),
+          DoScaleFont(1),
           APlus);
       end;
     cGutterIconsTriangles:
