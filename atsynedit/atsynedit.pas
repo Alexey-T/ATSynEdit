@@ -3662,8 +3662,8 @@ begin
       ARectLine.Left+FFoldUnderlineOffset,
       NCoordSep,
       ARectLine.Right-FFoldUnderlineOffset,
-      ATEditorOptions.DashedLine_DashLen,
-      ATEditorOptions.DashedLine_EmptyLen
+      DoScaleFont(ATEditorOptions.DashedLine_DashLen),
+      DoScaleFont(ATEditorOptions.DashedLine_EmptyLen)
       );
   end;
 
