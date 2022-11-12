@@ -8713,7 +8713,7 @@ begin
   St:= Strings;
   nLineFrom:= LineTop;
   nLineTo:= LineBottom;
-  nMaxHeight:= FRectMain.Height+FRectRuler.Height+2;
+  nMaxHeight:= FRectMain.Bottom+2; //not FRectMain.Height, bad with ruler on
   nRangeDeepest:= -1;
 
   Indexes:= FFold.FindRangesWithStaples(nLineFrom, nLineTo);
