@@ -23,12 +23,15 @@ type
   end;
 
 type
+  TATGutterScaleEvent = function(AValue: integer): integer of object;
 
+type
   { TATGutter }
 
   TATGutter = class
   private
     FList: TFPList;
+    FOnScale: TATGutterScaleEvent;
     function GetItem(N: integer): TATGutterItem;
   public
     GutterCoordLeft: integer;
@@ -45,6 +48,7 @@ type
     procedure Update;
     function FindIndexAtCoordX(AX: integer): integer;
     function FindIndexByTag(ATag: Int64): integer;
+    property OnScale: TATGutterScaleEvent read FOnScale write FOnScale;
   end;
 
 
@@ -143,8 +147,8 @@ begin
       Right:= Left;
       if Visible then
       begin
-        if Scaled then
-          Inc(Right, ATEditorScale(Size))
+        if Scaled and Assigned(FOnScale) then
+          Inc(Right, FOnScale(Size))
         else
           Inc(Right, Size);
       end;

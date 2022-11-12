@@ -4811,6 +4811,7 @@ begin
   FTextHintCenter:= false;
 
   FGutter:= TATGutter.Create;
+  FGutter.OnScale:= @DoScaleFont;
   FGutterDecor:= nil;
 
   FOptGutterVisible:= true;
@@ -8450,7 +8451,7 @@ begin
         CanvasLineHorz(C,
           CoordXCenter,
           ACoordY2,
-          CoordXCenter + ATEditorScale(FOptGutterPlusSize)
+          CoordXCenter + DoScaleFont(FOptGutterPlusSize)
           );
       end;
     cFoldbarMiddle:
@@ -8854,7 +8855,7 @@ begin
           ALineColor,
           FColorGutterFoldBG,
           Point(AX, AY),
-          ATEditorScale(FOptGutterPlusSize),
+          DoScaleFont(FOptGutterPlusSize),
           APlus);
       end;
     cGutterIconsTriangles:
@@ -8863,12 +8864,12 @@ begin
           CanvasPaintTriangleRight(C,
             ALineColor,
             Point(AX, AY),
-            ATEditorScale(FOptGutterPlusSize div 2))
+            DoScaleFont(FOptGutterPlusSize div 2))
         else
           CanvasPaintTriangleDown(C,
             ALineColor,
             Point(AX, AY),
-            ATEditorScale(FOptGutterPlusSize div 2))
+            DoScaleFont(FOptGutterPlusSize div 2))
       end;
   end;
 end;
