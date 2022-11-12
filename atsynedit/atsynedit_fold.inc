@@ -233,7 +233,7 @@ var
   NFoldFrom, NPosAfterEnd: integer;
   NMaxLine, iRange: integer;
   R: PATSynRange;
-  bOk: boolean;
+  bFold: boolean;
 begin
   St:= Strings;
   NMaxLine:= St.Count-1;
@@ -243,16 +243,25 @@ begin
     if R^.IsSimple then Continue;
     if R^.Y>NMaxLine then Continue; //same as "if not St.IsIndexValid"
     if St.LinesHidden[R^.Y, FEditorIndex] then Continue;
-    NFoldFrom:= St.LinesFoldFrom[R^.Y, FEditorIndex];
 
-    NPosAfterEnd:= St.LinesLen[R^.Y]+1;
-    if (OptFoldStyle in [cFoldFromEndOfLine, cFoldFromEndOfLineAlways]) and
-      (NFoldFrom=NPosAfterEnd) then
-      bOk:= true
-    else
-      bOk:= R^.X=NFoldFrom;
+    bFold:= false;
+    case OptFoldStyle of
+      cFoldFromEndOfLine,
+      cFoldFromEndOfLineAlways:
+        begin
+          NFoldFrom:= St.LinesFoldFrom[R^.Y, FEditorIndex];
+          NPosAfterEnd:= St.LinesLen[R^.Y]+1;
+          bFold:= NFoldFrom=NPosAfterEnd;
+        end;
+      cFoldFromNextLine:
+        begin
+          bFold:= (R^.Y+1<=NMaxLine) and St.LinesHidden[R^.Y+1, FEditorIndex];
+        end
+      else
+        bFold:= R^.X=NFoldFrom;
+    end;
 
-    if bOk then
+    if bFold then
       DoRangeFold(iRange); //do not just R.Folded:= true;
   end;
 end;
