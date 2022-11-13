@@ -1512,6 +1512,7 @@ type
     property Markers: TATMarkers read GetMarkers;
     property Attribs: TATMarkers read GetAttribs;
     property Micromap: TATMicromap read FMicromap;
+    property MicromapScaleDiv: integer read FMicromapScaleDiv;
     property DimRanges: TATDimRanges read GetDimRanges;
     property Hotspots: TATHotspots read GetHotspots;
     property Gaps: TATGaps read GetGaps;
@@ -1565,8 +1566,6 @@ type
     property RectMinimap: TRect read FRectMinimap;
     property RectMicromap: TRect read FRectMicromap;
     property RectRuler: TRect read FRectRuler;
-    function RectMicromapMark(AColumn, ALineFrom, ALineTo: integer;
-      AMapHeight, AMinMarkHeight: integer): TRect;
     property OptTextOffsetLeft: integer read FOptTextOffsetLeft write FOptTextOffsetLeft;
     property OptTextOffsetTop: integer read GetOptTextOffsetTop write FOptTextOffsetTop;
     //gutter
@@ -9684,33 +9683,6 @@ begin
     end;
     }
   end;
-end;
-
-function TATSynEdit.RectMicromapMark(AColumn, ALineFrom, ALineTo: integer;
-  AMapHeight, AMinMarkHeight: integer): TRect;
-//to make things safe, don't pass the ARect, but only its height
-begin
-  if FMicromap.IsIndexValid(AColumn) then
-  begin
-    if ALineFrom>=0 then
-      Result.Top:= Int64(ALineFrom) * AMapHeight div FMicromapScaleDiv
-    else
-      Result.Top:= 0;
-
-    if ALineTo>=0 then
-      Result.Bottom:= Max(Result.Top + AMinMarkHeight,
-                          Int64(ALineTo+1) * AMapHeight div FMicromapScaleDiv)
-    else
-      Result.Bottom:= AMapHeight;
-
-    with FMicromap.Columns[AColumn] do
-    begin
-      Result.Left:= NLeft;
-      Result.Right:= NRight;
-    end;
-  end
-  else
-    Result:= cRectEmpty;
 end;
 
 procedure TATSynEdit.SetShowOsBarVert(AValue: boolean);
