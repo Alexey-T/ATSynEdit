@@ -5631,7 +5631,9 @@ begin
           BitmapResizeBySteps(FBitmap, Width, Height);
     end;
 
+    //-1 means "auto detect from FScrollVert"
     NLine:= -1;
+    //if FLineTopTodo is set, use this var (usually on the first painting) and clear the var
     if FLineTopTodo>0 then
     begin
       NLine:= FLineTopTodo;
