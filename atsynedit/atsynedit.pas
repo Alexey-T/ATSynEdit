@@ -662,7 +662,6 @@ type
     FLastUndoTick: QWord;
     FLastUndoPaused: boolean;
     FLineTopTodo: integer;
-    FLineTopActual: integer;
     FIsCaretShapeChangedFromAPI: boolean;
     FIsReadOnlyChanged: boolean;
     FIsReadOnlyAutodetected: boolean;
@@ -1316,7 +1315,7 @@ type
     procedure UpdateScrollbarHorz;
     procedure UpdateSelRectFromPoints(const P1, P2: TPoint);
     procedure UpdateInitialVars(C: TCanvas);
-    procedure UpdateLinksAttribs;
+    procedure UpdateLinksAttribs(ALineFrom: integer);
     function UpdateLinksRegexObject: boolean;
     procedure UpdateTabHelper;
     procedure UpdateCursor;
@@ -3179,7 +3178,7 @@ begin
     {$endif}
   end;
 
-  UpdateLinksAttribs;
+  UpdateLinksAttribs(ALineFrom);
   DoPaintText(C, FRectMain, FCharSize, FOptGutterVisible, FScrollHorz, FScrollVert, ALineFrom);
   DoPaintMargins(C);
   DoPaintNiceScroll(C);
@@ -4570,10 +4569,6 @@ var
 begin
   if FLineTopTodo>0 then
     exit(FLineTopTodo);
-
-  if FLineTopActual>=0 then
-    exit(FLineTopActual);
-
   Result:= 0;
   if Assigned(FWrapInfo) and (FWrapInfo.Count>0) then
   begin
@@ -5463,7 +5458,6 @@ var
   NColorOther: TColor;
   NBlend: integer;
 begin
-  FLineTopActual:= ALineFrom;
   UpdateInitialVars(C);
 
   FColorFont:= Colors.TextFont;
@@ -8924,7 +8918,7 @@ begin
 end;
 
 
-procedure TATSynEdit.UpdateLinksAttribs;
+procedure TATSynEdit.UpdateLinksAttribs(ALineFrom: integer);
 var
   St: TATStrings;
   NLineStart, NLineEnd, NLineLen: integer;
@@ -8951,7 +8945,10 @@ begin
   {$endif}
 
   St:= Strings;
-  NLineStart:= LineTop;
+  if ALineFrom>=0 then
+    NLineStart:= ALineFrom
+  else
+    NLineStart:= LineTop;
   NLineEnd:= NLineStart+GetVisibleLines;
 
   InitAttribs;
