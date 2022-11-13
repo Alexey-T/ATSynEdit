@@ -5635,7 +5635,6 @@ begin
     if FLineTopTodo>0 then
     begin
       NLine:= FLineTopTodo;
-      //if FScrollVert.NPos>0 then //CudaText #4565
       FLineTopTodo:= 0;
     end;
 
