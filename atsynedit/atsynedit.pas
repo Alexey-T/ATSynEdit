@@ -1195,7 +1195,7 @@ type
       const ACharSize: TATEditorCharSize;
       AWithGutter: boolean;
       var AScrollHorz, AScrollVert: TATEditorScrollInfo;
-      ALineFrom: integer);
+      NWrapIndex: integer);
     procedure DoPaintTextFragment(C: TCanvas;
       const ARect: TRect;
       ALineFrom, ALineTo: integer;
@@ -3173,11 +3173,25 @@ end;
 procedure TATSynEdit.DoPaintMain(C: TCanvas; ALineFrom: integer);
 const
   cTextMacro = 'R';
+var
+  NWrapIndex, NWrapIndexDummy: integer;
 begin
   C.Brush.Color:= FColorBG;
   C.FillRect(0, 0, Width, Height); //avoid FClientW here to fill entire area
 
-  UpdateWrapInfo; //update WrapInfo before MinimapThread start
+  //update WrapInfo before MinimapThread start
+  UpdateWrapInfo;
+
+  //calc FScrollVert.NPos before MiminapThread start
+  if ALineFrom>=0 then
+  begin
+    FWrapInfo.FindIndexesOfLineNumber(ALineFrom, NWrapIndex, NWrapIndexDummy);
+    DoScroll_SetPos(FScrollVert, NWrapIndex);
+  end
+  else
+  begin
+    NWrapIndex:= Max(0, FScrollVert.NPos);
+  end;
 
   if FMinimapVisible then
   begin
@@ -3199,7 +3213,7 @@ begin
   end;
 
   UpdateLinksAttribs(ALineFrom);
-  DoPaintText(C, FRectMain, FCharSize, FOptGutterVisible, FScrollHorz, FScrollVert, ALineFrom);
+  DoPaintText(C, FRectMain, FCharSize, FOptGutterVisible, FScrollHorz, FScrollVert, NWrapIndex);
   DoPaintMargins(C);
   DoPaintNiceScroll(C);
 
@@ -3405,13 +3419,13 @@ procedure TATSynEdit.DoPaintText(C: TCanvas;
   const ACharSize: TATEditorCharSize;
   AWithGutter: boolean;
   var AScrollHorz, AScrollVert: TATEditorScrollInfo;
-  ALineFrom: integer);
+  NWrapIndex: integer);
 var
   RectLine: TRect;
   GapItemTop, GapItemCur: TATGapItem;
   GutterItem: TATGutterItem;
   WrapItem: TATWrapItem;
-  NWrapIndex, NWrapIndexDummy, NLineCount: integer;
+  NLineCount: integer;
 begin
   //wrap turned off can cause bad scrollpos, fix it
   with AScrollVert do
@@ -3478,17 +3492,6 @@ begin
   {$ifndef fix_horzscroll}
   AScrollHorz.NMax:= 1;
   {$endif}
-
-  if ALineFrom>=0 then
-  begin
-    FWrapInfo.FindIndexesOfLineNumber(ALineFrom, NWrapIndex, NWrapIndexDummy);
-    DoScroll_SetPos(AScrollVert, NWrapIndex);
-      //last param True, to continue scrolling after resize
-  end
-  else
-  begin
-    NWrapIndex:= Max(0, AScrollVert.NPos);
-  end;
 
   if FFoldCacheEnabled then
     InitFoldbarCache(NWrapIndex);
