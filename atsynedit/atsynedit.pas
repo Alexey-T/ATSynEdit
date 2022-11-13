@@ -795,7 +795,6 @@ type
     FMicromapLineStates: boolean;
     FMicromapSelections: boolean;
     FMicromapBookmarks: boolean;
-    FMicromapScaleDiv: integer;
     FMicromapShowForMinCount: integer;
     FFoldedMarkList: TATFoldedMarks;
     FFoldedMarkCurrent: TATFoldedMark;
@@ -1512,7 +1511,6 @@ type
     property Markers: TATMarkers read GetMarkers;
     property Attribs: TATMarkers read GetAttribs;
     property Micromap: TATMicromap read FMicromap;
-    property MicromapScaleDiv: integer read FMicromapScaleDiv;
     property DimRanges: TATDimRanges read GetDimRanges;
     property Hotspots: TATHotspots read GetHotspots;
     property Gaps: TATGaps read GetGaps;
@@ -3050,9 +3048,6 @@ begin
   end;
 
   FMicromap.UpdateCoords;
-  FMicromapScaleDiv:= Max(1, Strings.Count);
-  if OptLastLineOnTop then
-    FMicromapScaleDiv:= Max(1, FMicromapScaleDiv+GetVisibleLines-1);
 end;
 
 procedure TATSynEdit.GetRectGutter(out R: TRect);
@@ -4793,7 +4788,6 @@ begin
   FMicromapLineStates:= true;
   FMicromapSelections:= true;
   FMicromapBookmarks:= cInitMicromapBookmarks;
-  FMicromapScaleDiv:= 1;
   FMicromapShowForMinCount:= cInitMicromapShowForMinCount;
 
   FOverwrite:= false;

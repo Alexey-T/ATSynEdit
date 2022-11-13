@@ -1,6 +1,5 @@
 2022.11.14
 * change: removed func RectMicromapMark
-+ add: prop MicromapScaleDiv
 
 2022.10.13
 + add: OnCommandKeyEnter
