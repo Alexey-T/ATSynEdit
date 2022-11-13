@@ -662,6 +662,7 @@ type
     FLastUndoTick: QWord;
     FLastUndoPaused: boolean;
     FLineTopTodo: integer;
+    FLineTopActual: integer;
     FIsCaretShapeChangedFromAPI: boolean;
     FIsReadOnlyChanged: boolean;
     FIsReadOnlyAutodetected: boolean;
@@ -4569,6 +4570,10 @@ var
 begin
   if FLineTopTodo>0 then
     exit(FLineTopTodo);
+
+  if FLineTopActual>=0 then
+    exit(FLineTopActual);
+
   Result:= 0;
   if Assigned(FWrapInfo) and (FWrapInfo.Count>0) then
   begin
@@ -5458,6 +5463,7 @@ var
   NColorOther: TColor;
   NBlend: integer;
 begin
+  FLineTopActual:= ALineFrom;
   UpdateInitialVars(C);
 
   FColorFont:= Colors.TextFont;
