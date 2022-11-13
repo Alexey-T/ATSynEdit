@@ -1037,6 +1037,7 @@ type
     procedure UpdateClipboardRecents(const AText: string);
     procedure UpdateGapForms(ABeforePaint: boolean);
     procedure UpdateAndWait(AUpdateWrapInfo: boolean; APause: integer);
+    procedure UpdateScrollInfoVertPartial(out APage, AMax: Int64);
     procedure SetFoldingAsString(const AValue: string);
     procedure SetOptShowURLsRegex(const AValue: string);
     procedure SetShowOsBarVert(AValue: boolean);
@@ -2641,7 +2642,7 @@ end;
 function TATSynEdit.GetMinimapScrollPos(ALineFrom: integer): integer;
 var
   NLineTop: Int64;
-  NScrollMax, NScrollPage: integer;
+  NScrollMax, NScrollPage: Int64;
 begin
   if ALineFrom>=0 then
     NLineTop:= ALineFrom
@@ -2650,10 +2651,7 @@ begin
 
   //avoid using FScrollVert.NMax and .NPage, because vert-scrollbar
   //may be not inited yet; CudaText #4566
-  NScrollPage:= Max(1, GetVisibleLines)-1;
-  NScrollMax:= Max(0, FWrapInfo.Count-1);
-  if FOptLastLineOnTop then
-    Inc(NScrollMax, NScrollPage);
+  UpdateScrollInfoVertPartial(NScrollPage, NScrollMax);
 
   Result:=
     Int64(NLineTop) *
@@ -2739,6 +2737,14 @@ begin
     FWrapUpdateNeeded:= true;
 end;
 
+procedure TATSynEdit.UpdateScrollInfoVertPartial(out APage, AMax: Int64);
+begin
+  APage:= Max(1, GetVisibleLines)-1;
+  AMax:= Max(0, FWrapInfo.Count-1); //must be 0 for single line text
+  if FOptLastLineOnTop then
+    Inc(AMax, APage);
+end;
+
 function TATSynEdit.UpdateScrollbars(AdjustSmoothPos: boolean): boolean;
 //returns True is scrollbars visibility was changed
 var
@@ -2778,10 +2784,7 @@ begin
   if not ModeOneLine then
   with FScrollVert do
   begin
-    NPage:= Max(1, GetVisibleLines)-1;
-    NMax:= Max(0, FWrapInfo.Count-1); //must be 0 for single line text
-    if FOptLastLineOnTop then
-      Inc(NMax, NPage);
+    UpdateScrollInfoVertPartial(NPage, NMax);
     NPosLast:= Max(0, NMax-NPage);
 
     CharSizeScaled_Prev:= CharSizeScaled;
