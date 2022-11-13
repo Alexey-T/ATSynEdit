@@ -3004,11 +3004,18 @@ begin
   end;
 
   if FMinimapAtLeft then
-    R.Left:= 0
+  begin
+    R.Left:= 0;
+    R.Right:= R.Left+FMinimapWidth;
+  end
   else
-    R.Left:= ClientWidth-FMinimapWidth-IfThen(FMicromapVisible and not FMicromapOnScrollbar, FRectMicromap.Width);
+  begin
+    R.Right:= ClientWidth;
+    if FMicromapVisible and not FMicromapOnScrollbar then
+      Dec(R.Right, FRectMicromap.Width);
+    R.Left:= R.Right-FMinimapWidth;
+  end;
 
-  R.Right:= R.Left+FMinimapWidth;
   R.Top:= 0;
   R.Bottom:= ClientHeight;
 end;
