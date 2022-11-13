@@ -382,7 +382,6 @@ type
   TATMinimapThread = class(TThread)
   public
     Editor: TObject;
-    EditorLineFrom: integer;
   protected
     procedure Execute; override;
   end;
@@ -1209,7 +1208,7 @@ type
       AColorBG: TColor;
       AScrollPos: integer;
       AIndentLines: boolean);
-    procedure DoPaintMinimapAllToBGRABitmap(ALineFrom: integer);
+    procedure DoPaintMinimapAllToBGRABitmap;
     procedure DoPaintMinimapTextToBGRABitmap(
       const ARect: TRect;
       const ACharSize: TATEditorCharSize;
@@ -1303,7 +1302,7 @@ type
     procedure GetRectGutterBookmarks(out R: TRect);
     function GetTextOffset: TPoint;
     function GetPageLines: integer;
-    function GetMinimapScrollPos(ALineFrom: integer): integer;
+    function GetMinimapScrollPos: integer;
     procedure SetTabSize(AValue: integer);
     procedure SetTabSpaces(AValue: boolean);
     procedure SetText(const AValue: UnicodeString);
@@ -2126,7 +2125,7 @@ begin
     if Ed.FEventMapStart.WaitFor(1000)=wrSignaled then
     begin
       Ed.FEventMapStart.ResetEvent;
-      Ed.DoPaintMinimapAllToBGRABitmap(EditorLineFrom);
+      Ed.DoPaintMinimapAllToBGRABitmap;
       Ed.FEventMapDone.SetEvent;
     end;
   until false;
@@ -2639,22 +2638,19 @@ begin
     Result:= Min(Min(Result, 10), GetVisibleLines div 2 - 1)
 end;
 
-function TATSynEdit.GetMinimapScrollPos(ALineFrom: integer): integer;
+function TATSynEdit.GetMinimapScrollPos: integer;
 var
-  NLineTop: Int64;
+  NPos: Int64;
   NScrollMax, NScrollPage: Int64;
 begin
-  if ALineFrom>=0 then
-    NLineTop:= ALineFrom
-  else
-    NLineTop:= Max(0, FScrollVert.NPos);
+  NPos:= Max(0, FScrollVert.NPos);
 
   //avoid using FScrollVert.NMax and .NPage, because vert-scrollbar
   //may be not inited yet; CudaText #4566
   UpdateScrollInfoVertPartial(NScrollPage, NScrollMax);
 
   Result:=
-    Int64(NLineTop) *
+    Int64(NPos) *
     Max(0, NScrollMax-GetVisibleLinesMinimap) div
     Max(1, NScrollMax-NScrollPage);
 end;
@@ -3205,10 +3201,9 @@ begin
       FMinimapThread.Editor:= Self;
       FMinimapThread.Start;
     end;
-    FMinimapThread.EditorLineFrom:= ALineFrom;
     FEventMapStart.SetEvent;
     {$else}
-    DoPaintMinimapAllToBGRABitmap(ALineFrom);
+    DoPaintMinimapAllToBGRABitmap;
     {$endif}
   end;
 
@@ -4405,7 +4400,7 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoPaintMinimapAllToBGRABitmap(ALineFrom: integer);
+procedure TATSynEdit.DoPaintMinimapAllToBGRABitmap;
 begin
   //avoid too often minimap repainting
   if not FAdapterIsDataReady then exit;
@@ -4414,7 +4409,7 @@ begin
   FScrollHorzMinimap.Clear;
   FScrollVertMinimap.Clear;
 
-  FScrollVertMinimap.NPos:= GetMinimapScrollPos(ALineFrom);
+  FScrollVertMinimap.NPos:= GetMinimapScrollPos;
   FScrollVertMinimap.NPosLast:= MaxInt div 2;
 
   DoPaintMinimapTextToBGRABitmap(FRectMinimap, FCharSizeMinimap, FScrollHorzMinimap, FScrollVertMinimap);
