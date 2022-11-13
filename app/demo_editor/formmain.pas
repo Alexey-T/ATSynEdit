@@ -612,8 +612,8 @@ begin
     C.Brush.Style:= bsSolid;
     C.Brush.Color:= ed.Micromap.Columns[i].NColor;
     R:= ARect;
-    R.Left:= ed.Micromap.Columns[i].NLeft;
-    R.Right:= ed.Micromap.Columns[i].NRight;
+    R.Left:= ARect.Left+ed.Micromap.Columns[i].NLeft;
+    R.Right:= ARect.Left+ed.Micromap.Columns[i].NRight;
     C.FillRect(R);
   end;
 end;
