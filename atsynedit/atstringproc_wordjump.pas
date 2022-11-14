@@ -72,9 +72,8 @@ function SFindWordOffset(const S: atString; AOffset: integer;
   AJumpSimple: boolean): integer;
 var
   GroupOfChar: TCharGroupFunction;
-  n: integer;
   //------------
-  procedure Next;
+  procedure Next(var n: integer);
   var gr: TCharGroup;
   begin
     if not ((n>=0) and (n<Length(s))) then Exit;
@@ -84,7 +83,7 @@ var
       (n>=Length(s)) or (GroupOfChar(s[n+1], ANonWordChars)<>gr);
   end;
   //------------
-  procedure Home;
+  procedure Home(var n: integer);
   var gr: TCharGroup;
   begin
     if not ((n>0) and (n<Length(s))) then Exit;
@@ -93,20 +92,22 @@ var
       Dec(n);
   end;
   //------------
-  procedure JumpToNext;
+  procedure JumpToNext(var n: integer);
   begin
-    Next;
+    Next(n);
     if ABigJump then
       if (n<Length(s)) and (GroupOfChar(s[n+1], ANonWordChars)=cgSpaces) then
-        Next;
+        Next(n);
   end;
   //------------
-  procedure JumpToEnd;
+  procedure JumpToEnd(var n: integer);
   begin
     while (n<Length(S)) and (GroupOfChar(S[n+1], ANonWordChars)=cgWord) do
       Inc(n);
   end;
   //------------
+var
+  n: integer;
 begin
   n:= AOffset;
 
@@ -117,32 +118,32 @@ begin
 
   case AJump of
     cWordjumpToNext:
-      JumpToNext;
+      JumpToNext(n);
 
     cWordjumpToPrev:
       begin
         //if we at word middle, jump to word start
         if (n>0) and (n<Length(s)) and (GroupOfChar(s[n], ANonWordChars)=GroupOfChar(s[n+1], ANonWordChars)) then
-          Home
+          Home(n)
         else
         begin
           //jump lefter, then jump to prev word start
           if (n>0) then
-            begin Dec(n); Home end;
+            begin Dec(n); Home(n); end;
           if ABigJump then
             if (n>0) and (GroupOfChar(s[n+1], ANonWordChars)<>cgWord) then
-              begin Dec(n); Home end;
+              begin Dec(n); Home(n); end;
         end
       end;
 
     cWordjumpToEndOrNext:
       begin
-        JumpToEnd;
+        JumpToEnd(n);
         //not moved? jump again
         if n=AOffset then
         begin
-          JumpToNext;
-          JumpToEnd;
+          JumpToNext(n);
+          JumpToEnd(n);
         end;
       end;
   end;
