@@ -6494,7 +6494,7 @@ end;
 
 procedure TATSynEdit.MouseMove(Shift: TShiftState; X, Y: Integer);
 var
-  P: TPoint;
+  PntCoord, PntText: TPoint;
   bOnMain, bOnMinimap, bOnMicromap,
   bOnGutter, bOnGutterNumbers, bOnGutterBookmk,
   bSelecting, bSelectingGutterNumbers: boolean;
@@ -6509,10 +6509,11 @@ begin
   if not OptMouseEnableAll then exit;
   inherited;
 
-  P:= Point(X, Y);
+  PntCoord:= Point(X, Y);
+  PntText:= Point(-1, -1);
   UpdateCursor;
 
-  bMovedMinimal:= IsPointsDiffByDelta(P, FMouseDownCoordOriginal, ATEditorOptions.MouseMoveSmallDelta);
+  bMovedMinimal:= IsPointsDiffByDelta(PntCoord, FMouseDownCoordOriginal, ATEditorOptions.MouseMoveSmallDelta);
 
   bSelecting:= (not FMouseDragDropping) and (FMouseDownPnt.X>=0);
   bSelectingGutterNumbers:= FMouseDownGutterLineNumber>=0;
@@ -6523,18 +6524,18 @@ begin
 
   if bSelecting then
   begin
-    FMouseDragCoord:= P;
+    FMouseDragCoord:= PntCoord;
     _LimitPointByRect(FMouseDragCoord, FRectMainVisible);
   end
   else
     FMouseDragCoord:= Point(-1, -1);
 
-  bOnMain:= PtInRect(FRectMain, P);
-  bOnMinimap:= FMinimapVisible and PtInRect(FRectMinimap, P);
-  bOnMicromap:= FMicromapVisible and not FMicromapOnScrollbar and PtInRect(FRectMicromap, P);
-  bOnGutter:= FOptGutterVisible and PtInRect(FRectGutter, P);
-  bOnGutterNumbers:= bOnGutter and PtInRect(FRectGutterNums, P);
-  bOnGutterBookmk:= bOnGutter and PtInRect(FRectGutterBm, P);
+  bOnMain:= PtInRect(FRectMain, PntCoord);
+  bOnMinimap:= FMinimapVisible and PtInRect(FRectMinimap, PntCoord);
+  bOnMicromap:= FMicromapVisible and not FMicromapOnScrollbar and PtInRect(FRectMicromap, PntCoord);
+  bOnGutter:= FOptGutterVisible and PtInRect(FRectGutter, PntCoord);
+  bOnGutterNumbers:= bOnGutter and PtInRect(FRectGutterNums, PntCoord);
+  bOnGutterBookmk:= bOnGutter and PtInRect(FRectGutterBm, PntCoord);
 
   //detect cursor on minimap
   if FMinimapVisible then
@@ -6583,8 +6584,8 @@ begin
   //show/hide bookmark hint
   if bOnGutterBookmk and not bSelecting then
   begin
-    P:= ClientPosToCaretPos(Point(X, Y), Details);
-    DoHintShowForBookmark(P.Y);
+    PntText:= ClientPosToCaretPos(PntCoord, Details);
+    DoHintShowForBookmark(PntText.Y);
   end
   else
     DoHintHide;
@@ -6606,13 +6607,13 @@ begin
     FTimerScroll.Enabled:= bStartTimerScroll;
 
   FMouseAutoScrollDirection:= cDirNone;
-  if (P.Y<FRectMain.Top) and (not ModeOneLine) then
+  if (PntCoord.Y<FRectMain.Top) and (not ModeOneLine) then
     FMouseAutoScrollDirection:= cDirUp else
-  if (P.Y>=FRectMain.Bottom) and (not ModeOneLine) then
+  if (PntCoord.Y>=FRectMain.Bottom) and (not ModeOneLine) then
     FMouseAutoScrollDirection:= cDirDown else
-  if (P.X<FRectMain.Left) then
+  if (PntCoord.X<FRectMain.Left) then
     FMouseAutoScrollDirection:= cDirLeft else
-  if (P.X>=FRectMain.Right) then
+  if (PntCoord.X>=FRectMain.Right) then
     FMouseAutoScrollDirection:= cDirRight;
 
   //mouse dragged on gutter numbers (only if drag started on gutter numbers)
@@ -6621,10 +6622,10 @@ begin
     begin
       if Shift=[ssLeft] then
       begin
-        P:= ClientPosToCaretPos(P, Details);
-        if (P.Y>=0) and (P.X>=0) then
+        PntText:= ClientPosToCaretPos(PntCoord, Details);
+        if (PntText.Y>=0) and (PntText.X>=0) then
         begin
-          DoSelect_LineRange(FMouseDownGutterLineNumber, P);
+          DoSelect_LineRange(FMouseDownGutterLineNumber, PntText);
           Carets.Sort;
           DoEventCarets;
           Invalidate;
@@ -6653,10 +6654,10 @@ begin
       if Shift*[ssLeft, ssRight]=[] then
         if Assigned(FHotspots) and (FHotspots.Count>0) then
         begin
-          P:= ClientPosToCaretPos(P, Details);
-          if P.Y>=0 then
+          PntText:= ClientPosToCaretPos(PntCoord, Details);
+          if PntText.Y>=0 then
           begin
-            nIndex:= FHotspots.FindByPos(P.X, P.Y);
+            nIndex:= FHotspots.FindByPos(PntText.X, PntText.Y);
             if nIndex<>FLastHotspot then
             begin
               if FLastHotspot>=0 then
@@ -6681,21 +6682,21 @@ begin
       if (ssLeft in Shift) or bSelectColumnMiddle then
         if Carets.Count>0 then
         begin
-          P:= ClientPosToCaretPos(P, Details);
+          PntText:= ClientPosToCaretPos(PntCoord, Details);
           //Application.MainForm.Caption:= Format('MouseDownPnt %d:%d, CurPnt %d:%d',
-            //[FMouseDownPnt.Y, FMouseDownPnt.X, P.Y, P.X]);
-          if (P.Y<0) then Exit;
+            //[FMouseDownPnt.Y, FMouseDownPnt.X, PntText.Y, PntText.X]);
+          if (PntText.Y<0) then Exit;
 
           //mouse not moved at last by char?
-          if (FMouseDownPnt.X=P.X) and (FMouseDownPnt.Y=P.Y) then
+          if (FMouseDownPnt.X=PntText.X) and (FMouseDownPnt.Y=PntText.Y) then
           begin
             //remove selection from current caret
             nIndex:= Carets.IndexOfPosXY(FMouseDownPnt.X, FMouseDownPnt.Y, true);
             if Carets.IsIndexValid(nIndex) then
             begin
               Caret:= Carets[nIndex];
-              Caret.PosX:= P.X;
-              Caret.PosY:= P.Y;
+              Caret.PosX:= PntText.X;
+              Caret.PosY:= PntText.Y;
               Caret.EndX:= -1;
               Caret.EndY:= -1;
             end;
@@ -6713,7 +6714,7 @@ begin
                 FMouseDownAndColumnSelection:= true;
                 DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
                 DoSelect_None;
-                DoSelect_ColumnBlock_FromPoints(FMouseDownPnt, P);
+                DoSelect_ColumnBlock_FromPoints(FMouseDownPnt, PntText);
               end
               else
               if FOptMouseEnableNormalSelection then
@@ -6721,9 +6722,9 @@ begin
                 //normal selection
                 DoCaretSingleAsIs;
                 if FMouseDownDouble and FOptMouse2ClickDragSelectsWords then
-                  DoSelect_WordRange(0, FMouseDownPnt, P)
+                  DoSelect_WordRange(0, FMouseDownPnt, PntText)
                 else
-                  DoSelect_CharRange(0, P);
+                  DoSelect_CharRange(0, PntText);
               end;
             end;
 
@@ -6731,7 +6732,7 @@ begin
             if bSelectAdding then
             begin
               nIndex:= Carets.IndexOfPosXY(FMouseDownPnt.X, FMouseDownPnt.Y, true);
-              DoSelect_CharRange(nIndex, P);
+              DoSelect_CharRange(nIndex, PntText);
             end;
 
             //drag with Alt pressed: column selection
@@ -6742,7 +6743,7 @@ begin
                 FMouseDownAndColumnSelection:= true;
                 DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
                 DoSelect_None;
-                DoSelect_ColumnBlock_FromPoints(FMouseDownPnt, P);
+                DoSelect_ColumnBlock_FromPoints(FMouseDownPnt, PntText);
               end;
 
             Carets.Sort;
