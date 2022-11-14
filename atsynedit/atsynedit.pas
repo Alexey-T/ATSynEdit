@@ -8123,8 +8123,12 @@ begin
 end;
 
 procedure TATSynEdit.DoMinimapDrag(APosY: integer);
+var
+  NPos: integer;
 begin
-  DoScroll_SetPos(FScrollVert, GetMinimap_DraggedPosToWrapIndex(APosY));
+  NPos:= GetMinimap_DraggedPosToWrapIndex(APosY);
+  NPos:= Min(NPos, FScrollVert.NPosLast); //fix CudaText #4571
+  DoScroll_SetPos(FScrollVert, NPos);
   Update;
 end;
 
