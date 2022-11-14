@@ -130,7 +130,7 @@ begin
           if (n>0) then
             begin Dec(n); Home end;
           if ABigJump then
-            if (n>0) and (GroupOfChar(s[n+1], ANonWordChars)= cgSpaces) then
+            if (n>0) and (GroupOfChar(s[n+1], ANonWordChars)<>cgWord) then
               begin Dec(n); Home end;
         end
       end;

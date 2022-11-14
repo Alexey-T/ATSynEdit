@@ -404,8 +404,7 @@ begin
 end;
 
 
-function TATSynEdit.DoCommand_GotoWord(AJump: TATWordJump; AJumpSimple: boolean
-  ): TATCommandResults;
+function TATSynEdit.DoCommand_GotoWord(AJump: TATWordJump; AJumpSimple: boolean): TATCommandResults;
 var
   Caret: TATCaretItem;
   Strs: TATStrings;
