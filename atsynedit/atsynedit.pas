@@ -5366,7 +5366,7 @@ end;
 
 procedure TATSynEdit.DoScroll_SetPos(var AScrollInfo: TATEditorScrollInfo; APos: integer);
 begin
-  AScrollInfo.NPos:= APos;
+  AScrollInfo.NPos:= Min(APos, AScrollInfo.NPosLast);
   //must update other info in AScrollInfo
   UpdateScrollbars(true);
 end;
@@ -8127,7 +8127,6 @@ var
   NPos: integer;
 begin
   NPos:= GetMinimap_DraggedPosToWrapIndex(APosY);
-  NPos:= Min(NPos, FScrollVert.NPosLast); //fix CudaText #4571
   DoScroll_SetPos(FScrollVert, NPos);
   Update;
 end;
