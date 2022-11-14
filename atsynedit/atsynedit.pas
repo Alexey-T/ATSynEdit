@@ -5366,7 +5366,8 @@ end;
 
 procedure TATSynEdit.DoScroll_SetPos(var AScrollInfo: TATEditorScrollInfo; APos: integer);
 begin
-  AScrollInfo.NPos:= Min(APos, AScrollInfo.NPosLast);
+  //note: don't limit value by AScrollInfo.NPosLast, this gives regression: all files open at top
+  AScrollInfo.NPos:= APos;
   //must update other info in AScrollInfo
   UpdateScrollbars(true);
 end;
