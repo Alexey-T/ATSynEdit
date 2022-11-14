@@ -6394,7 +6394,7 @@ end;
 procedure TATSynEdit.DoHandleRightClick(X, Y: integer);
 var
   PosCoord: TPoint;
-  Index: integer;
+  NGutterIndex: integer;
 begin
   PosCoord:= Point(X, Y);
   if PtInRect(FRectMain, PosCoord) then
@@ -6410,12 +6410,12 @@ begin
   else
   if FOptGutterVisible and PtInRect(FRectGutter, PosCoord) then
   begin
-    Index:= FGutter.FindIndexAtCoordX(X);
-    if Index=FGutterBandBookmarks then
+    NGutterIndex:= FGutter.FindIndexAtCoordX(X);
+    if NGutterIndex=FGutterBandBookmarks then
       if Assigned(FMenuGutterBm) then FMenuGutterBm.PopUp;
-    if Index=FGutterBandNumbers then
+    if NGutterIndex=FGutterBandNumbers then
       if Assigned(FMenuGutterNum) then FMenuGutterNum.PopUp;
-    if Index=FGutterBandFolding then
+    if NGutterIndex=FGutterBandFolding then
       if Assigned(FMenuGutterFold) then FMenuGutterFold.PopUp else DoMenuGutterFold;
   end
   else
