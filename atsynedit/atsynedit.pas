@@ -3179,7 +3179,7 @@ begin
   //update WrapInfo before MinimapThread start
   UpdateWrapInfo;
 
-  //calc FScrollVert.NPos before MiminapThread start
+  //calc FScrollVert.NPos before MinimapThread start
   if ALineFrom>=0 then
   begin
     FWrapInfo.FindIndexesOfLineNumber(ALineFrom, NWrapIndex, NWrapIndexDummy);
@@ -3187,7 +3187,7 @@ begin
   end
   else
   begin
-    NWrapIndex:= Max(0, FScrollVert.NPos);
+    NWrapIndex:= Max(0, Min(FScrollVert.NPos, FScrollVert.NPosLast));
   end;
 
   if FMinimapVisible then
