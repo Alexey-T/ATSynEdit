@@ -5668,6 +5668,7 @@ end;
 procedure TATSynEdit.PaintEx(ALineNumber: integer);
 var
   R: TRect;
+  NWrapCount: integer;
 begin
   //experimental, reduce flickering on typing in Markdown
   FOptAllowRepaintOnTextChange:= not IsNormalLexerActive;
@@ -5687,11 +5688,16 @@ begin
     FTickMinimap:= 0;
   end;
 
-  //if scrollbar(s) toggled, paint again
+  NWrapCount:= FWrapInfo.Count;
   DoPaint(ALineNumber);
+
+  //block is folded at the document end? repaint needed
+  if not FOptLastLineOnTop then
+    if (FWrapInfo.Count<NWrapCount) and (FScrollVert.NPos>FScrollVert.NPosLast) then
+      Include(FPaintFlags, cIntFlagRepaintNeeded);
+
   if cIntFlagRepaintNeeded in FPaintFlags then
     DoPaint(ALineNumber);
-
   Exclude(FPaintFlags, cIntFlagRepaintNeeded);
   Exclude(FPaintFlags, cIntFlagBitmap);
 
