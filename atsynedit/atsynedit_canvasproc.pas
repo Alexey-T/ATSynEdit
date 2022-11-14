@@ -624,7 +624,8 @@ begin
     aeuePilcrow:
       CanvasPilcrowChar(C,
         Rect(AX, AY, AX+ACharSize.XScaled div ATEditorCharXScale, AY+ACharSize.Y),
-        AColorFont);
+        AColorFont,
+        ATEditorOptions.UnprintedPilcrowScale);
   end;
 end;
 

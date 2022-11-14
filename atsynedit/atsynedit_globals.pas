@@ -70,6 +70,7 @@ type
     UnprintedEndFontScale: integer;
     UnprintedEndSymbol: TATEditorUnptintedEolSymbol;
     UnprintedEndArrowLength: integer;
+    UnprintedPilcrowScale: integer;
     UnprintedWrapArrowLength: integer;
     UnprintedWrapArrowWidth: integer;
     UnprintedReplaceSpec: boolean;
@@ -383,6 +384,7 @@ initialization
     UnprintedEndFontScale:= 40;
     UnprintedEndSymbol:= aeueArrowDown;
     UnprintedEndArrowLength:= 70;
+    UnprintedPilcrowScale:= 80;
     UnprintedWrapArrowLength:= 40;
     UnprintedWrapArrowWidth:= 80;
     UnprintedReplaceSpec:= false;
