@@ -328,6 +328,7 @@ type
   TATEditorInternalFlag = (
     cIntFlagBitmap, //flag "bitmap should be repainted"
     cIntFlagScrolledHorz, //flag "horizontal scroll _position_ is changed"
+    cIntFlagRepaintNeeded, //last paint changes some state, so repainting is needed
     cIntFlagResize
     );
   TATEditorInternalFlags = set of TATEditorInternalFlag;
@@ -1162,7 +1163,7 @@ type
     procedure TempSel_GetRangesInLineAfterPoint(AX, AY: integer; out ARanges: TATSimpleRangeArray); inline;
     //paint
     procedure PaintEx(ALineNumber: integer);
-    function DoPaint(ALineFrom: integer): boolean;
+    procedure DoPaint(ALineFrom: integer);
     procedure DoPaintBorder(C: TCanvas; AColor: TColor; ABorderWidth: integer; AUseRectMain: boolean);
     procedure DoPaintAll(C: TCanvas; ALineFrom: integer);
     procedure DoPaintMain(C: TCanvas; ALineFrom: integer);
@@ -5537,11 +5538,12 @@ begin
   DoPaintMarkersTo(C);
 end;
 
-function TATSynEdit.DoPaint(ALineFrom: integer): boolean;
+procedure TATSynEdit.DoPaint(ALineFrom: integer);
 //gets True if one of the scrollbars changed its Visible state
 begin
-  if csLoading in ComponentState then exit(false);
-  if csDestroying in ComponentState then exit(false);
+  Exclude(FPaintFlags, cIntFlagRepaintNeeded);
+  if csLoading in ComponentState then exit;
+  if csDestroying in ComponentState then exit;
 
   UpdateTabHelper;
 
@@ -5561,7 +5563,8 @@ begin
   else
     DoPaintAll(Canvas, ALineFrom);
 
-  Result:= UpdateScrollbars(false);
+  if UpdateScrollbars(false) then
+    Include(FPaintFlags, cIntFlagRepaintNeeded);
 end;
 
 procedure TATSynEdit.DoPaintLockedWarning(C: TCanvas);
@@ -5684,9 +5687,12 @@ begin
     FTickMinimap:= 0;
   end;
 
-  //if scrollbars shown, paint again
-  if DoPaint(ALineNumber) then
+  //if scrollbar(s) toggled, paint again
+  DoPaint(ALineNumber);
+  if cIntFlagRepaintNeeded in FPaintFlags then
     DoPaint(ALineNumber);
+
+  Exclude(FPaintFlags, cIntFlagRepaintNeeded);
   Exclude(FPaintFlags, cIntFlagBitmap);
 
   if DoubleBuffered then
