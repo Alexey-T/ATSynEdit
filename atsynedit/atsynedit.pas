@@ -6045,7 +6045,7 @@ end;
 
 procedure TATSynEdit.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var
-  PosTextClicked: TPoint;
+  PosCoord, PosTextClicked: TPoint;
   PosDetails: TATEditorPosDetails;
   Index: integer;
   ActionId: TATEditorMouseAction;
@@ -6056,12 +6056,13 @@ begin
   inherited;
   SetFocus;
   DoCaretForceShow;
+  PosCoord:= Point(X, Y);
 
   if Button=mbRight then
   begin
     if FOptMouseRightClickMovesCaret then
     begin
-      PosTextClicked:= ClientPosToCaretPos(Point(X, Y), PosDetails);
+      PosTextClicked:= ClientPosToCaretPos(PosCoord, PosDetails);
       bClickOnSelection:= Carets.FindCaretContainingPos(PosTextClicked.X, PosTextClicked.Y)>=0;
       if not bClickOnSelection then //click over selection must never reset that selection, like in Notepad++
         if Strings.IsIndexValid(PosTextClicked.Y) then
@@ -6087,7 +6088,7 @@ begin
   FMouseDownWithAlt:= ssAlt in Shift;
   FMouseDownWithShift:= ssShift in Shift;
 
-  if FMinimapVisible and PtInRect(FRectMinimap, Point(X, Y)) then
+  if FMinimapVisible and PtInRect(FRectMinimap, PosCoord) then
   begin
     GetRectMinimapSel(R);
     FMouseDownOnMinimap:= true;
@@ -6101,7 +6102,7 @@ begin
       DoMinimapDrag(Y);
     end
     else
-    if PtInRect(R, Point(X, Y)) then
+    if PtInRect(R, PosCoord) then
     begin
       FMouseDragMinimap:= true;
       FMouseDragMinimapDelta:= Y-R.Top;
@@ -6109,7 +6110,7 @@ begin
     Exit;
   end;
 
-  PosTextClicked:= ClientPosToCaretPos(Point(X, Y), PosDetails);
+  PosTextClicked:= ClientPosToCaretPos(PosCoord, PosDetails);
   FCaretSpecPos:= false;
   FMouseDownOnEditingArea:= false;
   FMouseDownOnMinimap:= false;
@@ -6131,7 +6132,7 @@ begin
     Exit
   end;
 
-  if PtInRect(FRectMain, Point(X, Y)) then
+  if PtInRect(FRectMain, PosCoord) then
   begin
     FMouseDownOnEditingArea:= true;
     FMouseDownPnt:= PosTextClicked;
@@ -6152,7 +6153,7 @@ begin
           begin
             if not ModeOneLine then
             begin
-              FMouseNiceScrollPos:= Point(X, Y);
+              FMouseNiceScrollPos:= PosCoord;
               MouseNiceScroll:= true;
             end;
           end;
@@ -6234,7 +6235,7 @@ begin
     end;
   end;
 
-  if FOptGutterVisible and PtInRect(FRectGutter, Point(X, Y)) then
+  if FOptGutterVisible and PtInRect(FRectGutter, PosCoord) then
   begin
     if ActionId=cMouseActionClickSimple then
     begin
@@ -6259,7 +6260,7 @@ begin
     end;
   end;
 
-  if FMicromapVisible and not FMicromapOnScrollbar and PtInRect(FRectMicromap, Point(X, Y)) then
+  if FMicromapVisible and not FMicromapOnScrollbar and PtInRect(FRectMicromap, PosCoord) then
     if ActionId=cMouseActionClickSimple then
     begin
       DoEventClickMicromap(X-FRectMicromap.Left, Y-FRectMicromap.Top);
@@ -6281,21 +6282,22 @@ var
   Str: atString;
   Caret: TATCaretItem;
   PosDetails: TATEditorPosDetails;
-  PosTextClicked: TPoint;
+  PosCoord, PosTextClicked: TPoint;
   bMovedMinimal: boolean;
 begin
   if not OptMouseEnableAll then exit;
   inherited;
+  PosCoord:= Point(X, Y);
 
   if FOptShowMouseSelFrame then
     if FMouseDragCoord.X>=0 then
     begin
-      bMovedMinimal:= IsPointsDiffByDelta(Point(X, Y), FMouseDownCoordOriginal, ATEditorOptions.MouseMoveSmallDelta);
+      bMovedMinimal:= IsPointsDiffByDelta(PosCoord, FMouseDownCoordOriginal, ATEditorOptions.MouseMoveSmallDelta);
       if bMovedMinimal then
         Invalidate;
     end;
 
-  if PtInRect(FRectMinimap, Point(X, Y)) then
+  if PtInRect(FRectMinimap, PosCoord) then
   begin
     if FMouseDownOnMinimap then
     begin
@@ -6308,7 +6310,7 @@ begin
     Exit
   end;
 
-  if PtInRect(ClientRect, Point(X, Y)) then
+  if PtInRect(ClientRect, PosCoord) then
   if FMouseDragDropping then
   begin
     //drag-drop really started
@@ -6325,7 +6327,7 @@ begin
     else
     //mouse released w/o drag-drop
     begin
-      PosTextClicked:= ClientPosToCaretPos(Point(X, Y), PosDetails);
+      PosTextClicked:= ClientPosToCaretPos(PosCoord, PosDetails);
       DoCaretSingle(PosTextClicked.X, PosTextClicked.Y);
       DoEventCarets;
       Update;
@@ -6391,9 +6393,11 @@ end;
 
 procedure TATSynEdit.DoHandleRightClick(X, Y: integer);
 var
+  PosCoord: TPoint;
   Index: integer;
 begin
-  if PtInRect(FRectMain, Point(X, Y)) then
+  PosCoord:= Point(X, Y);
+  if PtInRect(FRectMain, PosCoord) then
   begin
     if Assigned(FMenuText) then
       FMenuText.PopUp
@@ -6404,7 +6408,7 @@ begin
     end;
   end
   else
-  if FOptGutterVisible and PtInRect(FRectGutter, Point(X, Y)) then
+  if FOptGutterVisible and PtInRect(FRectGutter, PosCoord) then
   begin
     Index:= FGutter.FindIndexAtCoordX(X);
     if Index=FGutterBandBookmarks then
@@ -6415,17 +6419,17 @@ begin
       if Assigned(FMenuGutterFold) then FMenuGutterFold.PopUp else DoMenuGutterFold;
   end
   else
-  if FMinimapVisible and PtInRect(FRectMinimap, Point(X, Y)) then
+  if FMinimapVisible and PtInRect(FRectMinimap, PosCoord) then
   begin
     if Assigned(FMenuMinimap) then FMenuMinimap.PopUp;
   end
   else
-  if FMicromapVisible and not FMicromapOnScrollbar and PtInRect(FRectMicromap, Point(X, Y)) then
+  if FMicromapVisible and not FMicromapOnScrollbar and PtInRect(FRectMicromap, PosCoord) then
   begin
     if Assigned(FMenuMicromap) then FMenuMicromap.PopUp;
   end
   else
-  if FOptRulerVisible and PtInRect(FRectRuler, Point(X, Y)) then
+  if FOptRulerVisible and PtInRect(FRectRuler, PosCoord) then
   begin
     if Assigned(FMenuRuler) then FMenuRuler.PopUp;
   end;
