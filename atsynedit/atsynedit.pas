@@ -58,12 +58,6 @@ uses
   ATSynEdit_FGL,
   ATScrollBar;
 
-{$ifdef LCLGTK2}
-  {$if (LCL_FULLVERSION >= 2030000)}
-    {$define GTK2_IME_CODE}
-  {$endif}
-{$endif}
-
 type
   TATPoint64 = record
     X, Y: Int64
@@ -1745,8 +1739,8 @@ type
     procedure WMIME_EndComposition(var Msg:TMessage); message WM_IME_ENDCOMPOSITION;
     {$endif}
 
+    {$ifdef LCLGTK2}
     {$ifdef GTK2_IME_CODE}
-    {$ifdef WITH_GTK2_IM}
     procedure WM_GTK_IM_COMPOSITION(var Message: TLMessage); message LM_IM_COMPOSITION;
     {$endif}
     {$endif}
@@ -8650,8 +8644,8 @@ begin
   end;
 end;
 
+{$ifdef LCLGTK2}
 {$ifdef GTK2_IME_CODE}
-{$ifdef WITH_GTK2_IM}
 // fcitx IM
 procedure TATSynEdit.WM_GTK_IM_COMPOSITION(var Message: TLMessage);
 var
