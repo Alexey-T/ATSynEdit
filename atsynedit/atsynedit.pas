@@ -1746,7 +1746,9 @@ type
     {$endif}
 
     {$ifdef GTK2_IME_CODE}
+    {$ifdef WITH_GTK2_IM}
     procedure WM_GTK_IM_COMPOSITION(var Message: TLMessage); message LM_IM_COMPOSITION;
+    {$endif}
     {$endif}
 
   published
@@ -8649,6 +8651,7 @@ begin
 end;
 
 {$ifdef GTK2_IME_CODE}
+{$ifdef WITH_GTK2_IM}
 // fcitx IM
 procedure TATSynEdit.WM_GTK_IM_COMPOSITION(var Message: TLMessage);
 var
@@ -8704,6 +8707,7 @@ begin
       TextInsertAtCarets(FIMSelText, False, False, False);
   end;
 end;
+{$endif}
 {$endif}
 
 procedure TATSynEdit.DoPaintStaple(C: TCanvas; const R: TRect; AColor: TColor);
