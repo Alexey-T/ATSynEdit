@@ -1017,7 +1017,6 @@ type
     procedure InitFoldbarCache(ACacheStartIndex: integer);
     procedure InitLengthArray(var Lens: TATIntArray);
     function IsCaretFarFromVertEdge(ACommand: integer): boolean;
-    function IsCaretOnVisibleRect: boolean;
     function IsInvalidateAllowed: boolean; inline;
     function IsNormalLexerActive: boolean;
     procedure MenuitemClipboardRecentsClick(Sender: TObject);
@@ -1522,6 +1521,7 @@ type
     property CaretShapeNormal: TATCaretShape read FCaretShapeNormal;
     property CaretShapeOverwrite: TATCaretShape read FCaretShapeOverwrite;
     property CaretShapeReadonly: TATCaretShape read FCaretShapeReadonly;
+    function IsCaretOnVisibleRect: boolean;
     //common
     property FontProportional: boolean read FFontProportional;
     property EncodingName: string read GetEncodingName write SetEncodingName;
