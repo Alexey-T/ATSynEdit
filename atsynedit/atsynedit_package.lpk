@@ -25,6 +25,12 @@
           <UseExternalDbgSyms Value="True"/>
         </Debugging>
       </Linking>
+      <Other>
+        <CustomOptions Value="-dGTK2_IME_CODE"/>
+        <OtherDefines Count="1">
+          <Define0 Value="GTK2_IME_CODE"/>
+        </OtherDefines>
+      </Other>
     </CompilerOptions>
     <Description Value="Multi-line editor control, used in CudaText editor. Supports syntax highlighting using EControl engine or other engines."/>
     <License Value="MPL 2.0, LGPL"/>
