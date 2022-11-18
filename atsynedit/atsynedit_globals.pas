@@ -411,7 +411,7 @@ initialization
     //Linux Qt5: same as for macOS
     //Linux GTK2: big slowdown from offsets
     TextoutNeedsOffsets:=
-      {$if defined(windows) or defined(LCLQt5)}
+      {$if Defined(LCLWin32) or Defined(LCLWin64) or Defined(LCLQt5)}
       true
       {$else}
       false

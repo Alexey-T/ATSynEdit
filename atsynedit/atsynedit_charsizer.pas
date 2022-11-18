@@ -107,7 +107,7 @@ begin
   Result:= false;
 end;
 
-{$ifdef windows}
+{$IF Defined(LCLWin32) or Defined(LCLWin64)}
 function _WidestrWidth(C: TCanvas; S: WideChar): integer; inline;
 var
   Size: TSize;
