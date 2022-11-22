@@ -149,6 +149,7 @@ type
     function IsLineWithCaret(APosY: integer; ADisableSelected: boolean=false): boolean;
     function IsLineWithSelection(APosY: integer): boolean;
     function IsSelection: boolean;
+    function IsSelectionInAllCarets: boolean;
     function IsSelectionWithTouching: boolean;
     function IsAnyCaretInVisibleRect(const R: TRect): boolean;
     procedure GetSelections(var D: TATCaretSelections);
@@ -915,6 +916,16 @@ begin
     if Items[i].IsSelection then
       exit(true);
   Result:= false;
+end;
+
+function TATCarets.IsSelectionInAllCarets: boolean;
+var
+  i: integer;
+begin
+  for i:= 0 to Count-1 do
+    if not Items[i].IsSelection then
+      exit(false);
+  Result:= true;
 end;
 
 class function TATCarets.IsTouchingSelections(Item1, Item2: TATCaretItem): boolean;
