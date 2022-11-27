@@ -7,6 +7,7 @@ object fmMain: TfmMain
   ClientHeight = 578
   ClientWidth = 889
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
   OnShow = FormShow
   Position = poScreenCenter
   LCLVersion = '2.3.0.0'
@@ -23,9 +24,9 @@ object fmMain: TfmMain
     TabOrder = 0
     object chkWrap: TCheckBox
       Left = 9
-      Height = 21
+      Height = 23
       Top = 8
-      Width = 82
+      Width = 98
       Caption = 'word wrap'
       OnChange = chkWrapChange
       ParentFont = False
@@ -33,7 +34,7 @@ object fmMain: TfmMain
     end
     object edLexer: TComboBox
       Left = 9
-      Height = 29
+      Height = 33
       Top = 120
       Width = 176
       DropDownCount = 24
@@ -63,9 +64,9 @@ object fmMain: TfmMain
     end
     object chkFullSel: TCheckBox
       Left = 9
-      Height = 21
+      Height = 23
       Top = 48
-      Width = 109
+      Width = 128
       Caption = 'show full sel-bg'
       OnChange = chkFullSelChange
       ParentFont = False
@@ -73,9 +74,9 @@ object fmMain: TfmMain
     end
     object chkFullHilite: TCheckBox
       Left = 9
-      Height = 21
+      Height = 23
       Top = 68
-      Width = 129
+      Width = 152
       Caption = 'show full syntax-bg'
       OnChange = chkFullHiliteChange
       ParentFont = False
@@ -93,9 +94,9 @@ object fmMain: TfmMain
     end
     object chkUnpri: TCheckBox
       Left = 9
-      Height = 21
+      Height = 23
       Top = 28
-      Width = 109
+      Width = 129
       Caption = 'show unprinted'
       OnChange = chkUnpriChange
       ParentFont = False
@@ -103,9 +104,9 @@ object fmMain: TfmMain
     end
     object chkShowCur: TCheckBox
       Left = 9
-      Height = 21
+      Height = 23
       Top = 88
-      Width = 113
+      Width = 131
       Caption = 'show cur line bg'
       OnChange = chkShowCurChange
       ParentFont = False
@@ -113,9 +114,9 @@ object fmMain: TfmMain
     end
     object chkLexer: TCheckBox
       Left = 9
-      Height = 21
+      Height = 23
       Top = 152
-      Width = 92
+      Width = 107
       Caption = 'enable lexer'
       Checked = True
       OnChange = chkLexerChange
@@ -125,9 +126,9 @@ object fmMain: TfmMain
     end
     object chkDyn: TCheckBox
       Left = 9
-      Height = 21
+      Height = 23
       Top = 176
-      Width = 100
+      Width = 119
       Caption = 'dynamic hilite'
       OnChange = chkDynChange
       ParentFont = False
@@ -147,7 +148,7 @@ object fmMain: TfmMain
       Left = 184
       Height = 17
       Top = 183
-      Width = 61
+      Width = 71
       Caption = 'Used mem'
       ParentFont = False
     end

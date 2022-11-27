@@ -56,6 +56,7 @@ type
     procedure edLexerChange(Sender: TObject);
     procedure filesClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure TimerMemoryTimer(Sender: TObject);
     procedure TreeClick(Sender: TObject);
@@ -165,6 +166,11 @@ begin
   chkUnpri.Checked:= ed.OptUnprintedVisible;
   chkShowCur.Checked:= ed.OptShowCurLine;
   chkDyn.Checked:= adapter.DynamicHiliteEnabled;
+end;
+
+procedure TfmMain.FormDestroy(Sender: TObject);
+begin
+  Tree.Items.Clear;
 end;
 
 procedure TfmMain.FormShow(Sender: TObject);
@@ -281,7 +287,7 @@ procedure TfmMain.bExportClick(Sender: TObject);
 var
   fn: string;
 begin
-  fn:=     GetTempDir+DirectorySeparator+'_export.html';
+  fn:= GetTempDir+DirectorySeparator+'_export.html';
   DoEditorExportToHTML(Ed, fn, 'Export test',
     'Courier New', 12, false,
     clWhite, clMedGray);
