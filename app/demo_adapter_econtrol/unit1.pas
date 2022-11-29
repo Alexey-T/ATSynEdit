@@ -169,7 +169,18 @@ begin
 end;
 
 procedure TfmMain.FormDestroy(Sender: TObject);
+var
+  Data: pointer;
+  i: integer;
 begin
+  //TreeFill fills Data of nodes
+  for i:= Tree.Items.Count-1 downto 0 do
+  begin
+    Data:= Tree.Items[i].Data;
+    if Assigned(Data) then
+      TObject(Data).Free;
+  end;
+
   Tree.Items.Clear;
 end;
 
