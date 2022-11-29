@@ -70,6 +70,7 @@ type
     procedure EditCalcStaple(Sender: TObject; ALine, AIndent: integer; var AColor: TColor);
     procedure EditClickGutter(Sender: TObject; ABand: integer; ALine: integer);
     function GetComment: string;
+    procedure TreeOnDeletion(Sender: TObject; Node: TTreeNode);
     procedure UpdateLexList;
   public
     { public declarations }
@@ -166,21 +167,12 @@ begin
   chkUnpri.Checked:= ed.OptUnprintedVisible;
   chkShowCur.Checked:= ed.OptShowCurLine;
   chkDyn.Checked:= adapter.DynamicHiliteEnabled;
+
+  Tree.OnDeletion:=@TreeOnDeletion;
 end;
 
 procedure TfmMain.FormDestroy(Sender: TObject);
-var
-  Data: pointer;
-  i: integer;
 begin
-  //TreeFill fills Data of nodes
-  for i:= Tree.Items.Count-1 downto 0 do
-  begin
-    Data:= Tree.Items[i].Data;
-    if Assigned(Data) then
-      TObject(Data).Free;
-  end;
-
   Tree.Items.Clear;
 end;
 
@@ -292,6 +284,15 @@ begin
   an:= adapter.Lexer;
   if Assigned(an) then
     Result:= an.LineComment;
+end;
+
+procedure TfmMain.TreeOnDeletion(Sender: TObject; Node: TTreeNode);
+begin
+  if Assigned(Node.Data) then
+  begin
+    TObject(Node.Data).Free;
+    Node.Data:= nil;
+  end;
 end;
 
 procedure TfmMain.bExportClick(Sender: TObject);
