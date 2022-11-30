@@ -86,7 +86,7 @@ type
   TATMarkerAttribArray = array of TATMarkerAttribRecord;
 
 const
-  //must be >= OptMaxLineLenForAccurateCharWidths
+  //must be >= ATEditorOptions.MaxLineLenForAccurateCharWidths
   cMaxFixedArray = 1024;
 
 type
