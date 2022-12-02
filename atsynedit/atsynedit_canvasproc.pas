@@ -741,7 +741,7 @@ var
   bAllowLigatures: boolean;
   {$endif}
   BufW: UnicodeString;
-  NLen, NCharWidthScaled, i, iPart: integer;
+  NLen, NCharWidthScaled, NDeltaForItalic, iPart, i: integer;
   NLastPart: integer;
   NPosFirstChar, NPosLastChar: integer;
   PartStr: atString;
@@ -751,12 +751,13 @@ var
   PartRect: TRect;
   DxPointer: PInteger;
   NStyles: integer;
-  bBold, bItalic, {bCrossed,} bSpaceChars: boolean;
+  bBold, bItalic, bSpaceChars: boolean;
   ch: WideChar;
 begin
   NLen:= Min(Length(AText), cMaxFixedArray);
   if NLen=0 then Exit;
   NCharWidthScaled:= AProps.CharSize.XScaled;
+  NDeltaForItalic:= C.Font.Size * ATEditorOptions.ItalicFontLongerInPercents div 100;
 
   FillChar(ListInt, SizeOf(ListInt), 0);
   FillChar(Dx, SizeOf(Dx), 0);
@@ -903,14 +904,15 @@ begin
       //eg comment //WWW, if theme has italic comments style,
       //with font eg "Fira Code Retina"
       if bItalic then
-        Inc(PartRect.Right,
-          C.Font.Size * ATEditorOptions.ItalicFontLongerInPercents div 100
-          );
+        Inc(PartRect.Right, NDeltaForItalic);
 
       //part with only blanks, render simpler
       //important for gtk2: tab-chars give Dx offsets, render is much slower with Dx
       if bSpaceChars then
       begin
+        //avoid clipping previous 'italic' part
+        if (iPart>0) and ((AParts^[iPart-1].FontStyles and afsFontItalic)<>0) then
+          Inc(PartRect.Left, NDeltaForItalic);
         C.FillRect(PartRect);
         Continue;
       end;
