@@ -131,7 +131,7 @@ begin
   M.Add(cCommand_RemoveLastCaret, 'selection: remove last caret', [], []);
 
   M.Add(cCommand_ToggleOverwrite, 'toggle insert/overwrite mode', ['Ins'], []);
-  M.Add(cCommand_ToggleReadOnly, 'toggle read-only mode', ['Ctrl+Shift+R'], []);
+  M.Add(cCommand_ToggleReadOnly, 'toggle read-only mode', [], []);
   M.Add(cCommand_ToggleWordWrap, 'toggle word-wrap mode (off/window)', [cXControl+'+U'], []);
   M.Add(cCommand_ToggleWordWrapAlt, 'toggle word-wrap mode (off/window/margin)', [], []);
 
