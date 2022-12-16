@@ -61,7 +61,8 @@ type
     property StringsObj: TATStrings read FStrings write FStrings;
     property VirtualMode: boolean read FVirtualMode write SetVirtualMode;
     function Count: integer; inline;
-    function IsIndexValid(N: integer): boolean; inline;
+    function IsIndexValid(AIndex: integer): boolean; inline;
+    function IsIndexUniqueForLine(AIndex: integer): boolean;
     property Data[N: integer]: TATWrapItem read GetData; default;
     procedure Add(const AData: TATWrapItem);
     procedure Delete(N: integer);
@@ -168,9 +169,23 @@ begin
     Result:= FList.Count;
 end;
 
-function TATWrapInfo.IsIndexValid(N: integer): boolean; inline;
+function TATWrapInfo.IsIndexValid(AIndex: integer): boolean; inline;
 begin
-  Result:= (N>=0) and (N<Count);
+  Result:= (AIndex>=0) and (AIndex<Count);
+end;
+
+function TATWrapInfo.IsIndexUniqueForLine(AIndex: integer): boolean;
+var
+  NLineIndex: integer;
+begin
+  if FVirtualMode then
+    Exit(true);
+  NLineIndex:= FList._GetItemPtr(AIndex)^.NLineIndex;
+  if (AIndex>0) and (FList._GetItemPtr(AIndex-1)^.NLineIndex=NLineIndex) then
+    Exit(false);
+  if (AIndex<FList.Count-1) and (FList._GetItemPtr(AIndex+1)^.NLineIndex=NLineIndex) then
+    Exit(false);
+  Result:= true;
 end;
 
 procedure TATWrapInfo.Add(const AData: TATWrapItem); inline;
