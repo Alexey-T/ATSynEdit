@@ -198,6 +198,13 @@ procedure TATWrapInfo.FindIndexesOfLineNumber(ALineNum: integer; out AFrom, ATo:
 var
   a, b, m, dif: integer;
 begin
+  if FVirtualMode then
+  begin
+    AFrom:= ALineNum;
+    ATo:= ALineNum;
+    Exit;
+  end;
+
   AFrom:= -1;
   ATo:= -1;
 
