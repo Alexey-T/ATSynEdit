@@ -232,7 +232,7 @@ begin
     if a>b then exit;
     m:= (a+b+1) div 2;
 
-    dif:= Data[m].NLineIndex-ALineNum;
+    dif:= FList._GetItemPtr(m)^.NLineIndex-ALineNum;
     if dif=0 then
       Break;
     if dif>0 then
@@ -243,8 +243,10 @@ begin
 
   AFrom:= m;
   ATo:= m;
-  while (AFrom>0) and (Data[AFrom-1].NLineIndex=ALineNum) do Dec(AFrom);
-  while (ATo<Count-1) and (Data[ATo+1].NLineIndex=ALineNum) do Inc(ATo);
+  while (AFrom>0) and (FList._GetItemPtr(AFrom-1)^.NLineIndex=ALineNum) do
+    Dec(AFrom);
+  while (ATo<Count-1) and (FList._GetItemPtr(ATo+1)^.NLineIndex=ALineNum) do
+    Inc(ATo);
 end;
 
 function TATWrapInfo.FindIndexOfCaretPos(APos: TPoint): integer;
