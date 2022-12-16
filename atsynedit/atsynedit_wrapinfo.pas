@@ -118,7 +118,7 @@ begin
     if AIndex>=0 then
       Result:= FList[AIndex]
     else
-      FillChar(Result, SizeOf(Result), 0);
+      Result:= Default(TATWrapItem);
   end;
 end;
 
