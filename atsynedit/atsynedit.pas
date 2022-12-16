@@ -2870,29 +2870,11 @@ begin
   begin
     FScrollbarLock:= true;
 
-    //if option "minimap on scrollbar" on, scrollbar shows all lines (from 0 to St.Count-1)
-    //including folded lines.
-    //if option is off, it shows smaller range, if lines are folded.
-    if FMicromapVisible and FMicromapOnScrollbar then
-    begin
-      if FOptScrollSmooth then
-        NDelta:= FCharSize.Y
-      else
-        NDelta:= 1;
-      FScrollbarVert.Min:= 0;
-      FScrollbarVert.Max:= NDelta * Max(Max(0, Strings.Count-1), WrapInfo.Count-1); //WrapInfo.Count is to partially fix CudaText #4512
-      FScrollbarVert.SmallChange:= NDelta;
-      FScrollbarVert.PageSize:= NDelta * Max(1, GetVisibleLines);
-      FScrollbarVert.Position:= NDelta * LineTop;
-    end
-    else
-    begin
-      FScrollbarVert.Min:= 0;
-      FScrollbarVert.Max:= FScrollVert.SmoothMax;
-      FScrollbarVert.SmallChange:= FScrollVert.CharSizeScaled div ATEditorCharXScale;
-      FScrollbarVert.PageSize:= FScrollVert.SmoothPage;
-      FScrollbarVert.Position:= FScrollVert.SmoothPos;
-    end;
+    FScrollbarVert.Min:= 0;
+    FScrollbarVert.Max:= FScrollVert.SmoothMax;
+    FScrollbarVert.SmallChange:= FScrollVert.CharSizeScaled div ATEditorCharXScale;
+    FScrollbarVert.PageSize:= FScrollVert.SmoothPage;
+    FScrollbarVert.Position:= FScrollVert.SmoothPos;
 
     FScrollbarVert.Update;
     FScrollbarLock:= false;
