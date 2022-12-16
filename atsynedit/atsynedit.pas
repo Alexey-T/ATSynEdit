@@ -9128,24 +9128,13 @@ end;
 procedure TATSynEdit.OnNewScrollbarVertChanged(Sender: TObject);
 var
   Msg: TLMVScroll;
-  NPos: Int64;
 begin
   if FScrollbarLock then exit;
 
-  if FMicromapVisible and FMicromapOnScrollbar then
-  begin
-    NPos:= FScrollbarVert.Position
-           div FScrollbarVert.SmallChange; //this supports OptScrollSmooth
-    DoUnfoldLine(NPos);
-    LineTop:= NPos;
-  end
-  else
-  begin
-    FillChar(Msg{%H-}, SizeOf(Msg), 0);
-    Msg.ScrollCode:= SB_THUMBPOSITION;
-    Msg.Pos:= FScrollbarVert.Position;
-    WMVScroll(Msg);
-  end;
+  FillChar(Msg{%H-}, SizeOf(Msg), 0);
+  Msg.ScrollCode:= SB_THUMBPOSITION;
+  Msg.Pos:= FScrollbarVert.Position;
+  WMVScroll(Msg);
 
   //show scroll hint
   DoHintShowForScrolling;
