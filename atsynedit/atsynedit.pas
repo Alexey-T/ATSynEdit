@@ -1142,7 +1142,6 @@ type
     //select
     procedure DoSelectionDeleteOrReset;
     procedure DoSelect_ExtendSelectionByLine(AUp: boolean);
-    procedure DoSelect_CharRange(ACaretIndex: integer; Pnt: TPoint);
     procedure DoSelect_WordRange(ACaretIndex: integer; P1, P2: TPoint);
     procedure DoSelect_ByDoubleClick(AllowOnlyWordChars: boolean);
     procedure DoSelect_Line_ByClick;
@@ -6706,7 +6705,7 @@ begin
                 if FMouseDownDouble and FOptMouse2ClickDragSelectsWords then
                   DoSelect_WordRange(0, FMouseDownPnt, PntText)
                 else
-                  DoSelect_CharRange(0, PntText);
+                  Carets[0].SelectToPoint(PntText.X, PntText.Y);
               end;
             end;
 
@@ -6714,7 +6713,8 @@ begin
             if bSelectAdding then
             begin
               nIndex:= Carets.IndexOfPosXY(FMouseDownPnt.X, FMouseDownPnt.Y, true);
-              DoSelect_CharRange(nIndex, PntText);
+              if Carets.IsIndexValid(nIndex) then
+                Carets[nIndex].SelectToPoint(PntText.X, PntText.Y);
             end;
 
             //drag with Alt pressed: column selection

@@ -105,12 +105,6 @@ begin
     DoCaretSingle(XTo, P.Y, XFrom, P.Y);
 end;
 
-procedure TATSynEdit.DoSelect_CharRange(ACaretIndex: integer; Pnt: TPoint);
-begin
-  if not Carets.IsIndexValid(ACaretIndex) then Exit;
-  Carets[ACaretIndex].SelectToPoint(Pnt.X, Pnt.Y);
-end;
-
 procedure TATSynEdit.DoSelect_WordRange(ACaretIndex: integer; P1, P2: TPoint);
 var
   St: TATStrings;
