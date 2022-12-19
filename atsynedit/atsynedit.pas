@@ -6701,11 +6701,15 @@ begin
               if FOptMouseEnableNormalSelection then
               begin
                 //normal selection
-                DoCaretSingleAsIs;
+                DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
+                //writeln('DoCaretSingle: '+inttostr(FMouseDownPnt.X)+':'+inttostr(FMouseDownPnt.Y));
                 if FMouseDownDouble and FOptMouse2ClickDragSelectsWords then
                   DoSelect_WordRange(0, FMouseDownPnt, PntText)
                 else
+                begin
                   Carets[0].SelectToPoint(PntText.X, PntText.Y);
+                  //writeln('Carets[0].SelToPnt: '+inttostr(PntText.X)+':'+inttostr(PntText.Y));
+                end;
               end;
             end;
 
