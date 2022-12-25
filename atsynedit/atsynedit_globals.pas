@@ -376,7 +376,7 @@ initialization
     DetectUTF16BufferWords:= 5;
     DetectEncodingByPythonSignature:= true;
     DetectEncodingByXmlSignature:= true;
-    FallbackEncoding:= eidCP1252;
+    FallbackEncoding:= EncConvGetANSI;
 
     ItalicFontLongerInPercents:= 40;
     UnprintedTabCharLength:= 1;
