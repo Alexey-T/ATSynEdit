@@ -12,7 +12,8 @@ interface
 uses
   SysUtils, Classes,
   LCLType, LCLIntf,
-  Graphics, Controls, Forms, Menus, Clipbrd;
+  Graphics, Controls, Forms, Menus, Clipbrd,
+  EncConv;
 
 type
   TATEditorUnptintedEolSymbol = (
@@ -60,6 +61,7 @@ type
     DetectUTF16BufferWords: integer;
     DetectEncodingByPythonSignature: boolean;
     DetectEncodingByXmlSignature: boolean;
+    FallbackEncoding: TEncConvId;
 
     ItalicFontLongerInPercents: integer;
     UnprintedTabCharLength: integer;
@@ -374,6 +376,7 @@ initialization
     DetectUTF16BufferWords:= 5;
     DetectEncodingByPythonSignature:= true;
     DetectEncodingByXmlSignature:= true;
+    FallbackEncoding:= eidCP1252;
 
     ItalicFontLongerInPercents:= 40;
     UnprintedTabCharLength:= 1;

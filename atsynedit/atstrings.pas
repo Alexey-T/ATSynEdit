@@ -1289,7 +1289,7 @@ begin
   FEncoding:= cEncUTF8;
   FEncodingDetect:= true;
   FEncodingDetectDefaultUtf8:= true;
-  FEncodingCodepage:= EncConvGetANSI;
+  FEncodingCodepage:= ATEditorOptions.FallbackEncoding;
   FEndings:= cLineEndOsDefault;
 
   FModified:= false;
