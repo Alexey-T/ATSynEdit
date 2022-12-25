@@ -9621,7 +9621,7 @@ begin
   if SameText(AName, cEncNameUtf32BE_NoBom) then begin St.Encoding:= cEnc32BE; St.SaveSignWide:= false; end else
   begin
     St.Encoding:= cEncAnsi;
-    St.EncodingCodepage:= EncConvFindEncoding(LowerCase(AName));
+    St.EncodingCodepage:= EncConvFindEncoding(LowerCase(AName), eidCP1252);
   end;
 end;
 
