@@ -170,7 +170,7 @@ type
     function CharPosToColumnPos(ALineIndex: integer; const S: atString; APos: integer): integer;
     function ColumnPosToCharPos(ALineIndex: integer; const S: atString; AColumn: integer): integer;
     function IndentUnindent(ALineIndex: integer; const Str: atString; ARight: boolean): atString;
-    procedure CalcCharOffsets(ALineIndex: integer; const S: atString; var AInfo: TATIntFixedArray; ACharsSkipped: integer = 0);
+    procedure CalcCharOffsets(ALineIndex: integer; const S: atString; out AInfo: TATIntFixedArray; ACharsSkipped: integer = 0);
     function CalcCharOffsetLast(ALineIndex: integer; const S: atString; ACharsSkipped: integer = 0): Int64;
     function FindWordWrapOffset(ALineIndex: integer; const S: atString; AColumns: Int64;
       const ANonWordChars: atString; AWrapIndented: boolean): integer;
@@ -688,7 +688,7 @@ end;
 
 
 procedure TATStringTabHelper.CalcCharOffsets(ALineIndex: integer; const S: atString;
-  var AInfo: TATIntFixedArray; ACharsSkipped: integer=0);
+  out AInfo: TATIntFixedArray; ACharsSkipped: integer=0);
 var
   NLen, NSize, NTabSize, NCharsSkipped: integer;
   NScalePercents: integer;

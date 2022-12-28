@@ -94,6 +94,7 @@ begin
   //show all lines not in found _folded_ subranges
   Line1:= RngOuter^.Y;
   Line2:= RngOuter^.Y2;
+  Checks:= nil;
   SetLength(Checks, Line2-Line1+1);
 
   for i:= 0 to High(Checks) do

@@ -718,7 +718,7 @@ var
   ListOffsets: TATIntFixedArray;
   ListInt: TATIntFixedArray;
   Dx: TATInt32FixedArray; //must be with 'longint' items
-  {$IF not Defined(LCLWin32) and not Defined(LCLWin64)}
+  {$IF not Defined(LCLWin32)}
   DxUTF8: TATInt32FixedArray; //must be with 'longint' items
   {$endif}
 
@@ -735,7 +735,7 @@ procedure CanvasTextOut(C: TCanvas;
   end;
 //
 var
-  {$IF not Defined(LCLWin32) and not Defined(LCLWin64)}
+  {$IF not Defined(LCLWin32)}
   Buf: string;
   {$else}
   bAllowLigatures: boolean;

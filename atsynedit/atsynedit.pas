@@ -798,7 +798,6 @@ type
     FPaintStarted: boolean;
     FPaintWorking: boolean;
     FTickMinimap: QWord;
-    FTickInvalidate: QWord;
     FTickAll: QWord;
     FShowOsBarVert: boolean;
     FShowOsBarHorz: boolean;
@@ -1015,7 +1014,7 @@ type
     function GetHotspots: TATHotspots;
     function GetGutterDecor: TATGutterDecor;
     procedure InitFoldbarCache(ACacheStartIndex: integer);
-    procedure InitLengthArray(var Lens: TATIntArray);
+    procedure InitLengthArray(out Lens: TATIntArray);
     function IsCaretFarFromVertEdge(ACommand: integer): boolean;
     function IsInvalidateAllowed: boolean; inline;
     function IsNormalLexerActive: boolean;
@@ -2851,7 +2850,6 @@ procedure TATSynEdit.UpdateScrollbarVert;
 var
   NeedBar: boolean;
   si: TScrollInfo;
-  NDelta: Int64;
 begin
   case FOptScrollStyleVert of
     aessHide:
@@ -8318,7 +8316,7 @@ var
   NIndexOfCurrentRng, NIndexOfCaretRng: integer;
 begin
   Result:= false;
-  FillChar(AProps, SizeOf(AProps), 0);
+  AProps:= Default(TATFoldBarProps);
 
   WrapItem:= FWrapInfo[AWrapItemIndex];
   NLineIndex:= WrapItem.NLineIndex;
@@ -8995,7 +8993,7 @@ begin
       FRegexLinks.InputString:= St.Lines[iLine];
 
       LinkIndex:= 0;
-      FillChar(LinkArray, SizeOf(LinkArray), 0);
+      FillChar(LinkArray{%H-}, SizeOf(LinkArray), 0);
       MatchPos:= 0;
       MatchLen:= 0;
       Inc(NRegexRuns);

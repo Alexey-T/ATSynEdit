@@ -14,7 +14,7 @@ var
 begin
   if not Strings.IsIndexValid(ALine) then exit;
 
-  FillChar(Data, SizeOf(Data), 0);
+  Data:= Default(TATBookmarkData);
   Data.LineNum:= ALine;
   Data.Kind:= ABmKind;
   Data.Hint:= StrNew(PChar(AHint));
@@ -74,7 +74,7 @@ begin
     St.Bookmarks.Delete(NIndex)
   else
   begin
-    FillChar(Data, SizeOf(Data), 0);
+    Data:= Default(TATBookmarkData);
     Data.LineNum:= ALine;
     Data.Kind:= ABmKind;
     Data.Hint:= StrNew(PChar(AHint));
@@ -333,7 +333,7 @@ var
   Data: TATBookmarkData;
   i: integer;
 begin
-  FillChar(Data{%H-}, SizeOf(Data), 0);
+  Data:= Default(TATBookmarkData);
   Data.Kind:= 1;
   Data.ShowInBookmarkList:= true;
   Data.AutoDelete:= bmadOption;

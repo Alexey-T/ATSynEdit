@@ -390,7 +390,7 @@ var
 begin
   Result.X:= 0;
   Result.Y:= -1;
-  FillChar(ADetails, SizeOf(ADetails), 0);
+  ADetails:= Default(TATEditorPosDetails);
 
   if (ATabHelper.CharSize.XScaled div ATEditorCharXScale <=0) or (ATabHelper.CharSize.Y<=0) then Exit;
   P.X:= Max(P.X, ARect.Left);
@@ -573,7 +573,7 @@ begin
     FEditorIndex);
 end;
 
-procedure TATSynEdit.InitLengthArray(var Lens: TATIntArray);
+procedure TATSynEdit.InitLengthArray(out Lens: TATIntArray);
 var
   St: TATStrings;
   i: integer;

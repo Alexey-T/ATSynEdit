@@ -423,7 +423,7 @@ var
   NIndex, i: integer;
   Data: TATBookmarkData;
 begin
-  FillChar(Data, SizeOf(Data), 0);
+  Data:= Default(TATBookmarkData);
   Data.Kind:= 1;
   Data.ShowInBookmarkList:= true;
 
@@ -570,7 +570,7 @@ begin
       ed.Strings.Bookmarks.Delete(NIndex)
     else
     begin
-      FillChar(Data, SizeOf(Data), 0);
+      Data:= Default(TATBookmarkData);
       Data.Kind:= 1;
       Data.LineNum:= ALine;
       Data.ShowInBookmarkList:= true;
@@ -1087,7 +1087,7 @@ begin
 
   FDecorImage:= (FDecorImage+1) mod ImagesDecor.Count;
 
-  FillChar(decor, SizeOf(decor), 0);
+  decor:= Default(TATGutterDecorData);
   decor.DeleteOnDelLine:= true;
   decor.TextAll:= V[1];
   decor.TextItalic:= true;

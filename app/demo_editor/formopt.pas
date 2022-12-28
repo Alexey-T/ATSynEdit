@@ -200,16 +200,20 @@ implementation
 
 {$R *.lfm}
 
+{
 const
   nameBm = 'bookmk';
   nameNums = 'nums';
   nameState = 'states';
   nameFold = 'fold';
   nameSep = 'separator';
+}
 
 procedure DoConfigEditor(ed: TATSynEdit);
+{
 var
   i: integer;
+  }
 begin
   with fmOpt do
   begin
