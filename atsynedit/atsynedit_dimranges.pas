@@ -10,9 +10,8 @@ interface
 
 uses
   Classes, SysUtils,
-  ATSynEdit_Markers,
-  ATSynEdit_LineParts;
-  
+  ATSynEdit_Markers;
+
 type
   { TATDimRanges }
 

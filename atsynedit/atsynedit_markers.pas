@@ -381,7 +381,7 @@ var
   NIndex, NIndexFrom, NIndexTo: integer;
   bExact: boolean;
 begin
-  FillChar(Item, SizeOf(Item), 0);
+  Item:= Default(TATMarkerItem);
   Item.PosX:= APos.X;
   Item.PosY:= APos.Y;
   Item.CoordX:= -1;

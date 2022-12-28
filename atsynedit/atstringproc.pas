@@ -695,7 +695,7 @@ var
   ch: widechar;
   i: integer;
 begin
-  FillChar(AInfo, SizeOf(AInfo), 0);
+  AInfo:= Default(TATIntFixedArray);
   NLen:= Min(Length(S), cMaxFixedArray);
   AInfo.Len:= NLen;
   if NLen=0 then Exit;
@@ -1234,7 +1234,7 @@ function StringOfCharW(ch: WideChar; Len: integer): UnicodeString;
 var
   i: integer;
 begin
-  SetLength(Result, Len);
+  SetLength(Result{%H-}, Len);
   for i:= 1 to Len do
     Result[i]:= ch;
 end;

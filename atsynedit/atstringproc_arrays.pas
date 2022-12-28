@@ -17,8 +17,8 @@ uses
 function PointsArrayToString(const A: TATPointArray): string;
 function MarkerArrayToString(const Ar: TATMarkerMarkerArray): string;
 
-procedure StringToMarkerArray(var Ar: TATMarkerMarkerArray; const AStr: string);
-procedure StringToPointsArray(var A: TATPointArray; const AStr: string);
+procedure StringToMarkerArray(out Ar: TATMarkerMarkerArray; const AStr: string);
+procedure StringToPointsArray(out A: TATPointArray; const AStr: string);
 
 implementation
 
@@ -74,7 +74,7 @@ begin
 end;
 
 
-procedure StringToMarkerArray(var Ar: TATMarkerMarkerArray; const AStr: string);
+procedure StringToMarkerArray(out Ar: TATMarkerMarkerArray; const AStr: string);
 var
   Sep: TATStringSeparator;
   Len: integer;
@@ -101,7 +101,7 @@ begin
   end;
 end;
 
-procedure StringToPointsArray(var A: TATPointArray; const AStr: string);
+procedure StringToPointsArray(out A: TATPointArray; const AStr: string);
 var
   Sep: TATStringSeparator;
   SItem, S1, S2: string;

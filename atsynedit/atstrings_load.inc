@@ -8,6 +8,7 @@ var
 begin
   Result:= false;
   if Stream.Size<Length(Sign)*cMinimalCountOfChars then Exit;
+  Buf:= '';
   SetLength(Buf, Length(Sign));
   Stream.Position:= 0;
   Stream.ReadBuffer(Buf[1], Length(Sign));
@@ -46,7 +47,7 @@ begin
 
   NSize:= BufSizeWords*2;
 
-  FillChar(Buf, SizeOf(Buf), 0);
+  FillChar(Buf{%H-}, SizeOf(Buf), 0);
   Stream.Position:= 0;
   Stream.Read(Buf, NSize);
   Stream.Position:= 0;
@@ -122,7 +123,7 @@ var
   N: integer;
 begin
   Result:= false;
-  FillChar(Buf, SizeOf(Buf), 0);
+  FillChar(Buf{%H-}, SizeOf(Buf), 0);
   Stream.Position:= 0;
   N:= Stream.Read(Buf, SizeOf(Buf)-1);
   Stream.Position:= 0;
@@ -581,7 +582,7 @@ var
           cEnc32LE,
           cEnc32BE:
             begin
-              SetLength(SQuad, Len div 4+1);
+              SetLength(SQuad{%H-}, Len div 4+1);
               Move(Buf[NStart], SQuad[0], Len);
               if FEncoding=cEnc32BE then
                 SSwapEndianUCS4(SQuad);

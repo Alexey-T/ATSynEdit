@@ -2280,7 +2280,7 @@ begin
   if (AX>=0) and (AY>=0) then
   begin
     //2 items per caret
-    SetLength(Ar, 2);
+    SetLength(Ar{%H-}, 2);
     Ar[0].X:= AX;
     Ar[0].Y:= AY;
     Ar[1].X:= -1;

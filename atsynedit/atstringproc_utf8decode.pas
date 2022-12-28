@@ -159,7 +159,7 @@ begin
   Error:=false;
   if s='' then
     exit;
-  SetLength(hs,length(s));
+  SetLength(hs{%H-},length(s));
   try
     i:=CustomUtf8ToUnicode(PUnicodeChar(hs),length(hs)+1,pchar(s),length(s));
     if i>0 then

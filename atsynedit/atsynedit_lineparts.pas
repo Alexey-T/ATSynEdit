@@ -100,7 +100,7 @@ end;
 
 procedure InitLinePart(out Part: TATLinePart);
 begin
-  FillChar(Part, SizeOf(Part), 0);
+  Part:= Default(TATLinePart);
   Part.ColorBG:= clNone;
   Part.ColorFont:= clNone;
   Part.ColorBorder:= clNone;
