@@ -4042,7 +4042,7 @@ var
 begin
   St:= Strings;
   bUseSetPixel:=
-    {$IF Defined(LCLWin32) or Defined(LCLWin64)} {$else} DoubleBuffered and {$endif}
+    {$IF Defined(LCLWin32)} {$else} DoubleBuffered and {$endif}
     (ACharSize.XScaled div ATEditorCharXScale = 1);
 
   if not FWrapInfo.IsIndexValid(AWrapIndex) then Exit; //e.g. main thread updated WrapInfo

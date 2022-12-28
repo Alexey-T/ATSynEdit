@@ -228,7 +228,7 @@ begin
 end;
 
 
-{$IF Defined(LCLWin32) or Defined(LCLWin64)}
+{$IF Defined(LCLWin32)}
 //to draw font ligatures
 function _TextOut_Windows(DC: HDC;
   X, Y: Integer;
@@ -277,7 +277,7 @@ end;
 procedure CanvasTextOutSimplest(C: TCanvas; X, Y: integer; const S: string);
 begin
   //don't set Brush.Style here, causes CudaText issue #3625
-  {$IF Defined(LCLWin32) or Defined(LCLWin64)}
+  {$IF Defined(LCLWin32)}
   Windows.TextOutA(C.Handle, X, Y, PChar(S), Length(S));
   {$else}
   LCLIntf.TextOut(C.Handle, X, Y, PChar(S), Length(S));
@@ -289,7 +289,7 @@ var
   Buf: string;
 begin
   //don't set Brush.Style here, causes CudaText issue #3625
-  {$IF Defined(LCLWin32) or Defined(LCLWin64)}
+  {$IF Defined(LCLWin32)}
   Windows.TextOutW(C.Handle, X, Y, PWChar(S), Length(S));
   {$else}
   Buf:= UTF8Encode(S);
@@ -300,7 +300,7 @@ end;
 
 procedure CanvasTextOutSimplest_PChar(C: TCanvas; X, Y: integer; Buf: PChar; Len: integer); inline;
 begin
-  {$IF Defined(LCLWin32) or Defined(LCLWin64)}
+  {$IF Defined(LCLWin32)}
   Windows.TextOutA(C.Handle, X, Y, Buf, Len);
   {$else}
   LCLIntf.TextOut(C.Handle, X, Y, Buf, Len);
@@ -359,7 +359,7 @@ procedure CanvasLineHorz(C: TCanvas; X1, Y, X2: integer; AWithEnd: boolean);
 begin
   //Assert(X2>X1, 'LineHorz x2>x1');
   if AWithEnd then Inc(X2);
-  {$IF Defined(LCLWin32) or Defined(LCLWin64)}
+  {$IF Defined(LCLWin32)}
   Windows.MoveToEx(C.Handle, X1, Y, nil);
   Windows.LineTo(C.Handle, X2, Y);
   {$else}
@@ -371,7 +371,7 @@ procedure CanvasLineVert(C: TCanvas; X, Y1, Y2: integer; AWithEnd: boolean);
 begin
   //Assert(Y2>Y1, 'LineVert y2>y1');
   if AWithEnd then Inc(Y2);
-  {$IF Defined(LCLWin32) or Defined(LCLWin64)}
+  {$IF Defined(LCLWin32)}
   Windows.MoveToEx(C.Handle, X, Y1, nil);
   Windows.LineTo(C.Handle, X, Y2);
   {$else}
@@ -805,7 +805,7 @@ begin
     end;
 
     C.Brush.Style:= cTextoutBrushStyle;
-    {$IF Defined(LCLWin32) or Defined(LCLWin64)}
+    {$IF Defined(LCLWin32)}
     _TextOut_Windows(C.Handle, APosX, APosY, nil, BufW, DxPointer, false{no ligatures});
     {$else}
     Buf:= BufW;
@@ -919,7 +919,7 @@ begin
 
       C.Brush.Style:= cTextoutBrushStyle;
 
-      {$IF Defined(LCLWin32) or Defined(LCLWin64)}
+      {$IF Defined(LCLWin32)}
       if AProps.HasAsciiNoTabs and not ATEditorOptions.TextoutNeedsOffsets then
       begin
         BufW:= PartStr;
@@ -1034,7 +1034,7 @@ begin
       C.Font.Style:= [];
       C.Brush.Style:= cTextoutBrushStyle;
 
-      {$IF Defined(LCLWin32) or Defined(LCLWin64)}
+      {$IF Defined(LCLWin32)}
       _TextOut_Windows(C.Handle,
         APosX+PixOffset1,
         APosY+AProps.TextOffsetFromLine,
