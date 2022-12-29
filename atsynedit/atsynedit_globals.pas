@@ -190,7 +190,7 @@ var
   ATEditorBitmaps: TATEditorBitmaps;
 
 var
-  ATEditorScalePercents: integer = 100;
+  ATEditorScalePercents: integer = 0;
   ATEditorScaleFontPercents: integer = 100; //if 0, it follows previous variable
 
 function ATEditorScale(AValue: integer): integer;
