@@ -31,25 +31,30 @@ end;
 
 procedure TATSynEdit.DoSelect_ColumnBlock_MoveEndUpDown(var AX, AY: integer; ALineDelta: integer);
 var
+  St: TATStrings;
   bDown: boolean;
   YMax, i: integer;
   Pnt: TPoint;
   Details: TATEditorPosDetails;
 begin
   if AY<0 then exit;
+  St:= Strings;
   bDown:= ALineDelta>0;
-  YMax:= Strings.Count-1;
+  YMax:= St.Count-1;
+
+  if (AY=0) and (ALineDelta<0) then exit;
+  if (AY>=St.Count-1) and (ALineDelta>0) then exit;
 
   if FOptCaretsPrimitiveColumnSelection then
   begin
-    AX:= Strings.ColumnPosToCharPos(AY, AX, FTabHelper);
+    AX:= St.ColumnPosToCharPos(AY, AX, FTabHelper);
     Pnt:= CaretPosToClientPos(Point(AX, AY));
     Inc(Pnt.Y, ALineDelta*FCharSize.Y);
     Pnt:= ClientPosToCaretPos(Pnt, Details);
     if Pnt.Y<0 then exit;
     AX:= Pnt.X;
     AY:= Pnt.Y;
-    AX:= Strings.CharPosToColumnPos(AY, AX, FTabHelper);
+    AX:= St.CharPosToColumnPos(AY, AX, FTabHelper);
   end
   else
   begin
