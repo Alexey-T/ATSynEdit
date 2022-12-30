@@ -42,8 +42,14 @@ begin
   bDown:= ALineDelta>0;
   YMax:= St.Count-1;
 
-  if (AY=0) and (ALineDelta<0) then exit;
-  if (AY>=St.Count-1) and (ALineDelta>0) then exit;
+  if not bDown then
+  begin
+    if AY=0 then exit;
+  end
+  else
+  begin
+    if AY>=YMax then exit;
+  end;
 
   if FOptCaretsPrimitiveColumnSelection then
   begin
