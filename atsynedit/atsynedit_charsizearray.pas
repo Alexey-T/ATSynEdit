@@ -175,7 +175,9 @@ begin
   }
 
   //"Miscellaneous Symbols" block which goes from 0x2600 to 0x26FF
-  for i:= $2600 to $26FF do
+  for i:= $2600 to $265F do
+    FixedSizes[i]:= uw_fullwidth;
+  for i:= $2668 to $26FF do
     FixedSizes[i]:= uw_fullwidth;
 
   //combining chars
