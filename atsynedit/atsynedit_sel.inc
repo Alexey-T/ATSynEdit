@@ -128,17 +128,15 @@ begin
   //jump lefter
   S:= St.Lines[P1.Y];
   N:= P1.X;
-  if (N>0) and (N<=Length(S)) then
-    while (N>0) and IsCharWord(S[N]) do
-      Dec(N);
+  while (N>0) and (N<=Length(S)) and IsCharWord(S[N]) do
+    Dec(N);
   P1.X:= N;
 
   //jump righter
   S:= St.Lines[P2.Y];
   N:= P2.X;
-  if (N<Length(S)) then
-    while (N<Length(S)) and IsCharWord(S[N+1]) do
-      Inc(N);
+  while (N<Length(S)) and IsCharWord(S[N+1]) do
+    Inc(N);
   P2.X:= N;
 
   with Carets[ACaretIndex] do
