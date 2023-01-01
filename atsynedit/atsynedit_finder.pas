@@ -2091,6 +2091,7 @@ begin
 
   InitProgress;
   IndexLineMax:= Strs.Count-PartCount;
+  if IndexLineMax<0 then exit;
 
     if not OptBack then
     //forward search
