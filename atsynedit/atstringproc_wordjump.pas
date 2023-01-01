@@ -113,6 +113,7 @@ var
 begin
   n:= AOffset;
   NLen:= Length(S);
+  if NLen=0 then exit;
 
   if AJumpSimple then
     GroupOfChar:= @GroupOfChar_Simple
