@@ -16,7 +16,9 @@ type
   TATWordJump = (
     cWordjumpToNext,
     cWordjumpToEndOrNext,
-    cWordjumpToPrev
+    cWordjumpToPrev,
+    cWordjumpPrimitiveNext,
+    cWordjumpPrimitivePrev
     );
 
 function SFindWordOffset(const S: atString; AOffset: integer; AJump: TATWordJump; ABigJump: boolean;
@@ -117,6 +119,18 @@ begin
     GroupOfChar:= @GroupOfChar_Usual;
 
   case AJump of
+    cWordjumpPrimitiveNext:
+      begin
+        while (n<Length(S)) and IsCharWord(S[n+1], ANonWordChars) do
+          Inc(n);
+      end;
+
+    cWordjumpPrimitivePrev:
+      begin
+        while (n>0) and (n<=Length(S)) and IsCharWord(S[n], ANonWordChars) do
+          Dec(n);
+      end;
+
     cWordjumpToNext:
       JumpToNext(n);
 
