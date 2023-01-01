@@ -108,6 +108,8 @@ end;
 procedure TATSynEdit.DoSelect_WordRange(ACaretIndex: integer; P1, P2: TPoint);
 var
   St: TATStrings;
+  S: atString;
+  N: integer;
 begin
   St:= Strings;
   if not Carets.IsIndexValid(ACaretIndex) then Exit;
@@ -120,8 +122,24 @@ begin
     SwapInt(P1.Y, P2.Y);
   end;
 
-  P1.X:= SFindWordOffset(St.Lines[P1.Y], P1.X, cWordjumpToPrev, false, FOptNonWordChars);
-  P2.X:= SFindWordOffset(St.Lines[P2.Y], P2.X, cWordjumpToNext, false, FOptNonWordChars);
+  //we don't use ATStringProc_WordJump here, because we need more primitive logic:
+  //jump over wordchars, but don't jump over groups of symbols; like Sublime Text
+
+  //jump lefter
+  S:= St.Lines[P1.Y];
+  N:= P1.X;
+  if (N>0) and (N<=Length(S)) then
+    while (N>0) and IsCharWord(S[N]) do
+      Dec(N);
+  P1.X:= N;
+
+  //jump righter
+  S:= St.Lines[P2.Y];
+  N:= P2.X;
+  if (N<Length(S)) then
+    while (N<Length(S)) and IsCharWord(S[N+1]) do
+      Inc(N);
+  P2.X:= N;
 
   with Carets[ACaretIndex] do
   begin
