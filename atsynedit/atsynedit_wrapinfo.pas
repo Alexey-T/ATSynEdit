@@ -120,7 +120,7 @@ begin
   end
   else
   begin
-    if AIndex>=0 then
+    if (AIndex>=0) and (AIndex<FList.Count) then
       Result:= FList[AIndex]
     else
       Result:= Default(TATWrapItem);
