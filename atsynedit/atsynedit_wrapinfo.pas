@@ -112,7 +112,12 @@ end;
 function TATWrapInfo.GetData(AIndex: integer): TATWrapItem;
 begin
   if FVirtualMode then
-    Result.Init(AIndex, 1, FStrings.LinesLen[AIndex], 0, cWrapItemFinal, true)
+  begin
+    if FStrings.IsIndexValid(AIndex) then
+      Result.Init(AIndex, 1, FStrings.LinesLen[AIndex], 0, cWrapItemFinal, true)
+    else
+      Result:= Default(TATWrapItem);
+  end
   else
   begin
     if AIndex>=0 then
