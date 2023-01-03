@@ -31,7 +31,7 @@ begin
 
   //usual text
   Str:= UTF8Decode(AClipboardText);
-  bAtLineStart:= FOptPasteWithEolAtLineStart and not Carets.IsSelection and SEndsWithEol(Str);
+  bAtLineStart:= FOptPasteWithEolAtLineStart and not Carets.IsSelection and SEndsWithEol(Str) and (Length(Str)>1);
   if ModeOneLine then
   begin
     Str:= SRemoveNewlineChars(Str);
