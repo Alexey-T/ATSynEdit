@@ -14,14 +14,14 @@ interface
 
 uses
   {$ifdef Windows}
-  Windows, Messages,
+  Windows,
   ATSynEdit_Adapter_IME,
   {$endif}
   InterfaceBase,
   Classes, SysUtils, Graphics,
   Controls, ExtCtrls, Menus, Forms, Clipbrd,
   syncobjs, gdeque,
-  LMessages, LCLType, LCLVersion,
+  Messages, LMessages, LCLType, LCLVersion,
   LazUTF8,
   EncConv,
   BGRABitmap,
@@ -1743,6 +1743,10 @@ type
     {$endif}
     {$endif}
 
+    {$ifdef LCLCOCOA}
+    procedure COCOA_IM_COMPOSITION(var Message: TLMessage); message LM_IM_COMPOSITION;
+    {$endif}
+
   published
     property Align;
     property Anchors;
@@ -2098,6 +2102,9 @@ uses
   {$ifdef LCLGTK2}
   gtk2,
   Gtk2Globals,
+  {$endif}
+  {$ifdef LCLCOCOA}
+  ATSynEdit_Adapter_CocoaIME,
   {$endif}
   ATStringProc_TextBuffer,
   ATSynEdit_Commands,
@@ -4678,6 +4685,10 @@ begin
   FAdapterIME:= TATAdapterIMEStandard.Create;
   {$endif}
 
+  {$ifdef LCLCOCOA}
+  FAdapterIME:= TATAdapterCocoaIME.Create(self);
+  {$endif}
+
   FPaintLocked:= 0;
   FPaintFlags:= [cIntFlagBitmap];
 
@@ -6010,6 +6021,13 @@ procedure TATSynEdit.WMIME_EndComposition(var Msg: TMessage);
 begin
   if Assigned(FAdapterIME) then
     FAdapterIME.ImeEndComposition(Self, Msg);
+end;
+{$endif}
+
+{$ifdef LCLCOCOA}
+procedure TATSynEdit.COCOA_IM_COMPOSITION(var Message: TMessage);
+begin
+  Message.Result := PtrInt(FAdapterIME);
 end;
 {$endif}
 
