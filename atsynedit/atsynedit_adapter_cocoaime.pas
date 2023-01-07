@@ -1,5 +1,5 @@
 {
-  ATSynEdit MacOS IME Adapter:
+  ATSynEdit macOS IME Adapter:
   1. various IME are fully supported, such as Chinese/Japanese/Korean and DeadKeys
   2. MultiCarets and MultiSelections fully supported
   3. GroupUndo or not are both fully supported
@@ -14,9 +14,11 @@ unit ATSynEdit_Adapter_CocoaIME;
 interface
 
 uses
+  SysUtils, Classes,
   CocoaPrivate,
-  Classes, SysUtils,
-  ATSynEdit_Adapters, AtSynEdit, ATSynEdit_Carets;
+  ATSynEdit,
+  ATSynEdit_Adapters,
+  ATSynEdit_Carets;
 
 type
   { TATAdapterCocoaIME }
@@ -34,7 +36,7 @@ type
   private
     procedure selectIntermediateText( var params: TCocoaIMEParameters );
     function calcBound( var params: TCocoaIMEParameters ) : TRect;
-    function getSuitableCaret() : TATCaretItem;
+    function getSuitableCaret(): TATCaretItem;
   public
     constructor Create( const editor: TATSynEdit );
     destructor Destroy; override;
