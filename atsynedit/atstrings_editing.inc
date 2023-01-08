@@ -566,7 +566,8 @@ begin
       Str:= LineSub(AFromY, 1, AFromX);
     Str:= Str + LineSub(AToY, AToX+1, MaxInt);
     Lines[AFromY]:= Str;
-
+    LinesEnds[AFromY]:= LinesEnds[AToY];
+    
     //del middle lines
     LineBlockDelete(AFromY+1, AToY);
 
