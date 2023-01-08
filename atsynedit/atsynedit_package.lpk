@@ -35,7 +35,7 @@
     <Description Value="Multi-line editor control, used in CudaText editor. Supports syntax highlighting using EControl engine or other engines."/>
     <License Value="MPL 2.0, LGPL"/>
     <Version Major="2" Minor="10"/>
-    <Files Count="40">
+    <Files Count="41">
       <Item1>
         <Filename Value="atsynedit_register.pas"/>
         <HasRegisterProc Value="True"/>
@@ -197,6 +197,10 @@
         <Filename Value="atsynedit_globals.pas"/>
         <UnitName Value="ATSynEdit_Globals"/>
       </Item40>
+      <Item41>
+        <Filename Value="atsynedit_adapter_cocoaime.pas"/>
+        <UnitName Value="ATSynEdit_Adapter_CocoaIME"/>
+      </Item41>
     </Files>
     <CompatibilityMode Value="True"/>
     <RequiredPkgs Count="5">
