@@ -12,7 +12,7 @@ uses
   Classes, SysUtils, Graphics, StrUtils,
   ATSynEdit;
 
-procedure DoEditorExportToHTML(Ed: TATSynEdit;
+procedure EditorExportToHTML(Ed: TATSynEdit;
   L: TStringList;
   APosBegin, APosEnd: TPoint;
   const APageTitle, AFontName: string;
@@ -88,7 +88,7 @@ begin
   S:= StringReplace(S, '>', '&gt;', [rfReplaceAll]);
 end;
 
-procedure DoEditorExportToHTML(Ed: TATSynEdit;
+procedure EditorExportToHTML(Ed: TATSynEdit;
   L: TStringList;
   APosBegin, APosEnd: TPoint;
   const APageTitle, AFontName: string;
