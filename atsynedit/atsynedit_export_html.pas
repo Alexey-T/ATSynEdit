@@ -13,7 +13,7 @@ uses
   ATSynEdit;
 
 procedure EditorExportToHTML(Ed: TATSynEdit;
-  L: TStringList;
+  AOutput: TStringList;
   APosBegin, APosEnd: TPoint;
   const APageTitle, AFontName: string;
   AFontSize: integer; AWithNumbers: boolean;
@@ -89,7 +89,7 @@ begin
 end;
 
 procedure EditorExportToHTML(Ed: TATSynEdit;
-  L: TStringList;
+  AOutput: TStringList;
   APosBegin, APosEnd: TPoint;
   const APageTitle, AFontName: string;
   AFontSize: integer; AWithNumbers: boolean;
@@ -177,50 +177,50 @@ begin
 
     _AddPreToStrings(LCode);
 
-    L.Add('<html>');
-    L.Add('<head>');
-    L.Add('  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />');
-    L.Add('  <title>'+APageTitle+'</title>');
-    L.Add('  <style>');
-    L.Add('    body, table {');
-    L.Add('      color: '+TATHtmlColorParserA.ColorToHtmlString(NColorFont)+';');
-    L.Add('      background-color: '+TATHtmlColorParserA.ColorToHtmlString(AColorBg)+';');
-    L.Add('    }');
-    L.Add('    pre, code {');
-    L.Add('      font-family: "'+AFontName+'", sans-serif;');
-    L.Add('      font-size: '+IntToStr(AFontSize)+'px;');
-    L.Add('    }');
-    L.Add('    table, td {');
-    L.Add('      border-style: hidden;');
-    L.Add('    }');
-    L.Add('    td {');
-    L.Add('      vertical-align: top;');
-    L.Add('    }');
-    L.Add('    td.num {');
-    L.Add('      color: '+TATHtmlColorParserA.ColorToHtmlString(AColorNumbers)+';');
-    L.Add('      text-align: right;');
-    L.Add('    }');
-    L.AddStrings(LStyles);
-    L.Add('  </style>');
-    L.Add('</head>');
-    L.Add('<body>');
+    AOutput.Add('<html>');
+    AOutput.Add('<head>');
+    AOutput.Add('  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />');
+    AOutput.Add('  <title>'+APageTitle+'</title>');
+    AOutput.Add('  <style>');
+    AOutput.Add('    body, table {');
+    AOutput.Add('      color: '+TATHtmlColorParserA.ColorToHtmlString(NColorFont)+';');
+    AOutput.Add('      background-color: '+TATHtmlColorParserA.ColorToHtmlString(AColorBg)+';');
+    AOutput.Add('    }');
+    AOutput.Add('    pre, code {');
+    AOutput.Add('      font-family: "'+AFontName+'", sans-serif;');
+    AOutput.Add('      font-size: '+IntToStr(AFontSize)+'px;');
+    AOutput.Add('    }');
+    AOutput.Add('    table, td {');
+    AOutput.Add('      border-style: hidden;');
+    AOutput.Add('    }');
+    AOutput.Add('    td {');
+    AOutput.Add('      vertical-align: top;');
+    AOutput.Add('    }');
+    AOutput.Add('    td.num {');
+    AOutput.Add('      color: '+TATHtmlColorParserA.ColorToHtmlString(AColorNumbers)+';');
+    AOutput.Add('      text-align: right;');
+    AOutput.Add('    }');
+    AOutput.AddStrings(LStyles);
+    AOutput.Add('  </style>');
+    AOutput.Add('</head>');
+    AOutput.Add('<body>');
 
     if AWithNumbers then
     begin
-      L.Add('<table>');
-      L.Add('<tr><td class="num">');
-      L.AddStrings(LNums);
-      L.Add('</td>');
-      L.Add('<td>');
+      AOutput.Add('<table>');
+      AOutput.Add('<tr><td class="num">');
+      AOutput.AddStrings(LNums);
+      AOutput.Add('</td>');
+      AOutput.Add('<td>');
     end;
 
-    L.AddStrings(LCode);
+    AOutput.AddStrings(LCode);
 
     if AWithNumbers then
-      L.Add('</td></tr></table>');
+      AOutput.Add('</td></tr></table>');
 
-    L.Add('</body>');
-    L.Add('</html>');
+    AOutput.Add('</body>');
+    AOutput.Add('</html>');
 
   finally
     FreeAndNil(LNums);
