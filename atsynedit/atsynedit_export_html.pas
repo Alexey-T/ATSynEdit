@@ -16,7 +16,8 @@ uses
   ATStringProc_HtmlColor;
 
 procedure DoEditorExportToHTML(Ed: TATSynEdit;
-  const AFilename, APageTitle, AFontName: string;
+  L: TStringList;
+  const APageTitle, AFontName: string;
   AFontSize: integer; AWithNumbers: boolean;
   AColorBg, AColorNumbers: TColor);
 
@@ -83,12 +84,14 @@ begin
   S:= StringReplace(S, '>', '&gt;', [rfReplaceAll]);
 end;
 
-procedure DoEditorExportToHTML(Ed: TATSynEdit; const AFilename, APageTitle,
-  AFontName: string; AFontSize: integer; AWithNumbers: boolean; AColorBg,
-  AColorNumbers: TColor);
+procedure DoEditorExportToHTML(Ed: TATSynEdit;
+  L: TStringList;
+  const APageTitle, AFontName: string;
+  AFontSize: integer; AWithNumbers: boolean;
+  AColorBg, AColorNumbers: TColor);
 var
   St: TATStrings;
-  L, LStyles, LCode, LNums: TStringList;
+  LStyles, LCode, LNums: TStringList;
   Parts: TATLineParts;
   PPart: ^TATLinePart;
   NColorFont: TColor;
@@ -104,10 +107,6 @@ begin
   NColorFont:= clBlack;
   FillChar(Parts, Sizeof(Parts), 0);
 
-  if FileExists(AFilename) then
-    DeleteFile(AFilename);
-
-  L:= TStringList.Create;
   LStyles:= TStringList.Create;
   LCode:= TStringList.Create;
   LNums:= TStringList.Create;
@@ -216,12 +215,10 @@ begin
     L.Add('</body>');
     L.Add('</html>');
 
-    L.SaveToFile(AFilename);
   finally
     FreeAndNil(LNums);
     FreeAndNil(LCode);
     FreeAndNil(LStyles);
-    FreeAndNil(L);
   end;
 end;
 
