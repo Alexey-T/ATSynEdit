@@ -8974,7 +8974,8 @@ begin
   if not OptShowURLs then
   begin
     if Assigned(FAttribs) then
-      FAttribs.DeleteWithTag(ATEditorOptions.UrlMarkerTag);
+      if FAttribs.DeleteWithTag(ATEditorOptions.UrlMarkerTag) then
+        Update;
     exit;
   end;
 
