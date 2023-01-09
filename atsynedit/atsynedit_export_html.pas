@@ -10,18 +10,22 @@ interface
 
 uses
   Classes, SysUtils, Graphics, StrUtils,
-  ATStrings,
-  ATSynEdit,
-  ATSynEdit_LineParts,
-  ATStringProc_HtmlColor;
+  ATSynEdit;
 
 procedure DoEditorExportToHTML(Ed: TATSynEdit;
   L: TStringList;
+  APosBegin, APosEnd: TPoint;
   const APageTitle, AFontName: string;
   AFontSize: integer; AWithNumbers: boolean;
   AColorBg, AColorNumbers: TColor);
 
 implementation
+
+uses
+  Math,
+  ATStrings,
+  ATSynEdit_LineParts,
+  ATStringProc_HtmlColor;
 
 
 procedure DoCssStyle(AColorFont, AColorBg, AColorFontDef, AColorBgDef: TColor;
@@ -86,6 +90,7 @@ end;
 
 procedure DoEditorExportToHTML(Ed: TATSynEdit;
   L: TStringList;
+  APosBegin, APosEnd: TPoint;
   const APageTitle, AFontName: string;
   AFontSize: integer; AWithNumbers: boolean;
   AColorBg, AColorNumbers: TColor);
@@ -99,7 +104,7 @@ var
   NeedStyleFont, NeedStyleBg, NeedStyle: boolean;
   S, StrText: string;
   StyleName, StyleText: string;
-  i, j: integer;
+  iLine, iPart: integer;
 begin
   St:= Ed.Strings;
   if St.Count=0 then exit;
@@ -114,24 +119,27 @@ begin
   try
     LStyles.UseLocale:= false; //speedup IndexOf
 
-    for i:= 0 to St.Count-1 do
-      LNums.Add(IntToStr(i+1)+'&nbsp;');
+    for iLine:= 0 to St.Count-1 do
+      LNums.Add(IntToStr(iLine+1)+'&nbsp;');
     _AddPreToStrings(LNums);
 
-    for i:= 0 to St.Count-1 do
+    for iLine:= APosBegin.Y to Min(St.Count-1, APosEnd.Y) do
     begin
       S:= '';
-      if not Ed.DoCalcLineHiliteEx(i, Parts, AColorBG, NColorAfter) then break;
-      for j:= 0 to High(Parts) do
+      if not Ed.DoCalcLineHiliteEx(iLine, Parts, AColorBG, NColorAfter) then break;
+      for iPart:= 0 to High(Parts) do
       begin
-        PPart:= @Parts[j];
+        PPart:= @Parts[iPart];
         if PPart^.Len=0 then Break;
+
+        if (iLine=APosBegin.Y) and (PPart^.Offset<APosBegin.X) then Continue;
+        if (iLine=APosEnd.Y) and (PPart^.Offset>=APosEnd.X) then Break;
 
         NeedStyleFont:= PPart^.ColorFont<>NColorFont;
         NeedStyleBg:= PPart^.ColorBG<>AColorBG;
         NeedStyle:= NeedStyleFont or NeedStyleBg;
 
-        StrText:= St.LineSub(i, PPart^.Offset+1, PPart^.Len);
+        StrText:= St.LineSub(iLine, PPart^.Offset+1, PPart^.Len);
         EscapeSpecChars(StrText);
 
         if _IsSpaces(StrText) and not NeedStyleBg then
