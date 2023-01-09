@@ -209,7 +209,7 @@ type
     CaretCount: integer;
     FirstLineIndentChars,
     FirstLineIndentColumns: integer;
-    FileName: ShortString; //AnsiString is harder to read from OS
+    FileName: array[0..1023] of char; //if String, record cannot be read/write to OS clipboard
     ModifiedVersion: QWord;
     TickOnCopy: QWord;
   end;

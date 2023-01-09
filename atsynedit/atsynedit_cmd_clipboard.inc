@@ -335,6 +335,7 @@ begin
       ClipExData.FirstLineIndentChars:= SGetIndentChars(SLine);
       ClipExData.FirstLineIndentColumns:= TabHelper.CharPosToColumnPos(Y1, SLine, ClipExData.FirstLineIndentChars);
       ClipExData.FileName:= Self.FileName;
+      ClipExData.FileName[High(ClipExData.FileName)]:= #0;
       ClipExData.ModifiedVersion:= Strings.ModifiedVersion;
       ClipExData.TickOnCopy:= GetTickCount64;
       AClipboardObject.AddFormat(
