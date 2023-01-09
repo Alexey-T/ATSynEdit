@@ -73,15 +73,16 @@ begin
   Result:= true;
 end;
 
-
 procedure _AddPreToStrings(L: TStringList);
 begin
-  if L.Count=0 then exit;
-  L[0]:= '<pre><code>'+L[0];
-  L[L.Count-1]:= L[L.Count-1]+'</code></pre>';
+  if L.Count>0 then
+  begin
+    L[0]:= '<pre><code>'+L[0];
+    L[L.Count-1]:= L[L.Count-1]+'</code></pre>';
+  end;
 end;
 
-procedure EscapeSpecChars(var S: string); inline;
+procedure _EscapeSpecChars(var S: string);
 begin
   S:= StringReplace(S, '&', '&amp;', [rfReplaceAll]);
   S:= StringReplace(S, '<', '&lt;', [rfReplaceAll]);
@@ -140,7 +141,7 @@ begin
         NeedStyle:= NeedStyleFont or NeedStyleBg;
 
         StrText:= St.LineSub(iLine, PPart^.Offset+1, PPart^.Len);
-        EscapeSpecChars(StrText);
+        _EscapeSpecChars(StrText);
 
         if _IsSpaces(StrText) and not NeedStyleBg then
         begin
