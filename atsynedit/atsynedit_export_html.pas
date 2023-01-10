@@ -112,7 +112,7 @@ var
   PPart: ^TATLinePart;
   NColorAfter: TColor;
   NeedStyleFont, NeedStyleBg, NeedStyle: boolean;
-  S, SToken: string;
+  SLine, SToken: string;
   iLine, iPart: integer;
 begin
   St:= Ed.Strings;
@@ -136,7 +136,7 @@ begin
 
     for iLine:= APosBegin.Y to Min(St.Count-1, APosEnd.Y) do
     begin
-      S:= '';
+      SLine:= '';
       if not Ed.DoCalcLineHiliteEx(iLine, Parts, AColorBG, NColorAfter) then break;
       for iPart:= 0 to High(Parts) do
       begin
@@ -155,33 +155,33 @@ begin
 
         if _IsSpaces(SToken) and not NeedStyleBg then
         begin
-          S+= SToken;
+          SLine+= SToken;
           Continue;
         end;
 
-        if (PPart^.FontStyles and afsFontBold)<>0 then S+= '<b>';
-        if (PPart^.FontStyles and afsFontItalic)<>0  then S+= '<i>';
-        if (PPart^.FontStyles and afsFontCrossed)<>0 then S+= '<s>';
+        if (PPart^.FontStyles and afsFontBold)<>0 then SLine+= '<b>';
+        if (PPart^.FontStyles and afsFontItalic)<>0  then SLine+= '<i>';
+        if (PPart^.FontStyles and afsFontCrossed)<>0 then SLine+= '<s>';
 
         if NeedStyle then
         begin
-          S+= '<span style="';
+          SLine+= '<span style="';
           if NeedStyleFont then
-            S+= 'color:' + TATHtmlColorParserA.ColorToHtmlString(PPart^.ColorFont) + ';';
+            SLine+= 'color:' + TATHtmlColorParserA.ColorToHtmlString(PPart^.ColorFont) + ';';
           if NeedStyleBg then
-            S+= 'background:' + TATHtmlColorParserA.ColorToHtmlString(PPart^.ColorBG) + ';';
-          S+= '">';
+            SLine+= 'background:' + TATHtmlColorParserA.ColorToHtmlString(PPart^.ColorBG) + ';';
+          SLine+= '">';
         end;
 
-        S+= SToken;
+        SLine+= SToken;
         if NeedStyle then
-          S+= '</span>';
+          SLine+= '</span>';
 
-        if (PPart^.FontStyles and afsFontCrossed)<>0  then S+= '</s>';
-        if (PPart^.FontStyles and afsFontItalic)<>0  then S+= '</i>';
-        if (PPart^.FontStyles and afsFontBold)<>0  then S+= '</b>';
+        if (PPart^.FontStyles and afsFontCrossed)<>0  then SLine+= '</s>';
+        if (PPart^.FontStyles and afsFontItalic)<>0  then SLine+= '</i>';
+        if (PPart^.FontStyles and afsFontBold)<>0  then SLine+= '</b>';
       end;
-      ListLines.Add(S);
+      ListLines.Add(SLine);
     end;
 
     _AddPreToStrings(ListLines);
