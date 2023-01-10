@@ -109,7 +109,6 @@ var
   ListLines, ListNums: TStringList;
   Parts: TATLineParts;
   PPart: ^TATLinePart;
-  NColorFont: TColor;
   NColorAfter: TColor;
   NeedStyleFont, NeedStyleBg, NeedStyle: boolean;
   S, StrText: string;
@@ -118,7 +117,6 @@ begin
   St:= Ed.Strings;
   if EditorIsEmpty(Ed) then exit;
 
-  NColorFont:= clNone;
   FillChar(Parts{%H-}, Sizeof(Parts), 0);
 
   ListLines:= TStringList.Create;
@@ -147,7 +145,7 @@ begin
         if (iLine=APosBegin.Y) and (PPart^.Offset<APosBegin.X) then Continue;
         if (iLine=APosEnd.Y) and (PPart^.Offset>=APosEnd.X) then Break;
 
-        NeedStyleFont:= PPart^.ColorFont<>NColorFont;
+        NeedStyleFont:= true; //PPart^.ColorFont<>NColorFont;
         NeedStyleBg:= PPart^.ColorBG<>AColorBG;
         NeedStyle:= NeedStyleFont or NeedStyleBg;
 
@@ -197,8 +195,7 @@ begin
       AFontName+=',Consolas,Monaco,Lucida Console,monospace'
     else
       AFontName:= 'Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New,monospace';
-    AOutput.Add(Format('<body style="color: %s; background: %s; font-family: %s; font-size: %dpx;">', [
-      TATHtmlColorParserA.ColorToHtmlString(NColorFont),
+    AOutput.Add(Format('<body style="background: %s; font-family: %s; font-size: %dpx;">', [
       TATHtmlColorParserA.ColorToHtmlString(AColorBg),
       AFontName,
       AFontSize
