@@ -1477,7 +1477,7 @@ type
     property ClientHeight: integer read FClientH;
     //updates
     procedure Invalidate; override;
-    procedure Update(AUpdateWrapInfo: boolean=false; AForceRepaint: boolean=false; AForceOnScroll: boolean=false); reintroduce;
+    procedure Update(AUpdateWrapInfo: boolean=false; AForceRepaint: boolean=false; AForceOnScroll: boolean=false; AUpdateTempSel: boolean=false); reintroduce;
     procedure UpdateWrapInfo(AForceUpdate: boolean=false; AAllowCachedUpdate: boolean=true);
     procedure UpdateFoldedFromLinesHidden;
     procedure UpdateScrollInfoFromSmoothPos(var AInfo: TATEditorScrollInfo; const APos: Int64);
@@ -5127,7 +5127,7 @@ begin
   inherited;
 end;
 
-procedure TATSynEdit.Update(AUpdateWrapInfo: boolean=false; AForceRepaint: boolean=false; AForceOnScroll: boolean=false);
+procedure TATSynEdit.Update(AUpdateWrapInfo: boolean=false; AForceRepaint: boolean=false; AForceOnScroll: boolean=false; AUpdateTempSel: boolean=false);
 begin
   if not IsRepaintEnabled then exit;
 
@@ -5135,7 +5135,8 @@ begin
     FWrapUpdateNeeded:= true;
 
   //do it here to allow apps to remove carets and call Update + CalcLineHiliteEx to get LineParts w/o selections
-  Carets.GetSelections(FSel);
+  if AUpdateTempSel then
+    Carets.GetSelections(FSel);
 
   InvalidateEx(AForceRepaint, AForceOnScroll);
 end;

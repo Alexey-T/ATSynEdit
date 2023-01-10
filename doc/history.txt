@@ -1,6 +1,7 @@
 2023.01.10
 * change: function to export HTML was renamed and has added parameters
-* change: function DoCalcLineHiliteEx has added parameter
+* change: method DoCalcLineHiliteEx has param AWithSelection
++ add: method Update has param AUpdateTempSel 
 
 2022.11.14
 * change: removed func RectMicromapMark
