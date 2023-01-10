@@ -64,6 +64,14 @@ begin
 end;
 }
 
+function EditorIsEmpty(Ed: TATSynEdit): boolean;
+var
+  Str: TATStrings;
+begin
+  Str:= Ed.Strings;
+  Result:=
+    (Str.Count=0) or ((Str.Count=1) and (Str.LinesLen[0]=0));
+end;
 
 function _IsSpaces(const S: string): boolean;
 var
@@ -108,8 +116,7 @@ var
   iLine, iPart: integer;
 begin
   St:= Ed.Strings;
-  if St.Count=0 then exit;
-  if (St.Count=1) and (St.LinesLen[0]=0) then exit;
+  if EditorIsEmpty(Ed) then exit;
 
   NColorFont:= clBlack;
   FillChar(Parts{%H-}, Sizeof(Parts), 0);
