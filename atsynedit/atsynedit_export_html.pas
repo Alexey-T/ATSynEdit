@@ -78,7 +78,8 @@ var
   i: integer;
 begin
   for i:= 1 to Length(S) do
-    if S[i]<>' ' then exit(false);
+    if (S[i]<>' ') and (S[i]<>#9) then
+      exit(false);
   Result:= true;
 end;
 
@@ -111,7 +112,7 @@ var
   PPart: ^TATLinePart;
   NColorAfter: TColor;
   NeedStyleFont, NeedStyleBg, NeedStyle: boolean;
-  S, StrText: string;
+  S, SToken: string;
   iLine, iPart: integer;
 begin
   St:= Ed.Strings;
@@ -149,12 +150,12 @@ begin
         NeedStyleBg:= PPart^.ColorBG<>AColorBG;
         NeedStyle:= NeedStyleFont or NeedStyleBg;
 
-        StrText:= St.LineSub(iLine, PPart^.Offset+1, PPart^.Len);
-        _EscapeSpecChars(StrText);
+        SToken:= St.LineSub(iLine, PPart^.Offset+1, PPart^.Len);
+        _EscapeSpecChars(SToken);
 
-        if _IsSpaces(StrText) and not NeedStyleBg then
+        if _IsSpaces(SToken) and not NeedStyleBg then
         begin
-          S+= StrText;
+          S+= SToken;
           Continue;
         end;
 
@@ -172,7 +173,7 @@ begin
           S+= '">';
         end;
 
-        S+= StrText;
+        S+= SToken;
         if NeedStyle then
           S+= '</span>';
 
