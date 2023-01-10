@@ -152,7 +152,7 @@ type
     function IsSelectionInAllCarets: boolean;
     function IsSelectionWithTouching: boolean;
     function IsAnyCaretInVisibleRect(const R: TRect): boolean;
-    procedure GetSelections(var D: TATCaretSelections);
+    procedure GetSelections(out D: TATCaretSelections);
     function CaretAtEdge(AEdge: TATCaretEdge): TPoint;
     function DebugText: string;
     property ManyAllowed: boolean read FManyAllowed write FManyAllowed;
@@ -1171,7 +1171,7 @@ begin
     Sort;
 end;
 
-procedure TATCarets.GetSelections(var D: TATCaretSelections);
+procedure TATCarets.GetSelections(out D: TATCaretSelections);
 var
   Item: TATCaretItem;
   NCount, NLen, i: integer;
