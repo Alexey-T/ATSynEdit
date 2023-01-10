@@ -114,12 +114,18 @@ begin
   FillChar(Parts, Sizeof(Parts), 0);
 
   ListLines:= TStringList.Create;
-  ListNums:= TStringList.Create;
+  if AWithNumbers then
+    ListNums:= TStringList.Create
+  else
+    ListNums:= nil;
 
   try
-    for iLine:= 0 to St.Count-1 do
-      ListNums.Add(IntToStr(iLine+1)+'&nbsp;');
-    _AddPreToStrings(ListNums);
+    if AWithNumbers then
+    begin
+      for iLine:= 0 to St.Count-1 do
+        ListNums.Add(IntToStr(iLine+1)+'&nbsp;');
+      _AddPreToStrings(ListNums);
+    end;
 
     for iLine:= APosBegin.Y to Min(St.Count-1, APosEnd.Y) do
     begin
@@ -212,7 +218,8 @@ begin
     AOutput.Add('</html>');
 
   finally
-    FreeAndNil(ListNums);
+    if Assigned(ListNums) then
+      FreeAndNil(ListNums);
     FreeAndNil(ListLines);
   end;
 end;
