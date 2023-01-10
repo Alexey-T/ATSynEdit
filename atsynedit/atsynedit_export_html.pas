@@ -183,21 +183,14 @@ begin
     AOutput.Add('<head>');
     AOutput.Add('  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />');
     AOutput.Add('  <title>'+APageTitle+'</title>');
-    AOutput.Add('  <style>');
-    AOutput.Add('    body, table {');
-    AOutput.Add('      color: '+TATHtmlColorParserA.ColorToHtmlString(NColorFont)+';');
-    AOutput.Add('      background-color: '+TATHtmlColorParserA.ColorToHtmlString(AColorBg)+';');
-    AOutput.Add('    }');
-    AOutput.Add('    pre, code {');
-    if AFontName<>'' then
-      AOutput.Add('      font-family: '+AFontName+',monospace;')
-    else
-      AOutput.Add('      font-family:Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New,monospace;');
-    AOutput.Add('      font-size: '+IntToStr(AFontSize)+'px;');
-    AOutput.Add('    }');
-    AOutput.Add('  </style>');
     AOutput.Add('</head>');
-    AOutput.Add('<body>');
+
+    AOutput.Add(Format('<body style="color: %s; background: %s; font-family: %s; font-size: %dpx;">', [
+      TATHtmlColorParserA.ColorToHtmlString(NColorFont),
+      TATHtmlColorParserA.ColorToHtmlString(AColorBg),
+      'Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New,monospace',
+      AFontSize
+      ]));
 
     if AWithNumbers then
     begin
