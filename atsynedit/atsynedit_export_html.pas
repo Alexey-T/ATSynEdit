@@ -15,7 +15,7 @@ uses
 procedure EditorExportToHTML(Ed: TATSynEdit;
   AOutput: TStringList;
   APosBegin, APosEnd: TPoint;
-  const APageTitle, AFontName: string;
+  APageTitle, AFontName: string;
   AFontSize: integer; AWithNumbers: boolean;
   AColorBg, AColorNumbers: TColor);
 
@@ -93,7 +93,7 @@ end;
 procedure EditorExportToHTML(Ed: TATSynEdit;
   AOutput: TStringList;
   APosBegin, APosEnd: TPoint;
-  const APageTitle, AFontName: string;
+  APageTitle, AFontName: string;
   AFontSize: integer; AWithNumbers: boolean;
   AColorBg, AColorNumbers: TColor);
 var
@@ -185,10 +185,14 @@ begin
     AOutput.Add('  <title>'+APageTitle+'</title>');
     AOutput.Add('</head>');
 
+    if AFontName<>'' then
+      AFontName+=',Consolas,Monaco,Lucida Console,monospace'
+    else
+      AFontName:= 'Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New,monospace';
     AOutput.Add(Format('<body style="color: %s; background: %s; font-family: %s; font-size: %dpx;">', [
       TATHtmlColorParserA.ColorToHtmlString(NColorFont),
       TATHtmlColorParserA.ColorToHtmlString(AColorBg),
-      'Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New,monospace',
+      AFontName,
       AFontSize
       ]));
 
