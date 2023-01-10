@@ -98,7 +98,7 @@ procedure EditorExportToHTML(Ed: TATSynEdit;
   AColorBg, AColorNumbers: TColor);
 var
   St: TATStrings;
-  LCode, LNums: TStringList;
+  ListLines, ListNums: TStringList;
   Parts: TATLineParts;
   PPart: ^TATLinePart;
   NColorFont: TColor;
@@ -113,13 +113,13 @@ begin
   NColorFont:= clBlack;
   FillChar(Parts, Sizeof(Parts), 0);
 
-  LCode:= TStringList.Create;
-  LNums:= TStringList.Create;
+  ListLines:= TStringList.Create;
+  ListNums:= TStringList.Create;
 
   try
     for iLine:= 0 to St.Count-1 do
-      LNums.Add(IntToStr(iLine+1)+'&nbsp;');
-    _AddPreToStrings(LNums);
+      ListNums.Add(IntToStr(iLine+1)+'&nbsp;');
+    _AddPreToStrings(ListNums);
 
     for iLine:= APosBegin.Y to Min(St.Count-1, APosEnd.Y) do
     begin
@@ -168,10 +168,10 @@ begin
         if (PPart^.FontStyles and afsFontItalic)<>0  then S+= '</i>';
         if (PPart^.FontStyles and afsFontBold)<>0  then S+= '</b>';
       end;
-      LCode.Add(S);
+      ListLines.Add(S);
     end;
 
-    _AddPreToStrings(LCode);
+    _AddPreToStrings(ListLines);
 
     AOutput.Add('<html>');
     AOutput.Add('<head>');
@@ -198,12 +198,12 @@ begin
       AOutput.Add('<table style="border-style: hidden;">');
       AOutput.Add('<tr>');
       AOutput.Add('<td style="border-style: hidden; vertical-align: top; text-align: right; color: '+TATHtmlColorParserA.ColorToHtmlString(AColorNumbers)+';">');
-      AOutput.AddStrings(LNums);
+      AOutput.AddStrings(ListNums);
       AOutput.Add('</td>');
       AOutput.Add('<td>');
     end;
 
-    AOutput.AddStrings(LCode);
+    AOutput.AddStrings(ListLines);
 
     if AWithNumbers then
       AOutput.Add('</td></tr></table>');
@@ -212,8 +212,8 @@ begin
     AOutput.Add('</html>');
 
   finally
-    FreeAndNil(LNums);
-    FreeAndNil(LCode);
+    FreeAndNil(ListNums);
+    FreeAndNil(ListLines);
   end;
 end;
 
