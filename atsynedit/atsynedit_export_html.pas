@@ -27,43 +27,6 @@ uses
   ATSynEdit_LineParts,
   ATStringProc_HtmlColor;
 
-{
-procedure DoCssStyle(AColorFont, AColorBg, AColorFontDef, AColorBgDef: TColor;
-  out StyleName, StyleText: string);
-var
-  NameF, TextF, NameBg, TextBg: string;
-begin
-  if AColorFont<>AColorFontDef then
-  begin
-    NameF:= TATHtmlColorParserA.ColorToHtmlString(AColorFont);
-    TextF:= 'color: '+NameF+'; ';
-    Delete(NameF, 1, 1);
-  end
-  else
-  begin
-    NameF:= '';
-    TextF:= '';
-  end;
-
-  if AColorBg<>AColorBgDef then
-  begin
-    NameBg:= TATHtmlColorParserA.ColorToHtmlString(AColorBg);
-    TextBg:= 'background: '+NameBg+'; ';
-    Delete(NameBg, 1, 1);
-  end
-  else
-  begin
-    NameBg:= '';
-    TextBg:= '';
-  end;
-
-  StyleName:= '_'+NameF;
-  if NameBg<>'' then
-    StyleName+= '_'+NameBg;
-  StyleText:= '    .'+StyleName+' {'+TextF+TextBg+'}';
-end;
-}
-
 function EditorIsEmpty(Ed: TATSynEdit): boolean;
 var
   Str: TATStrings;
