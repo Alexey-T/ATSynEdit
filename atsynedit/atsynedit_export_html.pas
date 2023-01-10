@@ -118,7 +118,7 @@ begin
   St:= Ed.Strings;
   if EditorIsEmpty(Ed) then exit;
 
-  NColorFont:= clBlack;
+  NColorFont:= clNone;
   FillChar(Parts{%H-}, Sizeof(Parts), 0);
 
   ListLines:= TStringList.Create;
