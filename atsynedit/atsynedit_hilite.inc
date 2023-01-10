@@ -107,12 +107,12 @@ begin
   else
   begin
     //this must work w/o adapter, it makes simple long part in AParts
-    DoPartCalc_CreateNew(AParts, nMaxOffset, nLineIndex, nCharIndex-1, AColorBG);
+    DoPartCalc_CreateNew(AParts, nMaxOffset, nLineIndex, nCharIndex-1, AColorBG, AWithSelection);
   end;
 end;
 
 procedure TATSynEdit.DoPartCalc_CreateNew(var AParts: TATLineParts;
-  AOffsetMax, ALineIndex, ACharIndex: integer; AColorBG: TColor);
+  AOffsetMax, ALineIndex, ACharIndex: integer; AColorBG: TColor; AWithSelection: boolean);
 var
   St: TATStrings;
   bSel, bSelPrev, bAdd: boolean;
@@ -120,7 +120,7 @@ var
   ch: WideChar;
 begin
   St:= Strings;
-  if not TempSel_IsLineWithSelection(ALineIndex) then
+  if not AWithSelection or not TempSel_IsLineWithSelection(ALineIndex) then
   begin
     nOffset:= 0;
     nLen:= Min(St.LinesLen[ALineIndex], AOffsetMax);

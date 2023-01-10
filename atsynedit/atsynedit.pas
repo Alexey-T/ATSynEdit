@@ -1098,7 +1098,7 @@ type
     procedure OnNewScrollbarHorzChanged(Sender: TObject);
     procedure OnNewScrollbarVertChanged(Sender: TObject);
     procedure DoPartCalc_CreateNew(var AParts: TATLineParts; AOffsetMax,
-      ALineIndex, ACharIndex: integer; AColorBG: TColor);
+      ALineIndex, ACharIndex: integer; AColorBG: TColor; AWithSelection: boolean);
     procedure DoPartCalc_ApplySelectionOver(var AParts: TATLineParts; AOffsetMax,
       ALineIndex, ACharIndex: integer);
     procedure DoPartCalc_ApplyAttribsOver(var AParts: TATLineParts; AOffsetMax,
