@@ -798,14 +798,30 @@ end;
 
 procedure TfmMain.mnuFileHtmlClick(Sender: TObject);
 var
-  fn: string;
+  List: TStringList;
+  SFilename: string;
 begin
-  fn:= GetTempDir+DirectorySeparator+'_export.html';
-  DoEditorExportToHTML(Ed, fn, 'Export test',
-    'Courier New', 12, false,
-    clWhite, clMedGray);
-  if FileExists(fn) then
-    OpenDocument(fn);
+  SFilename:= GetTempDir+DirectorySeparator+'export.html';
+
+  List:= TStringList.Create;
+  try
+    EditorExportToHTML(Ed,
+      List,
+      Point(0, 0),
+      Point(0, Ed.Strings.Count),
+      'Some title',
+      '',
+      12,
+      false,
+      clWhite,
+      clMedGray);
+    List.SaveToFile(SFilename);
+  finally
+    FreeAndNil(List);
+  end;
+
+  if FileExists(SFilename) then
+    OpenDocument(SFilename);
 end;
 
 
