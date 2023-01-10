@@ -109,9 +109,10 @@ var
 begin
   St:= Ed.Strings;
   if St.Count=0 then exit;
+  if (St.Count=1) and (St.LinesLen[0]=0) then exit;
 
   NColorFont:= clBlack;
-  FillChar(Parts, Sizeof(Parts), 0);
+  FillChar(Parts{%H-}, Sizeof(Parts), 0);
 
   ListLines:= TStringList.Create;
   if AWithNumbers then
