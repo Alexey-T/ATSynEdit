@@ -14,9 +14,9 @@ uses
   ATSynEdit_Adapters;
 
 type
-  { TATAdapterIMEStandard }
+  { TATAdapterWindowsIME }
 
-  TATAdapterIMEStandard = class(TATAdapterIME)
+  TATAdapterWindowsIME = class(TATAdapterIME)
   private
     FSelText: UnicodeString;
     {$ifdef IME_ATTR_FUNC}
@@ -49,7 +49,7 @@ const
 function ImmGetCandidateWindow(imc: HIMC; par1: DWORD; lpCandidate: LPCANDIDATEFORM): LongBool; stdcall ; external 'imm32' name 'ImmGetCandidateWindow';
 
 
-procedure TATAdapterIMEStandard.Stop(Sender: TObject; Success: boolean);
+procedure TATAdapterWindowsIME.Stop(Sender: TObject; Success: boolean);
 var
   Ed: TATSynEdit;
   imc: HIMC;
@@ -66,7 +66,7 @@ begin
   end;
 end;
 
-procedure TATAdapterIMEStandard.UpdateWindowPos(Sender: TObject);
+procedure TATAdapterWindowsIME.UpdateWindowPos(Sender: TObject);
 var
   Ed: TATSynEdit;
   Caret: TATCaretItem;
@@ -111,7 +111,7 @@ begin
   end;
 end;
 
-procedure TATAdapterIMEStandard.ImeRequest(Sender: TObject; var Msg: TMessage);
+procedure TATAdapterWindowsIME.ImeRequest(Sender: TObject; var Msg: TMessage);
 var
   Ed: TATSynEdit;
   Caret: TATCaretItem;
@@ -146,7 +146,7 @@ begin
   end;
 end;
 
-procedure TATAdapterIMEStandard.ImeNotify(Sender: TObject; var Msg: TMessage);
+procedure TATAdapterWindowsIME.ImeNotify(Sender: TObject; var Msg: TMessage);
 const
   IMN_OPENCANDIDATE_CH = 269;
 begin
@@ -157,7 +157,7 @@ begin
   end;
 end;
 
-procedure TATAdapterIMEStandard.ImeStartComposition(Sender: TObject;
+procedure TATAdapterWindowsIME.ImeStartComposition(Sender: TObject;
   var Msg: TMessage);
 begin
   UpdateWindowPos(Sender);
@@ -197,7 +197,7 @@ begin
 end;
 {$endif}
 
-procedure TATAdapterIMEStandard.ImeComposition(Sender: TObject; var Msg: TMessage);
+procedure TATAdapterWindowsIME.ImeComposition(Sender: TObject; var Msg: TMessage);
 const
   IME_COMPFLAG = GCS_COMPSTR or GCS_COMPATTR or GCS_CURSORPOS;
   IME_RESULTFLAG = GCS_RESULTCLAUSE or GCS_RESULTSTR;
@@ -289,7 +289,7 @@ begin
   Msg.Result:= -1;
 end;
 
-procedure TATAdapterIMEStandard.ImeEndComposition(Sender: TObject;
+procedure TATAdapterWindowsIME.ImeEndComposition(Sender: TObject;
   var Msg: TMessage);
 var
   Ed: TATSynEdit;

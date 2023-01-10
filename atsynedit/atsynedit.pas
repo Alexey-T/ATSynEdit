@@ -4687,7 +4687,7 @@ begin
   FMinimapBmp:= TBGRABitmap.Create;
 
   {$ifdef windows}
-  FAdapterIME:= TATAdapterIMEStandard.Create;
+  FAdapterIME:= TATAdapterWindowsIME.Create;
   {$endif}
 
   {$ifdef LCLCOCOA}
