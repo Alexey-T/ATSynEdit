@@ -5145,6 +5145,11 @@ procedure TATSynEdit.SetFocus;
 begin
   if HandleAllocated then
     LCLIntf.SetFocus(Handle);
+
+  {$ifdef darwin}
+  //DoEnter is not called, so caret don't blink in ui-tab opened by Command+N
+  DoEnter;
+  {$endif}
 end;
 
 procedure TATSynEdit.GetClientSizes(out W, H: integer);

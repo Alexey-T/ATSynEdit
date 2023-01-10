@@ -13,7 +13,6 @@ unit ATSynEdit_Adapter_CocoaIME;
 
 interface
 
-{$ifdef darwin}
 uses
   SysUtils, Classes,
   CocoaPrivate,
@@ -42,11 +41,9 @@ type
     constructor Create( const editor: TATSynEdit );
     destructor Destroy; override;
   end;
-{$endif}
 
 implementation
 
-{$ifdef darwin}
 uses
   ATSynEdit_Commands, ATStringProc;
 
@@ -213,6 +210,5 @@ end;
 
 // no need to implement TATAdapterIME.Stop(), LCLCocoa will take care it
 // (such as mouse click in ATSynEdit when in IME input state)
-{$endif}
 
 end.
