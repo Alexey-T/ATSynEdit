@@ -2113,8 +2113,8 @@ uses
 {$I atsynedit_proc.inc}
 
 {$ifdef LCLCOCOA}
-//file was the Unit before, but was changed to an INC file because of problems with IDE under macOS
-{$I atsynedit_adapter_cocoaime.pas}
+//unit was changed to an INC file because of problems with IDE under macOS
+{$I atsynedit_cocoaime.inc}
 {$endif}
 
 { TATMinimapThread }
