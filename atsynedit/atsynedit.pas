@@ -1136,7 +1136,7 @@ type
     procedure DoCalcLineHilite(const AData: TATWrapItem;
       var AParts: TATLineParts; ACharsSkipped, ACharsMax: integer;
       AColorBG: TColor; AColorForced: boolean; var AColorAfter: TColor;
-      AMainText: boolean);
+      AMainText: boolean; AWithSelection: boolean=true);
     function DoScaleFont(AValue: integer): integer;
     //select
     procedure DoSelectionDeleteOrReset;
@@ -1691,7 +1691,7 @@ type
     procedure DoScrollByDeltaInPixels(ADeltaX, ADeltaY: integer);
     procedure DoScaleFontDelta(AInc: boolean; AllowUpdate: boolean);
     function DoCalcLineHiliteEx(ALineIndex: integer; var AParts: TATLineParts;
-      AColorBG: TColor; out AColorAfter: TColor): boolean;
+      AColorBG: TColor; out AColorAfter: TColor; AWithSelection: boolean): boolean;
     procedure DoSetMarkedLines(ALine1, ALine2: integer);
     procedure DoGetMarkedLines(out ALine1, ALine2: integer);
     function DoGetLinkAtPos(AX, AY: integer): atString;

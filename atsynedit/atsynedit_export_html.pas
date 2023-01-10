@@ -105,7 +105,7 @@ begin
     for iLine:= APosBegin.Y to Min(St.Count-1, APosEnd.Y) do
     begin
       SLine:= '';
-      if not Ed.DoCalcLineHiliteEx(iLine, Parts, AColorBG, NColorAfter) then break;
+      if not Ed.DoCalcLineHiliteEx(iLine, Parts, AColorBG, NColorAfter, false) then Break;
       for iPart:= 0 to High(Parts) do
       begin
         PPart:= @Parts[iPart];

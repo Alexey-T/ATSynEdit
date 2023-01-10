@@ -2,7 +2,7 @@
 
 function TATSynEdit.DoCalcLineHiliteEx(ALineIndex: integer;
   var AParts: TATLineParts;
-  AColorBG: TColor; out AColorAfter: TColor): boolean;
+  AColorBG: TColor; out AColorAfter: TColor; AWithSelection: boolean): boolean;
 const
   cMaxCharsInLine = 50*1024;
 var
@@ -28,7 +28,8 @@ begin
     AColorBG,
     false,
     AColorAfter,
-    true);
+    true,
+    AWithSelection);
 end;
 
 
@@ -37,7 +38,7 @@ procedure TATSynEdit.DoCalcLineHilite(const AData: TATWrapItem;
   ACharsSkipped, ACharsMax: integer;
   AColorBG: TColor; AColorForced: boolean;
   var AColorAfter: TColor;
-  AMainText: boolean);
+  AMainText: boolean; AWithSelection: boolean=true);
 var
   nMaxOffset, nCharIndex, nLineIndex, nLineLen: integer;
   bEnableHilite: boolean;
@@ -100,7 +101,7 @@ begin
   //faster render w/out adapter
   if (AParts[0].Len>0) then
   begin
-    if TempSel_IsLineWithSelection(nLineIndex) then
+    if AWithSelection and TempSel_IsLineWithSelection(nLineIndex) then
       DoPartCalc_ApplySelectionOver(AParts, nMaxOffset, nLineIndex, nCharIndex-1);
   end
   else
