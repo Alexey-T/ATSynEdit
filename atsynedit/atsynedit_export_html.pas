@@ -27,7 +27,7 @@ uses
   ATSynEdit_LineParts,
   ATStringProc_HtmlColor;
 
-
+{
 procedure DoCssStyle(AColorFont, AColorBg, AColorFontDef, AColorBgDef: TColor;
   out StyleName, StyleText: string);
 var
@@ -62,6 +62,7 @@ begin
     StyleName+= '_'+NameBg;
   StyleText:= '    .'+StyleName+' {'+TextF+TextBg+'}';
 end;
+}
 
 
 function _IsSpaces(const S: string): boolean;
@@ -97,14 +98,13 @@ procedure EditorExportToHTML(Ed: TATSynEdit;
   AColorBg, AColorNumbers: TColor);
 var
   St: TATStrings;
-  LStyles, LCode, LNums: TStringList;
+  LCode, LNums: TStringList;
   Parts: TATLineParts;
   PPart: ^TATLinePart;
   NColorFont: TColor;
   NColorAfter: TColor;
   NeedStyleFont, NeedStyleBg, NeedStyle: boolean;
   S, StrText: string;
-  StyleName, StyleText: string;
   iLine, iPart: integer;
 begin
   St:= Ed.Strings;
@@ -113,13 +113,10 @@ begin
   NColorFont:= clBlack;
   FillChar(Parts, Sizeof(Parts), 0);
 
-  LStyles:= TStringList.Create;
   LCode:= TStringList.Create;
   LNums:= TStringList.Create;
 
   try
-    LStyles.UseLocale:= false; //speedup IndexOf
-
     for iLine:= 0 to St.Count-1 do
       LNums.Add(IntToStr(iLine+1)+'&nbsp;');
     _AddPreToStrings(LNums);
@@ -155,17 +152,15 @@ begin
 
         if NeedStyle then
         begin
-          DoCssStyle(
-            PPart^.ColorFont, PPart^.ColorBG,
-            NColorFont, AColorBG,
-            StyleName, StyleText
-            );
-          if LStyles.IndexOf(StyleText)<0 then
-            LStyles.Add(StyleText);
-          S+= Format('<span class="%s">', [StyleName]);
+          S+= '<span style="';
+          if NeedStyleFont then
+            S+= 'color:' + TATHtmlColorParserA.ColorToHtmlString(PPart^.ColorFont) + ';';
+          if NeedStyleBg then
+            S+= 'background:' + TATHtmlColorParserA.ColorToHtmlString(PPart^.ColorBG) + ';';
+          S+= '">';
         end;
 
-        S:= S+StrText;
+        S+= StrText;
         if NeedStyle then
           S+= '</span>';
 
@@ -188,28 +183,21 @@ begin
     AOutput.Add('      background-color: '+TATHtmlColorParserA.ColorToHtmlString(AColorBg)+';');
     AOutput.Add('    }');
     AOutput.Add('    pre, code {');
-    AOutput.Add('      font-family: "'+AFontName+'", sans-serif;');
+    if AFontName<>'' then
+      AOutput.Add('      font-family: '+AFontName+',monospace;')
+    else
+      AOutput.Add('      font-family:Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New,monospace;');
     AOutput.Add('      font-size: '+IntToStr(AFontSize)+'px;');
     AOutput.Add('    }');
-    AOutput.Add('    table, td {');
-    AOutput.Add('      border-style: hidden;');
-    AOutput.Add('    }');
-    AOutput.Add('    td {');
-    AOutput.Add('      vertical-align: top;');
-    AOutput.Add('    }');
-    AOutput.Add('    td.num {');
-    AOutput.Add('      color: '+TATHtmlColorParserA.ColorToHtmlString(AColorNumbers)+';');
-    AOutput.Add('      text-align: right;');
-    AOutput.Add('    }');
-    AOutput.AddStrings(LStyles);
     AOutput.Add('  </style>');
     AOutput.Add('</head>');
     AOutput.Add('<body>');
 
     if AWithNumbers then
     begin
-      AOutput.Add('<table>');
-      AOutput.Add('<tr><td class="num">');
+      AOutput.Add('<table style="border-style: hidden;">');
+      AOutput.Add('<tr>');
+      AOutput.Add('<td style="border-style: hidden; vertical-align: top; text-align: right; color: '+TATHtmlColorParserA.ColorToHtmlString(AColorNumbers)+';">');
       AOutput.AddStrings(LNums);
       AOutput.Add('</td>');
       AOutput.Add('<td>');
@@ -226,7 +214,6 @@ begin
   finally
     FreeAndNil(LNums);
     FreeAndNil(LCode);
-    FreeAndNil(LStyles);
   end;
 end;
 
