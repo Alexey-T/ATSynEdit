@@ -16,8 +16,6 @@ type
   private
     _editor: TATSynEdit;
     _IntermediateTextBeginPos: TPoint;
-  private const
-    CmdInvoke = cInvokeInternal;
   public
     procedure IMESessionBegin;
     procedure IMESessionEnd;
@@ -29,7 +27,7 @@ type
     function calcBound( var params: TCocoaIMEParameters ) : TRect;
     function getSuitableCaret(): TATCaretItem;
   public
-    constructor Create( const editor: TATSynEdit );
+    constructor Create( editor: TATSynEdit );
     destructor Destroy; override;
   end;
 
@@ -84,7 +82,7 @@ begin
 
   // need to eat some chars, such as DeadKeys
   if params.eatAmount<>0 then
-    _editor.DoCommand( cCommand_KeyBackspace, CmdInvoke );
+    _editor.DoCommand( cCommand_KeyBackspace, cInvokeInternal );
 
   // insert Intermediate Text and highlight the selected part
   _editor.TextInsertAtCarets( atString(params.text), false, false, false );
@@ -111,7 +109,7 @@ begin
 
   // need to eat some chars, such as DeadKeys
   if params.eatAmount<>0 then
-    _editor.DoCommand( cCommand_KeyBackspace, CmdInvoke );
+    _editor.DoCommand( cCommand_KeyBackspace, cInvokeInternal );
 
   _editor.TextInsertAtCarets( atString(params.text), false, false, false );
 end;
@@ -152,10 +150,10 @@ begin
   end;
 
   for i:=params.textCharLength-start downto 1 do
-    _editor.DoCommand( cCommand_KeyLeft, CmdInvoke );
+    _editor.DoCommand( cCommand_KeyLeft, cInvokeInternal );
 
   for i:=length downto 1 do
-    _editor.DoCommand( cCommand_KeyRight_Sel, CmdInvoke );
+    _editor.DoCommand( cCommand_KeyRight_Sel, cInvokeInternal );
 end;
 
 function TATAdapterCocoaIME.calcBound( var params: TCocoaIMEParameters ) : TRect;
@@ -185,7 +183,7 @@ begin
   Result:= _editor.Carets[0];
 end;
 
-constructor TATAdapterCocoaIME.Create( const editor: TATSynEdit );
+constructor TATAdapterCocoaIME.Create( editor: TATSynEdit );
 begin
   Inherited Create;
   _editor:= editor;
