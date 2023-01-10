@@ -15,7 +15,7 @@ interface
 uses
   {$ifdef Windows}
   Windows,
-  ATSynEdit_Adapter_IME,
+  ATSynEdit_Adapter_WindowsIME,
   {$endif}
   InterfaceBase,
   Classes, SysUtils, Graphics,
