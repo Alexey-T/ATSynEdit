@@ -56,7 +56,7 @@ object fmMain: TfmMain
       ReadOnly = True
       ShowColumnHeaders = False
       SortType = stText
-      TabOrder = 10
+      TabOrder = 9
       ToolTips = False
       ViewStyle = vsSmallIcon
       OnClick = filesClick
@@ -133,16 +133,6 @@ object fmMain: TfmMain
       OnChange = chkDynChange
       ParentFont = False
       TabOrder = 7
-    end
-    object bExport: TButton
-      Left = 192
-      Height = 25
-      Top = 40
-      Width = 152
-      Caption = 'export html'
-      OnClick = bExportClick
-      ParentFont = False
-      TabOrder = 9
     end
     object Label1: TLabel
       Left = 184

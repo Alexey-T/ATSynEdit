@@ -23,7 +23,6 @@ type
 
   TfmMain = class(TForm)
     bOpen: TButton;
-    bExport: TButton;
     chkDyn: TCheckBox;
     chkFullHilite: TCheckBox;
     chkFullSel: TCheckBox;
@@ -43,7 +42,6 @@ type
     Tree: TTreeView;
     procedure AdapterParseBegin(Sender: TObject);
     procedure AdapterParseDone(Sender: TObject);
-    procedure bExportClick(Sender: TObject);
     procedure bOpenClick(Sender: TObject);
     procedure chkDynChange(Sender: TObject);
     procedure chkFullHiliteChange(Sender: TObject);
@@ -293,18 +291,6 @@ begin
     TObject(Node.Data).Free;
     Node.Data:= nil;
   end;
-end;
-
-procedure TfmMain.bExportClick(Sender: TObject);
-var
-  fn: string;
-begin
-  fn:= GetTempDir+DirectorySeparator+'_export.html';
-  DoEditorExportToHTML(Ed, fn, 'Export test',
-    'Courier New', 12, false,
-    clWhite, clMedGray);
-  if FileExists(fn) then
-    OpenDocument(fn);
 end;
 
 procedure TfmMain.AdapterParseDone(Sender: TObject);
