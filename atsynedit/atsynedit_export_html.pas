@@ -81,7 +81,7 @@ var
   NColorAfter: TColor;
   NeedStyleFont, NeedStyleBg, NeedStyle: boolean;
   SLine, SToken: string;
-  iLine, iPart: integer;
+  iLine, iPart, NDelta: integer;
 begin
   St:= Ed.Strings;
   if EditorIsEmpty(Ed) then exit;
@@ -111,8 +111,24 @@ begin
         PPart:= @Parts[iPart];
         if PPart^.Len=0 then Break;
 
-        if (iLine=APosBegin.Y) and (PPart^.Offset<APosBegin.X) then Continue;
-        if (iLine=APosEnd.Y) and (PPart^.Offset>=APosEnd.X) then Break;
+        if iLine=APosBegin.Y then
+        begin
+          NDelta:= PPart^.Offset-APosBegin.X;
+          if NDelta<0 then
+          begin
+            if PPart^.Offset+PPart^.Len<=APosBegin.X then Continue;
+            Inc(PPart^.Offset, -NDelta);
+            Inc(PPart^.Len, NDelta);
+          end;
+        end;
+
+        if iLine=APosEnd.Y then
+        begin
+          if PPart^.Offset>=APosEnd.X then Break;
+          NDelta:= PPart^.Offset+PPart^.Len-APosEnd.X;
+          if NDelta>0 then
+            Dec(PPart^.Len, NDelta);
+        end;
 
         NeedStyleFont:= true;
         NeedStyleBg:= PPart^.ColorBG<>AColorBG;
