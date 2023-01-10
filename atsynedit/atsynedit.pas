@@ -2104,13 +2104,18 @@ uses
   Gtk2Globals,
   {$endif}
   {$ifdef LCLCOCOA}
-  ATSynEdit_Adapter_CocoaIME,
+  CocoaPrivate,
   {$endif}
   ATStringProc_TextBuffer,
   ATSynEdit_Commands,
   ATSynEdit_Keymap_Init;
 
 {$I atsynedit_proc.inc}
+
+{$ifdef LCLCOCOA}
+//file was the Unit before, but was changed to an INC file because of problems with IDE under macOS
+{$I atsynedit_adapter_cocoaime.pas}
+{$endif}
 
 { TATMinimapThread }
 

@@ -9,17 +9,6 @@
   License: MPL 2.0 or LGPL
 }
 
-unit ATSynEdit_Adapter_CocoaIME;
-
-interface
-
-uses
-  SysUtils, Classes,
-  CocoaPrivate,
-  ATSynEdit,
-  ATSynEdit_Adapters,
-  ATSynEdit_Carets;
-
 type
   { TATAdapterCocoaIME }
 
@@ -41,11 +30,6 @@ type
     constructor Create( const editor: TATSynEdit );
     destructor Destroy; override;
   end;
-
-implementation
-
-uses
-  ATSynEdit_Commands, ATStringProc;
 
 procedure TATAdapterCocoaIME.IMESessionBegin;
 begin
@@ -211,4 +195,3 @@ end;
 // no need to implement TATAdapterIME.Stop(), LCLCocoa will take care it
 // (such as mouse click in ATSynEdit when in IME input state)
 
-end.
