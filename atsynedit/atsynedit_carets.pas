@@ -1174,13 +1174,14 @@ end;
 procedure TATCarets.GetSelections(var D: TATCaretSelections);
 var
   Item: TATCaretItem;
-  NLen, i: integer;
+  NCount, NLen, i: integer;
   X1, Y1, X2, Y2: integer;
 begin
-  SetLength(D.Data, Count);
+  NCount:= Count;
+  SetLength(D.Data, NCount);
   NLen:= 0;
 
-  for i:= 0 to Count-1 do
+  for i:= 0 to NCount-1 do
   begin
     Item:= Items[i];
     X1:= Item.PosX;
@@ -1203,7 +1204,8 @@ begin
   end;
 
   //don't realloc in a loop
-  SetLength(D.Data, NLen);
+  if NLen<>NCount then
+    SetLength(D.Data, NLen);
 end;
 
 

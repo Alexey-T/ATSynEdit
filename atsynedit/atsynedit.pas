@@ -5134,6 +5134,9 @@ begin
   if AUpdateWrapInfo then
     FWrapUpdateNeeded:= true;
 
+  //do it here to allow apps to remove carets and call Update + CalcLineHiliteEx to get LineParts w/o selections
+  Carets.GetSelections(FSel);
+
   InvalidateEx(AForceRepaint, AForceOnScroll);
 end;
 
