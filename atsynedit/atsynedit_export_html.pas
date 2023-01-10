@@ -9,20 +9,23 @@ unit ATSynEdit_Export_HTML;
 interface
 
 uses
-  Classes, SysUtils, Graphics, StrUtils,
+  Classes, SysUtils, Graphics,
   ATSynEdit;
 
 procedure EditorExportToHTML(Ed: TATSynEdit;
   AOutput: TStringList;
   APosBegin, APosEnd: TPoint;
-  APageTitle, AFontName: string;
-  AFontSize: integer; AWithNumbers: boolean;
+  const APageTitle: string;
+  AFontName: string;
+  AFontSize: integer;
+  AWithNumbers: boolean;
   AColorBg, AColorNumbers: TColor);
 
 implementation
 
 uses
   Math,
+  StrUtils,
   ATStrings,
   ATSynEdit_LineParts,
   ATStringProc_HtmlColor;
@@ -65,8 +68,10 @@ end;
 procedure EditorExportToHTML(Ed: TATSynEdit;
   AOutput: TStringList;
   APosBegin, APosEnd: TPoint;
-  APageTitle, AFontName: string;
-  AFontSize: integer; AWithNumbers: boolean;
+  const APageTitle: string;
+  AFontName: string;
+  AFontSize: integer;
+  AWithNumbers: boolean;
   AColorBg, AColorNumbers: TColor);
 var
   St: TATStrings;
