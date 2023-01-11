@@ -89,9 +89,11 @@ procedure EditorExportToHTML(Ed: TATSynEdit;
       ]);
   end;
   //
-  function _CssTableCellAttrs: string;
+  function _CssTableCellAttrs(AlignRight: boolean): string;
+  const
+    cDir: array[boolean] of string = ('left', 'right');
   begin
-    Result:= 'style="border-style: hidden; vertical-align: top; text-align: right; color: '+TATHtmlColorParserA.ColorToHtmlString(AColorNumbers)+';"';
+    Result:= 'style="border-style: hidden; vertical-align: top; text-align: '+cDir[AlignRight]+'; color: '+TATHtmlColorParserA.ColorToHtmlString(AColorNumbers)+';"';
   end;
   //
 var
@@ -203,10 +205,10 @@ begin
     begin
       AOutput.Add('<table style="border-style: hidden;">');
       AOutput.Add('<tr>');
-      AOutput.Add('<td '+_CssTableCellAttrs+'>');
+      AOutput.Add('<td '+_CssTableCellAttrs(true)+'>');
       AOutput.AddStrings(ListNums);
       AOutput.Add('</td>');
-      AOutput.Add('<td '+_CssTableCellAttrs+'>');
+      AOutput.Add('<td '+_CssTableCellAttrs(false)+'>');
     end;
 
     AOutput.AddStrings(ListLines);
