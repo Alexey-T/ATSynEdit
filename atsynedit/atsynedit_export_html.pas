@@ -89,11 +89,14 @@ procedure EditorExportToHTML(Ed: TATSynEdit;
       ]);
   end;
   //
-  function _CssTableCellAttrs(AlignRight: boolean): string;
+  function _CssTableCellAttrs(IsGutter: boolean): string;
   const
     cDir: array[boolean] of string = ('left', 'right');
   begin
-    Result:= 'style="border-style: hidden; vertical-align: top; text-align: '+cDir[AlignRight]+'; color: '+TATHtmlColorParserA.ColorToHtmlString(AColorNumbers)+';"';
+    Result:= 'style="border-style: hidden; vertical-align: top; text-align: '+cDir[IsGutter]+';';
+    if IsGutter then
+      Result+= ' color: '+TATHtmlColorParserA.ColorToHtmlString(AColorNumbers)+';';
+    Result+= '"';
   end;
   //
 var
