@@ -16,7 +16,7 @@ procedure EditorExportToHTML(Ed: TATSynEdit;
   AOutput: TStringList;
   APosBegin, APosEnd: TPoint;
   const APageTitle: string;
-  AFontName: string;
+  const AFontName: string;
   AFontSize: integer;
   AWithNumbers: boolean;
   AColorBg, AColorNumbers: TColor);
@@ -69,10 +69,31 @@ procedure EditorExportToHTML(Ed: TATSynEdit;
   AOutput: TStringList;
   APosBegin, APosEnd: TPoint;
   const APageTitle: string;
-  AFontName: string;
+  const AFontName: string;
   AFontSize: integer;
   AWithNumbers: boolean;
   AColorBg, AColorNumbers: TColor);
+  //
+  function _CssBodyAttrs: string;
+  var
+    SFontName: string;
+  begin
+    if AFontName<>'' then
+      SFontName:= AFontName+',Consolas,Monaco,Lucida Console,monospace'
+    else
+      SFontName:= 'Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New,monospace';
+    Result:= Format('style="background: %s; font-family: %s; font-size: %dpx;"', [
+      TATHtmlColorParserA.ColorToHtmlString(AColorBg),
+      SFontName,
+      AFontSize
+      ]);
+  end;
+  //
+  function _CssTableCellAttrs: string;
+  begin
+    Result:= 'style="border-style: hidden; vertical-align: top; text-align: right; color: '+TATHtmlColorParserA.ColorToHtmlString(AColorNumbers)+';"';
+  end;
+  //
 var
   St: TATStrings;
   ListLines, ListNums: TStringList;
@@ -176,25 +197,16 @@ begin
     AOutput.Add('  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />');
     AOutput.Add('  <title>'+APageTitle+'</title>');
     AOutput.Add('</head>');
-
-    if AFontName<>'' then
-      AFontName+=',Consolas,Monaco,Lucida Console,monospace'
-    else
-      AFontName:= 'Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New,monospace';
-    AOutput.Add(Format('<body style="background: %s; font-family: %s; font-size: %dpx;">', [
-      TATHtmlColorParserA.ColorToHtmlString(AColorBg),
-      AFontName,
-      AFontSize
-      ]));
+    AOutput.Add('<body '+_CssBodyAttrs+'>');
 
     if AWithNumbers then
     begin
       AOutput.Add('<table style="border-style: hidden;">');
       AOutput.Add('<tr>');
-      AOutput.Add('<td style="border-style: hidden; vertical-align: top; text-align: right; color: '+TATHtmlColorParserA.ColorToHtmlString(AColorNumbers)+';">');
+      AOutput.Add('<td '+_CssTableCellAttrs+'>');
       AOutput.AddStrings(ListNums);
       AOutput.Add('</td>');
-      AOutput.Add('<td>');
+      AOutput.Add('<td '+_CssTableCellAttrs+'>');
     end;
 
     AOutput.AddStrings(ListLines);
