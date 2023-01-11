@@ -90,13 +90,21 @@ procedure EditorExportToHTML(Ed: TATSynEdit;
   end;
   //
   function _CssTableCellAttrs(IsGutter: boolean): string;
-  const
-    cDir: array[boolean] of string = ('left', 'right');
+  var
+    SAlign, SColor: string;
   begin
-    Result:= 'style="border-style: hidden; vertical-align: top; text-align: '+cDir[IsGutter]+';';
     if IsGutter then
-      Result+= ' color: '+TATHtmlColorParserA.ColorToHtmlString(AColorNumbers)+';';
-    Result+= '"';
+    begin
+      SAlign:= 'right';
+      SColor:= 'color: '+TATHtmlColorParserA.ColorToHtmlString(AColorNumbers)+';'
+    end
+    else
+    begin
+      SAlign:= 'left';
+      SColor:= '';
+    end;
+    Result:= Format('style="border-style: hidden; vertical-align: top; text-align: %s; %s"',
+      [SAlign, SColor]);
   end;
   //
 var
