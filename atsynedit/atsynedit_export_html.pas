@@ -49,11 +49,11 @@ begin
   Result:= true;
 end;
 
-procedure _AddPreToStrings(L: TStringList);
+procedure _AddPreToStrings(L: TStringList; const Attrs: string);
 begin
   if L.Count>0 then
   begin
-    L[0]:= '<pre><code>'+L[0];
+    L[0]:= '<pre><code '+Attrs+'>'+L[0];
     L[L.Count-1]:= L[L.Count-1]+'</code></pre>';
   end;
 end;
@@ -120,7 +120,7 @@ begin
     begin
       for iLine:= 0 to St.Count-1 do
         ListNums.Add(IntToStr(iLine+1)+'&nbsp;');
-      _AddPreToStrings(ListNums);
+      _AddPreToStrings(ListNums, _CssBodyAttrs);
     end;
 
     for iLine:= APosBegin.Y to Min(St.Count-1, APosEnd.Y) do
@@ -190,14 +190,14 @@ begin
       ListLines.Add(SLine);
     end;
 
-    _AddPreToStrings(ListLines);
+    _AddPreToStrings(ListLines, _CssBodyAttrs);
 
     AOutput.Add('<html>');
     AOutput.Add('<head>');
     AOutput.Add('  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />');
     AOutput.Add('  <title>'+APageTitle+'</title>');
     AOutput.Add('</head>');
-    AOutput.Add('<body '+_CssBodyAttrs+'>');
+    AOutput.Add('<body>');
 
     if AWithNumbers then
     begin
