@@ -22,6 +22,8 @@ begin
       OptWrapMode:= cWrapOff;
   end;
 
+  IsModifiedWrapMode:= true;
+
   Result:= [cResultState];
 end;
 
