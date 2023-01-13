@@ -5181,6 +5181,7 @@ end;
 
 procedure TATSynEdit.LoadFromFile(const AFilename: string; AKeepScroll: boolean=false);
 begin
+  if not FileExists(AFilename) then exit;
   TimerBlinkDisable;
 
   FCarets.Clear;
@@ -5205,12 +5206,26 @@ begin
     EndUpdate;
   end;
 
+  IsReadOnlyChanged:= false;
+  IsReadOnlyAutodetected:= false;
+  InitialOptions:= Default(TATEditorTempOptions);
+  IsModifiedWrapMode:= false;
+  IsModifiedMinimapVisible:= false;
+  IsModifiedMicromapVisible:= false;
+  IsModifiedRulerVisible:= false;
+  IsModifiedGutterNumbersVisible:= false;
+  IsModifiedGutterFoldingVisible:= false;
+  IsModifiedGutterBookmarksVisible:= false;
+  IsModifiedUnprintedVisible:= false;
+  IsModifiedUnprintedSpaces:= false;
+  IsModifiedUnprintedTrailingOnly:= false;
+  IsModifiedUnprintedEnds:= false;
+  IsModifiedUnprintedEndDetails:= false;
+
   Update;
   TimerBlinkEnable;
 
   DoEventChange(0, false{AllowOnChange}); //calling OnChange makes almost no sense on opening file
-
-  //DoEventCarets; //calling OnChangeCaretPos makes little sense on opening file
 end;
 
 procedure TATSynEdit.SaveToFile(const AFilename: string);
