@@ -30,30 +30,35 @@ end;
 function TATSynEdit.DoCommand_ToggleUnprinted: TATCommandResults;
 begin
   OptUnprintedVisible:= not OptUnprintedVisible;
+  IsModifiedUnprintedVisible:= true;
   Result:= [cResultState];
 end;
 
 function TATSynEdit.DoCommand_ToggleUnprintedSpaces: TATCommandResults;
 begin
   OptUnprintedSpaces:= not OptUnprintedSpaces;
+  IsModifiedUnprintedSpaces:= true;
   Result:= [cResultState];
 end;
 
 function TATSynEdit.DoCommand_ToggleUnprintedSpacesTrailing: TATCommandResults;
 begin
   OptUnprintedSpacesTrailing:= not OptUnprintedSpacesTrailing;
+  IsModifiedUnprintedTrailingOnly:= true;
   Result:= [cResultState];
 end;
 
 function TATSynEdit.DoCommand_ToggleUnprintedEnds: TATCommandResults;
 begin
   OptUnprintedEnds:= not OptUnprintedEnds;
+  IsModifiedUnprintedEnds:= true;
   Result:= [cResultState];
 end;
 
 function TATSynEdit.DoCommand_ToggleUnprintedEndDetails: TATCommandResults;
 begin
   OptUnprintedEndsDetails:= not OptUnprintedEndsDetails;
+  IsModifiedUnprintedEndDetails:= true;
   Result:= [cResultState];
 end;
 
@@ -61,6 +66,7 @@ function TATSynEdit.DoCommand_ToggleLineNums: TATCommandResults;
 begin
   with Gutter.Items[FGutterBandNumbers] do
     Visible:= not Visible;
+  IsModifiedGutterNumbersVisible:= true;
   Result:= [cResultState];
 end;
 
@@ -68,24 +74,28 @@ function TATSynEdit.DoCommand_ToggleFolding: TATCommandResults;
 begin
   with Gutter.Items[FGutterBandFolding] do
     Visible:= not Visible;
+  IsModifiedGutterFoldingVisible:= true;
   Result:= [cResultState];
 end;
 
 function TATSynEdit.DoCommand_ToggleRuler: TATCommandResults;
 begin
   OptRulerVisible:= not OptRulerVisible;
+  IsModifiedRulerVisible:= true;
   Result:= [cResultState];
 end;
 
 function TATSynEdit.DoCommand_ToggleMiniMap: TATCommandResults;
 begin
   OptMinimapVisible:= not OptMinimapVisible;
+  IsModifiedMinimapVisible:= true;
   Result:= [cResultState];
 end;
 
 function TATSynEdit.DoCommand_ToggleMicroMap: TATCommandResults;
 begin
   OptMicromapVisible:= not OptMicromapVisible;
+  IsModifiedMicromapVisible:= true;
   Result:= [cResultState];
 end;
 
