@@ -7266,9 +7266,9 @@ procedure TATSynEdit.DoPaintCarets(C: TCanvas; AWithInvalidate: boolean);
 var
   Caret: TATCaretItem;
   CaretShape: TATCaretShape;
-  R, R2: TRect;
+  R, RectCaretOld: TRect;
   NCharWidth: integer;
-  i: integer;
+  iCaret: integer;
 begin
   if csLoading in ComponentState then exit;
   if csDestroying in ComponentState then exit;
@@ -7295,9 +7295,9 @@ begin
 
   NCharWidth:= FCharSize.XScaled div ATEditorCharXScale;
 
-  for i:= 0 to FCarets.Count-1 do
+  for iCaret:= 0 to FCarets.Count-1 do
   begin
-    Caret:= FCarets[i];
+    Caret:= FCarets[iCaret];
     if Caret.CoordX=-1 then Continue;
     R.Left:= Caret.CoordX;
     R.Top:= Caret.CoordY;
@@ -7318,17 +7318,17 @@ begin
       //CudaText issue #3167
       if not FCaretShown then
       begin
-        R2:= Caret.OldRect;
-        if R2.Width>0 then
+        RectCaretOld:= Caret.OldRect;
+        if RectCaretOld.Width>0 then
         begin
-          CanvasInvertRect(C, R2, Colors.Caret);
+          CanvasInvertRect(C, RectCaretOld, Colors.Caret);
           if AWithInvalidate then
           begin
             {$ifdef darwin}
             //CudaText issue #4250
-            InflateRect(R2, 1, 1);
+            InflateRect(RectCaretOld, 1, 1);
             {$endif}
-            InvalidateRect(Handle, @R2, false);
+            InvalidateRect(Handle, @RectCaretOld, false);
           end;
         end;
       end;
