@@ -7289,7 +7289,10 @@ begin
   else
     CaretShape:= FCaretShapeNormal;
 
-  NCaretColor:= Colors.Caret;
+  if FCaretBlinkEnabled then
+    NCaretColor:= Colors.Caret
+  else
+    NCaretColor:= (not (Colors.Caret xor Colors.TextBG)) and $ffffff;
   { //block was needed when we didn't have OptCaretHideUnfocused
   if (not FCaretStopUnfocused) or _IsFocused then
     NCaretColor:= Colors.Caret
