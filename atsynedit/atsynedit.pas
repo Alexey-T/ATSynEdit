@@ -1213,7 +1213,7 @@ type
       APosX, APosY, ACoordX, ACoordY: integer;
       const AMarkText: string);
     procedure DoPaintCaretShape(C: TCanvas; ARect: TRect; ACaret: TATCaretItem;
-      ACaretShape: TATCaretShape; ACaretColor: TColor);
+      ACaretShape: TATCaretShape);
     procedure DoPaintCarets(C: TCanvas; AWithInvalidate: boolean);
     procedure TimerBlinkDisable;
     procedure TimerBlinkEnable;
@@ -7224,18 +7224,18 @@ end;
 
 
 procedure TATSynEdit.DoPaintCaretShape(C: TCanvas; ARect: TRect;
-  ACaret: TATCaretItem; ACaretShape: TATCaretShape; ACaretColor: TColor);
+  ACaret: TATCaretItem; ACaretShape: TATCaretShape);
 var
   NCoordX, NCoordY: integer;
 begin
   if not FCaretBlinkEnabled and ACaretShape.IsNarrow then
   begin
-    C.Brush.Color:= ACaretColor;
+    C.Brush.Color:= (not (Colors.Caret xor Colors.TextBG)) and $ffffff;
     C.FillRect(ARect);
     exit;
   end;
 
-  CanvasInvertRect(C, ARect, ACaretColor);
+  CanvasInvertRect(C, ARect, Colors.Caret);
 
   if ACaretShape.EmptyInside then
   begin
@@ -7243,7 +7243,7 @@ begin
     Inc(ARect.Top);
     Dec(ARect.Right);
     Dec(ARect.Bottom);
-    CanvasInvertRect(C, ARect, ACaretColor);
+    CanvasInvertRect(C, ARect, Colors.Caret);
   end
   else
   if ATEditorOptions.CaretTextOverInvertedRect and not ACaretShape.IsNarrow then
@@ -7266,7 +7266,6 @@ procedure TATSynEdit.DoPaintCarets(C: TCanvas; AWithInvalidate: boolean);
 var
   Caret: TATCaretItem;
   CaretShape: TATCaretShape;
-  NCaretColor: TColor;
   R, R2: TRect;
   NCharWidth: integer;
   i: integer;
@@ -7288,21 +7287,6 @@ begin
     CaretShape:= FCaretShapeOverwrite
   else
     CaretShape:= FCaretShapeNormal;
-
-  if FCaretBlinkEnabled then
-    NCaretColor:= Colors.Caret
-  else
-    NCaretColor:= (not (Colors.Caret xor Colors.TextBG)) and $ffffff;
-  { //block was needed when we didn't have OptCaretHideUnfocused
-  if (not FCaretStopUnfocused) or _IsFocused then
-    NCaretColor:= Colors.Caret
-  else
-    //I cannot find proper color of NCaretColor, to make unfocused carets invisible,
-    //tried several combinations: Colors.TextBG with Colors.TextFont with 'xor'.
-    //at least value 'Colors.TextBG xor Colors.TextFont' gives PALE caret color
-    //on many CudaText themes (default and dark themes).
-    NCaretColor:= Colors.TextBG xor Colors.TextFont;
-    }
 
   if FCaretBlinkEnabled then
     FCaretShown:= not FCaretShown
@@ -7337,7 +7321,7 @@ begin
         R2:= Caret.OldRect;
         if R2.Width>0 then
         begin
-          CanvasInvertRect(C, R2, NCaretColor);
+          CanvasInvertRect(C, R2, Colors.Caret);
           if AWithInvalidate then
           begin
             {$ifdef darwin}
@@ -7349,11 +7333,11 @@ begin
         end;
       end;
 
-      DoPaintCaretShape(C, R, Caret, CaretShape, NCaretColor);
+      DoPaintCaretShape(C, R, Caret, CaretShape);
     end
     else
     begin
-      DoPaintCaretShape(C, R, Caret, CaretShape, NCaretColor);
+      DoPaintCaretShape(C, R, Caret, CaretShape);
     end;
 
     Caret.OldRect:= R;
