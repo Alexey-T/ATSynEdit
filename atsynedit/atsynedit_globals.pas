@@ -460,7 +460,7 @@ initialization
     MaxCaretTime:= 2000;
     MinCharsAfterAnyIndent:= 20; //if indent is too big, leave 20 chrs in wrapped-parts anyway
     MaxLinesForOldWrapUpdate:= 100; //if less lines, force old wrapinfo update (fast)
-    MinimapColoringTime:= 15;
+    MinimapColoringTime:= 40;
     HintScrollDx:= 5;
     HintBookmarkDx:= 6;
     HintBookmarkDy:= 16;
