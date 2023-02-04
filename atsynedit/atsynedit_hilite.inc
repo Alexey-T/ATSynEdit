@@ -116,6 +116,7 @@ procedure TATSynEdit.DoPartCalc_CreateNew(var AParts: TATLineParts;
 var
   St: TATStrings;
   bSel, bSelPrev, bAdd: boolean;
+  bWord, bWordPrev: boolean;
   nPart, nOffset, nLen, nIndex, i: integer;
   ch: WideChar;
 begin
@@ -150,17 +151,25 @@ begin
 
   bSel:= false;
   bSelPrev:= false;
+  bWord:= false;
+  bWordPrev:= false;
   nIndex:= -1;
 
   for i:= 0 to AOffsetMax do
   begin
     bSel:= IsPosSelected(ACharIndex+i, ALineIndex);
 
+    {$if defined(LCLQt) or defined(LCLQt5) or defined(LCLQt6) or defined(LCLCocoa)}
+    //fix trembling of text after selection, visible on Qt and Cocoa
+    bWord:= IsCharWord(St.LineCharAt(ALineIndex, ACharIndex+i+1));
+    {$endif}
+
     if nIndex<0 then
       bAdd:= true
     else
-      bAdd:= bSel<>bSelPrev;
+      bAdd:= (bSel<>bSelPrev) or (bWord<>bWordPrev);
     bSelPrev:= bSel;
+    bWordPrev:= bWord;
 
     if not bAdd then
     begin
@@ -184,8 +193,15 @@ begin
         end
         else
         begin
-          ColorFont:= FColorFont;//random($ffff);
+          ColorFont:= FColorFont;
           ColorBG:= AColorBG;
+          {//debug
+          ColorFont:= Random($ffff);
+          if bWord then
+            ColorBG:= clYellow
+          else
+            ColorBg:= clGray;
+          }
         end;
       end;
     end;
