@@ -121,7 +121,8 @@ var
   ch: WideChar;
 begin
   St:= Strings;
-  if not AWithSelection or not TempSel_IsLineWithSelection(ALineIndex) then
+  if not AWithSelection or
+    (TempSel_IsRangeSelected(ACharIndex, ALineIndex, ACharIndex+AOffsetMax, ALineIndex)=cRangeAllUnselected) then
   begin
     nOffset:= 0;
     nLen:= Min(St.LinesLen[ALineIndex], AOffsetMax);
@@ -195,7 +196,8 @@ begin
         begin
           ColorFont:= FColorFont;
           ColorBG:= AColorBG;
-          {//debug
+          {
+          //debug
           ColorFont:= Random($ffff);
           if bWord then
             ColorBG:= clYellow
