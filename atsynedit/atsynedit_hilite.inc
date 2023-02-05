@@ -117,7 +117,7 @@ var
   St: TATStrings;
   bSel, bSelPrev, bAdd: boolean;
   bWord, bWordPrev: boolean;
-  nPartIndex, nOffset, nLen, nCharOffset, nCharInLine: integer;
+  nPartIndex, nPartOffset, nPartLen, nCharOffset, nCharInLine: integer;
   SLine: atString;
   ch: WideChar;
 const
@@ -129,27 +129,27 @@ begin
   if not AWithSelection or
     (TempSel_IsRangeSelected(ACharIndex, ALineIndex, ACharIndex+AOffsetMax, ALineIndex)=cRangeAllUnselected) then
   begin
-    nOffset:= 0;
-    nLen:= Min(St.LinesLen[ALineIndex], AOffsetMax);
+    nPartOffset:= 0;
+    nPartLen:= Min(St.LinesLen[ALineIndex], AOffsetMax);
     nPartIndex:= 0;
 
     //split leading tab-chars to separate part
     //this is much needed for gtk2, which paints ExtTextOut with Dx much slower
     repeat
-      if nLen=0 then Break;
-      ch:= St.LineCharAt(ALineIndex, ACharIndex+nOffset+1);
+      if nPartLen=0 then Break;
+      ch:= St.LineCharAt(ALineIndex, ACharIndex+nPartOffset+1);
       if ch<>#9 then Break;
       AParts[0].Offset:= 0;
       Inc(AParts[0].Len);
       AParts[0].ColorFont:= FColorFont;
       AParts[0].ColorBG:= AColorBG;
-      Inc(nOffset);
-      Dec(nLen);
+      Inc(nPartOffset);
+      Dec(nPartLen);
       nPartIndex:= 1;
     until false;
 
-    AParts[nPartIndex].Offset:= nOffset;
-    AParts[nPartIndex].Len:= nLen;
+    AParts[nPartIndex].Offset:= nPartOffset;
+    AParts[nPartIndex].Len:= nPartLen;
     AParts[nPartIndex].ColorFont:= FColorFont;
     AParts[nPartIndex].ColorBG:= AColorBG;
     exit;
