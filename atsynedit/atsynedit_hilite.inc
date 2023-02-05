@@ -119,7 +119,6 @@ var
   bWord, bWordPrev: boolean;
   nPartIndex, nPartOffset, nPartLen, nCharOffset, nCharInLine: integer;
   SLine: atString;
-  ch: WideChar;
 const
   //fix sub-pixel trembling of text after selection, visible on Qt5 and Cocoa.
   //we split long line to words => only one word (touched by selection edge) is trembling.
@@ -137,8 +136,7 @@ begin
     //this is much needed for gtk2, which paints ExtTextOut with Dx much slower
     repeat
       if nPartLen=0 then Break;
-      ch:= St.LineCharAt(ALineIndex, ACharIndex+nPartOffset+1);
-      if ch<>#9 then Break;
+      if St.LineCharAt(ALineIndex, ACharIndex+nPartOffset+1)<>#9 then Break;
       AParts[0].Offset:= 0;
       Inc(AParts[0].Len);
       AParts[0].ColorFont:= FColorFont;
