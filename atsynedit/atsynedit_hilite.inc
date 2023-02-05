@@ -162,7 +162,7 @@ begin
 
     {$if defined(LCLQt) or defined(LCLQt5) or defined(LCLQt6) or defined(LCLCocoa)}
     //fix trembling of text after selection, visible on Qt and Cocoa
-    bWord:= IsCharWord(St.LineCharAt(ALineIndex, ACharIndex+i+1));
+    bWord:= IsCharWord(St.LineCharAt(ALineIndex, ACharIndex+nCharOffset+1));
     {$endif}
 
     if nPartIndex<0 then
