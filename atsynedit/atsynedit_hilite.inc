@@ -117,7 +117,7 @@ var
   St: TATStrings;
   bSel, bSelPrev, bAdd: boolean;
   bWord, bWordPrev: boolean;
-  nPart, nOffset, nLen, nPartIndex, nCharOffset: integer;
+  nPartIndex, nOffset, nLen, nCharOffset, nCharInLine: integer;
   SLine: atString;
   ch: WideChar;
 const
@@ -131,7 +131,7 @@ begin
   begin
     nOffset:= 0;
     nLen:= Min(St.LinesLen[ALineIndex], AOffsetMax);
-    nPart:= 0;
+    nPartIndex:= 0;
 
     //split leading tab-chars to separate part
     //this is much needed for gtk2, which paints ExtTextOut with Dx much slower
@@ -145,13 +145,13 @@ begin
       AParts[0].ColorBG:= AColorBG;
       Inc(nOffset);
       Dec(nLen);
-      nPart:= 1;
+      nPartIndex:= 1;
     until false;
 
-    AParts[nPart].Offset:= nOffset;
-    AParts[nPart].Len:= nLen;
-    AParts[nPart].ColorFont:= FColorFont;
-    AParts[nPart].ColorBG:= AColorBG;
+    AParts[nPartIndex].Offset:= nOffset;
+    AParts[nPartIndex].Len:= nLen;
+    AParts[nPartIndex].ColorFont:= FColorFont;
+    AParts[nPartIndex].ColorBG:= AColorBG;
     exit;
   end;
 
@@ -171,7 +171,11 @@ begin
     bSel:= IsPosSelected(ACharIndex+nCharOffset, ALineIndex);
 
     if bFixFontTrembling then
-      bWord:= IsCharWord(SLine[ACharIndex+nCharOffset+1]);
+    begin
+      nCharInLine:= ACharIndex+nCharOffset+1;
+      if nCharInLine<=Length(SLine) then
+        bWord:= IsCharWord(SLine[nCharInLine]);
+    end;
 
     if nPartIndex<0 then
       bAdd:= true
