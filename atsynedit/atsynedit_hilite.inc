@@ -161,7 +161,8 @@ begin
     bSel:= IsPosSelected(ACharIndex+nCharOffset, ALineIndex);
 
     {$if defined(LCLQt) or defined(LCLQt5) or defined(LCLQt6) or defined(LCLCocoa)}
-    //fix trembling of text after selection, visible on Qt and Cocoa
+    //fix sub-pixel trembling of text after selection, visible on Qt5 and Cocoa
+    //we split long line to words (tokens) => only one word is trembling now
     bWord:= IsCharWord(St.LineCharAt(ALineIndex, ACharIndex+nCharOffset+1));
     {$endif}
 
