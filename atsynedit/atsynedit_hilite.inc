@@ -117,7 +117,7 @@ var
   St: TATStrings;
   bSel, bSelPrev, bAdd: boolean;
   bWord, bWordPrev: boolean;
-  nPart, nOffset, nLen, nIndex, i: integer;
+  nPart, nOffset, nLen, nPartIndex, nCharOffset: integer;
   ch: WideChar;
 begin
   St:= Strings;
@@ -154,18 +154,18 @@ begin
   bSelPrev:= false;
   bWord:= false;
   bWordPrev:= false;
-  nIndex:= -1;
+  nPartIndex:= -1;
 
-  for i:= 0 to AOffsetMax do
+  for nCharOffset:= 0 to AOffsetMax do
   begin
-    bSel:= IsPosSelected(ACharIndex+i, ALineIndex);
+    bSel:= IsPosSelected(ACharIndex+nCharOffset, ALineIndex);
 
     {$if defined(LCLQt) or defined(LCLQt5) or defined(LCLQt6) or defined(LCLCocoa)}
     //fix trembling of text after selection, visible on Qt and Cocoa
     bWord:= IsCharWord(St.LineCharAt(ALineIndex, ACharIndex+i+1));
     {$endif}
 
-    if nIndex<0 then
+    if nPartIndex<0 then
       bAdd:= true
     else
       bAdd:= (bSel<>bSelPrev) or (bWord<>bWordPrev);
@@ -174,15 +174,15 @@ begin
 
     if not bAdd then
     begin
-      Inc(AParts[nIndex].Len);
+      Inc(AParts[nPartIndex].Len);
     end
     else
     begin
-      Inc(nIndex);
-      if nIndex>=High(AParts) then Break;
-      with AParts[nIndex] do
+      Inc(nPartIndex);
+      if nPartIndex>=High(AParts) then Break;
+      with AParts[nPartIndex] do
       begin
-        Offset:= i;
+        Offset:= nCharOffset;
         Len:= 1;
         if bSel then
         begin
