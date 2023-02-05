@@ -118,7 +118,12 @@ var
   bSel, bSelPrev, bAdd: boolean;
   bWord, bWordPrev: boolean;
   nPart, nOffset, nLen, nPartIndex, nCharOffset: integer;
+  SLine: atString;
   ch: WideChar;
+const
+  //fix sub-pixel trembling of text after selection, visible on Qt5 and Cocoa.
+  //we split long line to words => only one word (touched by selection edge) is trembling.
+  bFixFontTrembling = {$if defined(LCLQt) or defined(LCLQt5) or defined(LCLQt6) or defined(LCLCocoa)} true {$else} false {$endif};
 begin
   St:= Strings;
   if not AWithSelection or
@@ -156,15 +161,17 @@ begin
   bWordPrev:= false;
   nPartIndex:= -1;
 
+  if bFixFontTrembling then
+    SLine:= St.Lines[ALineIndex]
+  else
+    SLine:= '';
+
   for nCharOffset:= 0 to AOffsetMax do
   begin
     bSel:= IsPosSelected(ACharIndex+nCharOffset, ALineIndex);
 
-    {$if defined(LCLQt) or defined(LCLQt5) or defined(LCLQt6) or defined(LCLCocoa)}
-    //fix sub-pixel trembling of text after selection, visible on Qt5 and Cocoa
-    //we split long line to words (tokens) => only one word is trembling now
-    bWord:= IsCharWord(St.LineCharAt(ALineIndex, ACharIndex+nCharOffset+1));
-    {$endif}
+    if bFixFontTrembling then
+      bWord:= IsCharWord(SLine[ACharIndex+nCharOffset+1]);
 
     if nPartIndex<0 then
       bAdd:= true
