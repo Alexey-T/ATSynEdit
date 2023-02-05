@@ -5555,7 +5555,6 @@ begin
 end;
 
 procedure TATSynEdit.DoPaint(ALineFrom: integer);
-//gets True if one of the scrollbars changed its Visible state
 begin
   Exclude(FPaintFlags, cIntFlagRepaintNeeded);
   if csLoading in ComponentState then exit;
