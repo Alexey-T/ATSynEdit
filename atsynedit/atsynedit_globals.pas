@@ -221,7 +221,7 @@ type
   end;
 
 function ATEditorGetClipboardExData(out AInfo: TATEditorClipboardExData): boolean;
-procedure ATEditorFreeClipboardRecents(var L: TList);
+procedure ATEditorClearClipboardRecents(var L: TList; AMaxItems: integer);
 
 var
   ATEditorClipboardRecents: TList = nil;
@@ -366,16 +366,16 @@ begin
   end;
 end;
 
-procedure ATEditorFreeClipboardRecents(var L: TList);
+procedure ATEditorClearClipboardRecents(var L: TList; AMaxItems: integer);
 var
   i: integer;
 begin
-  for i:= L.Count-1 downto 0 do
+  for i:= L.Count-1 downto AMaxItems do
   begin
     TObject(L[i]).Free;
     L[i]:= nil;
+    L.Delete(i);
   end;
-  L.Clear;
 end;
 
 
@@ -515,7 +515,10 @@ initialization
 finalization
 
   if Assigned(ATEditorClipboardRecents) then
-    ATEditorFreeClipboardRecents(ATEditorClipboardRecents);
+  begin
+    ATEditorClearClipboardRecents(ATEditorClipboardRecents, 0);
+    FreeAndNil(ATEditorClipboardRecents);
+  end;
 
   if Assigned(ATEditorClipboardRecentMenu) then
     FreeAndNil(ATEditorClipboardRecentMenu);
