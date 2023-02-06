@@ -353,12 +353,12 @@ begin
       Data.CaretCount:= Carets.Count;
       Data.FirstLineIndentChars:= SGetIndentChars(SLine);
       Data.FirstLineIndentColumns:= TabHelper.CharPosToColumnPos(Y1, SLine, Data.FirstLineIndentChars);
-      Data.FileName:= Self.FileName;
-      Data.FileName[High(Data.FileName)]:= #0;
-      Data.ModifiedVersion:= Strings.ModifiedVersion;
-      Data.TickOnCopy:= GetTickCount64;
     end;
   end;
+  Data.FileName:= Self.FileName;
+  Data.FileName[High(Data.FileName)]:= #0;
+  Data.ModifiedVersion:= Strings.ModifiedVersion;
+  Data.TickOnCopy:= GetTickCount64;
 end;
 
 procedure TATSynEdit.UpdateClipboardRecents(const AText: string);
