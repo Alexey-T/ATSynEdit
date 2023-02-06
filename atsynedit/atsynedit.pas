@@ -956,6 +956,7 @@ type
     FOptMouse2ClickAction: TATEditorDoubleClickAction;
     FOptMouse2ClickOpensURL: boolean;
     FOptMouse2ClickDragSelectsWords: boolean;
+    FOptMouse2ClickOnFoldMarkSelectsFoldedLines: boolean;
     FOptMouse3ClickSelectsLine: boolean;
     FOptMouseDragDrop: boolean;
     FOptMouseDragDropCopying: boolean;
@@ -2010,6 +2011,7 @@ type
     property OptMouseClickNumberSelectsLineWithEOL: boolean read FOptMouseClickNumberSelectsLineWithEOL write FOptMouseClickNumberSelectsLineWithEOL default true;
     property OptMouse2ClickAction: TATEditorDoubleClickAction read FOptMouse2ClickAction write FOptMouse2ClickAction default cMouseDblClickSelectAnyChars;
     property OptMouse2ClickOpensURL: boolean read FOptMouse2ClickOpensURL write FOptMouse2ClickOpensURL default true;
+    property OptMouse2ClickOnFoldMarkSelectsFoldedLines: boolean read FOptMouse2ClickOnFoldMarkSelectsFoldedLines write FOptMouse2ClickOnFoldMarkSelectsFoldedLines default true;
     property OptMouse2ClickDragSelectsWords: boolean read FOptMouse2ClickDragSelectsWords write FOptMouse2ClickDragSelectsWords default true;
     property OptMouse3ClickSelectsLine: boolean read FOptMouse3ClickSelectsLine write FOptMouse3ClickSelectsLine default true;
     property OptMouseDragDrop: boolean read FOptMouseDragDrop write FOptMouseDragDrop default true;
@@ -4545,17 +4547,14 @@ begin
   C.Rectangle(RectMark);
   C.Brush.Style:= bsSolid;
 
-  if FFoldTooltipVisible then
-  begin
-    FoldMark.Init(
-      RectMark,
-      APosY,
-      APosY + DoGetFoldedMarkLinesCount(APosY) -1
-      );
+  FoldMark.Init(
+    RectMark,
+    APosY,
+    APosY + DoGetFoldedMarkLinesCount(APosY) -1
+    );
 
-    InitFoldedMarkList;
-    FFoldedMarkList.Add(FoldMark);
-  end;
+  InitFoldedMarkList;
+  FFoldedMarkList.Add(FoldMark);
 end;
 
 function TATSynEdit.GetMarginString: string;
@@ -4958,6 +4957,7 @@ begin
   FOptMouseClickNumberSelectsLineWithEOL:= true;
   FOptMouse2ClickAction:= cMouseDblClickSelectAnyChars;
   FOptMouse2ClickOpensURL:= true;
+  FOptMouse2ClickOnFoldMarkSelectsFoldedLines:= true;
   FOptMouse2ClickDragSelectsWords:= true;
   FOptMouse3ClickSelectsLine:= true;
 
@@ -6923,11 +6923,25 @@ procedure TATSynEdit.DblClick;
 var
   Caret: TATCaretItem;
   SLink: atString;
+  FoldMark: TATFoldedMark;
+  MousePnt: TPoint;
 begin
   if not OptMouseEnableAll then exit;
   inherited;
 
   if DoHandleClickEvent(FOnClickDbl) then Exit;
+
+  if FOptMouse2ClickOnFoldMarkSelectsFoldedLines then
+    if Assigned(FFoldedMarkList) and (FFoldedMarkList.Count>0) then
+    begin
+      MousePnt:= ScreenToClient(Mouse.CursorPos);
+      FoldMark:= FFoldedMarkList.FindByCoord(MousePnt);
+      if FoldMark.IsInited then
+      begin
+        DoSelect_LineRange(FoldMark.LineFrom, Point(0, FoldMark.LineTo+1));
+        exit;
+      end;
+    end;
 
   if FOptMouse2ClickOpensURL then
     if Carets.Count>0 then

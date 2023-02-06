@@ -1,3 +1,6 @@
+2023.02.06
++ add: OptMouse2ClickOnFoldMarkSelectsFoldedLines
+
 2023.01.10
 * change: function to export HTML was renamed and has added parameters
 * change: method DoCalcLineHiliteEx has param AWithSelection
