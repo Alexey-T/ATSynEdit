@@ -227,7 +227,7 @@ begin
   if Carets.Count=0 then Exit;
 
   if ATEditorClipboardRecents=nil then Exit;
-  if ATEditorOptions.MaxClipboardRecents<=0 then Exit;
+  if ATEditorMaxClipboardRecents<=0 then Exit;
 
   if ATEditorClipboardRecentMenu=nil then
     ATEditorClipboardRecentMenu:= TPopupMenu.Create(nil);
@@ -366,7 +366,7 @@ var
   ClipExItem: TATEditorClipboardExItem;
 begin
   if AText='' then Exit;
-  if ATEditorOptions.MaxClipboardRecents<=0 then Exit;
+  if ATEditorMaxClipboardRecents<=0 then Exit;
 
   if ATEditorClipboardRecents=nil then
     ATEditorClipboardRecents:= TATEditorClipboardRecents.Create;

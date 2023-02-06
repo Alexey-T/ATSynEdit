@@ -56,6 +56,7 @@ uses
   ATSynEdit_Adapters,
   ATSynEdit_LinkCache,
   ATSynEdit_FGL,
+  ATSynEdit_ClipRecents,
   ATScrollBar;
 
 type
