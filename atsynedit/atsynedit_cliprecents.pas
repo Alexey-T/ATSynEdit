@@ -44,6 +44,7 @@ type
     function Count: integer;
     property Items[AIndex: integer]: TATEditorClipboardExItem read GetItems;
     procedure Clear;
+    function FindText(const AText: string): integer;
   end;
 
 var
@@ -101,9 +102,29 @@ begin
 end;
 
 procedure TATEditorClipboardRecents.Add(AItem: TATEditorClipboardExItem);
+var
+  N: integer;
 begin
+  N:= FindText(AItem.Text);
+  if N>=0 then
+  begin
+    TObject(L[N]).Free;
+    L.Delete(N);
+  end;
+
   L.Insert(0, AItem);
   LimitCount(ATEditorMaxClipboardRecents);
 end;
+
+function TATEditorClipboardRecents.FindText(const AText: string): integer;
+var
+  i: integer;
+begin
+  for i:= 0 to Count-1 do
+    if Items[i].Text=AText then
+      exit(i);
+  Result:= -1;
+end;
+
 
 end.
