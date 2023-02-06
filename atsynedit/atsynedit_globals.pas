@@ -425,7 +425,7 @@ initialization
 
     UsePaintStatic:= true;
     FoldedLenOfEmptyHint:= 50;
-    FoldedMarkIndentInner:= 2; //indent inside [...] folded-mark
+    FoldedMarkIndentInner:= 1; //indent inside [...] folded-mark
     FoldedMarkIndentOuter:= 2; //indent before [...] folded-mark
     SpeedScrollNice:= 3;
     SizeGutterFoldLineDx:= 3;
