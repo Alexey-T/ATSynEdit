@@ -4498,10 +4498,10 @@ procedure TATSynEdit.DoPaintFoldedMark(C: TCanvas;
   APosX, APosY, ACoordX, ACoordY: integer;
   const AMarkText: string);
 var
-  NWidth: integer;
   Str: string;
   RectMark: TRect;
   FoldMark: TATFoldedMark;
+  NWidth, NRangeIndex, NLastFoldedLine: integer;
 begin
   Str:= AMarkText;
 
@@ -4547,13 +4547,14 @@ begin
   C.Rectangle(RectMark);
   C.Brush.Style:= bsSolid;
 
-  FoldMark.Init(
-    RectMark,
-    APosY,
-    APosY + DoGetFoldedMarkLinesCount(APosY) -1
-    );
+  NRangeIndex:= FFold.FindRangeWithPlusAtLine(APosY);
+  if NRangeIndex>=0 then
+    NLastFoldedLine:= FFold.ItemPtr(NRangeIndex)^.Y2
+  else
+    NLastFoldedLine:= APosY + DoGetFoldedMarkLinesCount(APosY) -1;
 
   InitFoldedMarkList;
+  FoldMark.Init(RectMark, APosY, NLastFoldedLine);
   FFoldedMarkList.Add(FoldMark);
 end;
 
