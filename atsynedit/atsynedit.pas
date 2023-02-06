@@ -9308,6 +9308,7 @@ var
   NOutputStrWidth: Int64;
   NLine, NWrapIndex: integer;
   NVisibleColumns: integer;
+  NTextX, NTextY: integer;
   NColorAfter: TColor;
   WrapItem: TATWrapItem;
   TextOutProps: TATCanvasTextOutProps;
@@ -9401,9 +9402,13 @@ begin
     TextOutProps.LineIndex:= WrapItem.NLineIndex;
     TextOutProps.CharIndexInLine:= WrapItem.NCharIndex;
 
+    NTextX:= ATEditorOptions.SizeIndentTooltipX + WrapItem.NIndent*FCharSize.XScaled*FCharSize.XSpacePercents div ATEditorCharXScale div 100;
+    NTextY:= ATEditorOptions.SizeIndentTooltipY + FCharSize.Y*(NLine-ALineFrom);
+    if NTextY>=ARect.Bottom then Break;
+
     CanvasTextOut(C,
-      ATEditorOptions.SizeIndentTooltipX + WrapItem.NIndent*FCharSize.XScaled*FCharSize.XSpacePercents div ATEditorCharXScale div 100,
-      ATEditorOptions.SizeIndentTooltipY + FCharSize.Y*(NLine-ALineFrom),
+      NTextX,
+      NTextY,
       SText,
       @FParts,
       NOutputStrWidth,
