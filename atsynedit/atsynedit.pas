@@ -9475,7 +9475,7 @@ begin
   InitFoldedMarkTooltip;
 
   FFoldedMarkTooltip.Width:= FRectMain.Width * FFoldTooltipWidthPercents div 100;
-  FFoldedMarkTooltip.Height:= (FFoldedMarkCurrent.LineTo-FFoldedMarkCurrent.LineFrom+1) * FCharSize.Y + 2;
+  FFoldedMarkTooltip.Height:= Min(FFoldTooltipLineCount, FFoldedMarkCurrent.LineTo-FFoldedMarkCurrent.LineFrom+1) * FCharSize.Y + 2;
   FFoldedMarkTooltip.Left:= Min(
     FRectMain.Right - FFoldedMarkTooltip.Width - 1,
     FFoldedMarkCurrent.Coord.Left);
