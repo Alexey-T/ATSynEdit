@@ -1054,7 +1054,6 @@ type
     procedure DoMarkAllRangesUnfolded;
     procedure DoMarkAllLinesVisible;
     procedure DoFoldbarClick(ALine: integer);
-    function DoGetFoldedMarkLinesCount(ALine: integer): integer;
     procedure DoHandleRightClick(X, Y: integer);
     function DoHandleClickEvent(AEvent: TATSynEditClickEvent): boolean;
     procedure DoHotspotsExit;
@@ -4549,13 +4548,12 @@ begin
 
   NRangeIndex:= FFold.FindRangeWithPlusAtLine(APosY);
   if NRangeIndex>=0 then
-    NLastFoldedLine:= FFold.ItemPtr(NRangeIndex)^.Y2
-  else
-    NLastFoldedLine:= APosY + DoGetFoldedMarkLinesCount(APosY) -1;
-
-  InitFoldedMarkList;
-  FoldMark.Init(RectMark, APosY, NLastFoldedLine);
-  FFoldedMarkList.Add(FoldMark);
+  begin
+    NLastFoldedLine:= FFold.ItemPtr(NRangeIndex)^.Y2;
+    InitFoldedMarkList;
+    FoldMark.Init(RectMark, APosY, NLastFoldedLine);
+    FFoldedMarkList.Add(FoldMark);
+  end;
 end;
 
 function TATSynEdit.GetMarginString: string;
@@ -9511,20 +9509,6 @@ procedure TATSynEdit.FoldedMarkMouseEnter(Sender: TObject);
 begin
   if Assigned(FFoldedMarkTooltip) then
     FFoldedMarkTooltip.Hide;
-end;
-
-function TATSynEdit.DoGetFoldedMarkLinesCount(ALine: integer): integer;
-var
-  St: TATStrings;
-  i: integer;
-begin
-  Result:= 1;
-  St:= Strings;
-  for i:= ALine+1 to Min(ALine+FFoldTooltipLineCount-1, St.Count-1) do
-    if St.LinesHidden[i, FEditorIndex] then
-      Inc(Result)
-    else
-      Break;
 end;
 
 
