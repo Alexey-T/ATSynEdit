@@ -214,10 +214,17 @@ type
     TickOnCopy: QWord;
   end;
 
+  TATEditorClipboardExItem = class
+  public
+    Data: TATEditorClipboardExData;
+    Text: string;
+  end;
+
 function ATEditorGetClipboardExData(out AInfo: TATEditorClipboardExData): boolean;
+procedure ATEditorFreeClipboardRecents(var L: TList);
 
 var
-  ATEditorClipboardRecents: TStringList = nil;
+  ATEditorClipboardRecents: TList = nil;
   ATEditorClipboardRecentMenu: TPopupMenu = nil;
 
 
@@ -359,6 +366,18 @@ begin
   end;
 end;
 
+procedure ATEditorFreeClipboardRecents(var L: TList);
+var
+  i: integer;
+begin
+  for i:= L.Count-1 downto 0 do
+  begin
+    TObject(L[i]).Free;
+    L[i]:= nil;
+  end;
+  L.Clear;
+end;
+
 
 initialization
 
@@ -496,7 +515,7 @@ initialization
 finalization
 
   if Assigned(ATEditorClipboardRecents) then
-    FreeAndNil(ATEditorClipboardRecents);
+    ATEditorFreeClipboardRecents(ATEditorClipboardRecents);
 
   if Assigned(ATEditorClipboardRecentMenu) then
     FreeAndNil(ATEditorClipboardRecentMenu);

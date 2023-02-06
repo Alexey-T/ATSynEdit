@@ -179,6 +179,7 @@ end;
 procedure TATSynEdit.MenuitemClipboardRecentsClick(Sender: TObject);
 var
   NTag: integer;
+  ClipExItem: TATEditorClipboardExItem;
 begin
   if ModeReadOnly then Exit;
   if Carets.Count=0 then Exit;
@@ -186,10 +187,11 @@ begin
   NTag:= (Sender as TComponent).Tag;
   if (NTag>=0) and (NTag<ATEditorClipboardRecents.Count) then
   begin
+    ClipExItem:= TATEditorClipboardExItem(ATEditorClipboardRecents[NTag]);
     DoCommand(
       cCommand_TextInsert,
       cInvokeInternal,
-      UTF8Decode(ATEditorClipboardRecents[NTag])
+      UTF8Decode(ClipExItem.Text)
       );
   end;
 end;
@@ -214,6 +216,7 @@ function TATSynEdit.DoCommand_ClipboardPasteFromRecents: TATCommandResults;
   end;
   //
 var
+  ClipExItem: TATEditorClipboardExItem;
   mi: TMenuItem;
   Pnt: TPoint;
   S: string;
@@ -233,7 +236,8 @@ begin
   for i:= 0 to ATEditorClipboardRecents.Count-1 do
   begin
     mi:= TMenuItem.Create(ATEditorClipboardRecentMenu);
-    S:= ATEditorClipboardRecents[i];
+    ClipExItem:= TATEditorClipboardExItem(ATEditorClipboardRecents[i]);
+    S:= ClipExItem.Text;
     S:= PrepareStringForMenu(S);
     if Length(S)>ATEditorOptions.MaxClipboardRecentsMenuitemLen then
       S:= Copy(S, 1, ATEditorOptions.MaxClipboardRecentsMenuitemLen)+'...';
@@ -292,10 +296,7 @@ function TATSynEdit.DoCommand_ClipboardCopy(Append: boolean;
   AClipboardObject: TClipboard): TATCommandResults;
 var
   ClipExData: TATEditorClipboardExData;
-  SLine: atString;
   SNewText: string;
-  X1, Y1, X2, Y2: integer;
-  bSel: boolean;
 begin
   SNewText:= GetTextForClipboard;
 
@@ -323,45 +324,62 @@ begin
     SClipboardCopy(SNewText, PrimarySelection);
   {$endif}
 
-  if Carets.Count>0 then
-  begin
-    Carets[0].GetRange(X1, Y1, X2, Y2, bSel);
-    if Strings.IsIndexValid(Y1) then
-    begin
-      SLine:= Strings.Lines[Y1];
-      ClipExData:= Default(TATEditorClipboardExData);
-      ClipExData.CaretPos:= Rect(X1, Y1, X2, Y2);
-      ClipExData.CaretCount:= Carets.Count;
-      ClipExData.FirstLineIndentChars:= SGetIndentChars(SLine);
-      ClipExData.FirstLineIndentColumns:= TabHelper.CharPosToColumnPos(Y1, SLine, ClipExData.FirstLineIndentChars);
-      ClipExData.FileName:= Self.FileName;
-      ClipExData.FileName[High(ClipExData.FileName)]:= #0;
-      ClipExData.ModifiedVersion:= Strings.ModifiedVersion;
-      ClipExData.TickOnCopy:= GetTickCount64;
-      AClipboardObject.AddFormat(
-        ATEditorOptions.ClipboardExFormat,
-        ClipExData,
-        SizeOf(ClipExData));
-    end;
-  end;
+  InitClipboardExData(ClipExData);
+  AClipboardObject.AddFormat(
+    ATEditorOptions.ClipboardExFormat,
+    ClipExData,
+    SizeOf(ClipExData));
 
   UpdateClipboardRecents(SNewText);
 
   Result:= [];
 end;
 
+procedure TATSynEdit.InitClipboardExData(var Data: TATEditorClipboardExData);
+var
+  X1, Y1, X2, Y2: integer;
+  bSel: boolean;
+  SLine: atString;
+begin
+  Data:= Default(TATEditorClipboardExData);
+  if Carets.Count>0 then
+  begin
+    Carets[0].GetRange(X1, Y1, X2, Y2, bSel);
+    if Strings.IsIndexValid(Y1) then
+    begin
+      SLine:= Strings.Lines[Y1];
+      Data:= Default(TATEditorClipboardExData);
+      Data.CaretPos:= Rect(X1, Y1, X2, Y2);
+      Data.CaretCount:= Carets.Count;
+      Data.FirstLineIndentChars:= SGetIndentChars(SLine);
+      Data.FirstLineIndentColumns:= TabHelper.CharPosToColumnPos(Y1, SLine, Data.FirstLineIndentChars);
+      Data.FileName:= Self.FileName;
+      Data.FileName[High(Data.FileName)]:= #0;
+      Data.ModifiedVersion:= Strings.ModifiedVersion;
+      Data.TickOnCopy:= GetTickCount64;
+    end;
+  end;
+end;
 
 procedure TATSynEdit.UpdateClipboardRecents(const AText: string);
 var
-  i: integer;
+  ClipExItem: TATEditorClipboardExItem;
+  i, j: integer;
 begin
   if AText='' then Exit;
   if ATEditorOptions.MaxClipboardRecents<=0 then Exit;
 
   if ATEditorClipboardRecents=nil then
-    ATEditorClipboardRecents:= TStringList.Create;
+    ATEditorClipboardRecents:= TList.Create;
 
-  i:= ATEditorClipboardRecents.IndexOf(AText);
+  i:= -1;
+  for j:= 0 to ATEditorClipboardRecents.Count-1 do
+    if TATEditorClipboardExItem(ATEditorClipboardRecents[j]).Text=AText then
+    begin
+      i:= j;
+      Break;
+    end;
+
   if i=0 then
   begin
   end
@@ -372,7 +390,11 @@ begin
   end
   else
   begin
-    ATEditorClipboardRecents.Insert(0, AText);
+    ClipExItem:= TATEditorClipboardExItem.Create;
+    ClipExItem.Text:= AText;
+    InitClipboardExData(ClipExItem.Data);
+
+    ATEditorClipboardRecents.Insert(0, ClipExItem);
     while ATEditorClipboardRecents.Count>ATEditorOptions.MaxClipboardRecents do
       ATEditorClipboardRecents.Delete(ATEditorClipboardRecents.Count-1);
   end;
