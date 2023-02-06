@@ -42,6 +42,8 @@ type
     destructor Destroy; override;
     procedure Add(AItem: TATEditorClipboardExItem);
     function Count: integer;
+    function IsIndexValid(AIndex: integer): boolean;
+    procedure Delete(AIndex: integer);
     property Items[AIndex: integer]: TATEditorClipboardExItem read GetItems;
     procedure Clear;
     function FindText(const AText: string): integer;
@@ -81,21 +83,32 @@ begin
   Result:= L.Count;
 end;
 
+function TATEditorClipboardRecents.IsIndexValid(AIndex: integer): boolean;
+begin
+  Result:= (AIndex>=0) and (AIndex<Count);
+end;
+
+procedure TATEditorClipboardRecents.Delete(AIndex: integer);
+begin
+  if IsIndexValid(AIndex) then
+  begin
+    TObject(L[AIndex]).Free;
+    L[AIndex]:= nil;
+    L.Delete(AIndex);
+  end;
+end;
+
 procedure TATEditorClipboardRecents.LimitCount(AMaxCount: integer);
 var
   i: integer;
 begin
   for i:= L.Count-1 downto AMaxCount do
-  begin
-    TObject(L[i]).Free;
-    L[i]:= nil;
-    L.Delete(i);
-  end;
+    Delete(i);
 end;
 
 function TATEditorClipboardRecents.GetItems(AIndex: integer): TATEditorClipboardExItem;
 begin
-  if (AIndex>=0) and (AIndex<L.Count) then
+  if IsIndexValid(AIndex) then
     Result:= TATEditorClipboardExItem(L[AIndex])
   else
     Result:= nil;
@@ -107,10 +120,7 @@ var
 begin
   N:= FindText(AItem.Text);
   if N>=0 then
-  begin
-    TObject(L[N]).Free;
-    L.Delete(N);
-  end;
+    Delete(N);
 
   L.Insert(0, AItem);
   LimitCount(ATEditorMaxClipboardRecents);
