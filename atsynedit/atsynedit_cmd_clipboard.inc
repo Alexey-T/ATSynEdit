@@ -364,7 +364,6 @@ end;
 procedure TATSynEdit.UpdateClipboardRecents(const AText: string);
 var
   ClipExItem: TATEditorClipboardExItem;
-  i, j: integer;
 begin
   if AText='' then Exit;
   if ATEditorOptions.MaxClipboardRecents<=0 then Exit;
@@ -372,32 +371,13 @@ begin
   if ATEditorClipboardRecents=nil then
     ATEditorClipboardRecents:= TList.Create;
 
-  i:= -1;
-  for j:= 0 to ATEditorClipboardRecents.Count-1 do
-    if TATEditorClipboardExItem(ATEditorClipboardRecents[j]).Text=AText then
-    begin
-      i:= j;
-      Break;
-    end;
+  ClipExItem:= TATEditorClipboardExItem.Create;
+  ClipExItem.Text:= AText;
+  InitClipboardExData(ClipExItem.Data);
 
-  if i=0 then
-  begin
-  end
-  else
-  if i>0 then
-  begin
-    ATEditorClipboardRecents.Move(i, 0);
-  end
-  else
-  begin
-    ClipExItem:= TATEditorClipboardExItem.Create;
-    ClipExItem.Text:= AText;
-    InitClipboardExData(ClipExItem.Data);
-
-    ATEditorClipboardRecents.Insert(0, ClipExItem);
-    while ATEditorClipboardRecents.Count>ATEditorOptions.MaxClipboardRecents do
-      ATEditorClipboardRecents.Delete(ATEditorClipboardRecents.Count-1);
-  end;
+  ATEditorClipboardRecents.Insert(0, ClipExItem);
+  while ATEditorClipboardRecents.Count>ATEditorOptions.MaxClipboardRecents do
+    ATEditorClipboardRecents.Delete(ATEditorClipboardRecents.Count-1);
 end;
 
 
