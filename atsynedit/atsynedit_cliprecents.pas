@@ -51,7 +51,7 @@ var
 var
   ATEditorClipboardRecentMenu: TPopupMenu = nil;
 var
-  ATEditorMaxClipboardRecents: integer = 15;
+  ATEditorMaxClipboardRecents: integer = 0; //0 means: disabled by default
 
 
 implementation
