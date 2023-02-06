@@ -1002,7 +1002,7 @@ type
     procedure DoChangeBookmarks;
     procedure DoHandleWheelRecord(const ARec: TATEditorWheelRecord);
     procedure DoStringsOnUnfoldLine(Sender: TObject; ALine: integer);
-    procedure InitClipboardExData(var Data: TATEditorClipboardExData);
+    procedure InitClipboardExData(out Data: TATEditorClipboardExData);
     procedure FlushEditingChangeEx(AChange: TATLineChangeKind; ALine, AItemCount: integer);
     procedure FlushEditingChangeLog(ALine: integer);
     function GetActualDragDropIsCopying: boolean;

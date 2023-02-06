@@ -335,7 +335,7 @@ begin
   Result:= [];
 end;
 
-procedure TATSynEdit.InitClipboardExData(var Data: TATEditorClipboardExData);
+procedure TATSynEdit.InitClipboardExData(out Data: TATEditorClipboardExData);
 var
   X1, Y1, X2, Y2: integer;
   bSel: boolean;
