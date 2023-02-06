@@ -221,14 +221,80 @@ type
   end;
 
 function ATEditorGetClipboardExData(out AInfo: TATEditorClipboardExData): boolean;
-procedure ATEditorClearClipboardRecents(var L: TList; AMaxItems: integer);
+
+type
+  { TATEditorClipboardRecents }
+
+  TATEditorClipboardRecents = class
+  private
+    L: TList;
+    function GetItems(AIndex: integer): TATEditorClipboardExItem;
+    procedure LimitCount(AMaxCount: integer);
+  public
+    constructor Create; virtual;
+    destructor Destroy; override;
+    procedure Add(AItem: TATEditorClipboardExItem);
+    function Count: integer;
+    property Items[AIndex: integer]: TATEditorClipboardExItem read GetItems;
+    procedure Clear;
+  end;
 
 var
-  ATEditorClipboardRecents: TList = nil;
+  ATEditorClipboardRecents: TATEditorClipboardRecents = nil;
   ATEditorClipboardRecentMenu: TPopupMenu = nil;
 
 
 implementation
+
+{ TATEditorClipboardRecents }
+
+procedure TATEditorClipboardRecents.LimitCount(AMaxCount: integer);
+var
+  i: integer;
+begin
+  for i:= L.Count-1 downto AMaxCount do
+  begin
+    TObject(L[i]).Free;
+    L[i]:= nil;
+    L.Delete(i);
+  end;
+end;
+
+function TATEditorClipboardRecents.GetItems(AIndex: integer): TATEditorClipboardExItem;
+begin
+  if (AIndex>=0) and (AIndex<L.Count) then
+    Result:= TATEditorClipboardExItem(L[AIndex])
+  else
+    Result:= nil;
+end;
+
+constructor TATEditorClipboardRecents.Create;
+begin
+  L:= TList.Create;
+end;
+
+destructor TATEditorClipboardRecents.Destroy;
+begin
+  Clear;
+  FreeAndNil(L);
+  inherited Destroy;
+end;
+
+procedure TATEditorClipboardRecents.Add(AItem: TATEditorClipboardExItem);
+begin
+  L.Insert(0, AItem);
+  LimitCount(ATEditorOptions.MaxClipboardRecents);
+end;
+
+procedure TATEditorClipboardRecents.Clear;
+begin
+  LimitCount(0);
+end;
+
+function TATEditorClipboardRecents.Count: integer;
+begin
+  Result:= L.Count;
+end;
 
 { TATEditorOptions }
 
@@ -366,19 +432,6 @@ begin
   end;
 end;
 
-procedure ATEditorClearClipboardRecents(var L: TList; AMaxItems: integer);
-var
-  i: integer;
-begin
-  for i:= L.Count-1 downto AMaxItems do
-  begin
-    TObject(L[i]).Free;
-    L[i]:= nil;
-    L.Delete(i);
-  end;
-end;
-
-
 initialization
 
   FillChar(ATEditorOptions, SizeOf(ATEditorOptions), 0);
@@ -515,10 +568,7 @@ initialization
 finalization
 
   if Assigned(ATEditorClipboardRecents) then
-  begin
-    ATEditorClearClipboardRecents(ATEditorClipboardRecents, 0);
     FreeAndNil(ATEditorClipboardRecents);
-  end;
 
   if Assigned(ATEditorClipboardRecentMenu) then
     FreeAndNil(ATEditorClipboardRecentMenu);

@@ -187,7 +187,7 @@ begin
   NTag:= (Sender as TComponent).Tag;
   if (NTag>=0) and (NTag<ATEditorClipboardRecents.Count) then
   begin
-    ClipExItem:= TATEditorClipboardExItem(ATEditorClipboardRecents[NTag]);
+    ClipExItem:= ATEditorClipboardRecents.Items[NTag];
     DoCommand(
       cCommand_TextInsert,
       cInvokeInternal,
@@ -236,7 +236,7 @@ begin
   for i:= 0 to ATEditorClipboardRecents.Count-1 do
   begin
     mi:= TMenuItem.Create(ATEditorClipboardRecentMenu);
-    ClipExItem:= TATEditorClipboardExItem(ATEditorClipboardRecents[i]);
+    ClipExItem:= ATEditorClipboardRecents.Items[i];
     S:= ClipExItem.Text;
     S:= PrepareStringForMenu(S);
     if Length(S)>ATEditorOptions.MaxClipboardRecentsMenuitemLen then
@@ -369,15 +369,13 @@ begin
   if ATEditorOptions.MaxClipboardRecents<=0 then Exit;
 
   if ATEditorClipboardRecents=nil then
-    ATEditorClipboardRecents:= TList.Create;
+    ATEditorClipboardRecents:= TATEditorClipboardRecents.Create;
 
   ClipExItem:= TATEditorClipboardExItem.Create;
   ClipExItem.Text:= AText;
   InitClipboardExData(ClipExItem.Data);
 
-  ATEditorClipboardRecents.Insert(0, ClipExItem);
-  while ATEditorClipboardRecents.Count>ATEditorOptions.MaxClipboardRecents do
-    ATEditorClipboardRecents.Delete(ATEditorClipboardRecents.Count-1);
+  ATEditorClipboardRecents.Add(ClipExItem);
 end;
 
 
