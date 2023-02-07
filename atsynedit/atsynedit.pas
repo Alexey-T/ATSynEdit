@@ -6923,7 +6923,7 @@ var
   Caret: TATCaretItem;
   SLink: atString;
   FoldMark: TATFoldedMark;
-  MousePnt: TPoint;
+  MousePnt, TextPnt: TPoint;
 begin
   if not OptMouseEnableAll then exit;
   inherited;
@@ -6937,7 +6937,11 @@ begin
       FoldMark:= FFoldedMarkList.FindByCoord(MousePnt);
       if FoldMark.IsInited then
       begin
-        DoSelect_LineRange(FoldMark.LineFrom, Point(0, FoldMark.LineTo+1));
+        if Strings.IsIndexValid(FoldMark.LineTo+1) then
+          TextPnt:= Point(0, FoldMark.LineTo+1)
+        else
+          TextPnt:= Point(Strings.LinesLen[FoldMark.LineTo], FoldMark.LineTo);
+        DoSelect_LineRange(FoldMark.LineFrom, TextPnt);
         exit;
       end;
     end;
