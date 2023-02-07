@@ -9404,7 +9404,8 @@ begin
 
     NTextX:= ATEditorOptions.SizeIndentTooltipX + WrapItem.NIndent*FCharSize.XScaled*FCharSize.XSpacePercents div ATEditorCharXScale div 100;
     NTextY:= ATEditorOptions.SizeIndentTooltipY + FCharSize.Y*(NLine-ALineFrom);
-    if NTextY>=ARect.Bottom then Break;
+    if NTextY>=ARect.Bottom then
+      Break;
 
     CanvasTextOut(C,
       NTextX,
@@ -9436,7 +9437,7 @@ begin
     NPanelLeft:= FRectMinimap.Right + 1
   else
     NPanelLeft:= FRectMinimap.Left - NPanelWidth - 1;
-  NPanelHeight:= FMinimapTooltipLinesCount*FCharSize.Y + 2;
+  NPanelHeight:= FMinimapTooltipLinesCount*FCharSize.Y + 1;
   NPanelTop:= Max(0, Min(ClientHeight-NPanelHeight,
     Pnt.Y - FCharSize.Y*FMinimapTooltipLinesCount div 2 ));
 
