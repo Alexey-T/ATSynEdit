@@ -9437,7 +9437,7 @@ begin
     NPanelLeft:= FRectMinimap.Right + 1
   else
     NPanelLeft:= FRectMinimap.Left - NPanelWidth - 1;
-  NPanelHeight:= FMinimapTooltipLinesCount*FCharSize.Y + 1;
+  NPanelHeight:= FMinimapTooltipLinesCount*FCharSize.Y + 2;
   NPanelTop:= Max(0, Min(ClientHeight-NPanelHeight,
     Pnt.Y - FCharSize.Y*FMinimapTooltipLinesCount div 2 ));
 
@@ -9481,7 +9481,7 @@ begin
   InitFoldedMarkTooltip;
 
   FFoldedMarkTooltip.Width:= FRectMain.Width * FFoldTooltipWidthPercents div 100;
-  FFoldedMarkTooltip.Height:= Min(FFoldTooltipLineCount, FFoldedMarkCurrent.LineTo-FFoldedMarkCurrent.LineFrom+1) * FCharSize.Y + 2;
+  FFoldedMarkTooltip.Height:= Min(FFoldTooltipLineCount, FFoldedMarkCurrent.LineTo-FFoldedMarkCurrent.LineFrom+1) * FCharSize.Y + 1;
   FFoldedMarkTooltip.Left:= Min(
     FRectMain.Right - FFoldedMarkTooltip.Width - 1,
     FFoldedMarkCurrent.Coord.Left);
