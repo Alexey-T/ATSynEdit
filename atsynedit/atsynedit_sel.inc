@@ -412,14 +412,26 @@ begin
 end;
 
 procedure TATSynEdit.DoSelect_LineRange(ALineFrom: integer; APosTo: TPoint);
+var
+  NEndX, NEndY: integer;
 begin
   if APosTo.Y<ALineFrom then
   begin
+    if Strings.IsIndexValid(ALineFrom+1) then
+    begin
+      NEndX:= 0;
+      NEndY:= ALineFrom+1;
+    end
+    else
+    begin
+      NEndX:= Strings.LinesLen[ALineFrom];
+      NEndY:= ALineFrom;
+    end;
     DoCaretSingle(
       APosTo.X,
       APosTo.Y,
-      0,
-      ALineFrom+1
+      NEndX,
+      NEndY
       );
   end
   else
@@ -433,7 +445,7 @@ begin
       );
   end
   else
-  if APosTo.Y=ALineFrom then
+  //if APosTo.Y=ALineFrom then
   begin
     DoSelect_Line(APosTo);
   end;
