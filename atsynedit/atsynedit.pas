@@ -6261,6 +6261,17 @@ begin
 
   if FOptGutterVisible and PtInRect(FRectGutter, PosCoord) then
   begin
+    if ActionId=cMouseActionClickAndSelNormalBlock then
+    begin
+      Index:= FGutter.FindIndexAtCoordX(X);
+      if Index=FGutterBandNumbers then
+      begin
+        PosTextClicked:= ClientPosToCaretPos(PosCoord, PosDetails);
+        if Strings.IsIndexValid(PosTextClicked.Y) and (Carets.Count>0) then
+          DoSelect_LineRange(PosTextClicked.Y, Point(Carets[0].PosX, Carets[0].PosY));
+      end;
+    end;
+
     if ActionId=cMouseActionClickSimple then
     begin
       Index:= FGutter.FindIndexAtCoordX(X);
