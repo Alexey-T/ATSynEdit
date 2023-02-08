@@ -6072,7 +6072,6 @@ var
   PosDetails: TATEditorPosDetails;
   ActionId: TATEditorMouseAction;
   bClickOnSelection: boolean;
-  bSelectingLinesDown: boolean;
   NGutterIndex: integer;
   RectMinimapSel: TRect;
   Caret: TATCaretItem;
@@ -6273,8 +6272,6 @@ begin
           PosTextClicked:= ClientPosToCaretPos(PosCoord, PosDetails);
           if Strings.IsIndexValid(PosTextClicked.Y) then
           begin
-            bSelectingLinesDown:= PosTextClicked.Y>Caret.EndY;
-
             //adjust caret, if one whole line is selected (by previous click on gutter number)
             if (Caret.PosX=0) and (Caret.EndX=0) and (Caret.EndY=Caret.PosY-1) then
               Caret.Change(0, Caret.PosY-1, -1, -1)
@@ -6282,7 +6279,7 @@ begin
             if (Caret.PosX=Strings.LinesLen[Caret.PosY]) and (Caret.EndX=0) and (Caret.EndY=Caret.PosY) then
               Caret.Change(0, Caret.PosY, -1, -1);
 
-            if not bSelectingLinesDown and Strings.IsIndexValid(Caret.PosY+1) then
+            if (PosTextClicked.Y<Caret.PosY) and Strings.IsIndexValid(Caret.PosY+1) then
               Caret.PosY:= Caret.PosY+1;
 
             DoSelect_LineRange(PosTextClicked.Y, Point(Caret.PosX, Caret.PosY));
