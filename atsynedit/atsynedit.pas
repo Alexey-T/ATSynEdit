@@ -6472,12 +6472,11 @@ end;
 
 procedure TATSynEdit.UpdateCursor;
 var
-  PntMouse, P: TPoint;
+  PntClient: TPoint;
 begin
   if MouseNiceScroll then Exit;
-  PntMouse:= Mouse.CursorPos;
-  P:= ScreenToClient(PntMouse);
-  if not PtInRect(ClientRect, P) then exit;
+  PntClient:= ScreenToClient(Mouse.CursorPos);
+  if not PtInRect(ClientRect, PntClient) then exit;
 
   if FMouseDragDropping and FMouseDragDroppingReal then
   begin
@@ -6493,7 +6492,7 @@ begin
     Cursor:= DragCursor;
   end
   else
-  if PtInRect(FRectMain, P) then
+  if PtInRect(FRectMain, PntClient) then
   begin
     if FMouseDownAndColumnSelection then
       Cursor:= FCursorColumnSel
@@ -6501,22 +6500,22 @@ begin
       Cursor:= FCursorText;
   end
   else
-  if PtInRect(FRectGutterBm, P) then
+  if PtInRect(FRectGutterBm, PntClient) then
   begin
     if FMouseDownPnt.Y<0 then
       Cursor:= FCursorGutterBookmark;
   end
   else
-  if PtInRect(FRectGutterNums, P) then
+  if PtInRect(FRectGutterNums, PntClient) then
   begin
     if FMouseDownPnt.Y<0 then
       Cursor:= FCursorGutterNumbers;
   end
   else
-  if PtInRect(FRectMinimap, P) then
+  if PtInRect(FRectMinimap, PntClient) then
     Cursor:= FCursorMinimap
   else
-  if PtInRect(FRectMicromap, P) then
+  if PtInRect(FRectMicromap, PntClient) then
     Cursor:= FCursorMicromap
   else
     Cursor:= crDefault;
