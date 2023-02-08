@@ -6070,10 +6070,10 @@ procedure TATSynEdit.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: I
 var
   PosCoord, PosTextClicked: TPoint;
   PosDetails: TATEditorPosDetails;
-  Index: integer;
   ActionId: TATEditorMouseAction;
   bClickOnSelection: boolean;
-  R: TRect;
+  NGutterIndex: integer;
+  RectMinimapSel: TRect;
 begin
   if not OptMouseEnableAll then exit;
   inherited;
@@ -6114,9 +6114,9 @@ begin
 
   if FMinimapVisible and PtInRect(FRectMinimap, PosCoord) then
   begin
-    GetRectMinimapSel(R);
+    GetRectMinimapSel(RectMinimapSel);
     FMouseDownOnMinimap:= true;
-    FMouseDragMinimapSelHeight:= R.Height;
+    FMouseDragMinimapSelHeight:= RectMinimapSel.Height;
     if FMinimapDragImmediately then
     begin
       FCursorOnMinimap:= true;
@@ -6126,10 +6126,10 @@ begin
       DoMinimapDrag(Y);
     end
     else
-    if PtInRect(R, PosCoord) then
+    if PtInRect(RectMinimapSel, PosCoord) then
     begin
       FMouseDragMinimap:= true;
-      FMouseDragMinimapDelta:= Y-R.Top;
+      FMouseDragMinimapDelta:= Y-RectMinimapSel.Top;
     end;
     Exit;
   end;
@@ -6263,8 +6263,8 @@ begin
   begin
     if ActionId=cMouseActionClickAndSelNormalBlock then
     begin
-      Index:= FGutter.FindIndexAtCoordX(X);
-      if Index=FGutterBandNumbers then
+      NGutterIndex:= FGutter.FindIndexAtCoordX(X);
+      if NGutterIndex=FGutterBandNumbers then
       begin
         PosTextClicked:= ClientPosToCaretPos(PosCoord, PosDetails);
         if Strings.IsIndexValid(PosTextClicked.Y) and (Carets.Count>0) then
@@ -6274,8 +6274,8 @@ begin
 
     if ActionId=cMouseActionClickSimple then
     begin
-      Index:= FGutter.FindIndexAtCoordX(X);
-      if Index=FGutterBandNumbers then
+      NGutterIndex:= FGutter.FindIndexAtCoordX(X);
+      if NGutterIndex=FGutterBandNumbers then
       begin
         if FOptMouseClickNumberSelectsLine then
         begin
@@ -6285,7 +6285,7 @@ begin
         end;
       end
       else
-      if Index=FGutterBandFolding then
+      if NGutterIndex=FGutterBandFolding then
       begin
         DoFoldbarClick(PosTextClicked.Y);
       end
