@@ -7150,7 +7150,7 @@ end;
 
 procedure TATSynEdit.TimerScrollTick(Sender: TObject);
 var
-  nIndex: integer;
+  nIndexCaret: integer;
   PClient, PCaret: TPoint;
   Details: TATEditorPosDetails;
 begin
@@ -7184,9 +7184,9 @@ begin
     else
     if IsSelRectEmpty then
     begin
-      nIndex:= Carets.IndexOfPosXY(FMouseDownPnt.X, FMouseDownPnt.Y, true);
-      if nIndex>=0 then
-        Carets[nIndex].SelectToPoint(PCaret.X, PCaret.Y);
+      nIndexCaret:= Carets.IndexOfPosXY(FMouseDownPnt.X, FMouseDownPnt.Y, true);
+      if nIndexCaret>=0 then
+        Carets[nIndexCaret].SelectToPoint(PCaret.X, PCaret.Y);
     end
     else
     begin
