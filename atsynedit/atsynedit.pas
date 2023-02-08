@@ -6101,6 +6101,7 @@ begin
     exit;
   end;
 
+  //handle Button=mbExtra1 and =mbExtra2: they must pefrom Browser Backward/Forward
   if HandleMouseDownToHandleExtraMouseButtons(Self, Button, Shift) then exit;
 
   FMouseDownCoordOriginal.X:= X;
