@@ -6542,7 +6542,7 @@ var
   bUpdateForMinimap: boolean;
   bStartTimerScroll: boolean;
   Details: TATEditorPosDetails;
-  nIndex: integer;
+  nIndexHotspot, nIndexCaret: integer;
   Caret: TATCaretItem;
 begin
   if not OptMouseEnableAll then exit;
@@ -6696,18 +6696,18 @@ begin
           PntText:= ClientPosToCaretPos(PntCoord, Details);
           if PntText.Y>=0 then
           begin
-            nIndex:= FHotspots.FindByPos(PntText.X, PntText.Y);
-            if nIndex<>FLastHotspot then
+            nIndexHotspot:= FHotspots.FindByPos(PntText.X, PntText.Y);
+            if nIndexHotspot<>FLastHotspot then
             begin
               if FLastHotspot>=0 then
                 if Assigned(FOnHotspotExit) then
                   FOnHotspotExit(Self, FLastHotspot);
 
-              if nIndex>=0 then
+              if nIndexHotspot>=0 then
                 if Assigned(FOnHotspotEnter) then
-                  FOnHotspotEnter(Self, nIndex);
+                  FOnHotspotEnter(Self, nIndexHotspot);
 
-              FLastHotspot:= nIndex;
+              FLastHotspot:= nIndexHotspot;
             end;
           end;
         end;
@@ -6730,10 +6730,10 @@ begin
           if (FMouseDownPnt.X=PntText.X) and (FMouseDownPnt.Y=PntText.Y) then
           begin
             //remove selection from current caret
-            nIndex:= Carets.IndexOfPosXY(FMouseDownPnt.X, FMouseDownPnt.Y, true);
-            if Carets.IsIndexValid(nIndex) then
+            nIndexCaret:= Carets.IndexOfPosXY(FMouseDownPnt.X, FMouseDownPnt.Y, true);
+            if Carets.IsIndexValid(nIndexCaret) then
             begin
-              Caret:= Carets[nIndex];
+              Caret:= Carets[nIndexCaret];
               Caret.PosX:= PntText.X;
               Caret.PosY:= PntText.Y;
               Caret.EndX:= -1;
@@ -6774,9 +6774,9 @@ begin
             //drag with Ctrl pressed: add selection
             if bSelectAdding then
             begin
-              nIndex:= Carets.IndexOfPosXY(FMouseDownPnt.X, FMouseDownPnt.Y, true);
-              if Carets.IsIndexValid(nIndex) then
-                Carets[nIndex].SelectToPoint(PntText.X, PntText.Y);
+              nIndexCaret:= Carets.IndexOfPosXY(FMouseDownPnt.X, FMouseDownPnt.Y, true);
+              if Carets.IsIndexValid(nIndexCaret) then
+                Carets[nIndexCaret].SelectToPoint(PntText.X, PntText.Y);
             end;
 
             //drag with Alt pressed: column selection
