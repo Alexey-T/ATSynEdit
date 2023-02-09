@@ -6276,21 +6276,14 @@ begin
             //adjust caret, if one whole line is selected (by previous click on gutter number)
             if (Caret.PosX=0) and (Caret.EndX=0) and (Caret.EndY=Caret.PosY-1) then
             begin
-              Caret.Change(0, Caret.PosY-1, -1, -1);
-              if (PosTextClicked.Y<Caret.PosY) and Strings.IsIndexValid(Caret.PosY+1) then
-                Caret.PosY:= Caret.PosY+1;
+              if (PosTextClicked.Y>=Caret.PosY) then
+                Caret.Change(0, Caret.PosY-1, -1, -1);
             end
             else
             if (Caret.PosX=Strings.LinesLen[Caret.PosY]) and (Caret.EndX=0) and (Caret.EndY=Caret.PosY) then
             begin
-              if (PosTextClicked.Y<Caret.PosY) and Strings.IsIndexValid(Caret.PosY+1) then
-              begin
-                //none
-              end
-              else
-              begin
+              if (PosTextClicked.Y>=Caret.PosY) then
                 Caret.Change(0, Caret.PosY, -1, -1);
-              end;
             end;
 
             DoSelect_LineRange(PosTextClicked.Y, Point(Caret.PosX, Caret.PosY));
