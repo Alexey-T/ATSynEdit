@@ -419,8 +419,16 @@ begin
   begin
     if Strings.IsIndexValid(ALineFrom+1) then
     begin
-      NEndX:= 0;
-      NEndY:= ALineFrom+1;
+      if FOptMouseClickNumberSelectsLineWithEOL then
+      begin
+        NEndX:= 0;
+        NEndY:= ALineFrom+1;
+      end
+      else
+      begin
+        NEndX:= Strings.LinesLen[ALineFrom];
+        NEndY:= ALineFrom;
+      end;
     end
     else
     begin

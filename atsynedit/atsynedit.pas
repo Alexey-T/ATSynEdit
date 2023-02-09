@@ -6283,9 +6283,14 @@ begin
             else
             if (Caret.PosX=Strings.LinesLen[Caret.PosY]) and (Caret.EndX=0) and (Caret.EndY=Caret.PosY) then
             begin
-              Caret.Change(0, Caret.PosY, -1, -1);
               if (PosTextClicked.Y<Caret.PosY) and Strings.IsIndexValid(Caret.PosY+1) then
-                Caret.PosY:= Caret.PosY+1;
+              begin
+                //none
+              end
+              else
+              begin
+                Caret.Change(0, Caret.PosY, -1, -1);
+              end;
             end;
 
             DoSelect_LineRange(PosTextClicked.Y, Point(Caret.PosX, Caret.PosY));
