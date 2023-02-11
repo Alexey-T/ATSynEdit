@@ -6074,7 +6074,7 @@ var
   PosDetails: TATEditorPosDetails;
   ActionId: TATEditorMouseAction;
   bClickOnSelection: boolean;
-  NGutterIndex: integer;
+  NGutterIndex, NRangeIndex, NLineRangeEnd: integer;
   RectMinimapSel: TRect;
   Caret: TATCaretItem;
 begin
@@ -6303,7 +6303,19 @@ begin
         begin
           FSelRect:= cRectEmpty;
           FMouseDownGutterLineNumber:= PosTextClicked.Y;
-          DoSelect_Line(PosTextClicked);
+
+          //click on gutter line number for 1st line of folded range? select the entire range
+          NRangeIndex:= FFold.FindRangeWithPlusAtLine(PosTextClicked.Y);
+          if (NRangeIndex>=0) and FFold.ItemPtr(NRangeIndex)^.Folded then
+          begin
+            NLineRangeEnd:= FFold.ItemPtr(NRangeIndex)^.Y2;
+            if Strings.IsIndexValid(NLineRangeEnd+1) then
+              DoSelect_LineRange(PosTextClicked.Y, Point(0, NLineRangeEnd+1))
+            else
+              DoSelect_LineRange(PosTextClicked.Y, Point(Strings.LinesLen[NLineRangeEnd], NLineRangeEnd));
+          end
+          else
+            DoSelect_Line(PosTextClicked);
         end;
       end
       else
