@@ -542,7 +542,7 @@ var
   St: TATStrings;
   Caret: TATCaretItem;
   Shift, PosAfter: TPoint;
-  NLineFrom, NLineTo: integer;
+  NLineFrom, NLineTo, NRange: integer;
   iCaret, iLine: integer;
 begin
   Result:= [];
@@ -558,12 +558,9 @@ begin
       Caret:= Carets[iCaret];
       if not St.IsIndexValid(Caret.PosY) then Continue;
 
-      //disable 'Delete line' on lines of folded block
-      if not Caret.IsSelection then
-      begin
-        if St.LinesFoldFrom[Caret.PosY, EditorIndex]>0 then Continue;
-        if St.LinesHidden[Caret.PosY, EditorIndex] then Continue;
-      end;
+      NRange:= FFold.FindRangeWithPlusAtLine(Caret.PosY);
+      if NRange>=0 then
+        DoRangeUnfold(NRange);
 
       Caret.GetSelLines(NLineFrom, NLineTo, true);
 
