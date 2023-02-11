@@ -559,8 +559,11 @@ begin
       if not St.IsIndexValid(Caret.PosY) then Continue;
 
       //disable 'Delete line' on lines of folded block
-      if St.LinesFoldFrom[Caret.PosY, EditorIndex]>0 then Continue;
-      if St.LinesHidden[Caret.PosY, EditorIndex] then Continue;
+      if not Caret.IsSelection then
+      begin
+        if St.LinesFoldFrom[Caret.PosY, EditorIndex]>0 then Continue;
+        if St.LinesHidden[Caret.PosY, EditorIndex] then Continue;
+      end;
 
       Caret.GetSelLines(NLineFrom, NLineTo, true);
 
