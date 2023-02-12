@@ -1092,7 +1092,7 @@ type
     function GetOptTextOffsetTop: integer;
     function GetRedoAsString: string;
     function GetUndoAsString: string;
-    function IsFoldLineNeededBeforeWrapitem(N: integer): boolean;
+    function IsFoldingUnderlineNeededForWrapitem(N: integer): boolean;
     function IsRepaintNeededOnEnterOrExit: boolean;
     procedure MenuFoldFoldAllClick(Sender: TObject);
     procedure MenuFoldLevelClick(Sender: TObject);
@@ -3671,19 +3671,6 @@ begin
   NLinesIndex:= WrapItem.NLineIndex;
   if not St.IsIndexValid(NLinesIndex) then Exit;
 
-  if IsFoldLineNeededBeforeWrapitem(AWrapIndex) then
-  begin
-    NCoordSep:= ARectLine.Top-1;
-    CanvasLineHorz_Dashed(C,
-      Colors.CollapseLine,
-      ARectLine.Left+FFoldUnderlineOffset,
-      NCoordSep,
-      ARectLine.Right-FFoldUnderlineOffset,
-      DoScaleFont(ATEditorOptions.DashedLine_DashLen),
-      DoScaleFont(ATEditorOptions.DashedLine_EmptyLen)
-      );
-  end;
-
   //prepare line
   NOutputCharsSkipped:= 0;
   NOutputCellPercentsSkipped:= 0;
@@ -4027,6 +4014,20 @@ begin
       NCoordSep:= ARectLine.Top+ACharSize.Y-1;
     C.Pen.Color:= Colors.BlockSepLine;
     CanvasLineHorz(C, ARectLine.Left, NCoordSep, ARectLine.Right);
+  end;
+
+  //draw folding line '- - - -'
+  if IsFoldingUnderlineNeededForWrapitem(AWrapIndex) then
+  begin
+    NCoordSep:= ARectLine.Top+ACharSize.Y-1;
+    CanvasLineHorz_Dashed(C,
+      Colors.CollapseLine,
+      ARectLine.Left+FFoldUnderlineOffset,
+      NCoordSep,
+      ARectLine.Right-FFoldUnderlineOffset,
+      DoScaleFont(ATEditorOptions.DashedLine_DashLen),
+      DoScaleFont(ATEditorOptions.DashedLine_EmptyLen)
+      );
   end;
 end;
 

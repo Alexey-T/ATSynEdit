@@ -276,19 +276,22 @@ begin
   end;
 end;
 
-function TATSynEdit.IsFoldLineNeededBeforeWrapitem(N: integer): boolean;
+function TATSynEdit.IsFoldingUnderlineNeededForWrapitem(N: integer): boolean;
 var
-  NLineCur, NLinePrev: integer;
+  NLineCur, NLineNext: integer;
 begin
-  if FWrapInfo.IsIndexValid(N) and (N>0) then
+  if FWrapInfo.IsIndexValid(N) then
   begin
     NLineCur:= FWrapInfo[N].NLineIndex;
-    NLinePrev:= FWrapInfo[N-1].NLineIndex;
-    //before this line some is skipped
-    Result:= NLineCur-NLinePrev > 1;
-    //and prev visible line is fully visible
+    if FWrapInfo.IsIndexValid(N+1) then
+      NLineNext:= FWrapInfo[N+1].NLineIndex
+    else
+      NLineNext:= Strings.Count;
+    //after this line, some line(s) are skipped
+    Result:= NLineNext-NLineCur > 1;
+    //and line is fully visible
     if Result then
-      Result:= Strings.LinesFoldFrom[NLinePrev, FEditorIndex]=0;
+      Result:= Strings.LinesFoldFrom[NLineCur, FEditorIndex]=0;
   end
   else
     Result:= false;
