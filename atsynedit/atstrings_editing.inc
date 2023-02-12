@@ -18,6 +18,11 @@ end;
 
 procedure TATStrings.TextReplace_OneLine_ReplaceOneEol(AY, AX1, AX2: integer; const ATextPart1,
   ATextPart2: atString);
+{
+removes substr (AX1, AX2) from line AY, and splits the line to two parts.
+ATextPart1 is appeneded to 1st part (before AX1),
+ATextPart2 is prepended to 2nd part (after AX2).
+}
 var
   Str: atString;
   NEnd: TATLineEnds;
