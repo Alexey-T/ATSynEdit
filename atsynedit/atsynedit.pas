@@ -1092,7 +1092,7 @@ type
     function GetOptTextOffsetTop: integer;
     function GetRedoAsString: string;
     function GetUndoAsString: string;
-    function IsFoldingUnderlineNeededForWrapitem(N: integer): boolean;
+    function IsFoldingUnderlineNeededForWrapitem(AWrapIndex: integer): boolean;
     function IsRepaintNeededOnEnterOrExit: boolean;
     procedure MenuFoldFoldAllClick(Sender: TObject);
     procedure MenuFoldLevelClick(Sender: TObject);

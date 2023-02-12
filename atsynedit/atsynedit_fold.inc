@@ -276,15 +276,15 @@ begin
   end;
 end;
 
-function TATSynEdit.IsFoldingUnderlineNeededForWrapitem(N: integer): boolean;
+function TATSynEdit.IsFoldingUnderlineNeededForWrapitem(AWrapIndex: integer): boolean;
 var
   NLineCur, NLineNext: integer;
 begin
-  if FWrapInfo.IsIndexValid(N) then
+  if FWrapInfo.IsIndexValid(AWrapIndex) then
   begin
-    NLineCur:= FWrapInfo[N].NLineIndex;
-    if FWrapInfo.IsIndexValid(N+1) then
-      NLineNext:= FWrapInfo[N+1].NLineIndex
+    NLineCur:= FWrapInfo[AWrapIndex].NLineIndex;
+    if FWrapInfo.IsIndexValid(AWrapIndex+1) then
+      NLineNext:= FWrapInfo[AWrapIndex+1].NLineIndex
     else
       NLineNext:= Strings.Count;
     //after this line, some line(s) are skipped
