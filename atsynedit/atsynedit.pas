@@ -3147,7 +3147,11 @@ begin
   end;
 
   FNumbersIndent:= FCharSize.XScaled * FOptNumbersIndentPercents div 100 div ATEditorCharXScale;
-  FRulerHeight:= FCharSize.Y * FOptRulerHeightPercents div 100;
+
+  if FOptRulerText='' then
+    FRulerHeight:= FCharSize.Y * FOptRulerHeightPercents div 100
+  else
+    FRulerHeight:= FCharSize.Y * (SFindCharCount(FOptRulerText, #10)+1);
 
   if FOptGutterVisible and FOptNumbersAutosize then
     UpdateGutterAutosize;
