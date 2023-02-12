@@ -1,4 +1,5 @@
-2023.02.06
+2023.02.12
++ add: OptMouseClickNumberSelectsFoldedRange
 + add: OptMouse2ClickOnFoldMarkSelectsFoldedLines
 
 2023.01.10

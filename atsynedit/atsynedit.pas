@@ -955,6 +955,7 @@ type
     FOptMouseClickOpensURL: boolean;
     FOptMouseClickNumberSelectsLine: boolean;
     FOptMouseClickNumberSelectsLineWithEOL: boolean;
+    FOptMouseClickNumberSelectsFoldedRange: boolean;
     FOptMouse2ClickAction: TATEditorDoubleClickAction;
     FOptMouse2ClickOpensURL: boolean;
     FOptMouse2ClickDragSelectsWords: boolean;
@@ -2010,6 +2011,7 @@ type
     property OptMouseClickOpensURL: boolean read FOptMouseClickOpensURL write FOptMouseClickOpensURL default false;
     property OptMouseClickNumberSelectsLine: boolean read FOptMouseClickNumberSelectsLine write FOptMouseClickNumberSelectsLine default true;
     property OptMouseClickNumberSelectsLineWithEOL: boolean read FOptMouseClickNumberSelectsLineWithEOL write FOptMouseClickNumberSelectsLineWithEOL default true;
+    property OptMouseClickNumberSelectsFoldedRange: boolean read FOptMouseClickNumberSelectsFoldedRange write FOptMouseClickNumberSelectsFoldedRange default true;
     property OptMouse2ClickAction: TATEditorDoubleClickAction read FOptMouse2ClickAction write FOptMouse2ClickAction default cMouseDblClickSelectAnyChars;
     property OptMouse2ClickOpensURL: boolean read FOptMouse2ClickOpensURL write FOptMouse2ClickOpensURL default true;
     property OptMouse2ClickOnFoldMarkSelectsFoldedLines: boolean read FOptMouse2ClickOnFoldMarkSelectsFoldedLines write FOptMouse2ClickOnFoldMarkSelectsFoldedLines default true;
@@ -4956,6 +4958,7 @@ begin
   FOptMouseClickOpensURL:= false;
   FOptMouseClickNumberSelectsLine:= true;
   FOptMouseClickNumberSelectsLineWithEOL:= true;
+  FOptMouseClickNumberSelectsFoldedRange:= true;
   FOptMouse2ClickAction:= cMouseDblClickSelectAnyChars;
   FOptMouse2ClickOpensURL:= true;
   FOptMouse2ClickOnFoldMarkSelectsFoldedLines:= true;
@@ -6305,7 +6308,11 @@ begin
           FMouseDownGutterLineNumber:= PosTextClicked.Y;
 
           //click on gutter line number for 1st line of folded range? select the entire range
-          NRangeIndex:= FFold.FindRangeWithPlusAtLine(PosTextClicked.Y);
+          if FOptMouseClickNumberSelectsFoldedRange then
+            NRangeIndex:= FFold.FindRangeWithPlusAtLine(PosTextClicked.Y)
+          else
+            NRangeIndex:= -1;
+
           if (NRangeIndex>=0) and FFold.ItemPtr(NRangeIndex)^.Folded then
           begin
             NLineRangeEnd:= FFold.ItemPtr(NRangeIndex)^.Y2;
