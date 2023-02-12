@@ -478,6 +478,7 @@ type
   TATSynEditClickLinkEvent = procedure(Sender: TObject; const ALink: string) of object;
   TATSynEditDrawBookmarkEvent = procedure(Sender: TObject; C: TCanvas; ALineNum: integer; const ARect: TRect) of object;
   TATSynEditDrawRectEvent = procedure(Sender: TObject; C: TCanvas; const ARect: TRect) of object;
+  TATSynEditDrawRulerEvent = procedure(Sender: TObject; C: TCanvas; const ARect: TRect; var AHandled: boolean) of object;
   TATSynEditDrawGapEvent = procedure(Sender: TObject; C: TCanvas; const ARect: TRect; AGap: TATGapItem) of object;
   TATSynEditCalcBookmarkColorEvent = procedure(Sender: TObject; ABookmarkKind: integer; var AColor: TColor) of object;
   TATSynEditCalcStapleEvent = procedure(Sender: TObject; ALine, AIndent: integer; var AStapleColor: TColor) of object;
@@ -695,7 +696,7 @@ type
     FOnDrawLine: TATSynEditDrawLineEvent;
     FOnDrawMicromap: TATSynEditDrawRectEvent;
     FOnDrawEditor: TATSynEditDrawRectEvent;
-    FOnDrawRuler: TATSynEditDrawRectEvent;
+    FOnDrawRuler: TATSynEditDrawRulerEvent;
     FOnCommand: TATSynEditCommandEvent;
     FOnCommandAfter: TATSynEditCommandAfterEvent;
     FOnCommandKeyEnter: TNotifyEvent;
@@ -1820,7 +1821,7 @@ type
     property OnDrawGap: TATSynEditDrawGapEvent read FOnDrawGap write FOnDrawGap;
     property OnDrawMicromap: TATSynEditDrawRectEvent read FOnDrawMicromap write FOnDrawMicromap;
     property OnDrawEditor: TATSynEditDrawRectEvent read FOnDrawEditor write FOnDrawEditor;
-    property OnDrawRuler: TATSynEditDrawRectEvent read FOnDrawRuler write FOnDrawRuler;
+    property OnDrawRuler: TATSynEditDrawRulerEvent read FOnDrawRuler write FOnDrawRuler;
     property OnCalcCaretsCoords: TNotifyEvent read FOnCalcCaretsCoords write FOnCalcCaretsCoords;
     property OnCalcHilite: TATSynEditCalcHiliteEvent read FOnCalcHilite write FOnCalcHilite;
     property OnCalcStaple: TATSynEditCalcStapleEvent read FOnCalcStaple write FOnCalcStaple;
@@ -3170,6 +3171,7 @@ const
   cTextMacro = 'R';
 var
   NWrapIndex, NWrapIndexDummy: integer;
+  bRulerHandled: boolean;
 begin
   C.Brush.Color:= FColorBG;
   C.FillRect(0, 0, Width, Height); //avoid FClientW here to fill entire area
@@ -3213,9 +3215,11 @@ begin
 
   if FOptRulerVisible then
   begin
-    DoPaintRuler(C);
+    bRulerHandled:= false;
     if Assigned(FOnDrawRuler) then
-      FOnDrawRuler(Self, C, FRectRuler);
+      FOnDrawRuler(Self, C, FRectRuler, bRulerHandled);
+    if not bRulerHandled then
+      DoPaintRuler(C);
   end;
 
   if Assigned(FOnDrawEditor) then

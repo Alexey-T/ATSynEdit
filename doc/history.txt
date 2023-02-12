@@ -1,4 +1,5 @@
 2023.02.12
+* change: signature of OnDrawRuler
 + add: OptMouseClickNumberSelectsFoldedRange
 + add: OptMouse2ClickOnFoldMarkSelectsFoldedLines
 
