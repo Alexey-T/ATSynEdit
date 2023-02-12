@@ -287,11 +287,12 @@ begin
       NLineNext:= FWrapInfo[AWrapIndex+1].NLineIndex
     else
       NLineNext:= Strings.Count;
-    //after this line, some line(s) are skipped
-    Result:= NLineNext-NLineCur > 1;
-    //and line is fully visible
-    if Result then
-      Result:= Strings.LinesFoldFrom[NLineCur, FEditorIndex]=0;
+
+    Result:=
+      //after this line, some line(s) are skipped
+      (NLineNext-NLineCur > 1) and
+      //and line is fully visible
+      (Strings.LinesFoldFrom[NLineCur, FEditorIndex]=0);
   end
   else
     Result:= false;
