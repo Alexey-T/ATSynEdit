@@ -909,6 +909,7 @@ type
     FOptRulerMarkSizeBig: integer;
     FOptRulerMarkForAllCarets: boolean;
     FOptRulerTopIndentPercents: integer;
+    FOptRulerText: string;
     FOptGutterVisible: boolean;
     FOptGutterPlusSize: integer;
     FOptGutterShowFoldAlways: boolean;
@@ -1964,6 +1965,7 @@ type
     property OptRulerMarkSizeBig: integer read FOptRulerMarkSizeBig write FOptRulerMarkSizeBig default cInitRulerMarkBig;
     property OptRulerMarkForAllCarets: boolean read FOptRulerMarkForAllCarets write FOptRulerMarkForAllCarets default false;
     property OptRulerTopIndentPercents: integer read FOptRulerTopIndentPercents write FOptRulerTopIndentPercents default 0;
+    property OptRulerText: string read FOptRulerText write FOptRulerText;
     property OptMinimapCustomScale: integer read FMinimapCustomScale write FMinimapCustomScale default 0;
     property OptMinimapVisible: boolean read FMinimapVisible write SetMinimapVisible default cInitMinimapVisible;
     property OptMinimapCharWidth: integer read FMinimapCharWidth write FMinimapCharWidth default 0;
