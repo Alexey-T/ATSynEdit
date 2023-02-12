@@ -30,9 +30,10 @@ begin
 
   Lines[AY]:= Copy(Str, 1, AX1) + ATextPart1;
 
-  //line becomes not last so set ending for it
+  //line AY becomes not last, so set ending for it
   if LinesEnds[AY]=cEndNone then
     LinesEnds[AY]:= FEndings;
+  //line AY+1 can be last, so keep old eol
   LineInsertEx(AY+1, ATextPart2 + Copy(Str, AX2+1, MaxInt), NEnd);
 end;
 
