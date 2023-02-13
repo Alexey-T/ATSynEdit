@@ -6683,7 +6683,7 @@ begin
   bStartTimerScroll:=
     FOptMouseEnableAll and
     FOptMouseEnableNormalSelection and
-    FOptMouseEnableColumnSelection and
+    //FOptMouseEnableColumnSelection and //this option must not affect auto-scroll timer
     (ssLeft in Shift) and
     (not bOnMain) and
     //auto-scroll must not work when cursor is over minimap/micromap
