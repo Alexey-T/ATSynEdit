@@ -166,6 +166,7 @@ type
     FLastActionTime: QWord;
     FEnableCaretEvent: boolean;
     //FReplacedAtEndOfText: boolean;
+    FWrappedSearchCrossedBorder: boolean;
     //
     function IsSelStartsAtMatch: boolean;
     procedure UpdateCarets(ASimpleAction: boolean);
@@ -239,6 +240,7 @@ type
     property DataString: string read FDataString write FDataString;
     property CallbackString: string read FCallbackString write FCallbackString;
     property LastActionTime: QWord read FLastActionTime;
+    property WrappedSearchCrossedBorder: boolean read FWrappedSearchCrossedBorder;
     //
     constructor Create;
     destructor Destroy; override;
@@ -831,6 +833,7 @@ begin
   //FReplacedAtEndOfText:= false;
   FMaxLineLen:= MaxInt;
   FEnableCaretEvent:= true;
+  FWrappedSearchCrossedBorder:= false;
 
   OptFromCaret:= false;
   OptConfirmReplace:= false;
@@ -865,11 +868,15 @@ begin
   PosEnd.X:= Editor.Strings.LinesLen[Cnt-1];
   PosEnd.Y:= Cnt-1;
   bStartAtEdge:= (APosStart.X=0) and (APosStart.Y=0);
+  FWrappedSearchCrossedBorder:= false;
 
   BeginTiming;
   Result:= FindMatch_InEditor(APosStart, PosEnd, false);
   if not Result and OptWrapped and not bStartAtEdge then
+  begin
     Result:= FindMatch_InEditor(Point(0, 0), APosStart, false);
+    FWrappedSearchCrossedBorder:= true;
+  end;
   EndTiming;
 end;
 
@@ -1389,6 +1396,7 @@ var
 begin
   Result:= false;
   AChanged:= false;
+  FWrappedSearchCrossedBorder:= false;
 
   NLines:= Editor.Strings.Count;
   if NLines=0 then exit;
@@ -1457,6 +1465,8 @@ begin
 
   if not Result and OptWrapped and not OptInSelection and not bStartAtEdge then
   begin
+    FWrappedSearchCrossedBorder:= true;
+
     if not OptBack then
     begin
       SecondEnd.X:= PosStart.X;
@@ -1561,6 +1571,7 @@ begin
   Result:= false;
   AChanged:= false;
   //FReplacedAtEndOfText:= false;
+  FWrappedSearchCrossedBorder:= false;
 
   UpdateBuffer;
 
@@ -1578,6 +1589,8 @@ begin
   if not Result and OptWrapped and not OptInSelection
     and not bStartAtEdge then
     begin
+      FWrappedSearchCrossedBorder:= true;
+
       //we must have AReplace=false
       //(if not, need more actions: don't allow to replace in wrapped part if too big pos)
       //
@@ -2309,6 +2322,7 @@ begin
   if Assigned(FBuffer) then
     FBuffer.Clear;
 
+  FWrappedSearchCrossedBorder:= false;
   FSkipLen:= 0;
   FMaxLineLen:= MaxInt;
   DoFragmentsClear;
