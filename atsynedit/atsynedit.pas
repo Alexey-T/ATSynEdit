@@ -6097,11 +6097,10 @@ begin
   SetFocus;
   DoCaretForceShow;
 
-  //support OptTextCenteringCharWidth which makes empty band
+  //support OptTextCenteringCharWidth which makes empty area on the left of FRectMain
   if (FOptTextCenteringCharWidth>0) and
     (X<FRectMain.Left) and
-    (X>FRectGutter.Right) and
-    (X>=FRectMain.Left-FTextOffset.X) then
+    (X>=FRectGutter.Right) then
     X:= FRectMain.Left;
 
   PosCoord:= Point(X, Y);
