@@ -98,6 +98,7 @@ type
     procedure SetStrFind(const AValue: UnicodeString);
     procedure SetStrReplace(const AValue: UnicodeString);
     function GetRegexReplacement(const AFromText: UnicodeString): UnicodeString;
+    function GetPreserveCaseReplacement(const AFromText: UnicodeString): UnicodeString;
     function IsProgressNeeded(ANewPos: integer): boolean; inline;
   protected
     procedure DoOnFound(AWithEvent: boolean); virtual;
@@ -229,6 +230,7 @@ type
     OptConfirmReplace: boolean;
     OptInSelection: boolean;
     OptPutBackwardSelection: boolean; //on backward search, place backward selection, ie caret on left of selection
+    OptPreserveCase: boolean;
     //
     property MatchEdPos: TPoint read FMatchEdPos;
     property MatchEdEnd: TPoint read FMatchEdEnd;
@@ -558,6 +560,53 @@ begin
     Result:= StrReplace;
 end;
 
+function TATTextFinder.GetPreserveCaseReplacement(const AFromText: UnicodeString): UnicodeString;
+var
+  strResult: UnicodeString;
+  inputLen: Integer;
+  numLetters: Integer;
+  numUpperCaseLetters: Integer;
+  isFirstLetterUpperCase: Boolean;
+  i: Integer;
+begin
+  if StrReplace = '' then
+    exit('');
+
+  isFirstLetterUpperCase := false;
+  numLetters := 0;
+  numUpperCaseLetters := 0;
+  inputLen := Length(AFromText);
+  for i := 1 to inputLen do
+  begin
+    if TCharacter.IsLetter(AFromText[i]) then
+    begin
+      numLetters := numLetters + 1;
+      if TCharacter.IsUpper(AFromText[i]) then
+      begin
+        numUpperCaseLetters := numUpperCaseLetters + 1;
+        if numLetters = 1 then isFirstLetterUpperCase := true;
+      end
+    end
+  end;
+
+  if numLetters = 0 then
+    strResult := StrReplace
+  else if numUpperCaseLetters = numLetters then
+    strResult := UpperCase(StrReplace)
+  else if numUpperCaseLetters = 0 then
+    strResult := LowerCase(StrReplace)
+  else
+  begin
+    strResult := StrReplace;
+    if isFirstLetterUpperCase then
+      strResult[1] := TCharacter.ToUpper(strResult[1])
+    else
+      strResult[1] := TCharacter.ToLower(strResult[1])
+  end;
+
+  Result := strResult;
+end;
+
 function TATTextFinder.IsProgressNeeded(ANewPos: integer): boolean;
 begin
   Result:= Abs(FProgressPrev-ANewPos) >= FProgressDelta;
@@ -839,6 +888,7 @@ begin
   OptConfirmReplace:= false;
   OptInSelection:= false;
   OptPutBackwardSelection:= false;
+  OptPreserveCase:= false;
 
   FIndentVert:= -5;
   FIndentHorz:= 10;
@@ -1132,6 +1182,8 @@ begin
 
       if OptRegex then
         Str:= GetRegexReplacement(St.TextSubstring(P1.X, P1.Y, P2.X, P2.Y))
+      else if OptPreserveCase then
+        Str:= GetPreserveCaseReplacement(St.TextSubstring(P1.X, P1.Y, P2.X, P2.Y))
       else
         Str:= StrReplace;
 
@@ -1529,6 +1581,8 @@ begin
         end;
         SNew:= GetRegexReplacement(Editor.Strings.TextSubstring(P1.X, P1.Y, P2.X, P2.Y));
       end
+      else if OptPreserveCase then
+        SNew:= GetPreserveCaseReplacement(Editor.Strings.TextSubstring(P1.X, P1.Y, P2.X, P2.Y))
       else
         SNew:= StrReplace;
 
@@ -1635,6 +1689,8 @@ begin
 
       if OptRegex then
         SNew:= GetRegexReplacement(FBuffer.SubString(FMatchPos, FMatchLen))
+      else if OptPreserveCase then
+        SNew:= GetPreserveCaseReplacement(FBuffer.SubString(FMatchPos, FMatchLen))
       else
         SNew:= StrReplace;
 
@@ -1761,6 +1817,8 @@ begin
 
   if OptRegex then
     SNew:= GetRegexReplacement(SSelText)
+  else if OptPreserveCase then
+    SNew:= GetPreserveCaseReplacement(SSelText)
   else
     SNew:= StrReplace;
 
