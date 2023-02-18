@@ -15,13 +15,14 @@ interface
 uses
   {$ifdef Windows}
   Windows,
+  Messages,
   ATSynEdit_Adapter_WindowsIME,
   {$endif}
   InterfaceBase,
   Classes, SysUtils, Graphics,
   Controls, ExtCtrls, Menus, Forms, Clipbrd,
   syncobjs, gdeque,
-  Messages, LMessages, LCLType, LCLVersion,
+  LMessages, LCLType, LCLVersion,
   LazUTF8,
   EncConv,
   BGRABitmap,
@@ -2110,7 +2111,6 @@ uses
   Types,
   Math,
   {$ifdef LCLGTK2}
-  gtk2,
   Gtk2Globals,
   {$endif}
   {$ifdef LCLCOCOA}

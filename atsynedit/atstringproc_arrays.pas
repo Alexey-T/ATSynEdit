@@ -108,6 +108,7 @@ var
   i, NLen: integer;
 begin
   NLen:= SFindCharCount(AStr, ';');
+  A:= nil;
   SetLength(A, NLen);
   Sep.Init(AStr, ';');
   for i:= 0 to NLen-1 do
