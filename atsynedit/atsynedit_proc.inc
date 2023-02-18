@@ -179,6 +179,10 @@ begin
   Result:= cMouseActionNone;
   if State=[] then exit;
 
+  //make Meta+click do the same as simple click, like VSCode
+  if (State=[ssMeta, ssLeft]) then
+    Exclude(State, ssMeta);
+
   for i:= Low(M) to High(M) do
     if M[i].MouseState=State then
       exit(M[i].MouseActionId);
