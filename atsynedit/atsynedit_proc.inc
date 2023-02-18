@@ -145,10 +145,12 @@ begin
   NCount:= 0;
 
   //realloc to some big length
-  SetLength(M, 20);
+  SetLength(M, 25);
 
   Add(cMouseActionClickSimple, [ssLeft]);
+  Add(cMouseActionClickSimple, [ssLeft, ssMeta]); //like VSCode
   Add(cMouseActionClickRight, [ssRight]);
+  Add(cMouseActionClickRight, [ssRight, ssMeta]); //like VSCode
   Add(cMouseActionClickAndSelNormalBlock, [ssLeft, ssShift]);
   Add(cMouseActionClickAndSelVerticalBlock, [ssLeft, ssAlt, ssShift]);
 
@@ -178,10 +180,6 @@ var
 begin
   Result:= cMouseActionNone;
   if State=[] then exit;
-
-  //make Meta+click do the same as simple click, like VSCode
-  if (State=[ssMeta, ssLeft]) then
-    Exclude(State, ssMeta);
 
   for i:= Low(M) to High(M) do
     if M[i].MouseState=State then
