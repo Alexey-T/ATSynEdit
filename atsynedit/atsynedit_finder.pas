@@ -561,22 +561,31 @@ begin
 end;
 
 function TATTextFinder.GetPreserveCaseReplacement(const AFromText: UnicodeString): UnicodeString;
+type
+  LetterCase = (Unknown = -1, Lower = 0, Upper = 1, Unchanged = 2);
 var
   strResult: UnicodeString;
   inputLen: Integer;
   numLetters: Integer;
   numUpperCaseLetters: Integer;
-  isFirstLetterUpperCase: Boolean;
+  firstLetterCase: LetterCase;
   i: Integer;
 begin
   if StrReplace = '' then
     exit('');
 
-  isFirstLetterUpperCase := false;
+  firstLetterCase := Unknown;
   numLetters := 0;
   numUpperCaseLetters := 0;
   inputLen := Length(AFromText);
   for i := 1 to inputLen do
+  begin
+    if TCharacter.IsWhiteSpace(AFromText[i]) or TCharacter.IsPunctuation(AFromText[i]) then
+      continue
+    else
+      break
+  end;
+  while i < inputLen do
   begin
     if TCharacter.IsLetter(AFromText[i]) then
     begin
@@ -584,23 +593,32 @@ begin
       if TCharacter.IsUpper(AFromText[i]) then
       begin
         numUpperCaseLetters := numUpperCaseLetters + 1;
-        if numLetters = 1 then isFirstLetterUpperCase := true;
+        if firstLetterCase = Unknown then firstLetterCase := Upper;
+      end
+      else
+      begin
+        if firstLetterCase = Unknown then firstLetterCase := Lower;
       end
     end
+    else
+    begin
+      if firstLetterCase = Unknown then firstLetterCase := Unchanged;
+    end;
+    i := i + 1;
   end;
 
   if numLetters = 0 then
     strResult := StrReplace
   else if numUpperCaseLetters = numLetters then
-    strResult := UpperCase(StrReplace)
+    strResult := UnicodeUpperCase(StrReplace)
   else if numUpperCaseLetters = 0 then
-    strResult := LowerCase(StrReplace)
+    strResult := UnicodeLowerCase(StrReplace)
   else
   begin
     strResult := StrReplace;
-    if isFirstLetterUpperCase then
+    if firstLetterCase = Upper then
       strResult[1] := TCharacter.ToUpper(strResult[1])
-    else
+    else if firstLetterCase = Lower then
       strResult[1] := TCharacter.ToLower(strResult[1])
   end;
 
