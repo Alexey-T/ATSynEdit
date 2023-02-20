@@ -15,9 +15,9 @@ interface
 uses
   {$ifdef Windows}
   Windows,
-  Messages,
   ATSynEdit_Adapter_WindowsIME,
   {$endif}
+  Messages, //for Win32 and macOS
   InterfaceBase,
   Classes, SysUtils, Graphics,
   Controls, ExtCtrls, Menus, Forms, Clipbrd,
