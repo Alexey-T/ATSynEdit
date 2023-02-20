@@ -93,6 +93,19 @@ Some details about this:
 </table>
 
 = Help topics =
+==Compilation errors==
+'''GTK2 error on ATSynEdit compiling regarding IME.'''
+
+To fix this error, edit the file atsynedit/atsynedit_package.lpk and remove this block there:
+<syntaxhighlight lang="xml">
+      <Other>
+        <CustomOptions Value="-dGTK2_IME_CODE"/>
+        <OtherDefines Count="1">
+          <Define0 Value="GTK2_IME_CODE"/>
+        </OtherDefines>
+      </Other>
+</syntaxhighlight>
+
 == What limitations it has? ==
 * All lines have the same height
 * Cannot set different fonts for different parts 
