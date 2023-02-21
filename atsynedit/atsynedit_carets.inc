@@ -1248,12 +1248,15 @@ var
   Pnt: TPoint;
   Details: TATEditorPosDetails;
   NProximity, NRectTop, NRectBottom, NRectLeft, NRectRight: integer;
-  i: integer;
+  iCaret: integer;
 begin
   Result:= false;
 
   //"keep caret on screen" works bad for multi-carets
   if Carets.Count>1 then exit;
+
+  //fixes bad work of function for 'scroll page down' (Caret.CoordY not updated)
+  UpdateCaretsCoords;
 
   NProximity:= GetActualProximityVert;
   NRectTop:= FRectMain.Top+NProximity*FCharSize.Y;
@@ -1261,9 +1264,9 @@ begin
   NRectLeft:= FRectMain.Left;
   NRectRight:= FRectMain.Right;
 
-  for i:= 0 to Carets.Count-1 do
+  for iCaret:= 0 to Carets.Count-1 do
   begin
-    Caret:= Carets[i];
+    Caret:= Carets[iCaret];
     case ADirection of
       cDirUp:
         begin
