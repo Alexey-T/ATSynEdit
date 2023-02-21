@@ -1396,7 +1396,7 @@ type
     function DoCommand_GotoWord(AJump: TATWordJump; AJumpSimple: boolean=false): TATCommandResults;
     function DoCommand_GotoLineEdge(ABegin: boolean): TATCommandResults;
     function DoCommand_GotoScreenSide(ASide: TATCaretScreenSide): TATCommandResults;
-    function DoCommand_ScrollToBeginOrEnd(AToBegin: boolean): TATCommandResults;
+    function DoCommand_ScrollToBeginOrEnd(AToBegin: boolean; AKeepCaretOnScreen: boolean): TATCommandResults;
     function DoCommand_ScrollByDelta(ALines, AColumns: integer; AKeepCaretOnScreen: boolean): TATCommandResults;
     function DoCommand_ScrollToLeft: TATCommandResults;
     function DoCommand_TextInsertTabSpacesAtCarets(AOvrMode: boolean): TATCommandResults;

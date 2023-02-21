@@ -413,10 +413,31 @@ begin
 end;
 
 
-function TATSynEdit.DoCommand_ScrollToBeginOrEnd(AToBegin: boolean): TATCommandResults;
+function TATSynEdit.DoCommand_ScrollToBeginOrEnd(AToBegin: boolean;
+  AKeepCaretOnScreen: boolean): TATCommandResults;
+var
+  St: TATStrings;
 begin
   DoScrollToBeginOrEnd(AToBegin);
   Result:= [cResultScroll];
+
+  if AKeepCaretOnScreen then
+    if Carets.Count=1 then //keeping caret works bad with multi-carets
+    begin
+      Include(Result, cResultCaretAny);
+      St:= Strings;
+      if AToBegin then
+      begin
+        DoCaretSingle(0, 0);
+      end
+      else
+      begin
+        if FWrapMode=cWrapOff then
+          DoCaretSingle(0, St.Count-1)
+        else
+          DoCaretSingle(St.LinesLen[St.Count-1], St.Count-1);
+      end;
+    end;
 end;
 
 

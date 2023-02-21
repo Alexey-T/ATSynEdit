@@ -557,8 +557,8 @@ begin
     cCommand_TextIndent:               Result:= DoCommand_TextIndentUnindent(true);
     cCommand_TextUnindent:             Result:= DoCommand_TextIndentUnindent(false);
 
-    cCommand_ScrollToBegin:            Result:= DoCommand_ScrollToBeginOrEnd(true);
-    cCommand_ScrollToEnd:              Result:= DoCommand_ScrollToBeginOrEnd(false);
+    cCommand_ScrollToBegin:            Result:= DoCommand_ScrollToBeginOrEnd(true, FOptScrollLineCommandsKeepCaretOnScreen);
+    cCommand_ScrollToEnd:              Result:= DoCommand_ScrollToBeginOrEnd(false, FOptScrollLineCommandsKeepCaretOnScreen);
     cCommand_ScrollLineUp:             Result:= DoCommand_ScrollByDelta(-1, 0, FOptScrollLineCommandsKeepCaretOnScreen);
     cCommand_ScrollLineDown:           Result:= DoCommand_ScrollByDelta(1, 0, FOptScrollLineCommandsKeepCaretOnScreen);
     cCommand_ScrollPageUp:             Result:= DoCommand_ScrollByDelta(-GetPageLines, 0, FOptScrollLineCommandsKeepCaretOnScreen);
