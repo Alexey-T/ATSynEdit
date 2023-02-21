@@ -1241,11 +1241,13 @@ end;
 
 function TATSynEdit.DoCaretsKeepOnScreen(ADirection: TATEditorDirection): boolean;
 //Forces carets to visible screen area. Gets true if some caret modified.
+const
+  cPixelsIndent = 2;
 var
   Caret: TATCaretItem;
   Pnt: TPoint;
   Details: TATEditorPosDetails;
-  NProximity, NRectTop, NRectBottom: integer;
+  NProximity, NRectTop, NRectBottom, NRectLeft, NRectRight: integer;
   i: integer;
 begin
   Result:= false;
@@ -1256,25 +1258,16 @@ begin
   NProximity:= GetActualProximityVert;
   NRectTop:= FRectMain.Top+NProximity*FCharSize.Y;
   NRectBottom:= Max(FRectMain.Top, FRectMain.Bottom-NProximity*FCharSize.Y);
+  NRectLeft:= FRectMain.Left;
+  NRectRight:= FRectMain.Right;
 
   for i:= 0 to Carets.Count-1 do
   begin
     Caret:= Carets[i];
     case ADirection of
-      cDirDown:
-        begin
-          if (Caret.CoordY<=NRectTop+2) then
-          begin
-            Pnt:= Point(Caret.CoordX, NRectTop);
-            Pnt:= ClientPosToCaretPos(Pnt, Details);
-            Caret.PosX:= Pnt.X;
-            Caret.PosY:= Pnt.Y;
-            Result:= true;
-          end;
-        end;
       cDirUp:
         begin
-          if (Caret.CoordY>=NRectBottom-2*FCharSize.Y-2) then
+          if (Caret.CoordY>=NRectBottom-2*FCharSize.Y-cPixelsIndent) then
           begin
             Pnt:= Point(Caret.CoordX, NRectBottom-FCharSize.Y);
             Pnt:= ClientPosToCaretPos(Pnt, Details);
@@ -1283,13 +1276,38 @@ begin
             Result:= true;
           end;
         end;
+      cDirDown:
+        begin
+          if (Caret.CoordY<=NRectTop+cPixelsIndent) then
+          begin
+            Pnt:= Point(Caret.CoordX, NRectTop);
+            Pnt:= ClientPosToCaretPos(Pnt, Details);
+            Caret.PosX:= Pnt.X;
+            Caret.PosY:= Pnt.Y;
+            Result:= true;
+          end;
+        end;
       cDirLeft:
         begin
-          //TODO
+          if (Caret.CoordX>=NRectRight - 2*FCharSize.XScaled div ATEditorCharXScale - cPixelsIndent) then
+          begin
+            Pnt:= Point(NRectRight - 3*FCharSize.XScaled div ATEditorCharXScale, Caret.CoordY);
+            Pnt:= ClientPosToCaretPos(Pnt, Details);
+            Caret.PosX:= Pnt.X;
+            Caret.PosY:= Pnt.Y;
+            Result:= true;
+          end;
         end;
       cDirRight:
         begin
-          //TODO
+          if (Caret.CoordX<=NRectLeft+cPixelsIndent) then
+          begin
+            Pnt:= Point(NRectLeft, Caret.CoordY);
+            Pnt:= ClientPosToCaretPos(Pnt, Details);
+            Caret.PosX:= Pnt.X;
+            Caret.PosY:= Pnt.Y;
+            Result:= true;
+          end;
         end;
     end;
   end;
