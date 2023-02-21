@@ -1054,7 +1054,7 @@ type
       AIndentHorz: integer): boolean;
     procedure DoCaretsAddOnColumnBlock(APos1, APos2: TPoint; const ARect: TRect);
     procedure DoCaretsFixForSurrogatePairs(AMoveRight: boolean);
-    function DoCaretsKeepOnScreen(AMoveDown: boolean): boolean;
+    function DoCaretsKeepOnScreen(ADirection: TATEditorDirection): boolean;
     procedure DoCaretsAssign(NewCarets: TATCarets);
     procedure DoDropText(AndDeleteSelection: boolean);
     procedure DoMarkAllRangesUnfolded;

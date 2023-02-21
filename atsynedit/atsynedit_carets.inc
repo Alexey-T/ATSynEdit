@@ -1239,7 +1239,7 @@ begin
 end;
 
 
-function TATSynEdit.DoCaretsKeepOnScreen(AMoveDown: boolean): boolean;
+function TATSynEdit.DoCaretsKeepOnScreen(ADirection: TATEditorDirection): boolean;
 //Forces carets to visible screen area. Gets true if some caret modified.
 var
   Caret: TATCaretItem;
@@ -1249,6 +1249,7 @@ var
   i: integer;
 begin
   Result:= false;
+
   //"keep caret on screen" works bad for multi-carets
   if Carets.Count>1 then exit;
 
@@ -1259,22 +1260,37 @@ begin
   for i:= 0 to Carets.Count-1 do
   begin
     Caret:= Carets[i];
-    if AMoveDown and (Caret.CoordY<=NRectTop+2) then
-    begin
-      Pnt:= Point(Caret.CoordX, NRectTop);
-      Pnt:= ClientPosToCaretPos(Pnt, Details);
-      Caret.PosX:= Pnt.X;
-      Caret.PosY:= Pnt.Y;
-      Result:= true;
-    end
-    else
-    if not AMoveDown and (Caret.CoordY>=NRectBottom-2*FCharSize.Y-2) then
-    begin
-      Pnt:= Point(Caret.CoordX, NRectBottom-FCharSize.Y);
-      Pnt:= ClientPosToCaretPos(Pnt, Details);
-      Caret.PosX:= Pnt.X;
-      Caret.PosY:= Pnt.Y;
-      Result:= true;
+    case ADirection of
+      cDirDown:
+        begin
+          if (Caret.CoordY<=NRectTop+2) then
+          begin
+            Pnt:= Point(Caret.CoordX, NRectTop);
+            Pnt:= ClientPosToCaretPos(Pnt, Details);
+            Caret.PosX:= Pnt.X;
+            Caret.PosY:= Pnt.Y;
+            Result:= true;
+          end;
+        end;
+      cDirUp:
+        begin
+          if (Caret.CoordY>=NRectBottom-2*FCharSize.Y-2) then
+          begin
+            Pnt:= Point(Caret.CoordX, NRectBottom-FCharSize.Y);
+            Pnt:= ClientPosToCaretPos(Pnt, Details);
+            Caret.PosX:= Pnt.X;
+            Caret.PosY:= Pnt.Y;
+            Result:= true;
+          end;
+        end;
+      cDirLeft:
+        begin
+          //TODO
+        end;
+      cDirRight:
+        begin
+          //TODO
+        end;
     end;
   end;
 end;

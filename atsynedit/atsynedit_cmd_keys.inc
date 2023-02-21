@@ -381,12 +381,28 @@ end;
 
 function TATSynEdit.DoCommand_ScrollByDelta(ALines, AColumns: integer;
   AKeepCaretOnScreen: boolean): TATCommandResults;
+var
+  NDirection: TATEditorDirection;
 begin
   DoScrollByDelta(AColumns, ALines);
   Result:= [cResultScroll];
 
+  if ALines>0 then
+    NDirection:= cDirDown
+  else
+  if ALines<0 then
+    NDirection:= cDirUp
+  else
+  if AColumns>0 then
+    NDirection:= cDirRight
+  else
+  if AColumns<0 then
+    NDirection:= cDirLeft
+  else
+    NDirection:= cDirNone;
+
   if AKeepCaretOnScreen then
-    if DoCaretsKeepOnScreen(ALines>0) then
+    if DoCaretsKeepOnScreen(NDirection) then
       Include(Result, cResultCaretAny);
 end;
 
