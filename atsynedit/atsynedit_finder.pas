@@ -11,7 +11,7 @@ interface
 
 uses
   SysUtils, Classes, Graphics,
-  Dialogs, Forms, Math,
+  Dialogs, Forms, Math, Character,
   ATSynEdit,
   ATSynEdit_FGL,
   ATSynEdit_RegExpr, //must be with {$define Unicode}
@@ -98,6 +98,7 @@ type
     procedure SetStrFind(const AValue: UnicodeString);
     procedure SetStrReplace(const AValue: UnicodeString);
     function GetRegexReplacement(const AFromText: UnicodeString): UnicodeString;
+    function GetPreserveCaseReplacement(const AFromText: UnicodeString): UnicodeString;
     function IsProgressNeeded(ANewPos: integer): boolean; inline;
   protected
     procedure DoOnFound(AWithEvent: boolean); virtual;
@@ -229,6 +230,7 @@ type
     OptConfirmReplace: boolean;
     OptInSelection: boolean;
     OptPutBackwardSelection: boolean; //on backward search, place backward selection, ie caret on left of selection
+    OptPreserveCase: boolean;
     //
     property MatchEdPos: TPoint read FMatchEdPos;
     property MatchEdEnd: TPoint read FMatchEdEnd;
@@ -558,6 +560,86 @@ begin
     Result:= StrReplace;
 end;
 
+{
+The VS Code's logic is:
+- If the original string contains only upper-case or only lower-case characters,
+  the result will be either all upper-case or all lower-case characters:
+  "ABCDE" -> replace with "xyz" -> "XYZ" (preserving all upper-case);
+  "abcde" -> replace with "xYz" -> "xyz" (preserving all lower-case).
+- The case of the first character in the original string is always preserved:
+  if it is upper-case, the first character in the result will be upper-case;
+  if it is lower-case, the first character in the result will be lower-case.
+  "Abcde" -> replace with "xyz" -> "Xyz" (preserving the first upper-case);
+  "abcde" -> replace with "Xyz" -> "xyz" (preserving the first lower-case).
+- In case of a mixed-case original string, the result follows the case of
+  characters in the replacing string, excluding the very first character of
+  the original string that always preserves its original case.
+  "ABcde" -> replace with "xyZ" -> "XyZ" (preserving the first upper-case);
+  "abCDE" -> replace with "XYz" -> "xYz" (preserving the first lower-case).
+}
+function TATTextFinder.GetPreserveCaseReplacement(const AFromText: UnicodeString): UnicodeString;
+type
+  TLetterCase = (lcUnknown, lcLower, lcUpper, lcAsIs);
+var
+  inputLen: Integer;
+  numLetters: Integer;
+  numUpperCaseLetters: Integer;
+  firstLetterCase: TLetterCase;
+  i: Integer;
+begin
+  if StrReplace = '' then
+    exit('');
+
+  firstLetterCase := lcUnknown;
+  numLetters := 0;
+  numUpperCaseLetters := 0;
+  inputLen := Length(AFromText);
+  i := 1;
+  while i <= inputLen do
+  begin
+    if IsWordChar(AFromText[i]) then
+      break
+    else
+      Inc(i); // skipping non-word characters
+  end;
+  while i <= inputLen do
+  begin
+    if TCharacter.IsLetter(AFromText[i]) then
+    begin
+      Inc(numLetters);
+      if TCharacter.IsUpper(AFromText[i]) then // upper-case letter
+      begin
+        Inc(numUpperCaseLetters);
+        if firstLetterCase = lcUnknown then firstLetterCase := lcUpper;
+      end
+      else // lower-case letter
+      begin
+        if firstLetterCase = lcUnknown then firstLetterCase := lcLower;
+      end
+    end
+    else // not a letter
+    begin
+      if firstLetterCase = lcUnknown then firstLetterCase := lcAsIs;
+    end;
+    Inc(i);
+  end;
+
+  if numLetters = 0 then // no letters, replace as is
+    Result := StrReplace
+  else if numUpperCaseLetters = numLetters then // only upper-case letters
+    Result := UnicodeUpperCase(StrReplace)
+  else if numUpperCaseLetters = 0 then // only lower-case letters
+    Result := UnicodeLowerCase(StrReplace)
+  else
+  begin
+    Result := StrReplace;
+    if firstLetterCase = lcUpper then
+      Result[1] := TCharacter.ToUpper(Result[1])
+    else if firstLetterCase = lcLower then
+      Result[1] := TCharacter.ToLower(Result[1])
+  end
+end;
+
 function TATTextFinder.IsProgressNeeded(ANewPos: integer): boolean;
 begin
   Result:= Abs(FProgressPrev-ANewPos) >= FProgressDelta;
@@ -839,6 +921,7 @@ begin
   OptConfirmReplace:= false;
   OptInSelection:= false;
   OptPutBackwardSelection:= false;
+  OptPreserveCase:= false;
 
   FIndentVert:= -5;
   FIndentHorz:= 10;
@@ -1132,6 +1215,8 @@ begin
 
       if OptRegex then
         Str:= GetRegexReplacement(St.TextSubstring(P1.X, P1.Y, P2.X, P2.Y))
+      else if OptPreserveCase then
+        Str:= GetPreserveCaseReplacement(St.TextSubstring(P1.X, P1.Y, P2.X, P2.Y))
       else
         Str:= StrReplace;
 
@@ -1529,6 +1614,8 @@ begin
         end;
         SNew:= GetRegexReplacement(Editor.Strings.TextSubstring(P1.X, P1.Y, P2.X, P2.Y));
       end
+      else if OptPreserveCase then
+        SNew:= GetPreserveCaseReplacement(Editor.Strings.TextSubstring(P1.X, P1.Y, P2.X, P2.Y))
       else
         SNew:= StrReplace;
 
@@ -1635,6 +1722,8 @@ begin
 
       if OptRegex then
         SNew:= GetRegexReplacement(FBuffer.SubString(FMatchPos, FMatchLen))
+      else if OptPreserveCase then
+        SNew:= GetPreserveCaseReplacement(FBuffer.SubString(FMatchPos, FMatchLen))
       else
         SNew:= StrReplace;
 
@@ -1761,6 +1850,8 @@ begin
 
   if OptRegex then
     SNew:= GetRegexReplacement(SSelText)
+  else if OptPreserveCase then
+    SNew:= GetPreserveCaseReplacement(SSelText)
   else
     SNew:= StrReplace;
 
