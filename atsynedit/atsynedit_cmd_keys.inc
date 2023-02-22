@@ -531,22 +531,31 @@ function TATSynEdit.DoCommand_GotoScreenSide(ASide: TATCaretScreenSide): TATComm
 const
   dx = 2;
 var
+  Details: TATEditorPosDetails;
+  Caret: TATCaretItem;
   R: TRect;
   P: TPoint;
-  Details: TATEditorPosDetails;
+  NCaretX: integer;
 begin
   Result:= [];
+
+  if Carets.Count=0 then
+    DoCaretSingle(0, 0);
+  Caret:= Carets[0];
 
   R:= FRectMainVisible;
   OffsetRect(R, -dx, -dx);
 
+  NCaretX:= Caret.CoordX;
+  //NCaretX:= R.Left; //also useful, maybe make an option?
+
   case ASide of
     cScreenSideTop:
-      P:= Point(R.Left, R.Top);
+      P:= Point(NCaretX, R.Top);
     cScreenSideBottom:
-      P:= Point(R.Left, R.Bottom);
+      P:= Point(NCaretX, R.Bottom);
     cScreenSideMiddle:
-      P:= Point(R.Left, (R.Top+R.Bottom) div 2);
+      P:= Point(NCaretX, (R.Top+R.Bottom) div 2);
   end;
 
   P:= ClientPosToCaretPos(P, Details);
