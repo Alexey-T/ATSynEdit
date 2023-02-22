@@ -1,3 +1,7 @@
+
+2023.02.22
++ add: Finder option OptPreserveCase (mimics VSCode similar option)
+
 2023.02.12
 * change: signature of OnDrawRuler
 + add: OptRulerText: LF-separated lines, only count of lines is considered in core, but painting must be done via OnDrawRuler
