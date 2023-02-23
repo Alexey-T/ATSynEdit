@@ -6592,6 +6592,7 @@ end;
 procedure TATSynEdit.MouseMove(Shift: TShiftState; X, Y: Integer);
 var
   PntCoord, PntText: TPoint;
+  RectMainCopy: TRect;
   bOnMain, bOnMinimap, bOnMicromap,
   bOnGutter, bOnGutterNumbers, bOnGutterBookmk,
   bSelecting, bSelectingGutterNumbers: boolean;
@@ -6610,6 +6611,11 @@ begin
   PntText:= Point(-1, -1);
   UpdateCursor;
 
+  //RectMainCopy is to handle auto-scrolling in Distraction-Free mode,
+  //when FRectMain occupies the very bottom of the screen
+  RectMainCopy:= FRectMain;
+  Dec(RectMainCopy.Bottom); //Bottom is 1 pixel smaller
+
   bMovedMinimal:= IsPointsDiffByDelta(PntCoord, FMouseDownCoordOriginal, ATEditorOptions.MouseMoveSmallDelta);
 
   bSelecting:= (not FMouseDragDropping) and (FMouseDownPnt.X>=0);
@@ -6627,7 +6633,7 @@ begin
   else
     FMouseDragCoord:= Point(-1, -1);
 
-  bOnMain:= PtInRect(FRectMain, PntCoord);
+  bOnMain:= PtInRect(RectMainCopy, PntCoord);
   bOnMinimap:= FMinimapVisible and PtInRect(FRectMinimap, PntCoord);
   bOnMicromap:= FMicromapVisible and not FMicromapOnScrollbar and PtInRect(FRectMicromap, PntCoord);
   bOnGutter:= FOptGutterVisible and PtInRect(FRectGutter, PntCoord);
@@ -6703,13 +6709,13 @@ begin
     FTimerScroll.Enabled:= bStartTimerScroll;
 
   FMouseAutoScrollDirection:= cDirNone;
-  if (PntCoord.Y<FRectMain.Top) and (not ModeOneLine) then
+  if (PntCoord.Y<RectMainCopy.Top) and (not ModeOneLine) then
     FMouseAutoScrollDirection:= cDirUp else
-  if (PntCoord.Y>=FRectMain.Bottom) and (not ModeOneLine) then
+  if (PntCoord.Y>=RectMainCopy.Bottom) and (not ModeOneLine) then
     FMouseAutoScrollDirection:= cDirDown else
-  if (PntCoord.X<FRectMain.Left) then
+  if (PntCoord.X<RectMainCopy.Left) then
     FMouseAutoScrollDirection:= cDirLeft else
-  if (PntCoord.X>=FRectMain.Right) then
+  if (PntCoord.X>=RectMainCopy.Right) then
     FMouseAutoScrollDirection:= cDirRight;
 
   //mouse dragged on gutter numbers (only if drag started on gutter numbers)
