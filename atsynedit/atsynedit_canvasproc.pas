@@ -683,12 +683,12 @@ end;
 procedure _CalcCharSizesUtf8FromWidestring(const S: UnicodeString;
   DxIn: PInteger;
   DxInLen: integer;
-  var DxOut: TATInt32FixedArray);
+  out DxOut: TATInt32FixedArray);
 var
   NLen, NSize, ResLen, i: integer;
 begin
   NLen:= Min(Length(S), cMaxFixedArray);
-  FillChar(DxOut, SizeOf(DxOut), 0);
+  DxOut:= Default(TATInt32FixedArray);
 
   ResLen:= 0;
   i:= 0;
