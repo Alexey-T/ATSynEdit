@@ -46,11 +46,13 @@ var
   X1, Y1, X2, Y2, X_saved: integer;
   bSel, bNeedGroup, bInsertLinePerCaret: boolean;
   iCaret: integer;
+  NTextLines: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
   TextItems:= nil;
   St:= Strings;
+  bInsertLinePerCaret:= false;
 
   try
     //bNeedGroup:= (Carets.Count>1) or (Carets.IsSelection);
@@ -58,7 +60,36 @@ begin
       //True - for CudaText issue #3972; all TextInsert commands will undo in 1 step because of IsCommandToUndoInOneStep()
       //False - for CudaText issue #3274; but now True works too
 
-    bInsertLinePerCaret:= false;
+    //TextItems allows to insert each clipboard line into its own caret
+    //when count of carets = count of clipboard lines
+    if FOptPasteMultilineTextSpreadsToCarets then
+      if (AText<>sLineBreak) and (Length(AText)>1) and (Carets.Count>1) then
+      begin
+        NTextLines:= SCountTextLines(AText, sLineBreak);
+        if NTextLines=Carets.Count then
+        begin
+          TextItems:= TStringList.Create;
+          TextItems.Text:= UTF8Encode(AText);
+          bInsertLinePerCaret:= Carets.Count=TextItems.Count;
+          //if Carets.Count<>TextItems.Count then
+          //  raise Exception.CreateFmt('Unexpected lines count in clipboard text (found %d, expected %d)',
+          //    [TextItems.Count, Carets.Count]);
+        end
+        else
+        if (Carets.Count>=ATEditorOptions.WarningPasteMinCaretsCount) and
+          (Abs(Carets.Count-NTextLines)<=ATEditorOptions.WarningPasteMaxLinesDiff) then
+        begin
+          if MessageDlg(
+            Format(ATEditorOptions.WarningPasteDiffMessage, [NTextLines, Carets.Count]),
+            mtWarning,
+            [mbOK, mbCancel],
+            0) <> mrOk then exit;
+        end;
+      end;
+
+    //avoid 2 non-compatable modes of paste
+    if bInsertLinePerCaret then
+      AInsertAtLineStarts:= false;
 
     if bNeedGroup then
       St.BeginUndoGroup;
@@ -74,24 +105,6 @@ begin
     }
     if Carets.IsSelection then
       Result:= DoCommand_TextDeleteSelection(true);
-
-    //TextItems allows to insert each clipboard line into its own caret
-    //when count of carets = count of clipboard lines
-    if FOptPasteMultilineTextSpreadsToCarets then
-      if (AText<>sLineBreak) and (Length(AText)>1) and (Carets.Count>1) then
-        if SCountTextLines(AText, sLineBreak) = Carets.Count then
-        begin
-          TextItems:= TStringList.Create;
-          TextItems.Text:= UTF8Encode(AText);
-          bInsertLinePerCaret:= Carets.Count=TextItems.Count;
-          //if Carets.Count<>TextItems.Count then
-          //  raise Exception.CreateFmt('Unexpected lines count in clipboard text (found %d, expected %d)',
-          //    [TextItems.Count, Carets.Count]);
-        end;
-
-    //avoid 2 non-compatable modes of paste
-    if bInsertLinePerCaret then
-      AInsertAtLineStarts:= false;
 
     for iCaret:= Carets.Count-1 downto 0 do
     begin

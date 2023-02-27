@@ -157,6 +157,10 @@ type
     AutoCopyToPrimarySel: boolean;
     AutoCopyMaxTextSize: integer;
 
+    WarningPasteDiffMessage: string;
+    WarningPasteMinCaretsCount: integer;
+    WarningPasteMaxLinesDiff: integer;
+
     ClipboardColumnSignature: integer;
     function ClipboardColumnFormat: TClipboardFormat;
     function ClipboardExFormat: TClipboardFormat;
@@ -466,6 +470,10 @@ initialization
     AutoCopyToClipboard:= false;
     AutoCopyToPrimarySel:= false;
     AutoCopyMaxTextSize:= 500*1024;
+
+    WarningPasteDiffMessage:= 'You want to paste %d clipboard line(s) into %d caret(s), this may take a lot of memory. OK to proceed?';
+    WarningPasteMinCaretsCount:= 20;
+    WarningPasteMaxLinesDiff:= 5;
 
     ClipboardColumnSignature:= $1000;
   end;
