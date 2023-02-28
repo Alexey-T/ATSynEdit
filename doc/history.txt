@@ -1,3 +1,5 @@
+2023.02.28
++ add: event OnChangeCaretLine
 
 2023.02.22
 + add: Finder option OptPreserveCase (mimics VSCode similar option)

@@ -661,6 +661,7 @@ type
     FLastLineOfSlowEvents: integer;
     FLastUndoTick: QWord;
     FLastUndoPaused: boolean;
+    FLastCaretY: integer;
     FLineTopTodo: integer;
     FIsCaretShapeChangedFromAPI: boolean;
     FIsReadOnlyChanged: boolean;
@@ -685,6 +686,7 @@ type
     FOnChange: TNotifyEvent;
     FOnChangeLog: TATStringsChangeLogEvent;
     FOnChangeCaretPos: TNotifyEvent;
+    FOnChangeCaretLine: TNotifyEvent;
     FOnChangeState: TNotifyEvent;
     FOnChangeZoom: TNotifyEvent;
     FOnChangeModified: TNotifyEvent;
@@ -1810,6 +1812,7 @@ type
     property OnChangeLog: TATStringsChangeLogEvent read FOnChangeLog write FOnChangeLog;
     property OnChangeModified: TNotifyEvent read FOnChangeModified write FOnChangeModified;
     property OnChangeCaretPos: TNotifyEvent read FOnChangeCaretPos write FOnChangeCaretPos;
+    property OnChangeCaretLine: TNotifyEvent read FOnChangeCaretLine write FOnChangeCaretLine;
     property OnChangeState: TNotifyEvent read FOnChangeState write FOnChangeState;
     property OnChangeZoom: TNotifyEvent read FOnChangeZoom write FOnChangeZoom;
     property OnChangeBookmarks: TNotifyEvent read FOnChangeBookmarks write FOnChangeBookmarks;
@@ -7710,12 +7713,24 @@ end;
 procedure TATSynEdit.DoEventCarets;
 var
   SClip: string;
+  NCaretY: integer;
 begin
   if Assigned(FAdapterHilite) then
     FAdapterHilite.OnEditorCaretMove(Self);
 
   if Assigned(FOnChangeCaretPos) then
     FOnChangeCaretPos(Self);
+
+  if Assigned(FOnChangeCaretLine) then
+    if Carets.Count=1 then
+    begin
+      NCaretY:= Carets[0].PosY;
+      if NCaretY<>FLastCaretY then
+      begin
+        FLastCaretY:= NCaretY;
+        FOnChangeCaretLine(Self);
+      end;
+    end;
 
   if ATEditorOptions.AutoCopyToClipboard or
     ATEditorOptions.AutoCopyToPrimarySel then
