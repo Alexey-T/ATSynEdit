@@ -5048,6 +5048,7 @@ begin
   FLastCommandChangedText:= false;
   FLastCommandDelayedParsingOnLine:= MaxInt;
   FLastHotspot:= -1;
+  FLastCaretY:= -1;
 
   FScrollVert.Clear;
   FScrollHorz.Clear;
@@ -5241,6 +5242,8 @@ begin
   IsModifiedUnprintedTrailingOnly:= false;
   IsModifiedUnprintedEnds:= false;
   IsModifiedUnprintedEndDetails:= false;
+  FLastHotspot:= -1;
+  FLastCaretY:= -1;
 
   Update;
   TimerBlinkEnable;
