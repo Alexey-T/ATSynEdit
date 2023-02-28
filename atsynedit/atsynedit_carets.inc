@@ -960,22 +960,22 @@ end;
 
 function TATSynEdit.GetCaretsArray: TATPointArray;
 begin
-  SetLength(Result{%H-}, 0);
+  Result:= nil;
   if Assigned(FCarets) then
     Result:= FCarets.AsArray;
 end;
 
 function TATSynEdit.GetMarkersArray: TATMarkerMarkerArray;
 begin
-  SetLength(Result{%H-}, 0);
-  if Assigned(FMarkers) then
+  Result:= nil;
+  if Assigned(FMarkers) and (FMarkers.Count>0) then
     Result:= FMarkers.AsMarkerArray;
 end;
 
 function TATSynEdit.GetAttribsArray: TATMarkerAttribArray;
 begin
-  SetLength(Result{%H-}, 0);
-  if Assigned(FAttribs) then
+  Result:= nil;
+  if Assigned(FAttribs) and (FAttribs.Count>0) then
     Result:= FAttribs.AsAttribArray;
 end;
 
