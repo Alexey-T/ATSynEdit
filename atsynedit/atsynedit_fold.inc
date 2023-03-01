@@ -193,16 +193,27 @@ end;
 
 procedure TATSynEdit.DoFoldbarClick(ALine: integer);
 var
+  bUnfold: boolean;
   N: integer;
 begin
   N:= FFold.FindRangeWithPlusAtLine(ALine);
   if N>=0 then
   begin
-    if Fold.Items[N].Folded then
+    bUnfold:= Fold.Items[N].Folded;
+    if bUnfold then
       DoRangeUnfold(N)
     else
       DoRangeFold(N);
+
     Update;
+
+    //force repaint, if after 'fold' editor has empty space below the last line,
+    //because next click on gutter-fold-mark will be ignored. CudaText issue #4850
+    if not FOptLastLineOnTop and not bUnfold and (FScrollVert.NPos>=FScrollVert.NPosLast) then
+    begin
+      Application.ProcessMessages;
+      Update;
+    end;
   end;
 end;
 
