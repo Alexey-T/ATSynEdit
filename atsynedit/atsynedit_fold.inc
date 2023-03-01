@@ -194,16 +194,16 @@ end;
 procedure TATSynEdit.DoFoldbarClick(ALine: integer);
 var
   bUnfold: boolean;
-  N: integer;
+  NRange: integer;
 begin
-  N:= FFold.FindRangeWithPlusAtLine(ALine);
-  if N>=0 then
+  NRange:= FFold.FindRangeWithPlusAtLine(ALine);
+  if NRange>=0 then
   begin
-    bUnfold:= Fold.Items[N].Folded;
+    bUnfold:= Fold.Items[NRange].Folded;
     if bUnfold then
-      DoRangeUnfold(N)
+      DoRangeUnfold(NRange)
     else
-      DoRangeFold(N);
+      DoRangeFold(NRange);
 
     Update;
 
