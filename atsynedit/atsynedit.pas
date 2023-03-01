@@ -1061,7 +1061,8 @@ type
     procedure DoDropText(AndDeleteSelection: boolean);
     procedure DoMarkAllRangesUnfolded;
     procedure DoMarkAllLinesVisible;
-    procedure DoFoldbarClick(ALine: integer);
+    procedure DoFoldbarClick_LineIndex(ALine: integer);
+    procedure DoFoldbarClick_RangeIndex(ARange: integer);
     procedure DoHandleRightClick(X, Y: integer);
     function DoHandleClickEvent(AEvent: TATSynEditClickEvent): boolean;
     procedure DoHotspotsExit;
@@ -1642,7 +1643,7 @@ type
     //fold
     procedure DoRangeFold(ARangeIndex: integer);
     procedure DoRangeUnfold(ARangeIndex: integer);
-    procedure DoRangeHideLines(ALineFrom, ALineTo: integer); inline;
+    procedure DoRangeHideLines(ALineFrom, ALineTo: integer);
     procedure DoFoldForLevel(ALevel: integer);
     procedure DoFoldForLevelEx(ALevel: integer; AOuterRange: integer);
     function DoFoldUnfoldRangeAtCurLine(AOp: TATEditorFoldRangeCommand): boolean;
@@ -6352,7 +6353,7 @@ begin
       else
       if NGutterIndex=FGutterBandFolding then
       begin
-        DoFoldbarClick(PosTextClicked.Y);
+        DoFoldbarClick_LineIndex(PosTextClicked.Y);
       end
       else
         //click on other bands: fire event

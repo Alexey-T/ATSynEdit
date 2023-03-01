@@ -191,29 +191,33 @@ begin
     DoRangeUnfold(List[i]);
 end;
 
-procedure TATSynEdit.DoFoldbarClick(ALine: integer);
+procedure TATSynEdit.DoFoldbarClick_LineIndex(ALine: integer);
 var
-  bUnfold: boolean;
   NRange: integer;
 begin
   NRange:= FFold.FindRangeWithPlusAtLine(ALine);
   if NRange>=0 then
+    DoFoldbarClick_RangeIndex(NRange);
+end;
+
+procedure TATSynEdit.DoFoldbarClick_RangeIndex(ARange: integer);
+var
+  bUnfold: boolean;
+begin
+  bUnfold:= FFold.ItemPtr(ARange)^.Folded;
+  if bUnfold then
+    DoRangeUnfold(ARange)
+  else
+    DoRangeFold(ARange);
+
+  Update;
+
+  //force repaint, if after 'fold' editor has empty space below the last line,
+  //because next click on gutter-fold-mark will be ignored. CudaText issue #4850
+  if not FOptLastLineOnTop and not bUnfold and (FScrollVert.NPos>=FScrollVert.NPosLast) then
   begin
-    bUnfold:= FFold.ItemPtr(NRange)^.Folded;
-    if bUnfold then
-      DoRangeUnfold(NRange)
-    else
-      DoRangeFold(NRange);
-
+    Application.ProcessMessages;
     Update;
-
-    //force repaint, if after 'fold' editor has empty space below the last line,
-    //because next click on gutter-fold-mark will be ignored. CudaText issue #4850
-    if not FOptLastLineOnTop and not bUnfold and (FScrollVert.NPos>=FScrollVert.NPosLast) then
-    begin
-      Application.ProcessMessages;
-      Update;
-    end;
   end;
 end;
 
@@ -418,16 +422,11 @@ end;
 
 procedure TATSynEdit.MenuFoldPlusMinusClick(Sender: TObject);
 var
-  N: integer;
+  NRange: integer;
 begin
-  N:= (Sender as TComponent).Tag;
-  if not Fold.IsIndexValid(N) then exit;
-
-  if Fold.ItemPtr(N)^.Folded then
-    DoRangeUnfold(N)
-  else
-    DoRangeFold(N);
-  Update;
+  NRange:= (Sender as TComponent).Tag;
+  if Fold.IsIndexValid(NRange) then
+    DoFoldbarClick_RangeIndex(NRange);
 end;
 
 procedure TATSynEdit.MenuFoldFoldAllClick(Sender: TObject);
