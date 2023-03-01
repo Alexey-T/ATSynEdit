@@ -231,7 +231,7 @@ begin
 
   N:= FFold.FindRangeWithPlusAtLine(ALine);
   if N>=0 then
-    Result:= FFold.Items[N].Hint;
+    Result:= FFold.ItemPtr(N)^.Hint;
   if Result='' then
     Result:= cDefaultHint;
 end;
@@ -423,7 +423,7 @@ begin
   N:= (Sender as TComponent).Tag;
   if not Fold.IsIndexValid(N) then exit;
 
-  if Fold.Items[N].Folded then
+  if Fold.ItemPtr(N)^.Folded then
     DoRangeUnfold(N)
   else
     DoRangeFold(N);
@@ -504,7 +504,7 @@ begin
 
     NRange:= Fold.FindDeepestRangeContainingLine(Y, false{AWithStaple}, FFoldIconForMinimalRange);
     if NRange<0 then Continue;
-    bFolded:= Fold.Items[NRange].Folded;
+    bFolded:= Fold.ItemPtr(NRange)^.Folded;
 
     case AOp of
       cFoldingFold:

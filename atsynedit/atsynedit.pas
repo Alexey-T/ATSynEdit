@@ -10148,7 +10148,7 @@ var
 begin
   N:= Fold.FindRangeWithPlusAtLine(ALine);
   if N>=0 then
-    if Fold.Items[N].Folded then
+    if Fold.ItemPtr(N)^.Folded then
     begin
       DoRangeUnfold(N);
       UpdateWrapInfo(true); //without this, WrapInfo is not updated somehow
