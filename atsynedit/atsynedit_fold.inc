@@ -199,7 +199,7 @@ begin
   NRange:= FFold.FindRangeWithPlusAtLine(ALine);
   if NRange>=0 then
   begin
-    bUnfold:= Fold.Items[NRange].Folded;
+    bUnfold:= FFold.ItemPtr(NRange)^.Folded;
     if bUnfold then
       DoRangeUnfold(NRange)
     else
