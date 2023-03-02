@@ -391,7 +391,7 @@ initialization
     EmojiWidthPercents:= 210;
     MaxTabPositionToExpand:= 500;
     MinWordWrapOffset:= 3;
-    CommaCharsWrapWithWords:= '.,;:''"`~?!&%$';
+    CommaCharsWrapWithWords:= '.,;:''"`~?!&%$)]';
     MaxLineLenForAccurateCharWidths:= 500;
 
     //Win: seems no slowdown from offsets
