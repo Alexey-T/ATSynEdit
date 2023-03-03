@@ -94,11 +94,11 @@ begin
   if AMainText then
     DoPartCalc_ApplyAttribsOver(AParts, nMaxOffset, nLineIndex, nCharIndex-1, AColorBG);
 
-  //CreateNew makes parts for selection and fills empty AParts with these parts.
-  //ApplyOver makes parts for selection and inserts these one-by-one over ready AParts
-  //calculated before (in adapter or OnCalc event).
-  //Maybe possible to always use ApplyOver but it's slower so i made CreateNew for
-  //faster render w/out adapter
+  //_CreateNew makes parts for selection and fills empty AParts with these parts.
+  //_ApplySelectionOver makes parts for selection and inserts these one-by-one over ready AParts
+  //calculated before (in adapter or OnCalcHilite event).
+  //Maybe it's possible to always use _ApplySelectionOver, but it's slower so I made _CreateNew
+  //for faster rendering w/out adapter.
   if (AParts[0].Len>0) then
   begin
     if AWithSelection and TempSel_IsLineWithSelection(nLineIndex) then
