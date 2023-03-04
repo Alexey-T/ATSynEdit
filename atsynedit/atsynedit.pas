@@ -6598,7 +6598,7 @@ end;
 
 procedure TATSynEdit.MouseMove(Shift: TShiftState; X, Y: Integer);
 var
-  PntCoord, PntText: TPoint;
+  PntCoord, PntText, PntScreen: TPoint;
   RectMainCopy: TRect;
   bOnMain, bOnMinimap, bOnMicromap,
   bOnGutter, bOnGutterNumbers, bOnGutterBookmk,
@@ -6609,6 +6609,7 @@ var
   bStartTimerScroll: boolean;
   Details: TATEditorPosDetails;
   nIndexHotspot, nIndexCaret: integer;
+  nScreenDelta: integer;
   Caret: TATCaretItem;
 begin
   if not OptMouseEnableAll then exit;
@@ -6622,6 +6623,14 @@ begin
   //when FRectMain occupies the very bottom of the screen
   RectMainCopy:= FRectMain;
   Dec(RectMainCopy.Bottom); //Bottom is 1 pixel smaller
+
+  {$ifdef windows}
+  //workaround for Lazarus Win32 bug: editor has too big height in CudaText distraction-free mode
+  PntScreen:= ClientToScreen(Point(10, ClientHeight));
+  nScreenDelta:= PntScreen.Y-Screen.DesktopRect.Bottom;
+  if nScreenDelta>0 then
+    Dec(RectMainCopy.Bottom, nScreenDelta);
+  {$endif}
 
   bMovedMinimal:= IsPointsDiffByDelta(PntCoord, FMouseDownCoordOriginal, ATEditorOptions.MouseMoveSmallDelta);
 
