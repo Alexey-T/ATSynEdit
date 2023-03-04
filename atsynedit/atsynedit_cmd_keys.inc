@@ -561,19 +561,19 @@ begin
   P:= ClientPosToCaretPos(P, Details);
   if P.Y<0 then exit;
 
-  if FOptScrollSmooth then
-    case ASide of
-      cScreenSideTop:
-        begin
+  case ASide of
+    cScreenSideTop:
+      begin
+        if FOptScrollSmooth then
           if P.Y>0 then
             Inc(P.Y); //smooth scrolling gives partially visible 1st line
-        end;
-      cScreenSideBottom:
-        begin
-          if P.Y<Strings.Count-1 then
-            Dec(P.Y);
-        end;
-    end;
+      end;
+    cScreenSideBottom:
+      begin
+        if P.Y<Strings.Count-1 then
+          Dec(P.Y);
+      end;
+  end;
 
   DoCaretSingle(P.X, P.Y);
   Result:= [cResultCaretTop];
