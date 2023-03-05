@@ -6628,7 +6628,7 @@ begin
   //workaround for Lazarus Win32 bug: editor has too big height in CudaText distraction-free mode
   // https://gitlab.com/freepascal.org/lazarus/lazarus/-/issues/40143
   PntScreen:= ClientToScreen(Point(0, 0));
-  nScreenDelta:= PntScreen.Y+ClientHeight-Screen.DesktopRect.Bottom+1;
+  nScreenDelta:= PntScreen.Y+ClientHeight-Screen.DesktopRect.Bottom+3;
   if nScreenDelta>0 then
     Dec(RectMainCopy.Bottom, nScreenDelta);
   {$endif}
