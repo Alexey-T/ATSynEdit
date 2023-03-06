@@ -34,7 +34,7 @@ type
     class function ColorToHtmlString(Color: TColor): string;
     //convert string which starts with HTML color token #rgb, #rrggbb -> TColor, get len of color-string
     class function ParseTokenRGB(S: TPChar; out Len: integer; Default: TColor): TColor;
-    //parses 'rgb(10,20,30)' and rgba(10,20,30,0.5)
+    //parses 'rgb(10,20,30)' and 'rgba(10,20,30,0.5)'
     class function ParseFunctionRGB(const S: TStr; FromPos: integer; out LenOfColor: integer): TColor;
     //parses 'hsl(0,50%,100%)' and 'hsla(0,50%,100%,0.5)
     class function ParseFunctionHSL(const S: TStr; FromPos: integer; out LenOfColor: integer): TColor;
