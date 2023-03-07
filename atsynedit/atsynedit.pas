@@ -645,6 +645,7 @@ type
     FMouseDragMinimapDelta: integer;
     FMouseDragMinimapSelHeight: integer;
     FMouseDownAndColumnSelection: boolean;
+    FMouseRightClickOnGutterIsHandled: boolean;
     FMouseAutoScrollDirection: TATEditorDirection;
     FMouseActions: TATEditorMouseActions;
     FLockInput: boolean;
@@ -5799,6 +5800,13 @@ begin
     exit;
   end;
 
+  if FOptGutterVisible and PtInRect(FRectGutter, MousePos) then
+    if FMouseRightClickOnGutterIsHandled then
+    begin
+      Handled:= true;
+      exit;
+    end;
+
   InitMenuStd;
   inherited;
   if not Handled then
@@ -6103,6 +6111,7 @@ begin
   inherited;
   SetFocus;
   DoCaretForceShow;
+  FMouseRightClickOnGutterIsHandled:= false;
 
   //support OptTextCenteringCharWidth which makes empty area on the left of FRectMain
   if (FOptTextCenteringCharWidth>0) and
@@ -6121,7 +6130,11 @@ begin
       NGutterIndex:= FGutter.FindIndexAtCoordX(PosCoord.X);
       bClickHandled:= false;
       DoEventClickGutter(NGutterIndex, PosTextClicked.Y, bClickHandled);
-      if bClickHandled then exit;
+      if bClickHandled then
+      begin
+        FMouseRightClickOnGutterIsHandled:= true;
+        exit;
+      end;
     end;
 
     if FOptMouseRightClickMovesCaret then
@@ -6498,6 +6511,7 @@ begin
   FMouseDragDroppingReal:= false;
   FMouseDragMinimap:= false;
   FMouseDragCoord:= Point(-1, -1);
+  FMouseRightClickOnGutterIsHandled:= false;
 
   if Assigned(FTimerScroll) then
     FTimerScroll.Enabled:= false;
