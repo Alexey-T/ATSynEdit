@@ -474,7 +474,7 @@ type
   TATSynEditClickGapEvent = procedure(Sender: TObject; AGapItem: TATGapItem; APos: TPoint) of object;
   TATSynEditCommandEvent = procedure(Sender: TObject; ACommand: integer; AInvoke: TATEditorCommandInvoke; const AText: string; var AHandled: boolean) of object;
   TATSynEditCommandAfterEvent = procedure(Sender: TObject; ACommand: integer; const AText: string) of object;
-  TATSynEditClickGutterEvent = procedure(Sender: TObject; ABand: integer; ALineNum: integer) of object;
+  TATSynEditClickGutterEvent = procedure(Sender: TObject; ABand: integer; ALineNum: integer; var AHandled: boolean) of object;
   TATSynEditClickMicromapEvent = procedure(Sender: TObject; AX, AY: integer) of object;
   TATSynEditClickLinkEvent = procedure(Sender: TObject; const ALink: string) of object;
   TATSynEditDrawBookmarkEvent = procedure(Sender: TObject; C: TCanvas; ALineNum: integer; const ARect: TRect) of object;
@@ -1259,7 +1259,7 @@ type
     //events
     procedure DoEventBeforeCalcHilite;
     procedure DoEventClickMicromap(AX, AY: integer);
-    procedure DoEventClickGutter(ABandIndex, ALineNumber: integer);
+    procedure DoEventClickGutter(ABandIndex, ALineNumber: integer; var AHandled: boolean);
     function DoEventCommand(ACommand: integer; AInvoke: TATEditorCommandInvoke; const AText: string): boolean;
     procedure DoEventDrawBookmarkIcon(C: TCanvas; ALineNumber: integer; const ARect: TRect);
     procedure DoEventCommandAfter(ACommand: integer; const AText: string);
@@ -6094,7 +6094,7 @@ var
   PosCoord, PosTextClicked: TPoint;
   PosDetails: TATEditorPosDetails;
   ActionId: TATEditorMouseAction;
-  bClickOnSelection: boolean;
+  bClickOnSelection, bClickHandled: boolean;
   NGutterIndex, NRangeIndex, NLineRangeEnd: integer;
   RectMinimapSel: TRect;
   Caret: TATCaretItem;
@@ -6325,6 +6325,11 @@ begin
     if ActionId=cMouseActionClickSimple then
     begin
       NGutterIndex:= FGutter.FindIndexAtCoordX(X);
+
+      bClickHandled:= false;
+      DoEventClickGutter(FGutter.FindIndexAtCoordX(X), PosTextClicked.Y, bClickHandled);
+      if bClickHandled then exit;
+
       if NGutterIndex=FGutterBandNumbers then
       begin
         if FOptMouseClickNumberSelectsLine then
@@ -6354,10 +6359,7 @@ begin
       if NGutterIndex=FGutterBandFolding then
       begin
         DoFoldbarClick_LineIndex(PosTextClicked.Y);
-      end
-      else
-        //click on other bands: fire event
-        DoEventClickGutter(FGutter.FindIndexAtCoordX(X), PosTextClicked.Y);
+      end;
     end;
   end;
 
@@ -7835,10 +7837,10 @@ begin
     FOnChangeZoom(Self);
 end;
 
-procedure TATSynEdit.DoEventClickGutter(ABandIndex, ALineNumber: integer);
+procedure TATSynEdit.DoEventClickGutter(ABandIndex, ALineNumber: integer; var AHandled: boolean);
 begin
   if Assigned(FOnClickGutter) then
-    FOnClickGutter(Self, ABandIndex, ALineNumber);
+    FOnClickGutter(Self, ABandIndex, ALineNumber, AHandled);
 end;
 
 procedure TATSynEdit.DoEventClickMicromap(AX, AY: integer);
