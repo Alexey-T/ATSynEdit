@@ -6292,6 +6292,12 @@ begin
 
   if FOptGutterVisible and PtInRect(FRectGutter, PosCoord) then
   begin
+    NGutterIndex:= FGutter.FindIndexAtCoordX(PosCoord.X);
+
+    bClickHandled:= false;
+    DoEventClickGutter(NGutterIndex, PosTextClicked.Y, bClickHandled);
+    if bClickHandled then exit;
+
     //Shift+click on gutter numbers
     if ActionId=cMouseActionClickAndSelNormalBlock then
     begin
@@ -6324,12 +6330,6 @@ begin
     //simple click on gutter numbers / foldbar
     if ActionId=cMouseActionClickSimple then
     begin
-      NGutterIndex:= FGutter.FindIndexAtCoordX(X);
-
-      bClickHandled:= false;
-      DoEventClickGutter(FGutter.FindIndexAtCoordX(X), PosTextClicked.Y, bClickHandled);
-      if bClickHandled then exit;
-
       if NGutterIndex=FGutterBandNumbers then
       begin
         if FOptMouseClickNumberSelectsLine then
