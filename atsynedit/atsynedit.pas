@@ -6609,7 +6609,9 @@ var
   bStartTimerScroll: boolean;
   Details: TATEditorPosDetails;
   nIndexHotspot, nIndexCaret: integer;
+  {$ifdef windows}
   nScreenDelta: integer;
+  {$endif}
   Caret: TATCaretItem;
 begin
   if not OptMouseEnableAll then exit;
@@ -6619,10 +6621,10 @@ begin
   PntText:= Point(-1, -1);
   UpdateCursor;
 
-  //RectMainCopy is to handle auto-scrolling in Distraction-Free mode,
-  //when FRectMain occupies the very bottom of the screen
+  //RectMainCopy is to handle auto-scrolling in CudaText Distraction-Free mode,
+  //when FRectMain occupies the very bottom (and very left) of the screen
   RectMainCopy:= FRectMain;
-  Dec(RectMainCopy.Bottom); //Bottom is 1 pixel smaller
+  InflateRect(RectMainCopy, -2, -2);
 
   {$ifdef windows}
   //workaround for Lazarus Win32 bug: editor has too big height in CudaText distraction-free mode
