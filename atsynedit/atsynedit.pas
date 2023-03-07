@@ -6114,9 +6114,18 @@ begin
 
   if Button=mbRight then
   begin
+    PosTextClicked:= ClientPosToCaretPos(PosCoord, PosDetails);
+
+    if FOptGutterVisible and PtInRect(FRectGutter, PosCoord) then
+    begin
+      NGutterIndex:= FGutter.FindIndexAtCoordX(PosCoord.X);
+      bClickHandled:= false;
+      DoEventClickGutter(NGutterIndex, PosTextClicked.Y, bClickHandled);
+      if bClickHandled then exit;
+    end;
+
     if FOptMouseRightClickMovesCaret then
     begin
-      PosTextClicked:= ClientPosToCaretPos(PosCoord, PosDetails);
       bClickOnSelection:= Carets.FindCaretContainingPos(PosTextClicked.X, PosTextClicked.Y)>=0;
       if not bClickOnSelection then //click over selection must never reset that selection, like in Notepad++
         if Strings.IsIndexValid(PosTextClicked.Y) then
