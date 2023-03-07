@@ -7835,25 +7835,25 @@ begin
     FOnChangeZoom(Self);
 end;
 
-procedure TATSynEdit.DoEventClickGutter(ABandIndex, ALineNumber: integer); inline;
+procedure TATSynEdit.DoEventClickGutter(ABandIndex, ALineNumber: integer);
 begin
   if Assigned(FOnClickGutter) then
     FOnClickGutter(Self, ABandIndex, ALineNumber);
 end;
 
-procedure TATSynEdit.DoEventClickMicromap(AX, AY: integer); inline;
+procedure TATSynEdit.DoEventClickMicromap(AX, AY: integer);
 begin
   if Assigned(FOnClickMicromap) then
     FOnClickMicromap(Self, AX, AY);
 end;
 
-procedure TATSynEdit.DoEventDrawBookmarkIcon(C: TCanvas; ALineNumber: integer; const ARect: TRect); inline;
+procedure TATSynEdit.DoEventDrawBookmarkIcon(C: TCanvas; ALineNumber: integer; const ARect: TRect);
 begin
   if Assigned(FOnDrawBookmarkIcon) then
     FOnDrawBookmarkIcon(Self, C, ALineNumber, ARect);
 end;
 
-procedure TATSynEdit.DoEventBeforeCalcHilite; inline;
+procedure TATSynEdit.DoEventBeforeCalcHilite;
 begin
   if Assigned(FAdapterHilite) then
     FAdapterHilite.OnEditorBeforeCalcHilite(Self);
