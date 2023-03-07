@@ -8802,13 +8802,17 @@ end;
 procedure TATSynEdit.CMWantSpecialKey(var Message: TCMWantSpecialKey);
 begin
   case Message.CharCode of
-    VK_RETURN: Message.Result:= Ord(WantReturns);
-    VK_TAB: Message.Result:= Ord(WantTabs);
+    VK_RETURN:
+      Message.Result:= Ord(WantReturns);
+    VK_TAB:
+      Message.Result:= Ord(WantTabs);
     VK_LEFT,
     VK_RIGHT,
     VK_UP,
-    VK_DOWN: Message.Result:= 1;
-    else inherited;
+    VK_DOWN:
+      Message.Result:= 1;
+    else
+      inherited;
   end;
 end;
 
