@@ -1527,7 +1527,7 @@ type
     property ScrollHorz: TATEditorScrollInfo read FScrollHorz write FScrollHorz;
     property ScrollbarVert: TATScrollbar read FScrollbarVert;
     property ScrollbarHorz: TATScrollbar read FScrollbarHorz;
-    property ParentFrameObject: TCustomFrame read FParentFrameObject write FParentFrameObject;
+    property ParentFrameObject: TCustomFrame read FParentFrameObject write FParentFrameObject; //for CudaText; not the same as editor's Parent
     property CaretShapeNormal: TATCaretShape read FCaretShapeNormal;
     property CaretShapeOverwrite: TATCaretShape read FCaretShapeOverwrite;
     property CaretShapeReadonly: TATCaretShape read FCaretShapeReadonly;
