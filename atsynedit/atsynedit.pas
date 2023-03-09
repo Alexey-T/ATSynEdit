@@ -6833,7 +6833,7 @@ begin
             //[FMouseDownPnt.Y, FMouseDownPnt.X, PntText.Y, PntText.X]);
           if (PntText.Y<0) then Exit;
 
-          //mouse not moved at last by char?
+          //mouse not moved at least by char?
           if (FMouseDownPnt.X=PntText.X) and (FMouseDownPnt.Y=PntText.Y) then
           begin
             //remove selection from current caret
