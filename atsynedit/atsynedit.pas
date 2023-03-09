@@ -411,7 +411,7 @@ const
   cInitBorderWidthFocused = 1;
   cInitBorderWidthMacro = 3;
   cInitRulerNumeration = cRulerNumeration_0_10_20;
-  cInitRulerHeightPercents = 120;
+  cInitRulerHeightPercents = 100;
   cInitRulerFontSizePercents = 80;
   cInitRulerMarkCaret = 1;
   cInitRulerMarkSmall = 3;
