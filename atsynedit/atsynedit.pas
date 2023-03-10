@@ -6629,6 +6629,7 @@ var
   bOnGutter, bOnGutterNumbers, bOnGutterBookmk,
   bSelecting, bSelectingGutterNumbers: boolean;
   bSelectAdding, bSelectColumnLeft, bSelectColumnMiddle: boolean;
+  bSelectShiftExpanding: boolean;
   bMovedMinimal: boolean;
   bUpdateForMinimap: boolean;
   bStartTimerScroll: boolean;
@@ -6668,6 +6669,7 @@ begin
   bSelectAdding:= bSelecting and (ssLeft in Shift) and FMouseDownWithCtrl and not FMouseDownWithAlt and not FMouseDownWithShift;
   bSelectColumnLeft:= bSelecting and (ssLeft in Shift) and not FMouseDownWithCtrl and FMouseDownWithAlt and not FMouseDownWithShift;
   bSelectColumnMiddle:= bSelecting and (ssMiddle in Shift) and FMouseDownWithCtrl and not FMouseDownWithAlt and not FMouseDownWithShift;
+  bSelectShiftExpanding:= bSelecting and (ssLeft in Shift) and not FMouseDownWithCtrl and not FMouseDownWithAlt and FMouseDownWithShift;
 
   if bSelecting then
   begin
@@ -6834,7 +6836,7 @@ begin
           if (PntText.Y<0) then Exit;
 
           //mouse not moved at least by char?
-          if (FMouseDownPnt.X=PntText.X) and (FMouseDownPnt.Y=PntText.Y) then
+          if (FMouseDownPnt.X=PntText.X) and (FMouseDownPnt.Y=PntText.Y) and not bSelectShiftExpanding then
           begin
             //remove selection from current caret
             nIndexCaret:= Carets.IndexOfPosXY(FMouseDownPnt.X, FMouseDownPnt.Y, true);
@@ -6866,7 +6868,8 @@ begin
               if FOptMouseEnableNormalSelection then
               begin
                 //normal selection
-                DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
+                if not bSelectShiftExpanding then
+                  DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
                 //writeln('DoCaretSingle: '+inttostr(FMouseDownPnt.X)+':'+inttostr(FMouseDownPnt.Y));
                 if FMouseDownDouble and FOptMouse2ClickDragSelectsWords then
                   DoSelect_WordRange(0, FMouseDownPnt, PntText)
