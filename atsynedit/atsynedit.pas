@@ -6836,7 +6836,9 @@ begin
           if (PntText.Y<0) then Exit;
 
           //mouse not moved at least by char?
-          if (FMouseDownPnt.X=PntText.X) and (FMouseDownPnt.Y=PntText.Y) and not bSelectShiftExpanding then
+          if (FMouseDownPnt.X=PntText.X) and (FMouseDownPnt.Y=PntText.Y) and
+            not bSelectShiftExpanding //check it to allow expanding of selection by Shift+[mouse drag]
+          then
           begin
             //remove selection from current caret
             nIndexCaret:= Carets.IndexOfPosXY(FMouseDownPnt.X, FMouseDownPnt.Y, true);
@@ -6868,7 +6870,7 @@ begin
               if FOptMouseEnableNormalSelection then
               begin
                 //normal selection
-                if not bSelectShiftExpanding then
+                if not bSelectShiftExpanding then //check it to allow expanding of selection by Shift+[mouse drag]
                   DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
                 //writeln('DoCaretSingle: '+inttostr(FMouseDownPnt.X)+':'+inttostr(FMouseDownPnt.Y));
                 if FMouseDownDouble and FOptMouse2ClickDragSelectsWords then
