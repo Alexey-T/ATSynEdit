@@ -524,6 +524,7 @@ type
     UnprintedSpacesInSel: boolean;
     UnprintedEnds: boolean;
     UnprintedEndsDetails: boolean;
+    UnprintedForceTabs: boolean;
   end;
 
 type
@@ -726,6 +727,7 @@ type
     FUnprintedSpacesBothEnds,
     FUnprintedSpacesOnlyInSelection,
     FUnprintedSpacesAlsoInSelection,
+    FUnprintedForceTabs,
     FUnprintedEof,
     FUnprintedEnds,
     FUnprintedEndsDetails: boolean;
@@ -2010,6 +2012,7 @@ type
     property OptUnprintedSpacesBothEnds: boolean read FUnprintedSpacesBothEnds write FUnprintedSpacesBothEnds default false;
     property OptUnprintedSpacesOnlyInSelection: boolean read FUnprintedSpacesOnlyInSelection write FUnprintedSpacesOnlyInSelection default false;
     property OptUnprintedSpacesAlsoInSelection: boolean read FUnprintedSpacesAlsoInSelection write FUnprintedSpacesAlsoInSelection default false;
+    property OptUnprintedForceTabs: boolean read FUnprintedForceTabs write FUnprintedForceTabs default false;
     property OptUnprintedEnds: boolean read FUnprintedEnds write FUnprintedEnds default true;
     property OptUnprintedEndsDetails: boolean read FUnprintedEndsDetails write FUnprintedEndsDetails default true;
     property OptUnprintedEof: boolean read FUnprintedEof write FUnprintedEof default true;
@@ -3900,6 +3903,7 @@ begin
       TextOutProps.ShowUnprintedSpacesBothEnds:= FUnprintedSpacesBothEnds;
       TextOutProps.ShowUnprintedSpacesOnlyInSelection:= FUnprintedSpacesOnlyInSelection {and TempSel_IsSelection}; //careful, CudaText #4541
       TextOutProps.ShowUnprintedSpacesAlsoInSelection:= not FUnprintedSpacesOnlyInSelection and FUnprintedSpacesAlsoInSelection and TempSel_IsSelection;
+      TextOutProps.ShowUnprintedForceTabs:= FUnprintedForceTabs;
       TextOutProps.DetectIsPosSelected:= @IsPosSelected;
 
       TextOutProps.ShowFontLigatures:= FOptShowFontLigatures and
@@ -9477,6 +9481,7 @@ begin
   TextOutProps.ShowUnprintedSpacesBothEnds:= FUnprintedSpacesBothEnds;
   TextOutProps.ShowUnprintedSpacesOnlyInSelection:= FUnprintedSpacesOnlyInSelection and TempSel_IsSelection;
   TextOutProps.ShowUnprintedSpacesAlsoInSelection:= not FUnprintedSpacesOnlyInSelection and FUnprintedSpacesAlsoInSelection and TempSel_IsSelection;
+  TextOutProps.ShowUnprintedForceTabs:= FUnprintedForceTabs;
   TextOutProps.DetectIsPosSelected:= @IsPosSelected;
 
   TextOutProps.ShowFontLigatures:= FOptShowFontLigatures;

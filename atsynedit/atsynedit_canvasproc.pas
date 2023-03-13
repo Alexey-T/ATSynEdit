@@ -78,6 +78,7 @@ type
     ShowUnprintedSpacesBothEnds: boolean;
     ShowUnprintedSpacesOnlyInSelection: boolean;
     ShowUnprintedSpacesAlsoInSelection: boolean;
+    ShowUnprintedForceTabs: boolean;
     ShowFontLigatures: boolean;
     ColorNormalFont: TColor;
     ColorUnprintedFont: TColor;
@@ -752,6 +753,7 @@ var
   DxPointer: PInteger;
   NStyles: integer;
   bBold, bItalic, bSpaceChars: boolean;
+  bUnprintedOnlyPartial: boolean;
   ch: WideChar;
 begin
   NLen:= Min(Length(AText), cMaxFixedArray);
@@ -1057,8 +1059,10 @@ begin
 
   if AProps.ShowUnprinted then
   begin
+    bUnprintedOnlyPartial:= false;
     if AProps.ShowUnprintedSpacesOnlyInSelection then
     begin
+      bUnprintedOnlyPartial:= true;
       for i:= 1 to Length(AText) do
       begin
         ch:= AText[i];
@@ -1069,6 +1073,7 @@ begin
     else
     if AProps.ShowUnprintedSpacesBothEnds then
     begin
+      bUnprintedOnlyPartial:= true;
       NPosFirstChar:= SGetIndentChars(AText);
       NPosLastChar:= SGetNonSpaceLength(AText)+1;
       //paint leading
@@ -1097,6 +1102,7 @@ begin
     else
     if AProps.ShowUnprintedSpacesTrailing then
     begin
+      bUnprintedOnlyPartial:= true;
       NPosLastChar:= SGetNonSpaceLength(AText)+1;
       //paint trailing
       if not AProps.TrimmedTrailingNonSpaces then
@@ -1122,6 +1128,17 @@ begin
       begin
         ch:= AText[i];
         if IsCharUnicodeSpace(ch) then
+          DoPaintUnprintedChar(C, ch, i, ListInt, APosX, APosY, AProps.CharSize, AProps.ColorUnprintedFont);
+      end;
+    end;
+
+    if AProps.ShowUnprintedForceTabs and bUnprintedOnlyPartial then
+    begin
+      //paint all tab-chars
+      for i:= 1 to Length(AText) do
+      begin
+        ch:= AText[i];
+        if ch=#9 then
           DoPaintUnprintedChar(C, ch, i, ListInt, APosX, APosY, AProps.CharSize, AProps.ColorUnprintedFont);
       end;
     end;
