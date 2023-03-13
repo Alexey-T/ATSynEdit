@@ -753,7 +753,7 @@ var
   DxPointer: PInteger;
   NStyles: integer;
   bBold, bItalic, bSpaceChars: boolean;
-  bUnprintedOnlyPartial: boolean;
+  bShowUnprintedPartially: boolean;
   ch: WideChar;
 begin
   NLen:= Min(Length(AText), cMaxFixedArray);
@@ -1059,10 +1059,9 @@ begin
 
   if AProps.ShowUnprinted then
   begin
-    bUnprintedOnlyPartial:= false;
+    bShowUnprintedPartially:= true;
     if AProps.ShowUnprintedSpacesOnlyInSelection then
     begin
-      bUnprintedOnlyPartial:= true;
       for i:= 1 to Length(AText) do
       begin
         ch:= AText[i];
@@ -1073,7 +1072,6 @@ begin
     else
     if AProps.ShowUnprintedSpacesBothEnds then
     begin
-      bUnprintedOnlyPartial:= true;
       NPosFirstChar:= SGetIndentChars(AText);
       NPosLastChar:= SGetNonSpaceLength(AText)+1;
       //paint leading
@@ -1102,7 +1100,6 @@ begin
     else
     if AProps.ShowUnprintedSpacesTrailing then
     begin
-      bUnprintedOnlyPartial:= true;
       NPosLastChar:= SGetNonSpaceLength(AText)+1;
       //paint trailing
       if not AProps.TrimmedTrailingNonSpaces then
@@ -1124,6 +1121,7 @@ begin
     else
     begin
       //paint all
+      bShowUnprintedPartially:= false;
       for i:= 1 to Length(AText) do
       begin
         ch:= AText[i];
@@ -1132,7 +1130,7 @@ begin
       end;
     end;
 
-    if AProps.ShowUnprintedForceTabs and bUnprintedOnlyPartial then
+    if AProps.ShowUnprintedForceTabs and bShowUnprintedPartially then
     begin
       //paint all tab-chars
       for i:= 1 to Length(AText) do
