@@ -27,12 +27,12 @@ type
     FList: array of integer;
     FCount: integer;
     FLenEol: integer;
-    FVersion: integer;
     FOnChange: TATStringBufferChange;
     procedure SetCount(AValue: integer);
     procedure SetupFromGenericList(L: TATGenericIntList);
   public
     Valid: boolean;
+    VersionValue: Int64;
     FText: UnicodeString;
     constructor Create; virtual;
     destructor Destroy; override;
@@ -54,7 +54,6 @@ type
     function OffsetToOffsetOfLineEnd(APos: integer): integer; inline;
     property Count: integer read FCount;
     property OnChange: TATStringBufferChange read FOnChange write FOnChange;
-    property Version: integer read FVersion;
   end;
 
 implementation
@@ -77,7 +76,7 @@ begin
   FLenEol:= 1; //no apps should use other
   FCount:= 0;
   SetCount(0);
-  FVersion:= 0;
+  VersionValue:= 0;
   Valid:= false;
 end;
 
@@ -93,7 +92,7 @@ procedure TATStringBuffer.Setup(const AText: UnicodeString;
 var
   Pos, NLen, i: integer;
 begin
-  Inc(FVersion);
+  //Inc(FVersion);
   FText:= AText;
   //FLenEol:= ALenEol;
   Valid:= false;
@@ -113,7 +112,7 @@ procedure TATStringBuffer.SetupFromGenericList(L: TATGenericIntList);
 var
   Pos, NLen, i: integer;
 begin
-  Inc(FVersion);
+  //Inc(FVersion);
   SetCount(L.Count+1);
   Pos:= 0;
   FList[0]:= 0;
@@ -131,7 +130,7 @@ var
   Lens: TATGenericIntList;
   i, N: integer;
 begin
-  Inc(FVersion);
+  //Inc(FVersion);
 
   FText:= AText;
   Valid:= false;
@@ -186,7 +185,7 @@ begin
   FList:= Other.FList;
   FCount:= Other.FCount;
   FLenEol:= Other.FLenEol;
-  FVersion:= Other.FVersion;
+  VersionValue:= Other.VersionValue;
 end;
 
 
