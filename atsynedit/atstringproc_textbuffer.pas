@@ -45,9 +45,8 @@ type
     function SubString(APos, ALen: integer): UnicodeString; inline;
     function TextLength: integer; inline; //uses FText
     function TextLength_Alt: integer; //does not use FText
-    function LineIndex(N: integer): integer;
+    function OffsetOfLineIndex(N: integer): integer;
     function LineLength(N: integer): integer;
-    function LineSpace(N: integer): integer; inline;
     function OffsetToDistanceFromLineStart(APos: integer): integer;
     function OffsetToDistanceFromLineEnd(APos: integer): integer;
     function OffsetToOffsetOfLineStart(APos: integer): integer; inline;
@@ -275,27 +274,26 @@ begin
     Result:= 0;
 end;
 
-function TATStringBuffer.LineIndex(N: integer): integer;
+function TATStringBuffer.OffsetOfLineIndex(N: integer): integer;
 begin
-  if N<0 then Result:= 0
+  if N<0 then
+    Result:= 0
   else
-  if N>=FCount then Result:= TextLength-1
+  if N>=FCount then
+    Result:= TextLength-1
   else
     Result:= FList[N];
 end;
 
 function TATStringBuffer.LineLength(N: integer): integer;
 begin
-  if N<0 then Result:= 0
+  if N<0 then
+    Result:= 0
   else
-  if N>=FCount-1 then Result:= 0
+  if N>=FCount-1 then
+    Result:= 0
   else
     Result:= FList[N+1]-FList[N]-FLenEol;
-end;
-
-function TATStringBuffer.LineSpace(N: integer): integer; inline;
-begin
-  Result:= LineLength(N)+FLenEol;
 end;
 
 (*
