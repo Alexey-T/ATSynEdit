@@ -39,10 +39,8 @@ type
     procedure Clear;
     procedure Setup(const AText: UnicodeString; const ALineLens: array of integer);
     procedure SetupSlow(const AText: UnicodeString);
-    //procedure Lock;
-    //procedure Unlock;
     procedure Assign(Other: TATStringBuffer);
-    function CaretToStr(constref APnt: TPoint): integer;
+    function CaretToStr(const APnt: TPoint): integer;
     function StrToCaret(APos: integer): TPoint;
     function SubString(APos, ALen: integer): UnicodeString; inline;
     function TextLength: integer; inline;
@@ -64,7 +62,6 @@ implementation
 
 procedure TATStringBuffer.SetCount(AValue: integer);
 begin
-  //Assert(not FLocked, 'SetCount called for locked StringBuffer');
   if AValue<0 then
     raise Exception.Create('StringBuffer Count<0');
 
@@ -80,7 +77,6 @@ begin
   FCount:= 0;
   SetCount(0);
   FVersion:= 0;
-  //FLocked:= false;
   Valid:= false;
 end;
 
@@ -96,7 +92,6 @@ procedure TATStringBuffer.Setup(const AText: UnicodeString;
 var
   Pos, NLen, i: integer;
 begin
-  //Assert(not FLocked, 'Attempt to change locked StringBuffer');
   Inc(FVersion);
   FText:= AText;
   //FLenEol:= ALenEol;
@@ -117,7 +112,6 @@ procedure TATStringBuffer.SetupFromGenericList(L: TATGenericIntList);
 var
   Pos, NLen, i: integer;
 begin
-  //Assert(not FLocked, 'Attempt to change locked StringBuffer');
   Inc(FVersion);
   SetCount(L.Count+1);
   Pos:= 0;
@@ -136,7 +130,6 @@ var
   Lens: TATGenericIntList;
   i, N: integer;
 begin
-  //Assert(not FLocked, 'Attempt to change locked StringBuffer');
   Inc(FVersion);
 
   FText:= AText;
@@ -185,18 +178,6 @@ begin
   end;
 end;
 
-{
-procedure TATStringBuffer.Lock;
-begin
-  FLocked:= true;
-end;
-
-procedure TATStringBuffer.Unlock;
-begin
-  FLocked:= false;
-end;
-}
-
 procedure TATStringBuffer.Assign(Other: TATStringBuffer);
 begin
   FText:= Other.FText;
@@ -210,18 +191,17 @@ end;
 
 procedure TATStringBuffer.Clear;
 begin
-  //Assert(not FLocked, 'Attempt to clear locked StringBuffer');
   FText:= '';
   SetCount(0);
   Valid:= false;
 end;
 
-function TATStringBuffer.CaretToStr(constref APnt: TPoint): integer;
+function TATStringBuffer.CaretToStr(const APnt: TPoint): integer;
 var
-  Len,x: integer;
+  Len, x: integer;
 begin
   Result:= -1;
-  x:=APnt.X;
+  x:= APnt.X;
   if (APnt.Y<0) then Exit;
   if (APnt.X<0) then Exit;
   if (APnt.Y>=FCount) then Exit;
