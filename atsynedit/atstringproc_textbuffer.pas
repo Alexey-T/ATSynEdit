@@ -48,9 +48,8 @@ type
     function OffsetOfLineIndex(N: integer): integer;
     function LineLength(N: integer): integer;
     function OffsetToDistanceFromLineStart(APos: integer): integer; inline;
-    function OffsetToDistanceFromLineEnd(APos: integer): integer;
     function OffsetToOffsetOfLineStart(APos: integer): integer; inline;
-    function OffsetToOffsetOfLineEnd(APos: integer): integer; inline;
+    function OffsetToOffsetOfLineEnd(APos: integer): integer;
     property Count: integer read GetCount;
     property OnChange: TATStringBufferChange read FOnChange write FOnChange;
   end;
@@ -322,22 +321,17 @@ begin
   Result:= APos-OffsetToDistanceFromLineStart(APos);
 end;
 
-function TATStringBuffer.OffsetToOffsetOfLineEnd(APos: integer): integer; inline;
+function TATStringBuffer.OffsetToOffsetOfLineEnd(APos: integer): integer;
+var
+  NLine: integer;
 begin
-  Result:= APos+OffsetToDistanceFromLineEnd(APos);
+  NLine:= StrToCaret(APos).Y;
+  Result:= OffsetOfLineIndex(NLine+1)-FLenEol;
 end;
 
 function TATStringBuffer.OffsetToDistanceFromLineStart(APos: integer): integer; inline;
 begin
   Result:= StrToCaret(APos).X;
-end;
-
-function TATStringBuffer.OffsetToDistanceFromLineEnd(APos: integer): integer;
-var
-  Pnt: TPoint;
-begin
-  Pnt:= StrToCaret(APos);
-  Result:= LineLength(Pnt.Y)-Pnt.X;
 end;
 
 
