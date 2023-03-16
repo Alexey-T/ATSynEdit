@@ -276,21 +276,18 @@ end;
 
 function TATStringBuffer.OffsetOfLineIndex(N: integer): integer;
 begin
-  if N<0 then
+  if (N<0) or (FCount=0) then
     Result:= 0
   else
   if N>=FCount then
-    Result:= TextLength-1
+    Result:= FList[FCount-1]
   else
     Result:= FList[N];
 end;
 
 function TATStringBuffer.LineLength(N: integer): integer;
 begin
-  if N<0 then
-    Result:= 0
-  else
-  if N>=FCount-1 then
+  if (N<0) or (N>=FCount) then
     Result:= 0
   else
     Result:= FList[N+1]-FList[N]-FLenEol;
