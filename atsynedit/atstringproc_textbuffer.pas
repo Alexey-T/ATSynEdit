@@ -47,7 +47,7 @@ type
     function TextLength_Alt: integer; //does not use FText
     function OffsetOfLineIndex(N: integer): integer;
     function LineLength(N: integer): integer;
-    function OffsetToDistanceFromLineStart(APos: integer): integer;
+    function OffsetToDistanceFromLineStart(APos: integer): integer; inline;
     function OffsetToDistanceFromLineEnd(APos: integer): integer;
     function OffsetToOffsetOfLineStart(APos: integer): integer; inline;
     function OffsetToOffsetOfLineEnd(APos: integer): integer; inline;
@@ -327,35 +327,17 @@ begin
   Result:= APos+OffsetToDistanceFromLineEnd(APos);
 end;
 
-function TATStringBuffer.OffsetToDistanceFromLineStart(APos: integer): integer;
-const
-  CharEol = #10;
-var
-  NPos, NLen: integer;
+function TATStringBuffer.OffsetToDistanceFromLineStart(APos: integer): integer; inline;
 begin
-  Result:= 0;
-  NPos:= APos+1;
-  NLen:= TextLength;
-  while (NPos>1) and (NPos-1<=NLen) and (FText[NPos-1]<>CharEol) do
-  begin
-    Inc(Result);
-    Dec(NPos);
-  end;
+  Result:= StrToCaret(APos).X;
 end;
 
 function TATStringBuffer.OffsetToDistanceFromLineEnd(APos: integer): integer;
-const
-  CharEol = #10;
 var
-  NLen, NPos: integer;
+  Pnt: TPoint;
 begin
-  Result:= 0;
-  NPos:= APos+1;
-  NLen:= TextLength;
-  while (NPos<NLen) and (FText[NPos+1]<>CharEol) do  begin
-    Inc(Result);
-    Inc(NPos);
-  end;
+  Pnt:= StrToCaret(APos);
+  Result:= LineLength(Pnt.Y)-Pnt.X;
 end;
 
 
