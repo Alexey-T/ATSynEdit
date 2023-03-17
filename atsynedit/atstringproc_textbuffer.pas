@@ -261,7 +261,7 @@ var
 begin
   NCnt:= Count;
   if NCnt>0 then
-    Result:= FList[NCnt-1]
+    Result:= FList[NCnt-1]-LenEOL
   else
     Result:= 0;
 end;
