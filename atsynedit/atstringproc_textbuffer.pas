@@ -24,7 +24,7 @@ type
 
   TATStringBuffer = class
   strict private
-    //buffer must always be used LF line endings, FText must have only such line endings
+    //buffer must always use LF line endings, FText must have only such line endings
     const LenEOL=1;
   strict private
     FList: array of integer;
@@ -94,9 +94,7 @@ procedure TATStringBuffer.Setup(const AText: UnicodeString;
 var
   Pos, NLen, i: integer;
 begin
-  //Inc(FVersion);
   FText:= AText;
-  //LenEOL:= ALenEol;
   Valid:= false;
 
   SetCount(Length(ALineLens)+1);
@@ -105,7 +103,8 @@ begin
   for i:= 0 to Length(ALineLens)-1 do
   begin
     NLen:= ALineLens[i];
-    Inc(Pos, NLen+LenEOL);
+    Inc(Pos, NLen);
+    Inc(Pos, LenEOL);
     FList[i+1]:= Pos;
   end;
 end;
@@ -114,14 +113,14 @@ procedure TATStringBuffer.SetupFromGenericList(L: TATGenericIntList);
 var
   Pos, NLen, i: integer;
 begin
-  //Inc(FVersion);
   SetCount(L.Count+1);
   Pos:= 0;
   FList[0]:= 0;
   for i:= 0 to L.Count-1 do
   begin
     NLen:= L[i];
-    Inc(Pos, NLen+LenEOL);
+    Inc(Pos, NLen);
+    Inc(Pos, LenEOL);
     FList[i+1]:= Pos;
   end;
 end;
@@ -132,8 +131,6 @@ var
   Lens: TATGenericIntList;
   i, N: integer;
 begin
-  //Inc(FVersion);
-
   FText:= AText;
   Valid:= false;
   if FText='' then
