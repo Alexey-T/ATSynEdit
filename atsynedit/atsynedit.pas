@@ -817,6 +817,7 @@ type
     FEventMapDone: TSimpleEvent; //fired by MinimapThread, when it's work done
     FColorOfStates: array[TATLineState] of TColor;
     FFoldingAsStringTodo: string;
+    FStringBufferObject: TObject;
 
     //these options are implemented in CudaText, they are dummy here
     FOptThemed: boolean;
@@ -1682,6 +1683,7 @@ type
     function TextSelected: atString;
     function TextSelectedEx(ACaret: TATCaretItem): atString;
     function TextCurrentWord: atString;
+    property StringBufferObject: TObject read FStringBufferObject write FStringBufferObject;
     //LastCommandChangedLines: count of lines changed by last call of Strings.ActionTrimSpaces
     property LastCommandChangedLines: integer read GetLastCommandChangedLines write SetLastCommandChangedLines;
     property IsRunningCommand: boolean read FIsRunningCommand;
@@ -5087,6 +5089,8 @@ end;
 
 destructor TATSynEdit.Destroy;
 begin
+  if Assigned(FStringBufferObject) then
+    FreeAndNil(FStringBufferObject);
   if Assigned(FMinimapThread) then
   begin
     FMinimapThread.Terminate;

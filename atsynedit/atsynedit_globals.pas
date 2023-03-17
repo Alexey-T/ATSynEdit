@@ -133,6 +133,7 @@ type
     MaxCaretTime: integer;
     MinCharsAfterAnyIndent: integer;
     MaxLinesForOldWrapUpdate: integer;
+    MaxLinesForStatusbarOffsetsCalc: integer;
     MinimapColoringTime: integer;
     HintScrollDx: integer;
     HintBookmarkDx: integer;
@@ -447,6 +448,7 @@ initialization
     MaxCaretTime:= 2000;
     MinCharsAfterAnyIndent:= 20; //if indent is too big, leave 20 chrs in wrapped-parts anyway
     MaxLinesForOldWrapUpdate:= 100; //if less lines, force old wrapinfo update (fast)
+    MaxLinesForStatusbarOffsetsCalc:= 7000;
     MinimapColoringTime:= 40;
     HintScrollDx:= 5;
     HintBookmarkDx:= 6;
