@@ -268,7 +268,7 @@ function TATStringBuffer.TextLength_Alt: integer;
 var
   NCnt: integer;
 begin
-  NCnt:= Length(FList);
+  NCnt:= Count;
   if NCnt>0 then
     Result:= FList[NCnt-1]
   else
