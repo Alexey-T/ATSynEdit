@@ -45,8 +45,7 @@ type
     function CaretToStr(const APnt: TPoint): integer;
     function StrToCaret(APos: integer): TPoint;
     function SubString(APos, ALen: integer): UnicodeString; inline;
-    function TextLength: integer; inline; //uses FText
-    function TextLength_Alt: integer; //does not use FText
+    function TextLength: integer;
     function OffsetOfLineIndex(N: integer): integer;
     function LineLength(N: integer): integer;
     function OffsetToDistanceFromLineStart(APos: integer): integer; inline;
@@ -256,12 +255,7 @@ begin
   Result:= Copy(FText, APos, ALen);
 end;
 
-function TATStringBuffer.TextLength: integer; inline;
-begin
-  Result:= Length(FText);
-end;
-
-function TATStringBuffer.TextLength_Alt: integer;
+function TATStringBuffer.TextLength: integer;
 var
   NCnt: integer;
 begin
