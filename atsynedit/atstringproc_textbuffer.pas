@@ -24,8 +24,9 @@ type
 
   TATStringBuffer = class
   strict private
+    const FLenEol=1;
+  strict private
     FList: array of integer;
-    FLenEol: integer;
     FOnChange: TATStringBufferChange;
     function GetCount: integer; inline;
     procedure SetCount(AValue: integer);
@@ -75,7 +76,6 @@ end;
 constructor TATStringBuffer.Create;
 begin
   FText:= '';
-  FLenEol:= 1; //no apps should use other
   SetCount(0);
   Version:= 0;
   Valid:= false;
@@ -184,7 +184,6 @@ begin
   FText:= Other.FText;
   UniqueString(FText);
   FList:= Other.FList;
-  FLenEol:= Other.FLenEol;
   Version:= Other.Version;
 end;
 
