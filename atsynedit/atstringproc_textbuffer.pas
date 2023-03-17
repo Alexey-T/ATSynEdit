@@ -24,7 +24,8 @@ type
 
   TATStringBuffer = class
   strict private
-    const FLenEol=1;
+    //buffer must always be used LF line endings, FText must have only such line endings
+    const LenEOL=1;
   strict private
     FList: array of integer;
     FOnChange: TATStringBufferChange;
@@ -95,7 +96,7 @@ var
 begin
   //Inc(FVersion);
   FText:= AText;
-  //FLenEol:= ALenEol;
+  //LenEOL:= ALenEol;
   Valid:= false;
 
   SetCount(Length(ALineLens)+1);
@@ -104,7 +105,7 @@ begin
   for i:= 0 to Length(ALineLens)-1 do
   begin
     NLen:= ALineLens[i];
-    Inc(Pos, NLen+FLenEol);
+    Inc(Pos, NLen+LenEOL);
     FList[i+1]:= Pos;
   end;
 end;
@@ -120,7 +121,7 @@ begin
   for i:= 0 to L.Count-1 do
   begin
     NLen:= L[i];
-    Inc(Pos, NLen+FLenEol);
+    Inc(Pos, NLen+LenEOL);
     FList[i+1]:= Pos;
   end;
 end;
@@ -293,7 +294,7 @@ begin
   if (N<0) or (N>=Count) then
     Result:= 0
   else
-    Result:= FList[N+1]-FList[N]-FLenEol;
+    Result:= FList[N+1]-FList[N]-LenEOL;
 end;
 
 (*
@@ -325,7 +326,7 @@ var
   NLine: integer;
 begin
   NLine:= StrToCaret(APos).Y;
-  Result:= OffsetOfLineIndex(NLine+1)-FLenEol;
+  Result:= OffsetOfLineIndex(NLine+1)-LenEOL;
 end;
 
 function TATStringBuffer.OffsetToDistanceFromLineStart(APos: integer): integer; inline;
