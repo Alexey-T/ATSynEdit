@@ -296,6 +296,7 @@ type
     CaretsAfterLastEdition: TATPointArray;
     EditingActive: boolean;
     EditingTopLine: integer;
+    StringBufferObject: TObject;
     constructor Create(AUndoLimit: integer); virtual;
     destructor Destroy; override;
     procedure Clear(AWithEvent: boolean=true);
@@ -1325,6 +1326,9 @@ begin
 
   GutterDecor1:= nil;
   GutterDecor2:= nil;
+
+  if Assigned(StringBufferObject) then
+    FreeAndNil(StringBufferObject);
 
   ClearUndo(true);
   FList.Clear; //Clear calls event, no need
