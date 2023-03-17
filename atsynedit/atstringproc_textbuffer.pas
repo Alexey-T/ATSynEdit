@@ -32,7 +32,7 @@ type
     procedure SetupFromGenericList(L: TATGenericIntList);
   public
     Valid: boolean;
-    VersionValue: Int64;
+    Version: Int64;
     FText: UnicodeString;
     constructor Create; virtual;
     destructor Destroy; override;
@@ -77,7 +77,7 @@ begin
   FText:= '';
   FLenEol:= 1; //no apps should use other
   SetCount(0);
-  VersionValue:= 0;
+  Version:= 0;
   Valid:= false;
 end;
 
@@ -185,7 +185,7 @@ begin
   UniqueString(FText);
   FList:= Other.FList;
   FLenEol:= Other.FLenEol;
-  VersionValue:= Other.VersionValue;
+  Version:= Other.Version;
 end;
 
 
