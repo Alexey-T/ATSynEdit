@@ -127,52 +127,45 @@ end;
 
 procedure TATStringBuffer.SetupSlow(const AText: UnicodeString);
 var
-  Lens: TATGenericIntList;
-  i, N: integer;
+  LenList: TATGenericIntList;
+  NLen, i: integer;
 begin
   FText:= AText;
-  Valid:= false;
   if FText='' then
   begin
     SetCount(0);
     Exit
   end;
 
-  N:= 0;
-  i:= 1;
+  //replace CR LF to LF
+  FText:= UnicodeStringReplace(FText, #13#10, #10, [rfReplaceAll]);
 
-  Lens:= TATGenericIntList.Create;
+  Valid:= false;
+  NLen:= 0;
+
+  LenList:= TATGenericIntList.Create;
   try
-    while i<=Length(FText) do
+    for i:= 1 to Length(FText) do
     begin
-      //Replace CR LF and CR to LF
+      //replace CR to LF
       if FText[i]=#13 then
-      begin
-        if (i<Length(FText)) and (FText[i+1]=#10) then
-        begin
-          Delete(FText, i, 1);
-          Continue;
-        end
-        else
-          FText[i]:= #10;
-      end;
+        FText[i]:= #10;
 
       if FText[i]=#10 then
       begin
-        Lens.Add(N);
-        N:= 0;
+        LenList.Add(NLen);
+        NLen:= 0;
       end
       else
-        Inc(N);
-      Inc(i);
+        Inc(NLen);
     end;
 
-    if N>0 then
-      Lens.Add(N);
+    if NLen>0 then
+      LenList.Add(NLen);
 
-    SetupFromGenericList(Lens);
+    SetupFromGenericList(LenList);
   finally
-    FreeAndNil(Lens);
+    FreeAndNil(LenList);
   end;
 end;
 
