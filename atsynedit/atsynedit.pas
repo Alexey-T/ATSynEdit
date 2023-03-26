@@ -759,6 +759,7 @@ type
     FRectMain,
     FRectMainVisible,
     FRectMinimap,
+    FRectMinimapTooltip,
     FRectMicromap,
     FRectGutter,
     FRectGutterBm,
@@ -3176,6 +3177,8 @@ begin
   GetRectRuler(FRectRuler); //after main
   GetRectGutterBookmarks(FRectGutterBm); //after gutter
   GetRectGutterNumbers(FRectGutterNums); //after gutter
+
+  FRectMinimapTooltip:= Rect(0, 0, 0, 0);
 end;
 
 procedure TATSynEdit.DoPaintMain(C: TCanvas; ALineFrom: integer);
@@ -7456,6 +7459,13 @@ begin
     if R.Left>=FRectMain.Right then Continue;
     if R.Top>=FRectMain.Bottom then Continue;
 
+    if FMinimapTooltipVisible and FMinimapTooltipEnabled and (FRectMinimapTooltip.Width>0) then
+      if (R.Left>=FRectMinimapTooltip.Left) and
+        (R.Right<=FRectMinimapTooltip.Right) and
+        (R.Top>=FRectMinimapTooltip.Top) and
+        (R.Bottom<=FRectMinimapTooltip.Bottom) then
+        Continue;
+
     DoCaretsApplyShape(R, CaretShape, NCharWidth, FCharSize.Y);
 
     if FCaretBlinkEnabled then
@@ -9615,6 +9625,13 @@ begin
     );
 
   C.Draw(NPanelLeft, NPanelTop, FMinimapTooltipBitmap);
+
+  FRectMinimapTooltip:= Rect(
+    NPanelLeft,
+    NPanelTop,
+    NPanelLeft+NPanelWidth,
+    NPanelTop+NPanelHeight
+    );
 end;
 
 
