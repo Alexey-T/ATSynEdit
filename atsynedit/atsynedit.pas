@@ -3144,10 +3144,16 @@ begin
     FTextOffsetFromTop:= 0;
   FTextOffsetFromTop1:= FTextOffsetFromTop; //"-1" gives artifacts on gutter bands
 
-  if FMinimapCustomScale<100 then
+  if FMinimapCustomScale<=0 then
   begin
     FCharSizeMinimap.XScaled:= Max(1, ATEditorScale(1) * ATEditorCharXScale);
     FCharSizeMinimap.Y:=       Max(2, ATEditorScale(2));
+  end
+  else
+  if FMinimapCustomScale<100 then
+  begin
+    FCharSizeMinimap.XScaled:= Max(1, 1 * ATEditorCharXScale);
+    FCharSizeMinimap.Y:=       1;
   end
   else
   begin
