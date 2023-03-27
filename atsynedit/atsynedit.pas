@@ -3152,7 +3152,7 @@ begin
   else
   if FMinimapCustomScale<100 then
   begin
-    FCharSizeMinimap.XScaled:= Max(1, 1 * ATEditorCharXScale);
+    FCharSizeMinimap.XScaled:= ATEditorCharXScale;
     FCharSizeMinimap.Y:=       1;
   end
   else
