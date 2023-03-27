@@ -91,7 +91,7 @@ type
     EmojiWidthPercents: integer;
     MaxTabPositionToExpand: integer; //no sense to expand too far tabs
     MinWordWrapOffset: integer;
-    CommaCharsWrapWithWords: UnicodeString;
+    PunctuationToWrapWithWords: UnicodeString;
     MaxLineLenForAccurateCharWidths: integer; //must be <= cMaxFixedArray
     TextoutNeedsOffsets: boolean;
     CaretTextOverInvertedRect: boolean;
@@ -396,7 +396,7 @@ initialization
     EmojiWidthPercents:= 210;
     MaxTabPositionToExpand:= 500;
     MinWordWrapOffset:= 3;
-    CommaCharsWrapWithWords:= '.,;:''"`~?!&%$()[]';
+    PunctuationToWrapWithWords:= '.,;:''"`~?!&%$()[]';
     MaxLineLenForAccurateCharWidths:= 500;
 
     //Win: seems no slowdown from offsets

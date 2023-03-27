@@ -489,7 +489,7 @@ function TATStringTabHelper.FindWordWrapOffset(ALineIndex: integer; const S: atS
     if _IsCJKText(ch) then
       Result:= false
     else
-    if Pos(ch, ATEditorOptions.CommaCharsWrapWithWords)>0 then
+    if Pos(ch, ATEditorOptions.PunctuationToWrapWithWords)>0 then
       Result:= true
     else
       Result:= IsCharWord(ch, ANonWordChars);
