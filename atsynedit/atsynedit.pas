@@ -636,6 +636,8 @@ type
     FMouseDownOnEditingArea: boolean;
     FMouseDownOnMinimap: boolean;
     FMouseDownDouble: boolean;
+    FMouseDownDouble_SelBegin: TPoint;
+    FMouseDownDouble_SelEnd: TPoint;
     FMouseDownWithCtrl: boolean;
     FMouseDownWithAlt: boolean;
     FMouseDownWithShift: boolean;
@@ -6527,6 +6529,8 @@ begin
   FMouseDownPnt:= Point(-1, -1);
   FMouseDownGutterLineNumber:= -1;
   FMouseDownDouble:= false;
+  FMouseDownDouble_SelBegin:= Point(-1, -1);
+  FMouseDownDouble_SelEnd:= Point(-1, -1);
   FMouseDownAndColumnSelection:= false;
   FMouseDownOnEditingArea:= false;
   FMouseDownOnMinimap:= false;
@@ -6649,7 +6653,7 @@ end;
 
 procedure TATSynEdit.MouseMove(Shift: TShiftState; X, Y: Integer);
 var
-  PntCoord, PntText, PntScreen: TPoint;
+  PntCoord, PntText: TPoint;
   RectMainCopy: TRect;
   bOnMain, bOnMinimap, bOnMicromap,
   bOnGutter, bOnGutterNumbers, bOnGutterBookmk,
@@ -6899,8 +6903,32 @@ begin
                 if not bSelectShiftExpanding then //check it to allow expanding of selection by Shift+[mouse drag]
                   DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
                 //writeln('DoCaretSingle: '+inttostr(FMouseDownPnt.X)+':'+inttostr(FMouseDownPnt.Y));
+
                 if FMouseDownDouble and FOptMouse2ClickDragSelectsWords then
-                  DoSelect_WordRange(0, FMouseDownPnt, PntText)
+                begin
+                  if FMouseDownDouble_SelBegin<>FMouseDownPnt then
+                  begin
+                    if IsPosSorted(
+                      FMouseDownDouble_SelBegin.X,
+                      FMouseDownDouble_SelBegin.Y,
+                      PntText.X,
+                      PntText.Y,
+                      false
+                      ) then
+                      DoSelect_WordRange(0, FMouseDownDouble_SelBegin, PntText)
+                    else
+                    if IsPosSorted(
+                      PntText.X,
+                      PntText.Y,
+                      FMouseDownDouble_SelEnd.X,
+                      FMouseDownDouble_SelEnd.Y,
+                      false
+                      ) then
+                      DoSelect_WordRange(0, PntText, FMouseDownDouble_SelEnd);
+                  end
+                  else
+                    DoSelect_WordRange(0, FMouseDownPnt, PntText);
+                end
                 else
                 begin
                   Carets[0].SelectToPoint(PntText.X, PntText.Y);
@@ -7143,10 +7171,19 @@ end;
 
 
 procedure TATSynEdit.DoSelect_ByDoubleClick(AllowOnlyWordChars: boolean);
+var
+  Caret: TATCaretItem;
 begin
   if not Strings.IsIndexValid(FMouseDownPnt.Y) then Exit;
   DoSelect_CharGroupAtPos(FMouseDownPnt, EditorIsPressedCtrl, AllowOnlyWordChars);
   Invalidate;
+
+  if Carets.Count=1 then
+  begin
+    Caret:= Carets[0];
+    FMouseDownDouble_SelBegin:= Caret.GetLeftEdge;
+    FMouseDownDouble_SelEnd:= Caret.GetRightEdge;
+  end;
 end;
 
 function TATSynEdit.GetCaretManyAllowed: boolean;
