@@ -79,6 +79,8 @@ type
     UnprintedReplaceSpecToCode: integer;
     CharSizeProportional: boolean;
     CharScaleFullWidth: word;
+    RenderSpaceBgAtLineEOL: boolean;
+    RenderSpaceBgAtLineEOL_WidthOnEmpty: integer;
     SpeedScrollAutoHorz: integer; //auto-scroll (drag out of control): speed x
     SpeedScrollAutoVert: integer; //... speed y
     DebugTiming: boolean;
@@ -382,6 +384,8 @@ initialization
     UnprintedReplaceSpecToCode:= 164;
     CharSizeProportional:= true;
     CharScaleFullWidth:= 190;
+    RenderSpaceBgAtLineEOL:= true;
+    RenderSpaceBgAtLineEOL_WidthOnEmpty:= 50;
     SpeedScrollAutoHorz:= 10;
     SpeedScrollAutoVert:= 1;
     DebugTiming:= false;

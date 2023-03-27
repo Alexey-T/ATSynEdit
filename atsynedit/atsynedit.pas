@@ -3977,12 +3977,25 @@ begin
     //for OptShowFullWidthForSelection=false paint eol bg
     if bLineEolSelected then
     begin
-      C.Brush.Color:= Colors.TextSelBG;
-      C.FillRect(
-        CoordAfterText.X,
-        CoordAfterText.Y,
-        CoordAfterText.X+ACharSize.XScaled div ATEditorCharXScale,
-        CoordAfterText.Y+ACharSize.Y);
+      if ATEditorOptions.RenderSpaceBgAtLineEOL then
+      begin
+        C.Brush.Color:= Colors.TextSelBG;
+        C.FillRect(
+          CoordAfterText.X,
+          CoordAfterText.Y,
+          CoordAfterText.X+ACharSize.XScaled div ATEditorCharXScale,
+          CoordAfterText.Y+ACharSize.Y);
+      end
+      else
+      if NLineLen=0 then
+      begin
+        C.Brush.Color:= Colors.TextSelBG;
+        C.FillRect(
+          CoordAfterText.X,
+          CoordAfterText.Y,
+          CoordAfterText.X+ACharSize.XScaled div ATEditorCharXScale * ATEditorOptions.RenderSpaceBgAtLineEOL_WidthOnEmpty div 100,
+          CoordAfterText.Y+ACharSize.Y);
+      end
     end;
 
     //paint EOL mark
