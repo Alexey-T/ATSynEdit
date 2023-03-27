@@ -6666,6 +6666,7 @@ var
   Details: TATEditorPosDetails;
   nIndexHotspot, nIndexCaret: integer;
   {$ifdef windows}
+  PntScreen: TPoint;
   nScreenDelta: integer;
   {$endif}
   Caret: TATCaretItem;
