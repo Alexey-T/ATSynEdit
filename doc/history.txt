@@ -1,4 +1,5 @@
 2023.03.27
+* change: rename option to ATEditorOptions.PunctuationToWrapWithWords
 + add: ATEditorOptions.RenderSpaceBgAtLineEOL
 + add: ATEditorOptions.RenderSpaceBgAtLineEOL_WidthOnEmpty
 
