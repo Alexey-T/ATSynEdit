@@ -3378,8 +3378,6 @@ var
   SampleStrLen: integer;
   SampleStr: string;
   Size: TSize;
-  TempC: TCanvas;
-  dc: HDC;
 begin
   if ATEditorOptions.PreciseCalculationOfCharWidth then
     SampleStrLen:= 128
@@ -3395,18 +3393,10 @@ begin
   end
   else
   begin
-    TempC:= TCanvas.Create;
-    try
-      dc:= GetDC(0);
-      TempC.Handle:= dc;
-      TempC.Font.Name:= Self.Font.Name;
-      TempC.Font.Size:= DoScaleFont(Self.Font.Size);
-      Size:= TempC.TextExtent(SampleStr);
-      UpdateFontProportional(TempC);
-      ReleaseDC(dc, 0);
-    finally
-      FreeAndNil(TempC);
-    end;
+    FBitmap.Canvas.Font.Name:= Self.Font.Name;
+    FBitmap.Canvas.Font.Size:= DoScaleFont(Self.Font.Size);
+    Size:= FBitmap.Canvas.TextExtent(SampleStr);
+    UpdateFontProportional(FBitmap.Canvas);
   end;
 
   ACharSize.XScaled:= Max(1, Size.cx) * ATEditorCharXScale div SampleStrLen;
