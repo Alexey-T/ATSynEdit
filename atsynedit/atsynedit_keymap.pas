@@ -63,7 +63,6 @@ type
     function Count: integer; inline;
     function IsIndexValid(N: integer): boolean; inline;
     property Items[N: integer]: TATKeymapItem read GetItem; default;
-    //procedure Add1(ACmd: integer; const AName: string; const AKeys1, AKeys2: array of string; const ADescription: string='');
     procedure Add(ACmd: integer; const AName: string; const AKeys1, AKeys2: array of TShortcut; const ADescription: string='');
     procedure Delete(N: integer);
     procedure Assign(AKeymap: TATKeyMap);
@@ -165,40 +164,6 @@ function TATKeymap.IsIndexValid(N: integer): boolean; inline;
 begin
   Result:= (N>=0) and (N<FList.Count);
 end;
-
-(*
-function _TextToShortcut(const S: string): TShortcut; inline;
-begin
-  Result:= TextToShortCut(S);
-  {$ifdef test_correct_keynames}
-  if Result=0 then
-    Showmessage('Incorrect key in keymap: "'+S+'"');
-  {$endif}
-end;
-
-procedure TATKeymap.Add1(ACmd: integer; const AName: string; const AKeys1,
-  AKeys2: array of string; const ADescription: string);
-var
-  Item: TATKeymapItem;
-  i: integer;
-begin
-  Item:= TATKeymapItem.Create;
-  Item.Command:= ACmd;
-  Item.Name:= AName;
-  Item.Description:= ADescription;
-
-  Item.Keys1.Clear;
-  Item.Keys2.Clear;
-
-  for i:= 0 to Min(High(AKeys1), High(Item.Keys1.Data)) do
-    Item.Keys1.Data[i]:= _TextToShortcut(AKeys1[i]);
-
-  for i:= 0 to Min(High(AKeys2), High(Item.Keys2.Data)) do
-    Item.Keys2.Data[i]:= _TextToShortcut(AKeys2[i]);
-
-  FList.Add(Item);
-end;
-*)
 
 procedure TATKeyMap.Add(ACmd: integer; const AName: string;
   const AKeys1, AKeys2: array of TShortcut;
