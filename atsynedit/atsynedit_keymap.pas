@@ -13,7 +13,7 @@ interface
 
 uses
   Classes, SysUtils,
-  ATStringProc_Separator;
+  LCLType;
 
 type
   { TATKeyArray }
@@ -63,7 +63,8 @@ type
     function Count: integer; inline;
     function IsIndexValid(N: integer): boolean; inline;
     property Items[N: integer]: TATKeymapItem read GetItem; default;
-    procedure Add(ACmd: integer; const AName: string; const AKeys1, AKeys2: array of string; const ADescription: string='');
+    //procedure Add1(ACmd: integer; const AName: string; const AKeys1, AKeys2: array of string; const ADescription: string='');
+    procedure Add(ACmd: integer; const AName: string; const AKeys1, AKeys2: array of TShortcut; const ADescription: string='');
     procedure Delete(N: integer);
     procedure Assign(AKeymap: TATKeyMap);
     function IndexOf(ACmd: integer): integer;
@@ -72,11 +73,16 @@ type
     function GetCommandFromHotkeyString(const AHotkey: string; AComboSepar: char): integer;
   end;
 
+const
+  //macOS: instead of Ctrl use Command-key
+  scXControl = {$ifdef darwin} scMeta {$else} scCtrl {$endif};
+
 implementation
 
 uses
   Math,
-  LCLProc;
+  LCLProc,
+  ATStringProc_Separator;
 
 { TATKeymapItem }
 
@@ -160,6 +166,7 @@ begin
   Result:= (N>=0) and (N<FList.Count);
 end;
 
+(*
 function _TextToShortcut(const S: string): TShortcut; inline;
 begin
   Result:= TextToShortCut(S);
@@ -169,7 +176,7 @@ begin
   {$endif}
 end;
 
-procedure TATKeymap.Add(ACmd: integer; const AName: string; const AKeys1,
+procedure TATKeymap.Add1(ACmd: integer; const AName: string; const AKeys1,
   AKeys2: array of string; const ADescription: string);
 var
   Item: TATKeymapItem;
@@ -188,6 +195,31 @@ begin
 
   for i:= 0 to Min(High(AKeys2), High(Item.Keys2.Data)) do
     Item.Keys2.Data[i]:= _TextToShortcut(AKeys2[i]);
+
+  FList.Add(Item);
+end;
+*)
+
+procedure TATKeyMap.Add(ACmd: integer; const AName: string;
+  const AKeys1, AKeys2: array of TShortcut;
+  const ADescription: string='');
+var
+  Item: TATKeymapItem;
+  i: integer;
+begin
+  Item:= TATKeymapItem.Create;
+  Item.Command:= ACmd;
+  Item.Name:= AName;
+  Item.Description:= ADescription;
+
+  Item.Keys1.Clear;
+  Item.Keys2.Clear;
+
+  for i:= 0 to High(AKeys1) do
+    Item.Keys1.Data[i]:= AKeys1[i];
+
+  for i:= 0 to High(AKeys2) do
+    Item.Keys2.Data[i]:= AKeys2[i];
 
   FList.Add(Item);
 end;
