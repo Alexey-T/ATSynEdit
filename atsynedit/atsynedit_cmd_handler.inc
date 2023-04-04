@@ -359,7 +359,8 @@ begin
     //- Paint call needed, to repaint after "Fold all" (Linux gtk2)
     //and it helps to not skip repaints in big files with EControl lexer
     UpdateCursor;
-    Paint;
+    if cResultFoldChange in Res then
+      Paint;
     if bAllowRepaint then
       Invalidate;
   end
