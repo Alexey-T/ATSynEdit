@@ -734,12 +734,14 @@ type
     FUnprintedEnds,
     FUnprintedEndsDetails: boolean;
     FPrevModified: boolean;
-    FPrevFontName: string;
-    FPrevFontSize: integer;
-    FPrevFontSpacingY: integer;
-    FPrevScale_OptScaleFont: integer;
-    FPrevScale_GlobalScale: integer;
-    FPrevScale_GlobalScaleFont: integer;
+    FPrevFont: record
+      FontName: string;
+      FontSize: integer;
+      SpacingY: integer;
+      OptScaleFont: integer;
+      GlobalScale: integer;
+      GlobalScaleFont: integer;
+    end;
     FCharSize: TATEditorCharSize;
     FCharSizeMinimap: TATEditorCharSize;
     FSpacingY: integer;
@@ -3386,19 +3388,19 @@ var
   Size: TSize;
 begin
   //user told that caching helps here, on low-spec PC
-  if (FPrevFontName=Self.Font.Name) and
-    (FPrevFontSize=Self.Font.Size) and
-    (FPrevFontSpacingY=ACharSpacingY) and
-    (FPrevScale_OptScaleFont=FOptScaleFont) and
-    (FPrevScale_GlobalScale=ATEditorScalePercents) and
-    (FPrevScale_GlobalScaleFont=ATEditorScaleFontPercents) then exit;
+  if (FPrevFont.FontName=Self.Font.Name) and
+    (FPrevFont.FontSize=Self.Font.Size) and
+    (FPrevFont.SpacingY=ACharSpacingY) and
+    (FPrevFont.OptScaleFont=FOptScaleFont) and
+    (FPrevFont.GlobalScale=ATEditorScalePercents) and
+    (FPrevFont.GlobalScaleFont=ATEditorScaleFontPercents) then exit;
 
-  FPrevFontName:= Self.Font.Name;
-  FPrevFontSize:= Self.Font.Size;
-  FPrevFontSpacingY:= ACharSpacingY;
-  FPrevScale_OptScaleFont:= FOptScaleFont;
-  FPrevScale_GlobalScale:= ATEditorScalePercents;
-  FPrevScale_GlobalScaleFont:= ATEditorScaleFontPercents;
+  FPrevFont.FontName:= Self.Font.Name;
+  FPrevFont.FontSize:= Self.Font.Size;
+  FPrevFont.SpacingY:= ACharSpacingY;
+  FPrevFont.OptScaleFont:= FOptScaleFont;
+  FPrevFont.GlobalScale:= ATEditorScalePercents;
+  FPrevFont.GlobalScaleFont:= ATEditorScaleFontPercents;
 
   if ATEditorOptions.PreciseCalculationOfCharWidth then
     SampleStrLen:= 64
