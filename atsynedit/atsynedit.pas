@@ -3401,7 +3401,7 @@ begin
   FPrevScale_GlobalScaleFont:= ATEditorScaleFontPercents;
 
   if ATEditorOptions.PreciseCalculationOfCharWidth then
-    SampleStrLen:= 128
+    SampleStrLen:= 64
   else
     SampleStrLen:= 1;
 
