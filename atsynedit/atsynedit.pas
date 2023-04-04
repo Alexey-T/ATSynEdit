@@ -736,6 +736,7 @@ type
     FPrevModified: boolean;
     FPrevFontName: string;
     FPrevFontSize: integer;
+    FPrevFontSpacingY: integer;
     FPrevScale_OptScaleFont: integer;
     FPrevScale_GlobalScale: integer;
     FPrevScale_GlobalScaleFont: integer;
@@ -3387,12 +3388,14 @@ begin
   //user told that caching helps here, on low-spec PC
   if (FPrevFontName=Self.Font.Name) and
     (FPrevFontSize=Self.Font.Size) and
+    (FPrevFontSpacingY=ACharSpacingY) and
     (FPrevScale_OptScaleFont=FOptScaleFont) and
     (FPrevScale_GlobalScale=ATEditorScalePercents) and
     (FPrevScale_GlobalScaleFont=ATEditorScaleFontPercents) then exit;
 
   FPrevFontName:= Self.Font.Name;
   FPrevFontSize:= Self.Font.Size;
+  FPrevFontSpacingY:= ACharSpacingY;
   FPrevScale_OptScaleFont:= FOptScaleFont;
   FPrevScale_GlobalScale:= ATEditorScalePercents;
   FPrevScale_GlobalScaleFont:= ATEditorScaleFontPercents;
