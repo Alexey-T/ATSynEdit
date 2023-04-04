@@ -1041,7 +1041,6 @@ type
     procedure InitFoldbarCache(ACacheStartIndex: integer);
     procedure InitLengthArray(out Lens: TATIntArray);
     function IsCaretFarFromVertEdge(ACommand: integer): boolean;
-    function IsInvalidateAllowed: boolean; inline;
     function IsNormalLexerActive: boolean;
     procedure MenuitemClipboardRecentsClick(Sender: TObject);
     procedure SetEditorIndex(AValue: integer);
@@ -7234,6 +7233,7 @@ begin
   end;
 end;
 
+(*
 function TATSynEdit.IsInvalidateAllowed: boolean;
 begin
   exit(true);
@@ -7253,7 +7253,7 @@ begin
       Application.MainForm.Caption:= 'skip invalidate: '+TimeToStr(Now)+', lexer: '+AdapterForHilite.GetLexerName;
     }
 end;
-
+*)
 
 procedure TATSynEdit.Invalidate;
 begin
@@ -7502,8 +7502,8 @@ begin
   //disable InvalidateRect during Paint
   if (csCustomPaint in ControlState) then
     AWithInvalidate:= false;
-  if not IsInvalidateAllowed then
-    AWithInvalidate:= false;
+  //if not IsInvalidateAllowed then
+  //  AWithInvalidate:= false;
 
   if ModeReadOnly then
     CaretShape:= FCaretShapeReadonly

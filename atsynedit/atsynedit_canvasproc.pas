@@ -103,8 +103,8 @@ procedure CanvasLineEx(C: TCanvas;
   Color: TColor; Style: TATLineStyle;
   X1, Y1, X2, Y2: integer; AtDown: boolean);
 
-procedure CanvasTextOutSimplest(C: TCanvas; X, Y: integer; const S: string); inline;
-procedure CanvasTextOutSimplest(C: TCanvas; X, Y: integer; const S: UnicodeString); inline;
+procedure CanvasTextOutSimplest(C: TCanvas; X, Y: integer; const S: string);
+procedure CanvasTextOutSimplest(C: TCanvas; X, Y: integer; const S: UnicodeString);
 procedure CanvasTextOutSimplest_PChar(C: TCanvas; X, Y: integer; Buf: PChar; Len: integer); inline;
 
 procedure CanvasTextOut(C: TCanvas;
