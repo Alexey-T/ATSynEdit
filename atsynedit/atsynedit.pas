@@ -734,6 +734,11 @@ type
     FUnprintedEnds,
     FUnprintedEndsDetails: boolean;
     FPrevModified: boolean;
+    FPrevFontName: string;
+    FPrevFontSize: integer;
+    FPrevScale_OptScaleFont: integer;
+    FPrevScale_GlobalScale: integer;
+    FPrevScale_GlobalScaleFont: integer;
     FCharSize: TATEditorCharSize;
     FCharSizeMinimap: TATEditorCharSize;
     FSpacingY: integer;
@@ -3379,6 +3384,19 @@ var
   SampleStr: string;
   Size: TSize;
 begin
+  //user told that caching helps here, on low-spec PC
+  if (FPrevFontName=Self.Font.Name) and
+    (FPrevFontSize=Self.Font.Size) and
+    (FPrevScale_OptScaleFont=FOptScaleFont) and
+    (FPrevScale_GlobalScale=ATEditorScalePercents) and
+    (FPrevScale_GlobalScaleFont=ATEditorScaleFontPercents) then exit;
+
+  FPrevFontName:= Self.Font.Name;
+  FPrevFontSize:= Self.Font.Size;
+  FPrevScale_OptScaleFont:= FOptScaleFont;
+  FPrevScale_GlobalScale:= ATEditorScalePercents;
+  FPrevScale_GlobalScaleFont:= ATEditorScaleFontPercents;
+
   if ATEditorOptions.PreciseCalculationOfCharWidth then
     SampleStrLen:= 128
   else
