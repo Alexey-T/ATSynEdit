@@ -1,3 +1,6 @@
+2023.04.04
+* change: changed declaration of TATKeyMap.Add, to use integer key values like scCtrl+scShift+VK_D
+
 2023.03.27
 * change: rename option to ATEditorOptions.PunctuationToWrapWithWords
 + add: ATEditorOptions.RenderSpaceBgAtLineEOL
