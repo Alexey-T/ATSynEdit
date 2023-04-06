@@ -1026,8 +1026,8 @@ type
     procedure DoChangeBookmarks;
     procedure DoHandleWheelRecord(const ARec: TATEditorWheelRecord);
     procedure DoStringsOnUnfoldLine(Sender: TObject; ALine: integer);
-    function FindLineWordBegin(const ALine: UnicodeString; AX: integer): integer;
-    function FindLineWordEnd(const ALine: UnicodeString; AX: integer): integer;
+    function FindLineNonspaceBegin(const ALine: UnicodeString; AX: integer): integer;
+    function FindLineNonspaceEnd(const ALine: UnicodeString; AX: integer): integer;
     procedure InitClipboardExData(out Data: TATEditorClipboardExData);
     procedure FlushEditingChangeEx(AChange: TATLineChangeKind; ALine, AItemCount: integer);
     procedure FlushEditingChangeLog(ALine: integer);
