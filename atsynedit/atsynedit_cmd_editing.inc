@@ -294,7 +294,8 @@ begin
       false,
       Shift,
       PosAfter);
-    Caret.PosX:= Caret.PosX+IndentSizes[iCaret];
+    Caret.PosX+= IndentSizes[iCaret];
+    Caret.SelectNone;
   end;
 
   Result:= [cResultText, cResultCaretBottom, cResultCaretLazy];
