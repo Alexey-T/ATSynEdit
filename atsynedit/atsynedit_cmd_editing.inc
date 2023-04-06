@@ -268,7 +268,8 @@ begin
   end;
 
   if NFoundEdge=-1 then exit;
-  NFoundEdge:= FTabHelper.ColumnPosToCharPos(NCaretY, St.Lines[NCaretY], NFoundEdge);
+  SLine:= Copy(St.Lines[NCaretY], 1, NCaretX); //must truncate Lines[NCaretY] so tab-chars after NCaretX will not harm
+  NFoundEdge:= FTabHelper.ColumnPosToCharPos(NCaretY, SLine, NFoundEdge);
   if NFoundEdge<=NCaretX then exit;
 
   Result:= DoCommand_TextInsertAtCarets(
