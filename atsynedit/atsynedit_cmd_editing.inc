@@ -231,22 +231,22 @@ var
   St: TATStrings;
   Caret: TATCaretItem;
   SLine: UnicodeString;
-  NPosX, NPosY, NOrigColumn, NNextEdge, NFoundEdge, iLine, iChar: integer;
+  NCaretX, NCaretY, NOrigColumn, NNextEdge, NFoundEdge, iLine, iChar: integer;
 begin
   Result:= [];
 
   Caret:= Carets[0];
   if Caret.IsSelection then exit;
   St:= Strings;
-  NPosX:= Caret.PosX;
-  NPosY:= Caret.PosY;
-  if not St.IsIndexValid(NPosY) then exit;
+  NCaretX:= Caret.PosX;
+  NCaretY:= Caret.PosY;
+  if not St.IsIndexValid(NCaretY) then exit;
 
   NFoundEdge:= -1;
-  NOrigColumn:= FTabHelper.CharPosToColumnPos(NPosY, St.Lines[NPosY], NPosX);
+  NOrigColumn:= FTabHelper.CharPosToColumnPos(NCaretY, St.Lines[NCaretY], NCaretX);
 
-  //consider all lines before NPosY
-  for iLine:= NPosY-1 downto 0 do
+  //consider all lines before NCaretY
+  for iLine:= NCaretY-1 downto 0 do
   begin
     SLine:= St.Lines[iLine];
     iChar:= FTabHelper.ColumnPosToCharPos(iLine, SLine, NOrigColumn);
@@ -262,10 +262,11 @@ begin
   end;
 
   if NFoundEdge=-1 then exit;
-  NFoundEdge:= FTabHelper.ColumnPosToCharPos(NPosY, St.Lines[NPosY], NFoundEdge);
+  NFoundEdge:= FTabHelper.ColumnPosToCharPos(NCaretY, St.Lines[NCaretY], NFoundEdge);
+  if NFoundEdge<=NCaretX then exit;
 
   Result:= DoCommand_TextInsertAtCarets(
-    StringOfChar(' ', NFoundEdge-NPosX),
+    StringOfChar(' ', NFoundEdge-NCaretX),
     false,
     false,
     false,
