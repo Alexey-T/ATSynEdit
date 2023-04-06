@@ -231,13 +231,14 @@ begin
 end;
 
 function TATSynEdit.DoCommand_TextInsertTabSmart: TATCommandResults;
-//mimic "smart tabs" option, known from several text editors, and from Lazarus IDE
+//mimic smart-tabs option, known from several text editors, and from Lazarus IDE.
+//return [] if smart-tab cannot be used in caret position.
 var
   St: TATStrings;
   Caret: TATCaretItem;
   SLine: UnicodeString;
   NCaretX, NCaretY, NOrigColumn, NNextEdge, NFoundEdge,
-  {NIndentSize,} iLine, iChar: integer;
+  iLine, iChar: integer;
 begin
   Result:= [];
 
@@ -251,23 +252,13 @@ begin
   NFoundEdge:= -1;
   NOrigColumn:= FTabHelper.CharPosToColumnPos(NCaretY, St.Lines[NCaretY], NCaretX);
 
-  //consider all lines before NCaretY
   for iLine:= NCaretY-1 downto Max(0, NCaretY-ATEditorOptions.MaxPrecedingLinesForSmartTab) do
   begin
     SLine:= St.Lines[iLine];
     iChar:= FTabHelper.ColumnPosToCharPos(iLine, SLine, NOrigColumn);
     if iChar>=Length(SLine) then
       Continue;
-    {
-    NIndentSize:= FTabHelper.GetIndentExpanded(iLine, SLine);
 
-    if iChar<NIndentSize then
-      NNextEdge:= NIndentSize
-    else
-    begin
-      //...
-    end;
-    }
     NNextEdge:= FindLineNonspaceBegin(SLine, iChar+1);
     if NNextEdge=-1 then
       NNextEdge:= FindLineNonspaceEnd(SLine, iChar+1);
