@@ -246,7 +246,7 @@ begin
   NOrigColumn:= FTabHelper.CharPosToColumnPos(NCaretY, St.Lines[NCaretY], NCaretX);
 
   //consider all lines before NCaretY
-  for iLine:= NCaretY-1 downto 0 do
+  for iLine:= NCaretY-1 downto Max(0, NCaretY-ATEditorOptions.MaxPrecedingLinesForSmartTab) do
   begin
     SLine:= St.Lines[iLine];
     iChar:= FTabHelper.ColumnPosToCharPos(iLine, SLine, NOrigColumn);

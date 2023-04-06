@@ -55,6 +55,7 @@ type
     MaxUpdatesCountEasy: integer;
 
     MaxClipboardRecentsMenuitemLen: integer;
+    MaxPrecedingLinesForSmartTab: integer;
 
     UseGlobalCharSizer: boolean;
     DetectUTF8BufferKb: integer;
@@ -360,6 +361,7 @@ initialization
     MaxUpdatesCountEasy:= 200;
 
     MaxClipboardRecentsMenuitemLen:= 60;
+    MaxPrecedingLinesForSmartTab:= 1000;
 
     UseGlobalCharSizer:= true;
     DetectUTF8BufferKb:= 8;
