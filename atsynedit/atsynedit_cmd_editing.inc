@@ -247,7 +247,13 @@ begin
   IndentSizes:= nil;
   SetLength(IndentSizes, Carets.Count);
 
-  for iCaret:= Carets.Count-1 downto 0 do
+  {
+  suggestion by @veksha: move 'smart' only caret_0, all other carets
+  must move the same count of chars as caret_0.
+  for-loop is now not needed, we calculate only caret_0.
+  }
+  //for iCaret:= Carets.Count-1 downto 0 do
+  iCaret:= 0;
   begin
     Caret:= Carets[iCaret];
     if Caret.IsSelection then exit;
@@ -283,10 +289,6 @@ begin
     IndentSizes[iCaret]:= NFoundEdge-NCaretX;
   end;
 
-  {
-  suggestion by @veksha: move 'smart' only caret_0, all other carets
-  must move the same count of chars as caret_0.
-  }
   for iCaret:= 1 to Carets.Count-1 do
     IndentSizes[iCaret]:= IndentSizes[0];
 
