@@ -27,6 +27,10 @@ begin
       Exit(DoCommand_TextIndentUnindent(true));
   end;
 
+  if FOptTabSmart and (Carets.Count=1) then
+    Result:= DoCommand_TextInsertTabSmart;
+  if Result<>[] then Exit;
+
   if FOptTabSpaces then
     Result:= DoCommand_TextInsertTabSpacesAtCarets(FOverwrite)
   else
@@ -155,6 +159,7 @@ begin
   Result:= [cResultText, cResultCaretBottom, cResultCaretLazy];
 end;
 
+
 function TATSynEdit.DoCommand_TextInsertTabSpacesAtCarets(AOvrMode: boolean): TATCommandResults;
 var
   Caret: TATCaretItem;
@@ -194,6 +199,14 @@ begin
 
   Result:= [cResultText, cResultCaretBottom];
 end;
+
+
+function TATSynEdit.DoCommand_TextInsertTabSmart: TATCommandResults;
+begin
+  Result:= [];
+  //TODO
+end;
+
 
 function TATSynEdit.DoCalcIndentCharsFromPrevLines(AX, AY: integer): integer;
 var

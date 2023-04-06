@@ -949,6 +949,7 @@ type
     FOptAutoIndentBetterBracketsSquare: boolean;
     FOptAutoIndentRegexRule: string;
     FOptTabSpaces: boolean;
+    FOptTabSmart: boolean;
     FOptLastLineOnTop: boolean;
     FOptOverwriteSel: boolean;
     FOptOverwriteAllowedOnPaste: boolean;
@@ -1417,6 +1418,7 @@ type
     function DoCommand_ScrollToLeft: TATCommandResults;
     function DoCommand_TextInsertTabSpacesAtCarets(AOvrMode: boolean): TATCommandResults;
     function DoCommand_TextTabulation: TATCommandResults;
+    function DoCommand_TextInsertTabSmart: TATCommandResults;
     function DoCommand_KeyHome: TATCommandResults;
     function DoCommand_KeyEnd: TATCommandResults;
     function DoCommand_KeyLeft(ASelCommand: boolean): TATCommandResults;
@@ -1886,6 +1888,7 @@ type
     property OptIdleInterval: integer read FOptIdleInterval write FOptIdleInterval default cInitIdleInterval;
     property OptTabSpaces: boolean read FOptTabSpaces write SetTabSpaces default false;
     property OptTabSize: integer read FTabSize write SetTabSize default cInitTabSize;
+    property OptTabSmart: boolean read FOptTabSmart write FOptTabSmart default false;
     property OptNonWordChars: atString read FOptNonWordChars write FOptNonWordChars stored false;
     property OptFoldStyle: TATEditorFoldStyle read FFoldStyle write FFoldStyle default cInitFoldStyle;
     property OptFoldEnabled: boolean read FFoldEnabled write SetFoldEnabled default true;
