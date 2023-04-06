@@ -30,7 +30,7 @@ begin
     end;
   end;
 
-  if FOptTabSmart and (not ModeOneLine) and (Carets.Count=1) and (not Carets.IsSelection) then
+  if FOptTabSmart and (not ModeOneLine) and (not Carets.IsSelection) then
   begin
     Result:= DoCommand_TextInsertTabSmart;
     if Result<>[] then Exit;
@@ -234,52 +234,70 @@ function TATSynEdit.DoCommand_TextInsertTabSmart: TATCommandResults;
 var
   St: TATStrings;
   Caret: TATCaretItem;
+  IndentSizes: array of integer;
+  Shift, PosAfter: TPoint;
   SLine, SLineWithCaret: UnicodeString;
   NCaretX, NCaretY, NOrigColumn, NNextEdge, NFoundEdge,
-  iLine, iChar: integer;
+  iCaret, iLine, iChar: integer;
 begin
   Result:= [];
 
-  Caret:= Carets[0];
-  if Caret.IsSelection then exit;
   St:= Strings;
-  NCaretX:= Caret.PosX;
-  NCaretY:= Caret.PosY;
-  if not St.IsIndexValid(NCaretY) then exit;
+  DoCaretsDeleteOnSameLines;
+  IndentSizes:= nil;
+  SetLength(IndentSizes, Carets.Count);
 
-  NFoundEdge:= -1;
-
-  SLineWithCaret:= St.LineSub(NCaretY, 1, NCaretX); //truncate Lines[NCaretY] so tab-chars after NCaretX will not harm
-  NOrigColumn:= FTabHelper.CharPosToColumnPos(NCaretY, SLineWithCaret, NCaretX);
-
-  for iLine:= NCaretY-1 downto Max(0, NCaretY-ATEditorOptions.MaxPrecedingLinesForSmartTab) do
+  for iCaret:= Carets.Count-1 downto 0 do
   begin
-    SLine:= St.Lines[iLine];
-    iChar:= FTabHelper.ColumnPosToCharPos(iLine, SLine, NOrigColumn);
-    if iChar>=Length(SLine) then
-      Continue;
+    Caret:= Carets[iCaret];
+    if Caret.IsSelection then exit;
+    NCaretX:= Caret.PosX;
+    NCaretY:= Caret.PosY;
+    if not St.IsIndexValid(NCaretY) then exit;
 
-    NNextEdge:= FindLineNextNonspaceBegin(SLine, iChar+1);
-    if NNextEdge=-1 then
-      NNextEdge:= FindLineNextNonspaceEnd(SLine, iChar+1);
-    if NNextEdge=-1 then
-      Continue;
+    NFoundEdge:= -1;
 
-    NFoundEdge:= FTabHelper.CharPosToColumnPos(iLine, SLine, NNextEdge);
-    Break;
+    SLineWithCaret:= St.LineSub(NCaretY, 1, NCaretX); //truncate Lines[NCaretY] so tab-chars after NCaretX will not harm
+    NOrigColumn:= FTabHelper.CharPosToColumnPos(NCaretY, SLineWithCaret, NCaretX);
+
+    for iLine:= NCaretY-1 downto Max(0, NCaretY-ATEditorOptions.MaxPrecedingLinesForSmartTab) do
+    begin
+      SLine:= St.Lines[iLine];
+      iChar:= FTabHelper.ColumnPosToCharPos(iLine, SLine, NOrigColumn);
+      if iChar>=Length(SLine) then
+        Continue;
+
+      NNextEdge:= FindLineNextNonspaceBegin(SLine, iChar+1);
+      if NNextEdge=-1 then
+        NNextEdge:= FindLineNextNonspaceEnd(SLine, iChar+1);
+      if NNextEdge=-1 then
+        Continue;
+
+      NFoundEdge:= FTabHelper.CharPosToColumnPos(iLine, SLine, NNextEdge);
+      Break;
+    end;
+
+    if NFoundEdge=-1 then exit;
+
+    NFoundEdge:= FTabHelper.ColumnPosToCharPos(NCaretY, SLineWithCaret, NFoundEdge);
+    IndentSizes[iCaret]:= NFoundEdge-NCaretX;
   end;
 
-  if NFoundEdge=-1 then exit;
+  for iCaret:= Carets.Count-1 downto 0 do
+  begin
+    Caret:= Carets[iCaret];
+    SLine:= StringOfCharW(' ', IndentSizes[iCaret]);
+    St.TextInsert(
+      Caret.PosX,
+      Caret.PosY,
+      SLine,
+      false,
+      Shift,
+      PosAfter);
+    Caret.PosX:= Caret.PosX+IndentSizes[iCaret];
+  end;
 
-  NFoundEdge:= FTabHelper.ColumnPosToCharPos(NCaretY, SLineWithCaret, NFoundEdge);
-  if NFoundEdge<=NCaretX then exit;
-
-  Result:= DoCommand_TextInsertAtCarets(
-    StringOfCharW(' ', NFoundEdge-NCaretX),
-    false,
-    false,
-    false,
-    false);
+  Result:= [cResultText, cResultCaretBottom, cResultCaretLazy];
 end;
 
 
