@@ -1,3 +1,6 @@
+2023.04.06
++ add: OptTabSmart (works like "Smart tab" option in Lazarus IDE)
+
 2023.04.04
 * change: changed declaration of TATKeyMap.Add, to use integer key values like scCtrl+scShift+VK_D
 

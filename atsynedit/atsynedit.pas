@@ -1026,6 +1026,8 @@ type
     procedure DoChangeBookmarks;
     procedure DoHandleWheelRecord(const ARec: TATEditorWheelRecord);
     procedure DoStringsOnUnfoldLine(Sender: TObject; ALine: integer);
+    function FindLineWordBegin(const ALine: UnicodeString; AX: integer): integer;
+    function FindLineWordEnd(const ALine: UnicodeString; AX: integer): integer;
     procedure InitClipboardExData(out Data: TATEditorClipboardExData);
     procedure FlushEditingChangeEx(AChange: TATLineChangeKind; ALine, AItemCount: integer);
     procedure FlushEditingChangeLog(ALine: integer);
@@ -5005,6 +5007,7 @@ begin
   FOptAutoIndentBetterBracketsSquare:= false;
   FOptAutoIndentRegexRule:= '';
   FOptTabSpaces:= false;
+  FOptTabSmart:= false;
 
   FOptLastLineOnTop:= false;
   FOptOverwriteSel:= true;

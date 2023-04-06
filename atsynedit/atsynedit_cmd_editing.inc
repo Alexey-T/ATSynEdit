@@ -27,7 +27,7 @@ begin
       Exit(DoCommand_TextIndentUnindent(true));
   end;
 
-  if FOptTabSmart and (Carets.Count=1) then
+  if FOptTabSmart and (Carets.Count=1) and (not Carets.IsSelection) then
     Result:= DoCommand_TextInsertTabSmart;
   if Result<>[] then Exit;
 
@@ -201,10 +201,74 @@ begin
 end;
 
 
+function TATSynEdit.FindLineWordBegin(const ALine: UnicodeString; AX: integer): integer;
+// AX: 0-based offset
+var
+  NLen, i: integer;
+begin
+  Result:= -1;
+  NLen:= Length(ALine);
+  for i:= Max(1, AX) to NLen-1 do
+    if not IsCharWord(ALine[i]) and IsCharWord(ALine[i+1]) then
+      exit(i);
+end;
+
+function TATSynEdit.FindLineWordEnd(const ALine: UnicodeString; AX: integer): integer;
+// AX: 0-based offset
+var
+  NLen, i: integer;
+begin
+  Result:= -1;
+  NLen:= Length(ALine);
+  for i:= Max(1, AX) to NLen do
+    if IsCharWord(ALine[i]) and ((i=NLen) or (not IsCharWord(ALine[i+1]))) then
+      exit(i);
+end;
+
 function TATSynEdit.DoCommand_TextInsertTabSmart: TATCommandResults;
+var
+  St: TATStrings;
+  Caret: TATCaretItem;
+  SLine: UnicodeString;
+  NPosX, NPosY, iLine, iChar, NColumn: integer;
+  NNextEdge, NFoundEdge: integer;
 begin
   Result:= [];
-  //TODO
+
+  Caret:= Carets[0];
+  if Caret.IsSelection then exit;
+  St:= Strings;
+  NPosX:= Caret.PosX;
+  NPosY:= Caret.PosY;
+  if not St.IsIndexValid(NPosY) then exit;
+
+  NFoundEdge:= -1;
+  NColumn:= FTabHelper.CharPosToColumnPos(NPosY, St.Lines[NPosY], NPosX);
+
+  for iLine:= NPosY downto 0 do
+  begin
+    SLine:= St.Lines[iLine];
+    iChar:= FTabHelper.ColumnPosToCharPos(iLine, SLine, NColumn);
+    if iChar>=Length(SLine) then
+      Continue;
+    NNextEdge:= FindLineWordBegin(SLine, iChar+1);
+    if NNextEdge=-1 then
+      NNextEdge:= FindLineWordEnd(SLine, iChar+1);
+    if NNextEdge=-1 then
+      Continue;
+    NFoundEdge:= FTabHelper.CharPosToColumnPos(iLine, SLine, NNextEdge);
+    Break;
+  end;
+
+  if NFoundEdge=-1 then exit;
+  NFoundEdge:= FTabHelper.ColumnPosToCharPos(NPosY, St.Lines[NPosY], NFoundEdge);
+
+  Result:= DoCommand_TextInsertAtCarets(
+    StringOfChar(' ', NFoundEdge-NPosX),
+    false,
+    false,
+    false,
+    false);
 end;
 
 
