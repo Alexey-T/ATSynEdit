@@ -226,6 +226,7 @@ begin
 end;
 
 function TATSynEdit.DoCommand_TextInsertTabSmart: TATCommandResults;
+//mimic "smart tabs" option, known from several text editors, and from Lazarus IDE
 var
   St: TATStrings;
   Caret: TATCaretItem;
@@ -245,7 +246,8 @@ begin
   NFoundEdge:= -1;
   NColumn:= FTabHelper.CharPosToColumnPos(NPosY, St.Lines[NPosY], NPosX);
 
-  for iLine:= NPosY downto 0 do
+  //consider all lines before NPosY
+  for iLine:= NPosY-1 downto 0 do
   begin
     SLine:= St.Lines[iLine];
     iChar:= FTabHelper.ColumnPosToCharPos(iLine, SLine, NColumn);
