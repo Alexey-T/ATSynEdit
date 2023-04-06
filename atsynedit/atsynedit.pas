@@ -4849,7 +4849,6 @@ begin
   FMicromapShowForMinCount:= cInitMicromapShowForMinCount;
 
   FOverwrite:= false;
-  FTabSize:= cInitTabSize;
   FMarginRight:= cInitMarginRight;
   FMarginList:= nil;
   FFoldedMarkList:= nil;
@@ -5006,6 +5005,8 @@ begin
   FOptAutoIndentBetterBracketsRound:= false;
   FOptAutoIndentBetterBracketsSquare:= false;
   FOptAutoIndentRegexRule:= '';
+
+  FTabSize:= cInitTabSize;
   FOptTabSpaces:= false;
   FOptTabSmart:= false;
 
