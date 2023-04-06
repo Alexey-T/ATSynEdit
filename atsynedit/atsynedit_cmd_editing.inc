@@ -236,7 +236,8 @@ var
   St: TATStrings;
   Caret: TATCaretItem;
   SLine: UnicodeString;
-  NCaretX, NCaretY, NOrigColumn, NNextEdge, NFoundEdge, NIndentSize, iLine, iChar: integer;
+  NCaretX, NCaretY, NOrigColumn, NNextEdge, NFoundEdge,
+  {NIndentSize,} iLine, iChar: integer;
 begin
   Result:= [];
 
@@ -257,18 +258,21 @@ begin
     iChar:= FTabHelper.ColumnPosToCharPos(iLine, SLine, NOrigColumn);
     if iChar>=Length(SLine) then
       Continue;
+    {
     NIndentSize:= FTabHelper.GetIndentExpanded(iLine, SLine);
 
     if iChar<NIndentSize then
       NNextEdge:= NIndentSize
     else
     begin
-      NNextEdge:= FindLineNonspaceBegin(SLine, iChar+1);
-      if NNextEdge=-1 then
-        NNextEdge:= FindLineNonspaceEnd(SLine, iChar+1);
-      if NNextEdge=-1 then
-        Continue;
+      //...
     end;
+    }
+    NNextEdge:= FindLineNonspaceBegin(SLine, iChar+1);
+    if NNextEdge=-1 then
+      NNextEdge:= FindLineNonspaceEnd(SLine, iChar+1);
+    if NNextEdge=-1 then
+      Continue;
 
     NFoundEdge:= FTabHelper.CharPosToColumnPos(iLine, SLine, NNextEdge);
     Break;
