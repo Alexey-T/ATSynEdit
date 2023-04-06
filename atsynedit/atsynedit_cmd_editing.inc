@@ -206,26 +206,24 @@ begin
 end;
 
 
-function TATSynEdit.FindLineNonspaceBegin(const ALine: UnicodeString; AX: integer): integer;
-// AX: 0-based offset
+function TATSynEdit.FindLineNextNonspaceBegin(const ALine: UnicodeString; AFromOffset: integer): integer;
 var
   NLen, i: integer;
 begin
   Result:= -1;
   NLen:= Length(ALine);
-  for i:= Max(1, AX) to NLen-1 do
+  for i:= Max(1, AFromOffset) to NLen-1 do
     if IsCharSpace(ALine[i]) and not IsCharSpace(ALine[i+1]) then
       exit(i);
 end;
 
-function TATSynEdit.FindLineNonspaceEnd(const ALine: UnicodeString; AX: integer): integer;
-// AX: 0-based offset
+function TATSynEdit.FindLineNextNonspaceEnd(const ALine: UnicodeString; AFromOffset: integer): integer;
 var
   NLen, i: integer;
 begin
   Result:= -1;
   NLen:= Length(ALine);
-  for i:= Max(1, AX) to NLen do
+  for i:= Max(1, AFromOffset) to NLen do
     if not IsCharSpace(ALine[i]) and ((i=NLen) or IsCharSpace(ALine[i+1])) then
       exit(i);
 end;
@@ -259,9 +257,9 @@ begin
     if iChar>=Length(SLine) then
       Continue;
 
-    NNextEdge:= FindLineNonspaceBegin(SLine, iChar+1);
+    NNextEdge:= FindLineNextNonspaceBegin(SLine, iChar+1);
     if NNextEdge=-1 then
-      NNextEdge:= FindLineNonspaceEnd(SLine, iChar+1);
+      NNextEdge:= FindLineNextNonspaceEnd(SLine, iChar+1);
     if NNextEdge=-1 then
       Continue;
 
