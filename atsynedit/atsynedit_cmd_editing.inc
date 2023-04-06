@@ -234,7 +234,7 @@ function TATSynEdit.DoCommand_TextInsertTabSmart: TATCommandResults;
 var
   St: TATStrings;
   Caret: TATCaretItem;
-  SLine: UnicodeString;
+  SLine, SLineWithCaret: UnicodeString;
   NCaretX, NCaretY, NOrigColumn, NNextEdge, NFoundEdge,
   iLine, iChar: integer;
 begin
@@ -248,7 +248,9 @@ begin
   if not St.IsIndexValid(NCaretY) then exit;
 
   NFoundEdge:= -1;
-  NOrigColumn:= FTabHelper.CharPosToColumnPos(NCaretY, St.Lines[NCaretY], NCaretX);
+
+  SLineWithCaret:= St.LineSub(NCaretY, 1, NCaretX); //truncate Lines[NCaretY] so tab-chars after NCaretX will not harm
+  NOrigColumn:= FTabHelper.CharPosToColumnPos(NCaretY, SLineWithCaret, NCaretX);
 
   for iLine:= NCaretY-1 downto Max(0, NCaretY-ATEditorOptions.MaxPrecedingLinesForSmartTab) do
   begin
@@ -268,8 +270,8 @@ begin
   end;
 
   if NFoundEdge=-1 then exit;
-  SLine:= Copy(St.Lines[NCaretY], 1, NCaretX); //must truncate Lines[NCaretY] so tab-chars after NCaretX will not harm
-  NFoundEdge:= FTabHelper.ColumnPosToCharPos(NCaretY, SLine, NFoundEdge);
+
+  NFoundEdge:= FTabHelper.ColumnPosToCharPos(NCaretY, SLineWithCaret, NFoundEdge);
   if NFoundEdge<=NCaretX then exit;
 
   Result:= DoCommand_TextInsertAtCarets(
