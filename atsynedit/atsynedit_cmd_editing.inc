@@ -24,12 +24,17 @@ begin
     end;
 
     if bBlockSel then
-      Exit(DoCommand_TextIndentUnindent(true));
+    begin
+      Result:= DoCommand_TextIndentUnindent(true);
+      Exit;
+    end;
   end;
 
-  if FOptTabSmart and (Carets.Count=1) and (not Carets.IsSelection) then
+  if FOptTabSmart and (not ModeOneLine) and (Carets.Count=1) and (not Carets.IsSelection) then
+  begin
     Result:= DoCommand_TextInsertTabSmart;
-  if Result<>[] then Exit;
+    if Result<>[] then Exit;
+  end;
 
   if FOptTabSpaces then
     Result:= DoCommand_TextInsertTabSpacesAtCarets(FOverwrite)
