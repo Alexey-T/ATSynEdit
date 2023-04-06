@@ -231,8 +231,7 @@ var
   St: TATStrings;
   Caret: TATCaretItem;
   SLine: UnicodeString;
-  NPosX, NPosY, iLine, iChar, NColumn: integer;
-  NNextEdge, NFoundEdge: integer;
+  NPosX, NPosY, NOrigColumn, NNextEdge, NFoundEdge, iLine, iChar: integer;
 begin
   Result:= [];
 
@@ -244,13 +243,13 @@ begin
   if not St.IsIndexValid(NPosY) then exit;
 
   NFoundEdge:= -1;
-  NColumn:= FTabHelper.CharPosToColumnPos(NPosY, St.Lines[NPosY], NPosX);
+  NOrigColumn:= FTabHelper.CharPosToColumnPos(NPosY, St.Lines[NPosY], NPosX);
 
   //consider all lines before NPosY
   for iLine:= NPosY-1 downto 0 do
   begin
     SLine:= St.Lines[iLine];
-    iChar:= FTabHelper.ColumnPosToCharPos(iLine, SLine, NColumn);
+    iChar:= FTabHelper.ColumnPosToCharPos(iLine, SLine, NOrigColumn);
     if iChar>=Length(SLine) then
       Continue;
     NNextEdge:= FindLineWordBegin(SLine, iChar+1);
