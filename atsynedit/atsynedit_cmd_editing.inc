@@ -283,6 +283,13 @@ begin
     IndentSizes[iCaret]:= NFoundEdge-NCaretX;
   end;
 
+  {
+  suggestion by @veksha: move 'smart' only caret_0, all other carets
+  must move the same count of chars as caret_0.
+  }
+  for iCaret:= 1 to Carets.Count-1 do
+    IndentSizes[iCaret]:= IndentSizes[0];
+
   for iCaret:= Carets.Count-1 downto 0 do
   begin
     Caret:= Carets[iCaret];
