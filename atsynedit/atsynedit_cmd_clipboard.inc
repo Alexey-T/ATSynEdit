@@ -159,7 +159,7 @@ begin
       NIndent:= TabHelper.CharPosToColumnPos(Y1, SLineAll, NIndent);
       SLineIndent:= StringOfChar(' ', Max(0, XColumn+NIndent-ClipExData.FirstLineIndentColumns));
       if not FOptTabSpaces then
-        SLineIndent:= StringReplace(SLineIndent, StringOfChar(' ', FTabSize), #9, [rfReplaceAll]);
+        SLineIndent:= StringReplace(SLineIndent, StringOfChar(' ', FOptTabSize), #9, [rfReplaceAll]);
       Lines[i]:= SLineIndent+SLineText;
     end;
 

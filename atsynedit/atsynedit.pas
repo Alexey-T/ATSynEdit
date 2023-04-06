@@ -745,7 +745,6 @@ type
     FCharSize: TATEditorCharSize;
     FCharSizeMinimap: TATEditorCharSize;
     FSpacingY: integer;
-    FTabSize: integer;
     FGutter: TATGutter;
     FGutterDecor: TATGutterDecor;
     FGutterDecorImages: TImageList;
@@ -948,6 +947,7 @@ type
     FOptAutoIndentBetterBracketsRound: boolean;
     FOptAutoIndentBetterBracketsSquare: boolean;
     FOptAutoIndentRegexRule: string;
+    FOptTabSize: integer;
     FOptTabSpaces: boolean;
     FOptTabSmart: boolean;
     FOptLastLineOnTop: boolean;
@@ -1889,7 +1889,7 @@ type
     property OptScaleFont: integer read FOptScaleFont write SetOptScaleFont default 0;
     property OptIdleInterval: integer read FOptIdleInterval write FOptIdleInterval default cInitIdleInterval;
     property OptTabSpaces: boolean read FOptTabSpaces write SetTabSpaces default false;
-    property OptTabSize: integer read FTabSize write SetTabSize default cInitTabSize;
+    property OptTabSize: integer read FOptTabSize write SetTabSize default cInitTabSize;
     property OptTabSmart: boolean read FOptTabSmart write FOptTabSmart default false;
     property OptNonWordChars: atString read FOptNonWordChars write FOptNonWordChars stored false;
     property OptFoldStyle: TATEditorFoldStyle read FFoldStyle write FFoldStyle default cInitFoldStyle;
@@ -2427,7 +2427,7 @@ begin
   FCharSizer.Init(
     Font.Name,
     DoScaleFont(Font.Size),
-    FTabSize,
+    FOptTabSize,
     FFontProportional
     );
 
@@ -2694,10 +2694,10 @@ end;
 
 procedure TATSynEdit.SetTabSize(AValue: integer);
 begin
-  if FTabSize=AValue then Exit;
-  FTabSize:= Min(ATEditorOptions.MaxTabSize, Max(ATEditorOptions.MinTabSize, AValue));
+  if FOptTabSize=AValue then Exit;
+  FOptTabSize:= Min(ATEditorOptions.MaxTabSize, Max(ATEditorOptions.MinTabSize, AValue));
   FWrapUpdateNeeded:= true;
-  FTabHelper.TabSize:= FTabSize;
+  FTabHelper.TabSize:= FOptTabSize;
 end;
 
 procedure TATSynEdit.SetTabSpaces(AValue: boolean);
@@ -4191,7 +4191,7 @@ begin
         CurrPointText.X - FRectMinimap.Left,
         CurrPointText.Y - FRectminimap.Top,
         ACharSize,
-        FTabSize,
+        FOptTabSize,
         ATempParts,
         FColorBG,
         NColorAfter,
@@ -5006,7 +5006,7 @@ begin
   FOptAutoIndentBetterBracketsSquare:= false;
   FOptAutoIndentRegexRule:= '';
 
-  FTabSize:= cInitTabSize;
+  FOptTabSize:= cInitTabSize;
   FOptTabSpaces:= false;
   FOptTabSmart:= false;
 
@@ -7660,7 +7660,7 @@ begin
 
   if AIndentLines then
     for i:= 0 to AIndentSize-1 do
-      if i mod FTabSize = 0 then
+      if i mod FOptTabSize = 0 then
         CanvasLine_DottedVertAlt(C,
           Colors.IndentVertLines,
           ARect.Left + (i-AScrollPos)*ACharSize.XScaled*ACharSize.XSpacePercents div ATEditorCharXScale div 100,
@@ -8232,7 +8232,7 @@ end;
 function TATSynEdit.GetIndentString: UnicodeString;
 begin
   if FOptTabSpaces then
-    Result:= StringOfCharW(' ', FTabSize)
+    Result:= StringOfCharW(' ', FOptTabSize)
   else
     Result:= #9;
 end;
@@ -8266,9 +8266,9 @@ begin
     cIndentSpacesOnly:
       Result:= StringOfCharW(' ', NSpaces);
     cIndentTabsOnly:
-      Result:= StringOfCharW(#9, NSpaces div FTabSize);
+      Result:= StringOfCharW(#9, NSpaces div FOptTabSize);
     cIndentTabsAndSpaces:
-      Result:= StringOfCharW(#9, NSpaces div FTabSize) + StringOfCharW(' ', NSpaces mod FTabSize);
+      Result:= StringOfCharW(#9, NSpaces div FOptTabSize) + StringOfCharW(' ', NSpaces mod FOptTabSize);
     cIndentToOpeningBracket:
       begin
         //indent like in prev line + spaces up to opening bracket

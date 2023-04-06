@@ -185,7 +185,7 @@ begin
     for iCaret:= Carets.Count-1 downto 0 do
     begin
       Caret:= Carets[iCaret];
-      StrSpaces:= StringOfCharW(' ', FTabSize - Caret.PosX mod FTabSize);
+      StrSpaces:= StringOfCharW(' ', FOptTabSize - Caret.PosX mod FOptTabSize);
       St.TextInsert(Caret.PosX, Caret.PosY, StrSpaces, AOvrMode, Shift, PosAfter);
       UpdateCaretsAndMarkersOnEditing(iCaret+1,
         Point(Caret.PosX, Caret.PosY),
@@ -271,7 +271,7 @@ begin
   if NFoundEdge<=NCaretX then exit;
 
   Result:= DoCommand_TextInsertAtCarets(
-    StringOfChar(' ', NFoundEdge-NCaretX),
+    StringOfCharW(' ', NFoundEdge-NCaretX),
     false,
     false,
     false,
@@ -1052,9 +1052,9 @@ begin
 
   if FOptIndentSize=0 then
   begin
-    NDecSpaces:= FTabSize;
+    NDecSpaces:= FOptTabSize;
     if FOptTabSpaces then
-      NShiftChars:= FTabSize
+      NShiftChars:= FOptTabSize
     else
       NShiftChars:= 1;
   end
@@ -1066,7 +1066,7 @@ begin
   end
   else
   begin
-    NDecSpaces:= Abs(FOptIndentSize)*FTabSize;
+    NDecSpaces:= Abs(FOptIndentSize)*FOptTabSize;
     NShiftChars:= Abs(FOptIndentSize);
   end;
 
