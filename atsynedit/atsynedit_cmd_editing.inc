@@ -231,31 +231,18 @@ end;
 function TATSynEdit.DoCommand_TextInsertTabSmart: TATCommandResults;
 //mimic smart-tabs option, known from several text editors, and from Lazarus IDE.
 //return [] if smart-tab cannot be used in caret position.
-var
-  St: TATStrings;
-  Caret: TATCaretItem;
-  IndentSizes: array of integer;
-  Shift, PosAfter: TPoint;
-  SLine, SLineWithCaret: UnicodeString;
-  NCaretX, NCaretY, NOrigColumn, NNextEdge, NFoundEdge,
-  iCaret, iLine, iChar: integer;
-begin
-  Result:= [];
-
-  St:= Strings;
-  DoCaretsDeleteOnSameLines;
-  IndentSizes:= nil;
-  SetLength(IndentSizes, Carets.Count);
-
-  {
-  suggestion by @veksha: move 'smart' only caret_0, all other carets
-  must move the same count of chars as caret_0.
-  for-loop is now not needed, we calculate only caret_0.
-  }
-  //for iCaret:= Carets.Count-1 downto 0 do
-  iCaret:= 0;
+  //
+  function SmartMove(Caret: TATCaretItem): integer;
+  //returns the length of move, in chars
+  var
+    St: TATStrings;
+    SLine, SLineWithCaret: UnicodeString;
+    NCaretX, NCaretY, NOrigColumn, NNextEdge, NFoundEdge,
+    iLine, iChar: integer;
   begin
-    Caret:= Carets[iCaret];
+    Result:= 0;
+    St:= Strings;
+
     if Caret.IsSelection then exit;
     NCaretX:= Caret.PosX;
     NCaretY:= Caret.PosY;
@@ -286,24 +273,36 @@ begin
     if NFoundEdge=-1 then exit;
 
     NFoundEdge:= FTabHelper.ColumnPosToCharPos(NCaretY, SLineWithCaret, NFoundEdge);
-    IndentSizes[iCaret]:= NFoundEdge-NCaretX;
+    Result:= Max(0, NFoundEdge-NCaretX);
   end;
+  //
+var
+  St: TATStrings;
+  Caret: TATCaretItem;
+  Shift, PosAfter: TPoint;
+  NIndentSize, iCaret: integer;
+begin
+  Result:= [];
 
-  for iCaret:= 1 to Carets.Count-1 do
-    IndentSizes[iCaret]:= IndentSizes[0];
+  St:= Strings;
+  DoCaretsDeleteOnSameLines;
+
+  //suggestion by @veksha: move 'smart' only caret_0, all other carets
+  //must move the same count of chars as caret_0.
+  NIndentSize:= SmartMove(Carets[0]);
+  if NIndentSize=0 then exit;
 
   for iCaret:= Carets.Count-1 downto 0 do
   begin
     Caret:= Carets[iCaret];
-    SLine:= StringOfCharW(' ', IndentSizes[iCaret]);
     St.TextInsert(
       Caret.PosX,
       Caret.PosY,
-      SLine,
+      StringOfCharW(' ', NIndentSize),
       false,
       Shift,
       PosAfter);
-    Caret.PosX+= IndentSizes[iCaret];
+    Caret.PosX+= NIndentSize;
     Caret.SelectNone;
   end;
 
