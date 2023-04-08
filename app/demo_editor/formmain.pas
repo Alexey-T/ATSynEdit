@@ -241,7 +241,7 @@ type
       ALineIndex, ACharIndex, ALineLen: integer; var AColorAfterEol: TColor);
     procedure EditScroll(Sender: TObject);
     procedure EditCommand(Sender: TObject; ACmd{%H-}: integer; AInvoke: TATEditorCommandInvoke; const AText: string; var AHandled: boolean);
-    procedure EditClickGutter(Sender: TObject; ABand, ALine: integer);
+    procedure EditClickGutter(Sender: TObject; ABand, ALine: integer; var AHandled: boolean);
     procedure EditClickMicromap(Sender: TObject; AX, AY: integer);
     procedure EditDrawBm(Sender: TObject; C: TCanvas; ALineNum{%H-}: integer; const ARect: TRect);
     procedure EditDrawMicromap(Sender: TObject; C: TCanvas; const ARect: TRect);
@@ -558,7 +558,7 @@ begin
   }
 end;
 
-procedure TfmMain.EditClickGutter(Sender: TObject; ABand, ALine: integer);
+procedure TfmMain.EditClickGutter(Sender: TObject; ABand, ALine: integer; var AHandled: boolean);
 var
   NIndex: integer;
   Data: TATBookmarkData;
@@ -578,6 +578,7 @@ begin
       ed.Strings.Bookmarks.Add(Data);
     end;
     ed.Update;
+    AHandled:= true;
   end;
 end;
 

@@ -66,7 +66,7 @@ type
     procedure DoLexer(const aname: string);
     procedure DoOpenFile(const fn: string);
     procedure EditCalcStaple(Sender: TObject; ALine, AIndent: integer; var AColor: TColor);
-    procedure EditClickGutter(Sender: TObject; ABand: integer; ALine: integer);
+    procedure EditClickGutter(Sender: TObject; ABand: integer; ALine: integer; var AHandled: boolean);
     function GetComment: string;
     procedure TreeOnDeletion(Sender: TObject; Node: TTreeNode);
     procedure UpdateLexList;
@@ -340,7 +340,8 @@ begin
     DoOpenFile(fn);
 end;
 
-procedure TfmMain.EditClickGutter(Sender: TObject; ABand: integer; ALine: integer);
+procedure TfmMain.EditClickGutter(Sender: TObject; ABand: integer;
+  ALine: integer; var AHandled: boolean);
 var
   NIndex: integer;
   Data: TATBookmarkData;
@@ -359,6 +360,7 @@ begin
       ed.Strings.Bookmarks.Add(Data);
     end;
     ed.Update;
+    AHandled:= true;
   end;
 end;
 
