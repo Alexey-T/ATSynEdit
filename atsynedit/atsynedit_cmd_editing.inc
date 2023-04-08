@@ -283,14 +283,14 @@ var
   NIndentSize, iCaret: integer;
 begin
   Result:= [];
-
   St:= Strings;
-  DoCaretsDeleteOnSameLines;
 
   //suggestion by @veksha: move 'smart' only caret_0, all other carets
   //must move the same count of chars as caret_0.
   NIndentSize:= SmartMove(Carets[0]);
   if NIndentSize=0 then exit;
+
+  DoCaretsDeleteOnSameLines;
 
   for iCaret:= Carets.Count-1 downto 0 do
   begin
