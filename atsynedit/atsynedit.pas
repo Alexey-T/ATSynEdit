@@ -802,6 +802,7 @@ type
     FMinimapTooltipBitmap: TBitmap;
     FMinimapTooltipLinesCount: integer;
     FMinimapTooltipWidthPercents: integer;
+    FMinimapTooltipFontSize: integer;
     FMinimapHiliteLinesWithSelection: boolean;
     FMinimapDragImmediately: boolean;
     FMicromap: TATMicromap;
@@ -1215,9 +1216,10 @@ type
       NWrapIndex: integer);
     procedure DoPaintTextFragment(C: TCanvas;
       const ARect: TRect;
-      ALineFrom, ALineTo: integer;
+      ALineFrom: integer;
       AConsiderWrapInfo: boolean;
-      AColorBG, AColorBorder: TColor);
+      AColorBG, AColorBorder: TColor;
+      AFontSize: integer);
     procedure DoPaintLineIndent(C: TCanvas;
       const ARect: TRect;
       const ACharSize: TATEditorCharSize;
@@ -2000,6 +2002,7 @@ type
     property OptMinimapTooltipVisible: boolean read FMinimapTooltipVisible write FMinimapTooltipVisible default cInitMinimapTooltipVisible;
     property OptMinimapTooltipLinesCount: integer read FMinimapTooltipLinesCount write FMinimapTooltipLinesCount default cInitMinimapTooltipLinesCount;
     property OptMinimapTooltipWidthPercents: integer read FMinimapTooltipWidthPercents write FMinimapTooltipWidthPercents default cInitMinimapTooltipWidthPercents;
+    property OptMinimapTooltipFontSize: integer read FMinimapTooltipFontSize write FMinimapTooltipFontSize default 0;
     property OptMinimapHiliteLinesWithSelection: boolean read FMinimapHiliteLinesWithSelection write FMinimapHiliteLinesWithSelection default true;
     property OptMinimapDragImmediately: boolean read FMinimapDragImmediately write FMinimapDragImmediately default false;
     property OptMicromapVisible: boolean read FMicromapVisible write SetMicromapVisible default cInitMicromapVisible;
@@ -4945,6 +4948,7 @@ begin
   FMinimapTooltipVisible:= cInitMinimapTooltipVisible;
   FMinimapTooltipLinesCount:= cInitMinimapTooltipLinesCount;
   FMinimapTooltipWidthPercents:= cInitMinimapTooltipWidthPercents;
+  FMinimapTooltipFontSize:= 0;
   FMinimapHiliteLinesWithSelection:= true;
 
   FSpacingY:= cInitSpacingY;
@@ -9541,9 +9545,10 @@ end;
 
 procedure TATSynEdit.DoPaintTextFragment(C: TCanvas;
   const ARect: TRect;
-  ALineFrom, ALineTo: integer;
+  ALineFrom: integer;
   AConsiderWrapInfo: boolean;
-  AColorBG, AColorBorder: TColor);
+  AColorBG, AColorBorder: TColor;
+  AFontSize: integer);
 var
   St: TATStrings;
   NOutputStrWidth: Int64;
@@ -9554,6 +9559,7 @@ var
   WrapItem: TATWrapItem;
   TextOutProps: TATCanvasTextOutProps;
   SText: UnicodeString;
+  ChSize: TSize;
 begin
   St:= Strings;
   C.Brush.Color:= AColorBG;
@@ -9584,17 +9590,40 @@ begin
 
   TextOutProps.FontProportional:= FFontProportional;
 
-  TextOutProps.FontNormal_Name:= Font.Name;
-  TextOutProps.FontNormal_Size:= DoScaleFont(Font.Size);
+  if AFontSize<=2 then
+  begin
+    TextOutProps.FontNormal_Name:= Font.Name;
+    TextOutProps.FontNormal_Size:= DoScaleFont(Font.Size);
 
-  TextOutProps.FontItalic_Name:= FontItalic.Name;
-  TextOutProps.FontItalic_Size:= DoScaleFont(FontItalic.Size);
+    TextOutProps.FontItalic_Name:= FontItalic.Name;
+    TextOutProps.FontItalic_Size:= DoScaleFont(FontItalic.Size);
 
-  TextOutProps.FontBold_Name:= FontBold.Name;
-  TextOutProps.FontBold_Size:= DoScaleFont(FontBold.Size);
+    TextOutProps.FontBold_Name:= FontBold.Name;
+    TextOutProps.FontBold_Size:= DoScaleFont(FontBold.Size);
 
-  TextOutProps.FontBoldItalic_Name:= FontBoldItalic.Name;
-  TextOutProps.FontBoldItalic_Size:= DoScaleFont(FontBoldItalic.Size);
+    TextOutProps.FontBoldItalic_Name:= FontBoldItalic.Name;
+    TextOutProps.FontBoldItalic_Size:= DoScaleFont(FontBoldItalic.Size);
+  end
+  else
+  begin
+    TextOutProps.FontNormal_Name:= Font.Name;
+    TextOutProps.FontNormal_Size:= DoScaleFont(AFontSize);
+
+    TextOutProps.FontItalic_Name:= FontItalic.Name;
+    TextOutProps.FontItalic_Size:= TextOutProps.FontNormal_Size;
+
+    TextOutProps.FontBold_Name:= FontBold.Name;
+    TextOutProps.FontBold_Size:= TextOutProps.FontNormal_Size;
+
+    TextOutProps.FontBoldItalic_Name:= FontBoldItalic.Name;
+    TextOutProps.FontBoldItalic_Size:= TextOutProps.FontNormal_Size;
+
+    FBitmap.Canvas.Font.Size:= TextOutProps.FontNormal_Size;
+    ChSize:= FBitmap.Canvas.TextExtent('0');
+    TextOutProps.CharSize.XScaled:= Max(1, ChSize.cx) * ATEditorCharXScale;
+    TextOutProps.CharSize.Y:= Max(1, ChSize.cy);
+    TextOutProps.CharSize.XSpacePercents:= 100;
+  end;
 
   if AConsiderWrapInfo then
     NWrapIndex:= WrapInfo.FindIndexOfCaretPos(Point(0, ALineFrom));
@@ -9604,7 +9633,7 @@ begin
   else
     NVisibleColumns:= GetVisibleColumns;
 
-  for NLine:= ALineFrom to ALineTo do
+  for NLine:= ALineFrom to St.Count-1 do
   begin
     if not St.IsIndexValid(NLine) then Break;
     NColorAfter:= clNone;
@@ -9644,8 +9673,8 @@ begin
     TextOutProps.LineIndex:= WrapItem.NLineIndex;
     TextOutProps.CharIndexInLine:= WrapItem.NCharIndex;
 
-    NTextX:= ATEditorOptions.SizeIndentTooltipX + WrapItem.NIndent*FCharSize.XScaled*FCharSize.XSpacePercents div ATEditorCharXScale div 100;
-    NTextY:= ATEditorOptions.SizeIndentTooltipY + FCharSize.Y*(NLine-ALineFrom);
+    NTextX:= ATEditorOptions.SizeIndentTooltipX + WrapItem.NIndent*TextOutProps.CharSize.XScaled*FCharSize.XSpacePercents div ATEditorCharXScale div 100;
+    NTextY:= ATEditorOptions.SizeIndentTooltipY + TextOutProps.CharSize.Y*(NLine-ALineFrom);
     if NTextY>=ARect.Bottom then
       Break;
 
@@ -9701,10 +9730,11 @@ begin
 
   DoPaintTextFragment(C_Bmp, RectAll,
     NLineTop,
-    NLineBottom,
+    //NLineBottom,
     true,
     Colors.MinimapTooltipBG,
-    Colors.MinimapTooltipBorder
+    Colors.MinimapTooltipBorder,
+    FMinimapTooltipFontSize
     );
 
   C.Draw(NPanelLeft, NPanelTop, FMinimapTooltipBitmap);
@@ -9753,10 +9783,11 @@ begin
       FFoldedMarkTooltip.Canvas,
       Rect(0, 0, FFoldedMarkTooltip.Width, FFoldedMarkTooltip.Height),
       FFoldedMarkCurrent.LineFrom,
-      FFoldedMarkCurrent.LineTo,
+      //FFoldedMarkCurrent.LineTo,
       false, //to paint fully folded lines, must be False
       Colors.MinimapTooltipBG,
-      Colors.MinimapTooltipBorder
+      Colors.MinimapTooltipBorder,
+      0
       );
 end;
 

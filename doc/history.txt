@@ -1,3 +1,6 @@
+2023.04.12
++ add: OptMinimapTooltipFontSize (0: use main font size)
+
 2023.04.06
 + add: OptTabSmart (works like "Smart tab" option in Lazarus IDE)
 
