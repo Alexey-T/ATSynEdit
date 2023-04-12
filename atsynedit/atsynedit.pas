@@ -9554,7 +9554,7 @@ var
   NOutputStrWidth: Int64;
   NLine, NWrapIndex: integer;
   NVisibleColumns: integer;
-  NTextX, NTextY: integer;
+  NTextX, NTextY, NFontSize: integer;
   NColorAfter: TColor;
   WrapItem: TATWrapItem;
   TextOutProps: TATCanvasTextOutProps;
@@ -9606,19 +9606,21 @@ begin
   end
   else
   begin
+    NFontSize:= DoScaleFont(AFontSize);
+
     TextOutProps.FontNormal_Name:= Font.Name;
-    TextOutProps.FontNormal_Size:= DoScaleFont(AFontSize);
+    TextOutProps.FontNormal_Size:= NFontSize;
 
     TextOutProps.FontItalic_Name:= FontItalic.Name;
-    TextOutProps.FontItalic_Size:= TextOutProps.FontNormal_Size;
+    TextOutProps.FontItalic_Size:= NFontSize;
 
     TextOutProps.FontBold_Name:= FontBold.Name;
-    TextOutProps.FontBold_Size:= TextOutProps.FontNormal_Size;
+    TextOutProps.FontBold_Size:= NFontSize;
 
     TextOutProps.FontBoldItalic_Name:= FontBoldItalic.Name;
-    TextOutProps.FontBoldItalic_Size:= TextOutProps.FontNormal_Size;
+    TextOutProps.FontBoldItalic_Size:= NFontSize;
 
-    FBitmap.Canvas.Font.Size:= TextOutProps.FontNormal_Size;
+    FBitmap.Canvas.Font.Size:= NFontSize;
     ChSize:= FBitmap.Canvas.TextExtent('0');
     TextOutProps.CharSize.XScaled:= Max(1, ChSize.cx) * ATEditorCharXScale;
     TextOutProps.CharSize.Y:= Max(1, ChSize.cy);
