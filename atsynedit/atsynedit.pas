@@ -9569,7 +9569,6 @@ begin
 
   TextOutProps.Editor:= Self;
   TextOutProps.TabHelper:= FTabHelper;
-  TextOutProps.CharSize:= FCharSize;
   TextOutProps.CharsSkipped:= 0;
   TextOutProps.DrawEvent:= nil;
   TextOutProps.ControlWidth:= ARect.Width;
@@ -9603,6 +9602,8 @@ begin
 
     TextOutProps.FontBoldItalic_Name:= FontBoldItalic.Name;
     TextOutProps.FontBoldItalic_Size:= DoScaleFont(FontBoldItalic.Size);
+
+    TextOutProps.CharSize:= FCharSize;
   end
   else
   begin
