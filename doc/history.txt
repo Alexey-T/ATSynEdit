@@ -1,4 +1,5 @@
-2023.04.12
+2023.04.13
+* change: renamed OptMinimapTooltipLinesCount to OptMinimapTooltipHeight
 + add: OptMinimapTooltipFontSize (0: use main font size)
 
 2023.04.06

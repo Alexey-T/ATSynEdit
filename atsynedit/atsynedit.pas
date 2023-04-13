@@ -423,7 +423,7 @@ const
   cInitMinimapVisible = false;
   cInitMinimapSelColorChange = 6; //how much minimap sel-rect is darker, in %
   cInitMinimapTooltipVisible = true;
-  cInitMinimapTooltipLinesCount = 6;
+  cInitMinimapTooltipHeight = 6;
   cInitMinimapTooltipWidthPercents = 60;
   cInitMicromapVisible = false;
   cInitMicromapOnScrollbar = false;
@@ -800,7 +800,7 @@ type
     FMinimapTooltipVisible: boolean;
     FMinimapTooltipEnabled: boolean;
     FMinimapTooltipBitmap: TBitmap;
-    FMinimapTooltipLinesCount: integer;
+    FMinimapTooltipHeight: integer;
     FMinimapTooltipWidthPercents: integer;
     FMinimapTooltipFontSize: integer;
     FMinimapHiliteLinesWithSelection: boolean;
@@ -2000,7 +2000,7 @@ type
     property OptMinimapSelColorChange: integer read FMinimapSelColorChange write FMinimapSelColorChange default cInitMinimapSelColorChange;
     property OptMinimapAtLeft: boolean read FMinimapAtLeft write FMinimapAtLeft default false;
     property OptMinimapTooltipVisible: boolean read FMinimapTooltipVisible write FMinimapTooltipVisible default cInitMinimapTooltipVisible;
-    property OptMinimapTooltipLinesCount: integer read FMinimapTooltipLinesCount write FMinimapTooltipLinesCount default cInitMinimapTooltipLinesCount;
+    property OptMinimapTooltipHeight: integer read FMinimapTooltipHeight write FMinimapTooltipHeight default cInitMinimapTooltipHeight;
     property OptMinimapTooltipWidthPercents: integer read FMinimapTooltipWidthPercents write FMinimapTooltipWidthPercents default cInitMinimapTooltipWidthPercents;
     property OptMinimapTooltipFontSize: integer read FMinimapTooltipFontSize write FMinimapTooltipFontSize default 0;
     property OptMinimapHiliteLinesWithSelection: boolean read FMinimapHiliteLinesWithSelection write FMinimapHiliteLinesWithSelection default true;
@@ -4946,7 +4946,7 @@ begin
   FMinimapSelColorChange:= cInitMinimapSelColorChange;
   FMinimapAtLeft:= false;
   FMinimapTooltipVisible:= cInitMinimapTooltipVisible;
-  FMinimapTooltipLinesCount:= cInitMinimapTooltipLinesCount;
+  FMinimapTooltipHeight:= cInitMinimapTooltipHeight;
   FMinimapTooltipWidthPercents:= cInitMinimapTooltipWidthPercents;
   FMinimapTooltipFontSize:= 0;
   FMinimapHiliteLinesWithSelection:= true;
@@ -9711,9 +9711,9 @@ begin
     NPanelLeft:= FRectMinimap.Right + 1
   else
     NPanelLeft:= FRectMinimap.Left - NPanelWidth - 1;
-  NPanelHeight:= FMinimapTooltipLinesCount*FCharSize.Y + 2;
+  NPanelHeight:= FMinimapTooltipHeight*FCharSize.Y + 2;
   NPanelTop:= Max(0, Min(ClientHeight-NPanelHeight,
-    Pnt.Y - FCharSize.Y*FMinimapTooltipLinesCount div 2 ));
+    Pnt.Y - FCharSize.Y*FMinimapTooltipHeight div 2 ));
 
   if FMinimapTooltipBitmap=nil then
     FMinimapTooltipBitmap:= TBitmap.Create;
@@ -9728,8 +9728,8 @@ begin
   NWrapIndex:= GetMinimap_ClickedPosToWrapIndex(Pnt.Y);
   if NWrapIndex<0 then exit;
   NLineCenter:= FWrapInfo[NWrapIndex].NLineIndex;
-  NLineTop:= Max(0, NLineCenter - FMinimapTooltipLinesCount div 2);
-  //NLineBottom:= Min(NLineTop + FMinimapTooltipLinesCount-1, Strings.Count-1);
+  NLineTop:= Max(0, NLineCenter - FMinimapTooltipHeight div 2);
+  //NLineBottom:= Min(NLineTop + FMinimapTooltipHeight-1, Strings.Count-1);
 
   DoPaintTextFragment(C_Bmp, RectAll,
     NLineTop,
