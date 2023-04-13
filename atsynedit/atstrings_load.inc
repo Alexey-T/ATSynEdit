@@ -393,7 +393,7 @@ begin
       try
         Encoding:= cEncUTF8;
         EncodingDetect:= false;
-        LoadFromStream(MS, true{AFromUTF8});
+        LoadFromStream(MS, [cLoadOpFromUTF8]);
 
         //fixing CudaText issue #4172
         if not SEndsWithEol(AText) then
@@ -464,7 +464,7 @@ begin
 end;
 
 procedure TATStrings.DoLoadFromStream(Stream: TStream;
-  AFromUTF8: boolean; out AForcedToANSI: boolean);
+  AOptions: TATLoadStreamOptions; out AForcedToANSI: boolean);
 var
   Buf: PAnsiChar;
   BufSize: int64;
@@ -614,7 +614,7 @@ begin
   NStreamSize:= Stream.Size;
   NSignatureLen:= 0;
 
-  if AFromUTF8 then
+  if cLoadOpFromUTF8 in AOptions then
   begin
     //func param forces UTF8
     FEncoding:= cEncUTF8;
@@ -695,10 +695,10 @@ begin
   end;
 end;
 
-procedure TATStrings.LoadFromStream(Stream: TStream; AFromUTF8: boolean);
+procedure TATStrings.LoadFromStream(Stream: TStream; AOptions: TATLoadStreamOptions);
 begin
   ClearUndo(true);
-  DoLoadFromStream(Stream, AFromUTF8, FLoadingForcedANSI);
+  DoLoadFromStream(Stream, AOptions, FLoadingForcedANSI);
   DoFinalizeLoading;
 end;
 
@@ -711,13 +711,13 @@ begin
   fs:= TFileStream.Create(AFilename, fmOpenRead or fmShareDenyNone);
   try
     if fs.Size>=0 then
-      LoadFromStream(fs)
+      LoadFromStream(fs, [])
     else
     begin
       ms:= TMemoryStream.Create;
       try
         _ReadFileToStream(ms, AFilename);
-        LoadFromStream(ms);
+        LoadFromStream(ms, []);
       finally
         FreeAndNil(ms);
       end;
