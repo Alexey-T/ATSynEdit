@@ -31,8 +31,9 @@ function CustomUTF8ToUnicode(Dest: PUnicodeChar;
   Source: PChar;
   SourceBytes: SizeUInt;
   AllowBadCharsOfLen1: boolean): SizeUInt;
-//this is taken from System.Utf8ToUnicode,
-//instead of replacing result chars to '?' it raises exception now
+//code is taken from System.Utf8ToUnicode.
+//instead of replacing bad chars to '?' it raises exception.
+//param AllowBadCharsOfLen1 is needed to allow loading of _little broken_ UTF8 files.
 var
   InputUTF8: SizeUInt;
   IBYTE: BYTE;
