@@ -1604,7 +1604,7 @@ type
     }
     //files
     property FileName: string read FFileName write FFileName;
-    procedure LoadFromFile(const AFilename: string; AKeepScroll: boolean=false); virtual;
+    procedure LoadFromFile(const AFilename: string; AOptions: TATLoadStreamOptions); virtual;
     procedure SaveToFile(const AFilename: string); virtual;
     //cmd
     procedure TextInsertAtCarets(const AText: atString; AKeepCaret,
@@ -5253,7 +5253,7 @@ begin
   if H<1 then H:= 1;
 end;
 
-procedure TATSynEdit.LoadFromFile(const AFilename: string; AKeepScroll: boolean=false);
+procedure TATSynEdit.LoadFromFile(const AFilename: string; AOptions: TATLoadStreamOptions);
 begin
   if not FileExists(AFilename) then exit;
   TimerBlinkDisable;
@@ -5265,7 +5265,7 @@ begin
   FWrapInfo.Clear;
   FWrapUpdateNeeded:= true;
 
-  if not AKeepScroll then
+  if not (cLoadOpKeepScroll in AOptions) then
   begin
     FScrollHorz.Clear;
     FScrollVert.Clear;
@@ -5274,7 +5274,7 @@ begin
   BeginUpdate;
   try
     FFileName:= '';
-    Strings.LoadFromFile(AFilename);
+    Strings.LoadFromFile(AFilename, AOptions);
     FFileName:= AFileName;
   finally
     EndUpdate;

@@ -703,7 +703,7 @@ begin
 end;
 
 
-procedure TATStrings.LoadFromFile(const AFilename: string);
+procedure TATStrings.LoadFromFile(const AFilename: string; AOptions: TATLoadStreamOptions);
 var
   fs: TFileStream;
   ms: TMemoryStream;
@@ -711,13 +711,13 @@ begin
   fs:= TFileStream.Create(AFilename, fmOpenRead or fmShareDenyNone);
   try
     if fs.Size>=0 then
-      LoadFromStream(fs, [])
+      LoadFromStream(fs, AOptions)
     else
     begin
       ms:= TMemoryStream.Create;
       try
         _ReadFileToStream(ms, AFilename);
-        LoadFromStream(ms, []);
+        LoadFromStream(ms, AOptions);
       finally
         FreeAndNil(ms);
       end;
