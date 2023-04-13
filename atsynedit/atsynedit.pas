@@ -9701,7 +9701,7 @@ var
   C_Bmp: TCanvas;
   RectAll: TRect;
   Pnt: TPoint;
-  NWrapIndex, NLineCenter, NLineTop, NLineBottom: integer;
+  NWrapIndex, NLineCenter, NLineTop: integer;
   NPanelLeft, NPanelTop, NPanelWidth, NPanelHeight: integer;
 begin
   Pnt:= ScreenToClient(Mouse.CursorPos);
@@ -9729,7 +9729,7 @@ begin
   if NWrapIndex<0 then exit;
   NLineCenter:= FWrapInfo[NWrapIndex].NLineIndex;
   NLineTop:= Max(0, NLineCenter - FMinimapTooltipLinesCount div 2);
-  NLineBottom:= Min(NLineTop + FMinimapTooltipLinesCount-1, Strings.Count-1);
+  //NLineBottom:= Min(NLineTop + FMinimapTooltipLinesCount-1, Strings.Count-1);
 
   DoPaintTextFragment(C_Bmp, RectAll,
     NLineTop,
