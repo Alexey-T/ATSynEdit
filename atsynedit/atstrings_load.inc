@@ -341,7 +341,7 @@ begin
 end;
 
 
-procedure TATStrings.LoadFromStrings(AList: TStrings; AEnds: TATLineEnds);
+procedure TATStrings.LoadFromStrings(AList: TStrings; AEnds: TATLineEnds; AllowBadCharsOfLen1: boolean);
 var
   i: integer;
 begin
@@ -354,7 +354,7 @@ begin
   end;
 
   for i:= 0 to AList.Count-1 do
-    LineAddRaw_NoUndo(AList[i], AEnds);
+    LineAddRaw_NoUndo(AList[i], AEnds, AllowBadCharsOfLen1);
 
   ActionAddFakeLineIfNeeded;
   Modified:= true;
@@ -550,7 +550,7 @@ var
         Inc(NEnd, CharSize);
 
       if Len=0 then
-        LineAddRaw_NoUndo('', LineEnd)
+        LineAddRaw_NoUndo('', LineEnd, false)
       else
       begin
         case FEncoding of
@@ -558,14 +558,14 @@ var
             begin
               SetString(SA, @Buf[NStart], Len);
               SUtf8:= EncConvertToUTF8(SA, FEncodingCodepage);
-              LineAddRaw_NoUndo(SUtf8, LineEnd);
+              LineAddRaw_NoUndo(SUtf8, LineEnd, cLoadOpAllowBadCharsOfLen1 in AOptions);
             end;
 
           cEncUTF8:
             begin
               //this now raises exception if UTF8 content is bad, it's needed
               SetString(SA, @Buf[NStart], Len);
-              LineAddRaw_NoUndo(SA, LineEnd);
+              LineAddRaw_NoUndo(SA, LineEnd, cLoadOpAllowBadCharsOfLen1 in AOptions);
             end;
 
           cEncWideLE,

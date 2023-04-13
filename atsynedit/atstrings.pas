@@ -115,7 +115,7 @@ type
     function GetLineEnds: TATLineEnds;
     function GetLineState: TATLineState;
     procedure SetLineW(const S: UnicodeString);
-    procedure SetLineA(const S: string);
+    procedure SetLineA(const S: string; AllowBadCharsOfLen1: boolean);
   public
     Buf: string;
     Ex: TATStringItemEx;
@@ -128,7 +128,7 @@ type
     function CharAt(AIndex: integer): WideChar;
     function HasTab: boolean;
     function HasAsciiNoTabs: boolean;
-    procedure Init(const S: string; AEnd: TATLineEnds);
+    procedure Init(const S: string; AEnd: TATLineEnds; AllowBadCharsOfLen1: boolean);
     procedure Init(const S: UnicodeString; AEnd: TATLineEnds);
     procedure LineStateToChanged;
     procedure LineStateToSaved; inline;
@@ -311,7 +311,7 @@ type
     function IsIndexValid(N: integer): boolean; inline;
     function IsLastLineFake: boolean;
     function IsPosFolded(AX, AY, AIndexClient: integer): boolean;
-    procedure LineAddRaw_NoUndo(const S: string; AEnd: TATLineEnds);
+    procedure LineAddRaw_NoUndo(const S: string; AEnd: TATLineEnds; AllowBadCharsOfLen1: boolean);
     procedure LineAddRaw_NoUndo(const S: UnicodeString; AEnd: TATLineEnds);
     procedure LineAddRaw(const AString: atString; AEnd: TATLineEnds; AWithEvent: boolean=true);
     procedure LineAdd(const AString: atString);
@@ -386,7 +386,7 @@ type
     procedure LoadFromStream(Stream: TStream; AOptions: TATLoadStreamOptions);
     procedure LoadFromFile(const AFilename: string);
     procedure LoadFromString(const AText: string);
-    procedure LoadFromStrings(AList: TStrings; AEnds: TATLineEnds);
+    procedure LoadFromStrings(AList: TStrings; AEnds: TATLineEnds; AllowBadCharsOfLen1: boolean);
     procedure SaveToStream(AStream: TStream; AEncoding: TATFileEncoding; AWithSignature: boolean);
     procedure SaveToFile(const AFilename: string);
     property SaveSignUtf8: boolean read FSaveSignUtf8 write FSaveSignUtf8;
@@ -711,7 +711,7 @@ begin
   Ex.Updated:= true;
 end;
 
-procedure TATStringItem.SetLineA(const S: string);
+procedure TATStringItem.SetLineA(const S: string; AllowBadCharsOfLen1: boolean);
 var
   NLen, N: integer;
 begin
@@ -739,7 +739,7 @@ begin
     SetLength(Buf, NLen*2);
     try
       //this func is the same as Utf8ToUnicode but raises exception
-      N:= CustomUtf8ToUnicode(PUnicodeChar(PChar(Buf)), NLen, PChar(S), NLen);
+      N:= CustomUtf8ToUnicode(PUnicodeChar(PChar(Buf)), NLen, PChar(S), NLen, AllowBadCharsOfLen1);
       if N>0 then
         SetLength(Buf, 2*(N-1))
       else
@@ -758,10 +758,10 @@ begin
   end;
 end;
 
-procedure TATStringItem.Init(const S: string; AEnd: TATLineEnds);
+procedure TATStringItem.Init(const S: string; AEnd: TATLineEnds; AllowBadCharsOfLen1: boolean);
 begin
   FillChar(Ex, SizeOf(Ex), 0);
-  SetLineA(S);
+  SetLineA(S, AllowBadCharsOfLen1);
 
   Ex.Ends:= TATBits2(AEnd);
   Ex.State:= TATBits2(cLineStateAdded);
@@ -2614,11 +2614,11 @@ begin
     Exit(true);
 end;
 
-procedure TATStrings.LineAddRaw_NoUndo(const S: string; AEnd: TATLineEnds);
+procedure TATStrings.LineAddRaw_NoUndo(const S: string; AEnd: TATLineEnds; AllowBadCharsOfLen1: boolean);
 var
   Item: TATStringItem;
 begin
-  Item.Init(S, AEnd);
+  Item.Init(S, AEnd, AllowBadCharsOfLen1);
   Item.Ex.State:= TATBits2(cLineStateAdded);
   FList.Add(@Item);
   FillChar(Item, SizeOf(Item), 0);

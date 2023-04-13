@@ -7,7 +7,11 @@ unit ATStringProc_UTF8Decode;
 interface
 
 procedure CustomUTF8Decode(const s: RawByteString; out Res: UnicodeString; out Error: boolean);
-function CustomUTF8ToUnicode(Dest: PUnicodeChar; MaxDestChars: SizeUInt; Source: PChar; SourceBytes: SizeUInt): SizeUInt;
+function CustomUTF8ToUnicode(Dest: PUnicodeChar;
+  MaxDestChars: SizeUInt;
+  Source: PChar;
+  SourceBytes: SizeUInt;
+  AllowBadCharsOfLen1: boolean): SizeUInt;
 procedure RaiseUTF8TextError;
 
 implementation
@@ -22,7 +26,11 @@ begin
   raise EBadUTF8Text.Create('UTF-8 decode error');
 end;
 
-function CustomUTF8ToUnicode(Dest: PUnicodeChar; MaxDestChars: SizeUInt; Source: PChar; SourceBytes: SizeUInt): SizeUInt;
+function CustomUTF8ToUnicode(Dest: PUnicodeChar;
+  MaxDestChars: SizeUInt;
+  Source: PChar;
+  SourceBytes: SizeUInt;
+  AllowBadCharsOfLen1: boolean): SizeUInt;
 //this is taken from System.Utf8ToUnicode,
 //instead of replacing result chars to '?' it raises exception now
 var
@@ -80,8 +88,10 @@ begin
           case CharLen of
             1:  begin
                   //Not valid UTF-8 sequence
-                  //RaiseUTF8TextError; ////Exception is bad here, see CudaText issue #3678
-                  UC:= Ord('?');
+                  if AllowBadCharsOfLen1 then
+                    UC:= Ord('?')
+                  else
+                    RaiseUTF8TextError;
                 end;
             2:  begin
                   //Two bytes UTF, convert it
@@ -161,7 +171,7 @@ begin
     exit;
   SetLength(hs{%H-},length(s));
   try
-    i:=CustomUtf8ToUnicode(PUnicodeChar(hs),length(hs)+1,pchar(s),length(s));
+    i:=CustomUtf8ToUnicode(PUnicodeChar(hs),length(hs)+1,pchar(s),length(s),true);
     if i>0 then
       begin
         SetLength(hs,i-1);
