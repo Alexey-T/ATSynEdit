@@ -1139,6 +1139,16 @@ Even more weird look happens when user selects column block over word-wrapped li
 
 Here is the code's logic in all these cases (with full-width characters and with word-wrapped lines). Code calculates (line1, column1) text position of column block left-top edge. Then code calculates (line2, column2) text position of column block right-bottom edge. Then code selects characters in range column1...column2 in all those affected lines line1...line2. And this code logic produces so weird look in word-wrapped mode.
 
+==Horizontal scrollbar only increases but never shrinks?==
+Horizontal scrollbar has unusual behaviour: its width only increases (when long lines appear in the visible area). It never shrinks when we scroll to shorter lines. It was made as a workaround to GTK2 widgetset freezes - it freezes when scrollbar shows/hides/shows/hides/etc on scrolling.
+
+You can try to disable this workaround in file atsynedit_defines.inc:
+<syntaxhighlight lang="pascal">
+{$define fix_horzscroll} //workaround for gtk2 widgetset unstable: it freezes app
+                         //when horz-scroll hides/shows/hides/...
+                         //ok also for win32    
+</syntaxhighlight>
+
 ==more==
 
 = Auto-completion lists =
