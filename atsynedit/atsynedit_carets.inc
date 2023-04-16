@@ -268,6 +268,7 @@ var
   NScrolledHorzSmooth: Int64;
   NScrolledVert: Int64;
   NLineCount: integer;
+  NLastCharIndex: integer;
   Str: atString;
   bLineHuge: boolean;
   bAsciiOnly: boolean;
@@ -312,9 +313,11 @@ begin
     bLineHuge:= Item.NLength>ATEditorOptions.MaxLineLenForAccurateCharWidths;
 
     if (P.X<Item.NCharIndex-1) then Continue;
+
+    NLastCharIndex:= Item.NCharIndex-1+Item.NLength;
     if (Item.NFinal=cWrapItemMiddle) then
-      if (P.X>Item.NCharIndex-1+Item.NLength) or
-        ((P.X=Item.NCharIndex-1+Item.NLength) and APreferLeftSide) then
+      if (P.X>NLastCharIndex) or
+        ((P.X=NLastCharIndex) and APreferLeftSide) then
         Continue;
 
     NFromStart:= P.X+1-Item.NCharIndex;
