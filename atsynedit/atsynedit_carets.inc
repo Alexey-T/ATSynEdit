@@ -553,6 +553,12 @@ begin
 
   if Result.Y>=0 then
     Inc(Result.Y, FTextOffsetFromTop1);
+
+  {
+  if OptWrapMode<>cWrapOff then
+    if Result.X>Width then
+      raise Exception.Create('CaretPosToClientPos.X is too big in word-wrap mode, report to the author');
+  }
 end;
 
 function TATSynEdit.ClientPosToCaretPos(P: TPoint;
