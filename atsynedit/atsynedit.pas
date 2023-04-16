@@ -2842,8 +2842,12 @@ begin
     NPage:= Max(1, GetVisibleColumns);
     //NMax is calculated in DoPaintText
     //hide horz bar for word-wrap:
-    if FWrapMode=cWrapOn then
+    if FWrapMode<>cWrapOff then
+    begin
+      NPos:= 0;
+      SmoothPos:= 0;
       NMax:= NPage;
+    end;
     NPosLast:= Max(0, NMax-NPage);
 
     CharSizeScaled_Prev:= CharSizeScaled;
@@ -5836,7 +5840,7 @@ begin
   FLineTopTodo:= GetLineTop;
 
   Include(FPaintFlags, cIntFlagResize);
-  if FWrapMode in [cWrapOn, cWrapAtWindowOrMargin] then
+  if FWrapMode<>cWrapOff then
     FWrapUpdateNeeded:= true;
 
   if not FPaintStarted then exit;
