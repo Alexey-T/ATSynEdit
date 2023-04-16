@@ -25,6 +25,7 @@ type
 type
   { TATWrapItem }
 
+  PATWrapItem = ^TATWrapItem;
   TATWrapItem = packed record
     NLineIndex: integer;
     NCharIndex: integer;

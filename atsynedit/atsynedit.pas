@@ -2546,11 +2546,11 @@ procedure _CalcWrapInfos(
   AFontProportional: boolean);
 var
   WrapItem: TATWrapItem;
+  WrapItemPtr: PATWrapItem;
   NLineLen, NPartLen, NFoldFrom: integer;
   NPartOffset, NIndent, NVisColumns: integer;
-  FinalState: TATWrapItemFinal;
   bInitialItem: boolean;
-  StrPart: atString;
+  StrPart: UnicodeString;
 begin
   AItems.Clear;
 
@@ -2598,7 +2598,16 @@ begin
       StrPart:= AStrings.LineSub(ALineIndex, NPartOffset, ATEditorOptions.MaxVisibleColumns)
     else
       StrPart:= AStrings.LineSub(ALineIndex, NPartOffset, NVisColumns);
-    if StrPart='' then Break;
+
+    if StrPart='' then
+    begin
+      if not bInitialItem then
+      begin
+        WrapItemPtr:= AItems._GetItemPtr(AItems.Count-1);
+        WrapItemPtr^.NFinal:= cWrapItemFinal;
+      end;
+      Break;
+    end;
 
     NPartLen:= ATabHelper.FindWordWrapOffset(
       ALineIndex,
@@ -2610,12 +2619,7 @@ begin
       AWrapIndented
       );
 
-    if NPartLen>=Length(StrPart) then
-      FinalState:= cWrapItemFinal
-    else
-      FinalState:= cWrapItemMiddle;
-
-    WrapItem.Init(ALineIndex, NPartOffset, NPartLen, NIndent, FinalState, bInitialItem);
+    WrapItem.Init(ALineIndex, NPartOffset, NPartLen, NIndent, cWrapItemMiddle, bInitialItem);
     AItems.Add(WrapItem);
     bInitialItem:= false;
 
