@@ -263,7 +263,7 @@ function _DoCaretPosToClientPos(
 var
   Item: TATWrapItem;
   StringItem: PATStringItem;
-  NIndex1, NIndex2, NLineIndexTop: integer;
+  NWrapIndexFrom, NWrapIndexTo, NLineIndexTop: integer;
   NFromStart, NWidth: Int64;
   NScrolledHorzSmooth: Int64;
   NScrolledVert: Int64;
@@ -296,8 +296,8 @@ begin
     P.X:= AStrings.LinesLen[P.Y];
   end;
 
-  AWrapInfo.FindIndexesOfLineNumber(P.Y, NIndex1, NIndex2);
-  if NIndex1<0 then Exit;
+  AWrapInfo.FindIndexesOfLineNumber(P.Y, NWrapIndexFrom, NWrapIndexTo);
+  if NWrapIndexFrom<0 then Exit;
 
   //prepare optimization
   StringItem:= AStrings.GetItemPtr(P.Y);
@@ -306,7 +306,7 @@ begin
   NScrolledHorzSmooth:= AScrollHorz.SmoothPos-AScrollHorz.NPixelOffset;
   NScrolledVert:= Max(0, AScrollVert.NPos);
 
-  for i:= NIndex1 to NIndex2 do
+  for i:= NWrapIndexFrom to NWrapIndexTo do
   begin
     Item:= AWrapInfo[i];
     bLineHuge:= Item.NLength>ATEditorOptions.MaxLineLenForAccurateCharWidths;
