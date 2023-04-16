@@ -332,10 +332,10 @@ begin
     Result.X:= NWidth;
 
     if NFromStart>Item.NLength then
-      Inc(Result.X, (NFromStart-Item.NLength)*ATabHelper.CharSize.XScaled div ATEditorCharXScale);
+      Inc(Result.X, Int64(NFromStart-Item.NLength)*ATabHelper.CharSize.XScaled div ATEditorCharXScale);
 
-    Inc(Result.X, Item.NIndent*ATabHelper.CharSize.XScaled*ATabHelper.CharSize.XSpacePercents div ATEditorCharXScale div 100 - NScrolledHorzSmooth);
-    Result.Y:= (i-NScrolledVert)*ATabHelper.CharSize.Y;
+    Inc(Result.X, Int64(Item.NIndent)*ATabHelper.CharSize.XScaled*ATabHelper.CharSize.XSpacePercents div ATEditorCharXScale div 100 - NScrolledHorzSmooth);
+    Result.Y:= (Int64(i)-NScrolledVert)*ATabHelper.CharSize.Y;
 
     //consider gaps
     if (AGaps.Count>0) and AWrapInfo.IsIndexValid(NScrolledVert) then
