@@ -457,8 +457,8 @@ initialization
     MaxLinesForStatusbarOffsetsCalc:= 7000;
     MinimapColoringTime:= 40;
     HintScrollDx:= 5;
-    HintBookmarkDx:= 6;
-    HintBookmarkDy:= -16;
+    HintBookmarkDx:= 16;
+    HintBookmarkDy:= 16;
     HintBookmarkMaxWidth:= 700;
     UrlMarkerTag:= -100;
 
