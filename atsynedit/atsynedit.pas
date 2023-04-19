@@ -5892,6 +5892,7 @@ begin
 
   if FHintWnd=nil then
     FHintWnd:= THintWindow.Create(Self);
+  FHintWnd.Font:= Screen.HintFont;
 
   S:= ATEditorOptions.TextHintScrollPrefix+' '+IntToStr(LineTop+1);
   R:= FHintWnd.CalcHintRect(500, S, nil);
@@ -5915,6 +5916,7 @@ begin
 
   if FHintWnd=nil then
     FHintWnd:= THintWindow.Create(Self);
+  FHintWnd.Font:= Screen.HintFont;
 
   S:= '';
   St:= Strings;
