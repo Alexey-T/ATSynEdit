@@ -458,7 +458,7 @@ initialization
     MinimapColoringTime:= 40;
     HintScrollDx:= 5;
     HintBookmarkDx:= 6;
-    HintBookmarkDy:= 16;
+    HintBookmarkDy:= -16;
     HintBookmarkMaxWidth:= 700;
     UrlMarkerTag:= -100;
 
