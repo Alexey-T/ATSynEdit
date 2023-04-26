@@ -854,6 +854,16 @@ begin
   bChange:= false;
   St:= Strings;
 
+  //Sublime Text, VSCode: delete selection first
+  if Carets.IsSelection then
+  begin
+    Result:= DoCommand_TextDeleteSelection();
+    //deletion of block by BkSpace needs undo-group, CudaText issue #3971
+    St.BeginUndoGroup;
+    St.EndUndoGroup;
+    exit;
+  end;
+
   //also make undo-group to fix CudaText issue #3971
   St.BeginUndoGroup;
   St.EndUndoGroup;
