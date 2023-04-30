@@ -34,7 +34,8 @@ var
   St: TATStrings;
   bDown: boolean;
   YMax, i: integer;
-  Pnt: TPoint;
+  PntText: TPoint;
+  PntCoord: TATPoint;
   Details: TATEditorPosDetails;
 begin
   if AY<0 then exit;
@@ -54,12 +55,12 @@ begin
   if FOptCaretsPrimitiveColumnSelection then
   begin
     AX:= St.ColumnPosToCharPos(AY, AX, FTabHelper);
-    Pnt:= CaretPosToClientPos(Point(AX, AY));
-    Inc(Pnt.Y, ALineDelta*FCharSize.Y);
-    Pnt:= ClientPosToCaretPos(Pnt, Details);
-    if Pnt.Y<0 then exit;
-    AX:= Pnt.X;
-    AY:= Pnt.Y;
+    PntCoord:= CaretPosToClientPos(Point(AX, AY));
+    Inc(PntCoord.Y, ALineDelta*FCharSize.Y);
+    PntText:= ClientPosToCaretPos(PntCoord, Details);
+    if PntText.Y<0 then exit;
+    AX:= PntText.X;
+    AY:= PntText.Y;
     AX:= St.CharPosToColumnPos(AY, AX, FTabHelper);
   end
   else

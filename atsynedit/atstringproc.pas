@@ -26,6 +26,14 @@ const
   ATEditorCharXScale = 1024;
 
 type
+  TATPoint = record
+    X, Y: Int64;
+  end;
+  TATRect = record
+    Left, Top, Right, Bottom: Int64;
+  end;
+
+type
   TATEditorCharSize = record
     //XScaled is the average-char-width (usually of 'N'),
     //multiplied by ATEditorCharXScale and truncated.
@@ -105,6 +113,9 @@ type
 type
   TATSimpleRange = record NFrom, NTo: integer; end;
   TATSimpleRangeArray = array of TATSimpleRange;
+
+function ATPoint(const X, Y: Int64): TATPoint;
+function ATPointInRect(const Rect: TRect; const P: TATPoint): boolean;
 
 function IsStringWithUnicode(const S: string): boolean; inline;
 function IsStringWithUnicode(const S: UnicodeString): boolean; inline;
@@ -264,6 +275,20 @@ implementation
 
 uses
   Dialogs, Math;
+
+function ATPoint(const X, Y: Int64): TATPoint;
+begin
+  Result.X:= X;
+  Result.Y:= Y;
+end;
+
+function ATPointInRect(const Rect: TRect; const P: TATPoint): boolean;
+begin
+  Result:= (p.y>=Rect.Top) and
+           (p.y<Rect.Bottom) and
+           (p.x>=Rect.Left) and
+           (p.x<Rect.Right);
+end;
 
 function IsCharEol(ch: widechar): boolean;
 begin

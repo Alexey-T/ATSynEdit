@@ -35,6 +35,7 @@ type
     );
 
 procedure SwapInt(var n1, n2: integer); inline;
+procedure SwapInt(var n1, n2: Int64); inline;
 function IsPosSorted(X1, Y1, X2, Y2: integer; AllowEq: boolean): boolean; inline;
 function IsPosInRange(X, Y, X1, Y1, X2, Y2: integer; AllowOnRightEdge: boolean=false): TATPosRelation;
 
@@ -210,6 +211,15 @@ end;
 procedure SwapInt(var n1, n2: integer); inline;
 var
   n: integer;
+begin
+  n:= n1;
+  n1:= n2;
+  n2:= n;
+end;
+
+procedure SwapInt(var n1, n2: Int64); inline;
+var
+  n: Int64;
 begin
   n:= n1;
   n1:= n2;

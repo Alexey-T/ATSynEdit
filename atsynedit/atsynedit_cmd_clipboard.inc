@@ -218,7 +218,9 @@ function TATSynEdit.DoCommand_ClipboardPasteFromRecents: TATCommandResults;
 var
   ClipExItem: TATEditorClipboardExItem;
   mi: TMenuItem;
-  Pnt: TPoint;
+  PntText: TPoint;
+  PntCoord: TATPoint;
+  P0: TPoint;
   S: string;
   i: integer;
 begin
@@ -249,20 +251,23 @@ begin
 
   //show popup at the caret position, like Sublime
   with Carets[0] do
-    Pnt:= Point(PosX, PosY);
-  if not Strings.IsIndexValid(Pnt.Y) then
+    PntText:= Point(PosX, PosY);
+  if not Strings.IsIndexValid(PntText.Y) then
   begin
-    Pnt.X:= 0;
-    Pnt.Y:= Strings.Count-1;
+    PntText.X:= 0;
+    PntText.Y:= Strings.Count-1;
   end;
-  Pnt:= CaretPosToClientPos(Pnt);
-  Inc(Pnt.Y, FCharSize.Y);
+  PntCoord:= CaretPosToClientPos(PntText);
+  Inc(PntCoord.Y, FCharSize.Y);
   //caret can be scrolled away
-  Pnt.X:= Min(Width, Max(0, Pnt.X));
-  Pnt.Y:= Min(Height, Max(0, Pnt.Y));
-  Pnt:= ClientToScreen(Pnt);
+  PntCoord.X:= Min(Width, Max(0, PntCoord.X));
+  PntCoord.Y:= Min(Height, Max(0, PntCoord.Y));
 
-  ATEditorClipboardRecentMenu.PopUp(Pnt.X, Pnt.Y);
+  P0.X:= PntCoord.X;
+  P0.Y:= PntCoord.Y;
+  P0:= ClientToScreen(P0);
+
+  ATEditorClipboardRecentMenu.PopUp(P0.X, P0.Y);
 end;
 
 function TATSynEdit.DoCommand_ClipboardClearRecents: TATCommandResults;

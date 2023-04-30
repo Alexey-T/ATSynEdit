@@ -628,9 +628,9 @@ type
     MenuitemTextRedo: TMenuItem;
     FOverwrite: boolean;
     FHintWnd: THintWindow;
-    FMouseDownCoordOriginal: TPoint;
-    FMouseDownCoord: TPoint;
-    FMouseDragCoord: TPoint;
+    FMouseDownCoordOriginal: TATPoint;
+    FMouseDownCoord: TATPoint;
+    FMouseDragCoord: TATPoint;
     FMouseDownPnt: TPoint;
     FMouseDownGutterLineNumber: integer;
     FMouseDownOnEditingArea: boolean;
@@ -641,7 +641,7 @@ type
     FMouseDownWithCtrl: boolean;
     FMouseDownWithAlt: boolean;
     FMouseDownWithShift: boolean;
-    FMouseNiceScrollPos: TPoint;
+    FMouseNiceScrollPos: TATPoint;
     FMouseDragDropping: boolean;
     FMouseDragDroppingReal: boolean;
     FMouseDragMinimap: boolean;
@@ -1616,8 +1616,8 @@ type
     function DoCaretsFixIncorrectPos(AndLimitByLineEnds: boolean): boolean;
     procedure DoCaretsFixIfInsideFolded;
     procedure DoCaretForceShow;
-    function CaretPosToClientPos(P: TPoint): TPoint;
-    function ClientPosToCaretPos(P: TPoint;
+    function CaretPosToClientPos(const P: TPoint): TATPoint;
+    function ClientPosToCaretPos(P: TATPoint;
       out ADetails: TATEditorPosDetails;
       AGapCoordAction: TATEditorGapCoordAction=cGapCoordToLineEnd): TPoint;
     function IsLineWithCaret(ALine: integer; ADisableSelected: boolean=false): boolean;
@@ -5098,7 +5098,7 @@ begin
   FOptDimUnfocusedBack:= cInitDimUnfocusedBack;
 
   ClearMouseDownVariables;
-  FMouseNiceScrollPos:= Point(0, 0);
+  FMouseNiceScrollPos:= ATPoint(0, 0);
 
   FSelRect:= cRectEmpty;
   ClearSelRectPoints;
@@ -6160,7 +6160,8 @@ end;
 
 procedure TATSynEdit.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var
-  PosCoord, PosTextClicked: TPoint;
+  PosCoord: TATPoint;
+  PosTextClicked: TPoint;
   PosDetails: TATEditorPosDetails;
   ActionId: TATEditorMouseAction;
   bClickOnSelection, bClickHandled: boolean;
@@ -6180,13 +6181,13 @@ begin
     (X>=FRectGutter.Right) then
     X:= FRectMain.Left;
 
-  PosCoord:= Point(X, Y);
+  PosCoord:= ATPoint(X, Y);
 
   if Button=mbRight then
   begin
     PosTextClicked:= ClientPosToCaretPos(PosCoord, PosDetails);
 
-    if FOptGutterVisible and PtInRect(FRectGutter, PosCoord) then
+    if FOptGutterVisible and ATPointInRect(FRectGutter, PosCoord) then
     begin
       NGutterIndex:= FGutter.FindIndexAtCoordX(PosCoord.X);
       bClickHandled:= false;
@@ -6226,7 +6227,7 @@ begin
   FMouseDownWithAlt:= ssAlt in Shift;
   FMouseDownWithShift:= ssShift in Shift;
 
-  if FMinimapVisible and PtInRect(FRectMinimap, PosCoord) then
+  if FMinimapVisible and ATPointInRect(FRectMinimap, PosCoord) then
   begin
     GetRectMinimapSel(RectMinimapSel);
     FMouseDownOnMinimap:= true;
@@ -6246,7 +6247,7 @@ begin
       FMouseDragMinimapDelta:= Y-RectMinimapSel.Top;
     end
     else
-    if PtInRect(RectMinimapSel, PosCoord) then
+    if ATPointInRect(RectMinimapSel, PosCoord) then
     begin
       FMouseDragMinimap:= true;
       FMouseDragMinimapDelta:= Y-RectMinimapSel.Top;
@@ -6276,7 +6277,7 @@ begin
     Exit
   end;
 
-  if PtInRect(FRectMain, PosCoord) then
+  if ATPointInRect(FRectMain, PosCoord) then
   begin
     FMouseDownOnEditingArea:= true;
     FMouseDownPnt:= PosTextClicked;
@@ -6379,7 +6380,7 @@ begin
     end;
   end;
 
-  if FOptGutterVisible and PtInRect(FRectGutter, PosCoord) then
+  if FOptGutterVisible and ATPointInRect(FRectGutter, PosCoord) then
   begin
     NGutterIndex:= FGutter.FindIndexAtCoordX(PosCoord.X);
 
@@ -6452,7 +6453,7 @@ begin
     end;
   end;
 
-  if FMicromapVisible and not FMicromapOnScrollbar and PtInRect(FRectMicromap, PosCoord) then
+  if FMicromapVisible and not FMicromapOnScrollbar and ATPointInRect(FRectMicromap, PosCoord) then
     if ActionId=cMouseActionClickSimple then
     begin
       DoEventClickMicromap(X-FRectMicromap.Left, Y-FRectMicromap.Top);
@@ -6474,12 +6475,13 @@ var
   Str: atString;
   Caret: TATCaretItem;
   PosDetails: TATEditorPosDetails;
-  PosCoord, PosTextClicked: TPoint;
+  PosCoord: TATPoint;
+  PosTextClicked: TPoint;
   bMovedMinimal: boolean;
 begin
   if not OptMouseEnableAll then exit;
   inherited;
-  PosCoord:= Point(X, Y);
+  PosCoord:= ATPoint(X, Y);
 
   if FOptShowMouseSelFrame then
     if FMouseDragCoord.X>=0 then
@@ -6489,7 +6491,7 @@ begin
         Invalidate;
     end;
 
-  if PtInRect(FRectMinimap, PosCoord) then
+  if ATPointInRect(FRectMinimap, PosCoord) then
   begin
     if FMouseDownOnMinimap then
     begin
@@ -6502,7 +6504,7 @@ begin
     Exit
   end;
 
-  if PtInRect(ClientRect, PosCoord) then
+  if ATPointInRect(ClientRect, PosCoord) then
   if FMouseDragDropping then
   begin
     //drag-drop really started
@@ -6563,8 +6565,8 @@ end;
 
 procedure TATSynEdit.ClearMouseDownVariables;
 begin
-  FMouseDownCoordOriginal:= Point(-1, -1);
-  FMouseDownCoord:= Point(-1, -1);
+  FMouseDownCoordOriginal:= ATPoint(-1, -1);
+  FMouseDownCoord:= ATPoint(-1, -1);
   FMouseDownPnt:= Point(-1, -1);
   FMouseDownGutterLineNumber:= -1;
   FMouseDownDouble:= false;
@@ -6579,7 +6581,7 @@ begin
   FMouseDragDropping:= false;
   FMouseDragDroppingReal:= false;
   FMouseDragMinimap:= false;
-  FMouseDragCoord:= Point(-1, -1);
+  FMouseDragCoord:= ATPoint(-1, -1);
   FMouseRightClickOnGutterIsHandled:= false;
 
   if Assigned(FTimerScroll) then
@@ -6682,7 +6684,7 @@ begin
 end;
 
 
-procedure _LimitPointByRect(var P: TPoint; const R: TRect); inline;
+procedure _LimitPointByRect(var P: TATPoint; const R: TRect); inline;
 begin
   if P.X<R.Left+1 then P.X:= R.Left+1;
   if P.X>R.Right then P.X:= R.Right;
@@ -6692,7 +6694,8 @@ end;
 
 procedure TATSynEdit.MouseMove(Shift: TShiftState; X, Y: Integer);
 var
-  PntCoord, PntText: TPoint;
+  PntCoord: TATPoint;
+  PntText: TPoint;
   RectMainCopy: TRect;
   bOnMain, bOnMinimap, bOnMicromap,
   bOnGutter, bOnGutterNumbers, bOnGutterBookmk,
@@ -6713,7 +6716,7 @@ begin
   if not OptMouseEnableAll then exit;
   inherited;
 
-  PntCoord:= Point(X, Y);
+  PntCoord:= ATPoint(X, Y);
   PntText:= Point(-1, -1);
   UpdateCursor;
 
@@ -6747,14 +6750,14 @@ begin
     _LimitPointByRect(FMouseDragCoord, FRectMainVisible);
   end
   else
-    FMouseDragCoord:= Point(-1, -1);
+    FMouseDragCoord:= ATPoint(-1, -1);
 
-  bOnMain:= PtInRect(RectMainCopy, PntCoord);
-  bOnMinimap:= FMinimapVisible and PtInRect(FRectMinimap, PntCoord);
-  bOnMicromap:= FMicromapVisible and not FMicromapOnScrollbar and PtInRect(FRectMicromap, PntCoord);
-  bOnGutter:= FOptGutterVisible and PtInRect(FRectGutter, PntCoord);
-  bOnGutterNumbers:= bOnGutter and PtInRect(FRectGutterNums, PntCoord);
-  bOnGutterBookmk:= bOnGutter and PtInRect(FRectGutterBm, PntCoord);
+  bOnMain:= ATPointInRect(RectMainCopy, PntCoord);
+  bOnMinimap:= FMinimapVisible and ATPointInRect(FRectMinimap, PntCoord);
+  bOnMicromap:= FMicromapVisible and not FMicromapOnScrollbar and ATPointInRect(FRectMicromap, PntCoord);
+  bOnGutter:= FOptGutterVisible and ATPointInRect(FRectGutter, PntCoord);
+  bOnGutterNumbers:= bOnGutter and ATPointInRect(FRectGutterNums, PntCoord);
+  bOnGutterBookmk:= bOnGutter and ATPointInRect(FRectGutterBm, PntCoord);
 
   //detect cursor on minimap
   if FMinimapVisible then
@@ -6856,7 +6859,7 @@ begin
   if FMouseDragDropping then
   begin
     if not FMouseDragDroppingReal and
-      IsPointsDiffByDelta(Point(X, Y), FMouseDownCoordOriginal, Mouse.DragThreshold) then
+      IsPointsDiffByDelta(ATPoint(X, Y), FMouseDownCoordOriginal, Mouse.DragThreshold) then
     begin
       FMouseDragDroppingReal:= true;
       BeginDrag(true);
@@ -7241,15 +7244,17 @@ end;
 
 procedure TATSynEdit.DoSelect_Line_ByClick;
 var
-  P: TPoint;
+  P0: TPoint;
+  P: TATPoint;
   Details: TATEditorPosDetails;
 begin
-  P:= ScreenToClient(Mouse.CursorPos);
-  if PtInRect(FRectMain, P) then
+  P0:= ScreenToClient(Mouse.CursorPos);
+  P:= ATPoint(P0.X, P0.Y);
+  if ATPointInRect(FRectMain, P) then
   begin
-    P:= ClientPosToCaretPos(P, Details);
-    if P.Y<0 then Exit;
-    DoSelect_Line(P);
+    P0:= ClientPosToCaretPos(P, Details);
+    if P0.Y<0 then Exit;
+    DoSelect_Line(P0);
     Invalidate;
   end;
 end;
@@ -7368,10 +7373,14 @@ end;
 procedure TATSynEdit.TimerScrollTick(Sender: TObject);
 var
   nIndexCaret: integer;
-  PClient, PCaret: TPoint;
+  P0: TPoint;
+  PClient: TATPoint;
+  PCaret: TPoint;
   Details: TATEditorPosDetails;
 begin
-  PClient:= ScreenToClient(Mouse.CursorPos);
+  P0:= ScreenToClient(Mouse.CursorPos);
+  PClient.X:= P0.X;
+  PClient.Y:= P0.Y;
   PClient.X:= Max(FRectMain.Left, PClient.X);
   PClient.Y:= Max(FRectMain.Top, PClient.Y);
   PClient.X:= Min(FRectMain.Right, PClient.X);
@@ -7610,18 +7619,23 @@ procedure TATSynEdit.DoPaintMarkerOfDragDrop(C: TCanvas);
 var
   Details: TATEditorPosDetails;
   NMarkWidth: integer;
-  PntText, PntCoord: TPoint;
+  PntText: TPoint;
+  PntCoord: TATPoint;
   R: TRect;
+  P0: TPoint;
 begin
   if not FOptShowDragDropMarker then exit;
   if not FMouseDragDropping then exit;
   if not FMouseDragDroppingReal then exit;
 
-  PntText:= ClientPosToCaretPos(ScreenToClient(Mouse.CursorPos), Details);
+  P0:= ScreenToClient(Mouse.CursorPos);
+  PntCoord.X:= P0.X;
+  PntCoord.Y:= P0.Y;
+  PntText:= ClientPosToCaretPos(PntCoord, Details);
   if PntText.Y<0 then exit;
   PntCoord:= CaretPosToClientPos(PntText);
   if PntCoord.Y<0 then exit;
-  if not PtInRect(FRectMain, PntCoord) then exit;
+  if not ATPointInRect(FRectMain, PntCoord) then exit;
 
   NMarkWidth:= ATEditorScale(FOptShowDragDropMarkerWidth);
   R.Left:= PntCoord.X - NMarkWidth div 2;
@@ -8175,6 +8189,7 @@ var
   St: TATStrings;
   Str: atString;
   P, PosAfter, Shift: TPoint;
+  PntCoord: TATPoint;
   X1, Y1, X2, Y2: integer;
   bSel: boolean;
   Relation: TATPosRelation;
@@ -8190,7 +8205,9 @@ begin
 
   //calc insert-pos
   P:= ScreenToClient(Mouse.CursorPos);
-  P:= ClientPosToCaretPos(P, Details);
+  PntCoord.X:= P.X;
+  PntCoord.Y:= P.Y;
+  P:= ClientPosToCaretPos(PntCoord, Details);
   if P.Y<0 then exit;
 
   //can't drop into selection
@@ -8324,13 +8341,14 @@ end;
 function TATSynEdit.GetLinesFromTop: integer;
 var
   P: TPoint;
+  PntCoord: TATPoint;
 begin
   if Carets.Count=0 then
     begin Result:= 0; Exit end;
   with Carets[0] do
     P:= Point(PosX, PosY);
-  P:= CaretPosToClientPos(P);
-  Result:= (P.Y-FRectMain.Top) div FCharSize.Y;
+  PntCoord:= CaretPosToClientPos(P);
+  Result:= (PntCoord.Y-FRectMain.Top) div FCharSize.Y;
 end;
 
 function TATSynEdit.GetText: UnicodeString;
@@ -9027,7 +9045,7 @@ var
   nSpaceShift: integer;
   Indexes: TATIntArray;
   Range: PATSynRange;
-  P1, P2: TPoint;
+  P1, P2: TATPoint;
   RSt: TRect;
   NColor, NColorNormal, NColorActive: TColor;
   i: integer;
@@ -9407,6 +9425,7 @@ procedure TATSynEdit.DragDrop(Source: TObject; X, Y: Integer);
 var
   SText: atString;
   Pnt: TPoint;
+  PntCoord: TATPoint;
   Details: TATEditorPosDetails;
 begin
   if not (Source is TATSynEdit) then exit;
@@ -9417,7 +9436,8 @@ begin
   SText:= TATSynEdit(Source).TextSelected;
   if SText='' then exit;
 
-  Pnt:= ClientPosToCaretPos(Point(X, Y), Details);
+  PntCoord:= ATPoint(X, Y);
+  Pnt:= ClientPosToCaretPos(PntCoord, Details);
   if Strings.IsIndexValid(Pnt.Y) then
   begin
     DoCaretSingle(Pnt.X, Pnt.Y);
@@ -9812,7 +9832,7 @@ end;
 function TATSynEdit.DoGetGapRect(AIndex: integer; out ARect: TRect): boolean;
 var
   GapItem: TATGapItem;
-  Pnt: TPoint;
+  Pnt: TATPoint;
 begin
   Result:= false;
   ARect:= Rect(0, 0, 0, 0);
@@ -10231,7 +10251,7 @@ end;
 
 function TATSynEdit.IsPosInVisibleArea(AX, AY: integer): boolean;
 var
-  Pnt: TPoint;
+  Pnt: TATPoint;
   NTop, NCount: integer;
 begin
   NTop:= LineTop;
@@ -10255,7 +10275,7 @@ begin
     if Pnt.Y=-1 then
       exit(true);
 
-    Result:= PtInRect(FRectMainVisible, Pnt);
+    Result:= ATPointInRect(FRectMainVisible, Pnt);
   end;
 end;
 

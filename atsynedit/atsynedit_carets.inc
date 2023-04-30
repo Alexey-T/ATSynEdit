@@ -61,7 +61,8 @@ end;
 
 procedure TATSynEdit.DoCaretsColumnToPoint(AX, AY: integer);
 var
-  PCaret, PCoord1, PCoord2: TPoint;
+  PCaret: TPoint;
+  PCoord1, PCoord2: TATPoint;
   Details: TATEditorPosDetails;
 begin
   //needed to Undo multi-carets to last multi-caret state, before single caret appears
@@ -129,7 +130,8 @@ b) UpdateCaretsCoords is called from DoPaintAll. it is not related to DoCommand/
 var
   St: TATStrings;
   Caret: TATCaretItem;
-  PntCaret, PntCoord: TPoint;
+  PntCaret: TPoint;
+  PntCoord: TATPoint;
   NCaretCount, NStart: integer;
   //NLineTop, NLineBottom: integer;
   iCaret: integer;
@@ -210,7 +212,8 @@ end;
 procedure TATSynEdit.UpdateMarkersCoords;
 var
   Marker: PATMarkerItem;
-  PntCaret, PntCoord: TPoint;
+  PntCaret: TPoint;
+  PntCoord: TATPoint;
   NLineTop, NLineBottom: integer;
   i: integer;
 begin
@@ -259,7 +262,7 @@ function _DoCaretPosToClientPos(
   ATabHelper: TATStringTabHelper;
   const ARect: TRect;
   const AScrollHorz, AScrollVert: TATEditorScrollInfo;
-  APreferLeftSide: boolean): TPoint;
+  APreferLeftSide: boolean): TATPoint;
 var
   Item: TATWrapItem;
   StringItem: PATStringItem;
@@ -369,7 +372,7 @@ end;
 
 
 function _DoClientPosToCaretPos(
-  P: TPoint;
+  P: TATPoint;
   AWrapInfo: TATWrapInfo;
   AStrings: TATStrings;
   AGaps: TATGaps;
@@ -540,7 +543,7 @@ begin
     ADetails.EndOfWrappedLine:= false;
 end;
 
-function TATSynEdit.CaretPosToClientPos(P: TPoint): TPoint;
+function TATSynEdit.CaretPosToClientPos(const P: TPoint): TATPoint;
 begin
   Result:= _DoCaretPosToClientPos(P,
     FWrapInfo,
@@ -563,7 +566,7 @@ begin
   }
 end;
 
-function TATSynEdit.ClientPosToCaretPos(P: TPoint;
+function TATSynEdit.ClientPosToCaretPos(P: TATPoint;
   out ADetails: TATEditorPosDetails;
   AGapCoordAction: TATEditorGapCoordAction = cGapCoordToLineEnd): TPoint;
 begin
@@ -758,7 +761,7 @@ end;
 function TATSynEdit.DoShowPos(const APos: TPoint; AIndentHorz, AIndentVert: integer;
   AUnfold, AllowUpdate, AllowProximity: boolean): boolean;
 var
-  Coord: TPoint;
+  Coord: TATPoint;
   NProximityVert, NProximityHorz: integer;
 begin
   Result:= false;
@@ -1256,7 +1259,8 @@ const
   cPixelsIndent = 2;
 var
   Caret: TATCaretItem;
-  Pnt: TPoint;
+  PntText: TPoint;
+  PntCoord: TATPoint;
   Details: TATEditorPosDetails;
   NProximity, NRectTop, NRectBottom, NRectLeft, NRectRight: integer;
   iCaret: integer;
@@ -1283,10 +1287,10 @@ begin
         begin
           if (Caret.CoordY>=NRectBottom-2*FCharSize.Y-cPixelsIndent) then
           begin
-            Pnt:= Point(Caret.CoordX, NRectBottom-FCharSize.Y);
-            Pnt:= ClientPosToCaretPos(Pnt, Details);
-            Caret.PosX:= Pnt.X;
-            Caret.PosY:= Pnt.Y;
+            PntCoord:= ATPoint(Caret.CoordX, NRectBottom-FCharSize.Y);
+            PntText:= ClientPosToCaretPos(PntCoord, Details);
+            Caret.PosX:= PntText.X;
+            Caret.PosY:= PntText.Y;
             Result:= true;
           end;
         end;
@@ -1294,10 +1298,10 @@ begin
         begin
           if (Caret.CoordY<=NRectTop+cPixelsIndent) then
           begin
-            Pnt:= Point(Caret.CoordX, NRectTop);
-            Pnt:= ClientPosToCaretPos(Pnt, Details);
-            Caret.PosX:= Pnt.X;
-            Caret.PosY:= Pnt.Y;
+            PntCoord:= ATPoint(Caret.CoordX, NRectTop);
+            PntText:= ClientPosToCaretPos(PntCoord, Details);
+            Caret.PosX:= PntText.X;
+            Caret.PosY:= PntText.Y;
             Result:= true;
           end;
         end;
@@ -1305,10 +1309,10 @@ begin
         begin
           if (Caret.CoordX>=NRectRight - 2*FCharSize.XScaled div ATEditorCharXScale - cPixelsIndent) then
           begin
-            Pnt:= Point(NRectRight - 3*FCharSize.XScaled div ATEditorCharXScale, Caret.CoordY);
-            Pnt:= ClientPosToCaretPos(Pnt, Details);
-            Caret.PosX:= Pnt.X;
-            Caret.PosY:= Pnt.Y;
+            PntCoord:= ATPoint(NRectRight - 3*FCharSize.XScaled div ATEditorCharXScale, Caret.CoordY);
+            PntText:= ClientPosToCaretPos(PntCoord, Details);
+            Caret.PosX:= PntText.X;
+            Caret.PosY:= PntText.Y;
             Result:= true;
           end;
         end;
@@ -1316,10 +1320,10 @@ begin
         begin
           if (Caret.CoordX<=NRectLeft+cPixelsIndent) then
           begin
-            Pnt:= Point(NRectLeft, Caret.CoordY);
-            Pnt:= ClientPosToCaretPos(Pnt, Details);
-            Caret.PosX:= Pnt.X;
-            Caret.PosY:= Pnt.Y;
+            PntCoord:= ATPoint(NRectLeft, Caret.CoordY);
+            PntText:= ClientPosToCaretPos(PntCoord, Details);
+            Caret.PosX:= PntText.X;
+            Caret.PosY:= PntText.Y;
             Result:= true;
           end;
         end;

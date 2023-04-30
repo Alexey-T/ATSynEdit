@@ -480,7 +480,7 @@ end;
 
 procedure TATSynEdit.DoSelect_ColumnBlock_Primitive(P1, P2: TPoint);
 var
-  Coord1, Coord2: TPoint;
+  Coord1, Coord2: TATPoint;
   LineCoord1, LineCoord2: TPoint;
   Details: TATEditorPosDetails;
   Y, YMin, YMax: integer;
@@ -495,8 +495,8 @@ begin
 
   Y:= YMin+1;
   repeat
-    LineCoord1:= ClientPosToCaretPos(Point(Coord1.X, Y), Details);
-    LineCoord2:= ClientPosToCaretPos(Point(Coord2.X, Y), Details);
+    LineCoord1:= ClientPosToCaretPos(ATPoint(Coord1.X, Y), Details);
+    LineCoord2:= ClientPosToCaretPos(ATPoint(Coord2.X, Y), Details);
     if (LineCoord1.Y>=0) and (LineCoord2.Y>=0) then
       Carets.Add(LineCoord2.X, LineCoord2.Y, LineCoord1.X, LineCoord1.Y);
     Inc(Y, FCharSize.Y);

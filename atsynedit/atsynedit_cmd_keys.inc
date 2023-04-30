@@ -3,7 +3,8 @@
 function TATSynEdit.DoCommand_KeyHome: TATCommandResults;
 var
   Caret: TATCaretItem;
-  Pnt: TPoint;
+  PntText: TPoint;
+  PntCoord: TATPoint;
   Details: TATEditorPosDetails;
   NLine, NIndent, NWrapped, i: integer;
   IndentKind: TATLineIndentKind;
@@ -26,10 +27,10 @@ begin
 
     if FOptKeyHomeEndNavigateWrapped and (FWrapMode<>cWrapOff) then
     begin
-      Pnt.X:= 0;
-      Pnt.Y:= Caret.CoordY;
-      Pnt:= ClientPosToCaretPos(Pnt, Details);
-      NWrapped:= Pnt.X;
+      PntCoord.X:= 0;
+      PntCoord.Y:= Caret.CoordY;
+      PntText:= ClientPosToCaretPos(PntCoord, Details);
+      NWrapped:= PntText.X;
     end;
 
     if FOptKeyHomeToNonSpace then
@@ -60,7 +61,8 @@ function TATSynEdit.DoCommand_KeyEnd: TATCommandResults;
 var
   St: TATStrings;
   Caret: TATCaretItem;
-  Pnt: TPoint;
+  PntText: TPoint;
+  PntCoord: TATPoint;
   NLine, NLenTotal, NLen, NWrapped, i: integer;
   Details: TATEditorPosDetails;
 begin
@@ -85,11 +87,11 @@ begin
 
     if FOptKeyHomeEndNavigateWrapped and (FWrapMode<>cWrapOff) then
     begin
-      Pnt.X:= ClientWidth;
-      Pnt.Y:= Caret.CoordY;
-      Pnt:= ClientPosToCaretPos(Pnt, Details);
-      if Pnt.X<NLenTotal then
-        NWrapped:= Pnt.X-1;
+      PntCoord.X:= ClientWidth;
+      PntCoord.Y:= Caret.CoordY;
+      PntText:= ClientPosToCaretPos(PntCoord, Details);
+      if PntText.X<NLenTotal then
+        NWrapped:= PntText.X-1;
         //-1 here: need to jump not to last chr but to last-1 chr
         //(like Synwrite; to not blink caret at next part of wrapped line)
     end;
@@ -266,7 +268,8 @@ function TATSynEdit.DoCommand_KeyUpDown_Wrapped(ADown: boolean; ALines: integer)
 var
   St: TATStrings;
   Caret: TATCaretItem;
-  PosText, PosCoord, PosCoord2: TPoint;
+  PosText: TPoint;
+  PosCoord, PosCoord2: TATPoint;
   Details: TATEditorPosDetails;
   NWrapIndex, iCaret: integer;
 const
@@ -534,7 +537,8 @@ var
   Details: TATEditorPosDetails;
   Caret: TATCaretItem;
   R: TRect;
-  P: TPoint;
+  PntText: TPoint;
+  PntCoord: TATPoint;
   NCaretX: integer;
 begin
   Result:= [];
@@ -551,31 +555,31 @@ begin
 
   case ASide of
     cScreenSideTop:
-      P:= Point(NCaretX, R.Top);
+      PntCoord:= ATPoint(NCaretX, R.Top);
     cScreenSideBottom:
-      P:= Point(NCaretX, R.Bottom);
+      PntCoord:= ATPoint(NCaretX, R.Bottom);
     cScreenSideMiddle:
-      P:= Point(NCaretX, (R.Top+R.Bottom) div 2);
+      PntCoord:= ATPoint(NCaretX, (R.Top+R.Bottom) div 2);
   end;
 
-  P:= ClientPosToCaretPos(P, Details);
-  if P.Y<0 then exit;
+  PntText:= ClientPosToCaretPos(PntCoord, Details);
+  if PntText.Y<0 then exit;
 
   case ASide of
     cScreenSideTop:
       begin
         if FOptScrollSmooth then
-          if P.Y>0 then
-            Inc(P.Y); //smooth scrolling gives partially visible 1st line
+          if PntText.Y>0 then
+            Inc(PntText.Y); //smooth scrolling gives partially visible 1st line
       end;
     cScreenSideBottom:
       begin
-        if P.Y<Strings.Count-1 then
-          Dec(P.Y);
+        if PntText.Y<Strings.Count-1 then
+          Dec(PntText.Y);
       end;
   end;
 
-  DoCaretSingle(P.X, P.Y);
+  DoCaretSingle(PntText.X, PntText.Y);
   Result:= [cResultCaretTop];
 end;
 

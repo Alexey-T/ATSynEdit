@@ -365,6 +365,7 @@ end;
 procedure TATSynEdit.DoMenuGutterFold_AddDynamicItems(Menu: TPopupMenu);
 var
   Pnt: TPoint;
+  PntCoord: TATPoint;
   NLine: integer;
   IntList: TATIntArray;
   Details: TATEditorPosDetails;
@@ -374,7 +375,9 @@ var
 begin
   //calc ranges for curr line
   Pnt:= ScreenToClient(Mouse.CursorPos);
-  Pnt:= ClientPosToCaretPos(Pnt, Details);
+  PntCoord.X:= Pnt.X;
+  PntCoord.Y:= Pnt.Y;
+  Pnt:= ClientPosToCaretPos(PntCoord, Details);
   NLine:= Pnt.Y;
   if NLine<0 then Exit;
 
