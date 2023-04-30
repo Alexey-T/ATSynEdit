@@ -9448,14 +9448,12 @@ begin
 end;
 
 procedure TATSynEdit.OnNewScrollbarHorzChanged(Sender: TObject);
-var
-  Msg: TLMHScroll;
+//don't call WMHScroll with SB_THUMBPOSITION, because it is limited by LongInt,
+//and we need to support big Int64 values
 begin
   if FScrollbarLock then exit;
-  FillChar({%H-}Msg, SizeOf(Msg), 0);
-  Msg.ScrollCode:= SB_THUMBPOSITION;
-  Msg.Pos:= FScrollbarHorz.Position; //TODO: handle big Int64 numbers of Position!
-  WMHScroll(Msg);
+  UpdateScrollInfoFromSmoothPos(FScrollHorz, FScrollbarHorz.Position);
+  InvalidateEx(true, true);
 end;
 
 procedure TATSynEdit.TimerIdleTick(Sender: TObject);
