@@ -419,7 +419,7 @@ type
     cCharEnding13
     );
 
-function _GetBufferEnding(ABuffer: pointer; APos: integer; AEnc: TATFileEncoding): TATCharEnding; inline;
+function _GetBufferEnding(ABuffer: pointer; APos: SizeInt; AEnc: TATFileEncoding): TATCharEnding; inline;
 var
   p: PByte absolute ABuffer;
   Check: byte;
@@ -472,8 +472,8 @@ var
   NSignatureLen: integer;
   NStreamSize: Int64;
   //------
-  procedure _FindNextEol(AFromPos: integer;
-    out AFoundPos: integer;
+  procedure _FindNextEol(AFromPos: SizeInt;
+    out AFoundPos: SizeInt;
     out AEnding: TATLineEnds);
   begin
     AFoundPos:= AFromPos;
@@ -513,8 +513,8 @@ var
   //------
   procedure _LoadItems;
   var
-    Len, NStart, NEnd: integer;
-    //NPrevProgressPos: integer;
+    Len, NStart, NEnd: SizeInt;
+    //NPrevProgressPos: SizeInt;
     LineEnd: TATLineEnds;
     SA, SUtf8: string;
     SWide: UnicodeString;
@@ -529,6 +529,8 @@ var
     repeat
       _FindNextEol(NStart, NEnd, LineEnd);
       Len:= NEnd-NStart;
+      if Len>=MaxInt-4 then
+        raise Exception.Create('Too long line in file');
 
       {
       //call OnProgress each 1M chars
@@ -611,7 +613,7 @@ begin
     Clear(false{AWithEvent});
 
   bWithBom:= false;
-  NStreamSize:= Min(Stream.Size, MaxInt-6); //support >MaxInt sized files
+  NStreamSize:= Stream.Size;
   NSignatureLen:= 0;
 
   if cLoadOpFromUTF8 in AOptions then

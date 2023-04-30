@@ -210,7 +210,7 @@ type
     FUndoAfterSave: boolean;
     FUndoGroupCounter: integer;
     FOneLine: boolean;
-    FProgressValue: integer;
+    FProgressValue: SizeInt;
     FProgressKind: TATStringsProgressKind;
     FOnGetCaretsArray: TATStringsGetCarets;
     FOnGetMarkersArray: TATStringsGetMarkers;
@@ -356,7 +356,7 @@ type
     property ModifiedRecent: boolean read FModifiedRecent write FModifiedRecent;
     property ModifiedVersion: Int64 read FModifiedVersion;
     property OneLine: boolean read FOneLine write FOneLine;
-    property ProgressValue: integer read FProgressValue write FProgressValue;
+    property ProgressValue: SizeInt read FProgressValue write FProgressValue;
     property ProgressKind: TATStringsProgressKind read FProgressKind write FProgressKind;
     property ChangeBlockActive: boolean read FChangeBlockActive write FChangeBlockActive;
     property EnabledBookmarksUpdate: boolean read FEnabledBookmarksUpdate write FEnabledBookmarksUpdate;
