@@ -1203,9 +1203,9 @@ type
       AWrapIndex: integer);
     procedure DoPaintNiceScroll(C: TCanvas);
     procedure DoPaintGutterNumber(C: TCanvas; ALineIndex, ACoordTop: integer; ABand: TATGutterItem);
-    procedure DoPaintMarginLineTo(C: TCanvas; AX, AWidth: integer; AColor: TColor);
+    procedure DoPaintMarginLineTo(C: TCanvas; AX: Int64; AWidth: integer; AColor: TColor);
     procedure DoPaintRuler(C: TCanvas);
-    procedure DoPaintRulerCaretMark(C: TCanvas; ACaretX: integer);
+    procedure DoPaintRulerCaretMark(C: TCanvas; ACaretX: Int64);
     procedure DoPaintRulerCaretMarks(C: TCanvas);
     procedure DoPaintTiming(C: TCanvas);
     procedure DoPaintText(C: TCanvas;
@@ -2242,7 +2242,7 @@ begin
 end;
 
 
-procedure TATSynEdit.DoPaintRulerCaretMark(C: TCanvas; ACaretX: integer);
+procedure TATSynEdit.DoPaintRulerCaretMark(C: TCanvas; ACaretX: Int64);
 begin
   if (ACaretX>=FRectRuler.Left) and (ACaretX<FRectRuler.Right) then
     CanvasPaintTriangleDown(C,
@@ -4543,7 +4543,7 @@ begin
     FOnDrawGap(Self, C, ARect, AGap);
 end;
 
-procedure TATSynEdit.DoPaintMarginLineTo(C: TCanvas; AX, AWidth: integer; AColor: TColor);
+procedure TATSynEdit.DoPaintMarginLineTo(C: TCanvas; AX: Int64; AWidth: integer; AColor: TColor);
 begin
   if (AX>=FRectMain.Left) and (AX<FRectMain.Right) then
   begin
