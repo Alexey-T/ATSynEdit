@@ -49,7 +49,7 @@ type
     EndX, EndY: integer; //end of selection, or (-1,-1) if no selection
     CoordX, CoordY: Int64; //screen coords
     OldRect: TRect; //screen rect, but before running the last command
-    SavedX, SavedX_Pre: integer; //memory of last column, to use with arrows Up/Down
+    SavedX, SavedX_Pre: Int64; //memory of last column, to use with arrows Up/Down
     BeforeExtendX: integer; //memory for commands "carets extend: up/down/..."
     CharStr: UnicodeString; //str is rendered above the inverted-rect, if ATEditorOptions.CaretTextOverInvertedRect
     CharColor: TColor;
@@ -532,11 +532,11 @@ end;
 
 function TATCaretItem.IsInVisibleRect(const R: TRect): boolean;
 var
-  Pnt: TPoint;
+  PntCoord: TATPoint;
 begin
-  Pnt.X:= CoordX;
-  Pnt.Y:= CoordY;
-  Result:= PtInRect(R, Pnt);
+  PntCoord.X:= CoordX;
+  PntCoord.Y:= CoordY;
+  Result:= ATPointInRect(R, PntCoord);
 end;
 
 function TATCaretItem.FirstTouchedLine: integer;

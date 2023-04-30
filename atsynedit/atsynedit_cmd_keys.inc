@@ -539,7 +539,7 @@ var
   R: TRect;
   PntText: TPoint;
   PntCoord: TATPoint;
-  NCaretX: integer;
+  NCaretX: Int64;
 begin
   Result:= [];
 

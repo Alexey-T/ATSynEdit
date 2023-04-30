@@ -7481,7 +7481,7 @@ end;
 procedure TATSynEdit.DoPaintCaretShape(C: TCanvas; ARect: TRect;
   ACaret: TATCaretItem; ACaretShape: TATCaretShape);
 var
-  NCoordX, NCoordY: integer;
+  NCoordX, NCoordY: Int64;
 begin
   if not FCaretBlinkEnabled and ACaretShape.IsNarrow then
   begin
@@ -7554,16 +7554,17 @@ begin
   begin
     Caret:= FCarets[iCaret];
     if Caret.CoordX=-1 then Continue;
+
+    //check caret is visible (IntersectRect is slower)
+    if Caret.CoordX>=FRectMain.Right then Continue;
+    if Caret.CoordY>=FRectMain.Bottom then Continue;
+    if Caret.CoordX+NCharWidth<=FRectMain.Left then Continue;
+    if Caret.CoordY+FCharSize.Y<=FRectMain.Top then Continue;
+
     R.Left:= Caret.CoordX;
     R.Top:= Caret.CoordY;
     R.Right:= R.Left+NCharWidth;
     R.Bottom:= R.Top+FCharSize.Y;
-
-    //check caret is visible (IntersectRect is slower)
-    if R.Right<=FRectMain.Left then Continue;
-    if R.Bottom<=FRectMain.Top then Continue;
-    if R.Left>=FRectMain.Right then Continue;
-    if R.Top>=FRectMain.Bottom then Continue;
 
     if FMinimapTooltipVisible and FMinimapTooltipEnabled and (FRectMinimapTooltip.Width>0) then
       if (R.Left>=FRectMinimapTooltip.Left) and
