@@ -531,6 +531,8 @@ var
       Len:= NEnd-NStart;
       if Len>=MaxInt-12 then
         raise EEditorTooLongLine.Create('Too long line in file: 0x'+IntToHex(Len));
+      if Count>=MaxInt-2 then
+        raise EEditorTooManyLines.Create('Too many lines');
 
       {
       //call OnProgress each 1M chars

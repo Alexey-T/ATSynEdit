@@ -30,6 +30,7 @@ type
 
 type
   EEditorTooLongLine = class(Exception);
+  EEditorTooManyLines = class(Exception);
 
 type
   TATLineIndentKind = (
