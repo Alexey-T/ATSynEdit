@@ -47,7 +47,7 @@ type
   public
     PosX, PosY, //caret text position
     EndX, EndY: integer; //end of selection, or (-1,-1) if no selection
-    CoordX, CoordY: integer; //screen coords
+    CoordX, CoordY: Int64; //screen coords
     OldRect: TRect; //screen rect, but before running the last command
     SavedX, SavedX_Pre: integer; //memory of last column, to use with arrows Up/Down
     BeforeExtendX: integer; //memory for commands "carets extend: up/down/..."
