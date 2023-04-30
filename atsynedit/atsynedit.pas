@@ -1067,10 +1067,10 @@ type
     procedure DoCalcLineEntireColor(ALine: integer; AUseColorOfCurrentLine: boolean; out AColor: TColor; out
       AColorForced: boolean; AHiliteLineWithSelection: boolean);
     procedure DoCaretsApplyShape(var R: TRect; Props: TATCaretShape; W, H: integer);
-    function DoCaretApplyProximityToVertEdge(ACaretPos: TPoint;
-      ACaretCoordY: integer; AProximity, AIndentVert: integer): boolean;
-    function DoCaretApplyProximityToHorzEdge(ACaretCoordX, AProximity,
-      AIndentHorz: integer): boolean;
+    function DoCaretApplyProximityToVertEdge(ACaretPos: TPoint; ACaretCoordY: Int64;
+      AProximity, AIndentVert: integer): boolean;
+    function DoCaretApplyProximityToHorzEdge(ACaretCoordX: Int64;
+      AProximity, AIndentHorz: integer): boolean;
     procedure DoCaretsAddOnColumnBlock(APos1, APos2: TPoint; const ARect: TRect);
     procedure DoCaretsFixForSurrogatePairs(AMoveRight: boolean);
     function DoCaretsKeepOnScreen(ADirection: TATEditorDirection): boolean;

@@ -703,7 +703,7 @@ begin
   end;
 end;
 
-function TATSynEdit.DoCaretApplyProximityToVertEdge(ACaretPos: TPoint; ACaretCoordY: integer;
+function TATSynEdit.DoCaretApplyProximityToVertEdge(ACaretPos: TPoint; ACaretCoordY: Int64;
   AProximity, AIndentVert: integer): boolean;
 //  vert indent <0: always indent from top;
 //             >=0: indent from top (goto up) or bottom (goto down)
@@ -731,7 +731,7 @@ begin
   end;
 end;
 
-function TATSynEdit.DoCaretApplyProximityToHorzEdge(ACaretCoordX, AProximity, AIndentHorz: integer): boolean;
+function TATSynEdit.DoCaretApplyProximityToHorzEdge(ACaretCoordX: Int64; AProximity, AIndentHorz: integer): boolean;
 var
   NChars: Int64;
 begin
