@@ -5286,28 +5286,28 @@ begin
     FFileName:= AFileName;
   finally
     EndUpdate;
+
+    IsReadOnlyChanged:= false;
+    IsReadOnlyAutodetected:= false;
+    InitialOptions:= Default(TATEditorTempOptions);
+    IsModifiedWrapMode:= false;
+    IsModifiedMinimapVisible:= false;
+    IsModifiedMicromapVisible:= false;
+    IsModifiedRulerVisible:= false;
+    IsModifiedGutterNumbersVisible:= false;
+    IsModifiedGutterFoldingVisible:= false;
+    IsModifiedGutterBookmarksVisible:= false;
+    IsModifiedUnprintedVisible:= false;
+    IsModifiedUnprintedSpaces:= false;
+    IsModifiedUnprintedTrailingOnly:= false;
+    IsModifiedUnprintedEnds:= false;
+    IsModifiedUnprintedEndDetails:= false;
+    FLastHotspot:= -1;
+    FLastCaretY:= -1;
+
+    Update;
+    TimerBlinkEnable;
   end;
-
-  IsReadOnlyChanged:= false;
-  IsReadOnlyAutodetected:= false;
-  InitialOptions:= Default(TATEditorTempOptions);
-  IsModifiedWrapMode:= false;
-  IsModifiedMinimapVisible:= false;
-  IsModifiedMicromapVisible:= false;
-  IsModifiedRulerVisible:= false;
-  IsModifiedGutterNumbersVisible:= false;
-  IsModifiedGutterFoldingVisible:= false;
-  IsModifiedGutterBookmarksVisible:= false;
-  IsModifiedUnprintedVisible:= false;
-  IsModifiedUnprintedSpaces:= false;
-  IsModifiedUnprintedTrailingOnly:= false;
-  IsModifiedUnprintedEnds:= false;
-  IsModifiedUnprintedEndDetails:= false;
-  FLastHotspot:= -1;
-  FLastCaretY:= -1;
-
-  Update;
-  TimerBlinkEnable;
 
   DoEventChange(0, false{AllowOnChange}); //calling OnChange makes almost no sense on opening file
 end;
