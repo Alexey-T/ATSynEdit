@@ -6,6 +6,9 @@ unit ATStringProc_UTF8Decode;
 
 interface
 
+uses
+  SysUtils;
+
 procedure CustomUTF8Decode(const s: RawByteString; out Res: UnicodeString; out Error: boolean);
 function CustomUTF8ToUnicode(Dest: PUnicodeChar;
   MaxDestChars: SizeUInt;
@@ -14,16 +17,14 @@ function CustomUTF8ToUnicode(Dest: PUnicodeChar;
   AllowBadCharsOfLen1: boolean): SizeUInt;
 procedure RaiseUTF8TextError;
 
-implementation
-
-uses SysUtils;
-
 type
-  EBadUTF8Text = class(Exception);
+  EEditorBadUTF8 = class(Exception);
+
+implementation
 
 procedure RaiseUTF8TextError;
 begin
-  raise EBadUTF8Text.Create('UTF-8 decode error');
+  raise EEditorBadUTF8.Create('UTF-8 decode error');
 end;
 
 function CustomUTF8ToUnicode(Dest: PUnicodeChar;

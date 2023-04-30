@@ -529,8 +529,8 @@ var
     repeat
       _FindNextEol(NStart, NEnd, LineEnd);
       Len:= NEnd-NStart;
-      if Len>=MaxInt-4 then
-        raise Exception.Create('Too long line in file');
+      if Len>=MaxInt-12 then
+        raise EEditorTooLongLine.Create('Too long line in file');
 
       {
       //call OnProgress each 1M chars
@@ -683,12 +683,20 @@ begin
     try
       _LoadItems;
     except
-      //failed to load text as UTF8, so load again as ANSI
-      Clear; //clear loaded items
-      AForcedToANSI:= true;
-      FEncoding:= cEncAnsi;
-      CharSize:= 1;
-      _LoadItems;
+      on E: EEditorBadUTF8 do
+      begin
+        Clear;
+        //failed to load text as UTF8, so load again as ANSI
+        AForcedToANSI:= true;
+        FEncoding:= cEncAnsi;
+        CharSize:= 1;
+        _LoadItems;
+      end;
+      on E: EEditorTooLongLine do
+      begin
+        Clear;
+        raise;
+      end;
     end;
   finally
     FreeMem(Buf);

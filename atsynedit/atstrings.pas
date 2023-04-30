@@ -29,6 +29,9 @@ type
   TATIntegerList = specialize TFPGList<integer>;
 
 type
+  EEditorTooLongLine = class(Exception);
+
+type
   TATLineIndentKind = (
     cLineIndentOther,
     cLineIndentSpaces,
