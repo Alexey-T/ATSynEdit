@@ -254,7 +254,7 @@ end;
 procedure DetectStreamEncoding(Stream: TStream;
   var Enc: TATFileEncoding;
   var EncCodepage: TEncConvId;
-  out SignLen: integer;
+  out SignLen: SizeInt;
   out EncWithBom: boolean;
   BufSizeUTF8: integer;
   BufSizeUTF16: integer;
@@ -467,10 +467,10 @@ procedure TATStrings.DoLoadFromStream(Stream: TStream;
   AOptions: TATLoadStreamOptions; out AForcedToANSI: boolean);
 var
   Buf: PAnsiChar;
-  BufSize: int64;
-  CharSize: integer;
-  NSignatureLen: integer;
+  BufSize: Int64;
   NStreamSize: Int64;
+  CharSize: SizeInt;
+  NSignatureLen: SizeInt;
   //------
   procedure _FindNextEol(AFromPos: SizeInt;
     out AFoundPos: SizeInt;
