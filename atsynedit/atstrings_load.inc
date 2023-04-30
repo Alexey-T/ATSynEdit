@@ -698,8 +698,11 @@ end;
 procedure TATStrings.LoadFromStream(Stream: TStream; AOptions: TATLoadStreamOptions);
 begin
   ClearUndo(true);
-  DoLoadFromStream(Stream, AOptions, FLoadingForcedANSI);
-  DoFinalizeLoading;
+  try
+    DoLoadFromStream(Stream, AOptions, FLoadingForcedANSI);
+  finally
+    DoFinalizeLoading;
+  end;
 end;
 
 
