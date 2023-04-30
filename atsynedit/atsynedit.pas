@@ -9454,7 +9454,7 @@ begin
   if FScrollbarLock then exit;
   FillChar({%H-}Msg, SizeOf(Msg), 0);
   Msg.ScrollCode:= SB_THUMBPOSITION;
-  Msg.Pos:= FScrollbarHorz.Position;
+  Msg.Pos:= FScrollbarHorz.Position; //TODO: handle big Int64 numbers of Position!
   WMHScroll(Msg);
 end;
 
