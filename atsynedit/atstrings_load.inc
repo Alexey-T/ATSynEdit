@@ -611,7 +611,7 @@ begin
     Clear(false{AWithEvent});
 
   bWithBom:= false;
-  NStreamSize:= Stream.Size;
+  NStreamSize:= Min(Stream.Size, MaxInt-6); //support >MaxInt sized files
   NSignatureLen:= 0;
 
   if cLoadOpFromUTF8 in AOptions then
