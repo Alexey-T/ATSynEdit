@@ -182,7 +182,9 @@ type
     function CalcCharOffsetLast(ALineIndex: integer; const S: atString; ACharsSkipped: integer = 0): Int64;
     function FindWordWrapOffset(ALineIndex: integer; const S: atString; AColumns: Int64;
       const ANonWordChars: atString; AWrapIndented: boolean): integer;
-    function FindClickedPosition(ALineIndex: integer; const Str: atString;
+    function FindClickedPosition(ALineIndex: integer;
+      const Str: atString;
+      const StrLen: SizeInt;
       constref ListOffsets: TATIntFixedArray;
       APixelsFromLeft: Int64;
       AAllowVirtualPos: boolean;
@@ -808,7 +810,9 @@ begin
 end;
 
 
-function TATStringTabHelper.FindClickedPosition(ALineIndex: integer; const Str: atString;
+function TATStringTabHelper.FindClickedPosition(ALineIndex: integer;
+  const Str: atString;
+  const StrLen: SizeInt;
   constref ListOffsets: TATIntFixedArray;
   APixelsFromLeft: Int64;
   AAllowVirtualPos: boolean;
@@ -864,7 +868,7 @@ begin
   //Result:= ListEnds.Len + (APixelsFromLeft - ListEnds.Data[ListEnds.Len-1] - ACharSize div 2) div ACharSize + 2;
 
   if not AAllowVirtualPos then
-    Result:= Min(Result, Length(Str)+1);
+    Result:= Min(Result, StrLen+1);
 end;
 
 procedure TATStringTabHelper.FindOutputSkipOffset(ALineIndex: integer;

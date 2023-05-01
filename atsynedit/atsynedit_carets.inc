@@ -392,6 +392,7 @@ var
   Item: TATWrapItem;
   ItemGap: TATGapItem;
   Str: atString;
+  StrLen: SizeInt;
   AllowVirtual, bGapGoesToEnd: boolean;
 begin
   Result.X:= 0;
@@ -507,16 +508,18 @@ begin
     Str:= StringOfCharW(ATEditorOptions.SampleChar, Min(NLineLenOriginal, cMaxFixedArray));
 
     ATabHelper.CalcCharOffsets(Item.NLineIndex, Str, CharOffsets, 0);
-    Str:= AStrings.LineSub(Item.NLineIndex, Item.NCharIndex, NLineLenTrimmed);
+    Str:= AStrings.LineSub(Item.NLineIndex, Item.NCharIndex, Min(NLineLenTrimmed, cMaxFixedArray));
+    StrLen:= AStrings.LineSubLen(Item.NLineIndex, Item.NCharIndex, NLineLenTrimmed);
   end
   else
   begin
     Str:= AStrings.LineSub(Item.NLineIndex, Item.NCharIndex, NLineLenTrimmed);
+    StrLen:= Length(Str);
     ATabHelper.CalcCharOffsets(Item.NLineIndex, Str, CharOffsets, 0);
   end;
 
   if bGapGoesToEnd then
-    Result.X:= Length(Str) + Item.NCharIndex-1
+    Result.X:= StrLen + Item.NCharIndex-1
   else
   begin
     AllowVirtual:= AVirtualPos and (Item.NFinal=cWrapItemFinal);
@@ -524,6 +527,7 @@ begin
     Result.X:= ATabHelper.FindClickedPosition(
       Result.Y,
       Str,
+      StrLen,
       CharOffsets,
       NPixels,
       AllowVirtual,
