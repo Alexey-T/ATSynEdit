@@ -1093,7 +1093,7 @@ type
     procedure DoMinimapDrag(APosY: integer);
     procedure DoStringsOnChangeEx(Sender: TObject; AChange: TATLineChangeKind; ALine, AItemCount: SizeInt);
     procedure DoStringsOnChangeLog(Sender: TObject; ALine: SizeInt);
-    procedure DoStringsOnProgress(Sender: TObject);
+    procedure DoStringsOnProgress(Sender: TObject; var ACancel: boolean);
     procedure DoStringsOnUndoAfter(Sender: TObject; AX, AY: SizeInt);
     procedure DoStringsOnUndoBefore(Sender: TObject; AX, AY: SizeInt);
     procedure DoScroll_SetPos(var AScrollInfo: TATEditorScrollInfo; APos: integer);
@@ -9553,7 +9553,7 @@ begin
   inherited Invalidate;
 end;
 
-procedure TATSynEdit.DoStringsOnProgress(Sender: TObject);
+procedure TATSynEdit.DoStringsOnProgress(Sender: TObject; var ACancel: boolean);
 begin
   Invalidate;
   Application.ProcessMessages;

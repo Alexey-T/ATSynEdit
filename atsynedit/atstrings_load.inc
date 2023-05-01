@@ -475,6 +475,8 @@ var
   procedure _FindNextEol(AFromPos: SizeInt;
     out AFoundPos: SizeInt;
     out AEnding: TATLineEnds);
+  var
+    bCancel: boolean;
   begin
     AFoundPos:= AFromPos;
     AEnding:= cEndNone;
@@ -485,7 +487,12 @@ var
       begin
         FProgressValue:= Int64(AFoundPos)*100 div NStreamSize;
         if Assigned(FOnProgress) then
-          FOnProgress(Self);
+        begin
+          bCancel:= false;
+          FOnProgress(Self, bCancel);
+          if bCancel then
+            raise EEditorUserStopped.Create('User stopped');
+        end;
       end;
 
       case _GetBufferEnding(Buf, AFoundPos, FEncoding) of

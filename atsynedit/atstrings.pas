@@ -30,6 +30,7 @@ type
 
 type
   EEditorTooLongLine = class(Exception);
+  EEditorUserStopped = class(Exception);
 
 type
   TATLineIndentKind = (
@@ -182,6 +183,7 @@ type
                                  AChange: TATBlockChangeKind; ABlock: TStringList) of object;
   TATStringsUndoEvent = procedure(Sender: TObject; AX, AY: SizeInt) of object;
   TATStringsUnfoldLineEvent = procedure(Sender: TObject; ALine: SizeInt) of object;
+  TATStringsProgressEvent = procedure(Sender: TObject; var ACancel: boolean) of object;
 
 type
   { TATStrings }
@@ -222,7 +224,7 @@ type
     FOnSetCaretsArray: TATStringsSetCarets;
     FOnSetMarkersArray: TATStringsSetMarkers;
     FOnSetAttribsArray: TATStringsSetAttribs;
-    FOnProgress: TNotifyEvent;
+    FOnProgress: TATStringsProgressEvent;
     FOnChangeLog: TATStringsChangeLogEvent;
     FOnChangeEx: TATStringsChangeExEvent;
     FOnUndoBefore: TATStringsUndoEvent;
@@ -452,7 +454,7 @@ type
       AChange: TATBlockChangeKind; ABlock: TStringList);
     property LastCommandChangedLines: integer read FLastCommandChangedLines write FLastCommandChangedLines;
     //events
-    property OnProgress: TNotifyEvent read FOnProgress write FOnProgress;
+    property OnProgress: TATStringsProgressEvent read FOnProgress write FOnProgress;
     property OnChangeLog: TATStringsChangeLogEvent read FOnChangeLog write FOnChangeLog;
     property OnChangeEx: TATStringsChangeExEvent read FOnChangeEx write FOnChangeEx;
     property OnChangeBlock: TATStringsChangeBlockEvent read FOnChangeBlock write FOnChangeBlock;

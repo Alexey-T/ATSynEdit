@@ -16,6 +16,7 @@ var
   SWide: UnicodeString;
   SQuad: UCS4String;
   NLast, i: integer;
+  bCancel: boolean;
 begin
   AStream.Size:= 0;
   AStream.Seek(0, soFromBeginning);
@@ -101,8 +102,9 @@ begin
     begin
       FProgressKind:= cStringsProgressSaving;
       FProgressValue:= Int64(i)*100 div Count;
+      bCancel:= false;
       if Assigned(FOnProgress) then
-        FOnProgress(Self);
+        FOnProgress(Self, bCancel);
     end;
   end;
 
