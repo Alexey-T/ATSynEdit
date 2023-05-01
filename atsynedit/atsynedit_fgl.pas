@@ -57,7 +57,7 @@ type
     function  InternalGet(Index: Integer): Pointer; {$ifdef FGLINLINE} inline; {$endif}
     procedure InternalPut(Index: Integer; NewItem: Pointer);
     procedure Put(Index: Integer; Item: Pointer);
-    procedure QuickSort(L, R: Integer; Compare: TFPSListCompareFunc);
+    procedure QuickSort(L, R: SizeInt; Compare: TFPSListCompareFunc);
     procedure SetCapacity(NewCapacity: Integer);
     procedure SetCount(NewCount: Integer);
     procedure RaiseIndexError(Index : Integer);
@@ -836,7 +836,7 @@ begin
   SortingAlgorithm^.ItemListSorter_ContextComparer(FList, FCount, FItemSize, @TFPSList_Sort_Comparer, @Context);
 end;
 
-procedure TFPSList.QuickSort(L, R: Integer; Compare: TFPSListCompareFunc);
+procedure TFPSList.QuickSort(L, R: SizeInt; Compare: TFPSListCompareFunc);
 var
   Context: TFPSList_Sort_Comparer_Context;
   SortingAlgorithm: PSortingAlgorithm;

@@ -1026,12 +1026,12 @@ type
     function DoCalcLineLen(ALineIndex: integer): integer;
     procedure DoChangeBookmarks;
     procedure DoHandleWheelRecord(const ARec: TATEditorWheelRecord);
-    procedure DoStringsOnUnfoldLine(Sender: TObject; ALine: integer);
+    procedure DoStringsOnUnfoldLine(Sender: TObject; ALine: SizeInt);
     function FindLineNextNonspaceBegin(const ALine: UnicodeString; AFromOffset: integer): integer;
     function FindLineNextNonspaceEnd(const ALine: UnicodeString; AFromOffset: integer): integer;
     procedure InitClipboardExData(out Data: TATEditorClipboardExData);
-    procedure FlushEditingChangeEx(AChange: TATLineChangeKind; ALine, AItemCount: integer);
-    procedure FlushEditingChangeLog(ALine: integer);
+    procedure FlushEditingChangeEx(AChange: TATLineChangeKind; ALine, AItemCount: SizeInt);
+    procedure FlushEditingChangeLog(ALine: SizeInt);
     function GetActualDragDropIsCopying: boolean;
     function GetIndentString: UnicodeString;
     function GetActualProximityVert: integer;
@@ -1091,11 +1091,11 @@ type
     procedure DoMenuText;
     procedure DoMinimapClick(APosY: integer);
     procedure DoMinimapDrag(APosY: integer);
-    procedure DoStringsOnChangeEx(Sender: TObject; AChange: TATLineChangeKind; ALine, AItemCount: integer);
-    procedure DoStringsOnChangeLog(Sender: TObject; ALine: integer);
+    procedure DoStringsOnChangeEx(Sender: TObject; AChange: TATLineChangeKind; ALine, AItemCount: SizeInt);
+    procedure DoStringsOnChangeLog(Sender: TObject; ALine: SizeInt);
     procedure DoStringsOnProgress(Sender: TObject);
-    procedure DoStringsOnUndoAfter(Sender: TObject; AX, AY: integer);
-    procedure DoStringsOnUndoBefore(Sender: TObject; AX, AY: integer);
+    procedure DoStringsOnUndoAfter(Sender: TObject; AX, AY: SizeInt);
+    procedure DoStringsOnUndoBefore(Sender: TObject; AX, AY: SizeInt);
     procedure DoScroll_SetPos(var AScrollInfo: TATEditorScrollInfo; APos: integer);
     procedure DoScroll_LineTop(ALine: integer; AUpdate: boolean);
     function DoScroll_IndentFromBottom(AWrapInfoIndex, AIndentVert: integer): boolean;
@@ -4829,7 +4829,7 @@ begin
   FStringsInt.OnChangeLog:= @DoStringsOnChangeLog;
   FStringsInt.OnUndoBefore:= @DoStringsOnUndoBefore;
   FStringsInt.OnUndoAfter:= @DoStringsOnUndoAfter;
-  FStringsInt.OnUnfoldLine:=@DoStringsOnUnfoldLine;
+  FStringsInt.OnUnfoldLine:= @DoStringsOnUnfoldLine;
 
   FFold:= TATSynRanges.Create;
   FFoldStyle:= cInitFoldStyle;
@@ -9486,7 +9486,7 @@ begin
     FAdapterHilite.OnEditorIdle(Self);
 end;
 
-procedure TATSynEdit.DoStringsOnChangeEx(Sender: TObject; AChange: TATLineChangeKind; ALine, AItemCount: integer);
+procedure TATSynEdit.DoStringsOnChangeEx(Sender: TObject; AChange: TATLineChangeKind; ALine, AItemCount: SizeInt);
 //we are called inside BeginEditing/EndEditing - just remember top edited line
 var
   St: TATStrings;
@@ -9498,7 +9498,7 @@ begin
     FlushEditingChangeEx(AChange, ALine, AItemCount);
 end;
 
-procedure TATSynEdit.DoStringsOnChangeLog(Sender: TObject; ALine: integer);
+procedure TATSynEdit.DoStringsOnChangeLog(Sender: TObject; ALine: SizeInt);
 var
   St: TATStrings;
 begin
@@ -9507,13 +9507,13 @@ begin
     FlushEditingChangeLog(ALine);
 end;
 
-procedure TATSynEdit.FlushEditingChangeEx(AChange: TATLineChangeKind; ALine, AItemCount: integer);
+procedure TATSynEdit.FlushEditingChangeEx(AChange: TATLineChangeKind; ALine, AItemCount: SizeInt);
 begin
   if Assigned(FAdapterHilite) then
     FAdapterHilite.OnEditorChangeEx(Self, AChange, ALine, AItemCount);
 end;
 
-procedure TATSynEdit.FlushEditingChangeLog(ALine: integer);
+procedure TATSynEdit.FlushEditingChangeLog(ALine: SizeInt);
 begin
   if Assigned(FOnChangeLog) then
     FOnChangeLog(Self, ALine);
@@ -10280,7 +10280,7 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoStringsOnUndoBefore(Sender: TObject; AX, AY: integer);
+procedure TATSynEdit.DoStringsOnUndoBefore(Sender: TObject; AX, AY: SizeInt);
 var
   OldOption: boolean;
   Tick: QWord;
@@ -10332,7 +10332,7 @@ begin
     OptShowCurLine:= OldOption;
 end;
 
-procedure TATSynEdit.DoStringsOnUndoAfter(Sender: TObject; AX, AY: integer);
+procedure TATSynEdit.DoStringsOnUndoAfter(Sender: TObject; AX, AY: SizeInt);
 var
   OldOption: boolean;
 begin
@@ -10357,7 +10357,7 @@ begin
     OptShowCurLine:= OldOption;
 end;
 
-procedure TATSynEdit.DoStringsOnUnfoldLine(Sender: TObject; ALine: integer);
+procedure TATSynEdit.DoStringsOnUnfoldLine(Sender: TObject; ALine: SizeInt);
 var
   N: integer;
 begin

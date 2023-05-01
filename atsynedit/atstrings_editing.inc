@@ -1,7 +1,7 @@
 {$ifdef none}begin end;{$endif}
 
 
-procedure TATStrings.TextReplace_OneLine(AY, AX1, AX2: integer; const AText: atString);
+procedure TATStrings.TextReplace_OneLine(AY, AX1, AX2: SizeInt; const AText: atString);
 //simple, made to speedup mass-replace in CudaText
 //(usually match replaced inside one line)
 //IsIndexValid must be in outer func
@@ -16,7 +16,7 @@ begin
   Lines[AY]:= Str;
 end;
 
-procedure TATStrings.TextReplace_OneLine_ReplaceOneEol(AY, AX1, AX2: integer; const ATextPart1,
+procedure TATStrings.TextReplace_OneLine_ReplaceOneEol(AY, AX1, AX2: SizeInt; const ATextPart1,
   ATextPart2: atString);
 {
 removes substr (AX1, AX2) from line AY, and splits the line to two parts.
@@ -43,11 +43,11 @@ begin
 end;
 
 
-procedure TATStrings.TextReplaceRange(AFromX, AFromY, AToX, AToY: integer;
+procedure TATStrings.TextReplaceRange(AFromX, AFromY, AToX, AToY: SizeInt;
   const AText: atString; out AShift, APosAfter: TPoint; AWithUndoGroup: boolean);
 var
   bOneLine, bOneEol: boolean;
-  NCountEol, N: integer;
+  NCountEol, N: SizeInt;
   SPart1, SPart2: atString;
 begin
   NCountEol:= SFindCharCount(AText, #10);
@@ -86,7 +86,7 @@ begin
 end;
 
 
-function TATStrings.TextReplaceLines_UTF8(ALineFrom, ALineTo: integer;
+function TATStrings.TextReplaceLines_UTF8(ALineFrom, ALineTo: SizeInt;
   ANewLines: TStringList): boolean;
 begin
   Result:= false;
@@ -103,7 +103,7 @@ begin
 end;
 
 
-procedure TATStrings.TextInsert(AX, AY: integer; const AText: atString; AOverwrite: boolean; out AShift, APosAfter: TPoint);
+procedure TATStrings.TextInsert(AX, AY: SizeInt; const AText: atString; AOverwrite: boolean; out AShift, APosAfter: TPoint);
 var
   Str, StrLead, StrTail: atString;
   LastItem: PATStringItem;
@@ -113,7 +113,7 @@ var
   bAtLineEnd, bAtFileEnd, bAtEmptyLine,
   bBlockWithEol, bUseBlockFinalEol: boolean;
   BlockOriginalLineCount: integer;
-  NDeleteLen: integer;
+  NDeleteLen: SizeInt;
 begin
   AShift.X:= 0;
   AShift.Y:= 0;
@@ -262,7 +262,7 @@ end;
 
 procedure TATStrings.TextAppend(const AText: atString; out AShift, APosAfter: TPoint);
 var
-  NX, NY: integer;
+  NX, NY: SizeInt;
 begin
   if Count=0 then
     TextInsert(0, 0, AText, false, AShift, APosAfter)
@@ -274,7 +274,7 @@ begin
   end;
 end;
 
-procedure TATStrings.TextDeleteLeft(AX, AY: integer; ALen: integer;
+procedure TATStrings.TextDeleteLeft(AX, AY: SizeInt; ALen: SizeInt;
   out AShift, APosAfter: TPoint;
   AllowGoToPrevLine: boolean;
   out ATextChanged: boolean);
@@ -357,7 +357,7 @@ begin
   end;
 end;
 
-procedure TATStrings.TextDeleteRight(AX, AY: integer; ALen: integer; out AShift,
+procedure TATStrings.TextDeleteRight(AX, AY: SizeInt; ALen: SizeInt; out AShift,
   APosAfter: TPoint; ACanDelEol: boolean = true);
 var
   Str: atString;
@@ -443,9 +443,9 @@ begin
 end;
 
 
-procedure TATStrings.LineBlockDelete(ALine1, ALine2: integer);
+procedure TATStrings.LineBlockDelete(ALine1, ALine2: SizeInt);
 var
-  i: integer;
+  i: SizeInt;
 begin
   if ALine1>=Count then ALine1:= Count-1;
   if ALine2>=Count then ALine2:= Count-1;
@@ -478,9 +478,9 @@ begin
   FChangeBlockActive:= false;
 end;
 
-procedure TATStrings.LineBlockInsert(ALineFrom: integer; ANewLines: TStringList);
+procedure TATStrings.LineBlockInsert(ALineFrom: SizeInt; ANewLines: TStringList);
 var
-  i: integer;
+  i: SizeInt;
 begin
   FChangeBlockActive:= true;
   DoOnChangeBlock(
@@ -498,7 +498,7 @@ begin
 end;
 
 
-function TATStrings.TextDeleteRange(AFromX, AFromY, AToX, AToY: integer;
+function TATStrings.TextDeleteRange(AFromX, AFromY, AToX, AToY: SizeInt;
   out AShift, APosAfter: TPoint): boolean;
 var
   Str: atString;
@@ -612,11 +612,11 @@ begin
 end;
 
 
-procedure TATStrings.TextInsertColumnBlock(AX, AY: integer; ABlock: TATStrings; AOverwrite: boolean);
+procedure TATStrings.TextInsertColumnBlock(AX, AY: SizeInt; ABlock: TATStrings; AOverwrite: boolean);
 var
   Shift, PosAfter: TPoint;
   BlockUTF8: TStringList;
-  i: integer;
+  i: SizeInt;
 begin
   if not IsIndexValid(AY) then exit;
   FChangeBlockActive:= true;
@@ -652,7 +652,7 @@ begin
   FChangeBlockActive:= false;
 end;
 
-procedure TATStrings.TextInsertEol(AX, AY: integer; AKeepCaret: boolean; const AStrIndent: atString; out AShift, APosAfter: TPoint);
+procedure TATStrings.TextInsertEol(AX, AY: SizeInt; AKeepCaret: boolean; const AStrIndent: atString; out AShift, APosAfter: TPoint);
 var
   Str, StrMove: atString;
   NewEnd: TATLineEnds;
@@ -706,7 +706,7 @@ begin
   end;
 end;
 
-procedure TATStrings.TextDeleteLine(AX, AY: integer; out AShift, APosAfter: TPoint);
+procedure TATStrings.TextDeleteLine(AX, AY: SizeInt; out AShift, APosAfter: TPoint);
 var
   bOnLastLine: boolean;
 begin

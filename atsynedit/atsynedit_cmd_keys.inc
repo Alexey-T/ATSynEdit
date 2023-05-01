@@ -6,7 +6,7 @@ var
   PntText: TPoint;
   PntCoord: TATPoint;
   Details: TATEditorPosDetails;
-  NLine, NIndent, NWrapped, i: integer;
+  NLine, NIndent, NWrapped, i: SizeInt;
   IndentKind: TATLineIndentKind;
 begin
   if FCarets.Count=0 then exit([]);
