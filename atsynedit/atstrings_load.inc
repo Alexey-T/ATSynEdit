@@ -688,25 +688,21 @@ begin
     try
       _LoadItems;
     except
-      on E: EEditorBadUTF8 do
-      begin
-        Clear;
-        //failed to load text as UTF8, so load again as ANSI
-        AForcedToANSI:= true;
-        FEncoding:= cEncAnsi;
-        CharSize:= 1;
-        _LoadItems;
-      end;
-      on E: EEditorTooLongLine do
-      begin
-        Clear;
-        raise;
-      end;
-      on EListError do
-      begin
-        Clear;
-        raise;
-      end;
+      on E: Exception do
+        if E is EEditorBadUTF8 then
+        begin
+          Clear;
+          //failed to load text as UTF8, so load again as ANSI
+          AForcedToANSI:= true;
+          FEncoding:= cEncAnsi;
+          CharSize:= 1;
+          _LoadItems;
+        end
+        else
+        begin
+          Clear;
+          raise;
+        end;
     end;
   finally
     FreeMem(Buf);
