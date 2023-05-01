@@ -33,7 +33,7 @@ uses
 {$IFEND}
 
 const
-  MaxListSize = Maxint div 16;
+  MaxListSize = MaxInt div 3;
 
 type
   EListError = class(Exception);
@@ -669,7 +669,7 @@ end;
 function TFPSList.Expand: TFPSList;
 var
   IncSize : Longint;
-  NewVal: Longint;
+  NewVal: Int64;
 begin
   if FCount < FCapacity then exit;
   IncSize := 4;
@@ -681,7 +681,7 @@ begin
   if FCapacity >= MaxListSize then
     Error(SListCapacityError, FCapacity);
 
-  NewVal := FCapacity + IncSize;
+  NewVal := Int64(FCapacity) + IncSize;
   if NewVal > MaxListSize then
     NewVal := MaxListSize;
 
