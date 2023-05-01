@@ -248,7 +248,7 @@ type
       const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState;
       ACommandCode: integer);
     function DebugText: string;
-    function DoCheckFilled: boolean;
+    function IsFilled: boolean;
     procedure DoFinalizeSaving;
     function GetCaretsArray: TATPointArray;
     function GetMarkersArray: TATMarkerMarkerArray;
@@ -1421,7 +1421,7 @@ var
   Item: TATStringItem;
 begin
   if FReadOnly then Exit;
-  if DoCheckFilled then Exit;
+  if IsFilled then Exit;
 
   UpdateModified;
   AddUndoItem(aeaInsert, Count, '', cEndNone, cLineStateNone, FCommandCode);
@@ -1462,9 +1462,8 @@ begin
 end;
 
 
-function TATStrings.DoCheckFilled: boolean;
+function TATStrings.IsFilled: boolean;
 begin
-  Result:= false;
   if FOneLine then
   begin
     Result:= Count>0;
@@ -1484,7 +1483,7 @@ var
   Item: TATStringItem;
 begin
   if FReadOnly then Exit;
-  if DoCheckFilled then Exit;
+  if IsFilled then Exit;
 
   UpdateModified;
   AddUndoItem(aeaInsert, ALineIndex, '', cEndNone, cLineStateNone, FCommandCode);
