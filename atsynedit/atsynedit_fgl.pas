@@ -669,13 +669,20 @@ end;
 function TFPSList.Expand: TFPSList;
 var
   IncSize : Longint;
+  NewCapacity: Longint;
 begin
   if FCount < FCapacity then exit;
   IncSize := 4;
   if FCapacity > 3 then IncSize := IncSize + 4;
   if FCapacity > 8 then IncSize := IncSize + 8;
   if FCapacity > 127 then Inc(IncSize, FCapacity shr 2);
-  SetCapacity(FCapacity + IncSize);
+
+  //AT changed to allow more items up to MaxListSize
+  NewCapacity := FCapacity + IncSize;
+  if NewCapacity > MaxListSize then
+    NewCapacity := MaxListSize;
+
+  SetCapacity(NewCapacity);
   Result := Self;
 end;
 
