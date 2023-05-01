@@ -11,7 +11,7 @@ interface
 
 uses
   SysUtils, Classes, Graphics,
-  Dialogs, Forms, Math,
+  Dialogs, Forms, Math, Character,
   ATSynEdit,
   ATSynEdit_FGL,
   ATSynEdit_RegExpr, //must be with {$define Unicode}
@@ -78,9 +78,10 @@ type
     FMatchPos: integer;
     FMatchLen: integer;
     FStrFind: UnicodeString;
-    FStrFindCompiled: UnicodeString;
     FStrReplace: UnicodeString;
     FStrFindUnicode: boolean;
+    FCachedText: UnicodeString;
+    FCachedOptCase: boolean;
     FRegex: TRegExpr;
     FRegexReplacer: TRegExpr;
     FRegexBad: boolean;
@@ -97,6 +98,7 @@ type
     procedure SetStrFind(const AValue: UnicodeString);
     procedure SetStrReplace(const AValue: UnicodeString);
     function GetRegexReplacement(const AFromText: UnicodeString): UnicodeString;
+    function GetPreserveCaseReplacement(const AFromText: UnicodeString): UnicodeString;
     function IsProgressNeeded(ANewPos: integer): boolean; inline;
   protected
     procedure DoOnFound(AWithEvent: boolean); virtual;
@@ -106,6 +108,7 @@ type
     OptWords: boolean; //for non-regex
     OptCase: boolean; //for regex and usual
     OptRegex: boolean;
+    OptRegexSubst: boolean;
     OptWrapped: boolean;
     OptTokens: TATFinderTokensAllowed;
     StrText: UnicodeString;
@@ -115,7 +118,7 @@ type
     property RegexErrorMsg: string read FRegexErrorMsg;
     constructor Create;
     destructor Destroy; override;
-    function FindMatch_Regex(ASkipLen: integer; AStartPos: integer): boolean;
+    function FindMatch_Regex(AStartPos: integer): boolean;
     property MatchLen: integer read FMatchLen;
     property MatchPos: integer read FMatchPos;
     property OnProgress: TATFinderProgress read FOnProgress write FOnProgress;
@@ -162,7 +165,9 @@ type
     FReplacedAtLine: integer;
     FLastTick: QWord;
     FLastActionTime: QWord;
+    FEnableCaretEvent: boolean;
     //FReplacedAtEndOfText: boolean;
+    FIsSearchWrapped: boolean;
     //
     function IsSelStartsAtMatch: boolean;
     procedure UpdateCarets(ASimpleAction: boolean);
@@ -177,7 +182,7 @@ type
     function ConvertCaretPosToBufferPos(APos: TPoint): integer;
     function GetOffsetOfCaret: integer;
     function GetOffsetStartPos: integer;
-    function GetRegexSkipIncrement: integer; inline;
+    function GetRegexSkipIncrement: integer;
     procedure GetMarkerPos(out AX, AY: integer);
     procedure GetEditorSelRange(out AX1, AY1, AX2, AY2: integer; out ASelText: UnicodeString);
     procedure DoFixCaretSelectionDirection;
@@ -225,6 +230,7 @@ type
     OptConfirmReplace: boolean;
     OptInSelection: boolean;
     OptPutBackwardSelection: boolean; //on backward search, place backward selection, ie caret on left of selection
+    OptPreserveCase: boolean;
     //
     property MatchEdPos: TPoint read FMatchEdPos;
     property MatchEdEnd: TPoint read FMatchEdEnd;
@@ -236,6 +242,7 @@ type
     property DataString: string read FDataString write FDataString;
     property CallbackString: string read FCallbackString write FCallbackString;
     property LastActionTime: QWord read FLastActionTime;
+    property IsSearchWrapped: boolean read FIsSearchWrapped;
     //
     constructor Create;
     destructor Destroy; override;
@@ -247,8 +254,8 @@ type
     function DoAction_ReplaceSelected(AUpdateCaret: boolean): boolean;
     procedure DoAction_FindAll(AResults: TATFinderResults; AWithEvent: boolean);
     function DoAction_CountAll(AWithEvent: boolean): integer;
-    procedure DoAction_ExtractAll(AWithEvent: boolean; AMatches: TStringList; ASorted: boolean;
-      ADuplicates: TDuplicates);
+    procedure DoAction_ExtractAll(AWithEvent: boolean; AMatches: TStringList;
+      ASorted, ACaseSens: boolean; ADuplicates: TDuplicates);
     function DoAction_ReplaceAll: integer;
     function DoAction_HighlightAllEditorMatches(AColorBorder: TColor;
       AStyleBorder: TATLineStyle; ATagValue, AMaxLines: integer): integer;
@@ -303,6 +310,7 @@ var
   Sep: TATStringSeparator;
 begin
   NCount:= SFindCharCount(Str, #10)+1;
+  L:= nil;
   SetLength(L, NCount);
   if NCount=1 then
     L[0]:= Str
@@ -473,9 +481,11 @@ begin
   InitRegex;
 
   try
-    if FStrFindCompiled<>StrFind then
+    if (FCachedText<>StrFind) or
+      (FCachedOptCase<>OptCase) then
     begin
-      FStrFindCompiled:= StrFind;
+      FCachedText:= StrFind;
+      FCachedOptCase:= OptCase;
       FRegex.ModifierI:= not OptCase;
       FRegex.Expression:= StrFind;
       FRegex.Compile;
@@ -544,7 +554,90 @@ begin
     exit(StrReplace);
   end;
 
-  Result:= FRegexReplacer.Substitute(StrReplace);
+  if OptRegexSubst then
+    Result:= FRegexReplacer.Substitute(StrReplace)
+  else
+    Result:= StrReplace;
+end;
+
+{
+The VS Code's logic is:
+- If the original string contains only upper-case or only lower-case characters,
+  the result will be either all upper-case or all lower-case characters:
+  "ABCDE" -> replace with "xyz" -> "XYZ" (preserving all upper-case);
+  "abcde" -> replace with "xYz" -> "xyz" (preserving all lower-case).
+- The case of the first character in the original string is always preserved:
+  if it is upper-case, the first character in the result will be upper-case;
+  if it is lower-case, the first character in the result will be lower-case.
+  "Abcde" -> replace with "xyz" -> "Xyz" (preserving the first upper-case);
+  "abcde" -> replace with "Xyz" -> "xyz" (preserving the first lower-case).
+- In case of a mixed-case original string, the result follows the case of
+  characters in the replacing string, excluding the very first character of
+  the original string that always preserves its original case.
+  "ABcde" -> replace with "xyZ" -> "XyZ" (preserving the first upper-case);
+  "abCDE" -> replace with "XYz" -> "xYz" (preserving the first lower-case).
+}
+function TATTextFinder.GetPreserveCaseReplacement(const AFromText: UnicodeString): UnicodeString;
+type
+  TLetterCase = (lcUnknown, lcLower, lcUpper, lcAsIs);
+var
+  inputLen: Integer;
+  numLetters: Integer;
+  numUpperCaseLetters: Integer;
+  firstLetterCase: TLetterCase;
+  i: Integer;
+begin
+  if StrReplace = '' then
+    exit('');
+
+  firstLetterCase := lcUnknown;
+  numLetters := 0;
+  numUpperCaseLetters := 0;
+  inputLen := Length(AFromText);
+  i := 1;
+  while i <= inputLen do
+  begin
+    if IsWordChar(AFromText[i]) then
+      break
+    else
+      Inc(i); // skipping non-word characters
+  end;
+  while i <= inputLen do
+  begin
+    if TCharacter.IsLetter(AFromText[i]) then
+    begin
+      Inc(numLetters);
+      if TCharacter.IsUpper(AFromText[i]) then // upper-case letter
+      begin
+        Inc(numUpperCaseLetters);
+        if firstLetterCase = lcUnknown then firstLetterCase := lcUpper;
+      end
+      else // lower-case letter
+      begin
+        if firstLetterCase = lcUnknown then firstLetterCase := lcLower;
+      end
+    end
+    else // not a letter
+    begin
+      if firstLetterCase = lcUnknown then firstLetterCase := lcAsIs;
+    end;
+    Inc(i);
+  end;
+
+  if numLetters = 0 then // no letters, replace as is
+    Result := StrReplace
+  else if numUpperCaseLetters = numLetters then // only upper-case letters
+    Result := UnicodeUpperCase(StrReplace)
+  else if numUpperCaseLetters = 0 then // only lower-case letters
+    Result := UnicodeLowerCase(StrReplace)
+  else
+  begin
+    Result := StrReplace;
+    if firstLetterCase = lcUpper then
+      Result[1] := TCharacter.ToUpper(Result[1])
+    else if firstLetterCase = lcLower then
+      Result[1] := TCharacter.ToLower(Result[1])
+  end
 end;
 
 function TATTextFinder.IsProgressNeeded(ANewPos: integer): boolean;
@@ -557,6 +650,7 @@ end;
 
 procedure TATEditorFinder.DoCollect_Usual(AList: TATFinderResults; AWithEvent, AWithConfirm: boolean);
 var
+  St: TATStrings;
   IndexLineMax: integer;
   PosStart, PosEnd: TPoint;
   bOk, bContinue: boolean;
@@ -568,7 +662,8 @@ begin
   if StrFind='' then exit;
   SNew:= '';
 
-  IndexLineMax:= Editor.Strings.Count-1;
+  St:= Editor.Strings;
+  IndexLineMax:= St.Count-1;
   InitProgress;
 
   if FFragments.Count=0 then
@@ -576,7 +671,7 @@ begin
     PosStart.X:= 0;
     PosStart.Y:= 0;
     PosEnd.Y:= IndexLineMax;
-    PosEnd.X:= Editor.Strings.LinesLen[IndexLineMax];
+    PosEnd.X:= St.LinesLen[IndexLineMax];
   end
   else
   begin
@@ -589,10 +684,10 @@ begin
 
   repeat
     if Application.Terminated then Break;
-    if not Editor.Strings.IsIndexValid(PosStart.Y) then Break;
+    if not St.IsIndexValid(PosStart.Y) then Break;
     if not FindMatch_InEditor(PosStart, PosEnd, AWithEvent) then Break;
 
-    if FMatchEdPos.X < Editor.Strings.LinesLen[FMatchEdPos.Y] then
+    if FMatchEdPos.X < St.LinesLen[FMatchEdPos.Y] then
     begin
       PosStart.X:= FMatchEdEnd.X;
       PosStart.Y:= FMatchEdEnd.Y;
@@ -605,6 +700,8 @@ begin
 
     if AWithConfirm then
     begin
+      bOk:= true;
+      bContinue:= true;
       DoConfirmReplace(FMatchEdPos, FMatchEdEnd, bOk, bContinue, SNew);
       if not bContinue then exit;
       if not bOk then Continue;
@@ -638,9 +735,11 @@ begin
   SNew:= '';
 
   try
-    if FStrFindCompiled<>StrFind then
+    if (FCachedText<>StrFind) or
+      (FCachedOptCase<>OptCase) then
     begin
-      FStrFindCompiled:= StrFind;
+      FCachedText:= StrFind;
+      FCachedOptCase:= OptCase;
       FRegex.ModifierI:= not OptCase;
       FRegex.Expression:= StrFind;
       FRegex.Compile;
@@ -664,6 +763,7 @@ begin
   P2:= ConvertBufferPosToCaretPos(FRegex.MatchPos[0]+FRegex.MatchLen[0]);
 
   bOk:= true;
+  bContinue:= true;
 
   if bOk then
     if not CheckTokensEd(P1.X, P1.Y, P2.X, P2.Y) then
@@ -814,11 +914,14 @@ begin
   FinderCarets:= TATCarets.Create;
   //FReplacedAtEndOfText:= false;
   FMaxLineLen:= MaxInt;
+  FEnableCaretEvent:= true;
+  FIsSearchWrapped:= false;
 
   OptFromCaret:= false;
   OptConfirmReplace:= false;
   OptInSelection:= false;
   OptPutBackwardSelection:= false;
+  OptPreserveCase:= false;
 
   FIndentVert:= -5;
   FIndentHorz:= 10;
@@ -838,6 +941,7 @@ function TATEditorFinder.DoAction_FindSimple(const APosStart: TPoint): boolean;
 var
   Cnt: integer;
   PosEnd: TPoint;
+  bStartAtEdge: boolean;
 begin
   UpdateCarets(true);
   if OptRegex then
@@ -846,9 +950,16 @@ begin
   Cnt:= Editor.Strings.Count;
   PosEnd.X:= Editor.Strings.LinesLen[Cnt-1];
   PosEnd.Y:= Cnt-1;
+  bStartAtEdge:= (APosStart.X=0) and (APosStart.Y=0);
+  FIsSearchWrapped:= false;
 
   BeginTiming;
   Result:= FindMatch_InEditor(APosStart, PosEnd, false);
+  if not Result and OptWrapped and not bStartAtEdge then
+  begin
+    Result:= FindMatch_InEditor(Point(0, 0), APosStart, false);
+    FIsSearchWrapped:= true;
+  end;
   EndTiming;
 end;
 
@@ -893,6 +1004,7 @@ var
   Pnt: TPoint;
   MarkX, MarkY: integer;
   bMarkerUsed: boolean;
+  NDelta: integer;
 begin
   bMarkerUsed:= false;
   if FPlaceMarker then
@@ -909,11 +1021,13 @@ begin
   if not bMarkerUsed then
   begin
     if FinderCarets.Count>0 then
+    begin
       with FinderCarets[0] do
       begin
         Pnt.X:= PosX;
         Pnt.Y:= PosY;
       end
+    end
     else
       Pnt:= Point(0, 0);
   end;
@@ -922,10 +1036,17 @@ begin
 
   //find-back must goto previous match
   if OptBack then
-    Dec(Result, Length(StrFind));
+  begin
+    if OptRegex then
+      NDelta:= 2
+    else
+      NDelta:= Length(StrFind);
+    Dec(Result, NDelta);
+  end;
 
-  if Result<1 then
-    Result:= 1;
+  if not (OptBack and OptRegex) then
+    if Result<1 then
+      Result:= 1;
 end;
 
 function TATEditorFinder.DoAction_CountAll(AWithEvent: boolean): integer;
@@ -974,8 +1095,9 @@ end;
 
 
 procedure TATEditorFinder.DoAction_ExtractAll(AWithEvent: boolean; AMatches: TStringList;
-  ASorted: boolean; ADuplicates: TDuplicates);
+  ASorted, ACaseSens: boolean; ADuplicates: TDuplicates);
 var
+  St: TATStrings;
   ListRes: TATFinderResults;
   Res: TATFinderResult;
   Str: UnicodeString;
@@ -987,18 +1109,20 @@ begin
   UpdateBuffer;
   BeginTiming;
 
+  St:= Editor.Strings;
   AMatches.Clear;
   ListRes:= TATFinderResults.Create;
   try
     AMatches.TextLineBreakStyle:= tlbsLF;
     AMatches.Sorted:= ASorted;
     AMatches.Duplicates:= ADuplicates;
+    AMatches.CaseSensitive:= ACaseSens;
 
     DoCollect_Regex(ListRes, 1, AWithEvent, false);
     for i:= 0 to ListRes.Count-1 do
     begin
       Res:= ListRes[i];
-      Str:= Editor.Strings.TextSubstring(
+      Str:= St.TextSubstring(
         Res.FPos.X,
         Res.FPos.Y,
         Res.FEnd.X,
@@ -1022,6 +1146,7 @@ begin
   BeginTiming;
   if Editor.ModeReadOnly then exit;
   Editor.Strings.SetNewCommandMark;
+  FEnableCaretEvent:= false;
 
   UpdateCarets(false);
   UpdateFragments;
@@ -1042,8 +1167,13 @@ begin
     CurrentFragmentIndex:= 0;
   end;
 
+  FEnableCaretEvent:= true;
+
   if FReplacedAtLine<>MaxInt then
+  begin
     Editor.DoEventChange(FReplacedAtLine);
+    Editor.DoEventCarets;
+  end;
 
   EndTiming;
 end;
@@ -1051,6 +1181,7 @@ end;
 
 function TATEditorFinder.DoReplace_InFragment: integer;
 var
+  St: TATStrings;
   L: TATFinderResults;
   Res: TATFinderResult;
   Str: UnicodeString;
@@ -1059,6 +1190,7 @@ var
   Ok: boolean;
 begin
   Result:= 0;
+  St:= Editor.Strings;
 
   L:= TATFinderResults.Create;
   try
@@ -1082,7 +1214,9 @@ begin
       end;
 
       if OptRegex then
-        Str:= GetRegexReplacement(Editor.Strings.TextSubstring(P1.X, P1.Y, P2.X, P2.Y))
+        Str:= GetRegexReplacement(St.TextSubstring(P1.X, P1.Y, P2.X, P2.Y))
+      else if OptPreserveCase then
+        Str:= GetPreserveCaseReplacement(St.TextSubstring(P1.X, P1.Y, P2.X, P2.Y))
       else
         Str:= StrReplace;
 
@@ -1347,6 +1481,7 @@ var
 begin
   Result:= false;
   AChanged:= false;
+  FIsSearchWrapped:= false;
 
   NLines:= Editor.Strings.Count;
   if NLines=0 then exit;
@@ -1408,11 +1543,17 @@ begin
 
   Result:= DoFindOrReplace_InEditor_Internal(AReplace, AForMany, AChanged, PosStart, PosEnd, AUpdateCaret);
 
-  if not Result and OptWrapped and not OptInSelection then
+  if not OptBack then
+    bStartAtEdge:= (PosStart.X=0) and (PosStart.Y=0)
+  else
+    bStartAtEdge:= (PosStart.X=NLastX) and (PosStart.Y=NLastY);
+
+  if not Result and OptWrapped and not OptInSelection and not bStartAtEdge then
   begin
+    FIsSearchWrapped:= true;
+
     if not OptBack then
     begin
-      bStartAtEdge:= (PosStart.X=0) and (PosStart.Y=0);
       SecondEnd.X:= PosStart.X;
       SecondEnd.Y:= PosStart.Y;
       SecondStart.X:= 0;
@@ -1420,25 +1561,21 @@ begin
     end
     else
     begin
-      bStartAtEdge:= (PosStart.X=NLastX) and (PosStart.Y=NLastY);
       SecondEnd.X:= PosStart.X;
       SecondEnd.Y:= PosStart.Y;
       SecondStart.X:= NLastX;
       SecondStart.Y:= NLastY;
     end;
 
-    if not bStartAtEdge then
+    //same as _buffered version:
+    //we must have AReplace=false
+    //(if not, need more actions: don't allow to replace in wrapped part if too big pos)
+    if DoFindOrReplace_InEditor_Internal(false, AForMany, AChanged, SecondStart, SecondEnd, AUpdateCaret) then
     begin
-      //same as _buffered version:
-      //we must have AReplace=false
-      //(if not, need more actions: don't allow to replace in wrapped part if too big pos)
-      if DoFindOrReplace_InEditor_Internal(false, AForMany, AChanged, SecondStart, SecondEnd, AUpdateCaret) then
-      begin
-        Result:= (not OptBack and IsPosSorted(FMatchEdPos.X, FMatchEdPos.Y, PosStart.X, PosStart.Y, false)) or
-                 (OptBack and IsPosSorted(PosStart.X, PosStart.Y, FMatchEdPos.X, FMatchEdPos.Y, false));
-        if not Result then
-          ClearMatchPos;
-      end;
+      Result:= (not OptBack and IsPosSorted(FMatchEdPos.X, FMatchEdPos.Y, PosStart.X, PosStart.Y, false)) or
+               (OptBack and IsPosSorted(PosStart.X, PosStart.Y, FMatchEdPos.X, FMatchEdPos.Y, false));
+      if not Result then
+        ClearMatchPos;
     end;
   end;
 end;
@@ -1477,6 +1614,8 @@ begin
         end;
         SNew:= GetRegexReplacement(Editor.Strings.TextSubstring(P1.X, P1.Y, P2.X, P2.Y));
       end
+      else if OptPreserveCase then
+        SNew:= GetPreserveCaseReplacement(Editor.Strings.TextSubstring(P1.X, P1.Y, P2.X, P2.Y))
       else
         SNew:= StrReplace;
 
@@ -1514,20 +1653,31 @@ function TATEditorFinder.DoFindOrReplace_Buffered(AReplace, AForMany: boolean;
   out AChanged: boolean; AUpdateCaret: boolean): boolean;
 var
   NStartPos: integer;
+  bStartAtEdge: boolean;
 begin
   Result:= false;
   AChanged:= false;
   //FReplacedAtEndOfText:= false;
+  FIsSearchWrapped:= false;
 
   UpdateBuffer;
 
   NStartPos:= GetOffsetStartPos;
-  Result:= DoFindOrReplace_Buffered_Internal(AReplace, AForMany, AChanged, NStartPos, AUpdateCaret);
+  if (NStartPos<1) and OptBack then
+    Result:= false
+  else
+    Result:= DoFindOrReplace_Buffered_Internal(AReplace, AForMany, AChanged, NStartPos, AUpdateCaret);
 
-  if (not Result) and (OptWrapped and not OptInSelection) then
-    if (not OptBack and (NStartPos>1)) or
-       (OptBack and (NStartPos<Length(StrText))) then
+  if not OptBack then
+    bStartAtEdge:= NStartPos<=1
+  else
+    bStartAtEdge:= NStartPos>=Length(StrText);
+
+  if not Result and OptWrapped and not OptInSelection
+    and not bStartAtEdge then
     begin
+      FIsSearchWrapped:= true;
+
       //we must have AReplace=false
       //(if not, need more actions: don't allow to replace in wrapped part if too big pos)
       //
@@ -1554,7 +1704,7 @@ var
   SNew: UnicodeString;
 begin
   AChanged:= false;
-  Result:= FindMatch_Regex(FSkipLen, AStartPos);
+  Result:= FindMatch_Regex(AStartPos);
 
   FSkipLen:= FMatchLen+GetRegexSkipIncrement;
 
@@ -1572,6 +1722,8 @@ begin
 
       if OptRegex then
         SNew:= GetRegexReplacement(FBuffer.SubString(FMatchPos, FMatchLen))
+      else if OptPreserveCase then
+        SNew:= GetPreserveCaseReplacement(FBuffer.SubString(FMatchPos, FMatchLen))
       else
         SNew:= StrReplace;
 
@@ -1640,12 +1792,20 @@ begin
     else
       NLineLen:= 0;
     Editor.Markers.Clear;
-    Editor.Markers.Add(APosX, APosY, cTag, 0, 0, nil, 0, mmmShowInTextOnly, NLineLen);
+    Editor.Markers.Add(
+      Point(APosX, APosY),
+      Point(0, 0),
+      TATMarkerTags.Init(cTag, 0),
+      nil,
+      mmmShowInTextOnly,
+      NLineLen
+      );
   end
   else
   begin
     Editor.DoCaretSingle(APosX, APosY, AEndX, AEndY);
-    Editor.DoEventCarets;
+    if FEnableCaretEvent then
+      Editor.DoEventCarets;
 
     //solve CudaText issue #3261:
     Editor.ActionAddJumpToUndo;
@@ -1690,6 +1850,8 @@ begin
 
   if OptRegex then
     SNew:= GetRegexReplacement(SSelText)
+  else if OptPreserveCase then
+    SNew:= GetPreserveCaseReplacement(SSelText)
   else
     SNew:= StrReplace;
 
@@ -1715,6 +1877,7 @@ begin
   OptCase:= false;
   OptWords:= false;
   OptRegex:= false;
+  OptRegexSubst:= true;
   OptTokens:= cTokensAll;
   ClearMatchPos;
 
@@ -1743,7 +1906,7 @@ begin
   end;
 end;
 
-function TATTextFinder.FindMatch_Regex(ASkipLen: integer; AStartPos: integer): boolean;
+function TATTextFinder.FindMatch_Regex(AStartPos: integer): boolean;
 var
   NPos: integer;
 begin
@@ -2021,7 +2184,7 @@ begin
   StringArray_SetFromString(ListParts, SFind, OptBack);
   PartCount:= Length(ListParts);
   if PartCount=0 then exit;
-  SetLength(ListLooped, 0);
+  ListLooped:= nil;
 
   SLinePartW:= ListParts[0];
   SLinePart_Len:= Length(SLinePartW);
@@ -2032,6 +2195,7 @@ begin
 
   InitProgress;
   IndexLineMax:= Strs.Count-PartCount;
+  if IndexLineMax<0 then exit;
 
     if not OptBack then
     //forward search
@@ -2249,6 +2413,7 @@ begin
   if Assigned(FBuffer) then
     FBuffer.Clear;
 
+  FIsSearchWrapped:= false;
   FSkipLen:= 0;
   FMaxLineLen:= MaxInt;
   DoFragmentsClear;
@@ -2354,6 +2519,7 @@ function TATEditorFinder.DoAction_HighlightAllEditorMatches(
   AColorBorder: TColor; AStyleBorder: TATLineStyle; ATagValue,
   AMaxLines: integer): integer;
 var
+  St: TATStrings;
   Results: TATFinderResults;
   Res: TATFinderResult;
   PosX, PosY, SelX, SelY: integer;
@@ -2362,21 +2528,15 @@ var
   iRes, iLine: integer;
 const
   MicromapMode: TATMarkerMicromapMode = mmmShowInTextAndMicromap;
-  //
-  function GetAttrObj: TATLinePartClass;
-  begin
-    Result:= TATLinePartClass.Create;
-    Result.Data:= AttrRec;
-    Result.ColumnTag:= 1; //tag of micromap column
-  end;
-  //
+  MicromapColumnTag = 1;
 begin
   Result:= 0;
   BeginTiming;
   if Editor=nil then exit;
   bMatchVisible:= false;
   if StrFind='' then exit;
-  if Editor.Strings.Count>=AMaxLines then exit;
+  St:= Editor.Strings;
+  if St.Count>=AMaxLines then exit;
 
   Results:= TATFinderResults.Create;
   try
@@ -2388,7 +2548,7 @@ begin
     end;
     if Results.Count=0 then exit;
 
-    FillChar(AttrRec, SizeOf(AttrRec), 0);
+    FillChar(AttrRec{%H-}, SizeOf(AttrRec), 0);
     AttrRec.ColorBG:= clNone;
     AttrRec.ColorFont:= clNone;
     AttrRec.ColorBorder:= AColorBorder;
@@ -2412,12 +2572,18 @@ begin
         PosY:= Res.FPos.Y;
         SelY:= 0;
         SelX:= Abs(Res.FEnd.X-Res.FPos.X);
-        Editor.Attribs.Add(PosX, PosY, ATagValue, SelX, SelY, GetAttrObj, 0, MicromapMode);
+        Editor.Attribs.Add(
+          Point(PosX, PosY),
+          Point(SelX, SelY),
+          TATMarkerTags.Init(ATagValue, MicromapColumnTag),
+          @AttrRec,
+          MicromapMode
+          );
       end
       else
       //add N attrs per each line of a match
       for iLine:= Res.FPos.Y to Res.FEnd.Y do
-        if Editor.Strings.IsIndexValid(iLine) then
+        if St.IsIndexValid(iLine) then
         begin
           PosY:= iLine;
           SelY:= 0;
@@ -2425,7 +2591,7 @@ begin
           if iLine=Res.FPos.Y then
           begin
             PosX:= Res.FPos.X;
-            SelX:= Editor.Strings.LinesLen[iLine];
+            SelX:= St.LinesLen[iLine];
           end
           else
           //attr in final line
@@ -2438,10 +2604,16 @@ begin
           //attr on middle line
           begin
             PosX:= 0;
-            SelX:= Editor.Strings.LinesLen[iLine];
+            SelX:= St.LinesLen[iLine];
           end;
 
-          Editor.Attribs.Add(PosX, PosY, ATagValue, SelX, SelY, GetAttrObj, 0, MicromapMode);
+          Editor.Attribs.Add(
+            Point(PosX, PosY),
+            Point(SelX, SelY),
+            TATMarkerTags.Init(ATagValue, MicromapColumnTag),
+            @AttrRec,
+            MicromapMode
+            );
         end;
     end;
   finally

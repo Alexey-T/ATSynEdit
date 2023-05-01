@@ -12,6 +12,7 @@ interface
 uses
   Classes, SysUtils, StrUtils,
   LCLType, LCLIntf, Clipbrd,
+  ATSynEdit_Globals,
   ATSynEdit_UnicodeData,
   ATSynEdit_RegExpr,
   ATSynEdit_CharSizer;
@@ -20,6 +21,30 @@ type
   atString = UnicodeString;
   atChar = WideChar;
   PatChar = PWideChar;
+
+const
+  ATEditorCharXScale = 1024;
+
+type
+  TATPoint = record
+    X, Y: Int64;
+  end;
+
+type
+  TATEditorCharSize = record
+    //XScaled is the average-char-width (usually of 'N'),
+    //multiplied by ATEditorCharXScale and truncated.
+    //on Win32/Gtk2, XScaled is multiple of ATEditorCharXScale; but not on Qt5/macOS.
+    //macOS has actually floating-number font width, e.g. 7.801 pixels of a single char in monospaced fonts
+    //(all ASCII chars have the same width, it was tested on macOS).
+    XScaled: Int64;
+    //XSpacePercents is the width of space-char in percents (of average-char-width).
+    //if FontProportional=False, it is 100; otherwise it's different.
+    XSpacePercents: Int64;
+    //line height.
+    //macOS height is still an integer number.
+    Y: Int64;
+  end;
 
 type
   TATLineChangeKind = (
@@ -34,8 +59,39 @@ type
   TATPointArray = array of TPoint;
   TATInt64Array = array of Int64;
 
+type
+  TATMarkerMarkerRecord = record
+    Tag: Int64;
+    TagEx: Int64;
+    PosX: integer;
+    PosY: integer;
+    SelX: integer;
+    SelY: integer;
+    MicromapMode: integer;
+  end;
+  TATMarkerMarkerArray = array of TATMarkerMarkerRecord;
+
+type
+  TATMarkerAttribRecord = record
+    Tag: Int64;
+    TagEx: Int64;
+    PosX: integer;
+    PosY: integer;
+    SelX: integer;
+    ColorFont: integer;
+    ColorBG: integer;
+    ColorBorder: integer;
+    FontStyles: integer;
+    BorderLeft: integer;
+    BorderRight: integer;
+    BorderUp: integer;
+    BorderDown: integer;
+    MicromapMode: integer;
+  end;
+  TATMarkerAttribArray = array of TATMarkerAttribRecord;
+
 const
-  //must be >= OptMaxLineLenForAccurateCharWidths
+  //must be >= ATEditorOptions.MaxLineLenForAccurateCharWidths
   cMaxFixedArray = 1024;
 
 type
@@ -54,6 +110,9 @@ type
 type
   TATSimpleRange = record NFrom, NTo: integer; end;
   TATSimpleRangeArray = array of TATSimpleRange;
+
+function ATPoint(const X, Y: Int64): TATPoint;
+function ATPointInRect(const Rect: TRect; const P: TATPoint): boolean;
 
 function IsStringWithUnicode(const S: string): boolean; inline;
 function IsStringWithUnicode(const S: UnicodeString): boolean; inline;
@@ -79,26 +138,13 @@ type
     );
 
 const
+  cLineEndOsDefault = {$ifdef windows} cEndWin {$else} cEndUnix {$endif};
   cLineEndStrings: array[TATLineEnds] of UnicodeString = ('', #13#10, #10, #13);
   cLineEndNiceNames: array[TATLineEnds] of string = ('', 'CRLF', 'LF', 'CR');
   cLineEndLength: array[TATLineEnds] of integer = (0, 2, 1, 1);
 
 const
   BoolToPlusMinusOne: array[boolean] of integer = (-1, 1);
-
-var
-  EditorScalePercents: integer = 100;
-  EditorScaleFontPercents: integer = 0; //if 0, it follows previous variable
-
-function EditorScale(AValue: integer): integer; inline;
-function EditorScaleFont(AValue: integer): integer;
-
-var
-  OptEmojiWidthPercents: integer = 210;
-  OptMaxTabPositionToExpand: integer = 500; //no sense to expand too far tabs
-  OptMinWordWrapOffset: integer = 3;
-  OptCommaCharsWrapWithWords: UnicodeString = '.,;:''"`~?!&%$';
-  OptMaxLineLenForAccurateCharWidths: integer = 500; //must be <= cMaxFixedArray
 
 type
   TATStringTabCalcEvent = function(Sender: TObject; ALineIndex, ACharIndex: integer): integer of object;
@@ -110,6 +156,7 @@ type
 
   TATStringTabHelper = class
   private
+    CharSizer: TATCharSizer;
     //these arrays are local vars, placed here to alloc 2*4Kb not in stack
     ListEnds: TATIntFixedArray;
     ListMid: TATIntFixedArray;
@@ -117,9 +164,12 @@ type
     TabSpaces: boolean;
     TabSize: integer;
     IndentSize: integer;
+    CharSize: TATEditorCharSize;
+    FontProportional: boolean;
     SenderObj: TObject;
     OnCalcTabSize: TATStringTabCalcEvent;
     OnCalcLineLen: TATStringGetLenEvent;
+    constructor Create(ACharSizer: TATCharSizer);
     function CalcTabulationSize(ALineIndex, APos: integer): integer;
     function TabsToSpaces(ALineIndex: integer; const S: atString): atString;
     function TabsToSpaces_Length(ALineIndex: integer; const S: atString; AMaxLen: integer): integer;
@@ -128,17 +178,20 @@ type
     function CharPosToColumnPos(ALineIndex: integer; const S: atString; APos: integer): integer;
     function ColumnPosToCharPos(ALineIndex: integer; const S: atString; AColumn: integer): integer;
     function IndentUnindent(ALineIndex: integer; const Str: atString; ARight: boolean): atString;
-    procedure CalcCharOffsets(ALineIndex: integer; const S: atString; var AInfo: TATIntFixedArray; ACharsSkipped: integer = 0);
+    procedure CalcCharOffsets(ALineIndex: integer; const S: atString; out AInfo: TATIntFixedArray; ACharsSkipped: integer = 0);
     function CalcCharOffsetLast(ALineIndex: integer; const S: atString; ACharsSkipped: integer = 0): Int64;
     function FindWordWrapOffset(ALineIndex: integer; const S: atString; AColumns: Int64;
       const ANonWordChars: atString; AWrapIndented: boolean): integer;
     function FindClickedPosition(ALineIndex: integer; const Str: atString;
       constref ListOffsets: TATIntFixedArray;
-      APixelsFromLeft, ACharSize: Int64;
+      APixelsFromLeft: Int64;
       AAllowVirtualPos: boolean;
       out AEndOfLinePos: boolean): Int64;
-    procedure FindOutputSkipOffset(ALineIndex: integer; const S: atString;
-      AScrollPos: Int64; out ACharsSkipped: Int64; out ACellPercentsSkipped: Int64);
+    procedure FindOutputSkipOffset(ALineIndex: integer;
+      const S: atString;
+      const AScrollPosSmooth: Int64;
+      out ACharsSkipped: Int64;
+      out ACellPercentsSkipped: Int64);
   end;
 
 function IsCharEol(ch: widechar): boolean; inline;
@@ -177,6 +230,7 @@ function STrimAll(const S: UnicodeString): UnicodeString;
 function STrimLeft(const S: UnicodeString): UnicodeString;
 function STrimRight(const S: UnicodeString): UnicodeString;
 
+function SGetIndentChars(const S: string): integer;
 function SGetIndentChars(const S: atString): integer;
 function SGetIndentCharsToOpeningBracket(const S: atString): integer;
 function SGetTrailingSpaceChars(const S: atString): integer;
@@ -198,15 +252,7 @@ procedure SAddStringToHistory(const S: string; List: TStrings; MaxItems: integer
 
 procedure TrimStringList(L: TStringList); inline;
 
-const
-  cDefaultNonWordChars: UnicodeString = '-+*=/\()[]{}<>"''.,:;~?!@#$%^&|`…';
-
-type
-  TATDecodeRec = record SFrom, STo: UnicodeString; end;
-function SDecodeRecords(const S: UnicodeString; const Decode: array of TATDecodeRec): UnicodeString;
-
 procedure SReplaceAll(var S: string; const SFrom, STo: string); inline;
-procedure SReplaceAllPercentChars(var S: string);
 procedure SDeleteFrom(var s: string; const SFrom: string); inline;
 procedure SDeleteFrom(var s: UnicodeString; const SFrom: UnicodeString); inline;
 procedure SDeleteFromEol(var S: string);
@@ -226,6 +272,20 @@ implementation
 
 uses
   Dialogs, Math;
+
+function ATPoint(const X, Y: Int64): TATPoint;
+begin
+  Result.X:= X;
+  Result.Y:= Y;
+end;
+
+function ATPointInRect(const Rect: TRect; const P: TATPoint): boolean;
+begin
+  Result:= (p.y>=Rect.Top) and
+           (p.y<Rect.Bottom) and
+           (p.x>=Rect.Left) and
+           (p.x<Rect.Right);
+end;
 
 function IsCharEol(ch: widechar): boolean;
 begin
@@ -249,6 +309,9 @@ begin
   Result := CharCategoryArray[Ord(ch)] and 128 <> 0;
   if not Result then
   begin
+    if Ord(ch)<=32 then
+      exit(false);
+
     if IsCharUnicodeSpace(ch) then
       exit(false);
 
@@ -396,14 +459,59 @@ begin
   ShowMessage('Offsets'#10+s);
 end;
 
+{
+    Blocks Containing Han Ideographs
+    Han ideographic characters are found in five main blocks of the Unicode Standard, as shown in Table 12-2
+Table 12-2. Blocks Containing Han Ideographs
+Block                                   Range       Comment
+CJK Unified Ideographs                  4E00-9FFF   Common
+CJK Unified Ideographs Extension A      3400-4DBF   Rare
+CJK Unified Ideographs Extension B      20000-2A6DF Rare, historic
+CJK Unified Ideographs Extension C      2A700–2B73F Rare, historic
+CJK Unified Ideographs Extension D      2B740–2B81F Uncommon, some in current use
+CJK Unified Ideographs Extension E      2B820–2CEAF Rare, historic
+CJK Compatibility Ideographs            F900-FAFF   Duplicates, unifiable variants, corporate characters
+CJK Compatibility Ideographs Supplement 2F800-2FA1F Unifiable variants
+}
+
+function _IsCJKText(ch: widechar): boolean; inline;
+begin
+  case Ord(ch) of
+    $4E00..$9FFF,
+    $3400..$4DBF,
+    $F900..$FAFF:
+      Result:= true;
+    else
+      Result:= false;
+  end;
+end;
+
+function _IsCJKPunctuation(ch: widechar): boolean; inline;
+begin
+  case Ord(ch) of
+    $3002,
+    $ff01,
+    $ff0c,
+    $ff1a,
+    $ff1b,
+    $ff1f:
+      Result:= true;
+    else
+      Result:= false;
+  end;
+end;
+
 function TATStringTabHelper.FindWordWrapOffset(ALineIndex: integer; const S: atString; AColumns: Int64;
   const ANonWordChars: atString; AWrapIndented: boolean): integer;
   //
   //override IsCharWord to check also commas,dots,quotes
   //to wrap them with wordchars
-  function _IsWord(ch: widechar): boolean; inline;
+  function _IsWord(ch: widechar): boolean;
   begin
-    if Pos(ch, OptCommaCharsWrapWithWords)>0 then
+    if _IsCJKText(ch) then
+      Result:= false
+    else
+    if Pos(ch, ATEditorOptions.PunctuationToWrapWithWords)>0 then
       Result:= true
     else
       Result:= IsCharWord(ch, ANonWordChars);
@@ -412,10 +520,11 @@ function TATStringTabHelper.FindWordWrapOffset(ALineIndex: integer; const S: atS
 var
   N, NMin, NAvg: integer;
   Offsets: TATIntFixedArray;
+  ch, ch_next: widechar;
 begin
   if S='' then
     Exit(0);
-  if AColumns<OptMinWordWrapOffset then
+  if AColumns<ATEditorOptions.MinWordWrapOffset then
     Exit(AColumns);
 
   CalcCharOffsets(ALineIndex, S, Offsets);
@@ -427,24 +536,37 @@ begin
   N:= Min(Length(S), cMaxFixedArray)-1;
   while (N>0) and (Offsets.Data[N]>(AColumns+1)*100) do Dec(N);
   NAvg:= N;
-  if NAvg<OptMinWordWrapOffset then
-    Exit(OptMinWordWrapOffset);
+  if NAvg<ATEditorOptions.MinWordWrapOffset then
+    Exit(ATEditorOptions.MinWordWrapOffset);
 
-  //find correct offset: not allowed at edge
-  //a) 2 wordchars,
-  //b) space as 2nd char (not nice look for Python src)
   NMin:= SGetIndentChars(S)+1;
-  while (N>NMin) and
-    (IsCharSurrogateLow(S[N+1]) or
-     (_IsWord(S[N]) and _IsWord(S[N+1])) or
-     (AWrapIndented and IsCharSpace(S[N+1])))
-    do Dec(N);
+  repeat
+    ch:= S[N];
+    ch_next:= S[N+1];
 
-  //use correct of avg offset
+    if (N>NMin) and
+     (IsCharSurrogateLow(ch_next) or //don't wrap inside surrogate pair
+      (_IsCJKText(ch) and _IsCJKPunctuation(ch_next)) or //don't wrap between CJK char and CJK punctuation
+      (_IsWord(ch) and _IsWord(ch_next)) or //don't wrap between 2 word-chars
+      (AWrapIndented and IsCharSpace(ch_next)) //space as 2nd char looks bad with Python sources
+     )
+    then
+      Dec(N)
+    else
+      Break;
+  until false;
+
   if N>NMin then
     Result:= N
   else
     Result:= NAvg;
+end;
+
+function SGetIndentChars(const S: string): integer;
+begin
+  Result:= 0;
+  while (Result<Length(S)) and IsCharSpace(S[Result+1]) do
+    Inc(Result);
 end;
 
 function SGetIndentChars(const S: atString): integer;
@@ -512,15 +634,21 @@ begin
     S[i]:= SwapEndian(S[i]);
 end;
 
+constructor TATStringTabHelper.Create(ACharSizer: TATCharSizer);
+begin
+  inherited Create;
+  CharSizer:= ACharSizer;
+end;
+
 function TATStringTabHelper.CalcTabulationSize(ALineIndex, APos: integer): integer;
 begin
   if Assigned(OnCalcTabSize) then
     Result:= OnCalcTabSize(SenderObj, ALineIndex, APos)
   else
-  if Assigned(OnCalcLineLen) and (OnCalcLineLen(ALineIndex)>OptMaxLineLenForAccurateCharWidths) then
+  if Assigned(OnCalcLineLen) and (ALineIndex>=0) and (OnCalcLineLen(ALineIndex)>ATEditorOptions.MaxLineLenForAccurateCharWidths) then
     Result:= 1
   else
-  if APos>OptMaxTabPositionToExpand then
+  if APos>ATEditorOptions.MaxTabPositionToExpand then
     Result:= 1
   else
     Result:= TabSize - (APos-1) mod TabSize;
@@ -582,25 +710,21 @@ end;
 
 
 procedure TATStringTabHelper.CalcCharOffsets(ALineIndex: integer; const S: atString;
-  var AInfo: TATIntFixedArray; ACharsSkipped: integer);
+  out AInfo: TATIntFixedArray; ACharsSkipped: integer=0);
 var
   NLen, NSize, NTabSize, NCharsSkipped: integer;
   NScalePercents: integer;
-  //NPairSize: integer;
-  //StrPair: WideString;
   ch: widechar;
   i: integer;
 begin
-  FillChar(AInfo, SizeOf(AInfo), 0);
+  AInfo:= Default(TATIntFixedArray);
   NLen:= Min(Length(S), cMaxFixedArray);
   AInfo.Len:= NLen;
   if NLen=0 then Exit;
 
   NCharsSkipped:= ACharsSkipped;
-  //NPairSize:= 0;
-  //StrPair:= 'ab';
 
-  if NLen>OptMaxLineLenForAccurateCharWidths then
+  if NLen>ATEditorOptions.MaxLineLenForAccurateCharWidths then
   begin
     for i:= 0 to NLen-1 do
       AInfo.Data[i]:= (Int64(i)+1)*100;
@@ -612,33 +736,15 @@ begin
     ch:= S[i];
     Inc(NCharsSkipped);
 
-    {
-    ////if used GetStrWidth, then strange bug on Win32, Emoji wrap pos is not ok
-    if (NPairSize>0) and IsCharSurrogateLow(ch) then
-    begin
-      NScalePercents:= NPairSize div 2;
-      NPairSize:= 0;
-    end
-    else
-    if IsCharSurrogateHigh(ch) and (i<Length(S)) then
-    begin
-      StrPair[1]:= ch;
-      StrPair[2]:= S[i+1];
-      NPairSize:= GlobalCharSizer.GetStrWidth(StrPair);
-      NScalePercents:= NPairSize - NPairSize div 2;
-    end
-    }
     if IsCharSurrogateAny(ch) then
-    begin
-      NScalePercents:= OptEmojiWidthPercents div 2;
-    end
+      NScalePercents:= ATEditorOptions.EmojiWidthPercents div 2
     else
-    begin
-      NScalePercents:= GlobalCharSizer.GetCharWidth(ch);
-      //NPairSize:= 0;
-    end;
+      NScalePercents:= CharSizer.GetCharWidth(ch);
 
     if ch<>#9 then
+      NSize:= 1
+    else
+    if FontProportional then
       NSize:= 1
     else
     begin
@@ -655,7 +761,7 @@ begin
 end;
 
 function TATStringTabHelper.CalcCharOffsetLast(ALineIndex: integer; const S: atString;
-  ACharsSkipped: integer): Int64;
+  ACharsSkipped: integer=0): Int64;
 var
   NLen, NSize, NTabSize, NCharsSkipped: integer;
   NScalePercents: integer;
@@ -666,7 +772,7 @@ begin
   NLen:= Length(S);
   if NLen=0 then Exit;
 
-  if NLen>OptMaxLineLenForAccurateCharWidths then
+  if NLen>ATEditorOptions.MaxLineLenForAccurateCharWidths then
     exit(NLen*100);
 
   NCharsSkipped:= ACharsSkipped;
@@ -678,14 +784,17 @@ begin
 
     if IsCharSurrogateAny(ch) then
     begin
-      NScalePercents:= OptEmojiWidthPercents div 2;
+      NScalePercents:= ATEditorOptions.EmojiWidthPercents div 2;
     end
     else
     begin
-      NScalePercents:= GlobalCharSizer.GetCharWidth(ch);
+      NScalePercents:= CharSizer.GetCharWidth(ch);
     end;
 
     if ch<>#9 then
+      NSize:= 1
+    else
+    if FontProportional then
       NSize:= 1
     else
     begin
@@ -701,16 +810,20 @@ end;
 
 function TATStringTabHelper.FindClickedPosition(ALineIndex: integer; const Str: atString;
   constref ListOffsets: TATIntFixedArray;
-  APixelsFromLeft, ACharSize: Int64; AAllowVirtualPos: boolean; out AEndOfLinePos: boolean): Int64;
+  APixelsFromLeft: Int64;
+  AAllowVirtualPos: boolean;
+  out AEndOfLinePos: boolean): Int64;
 var
   i: integer;
 begin
   AEndOfLinePos:= false;
+
   if Str='' then
   begin
     Result:= 1;
     if AAllowVirtualPos then
-      Inc(Result, APixelsFromLeft div ACharSize);
+      Inc(Result, Round(APixelsFromLeft * ATEditorCharXScale / CharSize.XScaled));
+      //use Round() to fix CudaText issue #4240
     Exit;
   end;
 
@@ -719,7 +832,7 @@ begin
 
   //positions of each char end
   for i:= 0 to ListOffsets.Len-1 do
-    ListEnds.Data[i]:= ListOffsets.Data[i]*ACharSize div 100;
+    ListEnds.Data[i]:= ListOffsets.Data[i]*CharSize.XScaled div ATEditorCharXScale div 100;
 
   //positions of each char middle
   for i:= 0 to ListOffsets.Len-1 do
@@ -741,25 +854,38 @@ begin
     end;
 
   AEndOfLinePos:= true;
-  Result:= ListEnds.Len + (APixelsFromLeft - ListEnds.Data[ListEnds.Len-1] - ACharSize div 2) div ACharSize + 2;
+
+  Result:= ListEnds.Len + Round((APixelsFromLeft - ListEnds.Data[ListEnds.Len-1]) * ATEditorCharXScale / CharSize.XScaled) + 1;
+  //use Round() to fix CudaText issue #4240
+
+  ////this works
+  ////a) better if clicked after line end, far
+  ////b) bad if clicked exactly on line end (shifted to right by 1)
+  //Result:= ListEnds.Len + (APixelsFromLeft - ListEnds.Data[ListEnds.Len-1] - ACharSize div 2) div ACharSize + 2;
 
   if not AAllowVirtualPos then
     Result:= Min(Result, Length(Str)+1);
 end;
 
-procedure TATStringTabHelper.FindOutputSkipOffset(ALineIndex: integer; const S: atString;
-  AScrollPos: Int64; out ACharsSkipped: Int64; out ACellPercentsSkipped: Int64);
+procedure TATStringTabHelper.FindOutputSkipOffset(ALineIndex: integer;
+  const S: atString;
+  const AScrollPosSmooth: Int64;
+  out ACharsSkipped: Int64;
+  out ACellPercentsSkipped: Int64);
 var
   Offsets: TATIntFixedArray;
+  NCheckedOffset: Int64;
 begin
   ACharsSkipped:= 0;
   ACellPercentsSkipped:= 0;
-  if (S='') or (AScrollPos=0) then Exit;
+  if (S='') or (AScrollPosSmooth=0) then Exit;
 
   CalcCharOffsets(ALineIndex, S, Offsets);
 
+  NCheckedOffset:= AScrollPosSmooth * 100 * ATEditorCharXScale div CharSize.XScaled;
+
   while (ACharsSkipped<Offsets.Len) and
-    (Offsets.Data[ACharsSkipped] < AScrollPos*100) do
+    (Offsets.Data[ACharsSkipped] < NCheckedOffset) do
     Inc(ACharsSkipped);
 
   if (ACharsSkipped>0) then
@@ -1130,52 +1256,15 @@ function StringOfCharW(ch: WideChar; Len: integer): UnicodeString;
 var
   i: integer;
 begin
-  SetLength(Result, Len);
+  SetLength(Result{%H-}, Len);
   for i:= 1 to Len do
     Result[i]:= ch;
-end;
-
-
-function SDecodeRecords(const S: UnicodeString; const Decode: array of TATDecodeRec): UnicodeString;
-var
-  DoDecode: Boolean;
-  i, iPart: integer;
-begin
-  Result := '';
-  i := 1;
-  repeat
-    if i > Length(S) then Break;
-    DoDecode := False;
-    for iPart := Low(Decode) to High(Decode) do
-      with Decode[iPart] do
-        if strlcomp(PChar(SFrom), @S[i], Length(SFrom)) = 0 then
-        begin
-          DoDecode := True;
-          Result := Result + STo;
-          Inc(i, Length(SFrom));
-          Break
-        end;
-    if DoDecode then Continue;
-    Result := Result + S[i];
-    Inc(i);
-  until False;
 end;
 
 
 procedure SReplaceAll(var S: string; const SFrom, STo: string);
 begin
   S:= StringReplace(S, SFrom, STo, [rfReplaceAll]);
-end;
-
-procedure SReplaceAllPercentChars(var S: string);
-var
-  i: Integer;
-begin
-  for i:= $20 to $2F do
-    SReplaceAll(S, '%'+IntToHex(i, 2), Chr(i));
-
-  i:= $7C;
-  SReplaceAll(S, '%'+IntToHex(i, 2), Chr(i));
 end;
 
 procedure SDeleteFrom(var s: string; const SFrom: string);
@@ -1278,20 +1367,6 @@ begin
   for i:= 1 to Length(S) do
     if S[i]=ch then
       Inc(Result);
-end;
-
-
-function EditorScale(AValue: integer): integer;
-begin
-  Result:= AValue * EditorScalePercents div 100;
-end;
-
-function EditorScaleFont(AValue: integer): integer;
-begin
-  if EditorScaleFontPercents=0 then
-    Result:= EditorScale(AValue)
-  else
-    Result:= AValue * EditorScaleFontPercents div 100;
 end;
 
 
@@ -1414,5 +1489,5 @@ begin
   end;
 end;
 
-end.
 
+end.

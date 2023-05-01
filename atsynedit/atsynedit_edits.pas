@@ -14,7 +14,9 @@ uses
   LCLType,
   ATCanvasPrimitives,
   ATScrollbar,
+  ATStrings,
   ATSynEdit,
+  ATSynEdit_Globals,
   ATStringProc;
 
 type
@@ -41,10 +43,10 @@ type
     FItems: TStringList;
     FItemIndex: integer;
     FMenu: TPopupMenu;
+    procedure DoComboMenu;
     procedure DoComboUpDown(ADown: boolean);
     procedure MicromapClick(Sender: TObject; AX, AY: integer);
     procedure MicromapDraw(Sender: TObject; C: TCanvas; const ARect: TRect);
-    procedure DoMenu;
     procedure MenuItemClick(Sender: TObject);
   protected
     function DoMouseWheel(Shift: TShiftState; WheelDelta: integer; MousePos: TPoint): boolean; override;
@@ -52,7 +54,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     property Items: TStringList read FItems;
-    procedure DoCommand(ACmd: integer; const AText: atString = ''); override;
+    procedure DoCommand(ACmd: integer; AInvoke: TATEditorCommandInvoke; const AText: atString = ''); override;
     procedure DoAddLineToHistory(const AStr: atString; AMaxItems: integer);
   published
   end;
@@ -90,13 +92,16 @@ begin
 end;
 
 procedure TATEdit.DoEventChange(ALineIndex: integer; AllowOnChange: boolean);
+var
+  St: TATStrings;
 begin
   inherited;
   DoCaretSingleAsIs;
+  St:= Strings;
 
-  if Strings.Count=0 then
+  if St.Count=0 then
   begin
-    Strings.LineAdd('');
+    St.LineAdd('');
     Update(true);
   end;
 
@@ -111,10 +116,10 @@ begin
     end;
 
     if OptMaxLen>0 then
-      if Strings.LinesLen[0]>OptMaxLen then
+      if St.LinesLen[0]>OptMaxLen then
       begin
-        Strings.Lines[0]:= Strings.LineSub(0, 1, OptMaxLen);
-        DoCaretSingle(Strings.LinesLen[0], 0);
+        St.Lines[0]:= St.LineSub(0, 1, OptMaxLen);
+        DoCaretSingle(St.LinesLen[0], 0);
         Update(true);
       end;
   end;
@@ -123,6 +128,7 @@ end;
 constructor TATEdit.Create(AOwner: TComponent);
 begin
   inherited;
+  IsRepaintEnabled:= false;
 
   WantTabs:= false;
   WantReturns:= false;
@@ -133,15 +139,15 @@ begin
   BorderStyle:= bsNone;
   OptShowURLs:= false;
   OptTextOffsetLeft:= 2;
-  OptTextOffsetTop:= 3;
   OptMaxLen:= 0;
   OptBorderWidth:= 1;
   OptBorderWidthFocused:= 1;
   OptScrollIndentCaretHorz:= 0;
   OptShowMouseSelFrame:= false;
   OptMouseWheelZooms:= false;
-
   Height:= 26;
+
+  IsRepaintEnabled:= true;
 end;
 
 { TATComboEdit }
@@ -149,6 +155,7 @@ end;
 constructor TATComboEdit.Create(AOwner: TComponent);
 begin
   inherited;
+  IsRepaintEnabled:= false;
 
   WantReturns:= true; //allow combo to handle Enter
 
@@ -166,11 +173,13 @@ begin
 
   OnClickMicromap:= @MicromapClick;
   OnDrawMicromap:= @MicromapDraw;
+
+  IsRepaintEnabled:= true;
 end;
 
 procedure TATComboEdit.MicromapClick(Sender: TObject; AX, AY: integer);
 begin
-  DoMenu;
+  DoComboMenu;
 end;
 
 procedure TATComboEdit.MicromapDraw(Sender: TObject; C: TCanvas;
@@ -183,10 +192,10 @@ begin
     Point(
       (ARect.Left+ARect.Right) div 2,
       (ARect.Top+ARect.Bottom) div 2),
-    EditorScale(ATScrollbarTheme.ArrowSize));
+    ATEditorScale(ATScrollbarTheme.ArrowSize));
 end;
 
-procedure TATComboEdit.DoMenu;
+procedure TATComboEdit.DoComboMenu;
 var
   mi: TMenuItem;
   P: TPoint;
@@ -231,7 +240,7 @@ begin
 
     //scroll to left, select all
     DoScrollByDelta(-10000, 0);
-    DoCommand(cCommand_SelectAll);
+    DoCommand(cCommand_SelectAll, cInvokeMenuContext);
   end;
 end;
 
@@ -247,19 +256,24 @@ begin
     Result:= inherited;
 end;
 
-procedure TATComboEdit.DoCommand(ACmd: integer; const AText: atString);
+procedure TATComboEdit.DoCommand(ACmd: integer;
+  AInvoke: TATEditorCommandInvoke; const AText: atString);
 begin
   inherited;
   case ACmd of
+    cCommand_MoveSelectionUp,
+    cCommand_MoveSelectionDown,
     cCommand_ComboboxRecentsMenu:
       begin
-        DoMenu;
+        DoComboMenu;
       end;
     cCommand_KeyDown,
     cCommand_KeyUp:
       begin
+        //make Up-arrow go down in history, like in Sublime Text
+        //CudaText issue #4504
         if ModeOneLine then
-          DoComboUpDown(ACmd=cCommand_KeyDown);
+          DoComboUpDown(ACmd=cCommand_KeyUp);
       end;
   end;
 end;
@@ -287,8 +301,10 @@ begin
   Text:= Utf8Decode(FItems[FItemIndex]);
   ModeReadOnly:= bPrevRO;
 
+  ScrollHorz.SetZero;
+
   DoEventChange(0);
-  DoCommand(cCommand_SelectAll);
+  DoCommand(cCommand_SelectAll, cInvokeInternal);
 end;
 
 destructor TATComboEdit.Destroy;
@@ -300,4 +316,3 @@ end;
 
 
 end.
-

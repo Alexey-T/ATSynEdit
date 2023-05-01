@@ -26,13 +26,19 @@ end;
 
 function TATSynEdit.Unfolded_NextLineNumber(ALine: integer; ADown: boolean): integer;
 var
+  St: TATStrings;
   N: integer;
 begin
   Result:= ALine;
   N:= Result;
-  while IsLineFolded(N) and Strings.IsIndexValid(N) do
-    N:= N+BoolToPlusMinusOne[ADown];
-  if Strings.IsIndexValid(N) then Result:= N;
+  St:= Strings;
+  while IsLineFolded(N) and St.IsIndexValid(N) do
+    if ADown then
+      Inc(N)
+    else
+      Dec(N);
+  if St.IsIndexValid(N) then
+    Result:= N;
 end;
 
 function TATSynEdit.IsPosFolded(AX, AY: integer): boolean;
@@ -88,6 +94,7 @@ begin
   //show all lines not in found _folded_ subranges
   Line1:= RngOuter^.Y;
   Line2:= RngOuter^.Y2;
+  Checks:= nil;
   SetLength(Checks, Line2-Line1+1);
 
   for i:= 0 to High(Checks) do
@@ -118,8 +125,10 @@ end;
 
 procedure TATSynEdit.DoRangeFold(ARangeIndex: integer);
 var
+  St: TATStrings;
   Range: PATSynRange;
 begin
+  St:= Strings;
   Range:= Fold.ItemPtr(ARangeIndex);
   Range^.Folded:= true;
   FWrapUpdateNeeded:= true;
@@ -127,35 +136,32 @@ begin
   //partially hide first line
   case FFoldStyle of
     cFoldHereWithDots:
-    begin
-      Strings.LinesFoldFrom[Range^.Y, FEditorIndex]:= Range^.X;
-    end;
+      begin
+        St.LinesFoldFrom[Range^.Y, FEditorIndex]:= Range^.X;
+      end;
     cFoldHereWithTruncatedText:
-    begin
-      Strings.LinesFoldFrom[Range^.Y, FEditorIndex]:= Range^.X;
-      if Range^.Hint='' then
-        Range^.Hint:= Strings.LineSub(Range^.Y, Range^.X, cFoldedLenOfEmptyHint)+'...';
-    end;
+      begin
+        St.LinesFoldFrom[Range^.Y, FEditorIndex]:= Range^.X;
+        if Range^.Hint='' then
+          Range^.Hint:= St.LineSub(Range^.Y, Range^.X, ATEditorOptions.FoldedLenOfEmptyHint)+'...';
+      end;
     cFoldFromEndOfLine:
-    begin
-      if Range^.Hint<>'' then
-        Strings.LinesFoldFrom[Range^.Y, FEditorIndex]:= Range^.X
-      else
-        Strings.LinesFoldFrom[Range^.Y, FEditorIndex]:= Strings.LinesLen[Range^.Y]+1;
-    end;
+      begin
+        if Range^.Hint<>'' then
+          St.LinesFoldFrom[Range^.Y, FEditorIndex]:= Range^.X
+        else
+          St.LinesFoldFrom[Range^.Y, FEditorIndex]:= St.LinesLen[Range^.Y]+1;
+      end;
     cFoldFromEndOfLineAlways:
-    begin
-      Strings.LinesFoldFrom[Range^.Y, FEditorIndex]:= Strings.LinesLen[Range^.Y]+1;
-      Range^.Hint:= '...';
-    end;
+      begin
+        St.LinesFoldFrom[Range^.Y, FEditorIndex]:= St.LinesLen[Range^.Y]+1;
+        Range^.Hint:= '...';
+      end;
     cFoldFromNextLine:
-    begin
-      //don't fold line
-    end;
+      begin
+        //don't fold line
+      end;
   end;
-
-  //write to Fold list (after changed Range.Folded, Range.Hint)
-  //Fold.Items[ARangeIndex]:= Range;
 
   //fully hide other lines of range
   DoRangeHideLines(Range^.Y+1, Range^.Y2);
@@ -167,10 +173,12 @@ end;
 
 procedure TATSynEdit.DoRangeHideLines(ALineFrom, ALineTo: integer);
 var
+  St: TATStrings;
   i: integer;
 begin
+  St:= Strings;
   for i:= ALineFrom to ALineTo do
-    Strings.LinesHidden[i, FEditorIndex]:= true;
+    St.LinesHidden[i, FEditorIndex]:= true;
 end;
 
 procedure TATSynEdit.DoUnfoldLine(ALine: integer);
@@ -183,17 +191,32 @@ begin
     DoRangeUnfold(List[i]);
 end;
 
-procedure TATSynEdit.DoFoldbarClick(ALine: integer);
+procedure TATSynEdit.DoFoldbarClick_LineIndex(ALine: integer);
 var
-  N: integer;
+  NRange: integer;
 begin
-  N:= FFold.FindRangeWithPlusAtLine(ALine);
-  if N>=0 then
+  NRange:= FFold.FindRangeWithPlusAtLine(ALine);
+  if NRange>=0 then
+    DoFoldbarClick_RangeIndex(NRange);
+end;
+
+procedure TATSynEdit.DoFoldbarClick_RangeIndex(ARange: integer);
+var
+  bUnfold: boolean;
+begin
+  bUnfold:= FFold.ItemPtr(ARange)^.Folded;
+  if bUnfold then
+    DoRangeUnfold(ARange)
+  else
+    DoRangeFold(ARange);
+
+  Update;
+
+  //force repaint, if after 'fold' editor has empty space below the last line,
+  //because next click on gutter-fold-mark will be ignored. CudaText issue #4850
+  if not FOptLastLineOnTop and not bUnfold and (FScrollVert.NPos>=FScrollVert.NPosLast) then
   begin
-    if Fold.Items[N].Folded then
-      DoRangeUnfold(N)
-    else
-      DoRangeFold(N);
+    Application.ProcessMessages;
     Update;
   end;
 end;
@@ -212,52 +235,79 @@ begin
 
   N:= FFold.FindRangeWithPlusAtLine(ALine);
   if N>=0 then
-    Result:= FFold.Items[N].Hint;
+    Result:= FFold.ItemPtr(N)^.Hint;
   if Result='' then
     Result:= cDefaultHint;
 end;
 
 procedure TATSynEdit.UpdateFoldedFromLinesHidden;
 var
+  St: TATStrings;
   NFoldFrom, NPosAfterEnd: integer;
   NMaxLine, iRange: integer;
   R: PATSynRange;
-  bOk: boolean;
+  bFold: boolean;
 begin
-  NMaxLine:= Strings.Count-1;
+  St:= Strings;
+  NMaxLine:= St.Count-1;
   for iRange:= 0 to Fold.Count-1 do
   begin
     R:= Fold.ItemPtr(iRange);
     if R^.IsSimple then Continue;
-    if R^.Y>NMaxLine then Continue; //same as "if not Strings.IsIndexValid"
-    if Strings.LinesHidden[R^.Y, FEditorIndex] then Continue;
-    NFoldFrom:= Strings.LinesFoldFrom[R^.Y, FEditorIndex];
+    if R^.Y>NMaxLine then Continue; //same as "if not St.IsIndexValid"
+    if St.LinesHidden[R^.Y, FEditorIndex] then Continue;
 
-    NPosAfterEnd:= Strings.LinesLen[R^.Y]+1;
-    if (OptFoldStyle in [cFoldFromEndOfLine, cFoldFromEndOfLineAlways]) and
-      (NFoldFrom=NPosAfterEnd) then
-      bOk:= true
-    else
-      bOk:= R^.X=NFoldFrom;
+    bFold:= false;
+    NFoldFrom:= St.LinesFoldFrom[R^.Y, FEditorIndex];
 
-    if bOk then
+    case OptFoldStyle of
+      cFoldFromEndOfLine:
+        begin
+          if R^.Hint='' then
+          begin
+            NPosAfterEnd:= St.LinesLen[R^.Y]+1;
+            bFold:= NFoldFrom=NPosAfterEnd;
+          end
+          else
+          begin
+            bFold:= R^.X=NFoldFrom;
+          end;
+        end;
+      cFoldFromEndOfLineAlways:
+        begin
+          NPosAfterEnd:= St.LinesLen[R^.Y]+1;
+          bFold:= NFoldFrom=NPosAfterEnd;
+        end;
+      cFoldFromNextLine:
+        begin
+          bFold:= (R^.Y+1<=NMaxLine) and St.LinesHidden[R^.Y+1, FEditorIndex];
+        end
+      else
+        bFold:= R^.X=NFoldFrom;
+    end;
+
+    if bFold then
       DoRangeFold(iRange); //do not just R.Folded:= true;
   end;
 end;
 
-function TATSynEdit.IsFoldLineNeededBeforeWrapitem(N: integer): boolean;
+function TATSynEdit.IsFoldingUnderlineNeededForWrapitem(AWrapIndex: integer): boolean;
 var
-  NLineCur, NLinePrev: integer;
+  NLineCur, NLineNext: integer;
 begin
-  if FWrapInfo.IsIndexValid(N) and (N>0) then
+  if FWrapInfo.IsIndexValid(AWrapIndex) then
   begin
-    NLineCur:= FWrapInfo[N].NLineIndex;
-    NLinePrev:= FWrapInfo[N-1].NLineIndex;
-    //before this line some is skipped
-    Result:= NLineCur-NLinePrev > 1;
-    //and prev visible line is fully visible
-    if Result then
-      Result:= Strings.LinesFoldFrom[NLinePrev, FEditorIndex]=0;
+    NLineCur:= FWrapInfo[AWrapIndex].NLineIndex;
+    if FWrapInfo.IsIndexValid(AWrapIndex+1) then
+      NLineNext:= FWrapInfo[AWrapIndex+1].NLineIndex
+    else
+      NLineNext:= Strings.Count;
+
+    Result:=
+      //after this line, some line(s) are skipped
+      (NLineNext-NLineCur > 1) and
+      //and line is fully visible
+      (Strings.LinesFoldFrom[NLineCur, FEditorIndex]=0);
   end
   else
     Result:= false;
@@ -279,20 +329,20 @@ begin
 
   //items "fold all", "unfold all"
   mi:= TMenuItem.Create(Self);
-  mi.Caption:= cStrMenuitemFoldAll;
+  mi.Caption:= ATEditorOptions.TextMenuitemFoldAll;
   mi.OnClick:= @MenuFoldFoldAllClick;
   mi.Enabled:= Fold.Count>0;
   Menu.Items.Add(mi);
 
   mi:= TMenuItem.Create(Self);
-  mi.Caption:= cStrMenuitemUnfoldAll;
+  mi.Caption:= ATEditorOptions.TextMenuitemUnfoldAll;
   mi.OnClick:= @MenuFoldUnfoldAllClick;
   mi.Enabled:= Fold.Count>0;
   Menu.Items.Add(mi);
 
   //submenu "fold level"
   miSub:= TMenuItem.Create(Self);
-  miSub.Caption:= cStrMenuitemFoldLevel;
+  miSub.Caption:= ATEditorOptions.TextMenuitemFoldLevel;
   miSub.Enabled:= Fold.Count>0;
   Menu.Items.Add(miSub);
 
@@ -315,6 +365,7 @@ end;
 procedure TATSynEdit.DoMenuGutterFold_AddDynamicItems(Menu: TPopupMenu);
 var
   Pnt: TPoint;
+  PntCoord: TATPoint;
   NLine: integer;
   IntList: TATIntArray;
   Details: TATEditorPosDetails;
@@ -324,7 +375,9 @@ var
 begin
   //calc ranges for curr line
   Pnt:= ScreenToClient(Mouse.CursorPos);
-  Pnt:= ClientPosToCaretPos(Pnt, Details);
+  PntCoord.X:= Pnt.X;
+  PntCoord.Y:= Pnt.Y;
+  Pnt:= ClientPosToCaretPos(PntCoord, Details);
   NLine:= Pnt.Y;
   if NLine<0 then Exit;
 
@@ -345,8 +398,8 @@ begin
     mi.OnClick:= @MenuFoldPlusMinusClick;
 
     mi.Caption:=
-      cTextHintScrollPrefix+' '+Inttostr(Rng^.Y+1)+': '+
-      UTF8Encode(Strings.LineSub(Rng^.Y, 1, cFoldedLenOfEmptyHint));
+      ATEditorOptions.TextHintScrollPrefix+' '+IntToStr(Rng^.Y+1)+': '+
+      UTF8Encode(Strings.LineSub(Rng^.Y, 1, ATEditorOptions.FoldedLenOfEmptyHint));
 
     if Rng^.Folded then
       mi.ImageIndex:= 0
@@ -362,31 +415,26 @@ begin
   if FFoldImageList=nil then
   begin
     FFoldImageList:= TImageList.Create(Self);
-    FFoldImageList.Width:= cBitmapFoldPlus.Width;
-    FFoldImageList.Height:= cBitmapFoldPlus.Height;
-    FFoldImageList.Add(cBitmapFoldPlus, nil);
-    FFoldImageList.Add(cBitmapFoldMinus, nil);
+    FFoldImageList.Width:= ATEditorBitmaps.BitmapFoldPlus.Width;
+    FFoldImageList.Height:= ATEditorBitmaps.BitmapFoldPlus.Height;
+    FFoldImageList.Add(ATEditorBitmaps.BitmapFoldPlus, nil);
+    FFoldImageList.Add(ATEditorBitmaps.BitmapFoldMinus, nil);
   end;
 end;
 
 
 procedure TATSynEdit.MenuFoldPlusMinusClick(Sender: TObject);
 var
-  N: integer;
+  NRange: integer;
 begin
-  N:= (Sender as TComponent).Tag;
-  if not Fold.IsIndexValid(N) then exit;
-
-  if Fold.Items[N].Folded then
-    DoRangeUnfold(N)
-  else
-    DoRangeFold(N);
-  Update;
+  NRange:= (Sender as TComponent).Tag;
+  if Fold.IsIndexValid(NRange) then
+    DoFoldbarClick_RangeIndex(NRange);
 end;
 
 procedure TATSynEdit.MenuFoldFoldAllClick(Sender: TObject);
 begin
-  DoCommand(cCommand_FoldAll);
+  DoCommand(cCommand_FoldAll, cInvokeMenuContext);
 end;
 
 procedure TATSynEdit.MenuFoldLevelClick(Sender: TObject);
@@ -396,7 +444,7 @@ end;
 
 procedure TATSynEdit.MenuFoldUnfoldAllClick(Sender: TObject);
 begin
-  DoCommand(cCommand_UnfoldAll);
+  DoCommand(cCommand_UnfoldAll, cInvokeMenuContext);
 end;
 
 
@@ -437,51 +485,58 @@ begin
   FFoldEnabled:= AValue;
   if not FFoldEnabled then
   begin
-    DoCommand(cCommand_UnfoldAll);
+    DoCommand(cCommand_UnfoldAll, cInvokeInternal);
     FFold.Clear;
   end;
   Update;
 end;
 
 
-procedure TATSynEdit.DoFoldUnfoldRangeAtCurLine(AOp: TATEditorFoldRangeCommand);
+function TATSynEdit.DoFoldUnfoldRangeAtCurLine(AOp: TATEditorFoldRangeCommand): boolean;
 var
-  NLine, NRange: integer;
-  bFolded: boolean;
+  X, Y, X2, Y2, NRange, iCaret: integer;
+  bSel, bFolded: boolean;
 begin
-  if Carets.Count<>1 then exit;
-  NLine:= Carets[0].PosY;
-  if not Strings.IsIndexValid(NLine) then exit;
+  Result:= false;
+  for iCaret:= Carets.Count-1 downto 0 do
+  begin
+    Carets[iCaret].GetRange(X, Y, X2, Y2, bSel);
+    if bSel then Continue;
+    if not Strings.IsIndexValid(Y) then Continue;
 
-  NRange:= Fold.FindDeepestRangeContainingLine(NLine, false{AWithStaple});
-  if NRange<0 then exit;
-  bFolded:= Fold.Items[NRange].Folded;
+    NRange:= Fold.FindDeepestRangeContainingLine(Y, false{AWithStaple}, FFoldIconForMinimalRange);
+    if NRange<0 then Continue;
+    bFolded:= Fold.ItemPtr(NRange)^.Folded;
 
-  case AOp of
-    cFoldingFold:
-      begin
-        if not bFolded then
+    case AOp of
+      cFoldingFold:
         begin
-          DoRangeFold(NRange);
-          Update;
+          if not bFolded then
+          begin
+            DoRangeFold(NRange);
+            Update;
+            Result:= true;
+          end;
         end;
-      end;
-    cFoldingUnfold:
-      begin
-        if bFolded then
+      cFoldingUnfold:
         begin
-          DoRangeUnfold(NRange);
-          Update;
+          if bFolded then
+          begin
+            DoRangeUnfold(NRange);
+            Update;
+            Result:= true;
+          end;
         end;
-      end;
-    cFoldingToggle:
-      begin
-        if bFolded then
-          DoRangeUnfold(NRange)
-        else
-          DoRangeFold(NRange);
-        Update;
-      end;
+      cFoldingToggle:
+        begin
+          if bFolded then
+            DoRangeUnfold(NRange)
+          else
+            DoRangeFold(NRange);
+          Update;
+          Result:= true;
+        end;
+    end;
   end;
 end;
 

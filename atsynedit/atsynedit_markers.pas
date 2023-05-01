@@ -12,9 +12,10 @@ interface
 uses
   Classes, SysUtils,
   ATStringProc,
-  ATStringProc_Separator,
+  ATStringProc_Arrays,
   ATSynEdit_fgl,
-  ATSynEdit_Carets;
+  ATSynEdit_Carets,
+  ATSynEdit_LineParts;
 
 type
   TATMarkerMicromapMode = (
@@ -24,30 +25,59 @@ type
     );
 
 type
+
+  { TATMarkerTags }
+
+  TATMarkerTags = record
+    Tag,
+    TagEx: Int64;
+    constructor Init(const ATag, AColumnTag: Int64);
+  end;
+
+type
   { TATMarkerItem }
 
   PATMarkerItem = ^TATMarkerItem;
   TATMarkerItem = record
+    //text position of marker
     PosX, PosY: integer;
-    LineLen: integer; //render underline near the marker, if <>0
-    CoordX, CoordY: integer; //screen coords
-    CoordX2, CoordY2: integer; //screen coords for LineLen end
-    Tag: Int64;
-      //used in CudaText: when "collect marker" runs, for all markers
-      //with the same Tag>0 multi-carets placed
+
+    //render underline near the marker, when LineLen<>0
+    LineLen: integer;
+
+    //screen coords
+    CoordX, CoordY: Int64;
+    //screen coords of line end, when LineLen<>0
+    CoordX2, CoordY2: Int64;
+
+    //used in CudaText: when "Collect marker" gets this marker, caret will be with selection
+    //if SelY=0 - LenX is length of sel (single line)
+    //if SelY>0 - LenY is Y-delta of sel-end,
+    //            LenX is absolute X of sel-end
     SelX, SelY: integer;
-      //used in CudaText: when "collect marker" gets this marker, caret will be with selection
-      //if SelY=0 - LenX is length of sel (single line)
-      //if SelY>0 - LenY is Y-delta of sel-end,
-      //            LenX is absolute X of sel-end
-    Value: Int64;
-    Ptr: TObject; //used in Attribs object of ATSynEdit
+
+    //used in CudaText: when "Collect marker" runs, for all markers
+    //with the same Tag>0 multi-carets are placed
+    Tag: Int64;
+
+    //used to place marker on micromap column with given Tag
+    //used in DimRanges list, holds dim value
+    TagEx: Int64;
+
+    //used in Attribs object
+    LinePart: TATLinePart;
+
+    //enables to show marker on micromap
     MicromapMode: TATMarkerMicromapMode;
+
     class operator=(const A, B: TATMarkerItem): boolean;
     function SelContains(AX, AY: integer): boolean;
     function SelEnd: TPoint;
+    procedure UpdateOnEditing(APos, APosEnd, AShift, APosAfter: TPoint);
   end;
-  
+
+function IsMarkerPositionsEqual(A, B: PATMarkerItem): boolean;
+
 type
   { TATMarkerItems }
 
@@ -61,11 +91,13 @@ type
     FList: TATMarkerItems;
     FSorted: boolean;
     FDuplicates: boolean;
-    function GetAsArray: TATInt64Array;
-    function GetAsString: string;
+    function GetAsMarkerArray: TATMarkerMarkerArray;
+    function GetAsAttribArray: TATMarkerAttribArray;
+    function GetAsMarkerString: string;
     function GetItem(N: integer): TATMarkerItem;
-    procedure SetAsArray(const AValue: TATInt64Array);
-    procedure SetAsString(const AValue: string);
+    procedure SetAsMarkerArray(const AValue: TATMarkerMarkerArray);
+    procedure SetAsAttribArray(const AValue: TATMarkerAttribArray);
+    procedure SetAsMarkerString(const AValue: string);
     procedure SetItem(N: integer; const AItem: TATMarkerItem);
   public
     constructor Create; virtual;
@@ -78,23 +110,38 @@ type
     property Items[AIndex: integer]: TATMarkerItem read GetItem write SetItem; default;
     property Sorted: boolean read FSorted write FSorted;
     property Duplicates: boolean read FDuplicates write FDuplicates;
-    procedure Add(APosX, APosY: integer;
-      const ATag: Int64=0;
-      ASelX: integer=0;
-      ASelY: integer=0;
-      APtr: TObject=nil;
-      AValue: Int64=0;
+    procedure Add(
+      APos: TPoint;
+      ASel: TPoint;
+      const ATags: TATMarkerTags;
+      ALinePart: PATLinePart=nil;
       AMicromapMode: TATMarkerMicromapMode=mmmShowInTextOnly;
       ALineLen: integer=0);
-    procedure DeleteInRange(AX1, AY1, AX2, AY2: integer);
-    procedure DeleteWithTag(const ATag: Int64);
+    function DeleteInRange(AX1, AY1, AX2, AY2: integer): boolean;
+    function DeleteWithTag(const ATag: Int64): boolean;
+    function DeleteByPos(AX, AY: integer): boolean;
     procedure Find(AX, AY: integer; out AIndex: integer; out AExactMatch: boolean);
     function FindContaining(AX, AY: integer): integer;
-    property AsArray: TATInt64Array read GetAsArray write SetAsArray;
-    property AsString: string read GetAsString write SetAsString;
+    procedure UpdateOnEditing(APos, APosEnd, AShift, APosAfter: TPoint);
+    property AsMarkerArray: TATMarkerMarkerArray read GetAsMarkerArray write SetAsMarkerArray;
+    property AsAttribArray: TATMarkerAttribArray read GetAsAttribArray write SetAsAttribArray;
+    property AsMarkerString: string read GetAsMarkerString write SetAsMarkerString;
   end;
 
 implementation
+
+function IsMarkerPositionsEqual(A, B: PATMarkerItem): boolean;
+begin
+  Result:= (A^.PosX=B^.PosX) and (A^.PosY=B^.PosY);
+end;
+
+{ TATMarkerTags }
+
+constructor TATMarkerTags.Init(const ATag, AColumnTag: Int64);
+begin
+  Tag:= ATag;
+  TagEx:= AColumnTag;
+end;
 
 { TATMarkerItem }
 
@@ -133,6 +180,42 @@ begin
   end;
 end;
 
+procedure TATMarkerItem.UpdateOnEditing(APos, APosEnd, AShift, APosAfter: TPoint);
+begin
+  //marker below src, apply ShiftY/ShiftBelowX
+  if PosY>APos.Y then
+  begin
+    if AShift.Y=0 then exit;
+
+    if PosY=APosEnd.Y then
+      Inc(PosX, AShift.X);
+
+    Inc(PosY, AShift.Y);
+  end
+  else
+  //marker on same line as src
+  if PosY=APos.Y then
+  begin
+    if PosX=APos.X then
+    begin
+      PosX:= APosAfter.X;
+      PosY:= APosAfter.Y;
+    end
+    else
+    if PosX>=APos.X then
+      if AShift.Y=0 then
+        Inc(PosX, AShift.X)
+      else
+      begin
+        Inc(PosX, -APos.X+APosAfter.X);
+        Inc(PosY, AShift.Y);
+      end;
+  end;
+
+  if PosX<0 then PosX:= 0;
+  if PosY<0 then PosY:= 0;
+end;
+
 { TATMarkers }
 
 constructor TATMarkers.Create;
@@ -151,30 +234,14 @@ begin
 end;
 
 procedure TATMarkers.Clear;
-var
-  Item: PATMarkerItem;
-  i: integer;
 begin
-  for i:= FList.Count-1 downto 0 do
-  begin
-    Item:= ItemPtr(i);
-    if Assigned(Item^.Ptr) then
-      Item^.Ptr.Free;
-  end;
   FList.Clear;
 end;
 
 procedure TATMarkers.Delete(AIndex: integer);
-var
-  Item: PATMarkerItem;
 begin
   if IsIndexValid(AIndex) then
-  begin
-    Item:= ItemPtr(AIndex);
-    if Assigned(Item^.Ptr) then
-      Item^.Ptr.Free;
     FList.Delete(AIndex);
-  end;
 end;
 
 function TATMarkers.Count: integer; inline;
@@ -197,96 +264,108 @@ begin
   Result:= FList._GetItemPtr(AIndex);
 end;
 
-function TATMarkers.GetAsArray: TATInt64Array;
-const
-  NN = 7;
+function TATMarkers.GetAsMarkerArray: TATMarkerMarkerArray;
 var
   Item: PATMarkerItem;
   i: integer;
 begin
-  SetLength(Result{%H-}, Count*NN);
+  SetLength(Result{%H-}, Count);
   for i:= 0 to Count-1 do
   begin
     Item:= ItemPtr(i);
-    Result[i*NN]:= Item^.PosX;
-    Result[i*NN+1]:= Item^.PosY;
-    Result[i*NN+2]:= Item^.SelX;
-    Result[i*NN+3]:= Item^.SelY;
-    Result[i*NN+4]:= Item^.Tag;
-    Result[i*NN+5]:= Item^.Value;
-    Result[i*NN+6]:= Ord(Item^.MicromapMode);
+    Result[i].PosX:= Item^.PosX;
+    Result[i].PosY:= Item^.PosY;
+    Result[i].SelX:= Item^.SelX;
+    Result[i].SelY:= Item^.SelY;
+    Result[i].Tag:= Item^.Tag;
+    Result[i].TagEx:= Item^.TagEx;
+    Result[i].MicromapMode:= Ord(Item^.MicromapMode);
   end;
 end;
 
-procedure TATMarkers.SetAsArray(const AValue: TATInt64Array);
-const
-  NN = 7;
+function TATMarkers.GetAsAttribArray: TATMarkerAttribArray;
 var
-  NPosX, NPosY, NLenX, NLenY: integer;
-  NTag, NValue: Int64;
-  MicromapMode: TATMarkerMicromapMode;
+  Item: PATMarkerItem;
+  i: integer;
+begin
+  SetLength(Result{%H-}, Count);
+  for i:= 0 to Count-1 do
+  begin
+    Item:= ItemPtr(i);
+    Result[i].Tag:= Item^.Tag;
+    Result[i].PosX:= Item^.PosX;
+    Result[i].PosY:= Item^.PosY;
+    Result[i].SelX:= Item^.SelX;
+
+    Result[i].ColorFont:= Item^.LinePart.ColorFont;
+    Result[i].ColorBG:= Item^.LinePart.ColorBG;
+    Result[i].ColorBorder:= Item^.LinePart.ColorBorder;
+    Result[i].FontStyles:= Item^.LinePart.FontStyles;
+    Result[i].BorderLeft:= Ord(Item^.LinePart.BorderLeft);
+    Result[i].BorderRight:= Ord(Item^.LinePart.BorderRight);
+    Result[i].BorderDown:= Ord(Item^.LinePart.BorderDown);
+    Result[i].BorderUp:= Ord(Item^.LinePart.BorderUp);
+    Result[i].TagEx:= Item^.TagEx;
+    Result[i].MicromapMode:= Ord(Item^.MicromapMode);
+  end;
+end;
+
+procedure TATMarkers.SetAsMarkerArray(const AValue: TATMarkerMarkerArray);
+var
   i: integer;
 begin
   Clear;
-  for i:= 0 to Length(AValue) div NN - 1 do
+  for i:= 0 to Length(AValue)-1 do
   begin
-    NPosX:= AValue[i*NN];
-    NPosY:= AValue[i*NN+1];
-    NLenX:= AValue[i*NN+2];
-    NLenY:= AValue[i*NN+3];
-    NTag:= AValue[i*NN+4];
-    NValue:= AValue[i*NN+5];
-    MicromapMode:= TATMarkerMicromapMode(AValue[i*NN+6]);
     Add(
-      NPosX,
-      NPosY,
-      NTag,
-      NLenX,
-      NLenY,
+      Point(AValue[i].PosX, AValue[i].PosY),
+      Point(AValue[i].SelX, AValue[i].SelY),
+      TATMarkerTags.Init(AValue[i].Tag, AValue[i].TagEx),
       nil,
-      NValue,
-      MicromapMode
+      TATMarkerMicromapMode(AValue[i].MicromapMode)
       );
   end;
 end;
 
-function TATMarkers.GetAsString: string;
+procedure TATMarkers.SetAsAttribArray(const AValue: TATMarkerAttribArray);
 var
-  Ar: TATInt64Array;
+  LinePart: TATLinePart;
   i: integer;
 begin
-  Result:= '';
-  Ar:= AsArray;
-  for i:= 0 to High(Ar) do
-    Result+= IntToStr(Ar[i])+',';
+  Clear;
+  InitLinePart(LinePart);
+  for i:= 0 to Length(AValue)-1 do
+  begin
+    LinePart.ColorFont:= AValue[i].ColorFont;
+    LinePart.ColorBG:= AValue[i].ColorBG;
+    LinePart.ColorBorder:= AValue[i].ColorBorder;
+    LinePart.FontStyles:= AValue[i].FontStyles;
+    LinePart.BorderLeft:= TATLineStyle(AValue[i].BorderLeft);
+    LinePart.BorderRight:= TATLineStyle(AValue[i].BorderRight);
+    LinePart.BorderDown:= TATLineStyle(AValue[i].BorderDown);
+    LinePart.BorderUp:= TATLineStyle(AValue[i].BorderUp);
+
+    Add(
+      Point(AValue[i].PosX, AValue[i].PosY),
+      Point(AValue[i].SelX, 0),
+      TATMarkerTags.Init(AValue[i].Tag, AValue[i].TagEx),
+      @LinePart,
+      TATMarkerMicromapMode(AValue[i].MicromapMode)
+      );
+  end;
 end;
 
-procedure TATMarkers.SetAsString(const AValue: string);
-var
-  Sep: TATStringSeparator;
-  Ar: TATInt64Array;
-  Len: integer;
-  N: Int64;
-  i: integer;
+function TATMarkers.GetAsMarkerString: string;
 begin
-  if AValue='' then
-  begin
-    Clear;
-    exit;
-  end;
+  Result:= MarkerArrayToString(AsMarkerArray);
+end;
 
-  Len:= SFindCharCount(AValue, ',');
-  if Len=0 then exit;
-  SetLength(Ar, Len);
-
-  Sep.Init(AValue);
-  for i:= 0 to Len-1 do
-  begin
-    Sep.GetItemInt64(N, 0);
-    Ar[i]:= N;
-  end;
-
-  AsArray:= Ar;
+procedure TATMarkers.SetAsMarkerString(const AValue: string);
+var
+  Ar: TATMarkerMarkerArray;
+begin
+  StringToMarkerArray(Ar, AValue);
+  AsMarkerArray:= Ar;
 end;
 
 procedure TATMarkers.SetItem(N: integer; const AItem: TATMarkerItem);
@@ -294,79 +373,153 @@ begin
   FList[N]:= AItem;
 end;
 
-procedure TATMarkers.Add(APosX, APosY: integer; const ATag: Int64;
-  ASelX: integer; ASelY: integer; APtr: TObject; AValue: Int64;
+procedure TATMarkers.Add(APos: TPoint; ASel: TPoint;
+  const ATags: TATMarkerTags; ALinePart: PATLinePart;
   AMicromapMode: TATMarkerMicromapMode; ALineLen: integer);
 var
   Item: TATMarkerItem;
-  NIndex: integer;
+  NIndex, NIndexFrom, NIndexTo: integer;
   bExact: boolean;
 begin
-  FillChar(Item, SizeOf(Item), 0);
-  Item.PosX:= APosX;
-  Item.PosY:= APosY;
+  Item:= Default(TATMarkerItem);
+  Item.PosX:= APos.X;
+  Item.PosY:= APos.Y;
   Item.CoordX:= -1;
   Item.CoordY:= -1;
   Item.CoordX2:= -1;
   Item.CoordY2:= -1;
-  Item.Tag:= ATag;
-  Item.SelX:= ASelX;
-  Item.SelY:= ASelY;
+  Item.SelX:= ASel.X;
+  Item.SelY:= ASel.Y;
   Item.LineLen:= ALineLen;
-  Item.Ptr:= APtr;
-  Item.Value:= AValue;
   Item.MicromapMode:= AMicromapMode;
+
+  Item.Tag:= ATags.Tag;
+  Item.TagEx:= ATags.TagEx;
+
+  if Assigned(ALinePart) then
+    Item.LinePart:= ALinePart^
+  else
+    InitLinePart(Item.LinePart);
 
   if FSorted then
   begin
-    Find(APosX, APosY, NIndex, bExact);
+    Find(APos.X, APos.Y, NIndex, bExact);
     if bExact then
     begin
       if not FDuplicates then
-        FList.Delete(NIndex)
+      begin
+        NIndexFrom:= NIndex;
+        NIndexTo:= NIndex;
+        while IsIndexValid(NIndexTo+1) and IsMarkerPositionsEqual(ItemPtr(NIndexTo+1), @Item) do
+          Inc(NIndexTo);
+        while IsIndexValid(NIndexFrom-1) and IsMarkerPositionsEqual(ItemPtr(NIndexFrom-1), @Item) do
+          Dec(NIndexFrom);
+        //save 2 reallocs (delete, insert)
+        //FList.Deref(FList._GetItemPtr(NIndexFrom));
+        FList.Items[NIndexFrom]:= Item;
+        //delete other dups
+        if NIndexFrom+1<=NIndexTo then
+          FList.DeleteRange(NIndexFrom+1, NIndexTo);
+      end
       else
-      repeat
-        Inc(NIndex)
-      until not IsIndexValid(NIndex) or (Items[NIndex]<>Item);
-    end;
-    FList.Insert(NIndex, Item);
+      begin
+        repeat
+          Inc(NIndex)
+        until not IsIndexValid(NIndex) or not IsMarkerPositionsEqual(ItemPtr(NIndex), @Item);
+        FList.Insert(NIndex, Item);
+      end;
+    end
+    else
+      FList.Insert(NIndex, Item);
   end
   else
     FList.Add(Item);
 end;
 
-procedure TATMarkers.DeleteInRange(AX1, AY1, AX2, AY2: integer);
-var
-  Item: PATMarkerItem;
-  i: integer;
-begin
-  for i:= Count-1 downto 0 do
+function TATMarkers.DeleteInRange(AX1, AY1, AX2, AY2: integer): boolean;
+  //
+  function IsMarkerOk(Item: PATMarkerItem): boolean; inline;
   begin
-    Item:= ItemPtr(i);
-    if IsPosInRange(Item^.PosX, Item^.PosY, AX1, AY1, AX2, AY2)=cRelateInside then
-      Delete(i);
+    Result:= IsPosInRange(Item^.PosX, Item^.PosY, AX1, AY1, AX2, AY2)=cRelateInside;
   end;
+  //
+var
+  i, j: integer;
+begin
+  Result:= false;
+  i:= Count;
+  repeat
+    Dec(i);
+    if i<0 then Break;
+    if IsMarkerOk(ItemPtr(i)) then
+    begin
+      Result:= true;
+      j:= i;
+      while (j>0) and IsMarkerOk(ItemPtr(j-1)) do
+        Dec(j);
+      FList.DeleteRange(j, i);
+      i:= j;
+    end;
+  until false;
 end;
 
-procedure TATMarkers.DeleteWithTag(const ATag: Int64);
+function TATMarkers.DeleteWithTag(const ATag: Int64): boolean;
 var
-  bAllTagged: boolean;
-  i: integer;
+  i, j: integer;
 begin
-  bAllTagged:= true;
-  for i:= 0 to Count-1 do
-    if ItemPtr(i)^.Tag<>ATag then
-    begin
-      bAllTagged:= false;
-      Break;
-    end;
-
-  if bAllTagged then
-    Clear
-  else
-  for i:= Count-1 downto 0 do
+  Result:= false;
+  i:= Count;
+  repeat
+    Dec(i);
+    if i<0 then Break;
     if ItemPtr(i)^.Tag=ATag then
-      Delete(i);
+    begin
+      Result:= true;
+      j:= i;
+      while (j>0) and (ItemPtr(j-1)^.Tag=ATag) do
+        Dec(j);
+      FList.DeleteRange(j, i);
+      i:= j;
+    end;
+  until false;
+end;
+
+function TATMarkers.DeleteByPos(AX, AY: integer): boolean;
+// if AX=-1, delete all items for line AY
+  //
+  function IsMarkerOk(AIndex: integer): boolean; inline;
+  var
+    P: PATMarkerItem;
+  begin
+    P:= ItemPtr(AIndex);
+    Result:= (P^.PosY=AY) and ((AX<0) or (P^.PosX=AX));
+  end;
+  //
+var
+  N, NFrom, NTo: integer;
+  bExact: boolean;
+begin
+  Result:= false;
+
+  if AX<0 then
+    Find(0, AY, N, bExact)
+  else
+    Find(AX, AY, N, bExact);
+
+  if N>=0 then
+  begin
+    NFrom:= N;
+    NTo:= N-1;
+    while IsIndexValid(NTo+1) and IsMarkerOk(NTo+1) do
+      Inc(NTo);
+    while IsIndexValid(NFrom-1) and IsMarkerOk(NFrom-1) do
+      Dec(NFrom);
+    if NTo>=NFrom then
+    begin
+      FList.DeleteRange(NFrom, NTo);
+      Result:= true;
+    end;
+  end;
 end;
 
 function _ComparePoints(X1, Y1, X2, Y2: integer): integer; inline;
@@ -446,6 +599,18 @@ begin
   end;
 end;
 
+
+procedure TATMarkers.UpdateOnEditing(APos, APosEnd, AShift, APosAfter: TPoint);
+var
+  Item: PATMarkerItem;
+  i: integer;
+begin
+  for i:= 0 to Count-1 do
+  begin
+    Item:= ItemPtr(i);
+    Item^.UpdateOnEditing(APos, APosEnd, AShift, APosAfter);
+  end;
+end;
 
 end.
 

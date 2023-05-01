@@ -1,20 +1,30 @@
-var
-  cBitmapWait: TPortableNetworkGraphic = nil;
-  cBitmapSaving: TPortableNetworkGraphic = nil;
-  cBitmapNiceScroll: TPortableNetworkGraphic = nil;
-  cBitmapFoldPlus: TPortableNetworkGraphic = nil;
-  cBitmapFoldMinus: TPortableNetworkGraphic = nil;
-
-const
-  crNiceScrollNone  = TCursor(-40);
-  crNiceScrollUp    = TCursor(-41);
-  crNiceScrollDown  = TCursor(-42);
-  crNiceScrollLeft  = TCursor(-43);
-  crNiceScrollRight = TCursor(-44);
-
 const
   //under Mac don't use Ctrl key, use Meta key as default (e.g. Meta+C, Meta+A)
   ssXControl = {$ifndef darwin} ssCtrl {$else} ssMeta {$endif};
+
+{ TATEditorCommandLog }
+
+constructor TATEditorCommandLog.Create;
+begin
+  inherited;
+  MaxCount:= 200;
+end;
+
+procedure TATEditorCommandLog.Add(ACode: integer;
+  AInvoke: TATEditorCommandInvoke; const AText: string);
+var
+  Item: TATEditorCommandLogItem;
+begin
+  if MaxCount<=0 then exit;
+  while Size()>=MaxCount do
+    PopFront();
+
+  Item.ItemCode:= ACode;
+  Item.ItemInvoke:= AInvoke;
+  //Item.ItemTicks:= GetTickCount64;
+  Item.ItemText:= AText;
+  PushBack(Item);
+end;
 
 { TATFoldedMarks }
 
@@ -65,7 +75,7 @@ begin
   NMax:= 1;
   NPage:= 1;
   NPixelOffset:= 0;
-  SmoothCharSize:= 1;
+  CharSizeScaled:= 1*ATEditorCharXScale;
   SmoothPos:= 0;
   SmoothPosLast:= 1;
   SmoothMax:= 1;
@@ -86,6 +96,12 @@ begin
   SmoothPos:= SmoothPosLast;
 end;
 
+procedure TATEditorScrollInfo.SetNPos(const AValue: Int64);
+begin
+  if NPosInternal=AValue then Exit;
+  NPosInternal:= AValue;
+end;
+
 function TATEditorScrollInfo.TopGapVisible: boolean;
 begin
   Result:= NPos=-1;
@@ -93,7 +109,7 @@ end;
 
 function TATEditorScrollInfo.TotalOffset: Int64;
 begin
-  Result:= NPos*SmoothCharSize + NPixelOffset;
+  Result:= NPos * CharSizeScaled div ATEditorCharXScale + NPixelOffset;
 end;
 
 class operator TATEditorScrollInfo.= (const A, B: TATEditorScrollInfo): boolean;
@@ -106,56 +122,6 @@ begin
     (A.NPixelOffset=B.NPixelOffset);
 end;
 
-function EditorResourceScaleSuffix: string;
-var
-  N: integer;
-begin
-  N:= Screen.PixelsPerInch;
-  if N>=96*2 then
-    Result:= '_200'
-  else
-  if N>=(96 * 3 div 2) then
-    Result:= '_150'
-  else
-    Result:= '';
-end;
-
-procedure InitEditorResources;
-var
-  Suffix: string;
-begin
-  Suffix:= EditorResourceScaleSuffix;
-
-  Screen.Cursors[crNiceScrollNone]:= LoadCursor(HInstance, 'ATSYN_MOVE');
-  Screen.Cursors[crNiceScrollUp]:= LoadCursor(HInstance, 'ATSYN_MOVE_U');
-  Screen.Cursors[crNiceScrollDown]:= LoadCursor(HInstance, 'ATSYN_MOVE_D');
-  Screen.Cursors[crNiceScrollLeft]:= LoadCursor(HInstance, 'ATSYN_MOVE_L');
-  Screen.Cursors[crNiceScrollRight]:= LoadCursor(HInstance, 'ATSYN_MOVE_R');
-
-  cBitmapNiceScroll:= TPortableNetworkGraphic.Create;
-  cBitmapNiceScroll.LoadFromResourceName(HInstance, 'ATSYN_SCROLLMARK'+Suffix);
-
-  cBitmapWait:= TPortableNetworkGraphic.Create;
-  cBitmapWait.LoadFromResourceName(HInstance, 'ATSYN_WAIT');
-
-  cBitmapSaving:= TPortableNetworkGraphic.Create;
-  cBitmapSaving.LoadFromResourceName(HInstance, 'ATSYN_SAVE');
-
-  cBitmapFoldPlus:= TPortableNetworkGraphic.Create;
-  cBitmapFoldPlus.LoadFromResourceName(HInstance, 'ATSYN_FOLD_P'+Suffix);
-
-  cBitmapFoldMinus:= TPortableNetworkGraphic.Create;
-  cBitmapFoldMinus.LoadFromResourceName(HInstance, 'ATSYN_FOLD_M'+Suffix);
-end;
-
-procedure FreeEditorResources;
-begin
-  FreeAndNil(cBitmapWait);
-  FreeAndNil(cBitmapSaving);
-  FreeAndNil(cBitmapNiceScroll);
-  FreeAndNil(cBitmapFoldPlus);
-  FreeAndNil(cBitmapFoldMinus);
-end;
 
 function EditorDoubleBufferedNeeded: boolean;
 begin
@@ -163,34 +129,52 @@ begin
 end;
 
 
-procedure InitEditorMouseActions(var M: TATEditorMouseActionArray);
+procedure InitEditorMouseActions(out M: TATEditorMouseActions; ANoCtrlClickForCaret: boolean);
+var
+  NCount: integer;
   //
-  procedure Add(AId: TATEditorMouseAction; AState: TShiftState);
+  procedure Add(AId: TATEditorMouseAction; AState: TShiftState); inline;
   begin
-    SetLength(M, Length(M)+1);
-    M[High(M)].MouseActionId:= AId;
-    M[High(M)].MouseState:= AState;
+    M[NCount].MouseActionId:= AId;
+    M[NCount].MouseState:= AState;
+    Inc(NCount);
   end;
   //
 begin
-  SetLength(M, 0);
+  M:= nil;
+  NCount:= 0;
+
+  //realloc to some big length
+  SetLength(M, 25);
 
   Add(cMouseActionClickSimple, [ssLeft]);
+  Add(cMouseActionClickSimple, [ssLeft, ssMeta]); //like VSCode
   Add(cMouseActionClickRight, [ssRight]);
+  Add(cMouseActionClickRight, [ssRight, ssMeta]); //like VSCode
   Add(cMouseActionClickAndSelNormalBlock, [ssLeft, ssShift]);
   Add(cMouseActionClickAndSelVerticalBlock, [ssLeft, ssAlt, ssShift]);
-  Add(cMouseActionMakeCaret, [ssLeft, ssXControl]);
+
+  if ANoCtrlClickForCaret then
+    Add(cMouseActionClickSimple, [ssLeft, ssXControl])
+  else
+    Add(cMouseActionMakeCaret, [ssLeft, ssXControl]);
+
   Add(cMouseActionMakeCaretsColumn, [ssLeft, ssXControl, ssShift]);
+
   Add(cMouseActionClickMiddle, [ssMiddle]);
+  Add(cMouseActionMakeCaret, [ssMiddle, ssXControl]);
 
   Add(cMouseActionClickSimple, [ssLeft, ssAlt]);
   Add(cMouseActionClickSimple, [ssLeft, ssAltGr]);
   Add(cMouseActionClickSimple, [ssLeft, ssAlt, ssXControl]);
   Add(cMouseActionClickSimple, [ssLeft, ssAlt, ssShift, ssXControl]);
+
+  //realloc at end, to actual count
+  SetLength(M, NCount);
 end;
 
 
-function EditorMouseActionId(const M: TATEditorMouseActionArray; State: TShiftState): TATEditorMouseAction;
+function EditorMouseActionId(const M: TATEditorMouseActions; State: TShiftState): TATEditorMouseAction;
 var
   i: integer;
 begin
@@ -260,19 +244,17 @@ end;
 //it's like LCLProc.IsEditableTextKey() but changed to ignore Num-keys
 function IsEditorHotkeyForText(Key: Word): Boolean;
 begin
-  case Key of
-    VK_A..VK_Z,
-    //VK_NUMPAD0..VK_DIVIDE,
-    VK_0..VK_9,
-    186..192,
-    219..222:
-      Result:= true;
-    else
-     Result:= false;
-   end;
+  Result:= (Ord(Key)<256) and
+    (byte(key) in [
+      VK_A..VK_Z,
+      //VK_NUMPAD0..VK_DIVIDE,
+      VK_0..VK_9,
+      186..192,
+      219..222
+      ]);
 end;
 
-function IsPointsDiffByDelta(const P1, P2: TPoint; Delta: integer): boolean; inline;
+function IsPointsDiffByDelta(const P1, P2: TATPoint; Delta: integer): boolean; inline;
 begin
   Result:=
     (Abs(P1.X-P2.X)>=Delta) or

@@ -12,13 +12,11 @@ interface
 uses
   Classes, SysUtils,
   ATStringProc,
+  ATSynEdit_Globals,
   ATSynEdit_FGL;
 
 type
   TATBookmarkAutoDelete = (bmadDontDelete, bmadDelete, bmadOption);
-
-var
-  OptBookmarksAutoDelete: boolean = false;
 
 type
   { TATBookmarkData }
@@ -67,8 +65,10 @@ type
     function Count: integer;
     function IsIndexValid(N: integer): boolean;
     property ItemPtr[N: integer]: PATBookmarkItem read GetItemPtr; default;
-    procedure Add(const AData: TATBookmarkData);
+    procedure Add(const AData: TATBookmarkData; AToggle: boolean=false);
     function Find(ALineNum: integer): integer;
+    function FindNearest(ALineNum: integer; out AExactMatch: boolean): integer;
+    function FindHintForLine(ALineNum: integer): string;
     procedure DeleteDups;
     procedure Update(AChange: TATLineChangeKind; ALine, AItemCount, ALineCount: integer);
   end;
@@ -155,15 +155,23 @@ end;
 
 function TATBookmarks.DeleteByTag(const ATag: Int64): boolean;
 var
-  i: integer;
+  i, j: integer;
 begin
   Result:= false;
-  for i:= FList.Count-1 downto 0 do
+  i:= FList.Count;
+  repeat
+    Dec(i);
+    if i<0 then Break;
     if FList[i].Data.Tag=ATag then
     begin
       Result:= true;
-      Delete(i);
+      j:= i;
+      while (j>0) and (FList[j-1].Data.Tag=ATag) do
+        Dec(j);
+      FList.DeleteRange(j, i);
+      i:= j;
     end;
+  until false;
 end;
 
 function TATBookmarks.Count: integer; inline;
@@ -176,36 +184,42 @@ begin
   Result:= (N>=0) and (N<FList.Count);
 end;
 
-procedure TATBookmarks.Add(const AData: TATBookmarkData);
+procedure TATBookmarks.Add(const AData: TATBookmarkData; AToggle: boolean=false);
 var
   Item: TATBookmarkItem;
-  nLine, i: integer;
+  N: integer;
+  bExact: boolean;
 begin
-  FillChar(Item, SizeOf(Item), 0);
-
-  for i:= 0 to Count-1 do
+  N:= FindNearest(AData.LineNum, bExact);
+  if N<0 then
   begin
-    nLine:= FList.ItemPtr(i)^.Data.LineNum;
-
-    //bookmark already exists: overwrite
-    if nLine=AData.LineNum then
+    //not found bookmark for bigger line: append
+    Item:= Default(TATBookmarkItem);
+    Item.Assign(AData);
+    FList.Add(Item);
+  end
+  else
+  begin
+    if bExact then
     begin
-      ItemPtr[i]^.Assign(AData);
-      Exit
-    end;
-
-    //found bookmark for bigger line: insert before it
-    if nLine>AData.LineNum then
+      //bookmark exists
+      if AToggle then
+        FList.Delete(N)
+      else
+      begin
+        Item:= Default(TATBookmarkItem);
+        Item.Assign(AData);
+        ItemPtr[N]^.Assign(AData);
+      end;
+    end
+    else
     begin
+      //found bookmark for bigger line: insert before it
+      Item:= Default(TATBookmarkItem);
       Item.Assign(AData);
-      FList.Insert(i, Item);
-      Exit;
+      FList.Insert(N, Item);
     end;
   end;
-
-  //not found bookmark for bigger line: append
-  Item.Assign(AData);
-  FList.Add(Item);
 end;
 
 procedure TATBookmarks.DeleteDups;
@@ -242,6 +256,51 @@ begin
     else
       a:= m+1;
   until false;
+end;
+
+function TATBookmarks.FindNearest(ALineNum: integer; out AExactMatch: boolean): integer;
+var
+  a, b, m, dif: integer;
+begin
+  Result:= -1;
+  AExactMatch:= false;
+
+  a:= 0;
+  b:= Count-1;
+
+  repeat
+    if a>b then
+    begin
+      while IsIndexValid(a-1) and (FList.ItemPtr(a-1)^.Data.LineNum>=ALineNum) do
+        Dec(a);
+      if IsIndexValid(a) then
+        Result:= a;
+      exit;
+    end;
+
+    m:= (a+b+1) div 2;
+
+    dif:= FList.ItemPtr(m)^.Data.LineNum-ALineNum;
+    if dif=0 then
+    begin
+      AExactMatch:= true;
+      exit(m);
+    end;
+    if dif>0 then
+      b:= m-1
+    else
+      a:= m+1;
+  until false;
+end;
+
+function TATBookmarks.FindHintForLine(ALineNum: integer): string;
+var
+  N: integer;
+begin
+  Result:= '';
+  N:= Find(ALineNum);
+  if N>=0 then
+    Result:= GetItemPtr(N)^.Data.Hint;
 end;
 
 
@@ -283,7 +342,7 @@ begin
           if (NIndexPlaced>=0) then
           begin
             fAutoDel:= FList.ItemPtr(NIndexPlaced)^.Data.AutoDelete;
-            if (fAutoDel=bmadDelete) or ((fAutoDel=bmadOption) and OptBookmarksAutoDelete) then
+            if (fAutoDel=bmadDelete) or ((fAutoDel=bmadOption) and ATEditorOptions.BookmarksAutoDelete) then
             begin
               Delete(NIndexPlaced);
               NIndexPlaced:= -1;

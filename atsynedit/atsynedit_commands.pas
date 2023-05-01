@@ -27,6 +27,9 @@ const
   cCommand_KeyDown         = _base_KeyDown or cCmdFlag_ResetSel;
   cCommand_KeyLeft         = _base_KeyLeft; //handles sel
   cCommand_KeyRight        = _base_KeyRight; //handles sel
+    //why KeyLeft/KeyRight don't have cCmdFlag_ResetSel? because we need to support this feature:
+    //Left with selection moves caret to left sel edge;
+    //Right with selection moves caret to right sel edge.
   cCommand_KeyHome         = _base_KeyHome or cCmdFlag_ResetSel;
   cCommand_KeyEnd          = _base_KeyEnd or cCmdFlag_ResetSel;
   cCommand_KeyPageUp       = _base_KeyPageUp or cCmdFlag_ResetSel;
@@ -64,6 +67,7 @@ const
   cCommand_KeyEnter = 154;
   cCommand_KeyTab = 155;
   cCommand_ForceFinalEndOfLine = 160;
+  cCommand_DeleteFinalEndOfLine = 161;
 
   cCommand_TextDeleteSelection = 170;
   cCommand_TextDeleteLine = 171;
@@ -71,8 +75,8 @@ const
   cCommand_TextDeleteToLineBegin = 173 or cCmdFlag_ResetSel;
   cCommand_TextDeleteToLineEnd = 174 or cCmdFlag_ResetSel;
   cCommand_TextDeleteToTextEnd = 175 or cCmdFlag_ResetSel;
-  cCommand_TextDeleteWordNext = 176 or cCmdFlag_ResetSel;
-  cCommand_TextDeleteWordPrev = 177 or cCmdFlag_ResetSel;
+  cCommand_TextDeleteWordNext = 176;
+  cCommand_TextDeleteWordPrev = 177;
   cCommand_TextDeleteToTextBegin = 178 or cCmdFlag_ResetSel;
   cCommand_TextDeleteWordEntire = 179 or cCmdFlag_ResetSel;
 
@@ -118,6 +122,7 @@ const
   cCommand_TextIndent = 240;
   cCommand_TextUnindent = 241;
 
+  cCommand_ScrollToLeft = 247;
   cCommand_ScrollPageUp = 248;
   cCommand_ScrollPageDown = 249;
   cCommand_ScrollLineUp = 250;
@@ -138,6 +143,7 @@ const
   cCommand_SelectInverted = 264 or cCmdFlag_Caret;
   cCommand_SelectSplitToLines = 265 or cCmdFlag_Caret;
   cCommand_SelectExtendByLine = 266 or cCmdFlag_Caret;
+  cCommand_SelectExtendByLineUp = 267 or cCmdFlag_Caret;
 
   cCommand_MoveSelectionUp = 268; // or cCmdFlag_Caret;
   cCommand_MoveSelectionDown = 269; // or cCmdFlag_Caret;
@@ -177,12 +183,14 @@ const
 
   //first Paste command
   cCommand_Clipboard_Begin = 1000;
+
   cCommand_ClipboardPaste_Begin = 1000;
   cCommand_ClipboardPaste = 1000;
   cCommand_ClipboardPaste_Select = 1001;
   cCommand_ClipboardPaste_KeepCaret = 1002;
   cCommand_ClipboardPaste_Column = 1003 or cCmdFlag_ResetSel;
   cCommand_ClipboardPaste_ColumnKeepCaret = 1004 or cCmdFlag_ResetSel;
+  cCommand_ClipboardPasteAndIndent = 1005;
   cCommand_ClipboardCopy = 1006;
   cCommand_ClipboardCopyAdd = 1007;
   cCommand_ClipboardCut = 1008;
@@ -193,11 +201,11 @@ const
   cCommand_ClipboardAltPaste_KeepCaret = 1012;
   cCommand_ClipboardAltPaste_Column = 1013 or cCmdFlag_ResetSel;
   cCommand_ClipboardAltPaste_ColumnKeepCaret = 1014 or cCmdFlag_ResetSel;
-  //use SecondarySelection (has meaning in Linux)
-  cCommand_ClipboardAltAltPaste = 1015;
-  //last Paste command
-  cCommand_ClipboardPaste_End = 1015;
-  cCommand_Clipboard_End = 1015;
+  cCommand_ClipboardAltAltPaste = 1015; //use SecondarySelection (has meaning in Linux)
+  cCommand_ClipboardPasteFromRecents = 1016;
+  cCommand_ClipboardPaste_End = 1016; //last Paste command
+  cCommand_ClipboardClearRecents = 1017;
+  cCommand_Clipboard_End = 1017;
 
   cCommand_TextCaseLower = 1020;
   cCommand_TextCaseUpper = 1021;
@@ -226,7 +234,11 @@ const
   cCommand_FoldingToggleAtCurLine = 1042;
   cCommand_FoldingFoldSelection = 1043;
 
+  cCommand_CancelKeepSel = 1998;
+  cCommand_CancelKeepLast = 1999;
+  cCommand_CancelKeepLastAndSel = 2000;
   cCommand_Cancel = 2001;
+
   cCommand_RepeatTextCommand = 2002;
   cCommand_ZoomIn = 2003;
   cCommand_ZoomOut = 2004;
@@ -256,13 +268,22 @@ function IsCommandForDelayedParsing(AValue: integer): boolean;
 
 function IsCommandForClipboardAction(AValue: integer): boolean;
 
+procedure IsCommandForMultiCarets(AValue: integer; out AAllowMultiCarets, AMoveDown: boolean);
+
 implementation
 
 function IsCommandToUndoInOneStep(AValue: integer): boolean;
 begin
   case AValue and not cCmdFlag_ResetSel of
+    //TextInsert + BackSpace/Delete are here to fix CudaText #3972
+    cCommand_TextInsert,
+    cCommand_KeyBackspace,
+    cCommand_KeyDelete,
+
+    //"move lines up/down" were first who needed undo in single step
     cCommand_MoveSelectionUp,
     cCommand_MoveSelectionDown,
+
     cCommand_ClipboardPaste_Begin..
     cCommand_ClipboardPaste_End:
       Result:= true;
@@ -292,6 +313,33 @@ begin
       Result:= true
     else
       Result:= false;
+  end;
+end;
+
+procedure IsCommandForMultiCarets(AValue: integer; out AAllowMultiCarets, AMoveDown: boolean);
+begin
+  case AValue of
+    cCommand_SelectExtendByLine,
+    cCommand_CaretsExtendDownLine,
+    cCommand_CaretsExtendDownPage,
+    cCommand_CaretsExtendDownToEnd:
+      begin
+        AAllowMultiCarets:= true;
+        AMoveDown:= true;
+      end;
+    cCommand_SelectExtendByLineUp,
+    cCommand_CaretsExtendUpLine,
+    cCommand_CaretsExtendUpPage,
+    cCommand_CaretsExtendUpToTop:
+      begin
+        AAllowMultiCarets:= true;
+        AMoveDown:= false;
+      end;
+    else
+      begin
+        AAllowMultiCarets:= false;
+        AMoveDown:= false;
+      end;
   end;
 end;
 

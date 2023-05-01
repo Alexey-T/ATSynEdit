@@ -22,26 +22,15 @@ uses
   ATSynEdit_Bookmarks,
   ATSynEdit_Gutter_Decor,
   ATSynEdit_Commands,
+  ATSynEdit_Globals,
   EncConv;
-
-const
-  //set it to number of editors, which share same Strings obj
-  //(needed when UI tab is splitted to N parts, for the same file)
-  //set to 1 to allow only one editor for Strings obj (saves memory)
-  cMaxStringsClients = 2;
-
-  //if update count is less, do smarter wrapinfo update (find, replace items)
-  //smart update used only if lines changed, not deleted/inserted
-  cMaxUpdatesCountEasy = 200;
-
-  cStringsProgressLoadChars = 1000*1000;
-  cStringsProgressSaveLines = 100*1000;
-
-  //force utf8 for huge files on loading
-  cMaxFileSizeMbToDetectEncoding: integer = 50;
 
 type
   TATIntegerList = specialize TFPGList<integer>;
+
+type
+  EEditorTooLongLine = class(Exception);
+  EEditorTooManyLines = class(Exception);
 
 type
   TATLineIndentKind = (
@@ -71,6 +60,13 @@ type
     cBlockDeleteColumn,
     cBlockInsertColumn
   );
+
+  TATStringGitMarker = (
+    cGitMarkNone,
+    cGitMarkBegin,
+    cGitMarkMiddle,
+    cGitMarkEnd
+    );
 
 const
   cEncodingSize: array[TATFileEncoding] of integer = (1, 1, 2, 2, 4, 4);
@@ -119,32 +115,33 @@ type
 
   TATStringItem = packed record
   private
-    Buf: string;
     function GetLine: UnicodeString;
     function GetLineEnds: TATLineEnds;
     function GetLineState: TATLineState;
     procedure SetLineW(const S: UnicodeString);
-    procedure SetLineA(const S: string);
+    procedure SetLineA(const S: string; AllowBadCharsOfLen1: boolean);
   public
+    Buf: string;
     Ex: TATStringItemEx;
-    function CharLen: integer;
+    function CharLen: SizeInt;
     property Line: UnicodeString read GetLine write SetLineW;
     property LineState: TATLineState read GetLineState;
     property LineEnds: TATLineEnds read GetLineEnds;
-    function LineSub(AFrom, ALen: integer): UnicodeString;
+    function LineSub(AFrom, ALen: SizeInt): UnicodeString;
     procedure LineToBuffer(OtherBuf: PWideChar);
-    function CharAt(AIndex: integer): WideChar;
+    function CharAt(AIndex: SizeInt): WideChar;
     function HasTab: boolean;
     function HasAsciiNoTabs: boolean;
-    procedure Init(const S: string; AEnd: TATLineEnds);
+    procedure Init(const S: string; AEnd: TATLineEnds; AllowBadCharsOfLen1: boolean);
     procedure Init(const S: UnicodeString; AEnd: TATLineEnds);
     procedure LineStateToChanged;
     procedure LineStateToSaved; inline;
     procedure LineStateToNone; inline;
     function IsFake: boolean; inline;
-    procedure GetIndentProp(out ACharCount: integer; out AKind: TATLineIndentKind);
-    function CharLenWithoutSpace: integer;
+    procedure GetIndentProp(out ACharCount: SizeInt; out AKind: TATLineIndentKind);
+    function CharLenWithoutSpace: SizeInt;
     function IsBlank: boolean;
+    function IsGitMarker: TATStringGitMarker;
   end;
   PATStringItem = ^TATStringItem;
 
@@ -153,9 +150,9 @@ type
   TATStringItemList = class(TFPSList)
   public
     constructor Create;
-    function GetItem(AIndex: integer): PATStringItem;
+    function GetItem(AIndex: SizeInt): PATStringItem;
     procedure Deref(Item: Pointer); override; overload;
-    procedure SortRange(L, R: integer; Compare: TFPSListCompareFunc);
+    procedure SortRange(L, R: SizeInt; Compare: TFPSListCompareFunc);
   end;
 
 type
@@ -165,16 +162,26 @@ type
     cStringsProgressSaving
     );
 
+  TATLoadStreamOption = (
+    cLoadOpFromUTF8,
+    cLoadOpAllowBadCharsOfLen1,
+    cLoadOpKeepScroll
+    );
+  TATLoadStreamOptions = set of TATLoadStreamOption;
+
 type
   TATStringsGetCarets = function: TATPointArray of object;
-  TATStringsGetMarkers = function: TATInt64Array of object;
+  TATStringsGetMarkers = function: TATMarkerMarkerArray of object;
+  TATStringsGetAttribs = function: TATMarkerAttribArray of object;
   TATStringsSetCarets = procedure(const ACarets: TATPointArray) of object;
-  TATStringsSetMarkers = procedure(const AMarkers: TATInt64Array) of object;
-  TATStringsChangeLogEvent = procedure(Sender: TObject; ALine: integer) of object;
-  TATStringsChangeExEvent = procedure(Sender: TObject; AChange: TATLineChangeKind; ALine, AItemCount: integer) of object;
+  TATStringsSetMarkers = procedure(const AMarkers: TATMarkerMarkerArray) of object;
+  TATStringsSetAttribs = procedure(const AMarkers: TATMarkerAttribArray) of object;
+  TATStringsChangeLogEvent = procedure(Sender: TObject; ALine: SizeInt) of object;
+  TATStringsChangeExEvent = procedure(Sender: TObject; AChange: TATLineChangeKind; ALine, AItemCount: SizeInt) of object;
   TATStringsChangeBlockEvent = procedure(Sender: TObject; const AStartPos, AEndPos: TPoint; 
                                  AChange: TATBlockChangeKind; ABlock: TStringList) of object;
-  TATStringsUndoEvent = procedure(Sender: TObject; AX, AY: integer) of object;
+  TATStringsUndoEvent = procedure(Sender: TObject; AX, AY: SizeInt) of object;
+  TATStringsUnfoldLineEvent = procedure(Sender: TObject; ALine: SizeInt) of object;
 
 type
   { TATStrings }
@@ -182,8 +189,8 @@ type
   TATStrings = class
   private
     FList: TATStringItemList;
-    FListUpdates: TATIntegerList;
-    FListUpdatesHard: boolean;
+    FIndexesOfEditedLines: TATIntegerList;
+    FEnableCachedWrapinfoUpdate: boolean;
     FGaps: TATGaps;
     FBookmarks: TATBookmarks;
     FBookmarks2: TATBookmarks;
@@ -207,18 +214,21 @@ type
     FUndoAfterSave: boolean;
     FUndoGroupCounter: integer;
     FOneLine: boolean;
-    FProgressValue: integer;
+    FProgressValue: SizeInt;
     FProgressKind: TATStringsProgressKind;
     FOnGetCaretsArray: TATStringsGetCarets;
     FOnGetMarkersArray: TATStringsGetMarkers;
+    FOnGetAttribsArray: TATStringsGetAttribs;
     FOnSetCaretsArray: TATStringsSetCarets;
     FOnSetMarkersArray: TATStringsSetMarkers;
+    FOnSetAttribsArray: TATStringsSetAttribs;
     FOnProgress: TNotifyEvent;
     FOnChangeLog: TATStringsChangeLogEvent;
     FOnChangeEx: TATStringsChangeExEvent;
     FOnUndoBefore: TATStringsUndoEvent;
     FOnUndoAfter: TATStringsUndoEvent;
     FOnChangeBlock: TATStringsChangeBlockEvent;
+    FOnUnfoldLine: TATStringsUnfoldLineEvent;
     FChangeBlockActive: boolean;
       //to use with OnChangeBlock:
       //indicates that program can ignore separate line changes in OnChange,
@@ -227,33 +237,34 @@ type
     FEnabledBookmarksUpdate: boolean;
     FEnabledChangeEvents: boolean;
     FLoadingForcedANSI: boolean;
-    FLastUndoY: integer;
+    FLastUndoY: SizeInt;
 
     function Compare_Asc(Key1, Key2: Pointer): Integer;
     function Compare_AscNoCase(Key1, Key2: Pointer): Integer;
     function Compare_Desc(Key1, Key2: Pointer): Integer;
     function Compare_DescNoCase(Key1, Key2: Pointer): Integer;
-    procedure AddUndoItem(AAction: TATEditAction; AIndex: integer;
+    procedure AddUndoItem(AAction: TATEditAction; AIndex: SizeInt;
       const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState;
       ACommandCode: integer);
     function DebugText: string;
     function DoCheckFilled: boolean;
     procedure DoFinalizeSaving;
     function GetCaretsArray: TATPointArray;
-    function GetMarkersArray: TATInt64Array;
-    function GetLine(AIndex: integer): atString;
-    function GetLineAscii(AIndex: integer): boolean;
-    function GetLineBlank(AIndex: integer): boolean;
-    function GetLineEnd(AIndex: integer): TATLineEnds;
-    function GetLineFoldFrom(ALine, AClient: integer): integer;
-    function GetLineHasTab(AIndex: integer): boolean;
-    function GetLineHasAsciiNoTabs(AIndex: integer): boolean;
-    function GetLineHidden(ALine, AClient: integer): boolean;
-    function GetLineSep(AIndex: integer): TATLineSeparator;
-    function GetLineState(AIndex: integer): TATLineState;
-    function GetLineUpdated(AIndex: integer): boolean;
-    function GetLineLen(AIndex: integer): integer;
-    function GetLineLenPhysical(AIndex: integer): integer;
+    function GetMarkersArray: TATMarkerMarkerArray;
+    function GetAttribsArray: TATMarkerAttribArray;
+    function GetLine(AIndex: SizeInt): atString;
+    function GetLineAscii(AIndex: SizeInt): boolean;
+    function GetLineBlank(AIndex: SizeInt): boolean;
+    function GetLineEnd(AIndex: SizeInt): TATLineEnds;
+    function GetLineFoldFrom(ALine, AClient: SizeInt): SizeInt;
+    function GetLineHasTab(AIndex: SizeInt): boolean;
+    function GetLineHasAsciiNoTabs(AIndex: SizeInt): boolean;
+    function GetLineHidden(ALine, AClient: SizeInt): boolean;
+    function GetLineSep(AIndex: SizeInt): TATLineSeparator;
+    function GetLineState(AIndex: SizeInt): TATLineState;
+    function GetLineUpdated(AIndex: SizeInt): boolean;
+    function GetLineLen(AIndex: SizeInt): SizeInt;
+    function GetLineLenPhysical(AIndex: SizeInt): SizeInt;
     function GetRedoAsString: string;
     function GetRedoCount: integer;
     function GetRedoEmpty: boolean;
@@ -262,26 +273,26 @@ type
     function GetUndoEmpty: boolean;
     function GetUndoLimit: integer;
     function IsLastFakeLineUnneeded: boolean;
+    procedure LineInsertRaw(ALineIndex: SizeInt; const AString: atString; AEnd: TATLineEnds; AWithEvent: boolean=true);
+    procedure LineInsertEx(ALineIndex: SizeInt; const AString: atString; AEnd: TATLineEnds; AWithEvent: boolean=true);
     procedure LineAddEx(const AString: atString; AEnd: TATLineEnds);
-    procedure LineInsertRaw(ALineIndex: integer; const AString: atString; AEnd: TATLineEnds;
-      AWithEvent: boolean=true);
-    procedure LineInsertEx(ALineIndex: integer; const AString: atString; AEnd: TATLineEnds;
-      AWithEvent: boolean=true);
     function IsSavingWithSignature: boolean;
     procedure SetCaretsArray(const L: TATPointArray);
-    procedure SetMarkersArray(const L: TATInt64Array);
+    procedure SetMarkersArray(const L: TATMarkerMarkerArray);
+    procedure SetAttribsArray(const L: TATMarkerAttribArray);
     procedure SetEndings(AValue: TATLineEnds);
-    procedure SetLine(AIndex: integer; const AValue: atString);
-    procedure SetLineEnd(AIndex: integer; AValue: TATLineEnds);
-    procedure SetLineFoldFrom(AIndexLine, AIndexClient: integer; AValue: integer);
-    procedure SetLineHidden(AIndexLine, AIndexClient: integer; AValue: boolean);
-    procedure SetLineSep(AIndex: integer; AValue: TATLineSeparator);
-    procedure SetLineState(AIndex: integer; AValue: TATLineState);
-    procedure SetLineUpdated(AIndex: integer; AValue: boolean);
-    procedure DoLoadFromStream(Stream: TStream; AFromUTF8: boolean; out AForcedToANSI: boolean);
+    procedure SetLine(AIndex: SizeInt; const AValue: atString);
+    procedure SetLineEnd(AIndex: SizeInt; AValue: TATLineEnds);
+    procedure SetLineFoldFrom(AIndexLine, AIndexClient: SizeInt; AValue: SizeInt);
+    procedure SetLineHidden(AIndexLine, AIndexClient: SizeInt; AValue: boolean);
+    procedure SetLineSep(AIndex: SizeInt; AValue: TATLineSeparator);
+    procedure SetLineState(AIndex: SizeInt; AValue: TATLineState);
+    procedure SetLineUpdated(AIndex: SizeInt; AValue: boolean);
+    procedure DoLoadFromStream(Stream: TStream; AOptions: TATLoadStreamOptions; out AForcedToANSI: boolean);
     procedure DoDetectEndings;
     procedure DoFinalizeLoading;
-    procedure ClearLineStates(ASaved: boolean);
+    procedure ClearLineStates(ASaved: boolean; AFrom: SizeInt=-1; ATo: SizeInt=-1);
+    procedure ChangeLineStates(AFrom, ATo: SizeInt);
     procedure SetModified(AValue: boolean);
     procedure SetRedoAsString(const AValue: string);
     procedure SetUndoAsString(const AValue: string);
@@ -291,49 +302,52 @@ type
       out ACommandCode: integer;
       out ATickCount: QWord);
     procedure AddUpdatesAction(N: integer; AAction: TATEditAction);
+    procedure UpdateModified;
   public
     CaretsAfterLastEdition: TATPointArray;
     EditingActive: boolean;
-    EditingTopLine: integer;
+    EditingTopLine: SizeInt;
+    StringBufferObject: TObject;
     constructor Create(AUndoLimit: integer); virtual;
     destructor Destroy; override;
     procedure Clear(AWithEvent: boolean=true);
     procedure ClearSeparators;
-    function Count: integer;
-    function IsIndexValid(N: integer): boolean; inline;
+    function Count: SizeInt;
+    function IsIndexValid(N: SizeInt): boolean; inline;
     function IsLastLineFake: boolean;
-    function IsPosFolded(AX, AY, AIndexClient: integer): boolean;
-    procedure LineAddRaw_NoUndo(const S: string; AEnd: TATLineEnds);
+    function IsPosFolded(AX, AY, AIndexClient: SizeInt): boolean;
+    function IsSizeBig(const ALimit: SizeInt): boolean;
+    procedure LineAddRaw_NoUndo(const S: string; AEnd: TATLineEnds; AllowBadCharsOfLen1: boolean);
     procedure LineAddRaw_NoUndo(const S: UnicodeString; AEnd: TATLineEnds);
     procedure LineAddRaw(const AString: atString; AEnd: TATLineEnds; AWithEvent: boolean=true);
     procedure LineAdd(const AString: atString);
-    procedure LineInsert(ALineIndex: integer; const AString: atString; AWithEvent: boolean=true);
-    procedure LineInsertStrings(ALineIndex: integer; ABlock: TATStrings; AWithFinalEol: boolean);
-    procedure LineDelete(ALineIndex: integer; AForceLast: boolean= true;
+    procedure LineInsert(ALineIndex: SizeInt; const AString: atString; AWithEvent: boolean=true);
+    procedure LineInsertStrings(ALineIndex: SizeInt; ABlock: TATStrings; AWithFinalEol: boolean);
+    procedure LineDelete(ALineIndex: SizeInt; AForceLast: boolean= true;
       AWithEvent: boolean=true; AWithUndo: boolean=true);
-    procedure LineMove(AIndexFrom, AIndexTo: integer; AWithUndo: boolean=true);
-    property Lines[Index: integer]: atString read GetLine write SetLine;
-    property LinesAscii[Index: integer]: boolean read GetLineAscii;
-    property LinesLen[Index: integer]: integer read GetLineLen;
-    property LinesLenPhysical[Index: integer]: integer read GetLineLenPhysical;
-    property LinesEnds[Index: integer]: TATLineEnds read GetLineEnd write SetLineEnd;
-    property LinesHidden[IndexLine, IndexClient: integer]: boolean read GetLineHidden write SetLineHidden;
-    property LinesHasTab[Index: integer]: boolean read GetLineHasTab;
-    property LinesHasAsciiNoTabs[Index: integer]: boolean read GetLineHasAsciiNoTabs;
-    property LinesBlank[Index: integer]: boolean read GetLineBlank;
-    property LinesFoldFrom[IndexLine, IndexClient: integer]: integer read GetLineFoldFrom write SetLineFoldFrom;
-    property LinesState[Index: integer]: TATLineState read GetLineState write SetLineState;
-    property LinesUpdated[Index: integer]: boolean read GetLineUpdated write SetLineUpdated;
-    property LinesSeparator[Index: integer]: TATLineSeparator read GetLineSep write SetLineSep;
-    function LineSub(ALineIndex, APosFrom, ALen: integer): atString;
-    function LineCharAt(ALineIndex, ACharIndex: integer): WideChar;
-    procedure GetIndentProp(ALineIndex: integer; out ACharCount: integer; out AKind: TATLineIndentKind);
-    function LineLenWithoutSpace(ALineIndex: integer): integer;
-    procedure LineBlockDelete(ALine1, ALine2: integer);
-    procedure LineBlockInsert(ALineFrom: integer; ANewLines: TStringList);
-    function ColumnPosToCharPos(AIndex: integer; AX: integer; ATabHelper: TATStringTabHelper): integer;
-    function CharPosToColumnPos(AIndex: integer; AX: integer; ATabHelper: TATStringTabHelper): integer;
-    function GetItemPtr(AIndex: integer): PATStringItem;
+    procedure LineMove(AIndexFrom, AIndexTo: SizeInt; AWithUndo: boolean=true);
+    property Lines[Index: SizeInt]: atString read GetLine write SetLine;
+    property LinesAscii[Index: SizeInt]: boolean read GetLineAscii;
+    property LinesLen[Index: SizeInt]: SizeInt read GetLineLen;
+    property LinesLenPhysical[Index: SizeInt]: SizeInt read GetLineLenPhysical;
+    property LinesEnds[Index: SizeInt]: TATLineEnds read GetLineEnd write SetLineEnd;
+    property LinesHidden[IndexLine, IndexClient: SizeInt]: boolean read GetLineHidden write SetLineHidden;
+    property LinesHasTab[Index: SizeInt]: boolean read GetLineHasTab;
+    property LinesHasAsciiNoTabs[Index: SizeInt]: boolean read GetLineHasAsciiNoTabs;
+    property LinesBlank[Index: SizeInt]: boolean read GetLineBlank;
+    property LinesFoldFrom[IndexLine, IndexClient: SizeInt]: SizeInt read GetLineFoldFrom write SetLineFoldFrom;
+    property LinesState[Index: SizeInt]: TATLineState read GetLineState write SetLineState;
+    property LinesUpdated[Index: SizeInt]: boolean read GetLineUpdated write SetLineUpdated;
+    property LinesSeparator[Index: SizeInt]: TATLineSeparator read GetLineSep write SetLineSep;
+    function LineSub(ALineIndex, APosFrom, ALen: SizeInt): atString;
+    function LineCharAt(ALineIndex, ACharIndex: SizeInt): WideChar;
+    procedure GetIndentProp(ALineIndex: SizeInt; out ACharCount: SizeInt; out AKind: TATLineIndentKind);
+    function LineLenWithoutSpace(ALineIndex: SizeInt): SizeInt;
+    procedure LineBlockDelete(ALine1, ALine2: SizeInt);
+    procedure LineBlockInsert(ALineFrom: SizeInt; ANewLines: TStringList);
+    function ColumnPosToCharPos(AIndex: SizeInt; AX: SizeInt; ATabHelper: TATStringTabHelper): SizeInt;
+    function CharPosToColumnPos(AIndex: SizeInt; AX: SizeInt; ATabHelper: TATStringTabHelper): SizeInt;
+    function GetItemPtr(AIndex: SizeInt): PATStringItem;
 
     property Encoding: TATFileEncoding read FEncoding write FEncoding;
     property EncodingCodepage: TEncConvId read FEncodingCodepage write FEncodingCodepage;
@@ -341,13 +355,13 @@ type
     property EncodingDetectDefaultUtf8: boolean read FEncodingDetectDefaultUtf8 write FEncodingDetectDefaultUtf8;
     property Endings: TATLineEnds read FEndings write SetEndings;
     property LoadingForcedANSI: boolean read FLoadingForcedANSI;
-    property ListUpdates: TATIntegerList read FListUpdates;
-    property ListUpdatesHard: boolean read FListUpdatesHard write FListUpdatesHard;
+    property IndexesOfEditedLines: TATIntegerList read FIndexesOfEditedLines; //list has line indexes of edited lines; UpdateWrapInfo maybe performs cached update
+    property EnableCachedWrapinfoUpdate: boolean read FEnableCachedWrapinfoUpdate write FEnableCachedWrapinfoUpdate; //if False, UpdateWrapInfo cached update will be disabled for the next call
     property Modified: boolean read FModified write SetModified;
     property ModifiedRecent: boolean read FModifiedRecent write FModifiedRecent;
     property ModifiedVersion: Int64 read FModifiedVersion;
     property OneLine: boolean read FOneLine write FOneLine;
-    property ProgressValue: integer read FProgressValue write FProgressValue;
+    property ProgressValue: SizeInt read FProgressValue write FProgressValue;
     property ProgressKind: TATStringsProgressKind read FProgressKind write FProgressKind;
     property ChangeBlockActive: boolean read FChangeBlockActive write FChangeBlockActive;
     property EnabledBookmarksUpdate: boolean read FEnabledBookmarksUpdate write FEnabledBookmarksUpdate;
@@ -362,55 +376,57 @@ type
     procedure ActionDeleteFakeLine;
     procedure ActionDeleteFakeLineAndFinalEol;
     procedure ActionDeleteDupFakeLines;
-    procedure ActionDeleteAllBlanks;
-    procedure ActionDeleteAdjacentBlanks;
-    procedure ActionDeleteAdjacentDups;
-    procedure ActionDeleteAllDups(AKeepBlanks: boolean);
-    procedure ActionAddFakeLineIfNeeded;
+    function ActionDeleteAllBlanks: boolean;
+    function ActionDeleteAdjacentBlanks: boolean;
+    function ActionDeleteAdjacentDups: boolean;
+    function ActionDeleteAllDups(AKeepBlanks: boolean): boolean;
+    function ActionAddFakeLineIfNeeded: boolean;
     function ActionTrimSpaces(AMode: TATTrimSpaces): boolean;
     function ActionEnsureFinalEol: boolean;
     function ActionTrimFinalEmptyLines: boolean;
-    procedure ActionSort(AAction: TATStringsSortAction; AFrom, ATo: integer);
+    procedure ActionSort(AAction: TATStringsSortAction; AFrom, ATo: SizeInt);
     procedure ActionReverseLines;
     procedure ActionShuffleLines;
     procedure ActionAddJumpToUndo(constref ACaretsArray: TATPointArray);
     //file
-    procedure LoadFromStream(Stream: TStream; AFromUTF8: boolean=false);
-    procedure LoadFromFile(const AFilename: string);
+    procedure LoadFromStream(Stream: TStream; AOptions: TATLoadStreamOptions);
+    procedure LoadFromFile(const AFilename: string; AOptions: TATLoadStreamOptions);
     procedure LoadFromString(const AText: string);
-    procedure LoadFromStrings(AList: TStrings; AEnds: TATLineEnds);
-    procedure SaveToStream(Stream: TStream; AEncoding: TATFileEncoding; AWithSignature: boolean);
+    procedure LoadFromStrings(AList: TStrings; AEnds: TATLineEnds; AllowBadCharsOfLen1: boolean);
+    procedure SaveToStream(AStream: TStream; AEncoding: TATFileEncoding; AWithSignature: boolean);
     procedure SaveToFile(const AFilename: string);
     property SaveSignUtf8: boolean read FSaveSignUtf8 write FSaveSignUtf8;
     property SaveSignWide: boolean read FSaveSignWide write FSaveSignWide;
     //text
     property ReadOnly: boolean read FReadOnly write FReadOnly;
-    function TextString_Unicode(AMaxLen: integer=0): UnicodeString;
-    procedure TextInsert(AX, AY: integer; const AText: atString; AOverwrite: boolean;
+    function TextString_Unicode(AMaxLen: SizeInt=0): UnicodeString;
+    procedure TextInsert(AX, AY: SizeInt; const AText: atString; AOverwrite: boolean;
       out AShift, APosAfter: TPoint);
     procedure TextAppend(const AText: atString; out AShift, APosAfter: TPoint);
-    procedure TextInsertColumnBlock(AX, AY: integer; ABlock: TATStrings;
+    procedure TextInsertColumnBlock(AX, AY: SizeInt; ABlock: TATStrings;
       AOverwrite: boolean);
-    procedure TextDeleteLeft(AX, AY: integer; ALen: integer; out AShift,
-      APosAfter: TPoint; AllowGoToPrevLine: boolean);
-    procedure TextDeleteRight(AX, AY: integer; ALen: integer; out AShift,
+    procedure TextDeleteLeft(AX, AY: SizeInt; ALen: SizeInt; out AShift,
+      APosAfter: TPoint; AllowGoToPrevLine: boolean; out ATextChanged: boolean);
+    procedure TextDeleteRight(AX, AY: SizeInt; ALen: SizeInt; out AShift,
       APosAfter: TPoint; ACanDelEol: boolean=true);
-    function TextDeleteRange(AFromX, AFromY, AToX, AToY: integer; out AShift, APosAfter: TPoint): boolean;
-    procedure TextInsertEol(AX, AY: integer; AKeepCaret: boolean;
+    function TextDeleteRange(AFromX, AFromY, AToX, AToY: SizeInt; out AShift, APosAfter: TPoint): boolean;
+    procedure TextInsertEol(AX, AY: SizeInt; AKeepCaret: boolean;
       const AStrIndent: atString; out AShift, APosAfter: TPoint);
-    procedure TextDeleteLine(AX, AY: integer; out AShift, APosAfter: TPoint);
-    procedure TextReplace_OneLine(AY, AX1, AX2: integer; const AText: atString);
-    procedure TextReplace_OneLine_ReplaceOneEol(AY, AX1, AX2: integer; const ATextPart1, ATextPart2: atString);
-    procedure TextReplaceRange(AFromX, AFromY, AToX, AToY: integer; const AText: atString; out AShift,
+    procedure TextDeleteLine(AX, AY: SizeInt; out AShift, APosAfter: TPoint);
+    procedure TextReplace_OneLine(AY, AX1, AX2: SizeInt; const AText: atString);
+    procedure TextReplace_OneLine_ReplaceOneEol(AY, AX1, AX2: SizeInt; const ATextPart1, ATextPart2: atString);
+    procedure TextReplaceRange(AFromX, AFromY, AToX, AToY: SizeInt; const AText: atString; out AShift,
       APosAfter: TPoint; AWithUndoGroup: boolean);
-    function TextReplaceLines_UTF8(ALineFrom, ALineTo: integer; ANewLines: TStringList): boolean;
-    function TextSubstring(AX1, AY1, AX2, AY2: integer; const AEolString: UnicodeString = #10): atString;
-    function TextSubstringLength(AX1, AY1, AX2, AY2: integer; const AEolString: UnicodeString=#10): integer;
+    function TextReplaceLines_UTF8(ALineFrom, ALineTo: SizeInt; ANewLines: TStringList): boolean;
+    function TextSubstring(AX1, AY1, AX2, AY2: SizeInt; const AEolString: UnicodeString = #10): atString;
+    function TextSubstringLength(AX1, AY1, AX2, AY2: SizeInt; const AEolString: UnicodeString=#10): SizeInt;
     //undo
     property OnGetCaretsArray: TATStringsGetCarets read FOnGetCaretsArray write FOnGetCaretsArray;
     property OnGetMarkersArray: TATStringsGetMarkers read FOnGetMarkersArray write FOnGetMarkersArray;
+    property OnGetAttribsArray: TATStringsGetAttribs read FOnGetAttribsArray write FOnGetAttribsArray;
     property OnSetCaretsArray: TATStringsSetCarets read FOnSetCaretsArray write FOnSetCaretsArray;
     property OnSetMarkersArray: TATStringsSetMarkers read FOnSetMarkersArray write FOnSetMarkersArray;
+    property OnSetAttribsArray: TATStringsSetAttribs read FOnSetAttribsArray write FOnSetAttribsArray;
     procedure SetGroupMark;
     procedure SetNewCommandMark;
     procedure BeginUndoGroup;
@@ -426,14 +442,13 @@ type
     property RedoAsString: string read GetRedoAsString write SetRedoAsString;
     procedure ClearUndo(ALocked: boolean = false);
     procedure ClearLineStatesUpdated;
-    procedure DoEventLog(ALine: integer);
-    procedure DoEventChange(AChange: TATLineChangeKind; ALineIndex, AItemCount: integer);
+    procedure DoEventLog(ALine: SizeInt);
+    procedure DoEventChange(AChange: TATLineChangeKind; ALineIndex, AItemCount: SizeInt);
     //misc
-    procedure ActionSaveLastEditionPos(AX: integer=-1; AY: integer=-1);
+    procedure ActionSaveLastEditionPos(AX: SizeInt=-1; AY: SizeInt=-1);
     procedure ActionGotoLastEditionPos;
-    procedure DoOnChangeBlock(AX1, AY1, AX2, AY2: integer;
+    procedure DoOnChangeBlock(AX1, AY1, AX2, AY2: SizeInt;
       AChange: TATBlockChangeKind; ABlock: TStringList);
-    function OffsetToPosition(AOffset: integer): TPoint;
     property LastCommandChangedLines: integer read FLastCommandChangedLines write FLastCommandChangedLines;
     //events
     property OnProgress: TNotifyEvent read FOnProgress write FOnProgress;
@@ -442,6 +457,7 @@ type
     property OnChangeBlock: TATStringsChangeBlockEvent read FOnChangeBlock write FOnChangeBlock;
     property OnUndoBefore: TATStringsUndoEvent read FOnUndoBefore write FOnUndoBefore;
     property OnUndoAfter: TATStringsUndoEvent read FOnUndoAfter write FOnUndoAfter;
+    property OnUnfoldLine: TATStringsUnfoldLineEvent read FOnUnfoldLine write FOnUnfoldLine;
   end;
 
 type
@@ -450,10 +466,6 @@ type
 function ATStrings_To_StringList(AStr: TATStrings): TStringList;
 function DetectStreamUtf8NoBom(Stream: TStream; BufSizeKb: word): TBufferUTF8State;
 function DetectStreamUtf16NoBom(Stream: TStream; BufSizeWords: integer; out IsLE: boolean): boolean;
-
-var
-  GlobalDetectUtf8BufferKb: integer = 8;
-  GlobalDetectUf16BufferWords: integer = 5;
 
 implementation
 
@@ -472,7 +484,7 @@ const
 
 procedure DoEncError;
 begin
-  raise Exception.Create('Unknown enc value');
+  raise Exception.Create('Unknown encoding value');
 end;
 
 procedure _ReadFileToStream(AStream: TStream;
@@ -513,11 +525,9 @@ begin
     (LineEnds=cEndNone);
 end;
 
-procedure TATStringItem.GetIndentProp(out ACharCount: integer; out
-  AKind: TATLineIndentKind);
+procedure TATStringItem.GetIndentProp(out ACharCount: SizeInt; out AKind: TATLineIndentKind);
 var
-  NSpaces, NTabs: integer;
-  i: integer;
+  NSpaces, NTabs, i: SizeInt;
 begin
   ACharCount:= 0;
   AKind:= cLineIndentOther;
@@ -550,7 +560,7 @@ begin
     AKind:= cLineIndentTabs;
 end;
 
-function TATStringItem.CharLenWithoutSpace: integer;
+function TATStringItem.CharLenWithoutSpace: SizeInt;
 var
   ch: WideChar;
 begin
@@ -566,7 +576,7 @@ end;
 function TATStringItem.IsBlank: boolean;
 var
   PtrChar: PChar;
-  Len, i: integer;
+  Len, i: SizeInt;
   code: byte;
 begin
   Len:= Length(Buf);
@@ -586,8 +596,34 @@ begin
   Result:= true;
 end;
 
+function TATStringItem.IsGitMarker: TATStringGitMarker;
+const
+  MarkBegin: PChar  = '<<<<<<< ';
+  MarkMiddle: PChar = '=======';
+  MarkEnd: PChar    = '>>>>>>> ';
+var
+  NLen: SizeInt;
+begin
+  Result:= cGitMarkNone;
+  if Ex.Wide then exit;
+  NLen:= Length(Buf);
+  if NLen>=7 then
+  begin
+    if NLen>=8 then
+    begin
+      if strlcomp(PChar(Buf), MarkBegin, 8)=0 then
+        exit(cGitMarkBegin);
+      if strlcomp(PChar(Buf), MarkEnd, 8)=0 then
+        exit(cGitMarkEnd);
+    end;
+    if NLen=7 then
+      if strlcomp(PChar(Buf), MarkMiddle, 7)=0 then
+        exit(cGitMarkMiddle);
+  end;
+end;
 
-function TATStringItem.CharLen: integer;
+
+function TATStringItem.CharLen: SizeInt;
 begin
   if Ex.Wide then
     Result:= Length(Buf) div 2
@@ -597,7 +633,7 @@ end;
 
 function TATStringItem.GetLine: UnicodeString;
 var
-  NLen, i: integer;
+  NLen, i: SizeInt;
 begin
   NLen:= Length(Buf);
   if NLen=0 then exit('');
@@ -617,7 +653,7 @@ end;
 procedure TATStringItem.LineToBuffer(OtherBuf: PWideChar);
 //OtherBuf must point to WideChar array of enough size
 var
-  NLen, i: integer;
+  NLen, i: SizeInt;
   SrcBuf: PChar;
 begin
   NLen:= Length(Buf);
@@ -650,9 +686,11 @@ end;
 
 procedure TATStringItem.SetLineW(const S: UnicodeString);
 var
-  NLen, i: integer;
+  NLen, i: SizeInt;
 begin
   NLen:= Length(S);
+  if NLen>=MaxInt-1 then
+    raise EEditorTooLongLine.Create('Storing too long line: 0x'+IntToHex(NLen));
   if NLen=0 then
   begin
     Ex.Wide:= false;
@@ -679,9 +717,9 @@ begin
   Ex.Updated:= true;
 end;
 
-procedure TATStringItem.SetLineA(const S: string);
+procedure TATStringItem.SetLineA(const S: string; AllowBadCharsOfLen1: boolean);
 var
-  NLen, N: integer;
+  NLen, N: SizeInt;
 begin
   LineStateToChanged;
   Ex.HasTab:= 0; //cFlagUnknown
@@ -689,6 +727,8 @@ begin
   Ex.Updated:= true;
 
   NLen:= Length(S);
+  if NLen>=MaxInt-1 then
+    raise EEditorTooLongLine.Create('Storing too long line: 0x'+IntToHex(NLen));
   if NLen=0 then
   begin
     Ex.Wide:= false;
@@ -707,7 +747,7 @@ begin
     SetLength(Buf, NLen*2);
     try
       //this func is the same as Utf8ToUnicode but raises exception
-      N:= CustomUtf8ToUnicode(PUnicodeChar(PChar(Buf)), NLen, PChar(S), NLen);
+      N:= CustomUtf8ToUnicode(PUnicodeChar(PChar(Buf)), NLen, PChar(S), NLen, AllowBadCharsOfLen1);
       if N>0 then
         SetLength(Buf, 2*(N-1))
       else
@@ -726,10 +766,10 @@ begin
   end;
 end;
 
-procedure TATStringItem.Init(const S: string; AEnd: TATLineEnds);
+procedure TATStringItem.Init(const S: string; AEnd: TATLineEnds; AllowBadCharsOfLen1: boolean);
 begin
   FillChar(Ex, SizeOf(Ex), 0);
-  SetLineA(S);
+  SetLineA(S, AllowBadCharsOfLen1);
 
   Ex.Ends:= TATBits2(AEnd);
   Ex.State:= TATBits2(cLineStateAdded);
@@ -769,9 +809,9 @@ begin
   Ex.State:= TATBits2(cLineStateNone);
 end;
 
-function TATStringItem.LineSub(AFrom, ALen: integer): UnicodeString;
+function TATStringItem.LineSub(AFrom, ALen: SizeInt): UnicodeString;
 var
-  NLen, ResLen, i: integer;
+  NLen, ResLen, i: SizeInt;
 begin
   Result:= '';
   NLen:= Length(Buf);
@@ -792,9 +832,9 @@ begin
   end;
 end;
 
-function TATStringItem.CharAt(AIndex: integer): WideChar;
+function TATStringItem.CharAt(AIndex: SizeInt): WideChar;
 var
-  NLen: integer;
+  NLen: SizeInt;
 begin
   if AIndex<=0 then exit(#0);
   NLen:= CharLen;
@@ -809,7 +849,7 @@ end;
 function TATStringItem.HasTab: boolean;
 var
   Value: TATLineFlag;
-  NLen, i: integer;
+  NLen, i: SizeInt;
   Ptr: PWideChar;
 begin
   case TATLineFlag(Ex.HasTab) of
@@ -855,7 +895,8 @@ end;
 function TATStringItem.HasAsciiNoTabs: boolean;
 var
   Value: TATLineFlag;
-  NLen, NCode, i: integer;
+  NLen, i: SizeInt;
+  NCode: integer;
   Ptr: PWideChar;
 begin
   case TATLineFlag(Ex.HasAsciiNoTabs) of
@@ -905,7 +946,7 @@ end;
 
 function ATStrings_To_StringList(AStr: TATStrings): TStringList;
 var
-  i: integer;
+  i: SizeInt;
 begin
   Result:= TStringList.Create;
   for i:= 0 to AStr.Count-1 do
@@ -919,7 +960,7 @@ begin
   inherited Create(SizeOf(TATStringItem));
 end;
 
-function TATStringItemList.GetItem(AIndex: integer): PATStringItem; inline;
+function TATStringItemList.GetItem(AIndex: SizeInt): PATStringItem; inline;
 begin
   Result:= PATStringItem(Get(AIndex));
 end;
@@ -929,39 +970,39 @@ begin
   PATStringItem(Item)^.Buf:= '';
 end;
 
-procedure TATStringItemList.SortRange(L, R: integer; Compare: TFPSListCompareFunc);
+procedure TATStringItemList.SortRange(L, R: SizeInt; Compare: TFPSListCompareFunc);
 begin
   QuickSort(L, R, Compare);
 end;
 
 { TATStrings }
 
-function TATStrings.GetLine(AIndex: integer): atString;
+function TATStrings.GetLine(AIndex: SizeInt): atString;
 begin
   Result:= FList.GetItem(AIndex)^.Line;
 end;
 
-function TATStrings.GetLineAscii(AIndex: integer): boolean;
+function TATStrings.GetLineAscii(AIndex: SizeInt): boolean;
 begin
   Result:= not FList.GetItem(AIndex)^.Ex.Wide;
 end;
 
-function TATStrings.GetLineBlank(AIndex: integer): boolean;
+function TATStrings.GetLineBlank(AIndex: SizeInt): boolean;
 begin
   Result:= FList.GetItem(AIndex)^.IsBlank;
 end;
 
-function TATStrings.GetLineLen(AIndex: integer): integer;
+function TATStrings.GetLineLen(AIndex: SizeInt): SizeInt;
 begin
   Result:= FList.GetItem(AIndex)^.CharLen;
 end;
 
-function TATStrings.GetLineEnd(AIndex: integer): TATLineEnds;
+function TATStrings.GetLineEnd(AIndex: SizeInt): TATLineEnds;
 begin
   Result:= FList.GetItem(AIndex)^.LineEnds;
 end;
 
-function TATStrings.GetLineFoldFrom(ALine, AClient: integer): integer;
+function TATStrings.GetLineFoldFrom(ALine, AClient: SizeInt): SizeInt;
 begin
   case AClient of
     0: Result:= FList.GetItem(ALine)^.Ex.FoldFrom_0;
@@ -970,7 +1011,7 @@ begin
   end;
 end;
 
-function TATStrings.GetLineHidden(ALine, AClient: integer): boolean;
+function TATStrings.GetLineHidden(ALine, AClient: SizeInt): boolean;
 begin
   case AClient of
     0: Result:= FList.GetItem(ALine)^.Ex.Hidden_0;
@@ -979,17 +1020,17 @@ begin
   end;
 end;
 
-function TATStrings.GetLineState(AIndex: integer): TATLineState;
+function TATStrings.GetLineState(AIndex: SizeInt): TATLineState;
 begin
   Result:= FList.GetItem(AIndex)^.LineState;
 end;
 
-function TATStrings.GetLineUpdated(AIndex: integer): boolean;
+function TATStrings.GetLineUpdated(AIndex: SizeInt): boolean;
 begin
   Result:= FList.GetItem(AIndex)^.Ex.Updated;
 end;
 
-function TATStrings.GetLineLenPhysical(AIndex: integer): integer;
+function TATStrings.GetLineLenPhysical(AIndex: SizeInt): SizeInt;
 var
   ItemPtr: PATStringItem;
 begin
@@ -1002,17 +1043,17 @@ begin
   Result:= FRedoList.AsString;
 end;
 
-function TATStrings.GetLineSep(AIndex: integer): TATLineSeparator;
+function TATStrings.GetLineSep(AIndex: SizeInt): TATLineSeparator;
 begin
   Result:= TATLineSeparator(FList.GetItem(AIndex)^.Ex.Sep);
 end;
 
-function TATStrings.GetLineHasTab(AIndex: integer): boolean;
+function TATStrings.GetLineHasTab(AIndex: SizeInt): boolean;
 begin
   Result:= FList.GetItem(AIndex)^.HasTab;
 end;
 
-function TATStrings.GetLineHasAsciiNoTabs(AIndex: integer): boolean;
+function TATStrings.GetLineHasAsciiNoTabs(AIndex: SizeInt): boolean;
 begin
   Result:= FList.GetItem(AIndex)^.HasAsciiNoTabs;
 end;
@@ -1067,7 +1108,7 @@ end;
 procedure TATStrings.SetEndings(AValue: TATLineEnds);
 var
   typ: TATLineEnds;
-  i: integer;
+  i: SizeInt;
 begin
   if FReadOnly then Exit;
 
@@ -1080,14 +1121,16 @@ begin
   end;
 end;
 
-procedure TATStrings.SetLine(AIndex: integer; const AValue: atString);
+procedure TATStrings.SetLine(AIndex: SizeInt; const AValue: atString);
 var
   Item: PATStringItem;
+  bFolded0, bFolded1: boolean;
 begin
   //Assert(IsIndexValid(AIndex));
   if FReadOnly then Exit;
   Item:= FList.GetItem(AIndex);
 
+  UpdateModified;
   AddUndoItem(aeaChange, AIndex, Item^.Line, Item^.LineEnds, Item^.LineState, FCommandCode);
   DoEventLog(AIndex);
   DoEventChange(cLineChangeEdited, AIndex, 1);
@@ -1095,16 +1138,24 @@ begin
   Item^.Line:= AValue;
 
   //fully unfold this line
-  Item^.Ex.FoldFrom_0:= 0;
-  Item^.Ex.FoldFrom_1:= 0;
+  bFolded0:= Item^.Ex.FoldFrom_0>0;
+  bFolded1:= Item^.Ex.FoldFrom_1>0;
+  if bFolded0 then
+    Item^.Ex.FoldFrom_0:= 0;
+  if bFolded1 then
+    Item^.Ex.FoldFrom_1:= 0;
 
   Item^.LineStateToChanged;
 
   Item^.Ex.Updated:= true;
   Item^.Ex.HasTab:= 0; //unknown
+
+  if bFolded0 or bFolded1 then
+    if Assigned(FOnUnfoldLine) then
+      FOnUnfoldLine(Self, AIndex);
 end;
 
-procedure TATStrings.SetLineSep(AIndex: integer; AValue: TATLineSeparator);
+procedure TATStrings.SetLineSep(AIndex: SizeInt; AValue: TATLineSeparator);
 var
   Item: PATStringItem;
 begin
@@ -1116,7 +1167,7 @@ begin
 end;
 
 
-procedure TATStrings.SetLineEnd(AIndex: integer; AValue: TATLineEnds);
+procedure TATStrings.SetLineEnd(AIndex: SizeInt; AValue: TATLineEnds);
 var
   Item: PATStringItem;
 begin
@@ -1125,6 +1176,7 @@ begin
 
   Item:= FList.GetItem(AIndex);
 
+  UpdateModified;
   AddUndoItem(aeaChangeEol, AIndex, '', Item^.LineEnds, Item^.LineState, FCommandCode);
 
   Item^.Ex.Ends:= TATBits2(AValue);
@@ -1132,7 +1184,7 @@ begin
   Item^.Ex.Updated:= true;
 end;
 
-procedure TATStrings.SetLineFoldFrom(AIndexLine, AIndexClient: integer; AValue: integer);
+procedure TATStrings.SetLineFoldFrom(AIndexLine, AIndexClient: SizeInt; AValue: SizeInt);
 const
   cMax = High(TATStringItem_FoldFrom);
 var
@@ -1149,7 +1201,7 @@ begin
   end;
 end;
 
-procedure TATStrings.SetLineHidden(AIndexLine, AIndexClient: integer; AValue: boolean);
+procedure TATStrings.SetLineHidden(AIndexLine, AIndexClient: SizeInt; AValue: boolean);
 var
   Item: PATStringItem;
 begin
@@ -1161,7 +1213,7 @@ begin
   end;
 end;
 
-procedure TATStrings.SetLineState(AIndex: integer; AValue: TATLineState);
+procedure TATStrings.SetLineState(AIndex: SizeInt; AValue: TATLineState);
 var
   Item: PATStringItem;
 begin
@@ -1170,7 +1222,7 @@ begin
   Item^.Ex.State:= TATBits2(AValue);
 end;
 
-procedure TATStrings.SetLineUpdated(AIndex: integer; AValue: boolean);
+procedure TATStrings.SetLineUpdated(AIndex: SizeInt; AValue: boolean);
 var
   Item: PATStringItem;
 begin
@@ -1180,12 +1232,12 @@ begin
 end;
 
 
-function TATStrings.TextString_Unicode(AMaxLen: integer=0): UnicodeString;
+function TATStrings.TextString_Unicode(AMaxLen: SizeInt=0): UnicodeString;
 const
   LenEol = 1;
   CharEol = #10;
 var
-  Len, LastIndex, i: integer;
+  Len, LastIndex, i: SizeInt;
   Item: PATStringItem;
   Ptr: pointer;
   bFinalEol: boolean;
@@ -1239,8 +1291,8 @@ end;
 constructor TATStrings.Create(AUndoLimit: integer);
 begin
   FList:= TATStringItemList.Create;
-  FListUpdates:= TATIntegerList.Create;
-  FListUpdatesHard:= false;
+  FIndexesOfEditedLines:= TATIntegerList.Create;
+  FEnableCachedWrapinfoUpdate:= true;
   FUndoLimit:= AUndoLimit;
   FUndoList:= TATUndoList.Create(FUndoLimit);
   FRedoList:= TATUndoList.Create(FUndoLimit);
@@ -1253,8 +1305,8 @@ begin
   FEncoding:= cEncUTF8;
   FEncodingDetect:= true;
   FEncodingDetectDefaultUtf8:= true;
-  FEncodingCodepage:= EncConvGetANSI;
-  FEndings:= cEndWin;
+  FEncodingCodepage:= ATEditorOptions.FallbackEncoding;
+  FEndings:= cLineEndOsDefault;
 
   FModified:= false;
   FModifiedRecent:= false;
@@ -1267,7 +1319,7 @@ begin
   FOneLine:= false;
   FProgressValue:= 0;
   FProgressKind:= cStringsProgressNone;
-  SetLength(CaretsAfterLastEdition, 0);
+  CaretsAfterLastEdition:= nil;
 
   ActionAddFakeLineIfNeeded;
   ClearUndo;
@@ -1282,11 +1334,16 @@ begin
   FOnGetCaretsArray:= nil;
   FOnSetCaretsArray:= nil;
   FOnGetMarkersArray:= nil;
+  FOnGetAttribsArray:= nil;
   FOnSetMarkersArray:= nil;
+  FOnSetAttribsArray:= nil;
   FOnProgress:= nil;
 
   GutterDecor1:= nil;
   GutterDecor2:= nil;
+
+  if Assigned(StringBufferObject) then
+    FreeAndNil(StringBufferObject);
 
   ClearUndo(true);
   FList.Clear; //Clear calls event, no need
@@ -1295,7 +1352,7 @@ begin
   FreeAndNil(FBookmarks2);
   FreeAndNil(FBookmarks);
   FreeAndNil(FGaps);
-  FreeAndNil(FListUpdates);
+  FreeAndNil(FIndexesOfEditedLines);
   FreeAndNil(FUndoList);
   FreeAndNil(FRedoList);
 
@@ -1329,21 +1386,24 @@ begin
       LinesEnds[Count-1]:= cEndNone;
 end;
 
-procedure TATStrings.ActionAddFakeLineIfNeeded;
+function TATStrings.ActionAddFakeLineIfNeeded: boolean;
 begin
   if Count=0 then
   begin
     LineAddRaw('', cEndNone, false{AWithEvent});
-    Exit
+    Exit(true);
   end;
 
-  if IsLastLineFake then Exit;
+  if IsLastLineFake then
+    Exit(false);
 
   if LinesEnds[Count-1]<>cEndNone then
   begin
     LineAddRaw('', cEndNone, false{AWithEvent});
-    Exit
+    Exit(true);
   end;
+
+  Result:= false;
 end;
 
 procedure TATStrings.LineAddRaw(const AString: atString; AEnd: TATLineEnds; AWithEvent: boolean);
@@ -1353,6 +1413,7 @@ begin
   if FReadOnly then Exit;
   if DoCheckFilled then Exit;
 
+  UpdateModified;
   AddUndoItem(aeaInsert, Count, '', cEndNone, cLineStateNone, FCommandCode);
   if AWithEvent then
   begin
@@ -1403,7 +1464,7 @@ begin
   end;
 end;
 
-procedure TATStrings.LineInsertRaw(ALineIndex: integer; const AString: atString;
+procedure TATStrings.LineInsertRaw(ALineIndex: SizeInt; const AString: atString;
   AEnd: TATLineEnds; AWithEvent: boolean=true);
 var
   Item: TATStringItem;
@@ -1411,6 +1472,7 @@ begin
   if FReadOnly then Exit;
   if DoCheckFilled then Exit;
 
+  UpdateModified;
   AddUndoItem(aeaInsert, ALineIndex, '', cEndNone, cLineStateNone, FCommandCode);
 
   if AWithEvent then
@@ -1424,7 +1486,7 @@ begin
   FillChar(Item, SizeOf(Item), 0);
 end;
 
-procedure TATStrings.LineInsertEx(ALineIndex: integer; const AString: atString; AEnd: TATLineEnds;
+procedure TATStrings.LineInsertEx(ALineIndex: SizeInt; const AString: atString; AEnd: TATLineEnds;
   AWithEvent: boolean=true);
 begin
   if FReadOnly then Exit;
@@ -1433,29 +1495,35 @@ begin
     LineInsertRaw(ALineIndex, AString, AEnd, AWithEvent)
   else
   if ALineIndex=Count then
+  begin
+    if AString='' then //avoid adding _two_ lines at end
+      AEnd:= cEndNone;
     LineAddEx(AString, AEnd);
+  end;
   //else
   //  raise Exception.Create('Incorrect Insert index: '+IntToStr(ALineIndex));
 end;
 
-procedure TATStrings.LineInsert(ALineIndex: integer; const AString: atString;
+procedure TATStrings.LineInsert(ALineIndex: SizeInt; const AString: atString;
   AWithEvent: boolean=true);
 begin
   LineInsertEx(ALineIndex, AString, FEndings, AWithEvent);
 end;
 
-procedure TATStrings.LineInsertStrings(ALineIndex: integer; ABlock: TATStrings; AWithFinalEol: boolean);
+procedure TATStrings.LineInsertStrings(ALineIndex: SizeInt; ABlock: TATStrings; AWithFinalEol: boolean);
 //AWithFinalEol:
 //  True to insert whole lines;
 //  False to insert whole lines except last + concat last item to existing line
 var
   Item: TATStringItem;
   Str: atString;
-  NCount, i: integer;
+  NCount, i: SizeInt;
 begin
   NCount:= ABlock.Count;
   if NCount=0 then exit;
   if not AWithFinalEol then Dec(NCount);
+
+  UpdateModified;
 
   if NCount>0 then
   begin
@@ -1488,17 +1556,17 @@ begin
 end;
 
 
-function TATStrings.IsIndexValid(N: integer): boolean; inline;
+function TATStrings.IsIndexValid(N: SizeInt): boolean; inline;
 begin
   Result:= (N>=0) and (N<FList.Count);
 end;
 
-function TATStrings.Count: integer; inline;
+function TATStrings.Count: SizeInt; inline;
 begin
   Result:= FList.Count;
 end;
 
-procedure TATStrings.LineDelete(ALineIndex: integer; AForceLast: boolean = true;
+procedure TATStrings.LineDelete(ALineIndex: SizeInt; AForceLast: boolean = true;
   AWithEvent: boolean=true; AWithUndo: boolean=true);
 var
   Item: PATStringItem;
@@ -1509,6 +1577,7 @@ begin
   begin
     Item:= FList.GetItem(ALineIndex);
 
+    UpdateModified;
     if AWithUndo then
       AddUndoItem(aeaDelete, ALineIndex, Item^.Line, Item^.LineEnds, Item^.LineState, FCommandCode);
 
@@ -1527,11 +1596,13 @@ begin
     ActionAddFakeLineIfNeeded;
 end;
 
-procedure TATStrings.LineMove(AIndexFrom, AIndexTo: integer; AWithUndo: boolean=true);
+procedure TATStrings.LineMove(AIndexFrom, AIndexTo: SizeInt; AWithUndo: boolean=true);
 var
   ItemFrom, ItemTo: PATStringItem;
-  NLineMin: integer;
+  NLineMin: SizeInt;
 begin
+  UpdateModified;
+
   if AWithUndo then
   begin
     ItemFrom:= GetItemPtr(AIndexFrom);
@@ -1556,7 +1627,7 @@ begin
   DoEventLog(NLineMin);
 end;
 
-function TATStrings.LineSub(ALineIndex, APosFrom, ALen: integer): atString;
+function TATStrings.LineSub(ALineIndex, APosFrom, ALen: SizeInt): atString;
 var
   Item: PATStringItem;
 begin
@@ -1565,23 +1636,23 @@ begin
   Result:= Item^.LineSub(APosFrom, ALen);
 end;
 
-function TATStrings.LineCharAt(ALineIndex, ACharIndex: integer): WideChar;
+function TATStrings.LineCharAt(ALineIndex, ACharIndex: SizeInt): WideChar;
 begin
   Result:= GetItemPtr(ALineIndex)^.CharAt(ACharIndex);
 end;
 
-procedure TATStrings.GetIndentProp(ALineIndex: integer; out
-  ACharCount: integer; out AKind: TATLineIndentKind);
+procedure TATStrings.GetIndentProp(ALineIndex: SizeInt; out
+  ACharCount: SizeInt; out AKind: TATLineIndentKind);
 begin
   GetItemPtr(ALineIndex)^.GetIndentProp(ACharCount, AKind);
 end;
 
-function TATStrings.LineLenWithoutSpace(ALineIndex: integer): integer;
+function TATStrings.LineLenWithoutSpace(ALineIndex: SizeInt): SizeInt;
 begin
   Result:= GetItemPtr(ALineIndex)^.CharLenWithoutSpace;
 end;
 
-function TATStrings.ColumnPosToCharPos(AIndex: integer; AX: integer; ATabHelper: TATStringTabHelper): integer;
+function TATStrings.ColumnPosToCharPos(AIndex: SizeInt; AX: SizeInt; ATabHelper: TATStringTabHelper): SizeInt;
 var
   SLine: atString;
 begin
@@ -1592,7 +1663,7 @@ begin
   Result:= ATabHelper.ColumnPosToCharPos(AIndex, SLine, AX);
 end;
 
-function TATStrings.CharPosToColumnPos(AIndex: integer; AX: integer; ATabHelper: TATStringTabHelper): integer;
+function TATStrings.CharPosToColumnPos(AIndex: SizeInt; AX: SizeInt; ATabHelper: TATStringTabHelper): SizeInt;
 var
   SLine: atString;
 begin
@@ -1603,7 +1674,7 @@ begin
   Result:= ATabHelper.CharPosToColumnPos(AIndex, SLine, AX);
 end;
 
-function TATStrings.GetItemPtr(AIndex: integer): PATStringItem;
+function TATStrings.GetItemPtr(AIndex: SizeInt): PATStringItem;
 begin
   Result:= FList.GetItem(AIndex);
 end;
@@ -1619,14 +1690,22 @@ begin
   end;
 
   FList.Clear;
+  IndexesOfEditedLines.Clear;
+  EnableCachedWrapinfoUpdate:= false;
 end;
 
-procedure TATStrings.ClearLineStates(ASaved: boolean);
+procedure TATStrings.ClearLineStates(ASaved: boolean; AFrom: SizeInt=-1; ATo: SizeInt=-1);
 var
   Item: PATStringItem;
-  i: integer;
+  i: SizeInt;
 begin
-  for i:= 0 to Count-1 do
+  if AFrom<0 then
+  begin
+    AFrom:= 0;
+    ATo:= Count-1;
+  end;
+
+  for i:= AFrom to ATo do
   begin
     Item:= FList.GetItem(i);
     if ASaved then
@@ -1636,11 +1715,31 @@ begin
   end;
 end;
 
+procedure TATStrings.ChangeLineStates(AFrom, ATo: SizeInt);
+var
+  Item: PATStringItem;
+  i: SizeInt;
+begin
+  if AFrom<0 then
+  begin
+    AFrom:= 0;
+    ATo:= Count-1;
+  end;
+
+  for i:= AFrom to ATo do
+  begin
+    Item:= FList.GetItem(i);
+    Item^.LineStateToChanged;
+  end;
+end;
+
+
 procedure TATStrings.SetModified(AValue: boolean);
 begin
   FModified:= AValue;
   if FModified then
-    Inc(FModifiedVersion)
+  begin
+  end
   else
     FUndoList.AddUnmodifiedMark;
 end;
@@ -1664,15 +1763,15 @@ end;
 procedure TATStrings.DoDetectEndings;
 begin
   if not IsIndexValid(0) then Exit;
-  FEndings:= LinesEnds[0]; //no range-chk
+  FEndings:= LinesEnds[0]; //no range-check needed
   if FEndings=cEndNone then
-    FEndings:= cEndWin;
+    FEndings:= cLineEndOsDefault;
 end;
 
-function TATStrings.TextSubstring(AX1, AY1, AX2, AY2: integer;
+function TATStrings.TextSubstring(AX1, AY1, AX2, AY2: SizeInt;
   const AEolString: UnicodeString = #10): atString;
 var
-  i: integer;
+  i: SizeInt;
 begin
   Result:= '';
   if AY1>AY2 then Exit;
@@ -1693,10 +1792,10 @@ begin
   Result+= AEolString+LineSub(AY2, 1, AX2);
 end;
 
-function TATStrings.TextSubstringLength(AX1, AY1, AX2, AY2: integer;
-  const AEolString: UnicodeString = #10): integer;
+function TATStrings.TextSubstringLength(AX1, AY1, AX2, AY2: SizeInt;
+  const AEolString: UnicodeString = #10): SizeInt;
 var
-  NLen, NLenEol, i: integer;
+  NLen, NLenEol, i: SizeInt;
 begin
   Result:= 0;
   if AY1>AY2 then Exit;
@@ -1773,10 +1872,11 @@ var
   CurLineEnd: TATLineEnds;
   CurLineState: TATLineState;
   CurCaretsArray: TATPointArray;
-  CurMarkersArray: TATInt64Array;
+  CurMarkersArray: TATMarkerMarkerArray;
+  CurAttribsArray: TATMarkerAttribArray;
   OtherList: TATUndoList;
   NCount: integer;
-  NEventX, NEventY: integer;
+  NEventX, NEventY: SizeInt;
   bWithoutPause: boolean;
   bEnableEventBefore,
   bEnableEventAfter: boolean;
@@ -1801,6 +1901,7 @@ begin
   CurLineState:= CurItem.ItemLineState;
   CurCaretsArray:= CurItem.ItemCarets;
   CurMarkersArray:= CurItem.ItemMarkers;
+  CurAttribsArray:= CurItem.ItemAttribs;
   ACommandCode:= CurItem.ItemCommandCode;
   ASoftMarked:= CurItem.ItemSoftMark;
   AHardMarked:= CurItem.ItemHardMark;
@@ -1917,13 +2018,24 @@ begin
 
       aeaCaretJump:
         begin
-          OtherList.Add(CurAction, 0, '', cEndNone, cLineStateNone, CurCaretsArray, CurMarkersArray, ACommandCode);
+          OtherList.Add(
+            CurAction,
+            0,
+            '',
+            cEndNone,
+            cLineStateNone,
+            CurCaretsArray,
+            CurMarkersArray,
+            CurAttribsArray,
+            ACommandCode
+            );
         end;
     end;
 
     if Length(CurCaretsArray)>0 then
       SetCaretsArray(CurCaretsArray);
     SetMarkersArray(CurMarkersArray);
+    SetAttribsArray(CurAttribsArray);
 
     if bEnableEventAfter then
       if Assigned(FOnUndoAfter) then
@@ -1938,7 +2050,7 @@ end;
 function TATStrings.DebugText: string;
 var
   Item: PATStringItem;
-  i: integer;
+  i: SizeInt;
 begin
   Result:= '';
   for i:= 0 to Min(20, Count-1) do
@@ -1957,15 +2069,23 @@ begin
   if Assigned(FOnGetCaretsArray) then
     Result:= FOnGetCaretsArray()
   else
-    SetLength(Result, 0);
+    Result:= nil;
 end;
 
-function TATStrings.GetMarkersArray: TATInt64Array;
+function TATStrings.GetMarkersArray: TATMarkerMarkerArray;
 begin
   if Assigned(FOnGetMarkersArray) then
     Result:= FOnGetMarkersArray()
   else
-    SetLength(Result, 0);
+    Result:= nil;
+end;
+
+function TATStrings.GetAttribsArray: TATMarkerAttribArray;
+begin
+  if Assigned(FOnGetAttribsArray) then
+    Result:= FOnGetAttribsArray()
+  else
+    Result:= nil;
 end;
 
 procedure TATStrings.SetCaretsArray(const L: TATPointArray);
@@ -1974,25 +2094,31 @@ begin
     FOnSetCaretsArray(L);
 end;
 
-procedure TATStrings.SetMarkersArray(const L: TATInt64Array);
+procedure TATStrings.SetMarkersArray(const L: TATMarkerMarkerArray);
 begin
   if Assigned(FOnSetMarkersArray) then
     FOnSetMarkersArray(L);
 end;
 
-procedure TATStrings.AddUndoItem(AAction: TATEditAction; AIndex: integer;
+procedure TATStrings.SetAttribsArray(const L: TATMarkerAttribArray);
+begin
+  if Assigned(FOnSetAttribsArray) then
+    FOnSetAttribsArray(L);
+end;
+
+procedure TATStrings.UpdateModified;
+begin
+  FModified:= true;
+  FModifiedRecent:= true;
+  Inc(FModifiedVersion);
+end;
+
+procedure TATStrings.AddUndoItem(AAction: TATEditAction; AIndex: SizeInt;
   const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState;
   ACommandCode: integer);
 var
   CurList: TATUndoList;
 begin
-  if cEditActionSetsModified[AAction] then
-  begin
-    FModified:= true;
-    FModifiedRecent:= true;
-    Inc(FModifiedVersion);
-  end;
-
   if FUndoList=nil then exit;
   if FRedoList=nil then exit;
 
@@ -2003,6 +2129,12 @@ begin
     CurList:= FRedoList
   else
     exit;
+
+  if Length(AText)>ATEditorOptions.MaxLineLenForUndo then
+  begin
+    CurList.Clear;
+    exit
+  end;
 
   //handle CaretJump:
   //if last item was also CaretJump, delete the last item  (don't make huge list on many clicks)
@@ -2018,7 +2150,17 @@ begin
     AddUpdatesAction(AIndex, AAction);
   end;
 
-  CurList.Add(AAction, AIndex, AText, AEnd, ALineState, GetCaretsArray, GetMarkersArray, ACommandCode);
+  CurList.Add(
+    AAction,
+    AIndex,
+    AText,
+    AEnd,
+    ALineState,
+    GetCaretsArray,
+    GetMarkersArray,
+    GetAttribsArray,
+    ACommandCode
+    );
 end;
 
 procedure TATStrings.UndoOrRedo(AUndo: boolean; AGrouped: boolean);
@@ -2139,22 +2281,22 @@ begin
     FRedoList.Locked:= ALocked;
   end;
 
-  if Assigned(FListUpdates) then
+  if Assigned(FIndexesOfEditedLines) then
   begin
-    FListUpdates.Clear;
-    FListUpdatesHard:= false;
+    FIndexesOfEditedLines.Clear;
+    FEnableCachedWrapinfoUpdate:= true;
   end;
 end;
 
 procedure TATStrings.ClearLineStatesUpdated;
 var
-  i: integer;
+  i: SizeInt;
 begin
   for i:= 0 to FList.Count-1 do
     FList.GetItem(i)^.Ex.Updated:= false;
 end;
 
-procedure TATStrings.ActionSaveLastEditionPos(AX: integer; AY: integer);
+procedure TATStrings.ActionSaveLastEditionPos(AX: SizeInt; AY: SizeInt);
 var
   Ar: TATPointArray;
 begin
@@ -2163,7 +2305,7 @@ begin
   if (AX>=0) and (AY>=0) then
   begin
     //2 items per caret
-    SetLength(Ar, 2);
+    SetLength(Ar{%H-}, 2);
     Ar[0].X:= AX;
     Ar[0].Y:= AY;
     Ar[1].X:= -1;
@@ -2188,65 +2330,88 @@ begin
     LineDelete(Count-1, false, false, false);
 end;
 
-procedure TATStrings.ActionDeleteAllBlanks;
+function TATStrings.ActionDeleteAllBlanks: boolean;
 var
-  i: integer;
+  i: SizeInt;
 begin
+  Result:= false;
   ClearUndo;
   ClearLineStates(false);
 
   for i:= Count-1 downto 0 do
     if LinesBlank[i] then
+    begin
       FList.Delete(i);
+      Result:= true;
+    end;
 
-  ActionAddFakeLineIfNeeded;
-  ClearLineStates(false);
+  if Result then
+  begin
+    ActionAddFakeLineIfNeeded;
+    ClearUndo;
+    ClearLineStates(false);
 
-  DoEventChange(cLineChangeDeletedAll, -1, 1);
-  DoEventLog(0);
+    DoEventChange(cLineChangeDeletedAll, -1, 1);
+    DoEventLog(0);
+  end;
 end;
 
-procedure TATStrings.ActionDeleteAdjacentBlanks;
+function TATStrings.ActionDeleteAdjacentBlanks: boolean;
 var
-  i: integer;
+  i: SizeInt;
 begin
+  Result:= false;
   ClearUndo;
   ClearLineStates(false);
 
   for i:= Count-1 downto 1{!} do
     if LinesBlank[i] and LinesBlank[i-1] then
+    begin
       FList.Delete(i);
+      Result:= true;
+    end;
 
-  ActionAddFakeLineIfNeeded;
-  ClearLineStates(false);
+  if Result then
+  begin
+    ActionAddFakeLineIfNeeded;
+    ClearLineStates(false);
 
-  DoEventChange(cLineChangeDeletedAll, -1, 1);
-  DoEventLog(0);
+    DoEventChange(cLineChangeDeletedAll, -1, 1);
+    DoEventLog(0);
+  end;
 end;
 
-procedure TATStrings.ActionDeleteAdjacentDups;
+function TATStrings.ActionDeleteAdjacentDups: boolean;
 var
-  i: integer;
+  i: SizeInt;
 begin
+  Result:= false;
   ClearUndo;
   ClearLineStates(false);
 
   for i:= Count-1 downto 1{!} do
     if (LinesLen[i]=LinesLen[i-1]) and (Lines[i]=Lines[i-1]) then
+    begin
       FList.Delete(i);
+      Result:= true;
+    end;
 
-  ActionAddFakeLineIfNeeded;
-  ClearLineStates(false);
+  if Result then
+  begin
+    ActionAddFakeLineIfNeeded;
+    ClearLineStates(false);
 
-  DoEventChange(cLineChangeDeletedAll, -1, 1);
-  DoEventLog(0);
+    DoEventChange(cLineChangeDeletedAll, -1, 1);
+    DoEventLog(0);
+  end;
 end;
 
-procedure TATStrings.ActionDeleteAllDups(AKeepBlanks: boolean);
+function TATStrings.ActionDeleteAllDups(AKeepBlanks: boolean): boolean;
 var
-  i, j, NLen: integer;
+  i, j, NLen: SizeInt;
   S: UnicodeString;
 begin
+  Result:= false;
   ClearUndo;
   ClearLineStates(false);
 
@@ -2260,27 +2425,31 @@ begin
       if (NLen=LinesLen[j]) and (S=Lines[j]) then
       begin
         FList.Delete(i);
+        Result:= true;
         Break
       end;
   end;
 
-  ActionAddFakeLineIfNeeded;
-  ClearLineStates(false);
+  if Result then
+  begin
+    ActionAddFakeLineIfNeeded;
+    ClearLineStates(false);
 
-  DoEventChange(cLineChangeDeletedAll, -1, 1);
-  DoEventLog(0);
+    DoEventChange(cLineChangeDeletedAll, -1, 1);
+    DoEventLog(0);
+  end;
 end;
 
 
 procedure TATStrings.ActionReverseLines;
 var
-  Cnt, i, mid: integer;
+  NCount, NMiddle, i: SizeInt;
 begin
   ActionEnsureFinalEol;
   ActionDeleteFakeLine;
 
-  Cnt:= Count;
-  if Cnt<2 then
+  NCount:= Count;
+  if NCount<2 then
   begin
     ActionAddFakeLineIfNeeded;
     exit;
@@ -2289,12 +2458,12 @@ begin
   ClearUndo;
   ClearLineStates(false);
 
-  mid:= Cnt div 2;
-  if Odd(Cnt) then
-    Inc(mid);
+  NMiddle:= NCount div 2;
+  if Odd(NCount) then
+    Inc(NMiddle);
 
-  for i:= Cnt-1 downto mid do
-    FList.Exchange(i, Cnt-1-i);
+  for i:= NCount-1 downto NMiddle do
+    FList.Exchange(i, NCount-1-i);
 
   ActionAddFakeLineIfNeeded;
   ClearLineStates(false);
@@ -2305,8 +2474,9 @@ end;
 
 procedure TATStrings.ActionShuffleLines;
 var
-  Cnt, i: integer;
+  Cnt, i: SizeInt;
 begin
+  UpdateModified;
   ActionEnsureFinalEol;
   ActionDeleteFakeLine;
 
@@ -2346,26 +2516,26 @@ end;
 
 procedure TATStrings.AddUpdatesAction(N: integer; AAction: TATEditAction);
 begin
-  if not Assigned(FListUpdates) then Exit;
+  if not Assigned(FIndexesOfEditedLines) then Exit;
 
   if AAction in [aeaDelete, aeaInsert] then
   begin
-    FListUpdatesHard:= true;
+    FEnableCachedWrapinfoUpdate:= false;
     Exit
   end;
 
-  if FListUpdates.Count>cMaxUpdatesCountEasy then
+  if FIndexesOfEditedLines.Count>ATEditorOptions.MaxUpdatesCountEasy then
   begin
-    FListUpdatesHard:= true;
+    FEnableCachedWrapinfoUpdate:= false;
     Exit
   end;
 
-  with FListUpdates do
+  with FIndexesOfEditedLines do
     if IndexOf(N)<0 then
       Add(N);
 end;
 
-procedure TATStrings.DoOnChangeBlock(AX1, AY1, AX2, AY2: integer;
+procedure TATStrings.DoOnChangeBlock(AX1, AY1, AX2, AY2: SizeInt;
   AChange: TATBlockChangeKind; ABlock: TStringList);
 begin
   if Assigned(FOnChangeBlock) then
@@ -2375,24 +2545,6 @@ begin
       AChange,
       ABlock);
 end;
-
-function TATStrings.OffsetToPosition(AOffset: integer): TPoint;
-var
-  NOffset, NLen, i: integer;
-begin
-  Result:= Point(-1, -1);
-  if AOffset<0 then exit;
-
-  NOffset:= 0;
-  for i:= 0 to Count-1 do
-  begin
-    NLen:= LinesLen[i];
-    if (AOffset>=NOffset) and (AOffset<=NOffset+NLen) then
-      exit(Point(AOffset-NOffset, i));
-    Inc(NOffset, NLen+cLineEndLength[LinesEnds[i]]);
-  end;
-end;
-
 
 function TATStrings.ActionEnsureFinalEol: boolean;
 begin
@@ -2421,7 +2573,7 @@ end;
 
 function TATStrings.ActionTrimSpaces(AMode: TATTrimSpaces): boolean;
 var
-  i: integer;
+  i: SizeInt;
   S1, S2: atString;
 begin
   Result:= false;
@@ -2462,9 +2614,9 @@ begin
   end;
 end;
 
-function TATStrings.IsPosFolded(AX, AY, AIndexClient: integer): boolean;
+function TATStrings.IsPosFolded(AX, AY, AIndexClient: SizeInt): boolean;
 var
-  ValueFoldFrom: integer;
+  ValueFoldFrom: SizeInt;
 begin
   Result:= false;
   if not IsIndexValid(AY) then Exit;
@@ -2477,11 +2629,11 @@ begin
     Exit(true);
 end;
 
-procedure TATStrings.LineAddRaw_NoUndo(const S: string; AEnd: TATLineEnds);
+procedure TATStrings.LineAddRaw_NoUndo(const S: string; AEnd: TATLineEnds; AllowBadCharsOfLen1: boolean);
 var
   Item: TATStringItem;
 begin
-  Item.Init(S, AEnd);
+  Item.Init(S, AEnd, AllowBadCharsOfLen1);
   Item.Ex.State:= TATBits2(cLineStateAdded);
   FList.Add(@Item);
   FillChar(Item, SizeOf(Item), 0);
@@ -2497,14 +2649,18 @@ begin
   FillChar(Item, SizeOf(Item), 0);
 end;
 
-procedure TATStrings.DoEventLog(ALine: integer); inline;
+procedure TATStrings.DoEventLog(ALine: SizeInt);
 begin
   if not FEnabledChangeEvents then exit;
+
+  if (EditingTopLine<0) or (ALine<EditingTopLine) then
+    EditingTopLine:= ALine;
+
   if Assigned(FOnChangeLog) then
     FOnChangeLog(Self, ALine);
 end;
 
-procedure TATStrings.DoEventChange(AChange: TATLineChangeKind; ALineIndex, AItemCount: integer);
+procedure TATStrings.DoEventChange(AChange: TATLineChangeKind; ALineIndex, AItemCount: SizeInt);
 begin
   if not FEnabledChangeEvents then exit;
 
@@ -2528,7 +2684,7 @@ end;
 procedure TATStrings.ClearSeparators;
 var
   Item: PATStringItem;
-  i: integer;
+  i: SizeInt;
 begin
   for i:= 0 to Count-1 do
   begin
@@ -2572,18 +2728,32 @@ begin
 end;
 
 
-procedure TATStrings.ActionSort(AAction: TATStringsSortAction; AFrom, ATo: integer);
+procedure TATStrings.ActionSort(AAction: TATStringsSortAction; AFrom, ATo: SizeInt);
+  //
+  procedure RemoveEmptyLines;
+  var
+    i: SizeInt;
+  begin
+    for i:= Count-1 downto 0 do
+      if LinesLen[i]=0 then
+        FList.Delete(i);
+  end;
+  //
 var
   Func: TFPSListCompareFunc;
-  i: integer;
+  bAllText: boolean;
 begin
-  ActionEnsureFinalEol;
-  ActionDeleteFakeLine;
-
-  if Count<2 then
+  bAllText:= AFrom<0;
+  if bAllText then
   begin
-    ActionAddFakeLineIfNeeded;
-    exit;
+    ActionEnsureFinalEol;
+    ActionDeleteFakeLine;
+
+    if Count<2 then
+    begin
+      ActionAddFakeLineIfNeeded;
+      exit;
+    end;
   end;
 
   case AAction of
@@ -2598,23 +2768,37 @@ begin
   end;
 
   ClearUndo;
-  ClearLineStates(false);
 
-  for i:= Count-1 downto 0 do
-    if LinesLen[i]=0 then
-      FList.Delete(i);
-
-  if AFrom<0 then
-    FList.Sort(Func)
+  if bAllText then
+  begin
+    RemoveEmptyLines;
+    FList.Sort(Func);
+    ActionAddFakeLineIfNeeded;
+  end
   else
     FList.SortRange(AFrom, ATo, Func);
 
-  ActionAddFakeLineIfNeeded;
-  ClearLineStates(false);
+  ChangeLineStates(AFrom, ATo);
 
   //this clears all bookmarks, ranges, decors - it's ok
   DoEventChange(cLineChangeDeletedAll, -1, 1);
   DoEventLog(0);
+end;
+
+
+function TATStrings.IsSizeBig(const ALimit: SizeInt): boolean;
+var
+  NTotal, i: SizeInt;
+begin
+  Result:= false;
+  NTotal:= 0;
+  for i:= 0 to Count-1 do
+  begin
+    Inc(NTotal, LinesLen[i]);
+    Inc(NTotal); //EOL char
+    if NTotal>ALimit then
+      exit(true);
+  end;
 end;
 
 {$I atstrings_editing.inc}
@@ -2622,4 +2806,3 @@ end;
 {$I atstrings_save.inc}
 
 end.
-

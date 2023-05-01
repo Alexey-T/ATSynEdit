@@ -10,13 +10,11 @@ interface
 
 uses
   Classes, SysUtils,
-  Dialogs,
-  LazUTF8,
   ATStringProc,
   ATSynEdit_FGL;
 
 type
-  TTextChangedEvent = procedure(Sender: TObject; Pos, Count, LineChange: integer) of object;
+  TATStringBufferChange = procedure(Sender: TObject; Pos, Count, LineChange: integer) of object;
 
 type
   TATGenericIntList = specialize TFPGList<integer>;
@@ -26,39 +24,35 @@ type
 
   TATStringBuffer = class
   strict private
+    //buffer must always use LF line endings, FText must have only such line endings
+    const LenEOL=1;
+  strict private
     FList: array of integer;
-    FCount: integer;
-    FLenEol: integer;
-    FLocked: boolean;
-    FVersion: integer;
-    FOnChange: TTextChangedEvent;
+    FOnChange: TATStringBufferChange;
+    function GetCount: integer; inline;
     procedure SetCount(AValue: integer);
     procedure SetupFromGenericList(L: TATGenericIntList);
   public
+    Valid: boolean;
+    Version: Int64;
     FText: UnicodeString;
     constructor Create; virtual;
     destructor Destroy; override;
     procedure Clear;
     procedure Setup(const AText: UnicodeString; const ALineLens: array of integer);
     procedure SetupSlow(const AText: UnicodeString);
-    procedure Lock;
-    procedure Unlock;
     procedure Assign(Other: TATStringBuffer);
-    function CaretToStr(constref APnt: TPoint): integer;
+    function CaretToStr(const APnt: TPoint): integer;
     function StrToCaret(APos: integer): TPoint;
     function SubString(APos, ALen: integer): UnicodeString; inline;
-    function TextLength: integer; inline;
-    function LineIndex(N: integer): integer;
+    function TextLength: integer;
+    function OffsetOfLineIndex(N: integer): integer;
     function LineLength(N: integer): integer;
-    function LineSpace(N: integer): integer; inline;
-    function OffsetToDistanceFromLineStart(APos: integer): integer;
-    function OffsetToDistanceFromLineEnd(APos: integer): integer;
+    function OffsetToDistanceFromLineStart(APos: integer): integer; inline;
     function OffsetToOffsetOfLineStart(APos: integer): integer; inline;
-    function OffsetToOffsetOfLineEnd(APos: integer): integer; inline;
-    property Count: integer read FCount;
-    property OnChange: TTextChangedEvent read FOnChange write FOnChange;
-    property Version: integer read FVersion;
-    property IsLocked: boolean read FLocked;
+    function OffsetToOffsetOfLineEnd(APos: integer): integer;
+    property Count: integer read GetCount;
+    property OnChange: TATStringBufferChange read FOnChange write FOnChange;
   end;
 
 implementation
@@ -67,23 +61,24 @@ implementation
 
 procedure TATStringBuffer.SetCount(AValue: integer);
 begin
-  Assert(not FLocked, 'SetCount called for locked StringBuffer');
   if AValue<0 then
     raise Exception.Create('StringBuffer Count<0');
 
-  FCount:= AValue;
-  if Length(FList)<>FCount then
-    SetLength(FList, FCount);
+  if Length(FList)<>AValue then
+    SetLength(FList, AValue);
+end;
+
+function TATStringBuffer.GetCount: integer; inline;
+begin
+  Result:= Length(FList);
 end;
 
 constructor TATStringBuffer.Create;
 begin
   FText:= '';
-  FLenEol:= 1; //no apps should use other
-  FCount:= 0;
   SetCount(0);
-  FVersion:= 0;
-  FLocked:= false;
+  Version:= 0;
+  Valid:= false;
 end;
 
 destructor TATStringBuffer.Destroy;
@@ -98,10 +93,8 @@ procedure TATStringBuffer.Setup(const AText: UnicodeString;
 var
   Pos, NLen, i: integer;
 begin
-  Assert(not FLocked, 'Attempt to change locked StringBuffer');
-  Inc(FVersion);
   FText:= AText;
-  //FLenEol:= ALenEol;
+  Valid:= false;
 
   SetCount(Length(ALineLens)+1);
   Pos:= 0;
@@ -109,7 +102,8 @@ begin
   for i:= 0 to Length(ALineLens)-1 do
   begin
     NLen:= ALineLens[i];
-    Inc(Pos, NLen+FLenEol);
+    Inc(Pos, NLen);
+    Inc(Pos, LenEOL);
     FList[i+1]:= Pos;
   end;
 end;
@@ -118,15 +112,14 @@ procedure TATStringBuffer.SetupFromGenericList(L: TATGenericIntList);
 var
   Pos, NLen, i: integer;
 begin
-  Assert(not FLocked, 'Attempt to change locked StringBuffer');
-  Inc(FVersion);
   SetCount(L.Count+1);
   Pos:= 0;
   FList[0]:= 0;
   for i:= 0 to L.Count-1 do
   begin
     NLen:= L[i];
-    Inc(Pos, NLen+FLenEol);
+    Inc(Pos, NLen);
+    Inc(Pos, LenEOL);
     FList[i+1]:= Pos;
   end;
 end;
@@ -134,12 +127,9 @@ end;
 
 procedure TATStringBuffer.SetupSlow(const AText: UnicodeString);
 var
-  Lens: TATGenericIntList;
-  i, N: integer;
+  LenList: TATGenericIntList;
+  NLen, i: integer;
 begin
-  Assert(not FLocked, 'Attempt to change locked StringBuffer');
-  Inc(FVersion);
-
   FText:= AText;
   if FText='' then
   begin
@@ -147,52 +137,36 @@ begin
     Exit
   end;
 
-  N:= 0;
-  i:= 1;
+  //replace CR LF to LF
+  FText:= UnicodeStringReplace(FText, #13#10, #10, [rfReplaceAll]);
 
-  Lens:= TATGenericIntList.Create;
+  Valid:= false;
+  NLen:= 0;
+
+  LenList:= TATGenericIntList.Create;
   try
-    while i<=Length(FText) do
+    for i:= 1 to Length(FText) do
     begin
-      //Replace CR LF and CR to LF
+      //replace CR to LF
       if FText[i]=#13 then
-      begin
-        if (i<Length(FText)) and (FText[i+1]=#10) then
-        begin
-          Delete(FText, i, 1);
-          Continue;
-        end
-        else
-          FText[i]:= #10;
-      end;
+        FText[i]:= #10;
 
       if FText[i]=#10 then
       begin
-        Lens.Add(N);
-        N:= 0;
+        LenList.Add(NLen);
+        NLen:= 0;
       end
       else
-        Inc(N);
-      Inc(i);
+        Inc(NLen);
     end;
 
-    if N>0 then
-      Lens.Add(N);
+    if NLen>0 then
+      LenList.Add(NLen);
 
-    SetupFromGenericList(Lens);
+    SetupFromGenericList(LenList);
   finally
-    FreeAndNil(Lens);
+    FreeAndNil(LenList);
   end;
-end;
-
-procedure TATStringBuffer.Lock;
-begin
-  FLocked:= true;
-end;
-
-procedure TATStringBuffer.Unlock;
-begin
-  FLocked:= false;
 end;
 
 procedure TATStringBuffer.Assign(Other: TATStringBuffer);
@@ -200,28 +174,26 @@ begin
   FText:= Other.FText;
   UniqueString(FText);
   FList:= Other.FList;
-  FCount:= Other.FCount;
-  FLenEol:= Other.FLenEol;
-  FVersion:= Other.FVersion;
+  Version:= Other.Version;
 end;
 
 
 procedure TATStringBuffer.Clear;
 begin
-  Assert(not FLocked, 'Attempt to clear locked StringBuffer');
   FText:= '';
   SetCount(0);
+  Valid:= false;
 end;
 
-function TATStringBuffer.CaretToStr(constref APnt: TPoint): integer;
+function TATStringBuffer.CaretToStr(const APnt: TPoint): integer;
 var
-  Len,x: integer;
+  Len, x: integer;
 begin
   Result:= -1;
-  x:=APnt.X;
+  x:= APnt.X;
   if (APnt.Y<0) then Exit;
   if (APnt.X<0) then Exit;
-  if (APnt.Y>=FCount) then Exit;
+  if (APnt.Y>=Count) then Exit;
 
   //handle caret pos after eol
   if x>0 then
@@ -246,7 +218,7 @@ begin
   end;
 
   a:= 0;
-  b:= FCount-1;
+  b:= Count-1;
   if b<0 then Exit;
 
   repeat
@@ -276,32 +248,37 @@ begin
   Result:= Copy(FText, APos, ALen);
 end;
 
-function TATStringBuffer.TextLength: integer; inline;
+function TATStringBuffer.TextLength: integer;
+var
+  NCnt: integer;
 begin
-  Result:= Length(FText);
+  NCnt:= Count;
+  if NCnt>0 then
+    Result:= FList[NCnt-1]-LenEOL
+  else
+    Result:= 0;
 end;
 
-function TATStringBuffer.LineIndex(N: integer): integer;
+function TATStringBuffer.OffsetOfLineIndex(N: integer): integer;
+var
+  NCnt: integer;
 begin
-  if N<0 then Result:= 0
+  NCnt:= Count;
+  if (N<0) or (NCnt=0) then
+    Result:= 0
   else
-  if N>=FCount then Result:= TextLength-1
+  if N>=NCnt then
+    Result:= FList[NCnt-1]
   else
     Result:= FList[N];
 end;
 
 function TATStringBuffer.LineLength(N: integer): integer;
 begin
-  if N<0 then Result:= 0
+  if (N<0) or (N>=Count) then
+    Result:= 0
   else
-  if N>=FCount-1 then Result:= 0
-  else
-    Result:= FList[N+1]-FList[N]-FLenEol;
-end;
-
-function TATStringBuffer.LineSpace(N: integer): integer; inline;
-begin
-  Result:= LineLength(N)+FLenEol;
+    Result:= FList[N+1]-FList[N]-LenEOL;
 end;
 
 (*
@@ -311,7 +288,7 @@ var
   N: integer;
 begin
   N:= StrToCaret(APos).Y;
-  Result:= LineIndex(N);
+  Result:= OffsetOfLineIndex(N);
 end;
 
 function TATStringBuffer.OffsetToOffsetOfLineEnd(APos: integer): integer;
@@ -319,7 +296,7 @@ var
   N: integer;
 begin
   N:= StrToCaret(APos).Y;
-  Result:= LineIndex(N)+LineLength(N);
+  Result:= OffsetOfLineIndex(N)+LineLength(N);
 end;
 *)
 
@@ -328,40 +305,17 @@ begin
   Result:= APos-OffsetToDistanceFromLineStart(APos);
 end;
 
-function TATStringBuffer.OffsetToOffsetOfLineEnd(APos: integer): integer; inline;
+function TATStringBuffer.OffsetToOffsetOfLineEnd(APos: integer): integer;
+var
+  NLine: integer;
 begin
-  Result:= APos+OffsetToDistanceFromLineEnd(APos);
+  NLine:= StrToCaret(APos).Y;
+  Result:= OffsetOfLineIndex(NLine+1)-LenEOL;
 end;
 
-function TATStringBuffer.OffsetToDistanceFromLineStart(APos: integer): integer;
-const
-  CharEol = #10;
-var
-  NPos, NLen: integer;
+function TATStringBuffer.OffsetToDistanceFromLineStart(APos: integer): integer; inline;
 begin
-  Result:= 0;
-  NPos:= APos+1;
-  NLen:= TextLength;
-  while (NPos>1) and (NPos-1<=NLen) and (FText[NPos-1]<>CharEol) do
-  begin
-    Inc(Result);
-    Dec(NPos);
-  end;
-end;
-
-function TATStringBuffer.OffsetToDistanceFromLineEnd(APos: integer): integer;
-const
-  CharEol = #10;
-var
-  NLen, NPos: integer;
-begin
-  Result:= 0;
-  NPos:= APos+1;
-  NLen:= TextLength;
-  while (NPos<NLen) and (FText[NPos+1]<>CharEol) do  begin
-    Inc(Result);
-    Inc(NPos);
-  end;
+  Result:= StrToCaret(APos).X;
 end;
 
 

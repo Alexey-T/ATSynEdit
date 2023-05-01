@@ -14,6 +14,7 @@ uses
   ATSynEdit_Carets,
   ATSynEdit_Bookmarks,
   ATSynEdit_Export_HTML,
+  ATSynEdit_Globals,
   ec_SyntAnal,
   ec_proc_lexer;
 
@@ -22,7 +23,6 @@ type
 
   TfmMain = class(TForm)
     bOpen: TButton;
-    bExport: TButton;
     chkDyn: TCheckBox;
     chkFullHilite: TCheckBox;
     chkFullSel: TCheckBox;
@@ -42,7 +42,6 @@ type
     Tree: TTreeView;
     procedure AdapterParseBegin(Sender: TObject);
     procedure AdapterParseDone(Sender: TObject);
-    procedure bExportClick(Sender: TObject);
     procedure bOpenClick(Sender: TObject);
     procedure chkDynChange(Sender: TObject);
     procedure chkFullHiliteChange(Sender: TObject);
@@ -55,6 +54,7 @@ type
     procedure edLexerChange(Sender: TObject);
     procedure filesClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure TimerMemoryTimer(Sender: TObject);
     procedure TreeClick(Sender: TObject);
@@ -66,8 +66,9 @@ type
     procedure DoLexer(const aname: string);
     procedure DoOpenFile(const fn: string);
     procedure EditCalcStaple(Sender: TObject; ALine, AIndent: integer; var AColor: TColor);
-    procedure EditClickGutter(Sender: TObject; ABand: integer; ALine: integer);
+    procedure EditClickGutter(Sender: TObject; ABand: integer; ALine: integer; var AHandled: boolean);
     function GetComment: string;
+    procedure TreeOnDeletion(Sender: TObject; Node: TTreeNode);
     procedure UpdateLexList;
   public
     { public declarations }
@@ -114,7 +115,7 @@ begin
   ed.LoadFromFile(fn);
   ed.SetFocus;
 
-  an:= DoFindLexerForFilename(manager, fn);
+  an:= Lexer_FindForFilename(manager, fn);
   adapter.Lexer:= an;
 
   if Assigned(an) then
@@ -149,9 +150,6 @@ begin
   ed.Colors.TextBG:= $e0f0f0;
   ed.Colors.CurrentLineBG:= clTeal;
 
-  ed.Gutter[ed.GutterBandNumbers].Visible:= false;
-  ed.Gutter.Update;
-
   ed.OnClickGutter:= @EditClickGutter;
   ed.OnCalcStaple:= @EditCalcStaple;
   ed.OnChangeCaretPos:=@EditorChangeCaretPos;
@@ -167,6 +165,13 @@ begin
   chkUnpri.Checked:= ed.OptUnprintedVisible;
   chkShowCur.Checked:= ed.OptShowCurLine;
   chkDyn.Checked:= adapter.DynamicHiliteEnabled;
+
+  Tree.OnDeletion:=@TreeOnDeletion;
+end;
+
+procedure TfmMain.FormDestroy(Sender: TObject);
+begin
+  Tree.Items.Clear;
 end;
 
 procedure TfmMain.FormShow(Sender: TObject);
@@ -216,10 +221,12 @@ begin
 end;
 
 procedure TfmMain.EditorChangeCaretPos(Sender: TObject);
+var
+  NLine: integer;
 begin
   if ed.Carets.Count>0 then
     with ed.Carets[0] do
-      CodetreeSelectItemForPosition(Tree, PosX, PosY);
+      CodetreeSelectItemForPosition(Tree, PosX, PosY, NLine);
 end;
 
 procedure TfmMain.chkFullSelChange(Sender: TObject);
@@ -234,7 +241,7 @@ begin
   ed.Fold.Clear;
 
   if chkLexer.Checked then
-    adapter.Lexer:= DoFindLexerForFilename(manager, FFilename);
+    adapter.Lexer:= Lexer_FindForFilename(manager, FFilename);
   ed.Update;
 end;
 
@@ -277,21 +284,18 @@ begin
     Result:= an.LineComment;
 end;
 
-procedure TfmMain.bExportClick(Sender: TObject);
-var
-  fn: string;
+procedure TfmMain.TreeOnDeletion(Sender: TObject; Node: TTreeNode);
 begin
-  fn:=     GetTempDir+DirectorySeparator+'_export.html';
-  DoEditorExportToHTML(Ed, fn, 'Export test',
-    'Courier New', 12, false,
-    clWhite, clMedGray);
-  if FileExists(fn) then
-    OpenDocument(fn);
+  if Assigned(Node.Data) then
+  begin
+    TObject(Node.Data).Free;
+    Node.Data:= nil;
+  end;
 end;
 
 procedure TfmMain.AdapterParseDone(Sender: TObject);
 begin
-  adapter.TreeFill(Tree);
+  adapter.TreeFill(Tree, 1000);
   EditorChangeCaretPos(Self);
 end;
 
@@ -336,12 +340,13 @@ begin
     DoOpenFile(fn);
 end;
 
-procedure TfmMain.EditClickGutter(Sender: TObject; ABand: integer; ALine: integer);
+procedure TfmMain.EditClickGutter(Sender: TObject; ABand: integer;
+  ALine: integer; var AHandled: boolean);
 var
   NIndex: integer;
   Data: TATBookmarkData;
 begin
-  if ABand=ed.GutterBandBookmarks then
+  if ABand=ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagBookmarks) then
   begin
     NIndex:= ed.Strings.Bookmarks.Find(ALine);
     if NIndex>=0 then
@@ -355,6 +360,7 @@ begin
       ed.Strings.Bookmarks.Add(Data);
     end;
     ed.Update;
+    AHandled:= true;
   end;
 end;
 

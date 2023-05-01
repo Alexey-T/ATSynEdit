@@ -24,12 +24,19 @@ begin
 
   //special handle for spec keys
   case Key of
-    VK_SHIFT,
     VK_CONTROL,
+    VK_LWIN,
+    VK_RWIN:
+      begin
+        if FMouseDragDropping then
+          UpdateCursor;
+        exit;
+      end;
+    VK_SHIFT,
     VK_MENU, //3 usual state keys
     VK_LSHIFT..VK_RMENU: //also 6 state keys
       begin
-        //ignore Ctrl/Alt/Shift to not hide caret
+        //ignore Alt/Shift to not hide caret
         exit;
       end;
     VK_TAB:
@@ -51,8 +58,26 @@ begin
   if NCmd>0 then
   begin
     TimerBlinkDisable;
-    DoCommand(NCmd);
+    DoCommand(NCmd, cInvokeHotkey);
     TimerBlinkEnable;
+  end;
+end;
+
+procedure TATSynEdit.KeyUp(var Key: Word; Shift: TShiftState);
+begin
+  inherited;
+  if Key=0 then Exit;
+
+  //special handle for spec keys
+  case Key of
+    VK_CONTROL,
+    VK_LWIN,
+    VK_RWIN:
+      begin
+        if FMouseDragDropping then
+          UpdateCursor;
+        exit;
+      end;
   end;
 end;
 
@@ -121,7 +146,7 @@ begin
   end;
 
   TimerBlinkDisable;
-  DoCommand(cCommand_TextInsert, Str);
+  DoCommand(cCommand_TextInsert, cInvokeHotkeyChar, Str);
   TimerBlinkEnable;
 
   Utf8Key:= '';
@@ -142,7 +167,7 @@ begin
   end;
 
   //support combo-hotkeys with simple letter
-  // https://github.com/Alexey-T/CudaText/issues/2690
+  //CudaText issue #2690
   bComboPressing:= (FKeymapHistory.Length>0);
   if not bComboPressing then
     if IsEditorHotkeyForText(Key) and ((Shift=[]) or (Shift=[ssShift])) then
@@ -154,7 +179,7 @@ begin
     Key:= 0;
 end;
 
-function TATSynEdit.IsCommandResults_CaretMove(const Res: TATCommandResults): boolean; inline;
+function TATSynEdit.IsCommandResults_CaretMove(Res: TATCommandResults): boolean;
 begin
   Result:= Res*[
     cResultCaretAny,
@@ -173,11 +198,16 @@ var
   bNeedRepaint, bAllowRepaint: boolean;
   bUndoRedo: boolean;
   bAllowCaretScroll: boolean;
+  bCaretMoved: boolean;
+  NLineChanged: integer;
+  NProximityVert: integer;
 begin
   bNeedRepaint:= false;
   bAllowRepaint:= true;
   bTextChanged:= cResultText in Res;
   bUndoRedo:= cResultUndoRedo in Res;
+  bCaretMoved:= false;
+  St:= Strings;
 
   //if one-line, try to make right edge of text near the edge of control, like Win inputs
   if ModeOneLine then
@@ -195,7 +225,6 @@ begin
     UpdateWrapInfo;
   end;
 
-  St:= Strings;
   if bTextChanged or St.ModifiedRecent then
     St.ActionSaveLastEditionPos; //clears St.ModifiedRecent
 
@@ -218,9 +247,11 @@ begin
   end;
 
   DoCaretsFixIfInsideFolded;
-  DoCaretsSort;
+  Carets.Sort;
 
-  if IsCommandResults_CaretMove(Res) then
+
+  bCaretMoved:= IsCommandResults_CaretMove(Res);
+  if bCaretMoved then
   begin
     if Carets.Count=1 then
       bAllowCaretScroll:= true
@@ -233,34 +264,79 @@ begin
     if bAllowCaretScroll then
     begin
       if cResultCaretTop in Res then
-        DoGotoCaret(cEdgeTop, bUndoRedo, false, false)
+        DoGotoCaret(cEdgeTop, bUndoRedo, false, false, false)
       else
       if cResultCaretBottom in Res then
-        DoGotoCaret(cEdgeBottom, bUndoRedo, false, false)
+        DoGotoCaret(cEdgeBottom, bUndoRedo, false, false, false)
       else
       if cResultCaretLeft in Res then
-        DoGotoCaret(cEdgeLeft, bUndoRedo, false, false)
+        DoGotoCaret(cEdgeLeft, bUndoRedo, false, false, false)
       else
       if cResultCaretRight in Res then
-        DoGotoCaret(cEdgeRight, bUndoRedo, false, false);
+        DoGotoCaret(cEdgeRight, bUndoRedo, false, false, false);
     end;
 
     if not (cResultKeepColumnSel in Res) then
       FSelRect:= cRectEmpty;
-    DoEventCarets;
 
-    //update pixel coords, so that plugin command
-    //  for in in range(N): ed.cmd(cCommand_KeyDown)
-    //will move-down N times
+    //update pixel coords, so that CudaText python code
+    //    for in in range(N):
+    //        ed.cmd(cCommand_KeyDown)
+    //will move-down exactly N times
     UpdateCaretsCoords;
-  end;
+
+
+    NProximityVert:= GetActualProximityVert;
+    if (NProximityVert>0)
+      and (ACmd<>cCommand_SelectAll) //don't apply Proximity if 'select all' is called
+      and (cResultCaretFarFromEdge in Res) //don't apply Proximity if caret was near the edge, before the command
+      then
+    begin
+      if (Carets.Count=1) or (Res*[cResultCaretTop, cResultCaretAny]<>[]) then
+      begin
+        Caret:= Carets[0];
+        if DoCaretApplyProximityToVertEdge(
+             Point(Caret.PosX, Caret.PosY),
+             Caret.CoordY,
+             NProximityVert,
+             NProximityVert) then
+          UpdateCaretsCoords(false, true);
+      end
+      else
+      if (Carets.Count>1) and (Res*[cResultCaretBottom]<>[]) then
+      begin
+        Caret:= Carets[Carets.Count-1];
+        if DoCaretApplyProximityToVertEdge(
+             Point(Caret.PosX, Caret.PosY),
+             Caret.CoordY,
+             NProximityVert,
+             NProximityVert) then
+          UpdateCaretsCoords(false, true);
+      end;
+    end;
+  end
+  else
+  //scroll should do UpdateCaretsCoords, CudaText issue #3777
+  if cResultScroll in Res then
+    UpdateCaretsCoords(false, true);
+
 
   if bTextChanged then
   begin
     if not (cResultKeepColumnSel in Res) then
       FSelRect:= cRectEmpty;
-    DoEventChange;
+    //fixing CudaText issue #3708, syntax highlight is broken after Undo,
+    //with "Commands History" plugin (cannot find how plugin breaks it)
+    if bUndoRedo and (Carets.Count>0) then
+      NLineChanged:= Carets[0].FirstTouchedLine
+    else
+      NLineChanged:= -1;
+    DoEventChange(NLineChanged);
   end;
+
+  //fire DoEventCarets after DoEventChange, so that 'highlight pair brackets' properly works
+  if bCaretMoved then
+    DoEventCarets;
 
   if cResultState in Res then
     DoEventState;
@@ -283,7 +359,8 @@ begin
     //- Paint call needed, to repaint after "Fold all" (Linux gtk2)
     //and it helps to not skip repaints in big files with EControl lexer
     UpdateCursor;
-    Paint;
+    if cResultFoldChange in Res then
+      Paint;
     if bAllowRepaint then
       Invalidate;
   end
@@ -403,13 +480,14 @@ begin
     cCommand_RemoveFirstCaret:    Result:= DoCommand_RemoveOneCaret(true);
     cCommand_RemoveLastCaret:     Result:= DoCommand_RemoveOneCaret(false);
 
-    cCommand_TextInsert:          Result:= DoCommand_TextInsertAtCarets(AText, false, FOverwrite, false);
-    cCommand_TextInsertTabChar:   Result:= DoCommand_TextInsertAtCarets(#9, false, FOverwrite, false);
+    cCommand_TextInsert:          Result:= DoCommand_TextInsertAtCarets(AText, false, FOverwrite, false, false);
+    cCommand_TextInsertTabChar:   Result:= DoCommand_TextInsertAtCarets(#9, false, FOverwrite, false, false);
     cCommand_KeyBackspace:        Result:= DoCommand_TextBackspace;
     cCommand_KeyDelete:           Result:= DoCommand_TextDelete;
     cCommand_KeyTab:              Result:= DoCommand_TextTabulation;
     cCommand_KeyEnter:            Result:= DoCommand_TextInsertEol(false);
     cCommand_ForceFinalEndOfLine: Result:= DoCommand_ForceFinalEndOfLine;
+    cCommand_DeleteFinalEndOfLine: Result:= DoCommand_DeleteFinalEndOfLine;
 
     cCommand_Undo:                Result:= DoCommand_UndoRedo(true);
     cCommand_Redo:                Result:= DoCommand_UndoRedo(false);
@@ -430,7 +508,8 @@ begin
     cCommand_SelectNone:               Result:= [cResultCaretAny];
     cCommand_SelectInverted:           Result:= DoCommand_SelectInverted;
     cCommand_SelectSplitToLines:       Result:= DoCommand_SelectSplitToLines;
-    cCommand_SelectExtendByLine:       Result:= DoCommand_SelectExtendByLine;
+    cCommand_SelectExtendByLine:       Result:= DoCommand_SelectExtendByLine(false);
+    cCommand_SelectExtendByLineUp:     Result:= DoCommand_SelectExtendByLine(true);
     cCommand_SelectWords:              Result:= DoCommand_SelectWords;
     cCommand_SelectLines:              Result:= DoCommand_SelectLines;
 
@@ -479,8 +558,8 @@ begin
     cCommand_TextIndent:               Result:= DoCommand_TextIndentUnindent(true);
     cCommand_TextUnindent:             Result:= DoCommand_TextIndentUnindent(false);
 
-    cCommand_ScrollToBegin:            Result:= DoCommand_ScrollToBeginOrEnd(true);
-    cCommand_ScrollToEnd:              Result:= DoCommand_ScrollToBeginOrEnd(false);
+    cCommand_ScrollToBegin:            Result:= DoCommand_ScrollToBeginOrEnd(true, FOptScrollLineCommandsKeepCaretOnScreen);
+    cCommand_ScrollToEnd:              Result:= DoCommand_ScrollToBeginOrEnd(false, FOptScrollLineCommandsKeepCaretOnScreen);
     cCommand_ScrollLineUp:             Result:= DoCommand_ScrollByDelta(-1, 0, FOptScrollLineCommandsKeepCaretOnScreen);
     cCommand_ScrollLineDown:           Result:= DoCommand_ScrollByDelta(1, 0, FOptScrollLineCommandsKeepCaretOnScreen);
     cCommand_ScrollPageUp:             Result:= DoCommand_ScrollByDelta(-GetPageLines, 0, FOptScrollLineCommandsKeepCaretOnScreen);
@@ -491,6 +570,7 @@ begin
     cCommand_ScrollToCaretBottom:      Result:= [cResultCaretBottom];
     cCommand_ScrollToCaretLeft:        Result:= [cResultCaretLeft];
     cCommand_ScrollToCaretRight:       Result:= [cResultCaretRight];
+    cCommand_ScrollToLeft:             Result:= DoCommand_ScrollToLeft;
 
     cCommand_Sort_Asc:                 Result:= DoCommand_Sort(cSortActionAsc);
     cCommand_Sort_AscNoCase:           Result:= DoCommand_Sort(cSortActionAscNoCase);
@@ -510,20 +590,42 @@ begin
     cCommand_ClipboardCut:             Result:= DoCommand_ClipboardCut(Clipboard);
 
     //use Clipboard:TClipboard
-    cCommand_ClipboardPaste:                 Result:= DoCommand_ClipboardPaste(false, false, Clipboard);
-    cCommand_ClipboardPaste_Select:          Result:= DoCommand_ClipboardPaste(false, true, Clipboard);
-    cCommand_ClipboardPaste_KeepCaret:       Result:= DoCommand_ClipboardPaste(true, false, Clipboard);
-    cCommand_ClipboardPaste_Column:          Result:= DoCommand_ClipboardPasteColumnBlock(false, Clipboard);
-    cCommand_ClipboardPaste_ColumnKeepCaret: Result:= DoCommand_ClipboardPasteColumnBlock(true, Clipboard);
+    cCommand_ClipboardPaste:                 Result:= DoCommand_ClipboardPaste(false, false,
+                                                        Clipboard.HasFormat(ATEditorOptions.ClipboardColumnFormat),
+                                                        Clipboard.AsText);
+    cCommand_ClipboardPaste_Select:          Result:= DoCommand_ClipboardPaste(false, true,
+                                                        Clipboard.HasFormat(ATEditorOptions.ClipboardColumnFormat),
+                                                        Clipboard.AsText);
+    cCommand_ClipboardPaste_KeepCaret:       Result:= DoCommand_ClipboardPaste(true, false,
+                                                        Clipboard.HasFormat(ATEditorOptions.ClipboardColumnFormat),
+                                                        Clipboard.AsText);
+    cCommand_ClipboardPaste_Column:          Result:= DoCommand_ClipboardPasteColumnBlock(false,
+                                                        Clipboard.AsText);
+    cCommand_ClipboardPaste_ColumnKeepCaret: Result:= DoCommand_ClipboardPasteColumnBlock(true,
+                                                        Clipboard.AsText);
+
+    cCommand_ClipboardPasteAndIndent:        Result:= DoCommand_ClipboardPasteAndIndent;
+    cCommand_ClipboardPasteFromRecents:      Result:= DoCommand_ClipboardPasteFromRecents;
+    cCommand_ClipboardClearRecents:          Result:= DoCommand_ClipboardClearRecents;
 
     //use PrimarySelection:TClipboard
-    cCommand_ClipboardAltPaste:                 Result:= DoCommand_ClipboardPaste(false, false, PrimarySelection);
-    cCommand_ClipboardAltPaste_Select:          Result:= DoCommand_ClipboardPaste(false, true, PrimarySelection);
-    cCommand_ClipboardAltPaste_KeepCaret:       Result:= DoCommand_ClipboardPaste(true, false, PrimarySelection);
-    cCommand_ClipboardAltPaste_Column:          Result:= DoCommand_ClipboardPasteColumnBlock(false, PrimarySelection);
-    cCommand_ClipboardAltPaste_ColumnKeepCaret: Result:= DoCommand_ClipboardPasteColumnBlock(true, PrimarySelection);
+    cCommand_ClipboardAltPaste:                 Result:= DoCommand_ClipboardPaste(false, false,
+                                                           PrimarySelection.HasFormat(ATEditorOptions.ClipboardColumnFormat),
+                                                           PrimarySelection.AsText);
+    cCommand_ClipboardAltPaste_Select:          Result:= DoCommand_ClipboardPaste(false, true,
+                                                           PrimarySelection.HasFormat(ATEditorOptions.ClipboardColumnFormat),
+                                                           PrimarySelection.AsText);
+    cCommand_ClipboardAltPaste_KeepCaret:       Result:= DoCommand_ClipboardPaste(true, false,
+                                                           PrimarySelection.HasFormat(ATEditorOptions.ClipboardColumnFormat),
+                                                           PrimarySelection.AsText);
+    cCommand_ClipboardAltPaste_Column:          Result:= DoCommand_ClipboardPasteColumnBlock(false,
+                                                           PrimarySelection.AsText);
+    cCommand_ClipboardAltPaste_ColumnKeepCaret: Result:= DoCommand_ClipboardPasteColumnBlock(true,
+                                                           PrimarySelection.AsText);
     //use SecondarySelection:TClipboard
-    cCommand_ClipboardAltAltPaste:              Result:= DoCommand_ClipboardPaste(false, false, SecondarySelection);
+    cCommand_ClipboardAltAltPaste:              Result:= DoCommand_ClipboardPaste(false, false,
+                                                           SecondarySelection.HasFormat(ATEditorOptions.ClipboardColumnFormat),
+                                                           SecondarySelection.AsText);
 
     cCommand_MoveSelectionUp:          Result:= DoCommand_MoveSelectionUpDown(false);
     cCommand_MoveSelectiondown:        Result:= DoCommand_MoveSelectionUpDown(true);
@@ -550,7 +652,11 @@ begin
     cCommand_FoldingToggleAtCurLine:   Result:= DoCommand_FoldRangeAtCurLine(cFoldingToggle);
     cCommand_FoldingFoldSelection:     Result:= DoCommand_FoldSelection;
 
-    cCommand_Cancel:                   Result:= DoCommand_Cancel;
+    cCommand_Cancel:                   Result:= DoCommand_Cancel(false, false);
+    cCommand_CancelKeepSel:            Result:= DoCommand_Cancel(false, true);
+    cCommand_CancelKeepLast:           Result:= DoCommand_Cancel(true, false);
+    cCommand_CancelKeepLastAndSel:     Result:= DoCommand_Cancel(true, true);
+
     cCommand_CaretsExtendUpLine:       Result:= DoCommand_CaretsExtend(false, 1);
     cCommand_CaretsExtendUpPage:       Result:= DoCommand_CaretsExtend(false, GetPageLines);
     cCommand_CaretsExtendUpToTop:      Result:= DoCommand_CaretsExtend(false, Strings.Count);
@@ -561,16 +667,19 @@ begin
     cCommand_ZoomIn:                   Result:= DoCommand_ScaleDelta(true);
     cCommand_ZoomOut:                  Result:= DoCommand_ScaleDelta(false);
     cCommand_ZoomReset:                Result:= DoCommand_ScaleReset;
-    cCommand_RepeatTextCommand:        DoCommand(FLastTextCmd, FLastTextCmdText);
+    cCommand_RepeatTextCommand:        DoCommand(FLastTextCmd, cInvokeInternal, FLastTextCmdText);
   end;
 end;
 
-procedure TATSynEdit.DoCommand(ACmd: integer; const AText: atString = '');
+procedure TATSynEdit.DoCommand(ACmd: integer; AInvoke: TATEditorCommandInvoke; const AText: atString = '');
+// AInvoke is used only by CudaText, you may pass any value here
 var
+  St: TATStrings;
   Caret: TATCaretItem;
   Res: TATCommandResults;
   Str: string;
   bTooManyCarets: boolean;
+  bCaretFarFromVertEdge: boolean;
   NCommandCode: integer;
   i: integer;
 begin
@@ -578,21 +687,27 @@ begin
   LastCommandChangedLines:= 0;
   FLastCommandMakesColumnSel:= false;
   DoHotspotsExit;
+  St:= Strings;
 
   if AText<>'' then
     Str:= UTF8Encode(AText)
   else
     Str:= '';
 
-  if DoEventCommand(ACmd, Str) then Exit;
+  if AInvoke<>cInvokeHotkeyChar then
+    FCommandLog.Add(ACmd, AInvoke, Str);
+
+  if DoEventCommand(ACmd, AInvoke, Str) then Exit;
 
   if IsCommandToUndoInOneStep(ACmd) then
     NCommandCode:= ACmd
   else
     NCommandCode:= 0;
-  Strings.CommandCode:= NCommandCode;
+  St.CommandCode:= NCommandCode;
 
   FCaretSpecPos:= false;
+
+  bCaretFarFromVertEdge:= IsCaretFarFromVertEdge(ACmd);
 
   //moving must be with visible caret
   DoCaretForceShow;
@@ -611,13 +726,14 @@ begin
 
   if ACmd and cCmdFlag_Caret <> 0 then
   begin
-    Strings.SetGroupMark;
+    St.SetGroupMark;
   end;
 
   //support CudaText #3084
-  Strings.SetNewCommandMark;
+  St.SetNewCommandMark;
 
-  Carets.UpdateMemory(cCaretMem_PrepareX, false);
+  if not FCaretVirtual then
+    Carets.UpdateMemory(cCaretMem_PrepareX, false);
   FIsRunningCommand:= true;
 
   bTooManyCarets:= Carets.Count>FOptUndoMaxCarets;
@@ -641,6 +757,7 @@ begin
       ClearSelRectPoints;
     end;
 
+  FLastCommand:= ACmd;
   FLastCommandChangedText2:= FLastCommandChangedText;
   FLastCommandChangedText:= cResultText in Res;
   if FLastCommandChangedText then
@@ -659,6 +776,7 @@ begin
   //this logic: to make like in SynWrite, option "Fixed column move".
   //arrows up/down must keep their column, even if sometimes they jump to shorter lines (caret_after_end: off).
   //and special handling for tab-key (for first press of tab-key).
+  if not FCaretVirtual then
   case ACmd of
     cCommand_KeyTab:
       begin
@@ -679,14 +797,21 @@ begin
     cCommand_KeyUp,
     cCommand_KeyUp_Sel,
     cCommand_KeyDown,
-    cCommand_KeyDown_Sel:
+    cCommand_KeyDown_Sel,
+    cCommand_KeyPageUp,
+    cCommand_KeyPageUp_Sel,
+    cCommand_KeyPageDown,
+    cCommand_KeyPageDown_Sel:
       Carets.UpdateMemory(cCaretMem_SaveX, true);
     else
       Carets.UpdateMemory(cCaretMem_ClearX, false);
   end;
 
   if NCommandCode<>0 then
-    Strings.CommandCode:= 0;
+    St.CommandCode:= 0;
+  if bCaretFarFromVertEdge then
+    Include(Res, cResultCaretFarFromEdge);
+
   DoCommandResults(ACmd, Res);
   DoEventCommandAfter(ACmd, AText);
   FIsRunningCommand:= false;

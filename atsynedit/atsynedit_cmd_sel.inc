@@ -20,33 +20,48 @@ begin
   Result:= [cResultCaretBottom];
 end;
 
-function TATSynEdit.DoCommand_SelectExtendByLine: TATCommandResults;
+function TATSynEdit.DoCommand_SelectExtendByLine(AUp: boolean): TATCommandResults;
 begin
-  DoSelect_ExtendSelectionByLine;
-  Result:= [cResultCaretBottom];
+  DoSelect_ExtendSelectionByLine(AUp);
+  if AUp then
+    Result:= [cResultCaretTop]
+  else
+    Result:= [cResultCaretBottom];
 end;
 
 procedure TATSynEdit.DoSelect_ColumnBlock_MoveEndUpDown(var AX, AY: integer; ALineDelta: integer);
 var
+  St: TATStrings;
   bDown: boolean;
   YMax, i: integer;
-  Pnt: TPoint;
+  PntText: TPoint;
+  PntCoord: TATPoint;
   Details: TATEditorPosDetails;
 begin
   if AY<0 then exit;
+  St:= Strings;
   bDown:= ALineDelta>0;
-  YMax:= Strings.Count-1;
+  YMax:= St.Count-1;
+
+  if not bDown then
+  begin
+    if AY=0 then exit;
+  end
+  else
+  begin
+    if AY>=YMax then exit;
+  end;
 
   if FOptCaretsPrimitiveColumnSelection then
   begin
-    AX:= Strings.ColumnPosToCharPos(AY, AX, FTabHelper);
-    Pnt:= CaretPosToClientPos(Point(AX, AY));
-    Inc(Pnt.Y, ALineDelta*FCharSize.Y);
-    Pnt:= ClientPosToCaretPos(Pnt, Details);
-    if Pnt.Y<0 then exit;
-    AX:= Pnt.X;
-    AY:= Pnt.Y;
-    AX:= Strings.CharPosToColumnPos(AY, AX, FTabHelper);
+    AX:= St.ColumnPosToCharPos(AY, AX, FTabHelper);
+    PntCoord:= CaretPosToClientPos(Point(AX, AY));
+    Inc(PntCoord.Y, ALineDelta*FCharSize.Y);
+    PntText:= ClientPosToCaretPos(PntCoord, Details);
+    if PntText.Y<0 then exit;
+    AX:= PntText.X;
+    AY:= PntText.Y;
+    AX:= St.CharPosToColumnPos(AY, AX, FTabHelper);
   end
   else
   begin
@@ -87,7 +102,7 @@ begin
   //it's needed to Undo to multi-carets, not one caret
   Strings.SetGroupMark;
 
-  if IsSelRectEmpty and (FSelRectEnd.Y<0) then
+  if not IsSelColumn then
     if not DoSelect_MultiCaretsLookLikeColumnSelection then
     begin
       DoSelect_NormalSelToColumnSel(FSelRectBegin, FSelRectEnd);
@@ -149,14 +164,17 @@ end;
 
 function TATSynEdit.DoCommand_SelectColumnToLineEdge(AToEnd: boolean): TATCommandResults;
 var
+  St: TATStrings;
   NPos, i, Y1, Y2: integer;
 begin
   Result:= [];
   if Carets.Count=0 then Exit;
 
-  if IsSelRectEmpty or (FSelRectBegin.X<0) then Exit;
+  if not IsSelColumn then Exit;
   //maybe todo: make column sel if normal sel active here
   //like DoCommand_SelectColumnToDirection
+
+  St:= Strings;
 
   if not AToEnd then
   begin
@@ -170,8 +188,8 @@ begin
     if Y1>Y2 then
       SwapInt(Y1, Y2);
     for i:= Y1 to Y2 do
-      if Strings.IsIndexValid(i) then
-        NPos:= Max(NPos, FTabHelper.TabsToSpaces_Length(i, Strings.Lines[i], -1));
+      if St.IsIndexValid(i) then
+        NPos:= Max(NPos, FTabHelper.TabsToSpaces_Length(i, St.Lines[i], -1));
     FSelRectEnd.X:= NPos;
   end;
 
@@ -198,12 +216,12 @@ var
   NFrom, NTo, NLastLine: integer;
   Caret: TATCaretItem;
   St: TATStrings;
-  S: atString;
   Pnt: TPoint;
   bLastNoEol: boolean;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
+  if ModeOneLine then Exit;
   St:= Strings;
 
   DoCaretSingleAsIs;
@@ -282,16 +300,18 @@ end;
 
 function TATSynEdit.DoCommand_SelectWords: TATCommandResults;
 var
+  St: TATStrings;
   Item: TATCaretItem;
   i, NOffset1, NOffset2: integer;
   Str: atString;
 begin
+  St:= Strings;
   for i:= FCarets.Count-1 downto 0 do
   begin
     Item:= FCarets[i];
-    if not Strings.IsIndexValid(Item.PosY) then Continue;
+    if not St.IsIndexValid(Item.PosY) then Continue;
 
-    Str:= Strings.Lines[Item.PosY];
+    Str:= St.Lines[Item.PosY];
     SFindWordBounds(Str, Item.PosX, NOffset1, NOffset2, FOptNonWordChars);
     if NOffset1<>NOffset2 then
     begin

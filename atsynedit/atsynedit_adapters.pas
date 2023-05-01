@@ -21,9 +21,9 @@ type
     FDynamicHiliteEnabled: boolean;
     FDynamicHiliteMaxLines: integer;
     FDynamicHiliteSupportedInCurrentSyntax: boolean;
+    FImplementsDataReady: boolean;
   public
     constructor Create(AOwner: TComponent); override;
-    procedure AddEditor(AEditor: TComponent); virtual;
     //
     procedure OnEditorChange(Sender: TObject); virtual;
     //called when editor's text changes.
@@ -48,6 +48,10 @@ type
       AX, AY: integer; var AColor: TColor); virtual;
     //called to calculate BG/background color at position (usually pos after line end).
 
+    procedure OnEditorCalcPosForeground(Sender: TObject;
+      AX, AY: integer; var AColor: TColor; var AFontStyles: TFontStyles); virtual;
+    //called to calculate foreground/font color at position
+
     procedure OnEditorCaretMove(Sender: TObject); virtual;
     //called after caret is moved.
 
@@ -61,25 +65,34 @@ type
     function IsParsedAtLeastPartially: boolean; virtual;
     //returns False to supress unneeded painting, when parsing is not done
 
+    function GetLexerName: string; virtual;
+    //return lexer name
+
+    property ImplementsDataReady: boolean read FImplementsDataReady write FImplementsDataReady;
+    function IsDataReady: boolean; virtual;
+    function IsDataReadyPartially: boolean; virtual;
+    //return False to prevent Minimap repainting (avoid Minimap flicker during typing)
+
+    //
+    //dynamic-highlighting = some elements colors depend on caret position.
+    //e.g. in EControl HTML lexer: highlight of < > is changed, when caret is near < >.
     //
     property DynamicHiliteEnabled: boolean
       read FDynamicHiliteEnabled
       write FDynamicHiliteEnabled;
-    //dyn-hiliting global enabled flag.
+    //dynamic-highlighting global enabled flag.
     //app must set it.
-    //dyn-hiliting is on, if some chars colors depend on caret position,
-    //e.g. in EControl HTML lexer: hilites of < > change, if caret is near < >
 
     property DynamicHiliteMaxLines: integer
       read FDynamicHiliteMaxLines
       write FDynamicHiliteMaxLines;
-    //max count of lines, to use dyn-hiliting (for EControl its slow for 10K lines)
+    //max count of lines, to use dynamic-highlighting (for EControl its slow for 10K lines)
     //app must set it, e.g. 5K is ok
 
     property DynamicHiliteSupportedInCurrentSyntax: boolean
       read FDynamicHiliteSupportedInCurrentSyntax
       write FDynamicHiliteSupportedInCurrentSyntax;
-    //real adapter (subclass of this class) must set it.
+    //adapter must set it.
     //EControl adapter calculates it from lexer-file.
 
     function DynamicHiliteActiveNow(ALinesCount: integer): boolean;
@@ -143,13 +156,7 @@ begin
   FDynamicHiliteEnabled:= true;
   FDynamicHiliteSupportedInCurrentSyntax:= true;
   FDynamicHiliteMaxLines:= 1000;
-end;
-
-procedure TATAdapterHilite.AddEditor(AEditor: TComponent);
-begin
-  // not nil: adapter adds this editor object to his editors list,
-  //   and should setup editor's OnLog
-  // nil: adapter forgets about all editors
+  FImplementsDataReady:= false;
 end;
 
 procedure TATAdapterHilite.OnEditorChange(Sender: TObject);
@@ -176,8 +183,14 @@ begin
   //
 end;
 
-procedure TATAdapterHilite.OnEditorCalcPosColor(Sender: TObject; AX,
-  AY: integer; var AColor: TColor);
+procedure TATAdapterHilite.OnEditorCalcPosColor(Sender: TObject;
+  AX, AY: integer; var AColor: TColor);
+begin
+  //
+end;
+
+procedure TATAdapterHilite.OnEditorCalcPosForeground(Sender: TObject;
+  AX, AY: integer; var AColor: TColor; var AFontStyles: TFontStyles);
 begin
   //
 end;
@@ -198,6 +211,21 @@ begin
 end;
 
 function TATAdapterHilite.IsParsedAtLeastPartially: boolean;
+begin
+  Result:= true;
+end;
+
+function TATAdapterHilite.GetLexerName: string;
+begin
+  Result:= '-';
+end;
+
+function TATAdapterHilite.IsDataReady: boolean;
+begin
+  Result:= true;
+end;
+
+function TATAdapterHilite.IsDataReadyPartially: boolean;
 begin
   Result:= true;
 end;

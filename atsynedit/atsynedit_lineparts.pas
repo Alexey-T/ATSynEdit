@@ -28,39 +28,40 @@ const
   afsFontCrossed = 4;
 
 type
-  TATLinePart = packed record
-    Offset: SmallInt; //2 bytes
-    Len: word; //2 bytes
+  //packed record: sizeof=35 bytes
+  //bitpacked: sizeof=21 bytes
+  TATLinePart = bitpacked record
+    Offset: Longint; //4 bytes, 2 bytes are not enough (app will crash on line length 120K, with wrap=off)
     ColorFont, ColorBG, ColorBorder: TColor;
+    Len: word; //2 bytes
     FontStyles: byte;
     BorderUp, BorderDown, BorderLeft, BorderRight: TATLineStyle;
   end;
   PATLinePart = ^TATLinePart;
 
-type
-  TATLinePartClass = class
-  public
-    Data: TATLinePart;
-    ColumnTag: Int64;
-  end;
+procedure InitLinePart(out Part: TATLinePart);
 
 const
-  cMaxLineParts = 210;
+  cMaxLineParts = 230;
 type
   TATLineParts = array[0..cMaxLineParts-1] of TATLinePart;
   PATLineParts = ^TATLineParts;
 
-procedure DoPartFind(constref AParts: TATLineParts; APos: integer; out AIndex, AOffsetLeft: integer);
+procedure DoPartFind(var P: TATLineParts; APos: integer; out AIndex, AOffsetLeft: integer);
 function DoPartInsert(var AParts: TATLineParts; var APart: TATLinePart; AKeepFontStyles: boolean): boolean;
-procedure DoPartSetColorBG(var AParts: TATLineParts; AColor: TColor; AForceColor: boolean);
+procedure DoPartSetColorBG(var P: TATLineParts; AColor: TColor; AForceColor: boolean);
 
-function DoPartsGetCount(constref AParts: TATLineParts): integer;
+function DoPartsGetCount(var P: TATLineParts): integer;
+function DoPartsGetLastCachedChar(var P: TATLineParts): integer;
 function DoPartsShow(var P: TATLineParts): string;
 procedure DoPartsDim(var P: TATLineParts; ADimLevel255: integer; AColorBG: TColor);
 procedure DoPartsCutFromOffset(var P: TATLineParts; AOffset: integer);
 
 function ColorBlend(c1, c2: Longint; A: Longint): Longint;
 function ColorBlendHalf(c1, c2: Longint): Longint;
+
+function ConvertFontStylesToInteger(Styles: TFontStyles): integer;
+function ConvertIntegerToFontStyles(Value: integer): TFontStyles;
 
 implementation
 
@@ -97,8 +98,15 @@ begin
   Result := (b shl 16) + (g shl 8) + r;
 end;
 
+procedure InitLinePart(out Part: TATLinePart);
+begin
+  Part:= Default(TATLinePart);
+  Part.ColorBG:= clNone;
+  Part.ColorFont:= clNone;
+  Part.ColorBorder:= clNone;
+end;
 
-procedure DoPartFind(constref AParts: TATLineParts; APos: integer; out AIndex,
+procedure DoPartFind(var P: TATLineParts; APos: integer; out AIndex,
   AOffsetLeft: integer);
 var
   iStart, iEnd, i: integer;
@@ -106,27 +114,34 @@ begin
   AIndex:= -1;
   AOffsetLeft:= 0;
 
-  for i:= Low(AParts) to High(AParts)-1 do
+  for i:= Low(P) to High(P)-1 do
   begin
-    if AParts[i].Len=0 then
+    if P[i].Len=0 then
     begin
       //pos after last part?
-      if i>Low(AParts) then
-        if APos>=AParts[i-1].Offset+AParts[i-1].Len then
+      if i>Low(P) then
+        if APos>=P[i-1].Offset+P[i-1].Len then
           AIndex:= i;
       Break;
     end;
 
-    iStart:= AParts[i].Offset;
-    iEnd:= iStart+AParts[i].Len;
+    iStart:= P[i].Offset;
+    iEnd:= iStart+P[i].Len;
 
     //pos at part begin?
     if (APos=iStart) then
-      begin AIndex:= i; Break end;
+    begin
+      AIndex:= i;
+      Break
+    end;
 
     //pos at part middle?
     if (APos>=iStart) and (APos<iEnd) then
-      begin AIndex:= i; AOffsetLeft:= APos-iStart; Break end;
+    begin
+      AIndex:= i;
+      AOffsetLeft:= APos-iStart;
+      Break
+    end;
   end;
 end;
 
@@ -143,13 +158,25 @@ begin
     Result:= AParts[N-1].Offset+AParts[N-1].Len;
 end;
 
-function DoPartsGetCount(constref AParts: TATLineParts): integer;
+function DoPartsGetCount(var P: TATLineParts): integer;
 //func considers case when some middle part has Len=0
 begin
-  Result:= High(AParts)+1;
-  while (Result>0) and (AParts[Result-1].Len=0) do
+  Result:= High(P)+1;
+  while (Result>0) and (P[Result-1].Len=0) do
     Dec(Result);
 end;
+
+function DoPartsGetLastCachedChar(var P: TATLineParts): integer;
+var
+  N: integer;
+begin
+  N:= DoPartsGetCount(P);
+  if N<=0 then
+    Result:= 0
+  else
+    Result:= P[N-1].Offset+P[N-1].Len;
+end;
+
 
 var
   ResultParts: TATLineParts; //size is huge, so not local var
@@ -159,7 +186,7 @@ function DoPartInsert(var AParts: TATLineParts; var APart: TATLinePart;
 var
   ResultPartIndex: integer;
   //
-  procedure AddPart(const P: TATLinePart); inline;
+  procedure AddPart(constref P: TATLinePart); inline;
   begin
     if P.Len>0 then
       if ResultPartIndex<High(ResultParts) then
@@ -171,12 +198,13 @@ var
   //
   procedure FixPartLen(var P: TATLinePart; NOffsetEnd: integer); inline;
   begin
-    if P.Offset+P.Len>NOffsetEnd then
+    if P.Len>NOffsetEnd-P.Offset then
       P.Len:= NOffsetEnd-P.Offset;
   end;
   //
 var
   PartSelBegin, PartSelEnd: TATLinePart;
+  ColorFontLeft, ColorFontRight: TColor;
   nIndex1, nIndex2,
   nOffset1, nOffset2, nOffsetLimit,
   newLen2, newOffset2: integer;
@@ -202,14 +230,22 @@ begin
   if APart.ColorBG=clNone then
     APart.ColorBG:= AParts[nIndex1].ColorBG; //clYellow;
 
-  if APart.ColorFont=clNone then
-    APart.ColorFont:= AParts[nIndex1].ColorFont; //clYellow;
+  if APart.ColorFont<>clNone then
+  begin
+    ColorFontLeft:= APart.ColorFont;
+    ColorFontRight:= APart.ColorFont;
+  end
+  else
+  begin
+    ColorFontLeft:= AParts[nIndex1].ColorFont;
+    ColorFontRight:= AParts[nIndex2].ColorFont;
+  end;
 
   //these 2 parts are for edges of selection
   FillChar(PartSelBegin{%H-}, SizeOf(TATLinePart), 0);
   FillChar(PartSelEnd{%H-}, SizeOf(TATLinePart), 0);
 
-  PartSelBegin.ColorFont:= APart.ColorFont;
+  PartSelBegin.ColorFont:= ColorFontLeft;
   PartSelBegin.ColorBG:= APart.ColorBG;
 
   PartSelBegin.Offset:= AParts[nIndex1].Offset+nOffset1;
@@ -222,7 +258,7 @@ begin
   PartSelBegin.BorderUp:= AParts[nIndex1].BorderUp;
   PartSelBegin.ColorBorder:= AParts[nIndex1].ColorBorder;
 
-  PartSelEnd.ColorFont:= APart.ColorFont;
+  PartSelEnd.ColorFont:= ColorFontRight;
   PartSelEnd.ColorBG:= APart.ColorBG;
   PartSelEnd.Offset:= AParts[nIndex2].Offset;
   PartSelEnd.Len:= nOffset2;
@@ -253,7 +289,11 @@ begin
 
   //add middle (one APart of many parts)
   if not AKeepFontStyles then
-    AddPart(APart)
+  begin
+    if APart.ColorFont=clNone then //fix CudaText issue #3571, #3574
+      APart.ColorFont:= ColorFontLeft;
+    AddPart(APart);
+  end
   else
   begin
     nOffsetLimit:= APart.Offset+APart.Len;
@@ -262,7 +302,7 @@ begin
 
     for i:= nIndex1+1 to nIndex2-1 do
     begin
-      AParts[i].ColorFont:= APart.ColorFont;
+      AParts[i].ColorFont:= ColorFontLeft;
       AParts[i].ColorBG:= APart.ColorBG;
       FixPartLen(AParts[i], nOffsetLimit);
       AddPart(AParts[i]);
@@ -293,15 +333,14 @@ begin
 end;
 
 
-procedure DoPartSetColorBG(var AParts: TATLineParts; AColor: TColor;
-  AForceColor: boolean);
+procedure DoPartSetColorBG(var P: TATLineParts; AColor: TColor; AForceColor: boolean);
 var
   PartPtr: PATLinePart;
   i: integer;
 begin
-  for i:= Low(AParts) to High(AParts) do
+  for i:= Low(P) to High(P) do
   begin
-    PartPtr:= @AParts[i];
+    PartPtr:= @P[i];
     if PartPtr^.Len=0 then Break; //comment to colorize all parts to hide possible bugs
     if AForceColor or (PartPtr^.ColorBG=clNone) then
       PartPtr^.ColorBG:= AColor;
@@ -374,6 +413,29 @@ begin
           Offset:= 0;
         end;
       end;
+end;
+
+
+function ConvertFontStylesToInteger(Styles: TFontStyles): integer;
+begin
+  Result:= 0;
+  if fsBold in Styles then
+    Result:= Result or afsFontBold;
+  if fsItalic in Styles then
+    Result:= Result or afsFontItalic;
+  if fsStrikeOut in Styles then
+    Result:= Result or afsFontCrossed;
+end;
+
+function ConvertIntegerToFontStyles(Value: integer): TFontStyles;
+begin
+  Result:= [];
+  if (Value and afsFontBold)<>0 then
+    Include(Result, fsBold);
+  if (Value and afsFontItalic)<>0 then
+    Include(Result, fsItalic);
+  if (Value and afsFontCrossed)<>0 then
+    Include(Result, fsStrikeOut);
 end;
 
 

@@ -7,7 +7,11 @@ begin
   if Carets.Count<>1 then exit;
   Caret:= Carets[0];
   InitMarkers;
-  FMarkers.Add(Caret.PosX, Caret.PosY);
+  FMarkers.Add(
+    Point(Caret.PosX, Caret.PosY),
+    Point(0, 0),
+    TATMarkerTags.Init(0, 0)
+    );
   Update;
 end;
 
@@ -76,7 +80,7 @@ begin
       end;
   end;
 
-  DoCaretsSort; //must have here
+  Carets.Sort; //must have here
   Update;
 end;
 

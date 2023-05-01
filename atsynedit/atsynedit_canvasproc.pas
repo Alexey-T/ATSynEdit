@@ -22,40 +22,9 @@ uses
   ATCanvasPrimitives,
   ATStringProc,
   ATStrings,
+  ATSynEdit_Globals,
   ATSynEdit_LineParts,
   ATSynEdit_CharSizer;
-
-type
-  TATSynEditUnptintedEolSymbol = (
-    aeueDot,
-    aeueArrowDown,
-    aeuePilcrow
-    );
-
-var
-  OptUnprintedTabCharLength: integer = 1;
-  OptUnprintedTabPointerScale: integer = 22;
-  OptUnprintedEofCharLength: integer = 1;
-  OptUnprintedSpaceDotScale: integer = 15;
-  OptUnprintedEndDotScale: integer = 30;
-  OptUnprintedEndFontScale: integer = 40;
-  OptUnprintedEndSymbol: TATSynEditUnptintedEolSymbol = aeueArrowDown;
-  OptUnprintedEndArrowLength: integer = 70;
-  OptUnprintedWrapArrowLength: integer = 40;
-  OptUnprintedWrapArrowWidth: integer = 80;
-  OptItalicFontLongerInPercents: integer = 40;
-
-var
-  //Win: seems no slowdown from offsets
-  //macOS: better use offsets, fonts have floating width value, e.g. 10.2 pixels
-  //Linux Qt5: same as for macOS
-  //Linux GTK2: big slowdown from offsets
-  OptCanvasTextoutNeedsOffsets: boolean =
-    {$if defined(windows) or defined(darwin) or defined(LCLQt5)}
-    true
-    {$else}
-    false
-    {$endif} ;
 
 type
   TATSynEditCallbackIsCharSelected = function(AX, AY: integer): boolean of object;
@@ -70,7 +39,7 @@ type
 type
   TATSynEditDrawLineEvent = procedure(Sender: TObject; C: TCanvas;
     ALineIndex: integer;
-    AX, AY: integer; const AStr: atString; ACharSize: TPoint;
+    AX, AY: integer; const AStr: atString; const ACharSize: TATEditorCharSize;
     constref AExtent: TATIntFixedArray) of object;
 
 type
@@ -98,7 +67,7 @@ type
     TabHelper: TATStringTabHelper;
     LineIndex: integer;
     CharIndexInLine: integer;
-    CharSize: TPoint;
+    CharSize: TATEditorCharSize;
     CharsSkipped: integer;
     TrimmedTrailingNonSpaces: boolean;
     DrawEvent: TATSynEditDrawLineEvent;
@@ -108,10 +77,13 @@ type
     ShowUnprintedSpacesTrailing: boolean;
     ShowUnprintedSpacesBothEnds: boolean;
     ShowUnprintedSpacesOnlyInSelection: boolean;
+    ShowUnprintedSpacesAlsoInSelection: boolean;
+    ShowUnprintedForceTabs: boolean;
     ShowFontLigatures: boolean;
     ColorNormalFont: TColor;
     ColorUnprintedFont: TColor;
     ColorUnprintedHexFont: TColor;
+    FontProportional: boolean;
     FontNormal_Name: string;
     FontNormal_Size: integer;
     FontItalic_Name: string;
@@ -131,7 +103,8 @@ procedure CanvasLineEx(C: TCanvas;
   Color: TColor; Style: TATLineStyle;
   X1, Y1, X2, Y2: integer; AtDown: boolean);
 
-procedure CanvasTextOutSimplest(C: TCanvas; X, Y: integer; const S: string); inline;
+procedure CanvasTextOutSimplest(C: TCanvas; X, Y: integer; const S: string);
+procedure CanvasTextOutSimplest(C: TCanvas; X, Y: integer; const S: UnicodeString);
 procedure CanvasTextOutSimplest_PChar(C: TCanvas; X, Y: integer; Buf: PChar; Len: integer); inline;
 
 procedure CanvasTextOut(C: TCanvas;
@@ -146,7 +119,7 @@ procedure CanvasTextOutMinimap(
   C: TBGRABitmap;
   const ARect: TRect;
   APosX, APosY: integer;
-  ACharSize: TPoint;
+  const ACharSize: TATEditorCharSize;
   ATabSize: integer;
   constref AParts: TATLineParts;
   AColorBG: TColor;
@@ -158,21 +131,21 @@ procedure CanvasTextOutMinimap(
 procedure DoPaintUnprintedSymbols(C: TCanvas;
   ASymbols: TATLineEndsSymbols;
   AX, AY: integer;
-  ACharSize: TPoint;
+  const ACharSize: TATEditorCharSize;
   AColorFont, AColorBG: TColor);
 
 procedure DoPaintUnprintedEndSymbol(C: TCanvas;
   AX, AY: integer;
-  ACharSize: TPoint;
+  const ACharSize: TATEditorCharSize;
   AColorFont, AColorBg: TColor);
 
 procedure DoPaintUnprintedWrapMark(C: TCanvas;
   AX, AY: integer;
-  ACharSize: TPoint;
+  const ACharSize: TATEditorCharSize;
   AColorFont: TColor);
 
 function CanvasTextWidth(const S: atString; ALineIndex: integer;
-  ATabHelper: TATStringTabHelper; ACharWidth: integer): Int64; inline;
+  ATabHelper: TATStringTabHelper; ACharWidth: integer; AFontProportional: boolean): Int64; inline;
 
 procedure UpdateWiderFlags(C: TCanvas; out Flags: TATWiderFlags);
 
@@ -182,6 +155,10 @@ uses
   Math,
   LCLType,
   LCLIntf;
+
+const
+  //TextOut with bsClear is faster on Linux/macOS
+  cTextoutBrushStyle = bsClear;
 
 procedure UpdateWiderFlags(C: TCanvas; out Flags: TATWiderFlags);
 const
@@ -247,12 +224,12 @@ begin
       Result[i]:= ' '
     else
     if IsCharHexDisplayed(ch) then
-      Result[i]:= '?';
+      Result[i]:= ' '; //not '?', because it will render '?' above gray 'x00'
   end;
 end;
 
 
-{$ifdef windows}
+{$IF Defined(LCLWin32)}
 //to draw font ligatures
 function _TextOut_Windows(DC: HDC;
   X, Y: Integer;
@@ -298,18 +275,33 @@ begin
 end;
 {$endif}
 
-procedure CanvasTextOutSimplest(C: TCanvas; X, Y: integer; const S: string); inline;
+procedure CanvasTextOutSimplest(C: TCanvas; X, Y: integer; const S: string);
 begin
-  {$ifdef windows}
+  //don't set Brush.Style here, causes CudaText issue #3625
+  {$IF Defined(LCLWin32)}
   Windows.TextOutA(C.Handle, X, Y, PChar(S), Length(S));
   {$else}
   LCLIntf.TextOut(C.Handle, X, Y, PChar(S), Length(S));
   {$endif}
 end;
 
+procedure CanvasTextOutSimplest(C: TCanvas; X, Y: integer; const S: UnicodeString);
+var
+  Buf: string;
+begin
+  //don't set Brush.Style here, causes CudaText issue #3625
+  {$IF Defined(LCLWin32)}
+  Windows.TextOutW(C.Handle, X, Y, PWChar(S), Length(S));
+  {$else}
+  Buf:= UTF8Encode(S);
+  LCLIntf.TextOut(C.Handle, X, Y, PChar(Buf), Length(Buf));
+  {$endif}
+end;
+
+
 procedure CanvasTextOutSimplest_PChar(C: TCanvas; X, Y: integer; Buf: PChar; Len: integer); inline;
 begin
-  {$ifdef windows}
+  {$IF Defined(LCLWin32)}
   Windows.TextOutA(C.Handle, X, Y, Buf, Len);
   {$else}
   LCLIntf.TextOut(C.Handle, X, Y, Buf, Len);
@@ -319,7 +311,7 @@ end;
 procedure CanvasUnprintedSpace(C: TCanvas; const ARect: TRect;
   AScale: integer; AFontColor: TColor);
 const
-  cMinDotSize = 2;
+  cMinDotSize = 1; //should be 1, VSCode paints unprinted-space as 1 pixel
 var
   R: TRect;
   NSize: integer;
@@ -339,7 +331,7 @@ procedure DoPaintUnprintedChar(
   AIndex: integer;
   var AOffsets: TATIntFixedArray;
   AX, AY: integer;
-  ACharSize: TPoint;
+  const ACharSize: TATEditorCharSize;
   AColorFont: TColor);
 var
   R: TRect;
@@ -354,13 +346,13 @@ begin
   R.Bottom:= AY+ACharSize.Y;
 
   if ch<>#9 then
-    CanvasUnprintedSpace(C, R, OptUnprintedSpaceDotScale, AColorFont)
+    CanvasUnprintedSpace(C, R, ATEditorOptions.UnprintedSpaceDotScale, AColorFont)
   else
     CanvasArrowHorz(C, R,
       AColorFont,
-      OptUnprintedTabCharLength*ACharSize.X,
+      ATEditorOptions.UnprintedTabCharLength*ACharSize.XScaled div ATEditorCharXScale,
       true,
-      OptUnprintedTabPointerScale);
+      ATEditorOptions.UnprintedTabPointerScale);
 end;
 
 
@@ -368,7 +360,7 @@ procedure CanvasLineHorz(C: TCanvas; X1, Y, X2: integer; AWithEnd: boolean);
 begin
   //Assert(X2>X1, 'LineHorz x2>x1');
   if AWithEnd then Inc(X2);
-  {$ifdef windows}
+  {$IF Defined(LCLWin32)}
   Windows.MoveToEx(C.Handle, X1, Y, nil);
   Windows.LineTo(C.Handle, X2, Y);
   {$else}
@@ -380,7 +372,7 @@ procedure CanvasLineVert(C: TCanvas; X, Y1, Y2: integer; AWithEnd: boolean);
 begin
   //Assert(Y2>Y1, 'LineVert y2>y1');
   if AWithEnd then Inc(Y2);
-  {$ifdef windows}
+  {$IF Defined(LCLWin32)}
   Windows.MoveToEx(C.Handle, X, Y1, nil);
   Windows.LineTo(C.Handle, X, Y2);
   {$else}
@@ -470,7 +462,7 @@ procedure DoPaintHexChars(C: TCanvas;
   const AString: atString;
   ADx: PIntegerArray;
   AX, AY: integer;
-  ACharSize: TPoint;
+  const ACharSize: TATEditorCharSize;
   AColorFont,
   AColorBg: TColor;
   ASuperFast: boolean);
@@ -499,6 +491,7 @@ begin
         bColorSet:= true;
         C.Font.Color:= AColorFont;
         C.Brush.Color:= AColorBg;
+        C.Brush.Style:= bsClear;
       end;
 
       if ASuperFast then
@@ -586,7 +579,7 @@ end;
 procedure DoPaintUnprintedSymbols(C: TCanvas;
   ASymbols: TATLineEndsSymbols;
   AX, AY: integer;
-  ACharSize: TPoint;
+  const ACharSize: TATEditorCharSize;
   AColorFont, AColorBG: TColor);
 const
   cText: array[TATLineEndsSymbols] of string[4] = ('', 'LF', 'CRLF', 'CR', 'EOF');
@@ -595,7 +588,7 @@ var
   X, Y, W, H: integer;
   i: integer;
 begin
-  H:= ACharSize.Y * OptUnprintedEndFontScale div 100;
+  H:= ACharSize.Y * ATEditorOptions.UnprintedEndFontScale div 100;
   W:= H div 2;
 
   X:= AX + 2;
@@ -611,52 +604,47 @@ end;
 
 procedure DoPaintUnprintedEndSymbol(C: TCanvas;
   AX, AY: integer;
-  ACharSize: TPoint;
+  const ACharSize: TATEditorCharSize;
   AColorFont, AColorBg: TColor);
-const
-  // https://www.fileformat.info/info/unicode/char/B6/index.htm
-  cPilcrowString: PChar = #$C2#$B6;
 begin
-  case OptUnprintedEndSymbol of
+  case ATEditorOptions.UnprintedEndSymbol of
     aeueDot:
       CanvasUnprintedSpace(C,
-        Rect(AX, AY, AX+ACharSize.X, AY+ACharSize.Y),
-        OptUnprintedEndDotScale,
+        Rect(AX, AY, AX+ACharSize.XScaled div ATEditorCharXScale, AY+ACharSize.Y),
+        ATEditorOptions.UnprintedEndDotScale,
         AColorFont);
     aeueArrowDown:
       CanvasArrowDown(C,
-        Rect(AX, AY, AX+ACharSize.X, AY+ACharSize.Y),
+        Rect(AX, AY, AX+ACharSize.XScaled div ATEditorCharXScale, AY+ACharSize.Y),
         AColorFont,
-        OptUnprintedEndArrowLength,
-        OptUnprintedTabPointerScale
+        ATEditorOptions.UnprintedEndArrowLength,
+        ATEditorOptions.UnprintedTabPointerScale
         );
     aeuePilcrow:
-      begin
-        C.Font.Color:= AColorFont;
-        C.Brush.Style:= bsClear;
-        CanvasTextOutSimplest(C, AX, AY, cPilcrowString);
-        C.Brush.Style:= bsSolid;
-      end;
+      CanvasPilcrowChar(C,
+        Rect(AX, AY, AX+ACharSize.XScaled div ATEditorCharXScale, AY+ACharSize.Y),
+        AColorFont,
+        ATEditorOptions.UnprintedPilcrowScale);
   end;
 end;
 
 procedure DoPaintUnprintedWrapMark(C: TCanvas;
   AX, AY: integer;
-  ACharSize: TPoint;
+  const ACharSize: TATEditorCharSize;
   AColorFont: TColor);
 begin
   CanvasArrowWrapped(C,
-    Rect(AX, AY, AX+ACharSize.X, AY+ACharSize.Y),
+    Rect(AX, AY, AX+ACharSize.XScaled div ATEditorCharXScale, AY+ACharSize.Y),
     AColorFont,
-    OptUnprintedWrapArrowLength,
-    OptUnprintedWrapArrowWidth,
-    OptUnprintedTabPointerScale
+    ATEditorOptions.UnprintedWrapArrowLength,
+    ATEditorOptions.UnprintedWrapArrowWidth,
+    ATEditorOptions.UnprintedTabPointerScale
     )
 end;
 
 
 function CanvasTextWidth(const S: atString; ALineIndex: integer;
-  ATabHelper: TATStringTabHelper; ACharWidth: integer): Int64;
+  ATabHelper: TATStringTabHelper; ACharWidth: integer; AFontProportional: boolean): Int64;
 begin
   Result:= ATabHelper.CalcCharOffsetLast(ALineIndex, S) * ACharWidth div 100;
 end;
@@ -669,15 +657,10 @@ var
   St: TFontStyles;
 }
 begin
-  if OptCanvasTextoutNeedsOffsets then
+  if ATEditorOptions.TextoutNeedsOffsets then
     exit(true);
 
   {
-  //disabled since CudaText 1.104
-  //a) its used only on Linux/BSD yet, but is it needed there?
-  //it was needed maybe for Win32 (need to check) but on Win32 const OptCanvasTextoutNeedsOffsets=true
-  //b) it must be placed out of this deep func CanvasTextOut, its called too much (for each token)
-
   //detect result by presence of bold/italic tokens, offsets are needed for them,
   //ignore underline, strikeout
 
@@ -701,12 +684,12 @@ end;
 procedure _CalcCharSizesUtf8FromWidestring(const S: UnicodeString;
   DxIn: PInteger;
   DxInLen: integer;
-  var DxOut: TATInt32FixedArray);
+  out DxOut: TATInt32FixedArray);
 var
   NLen, NSize, ResLen, i: integer;
 begin
   NLen:= Min(Length(S), cMaxFixedArray);
-  FillChar(DxOut, SizeOf(DxOut), 0);
+  DxOut:= Default(TATInt32FixedArray);
 
   ResLen:= 0;
   i:= 0;
@@ -736,7 +719,7 @@ var
   ListOffsets: TATIntFixedArray;
   ListInt: TATIntFixedArray;
   Dx: TATInt32FixedArray; //must be with 'longint' items
-  {$ifndef windows}
+  {$IF not Defined(LCLWin32)}
   DxUTF8: TATInt32FixedArray; //must be with 'longint' items
   {$endif}
 
@@ -746,29 +729,37 @@ procedure CanvasTextOut(C: TCanvas;
   AParts: PATLineParts;
   out ATextWidth: Int64;
   const AProps: TATCanvasTextOutProps);
+//
+  function _IsCharSelected(NColumn: integer): boolean; inline;
+  begin
+    Result:= AProps.DetectIsPosSelected(NColumn-2+AProps.CharIndexInLine, AProps.LineIndex);
+  end;
+//
 var
-  {$ifndef windows}
+  {$IF not Defined(LCLWin32)}
   Buf: string;
   {$else}
   bAllowLigatures: boolean;
   {$endif}
   BufW: UnicodeString;
-  NLen, NCharWidth, i, iPart: integer;
+  NLen, NCharWidthScaled, NDeltaForItalic, iPart, i: integer;
   NLastPart: integer;
+  NPosFirstChar, NPosLastChar: integer;
   PartStr: atString;
   PartOffset, PartLen,
   PixOffset1, PixOffset2: integer;
   PartPtr: ^TATLinePart;
-  PartFontStyle: TFontStyles;
   PartRect: TRect;
   DxPointer: PInteger;
   NStyles: integer;
-  bBold, bItalic, bCrossed, bSpaceChars: boolean;
+  bBold, bItalic, bSpaceChars: boolean;
+  bShowUnprintedPartially: boolean;
   ch: WideChar;
 begin
   NLen:= Min(Length(AText), cMaxFixedArray);
   if NLen=0 then Exit;
-  NCharWidth:= AProps.CharSize.X;
+  NCharWidthScaled:= AProps.CharSize.XScaled;
+  NDeltaForItalic:= C.Font.Size * ATEditorOptions.ItalicFontLongerInPercents div 100;
 
   FillChar(ListInt, SizeOf(ListInt), 0);
   FillChar(Dx, SizeOf(Dx), 0);
@@ -780,8 +771,8 @@ begin
     Dx.Len:= NLen;
     for i:= 0 to NLen-1 do
     begin
-      ListInt.Data[i]:= NCharWidth*(i+1);
-      Dx.Data[i]:= NCharWidth;
+      ListInt.Data[i]:= NCharWidthScaled*(i+1) div ATEditorCharXScale;
+      Dx.Data[i]:= NCharWidthScaled div ATEditorCharXScale;
     end;
   end
   else
@@ -792,7 +783,7 @@ begin
     Dx.Len:= ListOffsets.Len;
 
     for i:= 0 to ListOffsets.Len-1 do
-      ListInt.Data[i]:= ListOffsets.Data[i] * NCharWidth div 100;
+      ListInt.Data[i]:= ListOffsets.Data[i] * NCharWidthScaled div 100 div ATEditorCharXScale;
 
     Dx.Data[0]:= ListInt.Data[0];
     for i:= 1 to ListInt.Len-1 do
@@ -801,7 +792,7 @@ begin
 
   if AParts=nil then
   begin
-    if AProps.HasAsciiNoTabs and not OptCanvasTextoutNeedsOffsets then
+    if AProps.HasAsciiNoTabs and not ATEditorOptions.TextoutNeedsOffsets then
     begin
       BufW:= AText;
       DxPointer:= nil;
@@ -809,13 +800,14 @@ begin
     else
     begin
       BufW:= SRemoveHexDisplayedChars(AText);
-      if CanvasTextOutNeedsOffsets(C, AText) then
+      if AProps.FontProportional or CanvasTextOutNeedsOffsets(C, AText) then
         DxPointer:= @Dx.Data[0]
       else
         DxPointer:= nil;
     end;
 
-    {$ifdef windows}
+    C.Brush.Style:= cTextoutBrushStyle;
+    {$IF Defined(LCLWin32)}
     _TextOut_Windows(C.Handle, APosX, APosY, nil, BufW, DxPointer, false{no ligatures});
     {$else}
     Buf:= BufW;
@@ -866,14 +858,9 @@ begin
         NStyles:= PartPtr^.FontStyles;
         bBold:= (NStyles and afsFontBold)<>0;
         bItalic:= (NStyles and afsFontItalic)<>0;
-        bCrossed:= (NStyles and afsFontCrossed)<>0;
+        //bCrossed:= (NStyles and afsFontCrossed)<>0;
 
-        PartFontStyle:= [];
-        if bBold then Include(PartFontStyle, fsBold);
-        if bItalic then Include(PartFontStyle, fsItalic);
-        if bCrossed then Include(PartFontStyle, fsStrikeOut);
-
-        C.Font.Style:= PartFontStyle;
+        C.Font.Style:= ConvertIntegerToFontStyles(NStyles);
         C.Font.Color:= PartPtr^.ColorFont;
 
         if bItalic and not bBold then
@@ -919,20 +906,23 @@ begin
       //eg comment //WWW, if theme has italic comments style,
       //with font eg "Fira Code Retina"
       if bItalic then
-        Inc(PartRect.Right,
-          C.Font.Size * OptItalicFontLongerInPercents div 100
-          );
+        Inc(PartRect.Right, NDeltaForItalic);
 
       //part with only blanks, render simpler
       //important for gtk2: tab-chars give Dx offsets, render is much slower with Dx
       if bSpaceChars then
       begin
+        //avoid clipping previous 'italic' part
+        if (iPart>0) and ((AParts^[iPart-1].FontStyles and afsFontItalic)<>0) then
+          Inc(PartRect.Left, NDeltaForItalic);
         C.FillRect(PartRect);
         Continue;
       end;
 
-      {$ifdef windows}
-      if AProps.HasAsciiNoTabs and not OptCanvasTextoutNeedsOffsets then
+      C.Brush.Style:= cTextoutBrushStyle;
+
+      {$IF Defined(LCLWin32)}
+      if AProps.HasAsciiNoTabs and not ATEditorOptions.TextoutNeedsOffsets then
       begin
         BufW:= PartStr;
         bAllowLigatures:= AProps.ShowFontLigatures;
@@ -945,7 +935,7 @@ begin
           AProps.ShowFontLigatures
           and not IsStringWithUnusualWidthChars(BufW); //disable ligatures if unicode chars
 
-        if CanvasTextOutNeedsOffsets(C, PartStr) then
+        if AProps.FontProportional or CanvasTextOutNeedsOffsets(C, PartStr) then
           DxPointer:= @Dx.Data[PartOffset]
         else
           DxPointer:= nil;
@@ -960,7 +950,7 @@ begin
         bAllowLigatures
         );
       {$else}
-      if AProps.HasAsciiNoTabs and not OptCanvasTextoutNeedsOffsets then
+      if AProps.HasAsciiNoTabs and not ATEditorOptions.TextoutNeedsOffsets then
       begin
         Buf:= PartStr;
         DxPointer:= nil;
@@ -970,7 +960,7 @@ begin
         BufW:= PartStr;
         Buf:= UTF8Encode(SRemoveHexDisplayedChars(BufW));
 
-        if CanvasTextOutNeedsOffsets(C, PartStr) then
+        if AProps.FontProportional or CanvasTextOutNeedsOffsets(C, PartStr) then
         begin
           _CalcCharSizesUtf8FromWidestring(BufW, @Dx.Data[PartOffset], Dx.Len-PartOffset, DxUTF8);
           DxPointer:= @DxUTF8.Data[0];
@@ -1044,8 +1034,9 @@ begin
       PixOffset1:= ListInt.Data[PartOffset];
       C.Font.Color:= AProps.ColorNormalFont;
       C.Font.Style:= [];
+      C.Brush.Style:= cTextoutBrushStyle;
 
-      {$ifdef windows}
+      {$IF Defined(LCLWin32)}
       _TextOut_Windows(C.Handle,
         APosX+PixOffset1,
         APosY+AProps.TextOffsetFromLine,
@@ -1068,53 +1059,84 @@ begin
 
   if AProps.ShowUnprinted then
   begin
+    bShowUnprintedPartially:= true;
     if AProps.ShowUnprintedSpacesOnlyInSelection then
     begin
       for i:= 1 to Length(AText) do
       begin
         ch:= AText[i];
-        if IsCharUnicodeSpace(ch) then
-          if AProps.DetectIsPosSelected(i-2+AProps.CharIndexInLine, AProps.LineIndex) then
-            DoPaintUnprintedChar(C, ch, i, ListInt, APosX, APosY, AProps.CharSize, AProps.ColorUnprintedFont);
+        if IsCharUnicodeSpace(ch) and _IsCharSelected(i) then
+          DoPaintUnprintedChar(C, ch, i, ListInt, APosX, APosY, AProps.CharSize, AProps.ColorUnprintedFont);
       end;
     end
     else
     if AProps.ShowUnprintedSpacesBothEnds then
     begin
+      NPosFirstChar:= SGetIndentChars(AText);
+      NPosLastChar:= SGetNonSpaceLength(AText)+1;
       //paint leading
-      for i:= 1 to SGetIndentChars(AText) do
+      for i:= 1 to NPosFirstChar do
       begin
         ch:= AText[i];
         if IsCharUnicodeSpace(ch) then
           DoPaintUnprintedChar(C, ch, i, ListInt, APosX, APosY, AProps.CharSize, AProps.ColorUnprintedFont);
       end;
       //paint trailing
-      for i:= SGetNonSpaceLength(AText)+1 to Length(AText) do
+      for i:= NPosLastChar to Length(AText) do
       begin
         ch:= AText[i];
         if IsCharUnicodeSpace(ch) then
           DoPaintUnprintedChar(C, ch, i, ListInt, APosX, APosY, AProps.CharSize, AProps.ColorUnprintedFont);
       end;
+      //paint middle if "also in selection"
+      if AProps.ShowUnprintedSpacesAlsoInSelection then
+        for i:= NPosFirstChar+1 to NPosLastChar-1 do
+        begin
+          ch:= AText[i];
+          if IsCharUnicodeSpace(ch) and _IsCharSelected(i) then
+            DoPaintUnprintedChar(C, ch, i, ListInt, APosX, APosY, AProps.CharSize, AProps.ColorUnprintedFont);
+        end;
     end
     else
     if AProps.ShowUnprintedSpacesTrailing then
     begin
+      NPosLastChar:= SGetNonSpaceLength(AText)+1;
       //paint trailing
       if not AProps.TrimmedTrailingNonSpaces then
-        for i:= SGetNonSpaceLength(AText)+1 to Length(AText) do
+        for i:= NPosLastChar to Length(AText) do
         begin
           ch:= AText[i];
           if IsCharUnicodeSpace(ch) then
+            DoPaintUnprintedChar(C, ch, i, ListInt, APosX, APosY, AProps.CharSize, AProps.ColorUnprintedFont);
+        end;
+      //paint middle if "also in selection"
+      if AProps.ShowUnprintedSpacesAlsoInSelection then
+        for i:= 1 to NPosLastChar-1 do
+        begin
+          ch:= AText[i];
+          if IsCharUnicodeSpace(ch) and _IsCharSelected(i) then
             DoPaintUnprintedChar(C, ch, i, ListInt, APosX, APosY, AProps.CharSize, AProps.ColorUnprintedFont);
         end;
     end
     else
     begin
       //paint all
+      bShowUnprintedPartially:= false;
       for i:= 1 to Length(AText) do
       begin
         ch:= AText[i];
         if IsCharUnicodeSpace(ch) then
+          DoPaintUnprintedChar(C, ch, i, ListInt, APosX, APosY, AProps.CharSize, AProps.ColorUnprintedFont);
+      end;
+    end;
+
+    if AProps.ShowUnprintedForceTabs and bShowUnprintedPartially then
+    begin
+      //paint all tab-chars
+      for i:= 1 to Length(AText) do
+      begin
+        ch:= AText[i];
+        if ch=#9 then
           DoPaintUnprintedChar(C, ch, i, ListInt, APosX, APosY, AProps.CharSize, AProps.ColorUnprintedFont);
       end;
     end;
@@ -1139,9 +1161,13 @@ end;
 
 procedure CanvasTextOutMinimap(
   C: TBGRABitmap;
-  const ARect: TRect; APosX, APosY: integer;
-  ACharSize: TPoint; ATabSize: integer; constref AParts: TATLineParts;
-  AColorBG: TColor; AColorAfter: TColor;
+  const ARect: TRect;
+  APosX, APosY: integer;
+  const ACharSize: TATEditorCharSize;
+  ATabSize: integer;
+  constref AParts: TATLineParts;
+  AColorBG: TColor;
+  AColorAfter: TColor;
   const ALine: atString;
   AUsePixels: boolean
   );
@@ -1155,7 +1181,6 @@ var
   bHasBG: boolean;
   bSpace: boolean;
   NColorBack, NColorFont, NColorFontHalf: TColor;
-  ch: WideChar;
   rColorBack, rColorFont: TBGRAPixel;
 begin
   //offset<0 means some bug on making parts!
@@ -1194,23 +1219,29 @@ begin
 
     //iterate over all chars, to check for spaces (ignore them) and Tabs (add indent for them).
     //because need to paint multiline comments/strings nicely.
-    for NCharIndex:= Part^.Offset+1 to Part^.Offset+Part^.Len do
+    for NCharIndex:= Part^.Offset+1 to
+                     Min(Part^.Offset+Part^.Len, Length(ALine)) do
     begin
-      if NCharIndex>Length(ALine) then Break;
-      ch:= ALine[NCharIndex];
-      if ch=#9 then
-      begin
-        bSpace:= true;
-        NSpaceThis:= ATabSize;
-      end
-      else
-      begin
-        bSpace:= ch=' ';
-        NSpaceThis:= 1;
+      case ALine[NCharIndex] of
+        ' ':
+          begin
+            bSpace:= true;
+            NSpaceThis:= 1;
+          end;
+        #9:
+          begin
+            bSpace:= true;
+            NSpaceThis:= ATabSize;
+          end
+        else
+          begin
+            bSpace:= false;
+            NSpaceThis:= 1;
+          end;
       end;
 
-      X1:= APosX + ACharSize.X*NSpaces;
-      X2:= X1 + ACharSize.X*NSpaceThis;
+      X1:= APosX + ACharSize.XScaled*NSpaces div ATEditorCharXScale;
+      X2:= X1 + ACharSize.XScaled*NSpaceThis div ATEditorCharXScale;
 
       if X1>ARect.Right then Break;
       Inc(NSpaces, NSpaceThis);
@@ -1219,7 +1250,9 @@ begin
       begin
         if bHasBG then
           C.SetPixel(X1, Y1, rColorBack);
-        if not bSpace then
+        if bSpace then
+          C.SetPixel(X1, Y2b, rColorBack)
+        else
           C.SetPixel(X1, Y2b, rColorFont);
       end
       else
@@ -1240,4 +1273,3 @@ begin
 end;
 
 end.
-

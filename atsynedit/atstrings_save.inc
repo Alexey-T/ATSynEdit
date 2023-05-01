@@ -1,6 +1,14 @@
 {$ifdef nn}begin end;{$endif}
 
-procedure TATStrings.SaveToStream(Stream: TStream; AEncoding: TATFileEncoding; AWithSignature: boolean);
+const
+  cLineEndMatrix: array[TATLineEnds, TATFileEncoding] of string = (
+    ('', '', '', '', '', ''),
+    (#13#10, #13#10, #13#0#10#0, #0#13#0#10, #13#0#0#0#10#0#0#0, #0#0#0#13#0#0#0#10),
+    (#10, #10, #10#0, #0#10, #10#0#0#0, #0#0#0#10),
+    (#13, #13, #13#0, #0#13, #13#0#0#0, #0#0#0#13)
+  );
+
+procedure TATStrings.SaveToStream(AStream: TStream; AEncoding: TATFileEncoding; AWithSignature: boolean);
 var
   Item: PATStringItem;
   ItemEnd: TATLineEnds;
@@ -9,6 +17,9 @@ var
   SQuad: UCS4String;
   NLast, i: integer;
 begin
+  AStream.Size:= 0;
+  AStream.Seek(0, soFromBeginning);
+
   EncConvErrorMode:= eemException;
 
   if AWithSignature then
@@ -28,7 +39,7 @@ begin
         Sign:= '';
     end;
     if Sign<>'' then
-      Stream.WriteBuffer(Sign[1], Length(Sign));
+      AStream.WriteBuffer(Sign[1], Length(Sign));
   end;
 
   NLast:= Count-1;
@@ -36,27 +47,21 @@ begin
   begin
     Item:= FList.GetItem(i);
 
-    ItemEnd:= Item^.LineEnds;
-    //don't break file if ending of some non-last line is unset
-    if i<NLast then
-      if ItemEnd=cEndNone then
-        ItemEnd:= FEndings;
-
-    SWide:= Item^.Line + cLineEndStrings[ItemEnd];
-
+    //write line without line-end
+    SWide:= Item^.Line;
     if SWide<>'' then
     case AEncoding of
       cEncAnsi:
         begin
           SAnsi:= UTF8Encode(SWide);
           SAnsi:= EncConvertFromUTF8(SAnsi, FEncodingCodepage);
-          Stream.WriteBuffer(SAnsi[1], Length(SAnsi));
+          AStream.WriteBuffer(SAnsi[1], Length(SAnsi));
         end;
 
       cEncUTF8:
         begin
           SAnsi:= UTF8Encode(SWide);
-          Stream.WriteBuffer(SAnsi[1], Length(SAnsi));
+          AStream.WriteBuffer(SAnsi[1], Length(SAnsi));
         end;
 
       cEncWideLE,
@@ -64,7 +69,7 @@ begin
         begin
           if AEncoding=cEncWideBE then
             SSwapEndianWide(SWide);
-          Stream.WriteBuffer(SWide[1], Length(SWide)*2);
+          AStream.WriteBuffer(SWide[1], Length(SWide)*2);
         end;
 
       cEnc32LE,
@@ -73,14 +78,26 @@ begin
           SQuad:= UnicodeStringToUCS4String(SWide);
           if AEncoding=cEnc32BE then
             SSwapEndianUCS4(SQuad);
-          Stream.WriteBuffer(SQuad[0], (Length(SQuad)-1)*4);
+          AStream.WriteBuffer(SQuad[0], (Length(SQuad)-1)*4);
         end;
 
       else
         DoEncError;
     end;
 
-    if (i mod cStringsProgressSaveLines) = (cStringsProgressSaveLines div 2) then
+    //write line-end as additional string
+    ItemEnd:= Item^.LineEnds;
+    //don't break file if ending of some non-last line is unset
+    if (ItemEnd=cEndNone) and (i<NLast) then
+      ItemEnd:= FEndings;
+
+    if ItemEnd<>cEndNone then
+    begin
+      SAnsi:= cLineEndMatrix[ItemEnd, AEncoding];
+      AStream.WriteBuffer(SAnsi[1], Length(SAnsi));
+    end;
+
+    if (i mod TATEditorOptions.ProgressSaveLines) = TATEditorOptions.ProgressSaveLines div 2 then
     begin
       FProgressKind:= cStringsProgressSaving;
       FProgressValue:= Int64(i)*100 div Count;
@@ -113,8 +130,14 @@ end;
 procedure TATStrings.SaveToFile(const AFilename: string);
 var
   fs: TFileStream;
+  NMode: word;
 begin
-  fs:= TFileStream.Create(AFilename, fmCreate or fmOpenWrite or fmShareDenyWrite);
+  NMode:= fmOpenWrite or fmShareDenyWrite;
+  //don't set fmCreate for existing file, to keep NTFS file streams
+  if not FileExists(AFilename) then
+    NMode:= NMode or fmCreate;
+
+  fs:= TFileStream.Create(AFilename, NMode);
   try
     SaveToStream(fs, FEncoding, IsSavingWithSignature);
   finally

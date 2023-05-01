@@ -19,7 +19,8 @@ uses
   ATSynEdit_Bookmarks, ATSynEdit_Gutter_Decor, ATSynEdit_fgl, 
   ATSynEdit_Micromap, atsynedit_unicodedata, ATSynEdit_LinkCache, 
   ATSynEdit_CharSizeArray, ATSynEdit_LineParts, ATStringProc_Separator, 
-  ATStringProc_UTF8Decode, LazarusPackageIntf;
+  ATStringProc_UTF8Decode, ATSynEdit_Globals, ATSynEdit_ClipRecents, 
+  LazarusPackageIntf;
 
 implementation
 

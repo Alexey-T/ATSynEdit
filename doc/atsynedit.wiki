@@ -1,6 +1,6 @@
 = About =
 
-'''ATSynEdit''' is the multi-line editor control, with fixed font.
+'''ATSynEdit''' is the multi-line editor control.
 
 * Homepage: https://github.com/Alexey-T/ATSynEdit
 * Support for EControl adapter: https://github.com/Alexey-T/EControl
@@ -93,11 +93,23 @@ Some details about this:
 </table>
 
 = Help topics =
+==Compilation errors==
+'''GTK2 error on ATSynEdit compiling regarding IME.'''
+
+To fix this error, edit the file atsynedit/atsynedit_package.lpk and remove this block there:
+<syntaxhighlight lang="xml">
+      <Other>
+        <CustomOptions Value="-dGTK2_IME_CODE"/>
+        <OtherDefines Count="1">
+          <Define0 Value="GTK2_IME_CODE"/>
+        </OtherDefines>
+      </Other>
+</syntaxhighlight>
+
 == What limitations it has? ==
-* Cannot set different fonts for different parts 
 * All lines have the same height
-* Not supported RTL mode, limited support for Arabic text
-* Not supported Unicode code points >0xFFFF, caret pos incorrect
+* Cannot set different fonts for different parts 
+* No support for right-to-left mode, only limited support for Arabic text
 
 == What features it has? ==
 * Fast editing of big texts (tested 10M log) 
@@ -119,8 +131,9 @@ Some details about this:
 * Renders CJK chars with big width 
 * Renders some Unicode chars as "AABB" hex code
 * Renders unprintable chars (space, tab, line end)
-* Can highlight URLs
-* Can set color attributes for ranges (to hilite brackets, words)
+* Can highlight/activate URLs
+* Can set color attributes for ranges (to highlight pair brackets or same words)
+* Supports proportional fonts
 
 == Difference from other components ==
 
@@ -1126,70 +1139,83 @@ Even more weird look happens when user selects column block over word-wrapped li
 
 Here is the code's logic in all these cases (with full-width characters and with word-wrapped lines). Code calculates (line1, column1) text position of column block left-top edge. Then code calculates (line2, column2) text position of column block right-bottom edge. Then code selects characters in range column1...column2 in all those affected lines line1...line2. And this code logic produces so weird look in word-wrapped mode.
 
+==Horizontal scrollbar only increases but never shrinks?==
+Horizontal scrollbar has unusual behaviour: its width only increases (when long lines appear in the visible area). It never shrinks when we scroll to shorter lines. It was made as a workaround to GTK2 widgetset freezes - it freezes when scrollbar shows/hides/shows/hides/etc on scrolling.
+
+You can try to disable this workaround in file atsynedit_defines.inc:
+<syntaxhighlight lang="pascal">
+{$define fix_horzscroll} //workaround for gtk2 widgetset unstable: it freezes app
+                         //when horz-scroll hides/shows/hides/...
+                         //ok also for win32    
+</syntaxhighlight>
+
 ==more==
 
 = Auto-completion lists =
-== General API ==
+== General auto-completion API ==
 
-You need to install package from repo https://github.com/Alexey-T/ATSynEdit_Ex .
+You need to install package ATSynEdit_Cmp, from repo https://github.com/Alexey-T/ATSynEdit_Cmp .
 
-Unit atsynedit_form_complete has function to show completion-listbox for editor. Listbox is not modal. It keeps editor caret blinking. While listbox shown, editor don't get keyboard input, but listbox passes typed chars/Backspace/Left/Right to editor. Listbox replaces text on Enter/Tab keys, hides on Esc or clicking outside.
+Unit atsynedit_cmp_form (from ATSynEdit_Cmp package) has the function to show completion listbox in the editor. This listbox is not modal, it only emulates modality of some degree. It keeps editor caret blinking. While completion listbox is shown, editor doesn't get keyboard input, but listbox passes typing letters/Backspace/Left/Right to the editor, so it looks like editor gets some part of keyboard input. Listbox performs insertion of chosen item on Enter/Tab keys, and it hides on Esc-key or clicking outside of the listbox.
 
 <syntaxhighlight lang="pascal">
 type
   TATCompletionPropEvent = procedure (Sender: TObject;
-    out AText: string; out ACharsLeft, ACharsRight: integer) of object;
+    AContent: TStringList; out ACharsLeft, ACharsRight: integer) of object;
+  TATCompletionResultEvent = procedure (Sender: TObject;
+    const ASnippetId: string; ASnippetIndex: integer) of object;
 
-procedure DoEditorCompletionListbox(AEd: TATSynEdit; AOnGetProp: TATCompletionPropEvent);
+procedure EditorShowCompletionListbox(AEd: TATSynEdit;
+  AOnGetProp: TATCompletionPropEvent;
+  AOnResult: TATCompletionResultEvent = nil;
+  AOnChoose: TATCompletionResultEvent = nil;
+  const ASnippetId: string = '';
+  ASelectedIndex: integer = 0;
+  AAllowCarets: boolean = false);
 </syntaxhighlight>
 
-Callback params:
+Callback AOnGetProp params:
 
-* AText: Chr(13)-separated lines, each line is S_id+'|'+S_text+'|'+S_desc. S_id is a prefix before actual text (good to pass here short texts: "var", "func"). S_text (it is usually second item) is text which is inserted into editor on closing listbox. After id/text several items may exist, all '|'-separated, they will show in additional listbox columns. For ex, this gives listbox with 3 items:
-
+* AContent: list of lines, each line is S_id+'|'+S_text+'|'+S_desc. S_id is a prefix before actual text (good to pass here short texts: "var", "func"). S_text (it is usually second item) is text which is inserted into editor on closing listbox. After id/text several items may exist, all '|'-separated, they will show in additional listbox columns. For example, this TStringList line makes the listbox line of 3 columns:
 <syntaxhighlight lang="pascal">
-AText:= 'func|Func1|(param1, param2)'#9'Func desc' + #13 + 'var|Var1' + #13 + 'var|Var2';
+  'func|FuncName|(param1, param2)'#9'Func description';
 </syntaxhighlight>
-
 ** If you need to insert not only S_text but also additional substring (showing in the listbox only S_text), use such S_text: S_text+#1+S_before_caret+#1+S_after_caret (also substrings will be added before and after caret). This is used by HTML autocompletion: here S_before_caret is ">" and S_after_caret is "</tag>".
-
 ** At the end of lines, you may add Chr(9)+S_tooltip: string S_tooltip will show outside of listbox, in a tooltip, when user selects its line. To show multi-line tooltip, separate it with Chr(2).
 
 * ACharsLeft, ACharsRight: count of chars, to the left and right of the caret, which will be replaced by selected listbox item. These counts must be detected by app. Some app may need to count only word chars, some may need spaces/brackets.
 
 Notes:
 
-* Func don't work for a) read-only editor, b) multi-carets.
-* You can change colors/sizes/font of listbox: see unit source.
+* Function EditorShowCompletionListbox doesn't work for a) read-only editor, b) multi-carets.
+* You can change colors/sizes/font of listbox: see unit source, it gives the global variable (record with many fields).
 
-== SynWrite acp files ==
-Unit atsynedit_form_complete_synwrite has function to show auto-completion listbox, from SynWrite .acp files.
-Acp file must be in the format described in SynWrite help file. You may copy acp files from SynWrite distro, or from additional lexers (zip files at sf.net). "Control line" in acp file is suppoted.
-
-Function reads text under caret and leaves only items which match the text. Like SynWrite.
+== Auto-completion using acp-files ==
+Unit atsynedit_cmp_acpfiles has the function to show auto-completion listbox, from CudaText/SynWrite .acp files.
+Acp file must be in the format described in the SynWrite help file. You may copy acp files from CudaText distro, or from additional lexers, ie from CudaText lexers on CudaText.SF.net.
 
 [[File:cudatext-php-complete.png]]
 
-== CSS files ==
-Unit atsynedit_form_complete_css has function to show auto-completion listbox, for CSS syntax.
-You must pass path of file "css_list.ini" from SynWrite distro (it is list of css tags/values).
-Completion works in 2 modes: 
+== Auto-completion for CSS ==
+Unit atsynedit_cmp_css has the function to show auto-completion listbox, for CSS syntax.
+You must pass path of the file "data/autocompletespec/css_list.ini" from CudaText distro.
+CSS completion supports several modes: 
 
 * caret is on css attrib before ":" char - then list of css attribs is shown (which match the substring under caret), 
 * caret is after css attrib and ":" char (before closing ";") - then list of values for this attrib is shown.
+* and more
 
 [[File:cudatext-css-complete.png]]
 
-==HTML files==
-Unit atsynedit_form_complete_html has function to show auto-completion listbox, for HTML syntax. You must pass path of file "html_list.ini" from SynWrite distro. Completion works in modes: 
+== Auto-completion for HTML ==
+Unit atsynedit_cmp_html has the function to show auto-completion listbox, for HTML syntax. You must pass path of the file "data/autocompletespec/html_list.ini" from CudaText distro. HTML completion supports several modes: 
 
 * caret on opening/closing tag name: list of tags shown
 * caret after tag, on attribute place before "=": list of attribs for found tag shown
 * caret after tag, after attribute, after "=": list of values of found tag+attrib shown
+* and more
 
 [[File:cudatext-html-complete.png]]
-
-== more ==
 
 = Finder =
 
@@ -1238,7 +1264,45 @@ Finder has events:
 
 Finder can handle multi-selections, by option OptInSelection. Selections are handled by CountAll, ReplaceAll. For other actions, selections don't make sense, because find-next makes new smaller selection (for found fragment) so prev big selection is lost. Tech note for replace-all: selections are looked from top to bottom, if they don't have common lines, and looked from bottom to top, if they have. This is done to not break lines, which are touched by 2+ selections. Count-all handles selections from top to bottom.
 
-= Adapter for EControl lexers=
+=Adapters=
+==Adapters description==
+To support syntax-highlighting in some way, you need
+* Add event OnCalcHilite handler, which must fill the TATLineParts array with needed highlighting, or
+* Create the unit with adapter class, child of TATAdapterHilite (unit atsynedit_adapters), which must fill the TATLineParts array, again. Partial code of the adapter class:
+
+<syntaxhighlight lang="pascal">
+type
+  TATAdapterHilite = class(TComponent)
+  ...
+  public
+    constructor Create(AOwner: TComponent); override;
+    //
+    procedure OnEditorChange(Sender: TObject); virtual;
+    //called when editor's text changes.
+
+    procedure OnEditorChangeEx(Sender: TObject; AChange: TATLineChangeKind; ALine, AItemCount: integer); virtual;
+    //detailed version of OnEditorChange
+
+    procedure OnEditorIdle(Sender: TObject); virtual;
+    //called after text is changed, and pause passed (OptIdleInterval)
+    //fast changes (faster than OptIdleInterval): called only after last change
+
+    procedure OnEditorCalcHilite(Sender: TObject;
+      var AParts: TATLineParts;
+      ALineIndex, ACharIndex, ALineLen: integer;
+      var AColorAfterEol: TColor;
+      AMainText: boolean); virtual;
+    //called to calculate hilite of entire line.
+    //ACharIndex is starting offset in this line, >0 if editor scrolled horizontally.
+    //ALineLen is len of line part, starting from ACharIndex.
+    ...
+</syntaxhighlight>
+
+You need your custom adapter class, child of TATAdapterHilite, which must implement some of methods. You don't have to implement all of them, if your adapter doesn't need that. Then you must create an object of your adapter class, and assign this object to editor's AdapterForHilite property.
+
+The package ATSynEdit_Ex contains 2 ready adapter classes: for complex EControl .lcf lexers, and for CudaText simplified "lite" lexers. The lexer files are distributed in the CudaText repos on SourceForge.
+
+==Adapter for EControl lexers==
 See [[ATSynEdit EControl adapter]]
 
 =How to adapt TRegExpr upstream for ATSynEdit=

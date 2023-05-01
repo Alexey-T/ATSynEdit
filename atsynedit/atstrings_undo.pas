@@ -11,7 +11,8 @@ interface
 uses
   Classes, SysUtils,
   ATStringProc,
-  ATStringProc_Separator;
+  ATStringProc_Separator,
+  ATStringProc_Arrays;
 
 type
   TATEditAction = (
@@ -53,8 +54,10 @@ type
     procedure SetAsString(const AValue: string);
   public
     ItemTickCount: QWord; //from GetTickCount64
+
     ItemGlobalCounter: DWord; //several adjacent items, made by the same editor command, have the same GlobalCounter
                               //it's used for deleting old undo-items when MaxCount is reached
+
     ItemCommandCode: integer; //if not 0, all adjacent items with the same CommandCode will undo as a group
                               //it's used mainly for commands "move lines up/down", CudaText issue #3289
 
@@ -64,15 +67,19 @@ type
     ItemEnd: TATLineEnds; //line-ending of that editor line
     ItemLineState: TATLineState; //line-state of that editor line
     ItemCarets: TATPointArray; //carets packed into array
-    ItemMarkers: TATInt64Array; //simple markers packed into array
+    ItemMarkers: TATMarkerMarkerArray;
+    ItemAttribs: TATMarkerAttribArray;
     ItemSoftMark: boolean; //undo soft-mark. logic is described in ATSynEdit Wiki page
     ItemHardMark: boolean; //undo hard-mark
 
     constructor Create(AAction: TATEditAction; AIndex: integer;
       const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState;
       ASoftMark, AHardMark: boolean;
-      const ACarets: TATPointArray; const AMarkers: TATInt64Array;
-      ACommandCode: integer; const ATickCount: QWord); virtual;
+      const ACarets: TATPointArray;
+      const AMarkers: TATMarkerMarkerArray;
+      const AAttribs: TATMarkerAttribArray;
+      ACommandCode: integer;
+      const ATickCount: QWord); virtual;
     constructor CreateEmpty;
     procedure Assign(const D: TATUndoItem);
     property AsString: string read GetAsString write SetAsString;
@@ -114,13 +121,20 @@ type
     procedure DeleteTrailingCaretJumps;
     procedure Add(AAction: TATEditAction; AIndex: integer; const AText: atString;
       AEnd: TATLineEnds; ALineState: TATLineState;
-      const ACarets: TATPointArray; const AMarkers: TATInt64Array;
+      const ACarets: TATPointArray;
+      const AMarkers: TATMarkerMarkerArray;
+      const AAttribs: TATMarkerAttribArray;
       ACommandCode: integer);
     procedure AddUnmodifiedMark;
     function DebugText: string;
     function IsEmpty: boolean;
     property AsString: string read GetAsString write SetAsString;
     property NewCommandMark: boolean read FNewCommandMark write FNewCommandMark;
+      //NewCommandMark is set from ATSynEdit.DoCommand() or CudaText API.
+      //When it's set to True, Undo list increases GlobalCounter for the next added Undo item.
+      //All Undo items with the same GlobalCounter are performed by a single command or single CudaText API call.
+      //So they must be undone with a single undo action.
+      //Also, this allows Undo list to support MaxCount _complex actions_ in the list, intead of MaxCount simple items.
   end;
 
 
@@ -128,60 +142,6 @@ implementation
 
 uses
   Math, Dialogs;
-
-function PointsArrayToString(const A: TATPointArray): string;
-var
-  j: integer;
-  Pnt: TPoint;
-begin
-  Result:= '';
-  for j:= 0 to Length(A)-1 do
-  begin
-    Pnt:= A[j];
-    Result+= IntToStr(Pnt.X)+','+IntToStr(Pnt.Y)+';';
-  end;
-end;
-
-function Int64ArrayToString(const A: TATInt64Array): string;
-var
-  i: integer;
-begin
-  Result:= '';
-  for i:= 0 to High(A) do
-    Result+= IntToStr(A[i])+',';
-end;
-
-procedure StringToPointsArray(var A: TATPointArray; const AStr: string);
-var
-  Sep: TATStringSeparator;
-  SItem, S1, S2: string;
-  i, NLen: integer;
-begin
-  NLen:= SFindCharCount(AStr, ';');
-  SetLength(A, NLen);
-  Sep.Init(AStr, ';');
-  for i:= 0 to NLen-1 do
-  begin
-    Sep.GetItemStr(SItem);
-    SSplitByChar(SItem, ',', S1, S2);
-    A[i].X:= StrToIntDef(S1, 0);
-    A[i].Y:= StrToIntDef(S2, 0);
-  end;
-end;
-
-procedure StringToInt64Array(var A: TATInt64Array; const AStr: string);
-var
-  Sep: TATStringSeparator;
-  i, NLen: integer;
-begin
-  NLen:= SFindCharCount(AStr, ',');
-  SetLength(A, NLen);
-  Sep.Init(AStr, ',');
-  for i:= 0 to NLen-1 do
-  begin
-    Sep.GetItemInt64(A[i], 0);
-  end;
-end;
 
 { TATUndoItem }
 
@@ -194,7 +154,7 @@ begin
     IntToStr(Ord(ItemEnd))+PartSep+
     IntToStr(Ord(ItemLineState))+PartSep+
     PointsArrayToString(ItemCarets)+MarkersSep+
-      Int64ArrayToString(ItemMarkers)+MarkersSep+
+      MarkerArrayToString(ItemMarkers)+MarkersSep+
       IntToStr(ItemGlobalCounter)+MarkersSep+
       IntToStr(ItemTickCount)+PartSep+
     IntToStr(Ord(ItemSoftMark))+PartSep+
@@ -231,9 +191,9 @@ begin
   //b) markers
   Sep2.GetItemStr(SubItem);
   if SubItem<>'' then
-    StringToInt64Array(ItemMarkers, SubItem)
+    StringToMarkerArray(ItemMarkers, SubItem)
   else
-    SetLength(ItemMarkers, 0);
+    ItemMarkers:= nil;
   //c) global_cnt
   Sep2.GetItemStr(SubItem);
   ItemGlobalCounter:= StrToDWordDef(SubItem, 0);
@@ -247,7 +207,8 @@ begin
   Sep.GetItemStr(S);
   ItemHardMark:= S='1';
 
-  Sep.GetItemStr(S);
+  //use Sep.GetRect for last item, because line can contain tab-chars
+  Sep.GetRest(S);
   ItemText:= UTF8Decode(S);
 end;
 
@@ -270,7 +231,9 @@ end;
 constructor TATUndoItem.Create(AAction: TATEditAction; AIndex: integer;
   const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState;
   ASoftMark, AHardMark: boolean;
-  const ACarets: TATPointArray; const AMarkers: TATInt64Array;
+  const ACarets: TATPointArray;
+  const AMarkers: TATMarkerMarkerArray;
+  const AAttribs: TATMarkerAttribArray;
   ACommandCode: integer;
   const ATickCount: QWord);
 var
@@ -294,6 +257,10 @@ begin
   SetLength(ItemMarkers, Length(AMarkers));
   for i:= 0 to High(AMarkers) do
     ItemMarkers[i]:= AMarkers[i];
+
+  SetLength(ItemAttribs, Length(AAttribs));
+  for i:= 0 to High(AAttribs) do
+    ItemAttribs[i]:= AAttribs[i];
 end;
 
 constructor TATUndoItem.CreateEmpty;
@@ -378,7 +345,9 @@ end;
 
 procedure TATUndoList.Add(AAction: TATEditAction; AIndex: integer;
   const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState;
-  const ACarets: TATPointArray; const AMarkers: TATInt64Array;
+  const ACarets: TATPointArray;
+  const AMarkers: TATMarkerMarkerArray;
+  const AAttribs: TATMarkerAttribArray;
   ACommandCode: integer);
 var
   Item: TATUndoItem;
@@ -401,27 +370,35 @@ begin
   else
     NGlobalCounter:= 0;
 
-  //not dup change?
+  //not duplicate change?
   if bNotEmpty and (AAction in [aeaChange, aeaChangeEol]) then
   begin
     Item:= Last;
     if (Item.ItemAction=AAction) and
       (Item.ItemIndex=AIndex) and
-      (Item.ItemText=AText) then
+      (Item.ItemText=AText) and
+      (Item.ItemCommandCode=ACommandCode) then
         Exit;
   end;
 
-  //not insert/delete same index?
+  {
+  //why it is commented: it was optimization, but it is risky, it caused
+  //this issue: after Alt+Up / Alt+Down -> Undo runs with error (loosing one line)
+
+  //optimization: not insert+delete of the same index?
   if bNotEmpty and (AAction=aeaDelete) then
   begin
     Item:= Last;
     if (Item.ItemAction=aeaInsert) and
-      (Item.ItemIndex=AIndex) then
+      (Item.ItemIndex=AIndex) and
+      (Item.ItemCommandCode=ACommandCode) and
+      (GetTickCount64-Item.ItemTickCount<FPauseForMakingGroup) then
       begin
         DeleteLast;
         Exit
       end;
   end;
+  }
 
   NewTick:= GetTickCount64;
   if (FLastTick>0) and (NewTick-FLastTick>=FPauseForMakingGroup) then
@@ -430,7 +407,9 @@ begin
 
   Item:= TATUndoItem.Create(AAction, AIndex, AText, AEnd, ALineState,
                             FSoftMark, FHardMark,
-                            ACarets, AMarkers,
+                            ACarets,
+                            AMarkers,
+                            AAttribs,
                             ACommandCode,
                             NewTick);
   Item.ItemGlobalCounter:= NGlobalCounter;
@@ -449,7 +428,8 @@ procedure TATUndoList.AddUnmodifiedMark;
 var
   Item: TATUndoItem;
   Carets: TATPointArray;
-  Markers: TATInt64Array;
+  Markers: TATMarkerMarkerArray;
+  Attribs: TATMarkerAttribArray;
 begin
   //if FLocked then exit; //on load file called with Locked=true
 
@@ -458,13 +438,24 @@ begin
   if Assigned(Item) then
     if Item.ItemAction=aeaClearModified then exit;
 
-  SetLength(Carets, 0);
-  SetLength(Markers, 0);
+  Carets:= nil;
+  Markers:= nil;
+  Attribs:= nil;
 
   Item:= TATUndoItem.Create(
-    aeaClearModified, 0, '',
-    cEndNone, cLineStateNone,
-    false, false, Carets, Markers, 0, 0);
+    aeaClearModified,
+    0,
+    '',
+    cEndNone,
+    cLineStateNone,
+    false,
+    false,
+    Carets,
+    Markers,
+    Attribs,
+    0,
+    0
+    );
   FList.Add(Item);
 end;
 
@@ -515,7 +506,9 @@ begin
     if N<0 then
       exit(true);
     case Items[N].ItemAction of
-      aeaClearModified:
+      //ignore some kind of items for IsEmpty
+      aeaClearModified,
+      aeaCaretJump:
         Continue;
       else
         exit(false);

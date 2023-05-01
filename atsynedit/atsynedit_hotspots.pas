@@ -120,12 +120,20 @@ end;
 
 procedure TATHotspots.DeleteByTag(const ATag: Int64);
 var
-  N: integer;
+  i, j: integer;
 begin
+  i:= FList.Count;
   repeat
-    N:= FindByTagInt(ATag);
-    if N<0 then Break;
-    Delete(N);
+    Dec(i);
+    if i<0 then Break;
+    if FList.ItemPtr(i)^.Tag=ATag then
+    begin
+      j:= i;
+      while (j>0) and (FList.ItemPtr(j-1)^.Tag=ATag) do
+        Dec(j);
+      FList.DeleteRange(j, i);
+      i:= j;
+    end;
   until false;
 end;
 

@@ -11,15 +11,14 @@ uses
   ATStrings,
   ATStringProc,
   ATSynEdit,
+  ATSynEdit_Globals,
   ATSynEdit_LineParts,
   ATSynEdit_Carets,
   ATSynEdit_Bookmarks,
+  ATSynEdit_Markers,
   ATSynEdit_Gaps,
-  ATSynEdit_CanvasProc,
   ATSynEdit_Finder,
   ATSynEdit_Export_HTML,
-  //ATSynEdit_Hotspots,
-  //ATSynEdit_DimRanges,
   ATSynEdit_Gutter_Decor,
   ATScrollBar,
   formkey,
@@ -50,7 +49,6 @@ type
     chkUnprintSp: TCheckBox;
     chkUnprintVis: TCheckBox;
     chkWrapIndent: TCheckBox;
-    chkWrapMargin: TRadioButton;
     chkWrapOff: TRadioButton;
     chkWrapOn: TRadioButton;
     edFontsize: TSpinEdit;
@@ -238,12 +236,12 @@ type
     procedure EditChanged(Sender: TObject);
     procedure EditCaretMoved(Sender: TObject);
     procedure EditDrawLine(Sender: TObject; C: TCanvas; ALineIndex, AX, AY: integer;
-      const AStr: atString; ACharSize: TPoint; constref AExtent: TATIntFixedArray);
+      const AStr: atString; const ACharSize: TATEditorCharSize; constref AExtent: TATIntFixedArray);
     procedure EditCalcLine(Sender: TObject; var AParts: TATLineParts;
       ALineIndex, ACharIndex, ALineLen: integer; var AColorAfterEol: TColor);
     procedure EditScroll(Sender: TObject);
-    procedure EditCommand(Sender: TObject; ACmd{%H-}: integer; const AText: string; var AHandled: boolean);
-    procedure EditClickGutter(Sender: TObject; ABand, ALine: integer);
+    procedure EditCommand(Sender: TObject; ACmd{%H-}: integer; AInvoke: TATEditorCommandInvoke; const AText: string; var AHandled: boolean);
+    procedure EditClickGutter(Sender: TObject; ABand, ALine: integer; var AHandled: boolean);
     procedure EditClickMicromap(Sender: TObject; AX, AY: integer);
     procedure EditDrawBm(Sender: TObject; C: TCanvas; ALineNum{%H-}: integer; const ARect: TRect);
     procedure EditDrawMicromap(Sender: TObject; C: TCanvas; const ARect: TRect);
@@ -293,6 +291,8 @@ end;
 { TfmMain }
 
 procedure TfmMain.FormCreate(Sender: TObject);
+const
+  cGoodFont = 'DejaVu Sans Mono';
 begin
   UpdateEnc;
 
@@ -303,15 +303,18 @@ begin
   ed.Parent:= PanelMain;
   ed.Align:= alClient;
 
-  {$ifdef LCLQt5}
-  OptCanvasTextoutNeedsOffsets:= true;
-  {$endif}
-
   {$ifdef windows}
   ed.Font.Name:= 'Consolas';
   {$else}
   ed.Font.Name:= 'Courier New';
+  if Screen.Fonts.IndexOf(cGoodFont)>=0 then
+    ed.Font.Name:= cGoodFont;
   {$endif}
+
+  SetLength(ed.Micromap.Columns, 0);
+  ed.Micromap.ColumnAdd(1, 100, clRed);
+  ed.Micromap.ColumnAdd(2, 100, clBlue);
+  ed.Micromap.ColumnAdd(3, 100, clGreen);
 
   ed.PopupGutterBm:= PopupBookmk;
   ed.PopupGutterNum:= PopupNums;
@@ -420,7 +423,7 @@ var
   NIndex, i: integer;
   Data: TATBookmarkData;
 begin
-  FillChar(Data, SizeOf(Data), 0);
+  Data:= Default(TATBookmarkData);
   Data.Kind:= 1;
   Data.ShowInBookmarkList:= true;
 
@@ -519,12 +522,15 @@ begin
   chkNewScroll.Checked:= ed.OptScrollbarsNew;
   edFontsize.Value:= ed.Font.Size;
   edTabsize.Value:= ed.OptTabSize;
-  edSpaceY.Value:= ed.OptCharSpacingY;
+  edSpaceY.Value:= ed.OptSpacingY;
   edMarginFixed.Value:= ed.OptMarginRight;
   case ed.OptWrapMode of
-    cWrapOff: chkWrapOff.Checked:= true;
-    cWrapOn: chkWrapOn.Checked:= true;
-    cWrapAtMargin: chkWrapMargin.Checked:= true;
+    cWrapOff:
+      chkWrapOff.Checked:= true;
+    cWrapOn:
+      chkWrapOn.Checked:= true;
+    cWrapAtWindowOrMargin:
+      chkWrapWndMargin.Checked:= true;
   end;
   chkWrapIndent.Checked:= ed.OptWrapIndented;
   chkUnprintVis.Checked:= ed.OptUnprintedVisible;
@@ -540,7 +546,7 @@ begin
 end;
 
 procedure TfmMain.EditCommand(Sender: TObject; ACmd: integer;
-  const AText: string; var AHandled: boolean);
+  AInvoke: TATEditorCommandInvoke; const AText: string; var AHandled: boolean);
 begin
   AHandled:= false;
   {
@@ -552,19 +558,19 @@ begin
   }
 end;
 
-procedure TfmMain.EditClickGutter(Sender: TObject; ABand, ALine: integer);
+procedure TfmMain.EditClickGutter(Sender: TObject; ABand, ALine: integer; var AHandled: boolean);
 var
   NIndex: integer;
   Data: TATBookmarkData;
 begin
-  if ABand=ed.GutterBandBookmarks then
+  if ABand=ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagBookmarks) then
   begin
     NIndex:= ed.Strings.Bookmarks.Find(ALine);
     if NIndex>=0 then
       ed.Strings.Bookmarks.Delete(NIndex)
     else
     begin
-      FillChar(Data, SizeOf(Data), 0);
+      Data:= Default(TATBookmarkData);
       Data.Kind:= 1;
       Data.LineNum:= ALine;
       Data.ShowInBookmarkList:= true;
@@ -572,6 +578,7 @@ begin
       ed.Strings.Bookmarks.Add(Data);
     end;
     ed.Update;
+    AHandled:= true;
   end;
 end;
 
@@ -597,11 +604,19 @@ begin
 end;
 
 procedure TfmMain.EditDrawMicromap(Sender: TObject; C: TCanvas; const ARect: TRect);
+var
+  R: TRect;
+  i: integer;
 begin
-  C.Pen.Color:= $c0c0c0;
-  C.Brush.Color:= $eeeeee;
-  C.Rectangle(ARect);
-  C.TextOut(ARect.Left+2, ARect.Top+2, 'tst');
+  for i:= 0 to High(ed.Micromap.Columns) do
+  begin
+    C.Brush.Style:= bsSolid;
+    C.Brush.Color:= ed.Micromap.Columns[i].NColor;
+    R:= ARect;
+    R.Left:= ARect.Left+ed.Micromap.Columns[i].NLeft;
+    R.Right:= ARect.Left+ed.Micromap.Columns[i].NRight;
+    C.FillRect(R);
+  end;
 end;
 
 procedure TfmMain.EditDrawTest(Sender: TObject; C: TCanvas; const ARect: TRect);
@@ -697,10 +712,17 @@ begin
 end;
 
 procedure TfmMain.btnMarkerClick(Sender: TObject);
+var
+  Caret: TATCaretItem;
 begin
   if ed.Carets.Count=1 then
   begin
-    ed.Markers.Add(ed.Carets[0].PosX, ed.Carets[0].PosY);
+    Caret:= ed.Carets[0];
+    ed.Markers.Add(
+      Point(Caret.PosX, Caret.PosY),
+      Point(0, 0),
+      TATMarkerTags.Init(0, 0)
+      );
     ed.Update;
   end;
 end;
@@ -777,14 +799,30 @@ end;
 
 procedure TfmMain.mnuFileHtmlClick(Sender: TObject);
 var
-  fn: string;
+  List: TStringList;
+  SFilename: string;
 begin
-  fn:= GetTempDir+DirectorySeparator+'_export.html';
-  DoEditorExportToHTML(Ed, fn, 'Export test',
-    'Courier New', 12, false,
-    clWhite, clMedGray);
-  if FileExists(fn) then
-    OpenDocument(fn);
+  SFilename:= GetTempDir+DirectorySeparator+'export.html';
+
+  List:= TStringList.Create;
+  try
+    EditorExportToHTML(Ed,
+      List,
+      Point(0, 0),
+      Point(0, Ed.Strings.Count),
+      'Some title',
+      '',
+      12,
+      false,
+      clWhite,
+      clMedGray);
+    List.SaveToFile(SFilename);
+  finally
+    FreeAndNil(List);
+  end;
+
+  if FileExists(SFilename) then
+    OpenDocument(SFilename);
 end;
 
 
@@ -835,7 +873,7 @@ begin
   Cmd:= DoCommandDialog(ed);
   if Cmd>0 then
   begin
-    ed.DoCommand(Cmd);
+    ed.DoCommand(Cmd, cInvokeAppPalette);
     ed.Update;
   end;
 end;
@@ -1066,9 +1104,9 @@ begin
 
   FDecorImage:= (FDecorImage+1) mod ImagesDecor.Count;
 
-  FillChar(decor, SizeOf(decor), 0);
+  decor:= Default(TATGutterDecorData);
   decor.DeleteOnDelLine:= true;
-  decor.Text:= V[1];
+  decor.TextAll:= V[1];
   decor.TextItalic:= true;
   decor.TextBold:= true;
   decor.TextColor:= Random($ffffff);
@@ -1097,8 +1135,9 @@ end;
 
 procedure TfmMain.TrackbarScaleChange(Sender: TObject);
 begin
-  EditorScalePercents:= TrackbarScale.Position;
-  ATScrollbarTheme.ScalePercents:= EditorScalePercents;
+  ATEditorScalePercents:= TrackbarScale.Position;
+  ATEditorScaleFontPercents:= TrackbarScale.Position;
+  ATScrollbarTheme.ScalePercents:= ATEditorScalePercents;
   Ed.Update(true);
 end;
 
@@ -1382,7 +1421,7 @@ end;
 procedure TfmMain.chkWrapMarginChange(Sender: TObject);
 begin
   if wait then Exit;
-  ed.OptWrapMode:= cWrapAtMargin;
+  ed.OptWrapMode:= cWrapAtWindowOrMargin;
 end;
 
 procedure TfmMain.chkWrapOffChange(Sender: TObject);
@@ -1427,7 +1466,7 @@ end;
 procedure TfmMain.edSpaceYChange(Sender: TObject);
 begin
   if wait then Exit;
-  ed.OptCharSpacingY:= edSpaceY.Value;
+  ed.OptSpacingY:= edSpaceY.Value;
   ed.Update;
 end;
 
@@ -1439,7 +1478,7 @@ begin
 end;
 
 procedure TfmMain.EditDrawLine(Sender: TObject; C: TCanvas; ALineIndex, AX,
-  AY: integer; const AStr: atString; ACharSize: TPoint; constref AExtent: TATIntFixedArray);
+  AY: integer; const AStr: atString; const ACharSize: TATEditorCharSize; constref AExtent: TATIntFixedArray);
 var
   X1, X2, Y, i: integer;
 begin
@@ -1580,7 +1619,7 @@ begin
     EndY:= APos2.Y;
   end;
 
-  Ed.DoCommand(cCommand_ScrollToCaretTop);
+  Ed.DoCommand(cCommand_ScrollToCaretTop, cInvokeAppInternal);
   Ed.Update(true);
 
   Buttons:= [mbYes, mbNo];
@@ -1622,7 +1661,11 @@ procedure TfmMain.FinderFound(Sender: TObject; APos1, APos2: TPoint);
 begin
   if FFindMarkAll then
   begin
-    ed.Markers.Add(APos1.X, APos1.Y, 0, Abs(APos2.X-APos1.X), 0);
+    ed.Markers.Add(
+      Point(APos1.X, APos1.Y),
+      Point(Abs(APos2.X-APos1.X), 0),
+      TATMarkerTags.Init(0, 0)
+      );
   end;
 end;
 

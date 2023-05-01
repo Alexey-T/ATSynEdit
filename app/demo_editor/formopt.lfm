@@ -34,10 +34,10 @@ object fmOpt: TfmOpt
     Height = 343
     Top = 6
     Width = 701
-    ActivePage = TabSheet7
+    ActivePage = TabSheet9
     Align = alClient
     BorderSpacing.Around = 6
-    TabIndex = 7
+    TabIndex = 2
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'show'
@@ -48,8 +48,8 @@ object fmOpt: TfmOpt
         Left = 8
         Height = 24
         Top = 8
-        Width = 169
-        Caption = 'highlight currrent line'
+        Width = 163
+        Caption = 'highlight current line'
         TabOrder = 0
       end
       object chkCurCol: TCheckBox
@@ -325,7 +325,7 @@ object fmOpt: TfmOpt
         Top = 4
         Width = 272
         Caption = 'sizes of columns'
-        ClientHeight = 244
+        ClientHeight = 229
         ClientWidth = 268
         TabOrder = 0
         object chkGutterBm: TCheckBox
@@ -475,6 +475,7 @@ object fmOpt: TfmOpt
           Height = 218
           Top = 0
           Width = 98
+          Enabled = False
           ItemHeight = 0
           ScrollWidth = 94
           TabOrder = 0
@@ -486,6 +487,7 @@ object fmOpt: TfmOpt
           Top = 0
           Width = 65
           Caption = 'up'
+          Enabled = False
           OnClick = bColUpClick
           TabOrder = 1
         end
@@ -495,6 +497,7 @@ object fmOpt: TfmOpt
           Top = 28
           Width = 66
           Caption = 'down'
+          Enabled = False
           OnClick = bColDownClick
           TabOrder = 2
         end
@@ -900,7 +903,7 @@ object fmOpt: TfmOpt
       Caption = 'carets'
       ClientHeight = 312
       ClientWidth = 697
-      object edCrTime: TSpinEdit
+      object edCaretTime: TSpinEdit
         Left = 8
         Height = 26
         Top = 8
@@ -918,7 +921,7 @@ object fmOpt: TfmOpt
         Width = 67
         Caption = 'blink time'
       end
-      object chkCrVirt: TCheckBox
+      object chkCaretVirtual: TCheckBox
         Left = 8
         Height = 24
         Top = 128
@@ -926,7 +929,7 @@ object fmOpt: TfmOpt
         Caption = 'caret allowed after line-end'
         TabOrder = 4
       end
-      object chkCrMul: TCheckBox
+      object chkCaretMulti: TCheckBox
         Left = 8
         Height = 24
         Top = 104
@@ -934,7 +937,7 @@ object fmOpt: TfmOpt
         Caption = 'multi-carets'
         TabOrder = 3
       end
-      object chkCrStopUnfocus: TCheckBox
+      object chkCaretStopUnfocus: TCheckBox
         Left = 8
         Height = 24
         Top = 64
@@ -949,7 +952,7 @@ object fmOpt: TfmOpt
         Width = 95
         Caption = 'shape, normal'
       end
-      object chkCrPreferLeft: TCheckBox
+      object chkCaretPreferLeft: TCheckBox
         Left = 8
         Height = 24
         Top = 152
@@ -957,7 +960,7 @@ object fmOpt: TfmOpt
         Caption = 'end of wrapped part: prefer next line pos'
         TabOrder = 5
       end
-      object chkCrBlinkEn: TCheckBox
+      object chkCaretBlinkEn: TCheckBox
         Left = 8
         Height = 24
         Top = 43
@@ -965,41 +968,43 @@ object fmOpt: TfmOpt
         Caption = 'blink enabled'
         TabOrder = 1
       end
-      object edCrWidthNormal: TSpinEdit
+      object edCaretWidthNormal: TSpinEdit
         Left = 344
         Height = 26
         Top = 32
         Width = 66
+        MaxValue = 20
         MinValue = -100
-        TabOrder = 6
+        TabOrder = 8
       end
-      object chkCrEmptyNormal: TCheckBox
+      object chkCaretEmptyNormal: TCheckBox
         Left = 344
         Height = 24
         Top = 96
         Width = 112
         Caption = 'empty inside'
-        TabOrder = 8
+        TabOrder = 10
       end
-      object edCrHeightNormal: TSpinEdit
+      object edCaretHeightNormal: TSpinEdit
         Left = 344
         Height = 26
         Top = 64
         Width = 66
+        MaxValue = 20
         MinValue = -300
-        TabOrder = 7
+        TabOrder = 9
       end
       object Label9: TLabel
-        AnchorSideTop.Control = edCrWidthNormal
+        AnchorSideTop.Control = edCaretWidthNormal
         AnchorSideTop.Side = asrCenter
         Left = 416
         Height = 17
         Top = 37
-        Width = 38
-        Caption = 'width'
+        Width = 232
+        Caption = 'width (>0: in pixels, <0: in percents)'
       end
       object Label21: TLabel
-        AnchorSideTop.Control = edCrHeightNormal
+        AnchorSideTop.Control = edCaretHeightNormal
         AnchorSideTop.Side = asrCenter
         Left = 416
         Height = 17
@@ -1007,13 +1012,36 @@ object fmOpt: TfmOpt
         Width = 42
         Caption = 'height'
       end
-      object chkCrPrimitiveCol: TCheckBox
+      object chkCaretPrimitiveCol: TCheckBox
         Left = 8
         Height = 24
         Top = 191
         Width = 312
         Caption = 'primitive column sel (affects wapped lines)'
-        TabOrder = 9
+        TabOrder = 6
+      end
+      object edCaretProximity: TSpinEdit
+        Left = 8
+        Height = 26
+        Top = 224
+        Width = 64
+        MaxValue = 10
+        TabOrder = 7
+      end
+      object Label24: TLabel
+        Left = 80
+        Height = 17
+        Top = 228
+        Width = 204
+        Caption = 'proximity of caret to vert edge'
+      end
+      object chkCaretRenderText: TCheckBox
+        Left = 344
+        Height = 24
+        Top = 120
+        Width = 144
+        Caption = 'render text above'
+        TabOrder = 11
       end
     end
     object TabSheet7: TTabSheet

@@ -11,7 +11,7 @@ uses
   FileUtil,
   ATStringProc,
   ATSynEdit,
-  ATSynEdit_CanvasProc,
+  ATSynEdit_Globals,
   ATSynEdit_CharSizer;
 
 type
@@ -21,12 +21,13 @@ type
     bColDown: TButton;
     bColUp: TButton;
     ButtonPanel1: TButtonPanel;
+    chkCaretRenderText: TCheckBox;
     chkMapClickDoDrag: TCheckBox;
     chkUndoForCrt: TCheckBox;
     chkUndoGrp: TCheckBox;
     chkUndoAfterSave: TCheckBox;
     chkUpDownToEdge: TCheckBox;
-    chkCrPrimitiveCol: TCheckBox;
+    chkCaretPrimitiveCol: TCheckBox;
     chkClickLink: TCheckBox;
     chkCopyNoSel: TCheckBox;
     chkCutNoSel: TCheckBox;
@@ -39,8 +40,8 @@ type
     chkBkspGoPrev: TCheckBox;
     chkUnprintOnlyBothEnds: TCheckBox;
     chkUnprintOnlyEnd: TCheckBox;
-    chkCrEmptyNormal: TCheckBox;
-    chkCrBlinkEn: TCheckBox;
+    chkCaretEmptyNormal: TCheckBox;
+    chkCaretBlinkEn: TCheckBox;
     chkMsNormalSel: TCheckBox;
     chkMsColumnSel: TCheckBox;
     chkShowFullHilite: TCheckBox;
@@ -61,7 +62,7 @@ type
     chkUnprintAsciiRep: TCheckBox;
     chkShowFoldLines: TCheckBox;
     chkShowFoldAlways: TCheckBox;
-    chkCrPreferLeft: TCheckBox;
+    chkCaretPreferLeft: TCheckBox;
     chkKeepCol: TCheckBox;
     chkCurLineMin: TCheckBox;
     chkScrollHint: TCheckBox;
@@ -74,7 +75,7 @@ type
     chkShowNumBg: TCheckBox;
     chkTabSpaces: TCheckBox;
     chkMsClickNumSel: TCheckBox;
-    chkCrStopUnfocus: TCheckBox;
+    chkCaretStopUnfocus: TCheckBox;
     chkEndNonspace: TCheckBox;
     chkHomeNonspace: TCheckBox;
     chkLeftRtSwap: TCheckBox;
@@ -82,8 +83,8 @@ type
     chkOvrSel: TCheckBox;
     chkMsRtClickMove: TCheckBox;
     chkMsDragDrop: TCheckBox;
-    chkCrMul: TCheckBox;
-    chkCrVirt: TCheckBox;
+    chkCaretMulti: TCheckBox;
+    chkCaretVirtual: TCheckBox;
     chkMsClick2Drag: TCheckBox;
     chkMsClick3: TCheckBox;
     chkShowFullSel: TCheckBox;
@@ -95,18 +96,19 @@ type
     chkUnprintSpace: TCheckBox;
     chkUnprintEn: TCheckBox;
     chkZebraActive: TCheckBox;
+    edCaretProximity: TSpinEdit;
     edUnpriEol: TComboBox;
     comboMsMidClick: TComboBox;
     ComboMsClick2: TComboBox;
     comboRulerStyle: TComboBox;
-    edCrHeightNormal: TSpinEdit;
+    edCaretHeightNormal: TSpinEdit;
     edRulerFSize: TSpinEdit;
     edRulerIndent: TSpinEdit;
     edRulerSize: TSpinEdit;
     edMapCharWidth: TSpinEdit;
     edNumAlign: TComboBox;
     edIndentKind: TComboBox;
-    edCrTime: TSpinEdit;
+    edCaretTime: TSpinEdit;
     edSizeSep: TSpinEdit;
     edNonWordChars: TEdit;
     edIndentSize: TSpinEdit;
@@ -149,6 +151,7 @@ type
     Label21: TLabel;
     Label22: TLabel;
     Label23: TLabel;
+    Label24: TLabel;
     Label6: TLabel;
     LabelZebraAlpha: TLabel;
     Label3: TLabel;
@@ -163,7 +166,7 @@ type
     LabelZebraStep: TLabel;
     ListCol: TListBox;
     PageControl1: TPageControl;
-    edCrWidthNormal: TSpinEdit;
+    edCaretWidthNormal: TSpinEdit;
     TabSheet1: TTabSheet;
     TabSheet10: TTabSheet;
     TabSheet11: TTabSheet;
@@ -197,19 +200,24 @@ implementation
 
 {$R *.lfm}
 
+{
 const
   nameBm = 'bookmk';
   nameNums = 'nums';
   nameState = 'states';
   nameFold = 'fold';
   nameSep = 'separator';
+}
 
 procedure DoConfigEditor(ed: TATSynEdit);
+{
 var
   i: integer;
+  }
 begin
   with fmOpt do
   begin
+    {
     with ListCol do
     begin
       Items.Clear;
@@ -223,6 +231,7 @@ begin
       end;
       ItemIndex:= 0;
     end;
+    }
 
     //general
     chkCurLine.Checked:= ed.OptShowCurLine;
@@ -251,23 +260,25 @@ begin
     chkUnprintEndDet.Checked:= ed.OptUnprintedEndsDetails;
     chkUnprintOnlyBothEnds.Checked:= ed.OptUnprintedSpacesBothEnds;
     chkUnprintOnlyEnd.Checked:= ed.OptUnprintedSpacesTrailing;
-    edUnpriEol.ItemIndex:= Ord(OptUnprintedEndSymbol);
-    chkUnprintAsciiRep.Checked:= OptUnprintedReplaceSpec;
-    edTabArrowSize.Value:= OptUnprintedTabCharLength;
-    edTabArrowPnt.Value:= OptUnprintedTabPointerScale;
+    edUnpriEol.ItemIndex:= Ord(ATEditorOptions.UnprintedEndSymbol);
+    chkUnprintAsciiRep.Checked:= ATEditorOptions.UnprintedReplaceSpec;
+    edTabArrowSize.Value:= ATEditorOptions.UnprintedTabCharLength;
+    edTabArrowPnt.Value:= ATEditorOptions.UnprintedTabPointerScale;
 
     //caret
-    chkCrBlinkEn.Checked:= ed.OptCaretBlinkEnabled;
-    edCrTime.Value:= ed.OptCaretBlinkTime;
-    chkCrVirt.Checked:= ed.OptCaretVirtual;
-    chkCrMul.Checked:= ed.OptCaretManyAllowed;
-    chkCrStopUnfocus.Checked:= ed.OptCaretStopUnfocused;
-    chkCrPreferLeft.Checked:= ed.OptCaretPreferLeftSide;
-    chkCrPrimitiveCol.Checked:= ed.OptCaretsPrimitiveColumnSelection;
+    chkCaretBlinkEn.Checked:= ed.OptCaretBlinkEnabled;
+    edCaretTime.Value:= ed.OptCaretBlinkTime;
+    chkCaretVirtual.Checked:= ed.OptCaretVirtual;
+    chkCaretMulti.Checked:= ed.OptCaretManyAllowed;
+    chkCaretStopUnfocus.Checked:= ed.OptCaretStopUnfocused;
+    chkCaretPreferLeft.Checked:= ed.OptCaretPreferLeftSide;
+    chkCaretPrimitiveCol.Checked:= ed.OptCaretsPrimitiveColumnSelection;
+    edCaretProximity.Value:= ed.OptCaretProximityVert;
 
-    edCrWidthNormal.Value:= ed.CaretShapeNormal.Width;
-    edCrHeightNormal.Value:= ed.CaretShapeNormal.Height;
-    chkCrEmptyNormal.Checked:= ed.CaretShapeNormal.EmptyInside;
+    edCaretWidthNormal.Value:= ed.CaretShapeNormal.Width;
+    edCaretHeightNormal.Value:= ed.CaretShapeNormal.Height;
+    chkCaretEmptyNormal.Checked:= ed.CaretShapeNormal.EmptyInside;
+    chkCaretRenderText.Checked:= ATEditorOptions.CaretTextOverInvertedRect;
 
     //gutter
     edNumStyle.ItemIndex:= Ord(ed.OptNumbersStyle);
@@ -285,18 +296,18 @@ begin
     edRulerIndent.Value:= ed.OptRulerTopIndentPercents;
     comboRulerStyle.ItemIndex:= Ord(ed.OptRulerNumeration);
 
-    chkGutterBm.Checked:= ed.Gutter[ed.GutterBandBookmarks].Visible;
-    chkGutterNum.Checked:= ed.Gutter[ed.GutterBandNumbers].Visible;
-    chkGutterFold.Checked:= ed.Gutter[ed.GutterBandFolding].Visible;
-    chkGutterStat.Checked:= ed.Gutter[ed.GutterBandStates].Visible;
-    chkGutterSep.Checked:= ed.Gutter[ed.GutterBandSeparator].Visible;
-    chkGutterEmpty.Checked:= ed.Gutter[ed.GutterBandEmpty].Visible;
-    edSizeBm.Value:= ed.Gutter[ed.GutterBandBookmarks].Size;
-    edSizeFold.Value:= ed.Gutter[ed.GutterBandFolding].Size;
-    edSizeState.Value:= ed.Gutter[ed.GutterBandStates].Size;
-    edSizeSep.Value:= ed.Gutter[ed.GutterBandSeparator].Size;
-    edSizeEmpty.Value:= ed.Gutter[ed.GutterBandEmpty].Size;
-    edSizeNum.Value:= ed.Gutter[ed.GutterBandNumbers].Size;
+    chkGutterBm.Checked:= ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagBookmarks)].Visible;
+    chkGutterNum.Checked:= ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagNumbers)].Visible;
+    chkGutterFold.Checked:= ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagFolding)].Visible;
+    chkGutterStat.Checked:= ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagLineStates)].Visible;
+    chkGutterSep.Checked:= ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagSeparator)].Visible;
+    chkGutterEmpty.Checked:= ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagEmpty)].Visible;
+    edSizeBm.Value:= ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagBookmarks)].Size;
+    edSizeFold.Value:= ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagFolding)].Size;
+    edSizeState.Value:= ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagLineStates)].Size;
+    edSizeSep.Value:= ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagSeparator)].Size;
+    edSizeEmpty.Value:= ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagEmpty)].Size;
+    edSizeNum.Value:= ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagNumbers)].Size;
     edSizeNumIndent.Value:= ed.OptNumbersIndentPercents;
     chkGutterNumAuto.Checked:= ed.OptNumbersAutosize;
 
@@ -353,11 +364,13 @@ begin
 
     if ShowModal=mrOk then
     begin
+      {
       ed.GutterBandBookmarks:= ListCol.Items.IndexOf(nameBm);
       ed.GutterBandNumbers:= ListCol.Items.IndexOf(nameNums);
       ed.GutterBandStates:= ListCol.Items.IndexOf(nameState);
       ed.GutterBandFolding:= ListCol.Items.IndexOf(nameFold);
       ed.GutterBandSeparator:= ListCol.Items.IndexOf(nameSep);
+      }
 
       //general
       ed.OptShowCurLine:= chkCurLine.Checked;
@@ -386,23 +399,25 @@ begin
       ed.OptUnprintedEndsDetails:= chkUnprintEndDet.Checked;
       ed.OptUnprintedSpacesBothEnds:= chkUnprintOnlyBothEnds.Checked;
       ed.OptUnprintedSpacesTrailing:= chkUnprintOnlyEnd.Checked;
-      OptUnprintedReplaceSpec:= chkUnprintAsciiRep.Checked;
-      OptUnprintedTabCharLength:= edTabArrowSize.Value;
-      OptUnprintedTabPointerScale:= edTabArrowPnt.Value;
-      OptUnprintedEndSymbol:= TATSynEditUnptintedEolSymbol(edUnpriEol.ItemIndex);
+      ATEditorOptions.UnprintedReplaceSpec:= chkUnprintAsciiRep.Checked;
+      ATEditorOptions.UnprintedTabCharLength:= edTabArrowSize.Value;
+      ATEditorOptions.UnprintedTabPointerScale:= edTabArrowPnt.Value;
+      ATEditorOptions.UnprintedEndSymbol:= TATEditorUnptintedEolSymbol(edUnpriEol.ItemIndex);
 
       //caret
-      ed.OptCaretBlinkEnabled:= chkCrBlinkEn.Checked;
-      ed.OptCaretBlinkTime:= edCrTime.Value;
-      ed.OptCaretVirtual:= chkCrVirt.Checked;
-      ed.OptCaretManyAllowed:= chkCrMul.Checked;
-      ed.OptCaretStopUnfocused:= chkCrStopUnfocus.Checked;
-      ed.OptCaretPreferLeftSide:= chkCrPreferLeft.Checked;
-      ed.OptCaretsPrimitiveColumnSelection:= chkCrPrimitiveCol.Checked;
+      ed.OptCaretBlinkEnabled:= chkCaretBlinkEn.Checked;
+      ed.OptCaretBlinkTime:= edCaretTime.Value;
+      ed.OptCaretVirtual:= chkCaretVirtual.Checked;
+      ed.OptCaretManyAllowed:= chkCaretMulti.Checked;
+      ed.OptCaretStopUnfocused:= chkCaretStopUnfocus.Checked;
+      ed.OptCaretPreferLeftSide:= chkCaretPreferLeft.Checked;
+      ed.OptCaretsPrimitiveColumnSelection:= chkCaretPrimitiveCol.Checked;
+      ed.OptCaretProximityVert:= edCaretProximity.Value;
+      ATEditorOptions.CaretTextOverInvertedRect:= chkCaretRenderText.Checked;
 
-      ed.CaretShapeNormal.Width:= edCrWidthNormal.Value;
-      ed.CaretShapeNormal.Height:= edCrHeightNormal.Value;
-      ed.CaretShapeNormal.EmptyInside:= chkCrEmptyNormal.Checked;
+      ed.CaretShapeNormal.Width:= edCaretWidthNormal.Value;
+      ed.CaretShapeNormal.Height:= edCaretHeightNormal.Value;
+      ed.CaretShapeNormal.EmptyInside:= chkCaretEmptyNormal.Checked;
 
       //gutter
       //ed.OptNumbersFontSizePercents:= edNumSize.Value;
@@ -420,18 +435,18 @@ begin
       ed.OptRulerTopIndentPercents:= edRulerIndent.Value;
       ed.OptRulerNumeration:= TATEditorRulerNumeration(comboRulerStyle.ItemIndex);
 
-      ed.Gutter[ed.GutterBandBookmarks].Visible:= chkGutterBm.Checked;
-      ed.Gutter[ed.GutterBandNumbers].Visible:= chkGutterNum.Checked;
-      ed.Gutter[ed.GutterBandFolding].Visible:= chkGutterFold.Checked;
-      ed.Gutter[ed.GutterBandStates].Visible:= chkGutterStat.Checked;
-      ed.Gutter[ed.GutterBandSeparator].Visible:= chkGutterSep.Checked;
-      ed.Gutter[ed.GutterBandEmpty].Visible:= chkGutterEmpty.Checked;
-      ed.Gutter[ed.GutterBandBookmarks].Size:= edSizeBm.Value;
-      ed.Gutter[ed.GutterBandNumbers].Size:= edSizeNum.Value;
-      ed.Gutter[ed.GutterBandFolding].Size:= edSizeFold.Value;
-      ed.Gutter[ed.GutterBandStates].Size:= edSizeState.Value;
-      ed.Gutter[ed.GutterBandSeparator].Size:= edSizeSep.Value;
-      ed.Gutter[ed.GutterBandEmpty].Size:= edSizeEmpty.Value;
+      ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagBookmarks)].Visible:= chkGutterBm.Checked;
+      ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagNumbers)].Visible:= chkGutterNum.Checked;
+      ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagFolding)].Visible:= chkGutterFold.Checked;
+      ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagLineStates)].Visible:= chkGutterStat.Checked;
+      ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagSeparator)].Visible:= chkGutterSep.Checked;
+      ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagEmpty)].Visible:= chkGutterEmpty.Checked;
+      ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagBookmarks)].Size:= edSizeBm.Value;
+      ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagNumbers)].Size:= edSizeNum.Value;
+      ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagFolding)].Size:= edSizeFold.Value;
+      ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagLineStates)].Size:= edSizeState.Value;
+      ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagSeparator)].Size:= edSizeSep.Value;
+      ed.Gutter[ed.Gutter.FindIndexByTag(ATEditorOptions.GutterTagEmpty)].Size:= edSizeEmpty.Value;
       ed.OptNumbersAutosize:= chkGutterNumAuto.Checked;
       ed.OptNumbersIndentPercents:= edSizeNumIndent.Value;
 
@@ -537,4 +552,3 @@ end;
 
 
 end.
-

@@ -13,7 +13,7 @@ interface
 
 uses
   Classes, SysUtils,
-  ATStringProc_Separator;
+  LCLType;
 
 type
   { TATKeyArray }
@@ -26,6 +26,7 @@ type
     procedure Clear;
     function Length: integer;
     function ToString: string;
+    function IsConflictWith(constref AOther: TATKeyArray): boolean;
     procedure SetFromString(const AHotkey: string; AComboSepar: char= ComboSeparator);
     class operator =(const a1, a2: TATKeyArray): boolean;
   end;
@@ -38,8 +39,11 @@ type
     Command: integer;
     Name: string;
     Keys1, Keys2: TATKeyArray;
-    LexerSpecific: boolean;
+    LexerSpecific: boolean; //CudaText stores here True for lexer-specific keymaps
+    Description: string; //CudaText stores here 'pythonmodule,method,param'
     procedure Assign(AItem: TATKeymapItem);
+    function ShortenedKeys1: TATKeyArray;
+    function ShortenedKeys2: TATKeyArray;
   end;
 
 type
@@ -59,7 +63,7 @@ type
     function Count: integer; inline;
     function IsIndexValid(N: integer): boolean; inline;
     property Items[N: integer]: TATKeymapItem read GetItem; default;
-    procedure Add(ACmd: integer; const AName: string; const AKeys1, AKeys2: array of string);
+    procedure Add(ACmd: integer; const AName: string; const AKeys1, AKeys2: array of TShortcut; const ADescription: string='');
     procedure Delete(N: integer);
     procedure Assign(AKeymap: TATKeyMap);
     function IndexOf(ACmd: integer): integer;
@@ -68,11 +72,16 @@ type
     function GetCommandFromHotkeyString(const AHotkey: string; AComboSepar: char): integer;
   end;
 
+const
+  //macOS: instead of Ctrl use Command-key
+  scXControl = {$ifdef darwin} scMeta {$else} scCtrl {$endif};
+
 implementation
 
 uses
   Math,
-  LCLProc;
+  LCLProc,
+  ATStringProc_Separator;
 
 { TATKeymapItem }
 
@@ -82,6 +91,21 @@ begin
   Name:= AItem.Name;
   Keys1:= AItem.Keys1;
   Keys2:= AItem.Keys2;
+  Description:= AItem.Description;
+end;
+
+function TATKeymapItem.ShortenedKeys1: TATKeyArray;
+begin
+  Result:= Keys1;
+  Result.Data[1]:= 0;
+  Result.Data[2]:= 0;
+end;
+
+function TATKeymapItem.ShortenedKeys2: TATKeyArray;
+begin
+  Result:= Keys2;
+  Result.Data[1]:= 0;
+  Result.Data[2]:= 0;
 end;
 
 { TATKeyArray }
@@ -141,17 +165,9 @@ begin
   Result:= (N>=0) and (N<FList.Count);
 end;
 
-function _TextToShortcut(const S: string): TShortcut; inline;
-begin
-  Result:= TextToShortCut(S);
-  {$ifdef test_correct_keynames}
-  if Result=0 then
-    Showmessage('Incorrect key in keymap: "'+S+'"');
-  {$endif}
-end;
-
-procedure TATKeymap.Add(ACmd: integer; const AName: string; const AKeys1,
-  AKeys2: array of string);
+procedure TATKeyMap.Add(ACmd: integer; const AName: string;
+  const AKeys1, AKeys2: array of TShortcut;
+  const ADescription: string='');
 var
   Item: TATKeymapItem;
   i: integer;
@@ -159,15 +175,16 @@ begin
   Item:= TATKeymapItem.Create;
   Item.Command:= ACmd;
   Item.Name:= AName;
+  Item.Description:= ADescription;
 
   Item.Keys1.Clear;
   Item.Keys2.Clear;
 
-  for i:= 0 to Min(High(AKeys1), High(Item.Keys1.Data)) do
-    Item.Keys1.Data[i]:= _TextToShortcut(AKeys1[i]);
+  for i:= 0 to High(AKeys1) do
+    Item.Keys1.Data[i]:= AKeys1[i];
 
-  for i:= 0 to Min(High(AKeys2), High(Item.Keys2.Data)) do
-    Item.Keys2.Data[i]:= _TextToShortcut(AKeys2[i]);
+  for i:= 0 to High(AKeys2) do
+    Item.Keys2.Data[i]:= AKeys2[i];
 
   FList.Add(Item);
 end;
@@ -332,6 +349,40 @@ begin
         Result+= cNiceSeparator;
       Result+= ShortcutToText(Data[i]);
     end;
+end;
+
+function TATKeyArray.IsConflictWith(constref AOther: TATKeyArray): boolean;
+var
+  SelfLen, OtherLen: integer;
+begin
+  Result:= false;
+  SelfLen:= Self.Length;
+  OtherLen:= AOther.Length;
+  if OtherLen=0 then exit;
+
+  case SelfLen of
+    0:
+      exit;
+    1:
+      begin
+        //'Ctrl+K' conflicts with 'Ctrl+K' and with 'Ctrl+K * B'
+        Result:= Data[0]=AOther.Data[0];
+      end;
+    2, 3:
+      begin
+        if SelfLen=OtherLen then
+          Result:= Self=AOther
+        else
+        case OtherLen of
+          1:
+            //'Ctrl+K * B' conflicts with 'Ctrl+K'
+            Result:= Data[0]=AOther.Data[0];
+          else
+            Result:= (Data[0]=AOther.Data[0]) and
+                     (Data[1]=AOther.Data[1]);
+        end;
+      end;
+  end;
 end;
 
 procedure TATKeyArray.SetFromString(const AHotkey: string; AComboSepar: char);

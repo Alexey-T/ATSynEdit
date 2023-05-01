@@ -6,13 +6,16 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-  StdCtrls, ButtonPanel, Spin, ATSynEdit_Edits;
+  StdCtrls, ButtonPanel, Spin,
+  ATSynEdit,
+  ATSynEdit_Edits;
 
 type
   { TfmCombo }
 
   TfmCombo = class(TForm)
     ButtonPanel1: TButtonPanel;
+    chkRounded: TCheckBox;
     chkRO: TCheckBox;
     chkNumAllowNeg: TCheckBox;
     chkNumOnly: TCheckBox;
@@ -29,10 +32,12 @@ type
     procedure chkNumAllowNegChange(Sender: TObject);
     procedure chkNumOnlyChange(Sender: TObject);
     procedure chkROChange(Sender: TObject);
+    procedure chkRoundedChange(Sender: TObject);
     procedure edMaxLenChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
-    procedure ComboCommand(Sender: TObject; ACmd: integer; const AText: string; var AHandled: boolean);
+    procedure ComboCommand(Sender: TObject; ACmd: integer; AInvoke: TATEditorCommandInvoke;
+      const AText: string; var AHandled: boolean);
     { private declarations }
   public
     { public declarations }
@@ -62,6 +67,7 @@ begin
   ed.OnCommand:= @ComboCommand;
   //ed.Text:= 'combo';
   ed.OptTextHint:= '(empty)';
+  ed.Colors.ComboboxArrowBG:= clMoneyGreen;
 
   ed0:= TATEdit.Create(Self);
   ed0.Parent:= PanelEdit;
@@ -103,6 +109,14 @@ begin
   ed0.ModeReadOnly:= chkRO.Checked;
 end;
 
+procedure TfmCombo.chkRoundedChange(Sender: TObject);
+begin
+  ed.OptBorderRounded:= chkRounded.Checked;
+  ed0.OptBorderRounded:= chkRounded.Checked;
+  ed.Invalidate;
+  ed0.Invalidate;
+end;
+
 procedure TfmCombo.edMaxLenChange(Sender: TObject);
 begin
   ed.OptMaxLen:= edMaxLen.Value;
@@ -110,7 +124,7 @@ begin
 end;
 
 procedure TfmCombo.ComboCommand(Sender: TObject; ACmd: integer;
-  const AText: string; var AHandled: boolean);
+  AInvoke: TATEditorCommandInvoke; const AText: string; var AHandled: boolean);
 var
   s: string;
   n: integer;

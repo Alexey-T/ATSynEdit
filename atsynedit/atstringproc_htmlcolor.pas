@@ -23,15 +23,18 @@ type
     class function HexCodeToInt(ch: word): integer;
     class procedure SkipSpaces(const S: TStr; var N: integer);
     class procedure SkipComma(const S: TStr; var N: integer);
+    class procedure SkipCommaOrSlash(const S: TStr; var N: integer);
     class function SkipInt(const S: TStr; var N: integer): integer;
+    class function SkipIntMaybeInPercents(const S: TStr; var N: integer): integer;
     class function SkipIntWithPercent(const S: TStr; var N: integer): integer;
-    class function SkipFloat(const S: TStr; var N: integer): integer;
+    class function SkipFloat(const S: TStr; var N: integer;
+      CalcValue, SkipPercent: boolean; out Ok: boolean): double;
   public
     //convert TColor -> HTML color string #rrggbb
     class function ColorToHtmlString(Color: TColor): string;
     //convert string which starts with HTML color token #rgb, #rrggbb -> TColor, get len of color-string
     class function ParseTokenRGB(S: TPChar; out Len: integer; Default: TColor): TColor;
-    //parses 'rgb(10,20,30)' and rgba(10,20,30,0.5)
+    //parses 'rgb(10,20,30)' and 'rgba(10,20,30,0.5)'
     class function ParseFunctionRGB(const S: TStr; FromPos: integer; out LenOfColor: integer): TColor;
     //parses 'hsl(0,50%,100%)' and 'hsla(0,50%,100%,0.5)
     class function ParseFunctionHSL(const S: TStr; FromPos: integer; out LenOfColor: integer): TColor;
@@ -151,6 +154,15 @@ begin
         Result:= RGBToColor(N1, N2, N3);
       end;
   end;
+
+  //some chars after '#rrggbb' must break the parsing, e.g. for this case: "#add-some-value"
+  ch:= ord(S[Len]);
+  case ch of
+    ord('-'),
+    ord('+'),
+    ord('$'):
+      Result:= Default;
+  end;
 end;
 
 
@@ -163,6 +175,12 @@ end;
 class procedure TATHtmlColorParser.SkipComma(const S: TStr; var N: integer); inline;
 begin
   if S[N]=',' then
+    Inc(N);
+end;
+
+class procedure TATHtmlColorParser.SkipCommaOrSlash(const S: TStr; var N: integer); inline;
+begin
+  if (S[N]=',') or (S[N]='/') then
     Inc(N);
 end;
 
@@ -180,6 +198,18 @@ begin
   SkipSpaces(S, N);
 end;
 
+class function TATHtmlColorParser.SkipIntMaybeInPercents(const S: TStr; var N: integer): integer;
+begin
+  Result:= SkipInt(S, N);
+  if N>Length(S) then exit(-1);
+  if S[N]='%' then
+  begin
+    Inc(N);
+    Result:= Result*255 div 100;
+  end;
+  SkipSpaces(S, N);
+end;
+
 class function TATHtmlColorParser.SkipIntWithPercent(const S: TStr; var N: integer): integer;
 begin
   Result:= SkipInt(S, N);
@@ -191,16 +221,43 @@ begin
   SkipSpaces(S, N);
 end;
 
-class function TATHtmlColorParser.SkipFloat(const S: TStr; var N: integer): integer;
+
+class function TATHtmlColorParser.SkipFloat(const S: TStr; var N: integer;
+  CalcValue, SkipPercent: boolean; out Ok: boolean): double;
+var
+  Buf: string;
+  NEnd: integer;
 begin
-  Result:= -1;
+  Ok:= false;
+  Result:= 0.0;
   SkipSpaces(S, N);
-  while (N<=Length(S)) and (IsCodeDigit(ord(S[N])) or (S[N]='.')) do
+  NEnd:= N;
+
+  if S[NEnd]='-' then
+    Inc(NEnd);
+  while (NEnd<=Length(S)) and (IsCodeDigit(ord(S[NEnd])) or (S[NEnd]='.')) do
+    Inc(NEnd);
+
+  if CalcValue then
   begin
-    Inc(N);
-    Result:= 1; //ignore the value
-  end;
+    Buf:= Copy(S, N, NEnd-N);
+    if Buf='' then exit;
+    if Buf[1]='.' then
+      Insert('0', Buf, 1);
+    Ok:= TryStrToFloat(Buf, Result);
+  end
+  else
+    Ok:= true;
+
+  N:= NEnd;
   SkipSpaces(S, N);
+
+  if SkipPercent then
+    if S[N]='%' then
+    begin
+      Inc(N);
+      SkipSpaces(S, N);
+    end;
 end;
 
 
@@ -208,8 +265,9 @@ class function TATHtmlColorParser.ParseFunctionRGB(const S: TStr; FromPos: integ
 var
   NLen: integer;
 var
-  Val1, Val2, Val3, ValAlpha: integer;
-  bAlpha: boolean;
+  Val1, Val2, Val3: integer;
+  ValAlpha: double;
+  bAlpha, bOk: boolean;
   N: integer;
 begin
   Result:= clNone;
@@ -234,28 +292,33 @@ begin
   if S[N]<>'(' then exit;
   Inc(N);
 
-  Val1:= SkipInt(S, N);
+  Val1:= SkipIntMaybeInPercents(S, N);
   if Val1<0 then exit;
   if Val1>255 then exit;
   if N>NLen then exit;
   SkipComma(S, N);
 
-  Val2:= SkipInt(S, N);
+  Val2:= SkipIntMaybeInPercents(S, N);
   if Val2<0 then exit;
   if Val2>255 then exit;
   if N>NLen then exit;
   SkipComma(S, N);
 
-  Val3:= SkipInt(S, N);
+  Val3:= SkipIntMaybeInPercents(S, N);
   if Val3<0 then exit;
   if Val3>255 then exit;
   if N>NLen then exit;
+  SkipSpaces(S, N);
+
+  //allow 'alpha' part always
+  bAlpha:= (S[N]=',') or (S[N]='/');
   if bAlpha then
   begin
-    SkipComma(S, N);
-    ValAlpha:= SkipFloat(S, N);
+    SkipCommaOrSlash(S, N);
+    ValAlpha:= SkipFloat(S, N, false, true, bOk);
     if ValAlpha<0 then exit;
   end;
+
   if S[N]<>')' then exit;
 
   Result:= RGBToColor(byte(Val1), byte(Val2), byte(Val3));
@@ -264,10 +327,14 @@ end;
 
 
 class function TATHtmlColorParser.ParseFunctionHSL(const S: TStr; FromPos: integer; out LenOfColor: integer): TColor;
+const
+  cMaxDegrees=1500.0;
 var
   NLen: integer;
-  Val1, Val2, Val3, ValAlpha: integer;
-  bAlpha: boolean;
+  ValAngle: double;
+  Val2, Val3: integer;
+  ValAlpha: double;
+  bAlpha, bOk: boolean;
   N: integer;
 begin
   Result:= clNone;
@@ -292,32 +359,71 @@ begin
   if S[N]<>'(' then exit;
   Inc(N);
 
-  Val1:= SkipInt(S, N);
-  if Val1<0 then exit;
-  if Val1>360 then exit;
+  //H component
+  ValAngle:= SkipFloat(S, N, true, false, bOk);
+  if not bOk then exit;
   if N>NLen then exit;
+  if N+4<=NLen then
+  begin
+    if (S[N]='d') and (S[N+1]='e') and (S[N+2]='g') then
+    begin
+      Inc(N, 3);
+      if IsCodeWord(Ord(S[N])) then exit;
+    end
+    else
+    if (S[N]='r') and (S[N+1]='a') and (S[N+2]='d') then
+    begin
+      ValAngle:= ValAngle*(360.0/2/Pi);
+      Inc(N, 3);
+      if IsCodeWord(Ord(S[N])) then exit;
+    end
+    else
+    if (S[N]='g') and (S[N+1]='r') and (S[N+2]='a') and (S[N+3]='d') then
+    begin
+      ValAngle:= ValAngle*(360.0/400.0);
+      Inc(N, 4);
+      if IsCodeWord(Ord(S[N])) then exit;
+    end
+    else
+    if (S[N]='t') and (S[N+1]='u') and (S[N+2]='r') and (S[N+3]='n') then
+    begin
+      ValAngle:= ValAngle*360.0;
+      Inc(N, 4);
+      if IsCodeWord(Ord(S[N])) then exit;
+    end;
+  end;
+  if ValAngle>cMaxDegrees then exit;
+  if ValAngle<-cMaxDegrees then exit;
+  while ValAngle<0.0 do
+    ValAngle:= ValAngle+360.0;
+  while ValAngle>360.0 do
+    ValAngle:= ValAngle-360.0;
   SkipComma(S, N);
 
+  //S component
   Val2:= SkipIntWithPercent(S, N);
   if Val2<0 then exit;
   if Val2>100 then exit;
   if N>NLen then exit;
   SkipComma(S, N);
 
+  //L component
   Val3:= SkipIntWithPercent(S, N);
   if Val3<0 then exit;
   if Val3>100 then exit;
   if N>NLen then exit;
-  if bAlpha then
+
+  //Alpha
+  if bAlpha and (S[N]<>')') then
   begin
-    SkipComma(S, N);
-    ValAlpha:= SkipFloat(S, N);
+    SkipCommaOrSlash(S, N);
+    ValAlpha:= SkipFloat(S, N, false, true, bOk);
     if ValAlpha<0 then exit;
   end;
   if S[N]<>')' then exit;
 
   Result:= HLStoColor(
-    byte(Val1 * 255 div 360),
+    byte(Round(ValAngle*(255.0/360.0))),
     byte(Val3 * 255 div 100),
     byte(Val2 * 255 div 100)
     );

@@ -8,6 +8,7 @@ var
 begin
   Result:= false;
   if Stream.Size<Length(Sign)*cMinimalCountOfChars then Exit;
+  Buf:= '';
   SetLength(Buf, Length(Sign));
   Stream.Position:= 0;
   Stream.ReadBuffer(Buf[1], Length(Sign));
@@ -46,7 +47,7 @@ begin
 
   NSize:= BufSizeWords*2;
 
-  FillChar(Buf, SizeOf(Buf), 0);
+  FillChar(Buf{%H-}, SizeOf(Buf), 0);
   Stream.Position:= 0;
   Stream.Read(Buf, NSize);
   Stream.Position:= 0;
@@ -96,65 +97,169 @@ begin
   end;
 end;
 
-function DetectStreamEncodingByPythonId(Stream: TStream; var AEnc: TATFileEncoding; var AEncCodepage: TEncConvId): boolean;
-// https://docs.python.org/3/reference/lexical_analysis.html#encoding-declarations
+function FixEncodingNameByIANAStandart(const S: string): string;
+//correct some names according to this standard:
+// IANA Registered Character Sets
+// https://www.iana.org/assignments/character-sets/character-sets.xhtml
+begin
+  Result:= LowerCase(S);
+  Result:= StringReplace(Result, 'windows-', 'cp', []);
+  Result:= StringReplace(Result, 'ibm', 'cp', []);
+  Result:= StringReplace(Result, 'iso_', 'iso-', []);
+  Result:= StringReplace(Result, 'utf-8', 'utf8', []);
+  if (Result='us') or (Result='us-ascii') then //this maps to cp367 but Lazarus don't have it
+    Result:= 'cp437';
+end;
+
+function DetectStreamEncodingByXmlId(Stream: TStream; var AEnc: TATFileEncoding; var AEncCodepage: TEncConvId): boolean;
+//detect in XML files by signature <?xml version="1.0" encoding="ISO-8859-9"?>
 const
-  BufSize = 100;
-  cRegex = '^.+coding[=:]\s*([-\w.]+)';
-  cRegexGroup = 1;
+  cTagXML = '<?xml ';
+  cTagEnc = ' encoding="';
+var
+  Buf: array[0..70] of char;
+  TempEnc: TEncConvId;
+  S: string;
+  N: integer;
+begin
+  Result:= false;
+  FillChar(Buf{%H-}, SizeOf(Buf), 0);
+  Stream.Position:= 0;
+  N:= Stream.Read(Buf, SizeOf(Buf)-1);
+  Stream.Position:= 0;
+  if N<=20 then exit;
+
+  SetString(S, Buf, N);
+  SDeleteFrom(S, #10);
+  SDeleteFrom(S, #13);
+
+  N:= Pos(cTagXML, S);
+  if N=0 then exit;
+  N:= Pos(cTagEnc, S);
+  if N=0 then exit;
+  Delete(S, 1, N-1+Length(cTagEnc));
+  SDeleteFrom(S, '"');
+
+  S:= FixEncodingNameByIANAStandart(S);
+
+  TempEnc:= EncConvFindEncoding(S);
+  case TempEnc of
+    eidUTF8,
+    eidUTF8BOM:
+      begin
+        AEnc:= cEncUTF8;
+        Result:= true;
+      end;
+    eidUCS2LE,
+    eidUCS2BE:
+      exit;
+    else
+      begin
+        AEnc:= cEncAnsi;
+        AEncCodepage:= TempEnc;
+        Result:= true;
+      end;
+  end;
+end;
+
+function DetectStreamEncodingByPythonId(Stream: TStream; var AEnc: TATFileEncoding; var AEncCodepage: TEncConvId): boolean;
+{
+https://docs.python.org/3/reference/lexical_analysis.html#encoding-declarations
+The recommended forms of an encoding expression are
+
+# -*- coding: <encoding-name> -*-
+
+which is recognized also by GNU Emacs, and
+
+# vim:fileencoding=<encoding-name>
+
+which is recognized by VIM.
+}
+  //
+  function IsLineComment(const S: string): boolean;
+  begin
+    Result:=
+      SBeginsWith(S, '#') or
+      SBeginsWith(S, ';') or
+      SBeginsWith(S, '//') or
+      SBeginsWith(S, '--');
+  end;
+  //
+  function GetEnc(const S: string): string;
+  var
+    N, N0, Len: integer;
+  begin
+    Result:= '';
+    N:= Pos('coding', S);
+    if N=0 then exit;
+    Len:= Length(S);
+    if N+8>Len then exit;
+    Inc(N, 6);
+    if not (S[N] in ['=', ':']) then exit;
+    Inc(N);
+    while (N<=Len) and (S[N]=' ') do Inc(N);
+    N0:= N;
+    while (N<=Len) and (S[N] in ['a'..'z', 'A'..'Z', '0'..'9', '-']) do Inc(N);
+    Result:= Copy(S, N0, N-N0);
+
+    Result:= FixEncodingNameByIANAStandart(Result);
+  end;
+  //
+const
+  cBufSize = 100;
+  cLineCount = 2; //detect by first 2 lines, 2nd used if 1st is comment
 var
   Buf, SLine, SEncId: string;
   Sep: TATStringSeparator;
   i: integer;
 begin
   Result:= false;
-  Buf:= StringOfChar(' ', BufSize);
+  Buf:= StringOfChar(' ', cBufSize);
   Stream.Position:= 0;
-  Stream.Read(Buf[1], Length(Buf));
-  Sep.Init(Buf, #10); //don't support CR separator yet
+  i:= Stream.Read(Buf[1], Length(Buf));
+  SetLength(Buf, i);
+  Stream.Position:= 0;
 
-  //detect by first 2 lines, 2nd used if 1st is comment
-  for i:= 1 to 2 do
-    if Sep.GetItemStr(SLine) then
+  Buf:= StringReplace(Buf, #13#10, #10, [rfReplaceAll]);
+  Buf:= StringReplace(Buf, #13, #10, [rfReplaceAll]);
+  Sep.Init(Buf, #10);
+
+  for i:= 0 to cLineCount-1 do
+  begin
+    Sep.GetItemStr(SLine);
+    if SLine='' then exit;
+    if not IsLineComment(SLine) then exit;
+    SEncId:= LowerCase(GetEnc(SLine));
+    if SEncId<>'' then
     begin
-      if SLine='' then exit;
-
-      //support several line comments, not all
-      if
-        not SBeginsWith(SLine, '#') and
-        not SBeginsWith(SLine, ';') and
-        not SBeginsWith(SLine, '//') and
-        not SBeginsWith(SLine, '--') then exit;
-
-      SEncId:= SFindRegexMatch(SLine, cRegex, cRegexGroup, false, false, false);
-      if SEncId<>'' then
-      begin
-        AEncCodepage:= EncConvFindEncoding(SEncId);
-        case AEncCodepage of
-          eidUTF8,
-          eidUTF8BOM,
-          eidUCS2LE,
-          eidUCS2BE:
-            begin
-              AEnc:= cEncUTF8;
-              AEncCodepage:= eidUTF8;
-            end
-          else
-            AEnc:= cEncAnsi;
-        end;
-        Result:= true;
-        exit;
+      AEncCodepage:= EncConvFindEncoding(SEncId);
+      case AEncCodepage of
+        eidUTF8,
+        eidUTF8BOM,
+        eidUCS2LE,
+        eidUCS2BE:
+          begin
+            AEnc:= cEncUTF8;
+            AEncCodepage:= eidUTF8;
+          end
+        else
+          AEnc:= cEncAnsi;
       end;
+      Result:= true;
+      exit;
     end;
+  end;
 end;
 
 procedure DetectStreamEncoding(Stream: TStream;
   var Enc: TATFileEncoding;
   var EncCodepage: TEncConvId;
-  out SignLen: integer;
+  out SignLen: SizeInt;
   out EncWithBom: boolean;
   BufSizeUTF8: integer;
-  BufSizeUTF16: integer);
+  BufSizeUTF16: integer;
+  DetectByPythonSignature: boolean;
+  DetectByXmlSignature: boolean);
 var
   IsLE: boolean;
 begin
@@ -216,8 +321,13 @@ begin
         end;
     end;
 
-  if DetectStreamEncodingByPythonId(Stream, Enc, EncCodepage) then
-    Exit;
+  if DetectByPythonSignature then
+    if DetectStreamEncodingByPythonId(Stream, Enc, EncCodepage) then
+      Exit;
+
+  if DetectByXmlSignature then
+    if DetectStreamEncodingByXmlId(Stream, Enc, EncCodepage) then
+      Exit;
 
   if BufSizeUTF16>0 then
     if DetectStreamUtf16NoBom(Stream, BufSizeUTF16, IsLE) then
@@ -231,7 +341,7 @@ begin
 end;
 
 
-procedure TATStrings.LoadFromStrings(AList: TStrings; AEnds: TATLineEnds);
+procedure TATStrings.LoadFromStrings(AList: TStrings; AEnds: TATLineEnds; AllowBadCharsOfLen1: boolean);
 var
   i: integer;
 begin
@@ -244,7 +354,7 @@ begin
   end;
 
   for i:= 0 to AList.Count-1 do
-    LineAddRaw_NoUndo(AList[i], AEnds);
+    LineAddRaw_NoUndo(AList[i], AEnds, AllowBadCharsOfLen1);
 
   ActionAddFakeLineIfNeeded;
   Modified:= true;
@@ -283,7 +393,11 @@ begin
       try
         Encoding:= cEncUTF8;
         EncodingDetect:= false;
-        LoadFromStream(MS, true{AFromUTF8});
+        LoadFromStream(MS, [cLoadOpFromUTF8]);
+
+        //fixing CudaText issue #4172
+        if not SEndsWithEol(AText) then
+          ActionDeleteFakeLineAndFinalEol;
       finally
         Encoding:= EncOld;
         ActionAddFakeLineIfNeeded;
@@ -305,7 +419,7 @@ type
     cCharEnding13
     );
 
-function _GetBufferEnding(ABuffer: pointer; APos: integer; AEnc: TATFileEncoding): TATCharEnding; inline;
+function _GetBufferEnding(ABuffer: pointer; APos: SizeInt; AEnc: TATFileEncoding): TATCharEnding; inline;
 var
   p: PByte absolute ABuffer;
   Check: byte;
@@ -350,22 +464,29 @@ begin
 end;
 
 procedure TATStrings.DoLoadFromStream(Stream: TStream;
-  AFromUTF8: boolean; out AForcedToANSI: boolean);
+  AOptions: TATLoadStreamOptions; out AForcedToANSI: boolean);
 var
   Buf: PAnsiChar;
-  BufSize: int64;
-  CharSize: integer;
-  NSignatureLen: integer;
+  BufSize: Int64;
   NStreamSize: Int64;
+  CharSize: SizeInt;
+  NSignatureLen: SizeInt;
   //------
-  procedure _FindNextEol(AFromPos: integer;
-    out AFoundPos: integer;
+  procedure _FindNextEol(AFromPos: SizeInt;
+    out AFoundPos: SizeInt;
     out AEnding: TATLineEnds);
   begin
     AFoundPos:= AFromPos;
     AEnding:= cEndNone;
     repeat
       if AFoundPos>=BufSize then exit;
+
+      if (AFoundPos>0) and (AFoundPos mod TATEditorOptions.ProgressLoadChars = 0) then
+      begin
+        FProgressValue:= Int64(AFoundPos)*100 div NStreamSize;
+        if Assigned(FOnProgress) then
+          FOnProgress(Self);
+      end;
 
       case _GetBufferEnding(Buf, AFoundPos, FEncoding) of
         cCharNotEnding:
@@ -392,28 +513,42 @@ var
   //------
   procedure _LoadItems;
   var
-    Len, NStart, NEnd, NCounted: integer;
+    Len, NStart, NEnd: SizeInt;
+    //NPrevProgressPos: SizeInt;
     LineEnd: TATLineEnds;
     SA, SUtf8: string;
     SWide: UnicodeString;
     SQuad: UCS4String;
   begin
     NStart:= 0;
-    NCounted:= 0;
+    //NPrevProgressPos:= 0;
+
+    FProgressKind:= cStringsProgressLoading;
+    FProgressValue:= 0;
+
     repeat
       _FindNextEol(NStart, NEnd, LineEnd);
       Len:= NEnd-NStart;
+      if Len>=MaxInt-12 then
+        raise EEditorTooLongLine.Create('Too long line on reading: 0x'+IntToHex(Len));
+      {
+      if Count>=MaxInt-2 then
+        raise EEditorTooManyLines.Create('Too many lines');
+        }
 
+      {
       //call OnProgress each 1M chars
       //it's smooth enough progress, on 280Mb log, 10 seconds
-      if NStart-NCounted>cStringsProgressLoadChars then
+      //2022.01: not needed now, because we call OnProgress in _FindNextEol
+
+      if NStart-NPrevProgressPos>TATEditorOptions.ProgressLoadChars then
       begin
-        NCounted:= NStart;
-        FProgressKind:= cStringsProgressLoading;
+        NPrevProgressPos:= NStart;
         FProgressValue:= Int64(NStart)*100 div NStreamSize;
         if Assigned(FOnProgress) then
           FOnProgress(Self);
       end;
+      }
 
       if LineEnd=cEndWin then
         Inc(NEnd, CharSize*2)
@@ -421,7 +556,7 @@ var
         Inc(NEnd, CharSize);
 
       if Len=0 then
-        LineAddRaw_NoUndo('', LineEnd)
+        LineAddRaw_NoUndo('', LineEnd, false)
       else
       begin
         case FEncoding of
@@ -429,14 +564,14 @@ var
             begin
               SetString(SA, @Buf[NStart], Len);
               SUtf8:= EncConvertToUTF8(SA, FEncodingCodepage);
-              LineAddRaw_NoUndo(SUtf8, LineEnd);
+              LineAddRaw_NoUndo(SUtf8, LineEnd, cLoadOpAllowBadCharsOfLen1 in AOptions);
             end;
 
           cEncUTF8:
             begin
               //this now raises exception if UTF8 content is bad, it's needed
               SetString(SA, @Buf[NStart], Len);
-              LineAddRaw_NoUndo(SA, LineEnd);
+              LineAddRaw_NoUndo(SA, LineEnd, cLoadOpAllowBadCharsOfLen1 in AOptions);
             end;
 
           cEncWideLE,
@@ -453,7 +588,7 @@ var
           cEnc32LE,
           cEnc32BE:
             begin
-              SetLength(SQuad, Len div 4+1);
+              SetLength(SQuad{%H-}, Len div 4+1);
               Move(Buf[NStart], SQuad[0], Len);
               if FEncoding=cEnc32BE then
                 SSwapEndianUCS4(SQuad);
@@ -485,18 +620,21 @@ begin
   NStreamSize:= Stream.Size;
   NSignatureLen:= 0;
 
-  if AFromUTF8 then
+  if cLoadOpFromUTF8 in AOptions then
   begin
     //func param forces UTF8
     FEncoding:= cEncUTF8;
   end
   else
-  if NStreamSize>(cMaxFileSizeMbToDetectEncoding*1024*1024) then
+  if NStreamSize>ATEditorOptions.MaxFileSizeMbToDetectEncoding*1024*1024 then
   begin
     //detect encoding by signature, even for huge files
     DetectStreamEncoding(Stream, FEncoding, FEncodingCodepage, NSignatureLen, bWithBom,
-      0, //buffer sizes=0
-      0);
+      0, //buffer size=0
+      0, //buffer size=0
+      ATEditorOptions.DetectEncodingByPythonSignature,
+      ATEditorOptions.DetectEncodingByXmlSignature
+      );
     //no signature?
     //it's safe to set here UTF8 even for binary files, later contents will be checked
     if not bWithBom then
@@ -511,21 +649,29 @@ begin
     else
       FEncoding:= cEncAnsi;
     DetectStreamEncoding(Stream, FEncoding, FEncodingCodepage, NSignatureLen, bWithBom,
-      GlobalDetectUtf8BufferKb,
-      GlobalDetectUf16BufferWords);
+      ATEditorOptions.DetectUTF8BufferKb,
+      ATEditorOptions.DetectUTF16BufferWords,
+      ATEditorOptions.DetectEncodingByPythonSignature,
+      ATEditorOptions.DetectEncodingByXmlSignature
+      );
   end
   else
   begin
     //detect encoding only by signature
     DetectStreamEncoding(Stream, FEncoding, FEncodingCodepage, NSignatureLen, bWithBom,
       0, //buffer sizes=0
-      0);
+      0,
+      false,
+      false
+      );
   end;
 
   case FEncoding of
-    cEncUTF8: SaveSignUtf8:= bWithBom;
+    cEncUTF8:
+      SaveSignUtf8:= bWithBom;
     cEncWideBE,
-    cEncWideLE: SaveSignWide:= bWithBom;
+    cEncWideLE:
+      SaveSignWide:= bWithBom;
   end;
 
   CharSize:= cEncodingSize[FEncoding];
@@ -538,27 +684,23 @@ begin
     Stream.Position:= NSignatureLen;
     Stream.ReadBuffer(Buf^, BufSize);
 
-    (*
-    //check that we won't break file contents, it may be cp1252 file, so UTF8 loading will break chars to '?'
-    //this is now not needed, utf8 load error raises exception in ATStringItem.SetLine, ie in _LoadItems
-    if FEncoding=cEncUTF8 then
-      if IsBufferUtf8(Buf, BufSize, false)=u8sNo then
-      begin
-        AForcedToANSI:= true;
-        FEncoding:= cEncAnsi;
-        CharSize:= 1;
-      end;
-      *)
-
     try
       _LoadItems;
     except
-      //failed to load text as UTF8, so load again as ANSI
-      Clear; //clear loaded items
-      AForcedToANSI:= true;
-      FEncoding:= cEncAnsi;
-      CharSize:= 1;
-      _LoadItems;
+      on E: EEditorBadUTF8 do
+      begin
+        Clear;
+        //failed to load text as UTF8, so load again as ANSI
+        AForcedToANSI:= true;
+        FEncoding:= cEncAnsi;
+        CharSize:= 1;
+        _LoadItems;
+      end;
+      on E: EEditorTooLongLine do
+      begin
+        Clear;
+        raise;
+      end;
     end;
   finally
     FreeMem(Buf);
@@ -567,15 +709,18 @@ begin
   end;
 end;
 
-procedure TATStrings.LoadFromStream(Stream: TStream; AFromUTF8: boolean);
+procedure TATStrings.LoadFromStream(Stream: TStream; AOptions: TATLoadStreamOptions);
 begin
   ClearUndo(true);
-  DoLoadFromStream(Stream, AFromUTF8, FLoadingForcedANSI);
-  DoFinalizeLoading;
+  try
+    DoLoadFromStream(Stream, AOptions, FLoadingForcedANSI);
+  finally
+    DoFinalizeLoading;
+  end;
 end;
 
 
-procedure TATStrings.LoadFromFile(const AFilename: string);
+procedure TATStrings.LoadFromFile(const AFilename: string; AOptions: TATLoadStreamOptions);
 var
   fs: TFileStream;
   ms: TMemoryStream;
@@ -583,13 +728,13 @@ begin
   fs:= TFileStream.Create(AFilename, fmOpenRead or fmShareDenyNone);
   try
     if fs.Size>=0 then
-      LoadFromStream(fs)
+      LoadFromStream(fs, AOptions)
     else
     begin
       ms:= TMemoryStream.Create;
       try
         _ReadFileToStream(ms, AFilename);
-        LoadFromStream(ms);
+        LoadFromStream(ms, AOptions);
       finally
         FreeAndNil(ms);
       end;

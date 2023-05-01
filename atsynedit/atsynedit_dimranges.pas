@@ -11,7 +11,7 @@ interface
 uses
   Classes, SysUtils,
   ATSynEdit_Markers;
-  
+
 type
   { TATDimRanges }
 
@@ -33,13 +33,9 @@ end;
 procedure TATDimRanges.Add(ALineFrom, ALineTo: integer; ADimValue: integer);
 begin
   inherited Add(
-    0,
-    ALineFrom,
-    0,
-    0,
-    ALineTo-ALineFrom+1,
-    nil,
-    ADimValue
+    Point(0, ALineFrom),
+    Point(0, ALineTo-ALineFrom+1),
+    TATMarkerTags.Init(0, ADimValue)
     );
 end;
 
@@ -50,7 +46,7 @@ begin
   Result:= ADefValue;
   NIndex:= FindContaining(0, ALine);
   if IsIndexValid(NIndex) then
-    Result:= Items[NIndex].Value;
+    Result:= Items[NIndex].TagEx;
 end;
 
 

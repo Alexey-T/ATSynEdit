@@ -17,6 +17,7 @@ uses
   ec_SyntAnal,
   ec_syntax_format,
   ATSynEdit,
+  ATSynEdit_Globals,
   ATSynEdit_Adapter_EControl;
 
 type
@@ -66,6 +67,7 @@ type
     procedure edStyleTypeChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure FormShow(Sender: TObject);
     procedure ListStylesClick(Sender: TObject);
   private
     { private declarations }
@@ -117,6 +119,11 @@ procedure TfmLexerProp.FormDestroy(Sender: TObject);
 begin
   Adapter.AddEditor(nil);
   FreeAndNil(Adapter);
+end;
+
+procedure TfmLexerProp.FormShow(Sender: TObject);
+begin
+  edSample.DoEventChange(0);
 end;
 
 procedure TfmLexerProp.ListStylesClick(Sender: TObject);
@@ -227,8 +234,8 @@ begin
 
     F.edSample.Font.Name:= AFontName;
     F.edSample.Font.Size:= AFontSize;
-    F.edSample.Gutter[F.edSample.GutterBandBookmarks].Visible:= false;
-    F.edSample.Gutter[F.edSample.GutterBandNumbers].Visible:= false;
+    F.edSample.Gutter[F.edSample.Gutter.FindIndexByTag(ATEditorOptions.GutterTagBookmarks)].Visible:= false;
+    F.edSample.Gutter[F.edSample.Gutter.FindIndexByTag(ATEditorOptions.GutterTagNumbers)].Visible:= false;
     F.Adapter.Lexer:= an;
     if Assigned(an.SampleText) then
     begin

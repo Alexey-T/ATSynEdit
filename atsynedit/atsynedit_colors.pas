@@ -22,6 +22,9 @@ type
     FTextSelBG,
     FCaret,
     FMarkers,
+    FMacroRecordBorder,
+    FDragDropMarker,
+    FGitMarkerBG,
     FGutterFont,
     FGutterBG,
     FGutterCaretFont,
@@ -61,6 +64,7 @@ type
     FMarkedLinesBG,
     FBorderLine,
     FBorderLineFocused,
+    FBorderParentBG,
     FComboboxArrow,
     FComboboxArrowBG: TColor;
   published
@@ -72,6 +76,9 @@ type
     property TextSelBG: TColor read FTextSelBG write FTextSelBG;
     property Caret: TColor read FCaret write FCaret;
     property Markers: TColor read FMarkers write FMarkers;
+    property MacroRecordBorder: TColor read FMacroRecordBorder write FMacroRecordBorder;
+    property DragDropMarker: TColor read FDragDropMarker write FDragDropMarker;
+    property GitMarkerBG: TColor read FGitMarkerBG write FGitMarkerBG;
     property GutterFont: TColor read FGutterFont write FGutterFont;
     property GutterBG: TColor read FGutterBG write FGutterBG;
     property GutterCaretFont: TColor read FGutterCaretFont write FGutterCaretFont;
@@ -111,6 +118,7 @@ type
     property MarkedLinesBG: TColor read FMarkedLinesBG write FMarkedLinesBG;
     property BorderLine: TColor read FBorderLine write FBorderLine;
     property BorderLineFocused: TColor read FBorderLineFocused write FBorderLineFocused;
+    property BorderParentBG: TColor read FBorderParentBG write FBorderParentBG;
     property ComboboxArrow: TColor read FComboboxArrow write FComboboxArrow;
     property ComboboxArrowBG: TColor read FComboboxArrowBG write FComboboxArrowBG;
   end;
@@ -130,6 +138,9 @@ begin
   C.TextDisabledBG:= $f0f0f0;
   C.Caret:= clBlack;
   C.Markers:= $0000c0;
+  C.MacroRecordBorder:= C.Markers;
+  C.DragDropMarker:= C.Markers;
+  C.GitMarkerBG:= C.Markers;
   C.GutterFont:= clGray;
   C.GutterBG:= $e0e0e0;
   C.GutterCaretFont:= clGray;
@@ -169,6 +180,7 @@ begin
   C.MarkedLinesBG:= $f0e0b0;
   C.BorderLine:= clMedGray;
   C.BorderLineFocused:= clNavy;
+  C.BorderParentBG:= clWindow;
   C.ComboboxArrow:= clGray;
   C.ComboboxArrowBG:= $f0f0f0;
 end;

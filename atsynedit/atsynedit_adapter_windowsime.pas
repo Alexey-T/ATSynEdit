@@ -3,7 +3,7 @@ Windows IME support, tested with Korean/Chinese
 by https://github.com/rasberryrabbit
 refactored to separate unit by Alexey T.
 }
-unit ATSynEdit_Adapter_IME;
+unit ATSynEdit_Adapter_WindowsIME;
 
 interface
 
@@ -13,9 +13,9 @@ uses
   ATSynEdit_Adapters;
 
 type
-  { TATAdapterIMEStandard }
+  { TATAdapterWindowsIME }
 
-  TATAdapterIMEStandard = class(TATAdapterIME)
+  TATAdapterWindowsIME = class(TATAdapterIME)
   private
     FSelText: UnicodeString;
     position: Integer;
@@ -44,6 +44,7 @@ uses
   Classes,
   Controls,
   Graphics,
+  ATStringProc,
   ATSynEdit,
   ATSynEdit_Carets;
 
@@ -54,7 +55,7 @@ const
 function ImmGetCandidateWindow(imc: HIMC; par1: DWORD; lpCandidate: LPCANDIDATEFORM): LongBool; stdcall ; external 'imm32' name 'ImmGetCandidateWindow';
 
 
-procedure TATAdapterIMEStandard.Stop(Sender: TObject; Success: boolean);
+procedure TATAdapterWindowsIME.Stop(Sender: TObject; Success: boolean);
 var
   Ed: TATSynEdit;
   imc: HIMC;
@@ -71,7 +72,7 @@ begin
   end;
 end;
 
-procedure TATAdapterIMEStandard.CompFormPaint(Sender: TObject);
+procedure TATAdapterWindowsIME.CompFormPaint(Sender: TObject);
 var
   tm, cm: TSize;
   s: UnicodeString;
@@ -94,7 +95,7 @@ begin
   CompForm.Canvas.Line(cm.cx+1,0,cm.cx+1,cm.cy+2);
 end;
 
-procedure TATAdapterIMEStandard.UpdateWindowPos(Sender: TObject);
+procedure TATAdapterWindowsIME.UpdateWindowPos(Sender: TObject);
 var
   Ed: TATSynEdit;
   Caret: TATCaretItem;
@@ -143,10 +144,10 @@ begin
   end;
 end;
 
-procedure TATAdapterIMEStandard.UpdateCompForm(Sender: TObject);
+procedure TATAdapterWindowsIME.UpdateCompForm(Sender: TObject);
 var
   ed: TATSynEdit;
-  CompPos: TPoint;
+  CompPos: TATPoint;
   Caret: TATCaretItem;
 begin
   ed:=TATSynEdit(Sender);
@@ -174,7 +175,7 @@ begin
   CompForm.Invalidate;
 end;
 
-procedure TATAdapterIMEStandard.ImeRequest(Sender: TObject; var Msg: TMessage);
+procedure TATAdapterWindowsIME.ImeRequest(Sender: TObject; var Msg: TMessage);
 var
   Ed: TATSynEdit;
   Caret: TATCaretItem;
@@ -209,7 +210,7 @@ begin
   end;
 end;
 
-procedure TATAdapterIMEStandard.ImeNotify(Sender: TObject; var Msg: TMessage);
+procedure TATAdapterWindowsIME.ImeNotify(Sender: TObject; var Msg: TMessage);
 const
   IMN_OPENCANDIDATE_CH = 269;
 begin
@@ -221,7 +222,7 @@ begin
   //writeln(Format('ImeNotify %d',[Msg.WParam]));
 end;
 
-procedure TATAdapterIMEStandard.ImeStartComposition(Sender: TObject;
+procedure TATAdapterWindowsIME.ImeStartComposition(Sender: TObject;
   var Msg: TMessage);
 begin
   UpdateWindowPos(Sender);
@@ -229,7 +230,7 @@ begin
   Msg.Result:= -1;
 end;
 
-procedure TATAdapterIMEStandard.ImeComposition(Sender: TObject; var Msg: TMessage);
+procedure TATAdapterWindowsIME.ImeComposition(Sender: TObject; var Msg: TMessage);
 var
   Ed: TATSynEdit;
   IMC: HIMC;
@@ -318,7 +319,7 @@ begin
   Msg.Result:= -1;
 end;
 
-procedure TATAdapterIMEStandard.ImeEndComposition(Sender: TObject;
+procedure TATAdapterWindowsIME.ImeEndComposition(Sender: TObject;
   var Msg: TMessage);
 var
   Ed: TATSynEdit;

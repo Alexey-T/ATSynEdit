@@ -53,6 +53,14 @@ begin
   Result:= EqualRect(FSelRect, cRectEmpty);
 end;
 
+function TATSynEdit.IsSelColumn: boolean;
+//it also gives True if 'new kind' of column block is set,
+//which is activated by OptCaretsPrimitiveColumnSelection
+begin
+  Result:= not EqualRect(FSelRect, cRectEmpty) or
+    (FSelRectBegin.Y>=0);
+end;
+
 procedure TATSynEdit.DoSelect_CharGroupAtPos(P: TPoint; AddCaret, AllowOnlyWordChars: boolean);
 var
   XFrom, XTo: integer;
@@ -91,23 +99,20 @@ begin
   if AddCaret then
   begin
     Carets.Add(XTo, P.Y, XFrom, P.Y);
-    DoCaretsSort;
+    Carets.Sort;
   end
   else
     DoCaretSingle(XTo, P.Y, XFrom, P.Y);
 end;
 
-procedure TATSynEdit.DoSelect_CharRange(ACaretIndex: integer; Pnt: TPoint);
-begin
-  if not Carets.IsIndexValid(ACaretIndex) then Exit;
-  Carets[ACaretIndex].SelectToPoint(Pnt.X, Pnt.Y);
-end;
-
 procedure TATSynEdit.DoSelect_WordRange(ACaretIndex: integer; P1, P2: TPoint);
+var
+  St: TATStrings;
 begin
+  St:= Strings;
   if not Carets.IsIndexValid(ACaretIndex) then Exit;
-  if not Strings.IsIndexValid(P1.Y) then Exit;
-  if not Strings.IsIndexValid(P2.Y) then Exit;
+  if not St.IsIndexValid(P1.Y) then Exit;
+  if not St.IsIndexValid(P2.Y) then Exit;
 
   if not IsPosSorted(P1.X, P1.Y, P2.X, P2.Y, true) then
   begin
@@ -115,8 +120,8 @@ begin
     SwapInt(P1.Y, P2.Y);
   end;
 
-  P1.X:= SFindWordOffset(Strings.Lines[P1.Y], P1.X, cWordjumpToPrev, false, FOptNonWordChars);
-  P2.X:= SFindWordOffset(Strings.Lines[P2.Y], P2.X, cWordjumpToNext, false, FOptNonWordChars);
+  P1.X:= SFindWordOffset(St.Lines[P1.Y], P1.X, cWordjumpToPrevByMouse, false, FOptNonWordChars);
+  P2.X:= SFindWordOffset(St.Lines[P2.Y], P2.X, cWordjumpToNextByMouse, false, FOptNonWordChars);
 
   with Carets[ACaretIndex] do
   begin
@@ -206,11 +211,13 @@ end;
 
 procedure TATSynEdit.DoSelect_SplitSelectionToLines;
 var
+  St: TATStrings;
   NewCarets: TATCarets;
   X1, Y1, X2, Y2: integer;
   i, j, NLen: integer;
   Sel: boolean;
 begin
+  St:= Strings;
   NewCarets:= TATCarets.Create;
   try
     for i:= 0 to Carets.Count-1 do
@@ -229,7 +236,7 @@ begin
       end;
 
       //add first part
-      NLen:= Strings.LinesLen[Y1];
+      NLen:= St.LinesLen[Y1];
       if X1<NLen then
         NewCarets.Add(NLen, Y1, X1, Y1)
       else
@@ -238,7 +245,7 @@ begin
       //add middle parts
       for j:= Y1+1 to Y2-1 do
       begin
-        NLen:= Strings.LinesLen[j];
+        NLen:= St.LinesLen[j];
         if NLen=0 then
           NewCarets.Add(0, j)
         else
@@ -255,55 +262,184 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoSelect_ExtendSelectionByLine;
+procedure TATSynEdit.DoSelect_ExtendSelectionByLine(AUp: boolean);
+  //
+  procedure GetPosDown(Y: integer; out ResX, ResY: integer);
+  var
+    NLastLine: integer;
+    PosLast: TPoint;
+  begin
+    NLastLine:= Strings.Count-1;
+    if Y<NLastLine then
+    begin
+      ResX:= 0;
+      ResY:= Y+1;
+    end
+    else
+    begin
+      PosLast:= GetEndOfFilePos;
+      ResX:= PosLast.X;
+      ResY:= PosLast.Y;
+    end;
+  end;
+  //
 var
+  St: TATStrings;
+  Caret: TATCaretItem;
   NewCarets: TATCarets;
   X1, Y1, X2, Y2: integer;
-  i: integer;
-  Sel: boolean;
-  PosLast: TPoint;
+  NewX, NewY, EndX, EndY: integer;
+  bSel, bSelShrink, bWholeLinesSel: boolean;
+  iCaret: integer;
 begin
+  St:= Strings;
+
   NewCarets:= TATCarets.Create;
   try
-    for i:= 0 to Carets.Count-1 do
+    for iCaret:= 0 to Carets.Count-1 do
     begin
-      Carets[i].GetRange(X1, Y1, X2, Y2, Sel);
-      if not Sel then
-        begin X2:= X1; Y2:= Y1; end;
-
-      X1:= 0; //select entire 1st line
-      if Y2<Strings.Count-1 then
+      Caret:= Carets[iCaret];
+      Caret.GetRange(X1, Y1, X2, Y2, bSel);
+      if not bSel then
       begin
-        //select till start of next ln
-        X2:= 0;
-        Y2:= Y2+1;
+        X2:= X1;
+        Y2:= Y1;
+      end;
+
+      bSelShrink:= bSel and (Caret.IsForwardSelection=AUp);
+      bWholeLinesSel:= (X1=0) and ((X2=0) or (X2>=St.LinesLen[Y2]));
+
+      if bSelShrink then
+      begin
+        //not _whole_ line(s) selected? select whole line(s), and don't shrink/extend more
+        if not bWholeLinesSel then
+        begin
+          if not AUp then
+          begin
+            EndX:= 0;
+            EndY:= Y1;
+            GetPosDown(Y2, NewX, NewY);
+          end
+          else
+          begin
+            NewX:= 0;
+            NewY:= Y1;
+            if X2=0 then
+            begin
+              EndX:= 0;
+              EndY:= Y2;
+            end
+            else
+            begin
+              GetPosDown(Y2, EndX, EndY);
+            end;
+          end;
+        end
+        else
+        //shrink selection up
+        if AUp then
+        begin
+          EndX:= X1;
+          EndY:= Y1;
+          NewX:= X2;
+          NewY:= Max(0, Y2-1);
+        end
+        else
+        //shrink selection down
+        begin
+          if Y1=Y2 then
+            EndX:= 0
+          else
+            EndX:= X2;
+          EndY:= Y2;
+          GetPosDown(Y1, NewX, NewY);
+        end;
       end
       else
       begin
-        //select till eof
-        PosLast:= GetEndOfFilePos;
-        X2:= PosLast.X;
-        Y2:= PosLast.Y;
+        //no selection - select the whole line
+        if not bSel then
+        begin
+          if not AUp then
+          begin
+            EndX:= 0;
+            EndY:= Y1;
+            GetPosDown(Y2, NewX, NewY);
+          end
+          else
+          begin
+            EndX:= 0;
+            EndY:= Y2;
+            NewX:= 0;
+            NewY:= Max(0, Y1-1);
+          end;
+        end
+        else
+        //extend selection up
+        if AUp then
+        begin
+          EndX:= X2;
+          EndY:= Y2;
+          if Y2<St.Count-1 then
+            EndX:= 0;
+          NewX:= 0;
+          NewY:= Y1;
+          if (NewY>0) and (X1=0) then
+            Dec(NewY);
+        end
+        else
+        //extend selection down
+        begin
+          EndX:= 0;
+          EndY:= Y1;
+          GetPosDown(Y2, NewX, NewY);
+        end;
       end;
 
-      NewCarets.Add(X2, Y2, X1, Y1);
+      if (EndX=NewX) and (EndY=NewY) then
+      begin
+        EndX:= -1;
+        EndY:= -1;
+      end;
+      NewCarets.Add(NewX, NewY, EndX, EndY);
     end;
 
     DoCaretsAssign(NewCarets);
+    Carets.Sort;
   finally
     FreeAndNil(NewCarets);
   end;
 end;
 
 procedure TATSynEdit.DoSelect_LineRange(ALineFrom: integer; APosTo: TPoint);
+var
+  NEndX, NEndY: integer;
 begin
   if APosTo.Y<ALineFrom then
   begin
+    if Strings.IsIndexValid(ALineFrom+1) then
+    begin
+      if FOptMouseClickNumberSelectsLineWithEOL then
+      begin
+        NEndX:= 0;
+        NEndY:= ALineFrom+1;
+      end
+      else
+      begin
+        NEndX:= Strings.LinesLen[ALineFrom];
+        NEndY:= ALineFrom;
+      end;
+    end
+    else
+    begin
+      NEndX:= Strings.LinesLen[ALineFrom];
+      NEndY:= ALineFrom;
+    end;
     DoCaretSingle(
       APosTo.X,
       APosTo.Y,
-      0,
-      ALineFrom+1
+      NEndX,
+      NEndY
       );
   end
   else
@@ -317,7 +453,7 @@ begin
       );
   end
   else
-  if APosTo.Y=ALineFrom then
+  //if APosTo.Y=ALineFrom then
   begin
     DoSelect_Line(APosTo);
   end;
@@ -344,10 +480,10 @@ end;
 
 procedure TATSynEdit.DoSelect_ColumnBlock_Primitive(P1, P2: TPoint);
 var
-  Coord1, Coord2: TPoint;
+  Coord1, Coord2: TATPoint;
   LineCoord1, LineCoord2: TPoint;
   Details: TATEditorPosDetails;
-  Y, YMin, YMax: integer;
+  Y, YMin, YMax: Int64;
 begin
   Coord1:= CaretPosToClientPos(P1);
   Coord2:= CaretPosToClientPos(P2);
@@ -359,8 +495,8 @@ begin
 
   Y:= YMin+1;
   repeat
-    LineCoord1:= ClientPosToCaretPos(Point(Coord1.X, Y), Details);
-    LineCoord2:= ClientPosToCaretPos(Point(Coord2.X, Y), Details);
+    LineCoord1:= ClientPosToCaretPos(ATPoint(Coord1.X, Y), Details);
+    LineCoord2:= ClientPosToCaretPos(ATPoint(Coord2.X, Y), Details);
     if (LineCoord1.Y>=0) and (LineCoord2.Y>=0) then
       Carets.Add(LineCoord2.X, LineCoord2.Y, LineCoord1.X, LineCoord1.Y);
     Inc(Y, FCharSize.Y);
@@ -459,26 +595,28 @@ end;
 
 procedure TATSynEdit.DoSelectionDeleteColumnBlock;
 var
+  St: TATStrings;
   X1, X2, i: Integer;
   Str, StrNew: atString;
 begin
   if IsSelRectEmpty then exit;
 
-  Strings.BeginUndoGroup;
+  St:= Strings;
+  St.BeginUndoGroup;
   try
     for i:= FSelRect.Top to FSelRect.Bottom do
     begin
-      Str:= Strings.Lines[i];
-      X1:= Strings.ColumnPosToCharPos(i, FSelRect.Left, FTabHelper);
-      X2:= Strings.ColumnPosToCharPos(i, FSelRect.Right, FTabHelper);
+      Str:= St.Lines[i];
+      X1:= St.ColumnPosToCharPos(i, FSelRect.Left, FTabHelper);
+      X2:= St.ColumnPosToCharPos(i, FSelRect.Right, FTabHelper);
 
       StrNew:= Str;
       Delete(StrNew, X1+1, X2-X1);
       if StrNew<>Str then
-        Strings.Lines[i]:= StrNew;
+        St.Lines[i]:= StrNew;
     end;
   finally
-    Strings.EndUndoGroup;
+    St.EndUndoGroup;
   end;
 
   DoSelect_None;
@@ -547,7 +685,7 @@ end;
 
 procedure TATSynEdit.DebugSelRect;
 begin
-  Application.MainForm.Caption:= Format('selrect %d:%d-%d:%d, begin %d:%d, end %d:%d', [
+  Application.MainForm.Caption:= Format('SelRect %d:%d-%d:%d, SelRectBegin %d:%d, SelRectEnd %d:%d', [
     FSelRect.Left,
     FSelRect.Top,
     FSelRect.Right,

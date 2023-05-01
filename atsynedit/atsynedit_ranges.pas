@@ -46,10 +46,12 @@ type
   TATSynRanges = class
   private
     FList: TATSynRangeList;
+    FListPersist: TATSynRangeList; //for BackupPersistentRanges/RestorePersistentRanges
     FLineIndexer: array of array of integer;
     FHasTagPersist: boolean;
     FHasStaples: boolean;
-    procedure AddToLineIndexer(ALine1, ALine2, AIndex: integer); inline;
+    procedure AddToLineIndexer(ALine1, ALine2, AIndex: integer);
+    procedure AdjustLineIndexerForInsertion(ARangeIndex: integer);
     function GetItems(Index: integer): TATSynRange;
     procedure SetItems(Index: integer; const AValue: TATSynRange);
     //function MessageTextForIndexList(const L: TATIntArray): string;
@@ -62,6 +64,9 @@ type
     function IsRangesTouch(N1, N2: integer): boolean;
     function Add(AX, AY, AY2: integer; AWithStaple: boolean; const AHint: string;
       const ATag: Int64=0): TATSynRange;
+    function AddSorted(AX, AY, AY2: integer; AWithStaple: boolean;
+      const AHint: string; const ATag: Int64;
+      out AItemIndex: integer): TATSynRange;
     function Insert(AIndex: integer; AX, AY, AY2: integer; AWithStaple: boolean;
       const AHint: string; const ATag: Int64=0): TATSynRange;
     procedure Clear;
@@ -69,6 +74,8 @@ type
     procedure Delete(AIndex: integer);
     procedure DeleteAllByTag(const ATag: Int64);
     procedure DeleteAllExceptTag(const ATag: Int64);
+    procedure BackupPersistentRanges;
+    procedure RestorePersistentRanges;
     property Items[Index: integer]: TATSynRange read GetItems write SetItems; default;
     function ItemPtr(AIndex: integer): PATSynRange;
     function IsRangeInsideOther(R1, R2: PATSynRange): boolean;
@@ -78,7 +85,7 @@ type
     function FindRangesWithAnyOfLines(ALineFrom, ALineTo: integer): TATIntArray;
     function FindRangesWithStaples(ALineFrom, ALineTo: integer): TATIntArray;
     function FindDeepestRangeContainingLine_Old(ALine: integer; const AIndexes: TATIntArray): integer;
-    function FindDeepestRangeContainingLine(ALine: integer; AWithStaple: boolean): integer;
+    function FindDeepestRangeContainingLine(ALine: integer; AWithStaple: boolean; AMinimalRangeHeight: integer): integer;
     function FindRangeWithPlusAtLine(ALine: integer): integer;
     function FindRangeWithPlusAtLine_ViaIndexer(ALine: integer): integer;
     function FindRangeLevel(AIndex: integer): integer;
@@ -133,8 +140,9 @@ begin
 end;
 
 function TATSynRange.IsSimple: boolean; inline;
+//ranges of only 2 lines are needed sometimes, e.g. in FindInFiles lexer
 begin
-  Result:= Y=Y2;
+  Result:= Y2-Y < 1;
 end;
 
 function TATSynRange.IsLineInside(ALine: integer): boolean; inline;
@@ -188,9 +196,9 @@ begin
   if not ASetLenOnly then
     {
     for i:= High(FLineIndexer) downto 0 do
-      SetLength(FLineIndexer[i], 0);
+      FLineIndexer[i]:= nil;
     }
-    SetLength(FLineIndexer, 0); //it frees old memory? seems yes
+    FLineIndexer:= nil;
 
   SetLength(FLineIndexer, ALineCount);
 end;
@@ -199,13 +207,16 @@ constructor TATSynRanges.Create;
 begin
   FList:= TATSynRangeList.Create;
   FList.Capacity:= 2*1024;
+  FListPersist:= TATSynRangeList.Create;
   FHasTagPersist:= false;
   FHasStaples:= false;
 end;
 
 destructor TATSynRanges.Destroy;
 begin
+  FListPersist.Clear;
   Clear;
+  FreeAndNil(FListPersist);
   FreeAndNil(FList);
   inherited;
 end;
@@ -235,6 +246,43 @@ begin
   AddToLineIndexer(AY, AY2, NIndex);
 end;
 
+function TATSynRanges.AddSorted(AX, AY, AY2: integer; AWithStaple: boolean;
+  const AHint: string;
+  const ATag: Int64;
+  out AItemIndex: integer): TATSynRange;
+var
+  Item: PATSynRange;
+  i: integer;
+begin
+  AItemIndex:= -1;
+  Result.Init(AX, AY, AY2, AWithStaple, AHint, ATag);
+
+  for i:= 0 to Count-1 do
+  begin
+    Item:= ItemPtr(i);
+    if Item^.Y>=AY then
+    begin
+      AItemIndex:= i;
+      Break;
+    end;
+  end;
+
+  if AItemIndex>=0 then
+  begin
+    FList.Insert(AItemIndex, Result);
+    AdjustLineIndexerForInsertion(AItemIndex);
+  end
+  else
+    AItemIndex:= FList.Add(Result);
+
+  if ATag=cTagPersistentFoldRange then
+    FHasTagPersist:= true;
+  if AWithStaple then
+    FHasStaples:= true;
+
+  AddToLineIndexer(AY, AY2, AItemIndex);
+end;
+
 procedure TATSynRanges.AddToLineIndexer(ALine1, ALine2, AIndex: integer);
 var
   NItemLen, i: integer;
@@ -247,6 +295,16 @@ begin
         SetLength(FLineIndexer[i], NItemLen+1);
         FLineIndexer[i][NItemLen]:= AIndex;
       end;
+end;
+
+procedure TATSynRanges.AdjustLineIndexerForInsertion(ARangeIndex: integer);
+var
+  i, j: integer;
+begin
+  for i:= 0 to High(FLineIndexer) do
+    for j:= 0 to High(FLineIndexer[i]) do
+      if FLineIndexer[i][j]>=ARangeIndex then
+        Inc(FLineIndexer[i][j]);
 end;
 
 function TATSynRanges.Insert(AIndex: integer; AX, AY, AY2: integer;
@@ -306,6 +364,48 @@ begin
     FHasTagPersist:= false;
 
   UpdateLineIndexer;
+end;
+
+procedure TATSynRanges.BackupPersistentRanges;
+var
+  Item: PATSynRange;
+  i: integer;
+begin
+  FListPersist.Clear;
+
+  for i:= 0 to Count-1 do
+  begin
+    Item:= ItemPtr(i);
+    if Item^.Tag=cTagPersistentFoldRange then
+      FListPersist.Add(Item^);
+  end;
+end;
+
+procedure TATSynRanges.RestorePersistentRanges;
+var
+  ItemFrom: PATSynRange;
+  NItemIndex, i: integer;
+begin
+  for i:= 0 to FListPersist.Count-1 do
+  begin
+    ItemFrom:= FListPersist.ItemPtr(i);
+    AddSorted(
+      ItemFrom^.X,
+      ItemFrom^.Y,
+      ItemFrom^.Y2,
+      ItemFrom^.Staple,
+      ItemFrom^.Hint,
+      ItemFrom^.Tag,
+      NItemIndex
+      );
+    ItemPtr(NItemIndex)^.Folded:= ItemFrom^.Folded;
+
+    FHasTagPersist:= true;
+    if ItemFrom^.Staple then
+      FHasStaples:= true;
+  end;
+
+  FListPersist.Clear;
 end;
 
 function TATSynRanges.ItemPtr(AIndex: integer): PATSynRange;
@@ -523,12 +623,13 @@ begin
   end;
 end;
 
-function TATSynRanges.FindDeepestRangeContainingLine(ALine: integer; AWithStaple: boolean): integer;
+function TATSynRanges.FindDeepestRangeContainingLine(ALine: integer; AWithStaple: boolean; AMinimalRangeHeight: integer): integer;
 var
   NItemLen, NRange, iItem: integer;
   Ptr: PATSynRange;
 begin
   Result:= -1;
+  if ALine<0 then exit;
   if ALine>High(FLineIndexer) then exit;
 
   NItemLen:= Length(FLineIndexer[ALine]);
@@ -537,10 +638,18 @@ begin
     NRange:= FLineIndexer[ALine][iItem];
     if not IsIndexValid(NRange) then Continue;
     Ptr:= ItemPtr(NRange);
+
     if Ptr^.IsSimple then
       Continue;
+
     if AWithStaple and not Ptr^.Staple then
       Continue;
+
+    //skip small ranges, but don't skip _folded_ ranges; CudaText issue #4159
+    if not Ptr^.Folded then
+      if Ptr^.Y2-Ptr^.Y<AMinimalRangeHeight then
+        Continue;
+
     exit(NRange);
   end;
 end;
@@ -566,7 +675,7 @@ begin
 end;
 
 function TATSynRanges.FindRangeWithPlusAtLine(ALine: integer): integer;
-// issue https://github.com/Alexey-T/CudaText/issues/2566
+// CudaText issue #2566
 // because of this, we must skip all one-line ranges
 var
   a, b, m, dif, NCount: integer;

@@ -1,3 +1,167 @@
+2023.04.13
+* change: renamed OptMinimapTooltipLinesCount to OptMinimapTooltipHeight
++ add: OptMinimapTooltipFontSize (0: use main font size)
+
+2023.04.06
++ add: OptTabSmart (works like "Smart tab" option in Lazarus IDE)
+
+2023.04.04
+* change: changed declaration of TATKeyMap.Add, to use integer key values like scCtrl+scShift+VK_D
+
+2023.03.27
+* change: rename option to ATEditorOptions.PunctuationToWrapWithWords
++ add: ATEditorOptions.RenderSpaceBgAtLineEOL
++ add: ATEditorOptions.RenderSpaceBgAtLineEOL_WidthOnEmpty
+
+2023.03.13
++ add: OptUnprintedForceTabs
+
+2023.03.07
+* change: signature of OnClickGutter
+
+2023.02.28
++ add: event OnChangeCaretLine
+
+2023.02.22
++ add: Finder option OptPreserveCase (mimics VSCode similar option)
+
+2023.02.12
+* change: signature of OnDrawRuler
++ add: OptRulerText: LF-separated lines, only count of lines is considered in core, but painting must be done via OnDrawRuler
++ add: OptMouseClickNumberSelectsFoldedRange
++ add: OptMouse2ClickOnFoldMarkSelectsFoldedLines
+
+2023.01.10
+* change: function to export HTML was renamed and has added parameters
+* change: method DoCalcLineHiliteEx has param AWithSelection
++ add: method Update has param AUpdateTempSel 
+
+2022.11.14
+* change: removed func RectMicromapMark
+
+2022.10.13
++ add: OnCommandKeyEnter
+
+2022.09.29
++ add: ATEditorOptions.AutoCopyToClipboard
++ add: ATEditorOptions.AutoCopyToPrimarySel
++ add: ATEditorOptions.AutoCopyMaxTextSize (default 500k)
+
+2022.09.28
++ add: OnPaint
++ add: OnCalcCaretsCoords
+
+2022.09.17
+* change: ATEditorOptions.FlickerReducingPause replaced with TATSynEdit.OptFlickerReducingPause
+
+2022.09.09
+* change: changed signature of TATMarkers.Add to make it more readable
++ add: prop UndoForMarkers, UndoForAttribs
+
+2022.08.24
+* change: renamed Decor property Text to TextAll; added Decor read-only props TextCaption, TextHint; TextAll now contains caption+chr(1)+hint
+
+2022.07.17
+- fix/optimization: rendering with 100k+ 'markers' was very slow
+- fix/optimization: during mass replacement, OnCaret must not activate
+- fix/optimization: "Inverse bookmarks" was very slow in 100k+ lines documents
+- fix/optimization: DeleteByTag of 10k+ gutter-decor items was very slow
+
+2022.06.12
+* change: changed Strings.ListUpdatesHard to inverse option Strings.EnableCachedWrapInfoUpdate
+
+2022.05.27
+* deleted prop OptHighlightGitConflicts
+
+2022.05.16
++ add: ATEditorOptions.MinimapColoringTime (15 msec)
+
+2022.05.09
++ add: support for proportional fonts, it's auto enabled when editor finds that TextWidth('N')>TextWidth('.')
+
+2022.04.10
++ add: ATEditorOptions.DetectEncodingByPythonId (on)
++ add: ATEditorOptions.DetectEncodingByXmlId (on)
+
+2022.04.04
+* change: gutter bands are addressed by FindIndexByTag(ATag) now, added members ATEditorOptions.GutterTagNNNN
+* change: removed GutterBandNNNN props
+
+2022.03.22
++ add: ATEditorOptions.UseGlobalCharSizer
+
+2022.03.07
++ add: command "clipboard: paste and indent" (mimics Sublime Text)
+
+2022.01.31
++ add: Colors members: MacroRecordBorder, DragDropMarker, GitMarkerBG (before, Markers member was used instead)
+
+2022.01.19
++ add: OptUnprintedSpacesAlsoInSelection
+* change: delete OptWrapMode enum value cWrapAtMargin, because it worked the same as cWrapAtWindowOrMargin
+
+2022.01.16
++ add: middle-button-click with Ctrl: add/remove caret (like Sublime Text)
++ add: middle-button-drag with Ctrl: make column selection (like Sublime Text)
+* change: rename prop MouseMap to MouseActions
+
+2022.01.06
+* change: move many global constants/vars to global var ATEditorOptions
++ add: init bitmap/cursor resources only on demand; add ATEditorBitmaps global var
+
+2022.01.01
++ add: OptFoldIconForMinimalRangeHeight
+
+2021.11.21
++ add: TATCaretShape has new prop RenderCharAbove
+* change: moved all global options to record ATEditorOptions in atsynedit_options unit
+
+2021.11.02
++ add: prop OptBorderRounded; and Colors.BorderParentBG
+
+2021.10.23
++ add: prop OptCaretProximityVert
+
+2021.10.19
++ add: prop OptShowFoldedMarkWithSelectionBG
+
+2021.10.15
++ add: prop OptShowDragDropMarkerWidth
+
+2021.10.11
+* change: new prop OptPasteWithEolAtLineStart, which is set to True
+
+2021.10.04
++ add: prop ModeMacroRecording (uses Colors.Markers)
++ add: prop OptBorderWidthMacro
+
+2021.09.21
++ add: 3 commands "cancel carets, but keep ...."
+
+2021.09.05
++ add: OptMicromapOnScrollbar (app must paint the micromap by itself, in OnDraw* event of its vertical scrollbar)
+
+2021.08.16
+* move to 'public': OptTextOffsetLeft, OptTextOffsetTop
+* rename OptCharSpacingY to OptSpacingY
+* delete OptTextOffsetFromLine
+
+2021.08.09
++ add: CommandLog object (made for new CudaText API)
+
+2021.07.27
++ add: OptFoldCacheEnabled (default True): reduces flickering of folding-bar on fast editing
+
+2021.07.21
++ add: special value OptEditorFlickerReducingPause>=1000 makes special anti-flickering
++ add: OnChangeZoom
+
+2021.07.19
++ add: prop OptShowCurLineIfWithoutSel
++ add: Colors.TextSelFont can now be clNone to keep font-colors
+
+2021.07.08
++ add: prop OptHighlightGitConflicts
 
 2021.06.06
 + add: Gaps now can contain not only Bitmaps but also Forms

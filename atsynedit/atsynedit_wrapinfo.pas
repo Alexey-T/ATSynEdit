@@ -25,6 +25,7 @@ type
 type
   { TATWrapItem }
 
+  PATWrapItem = ^TATWrapItem;
   TATWrapItem = packed record
     NLineIndex: integer;
     NCharIndex: integer;
@@ -33,6 +34,7 @@ type
     NFinal: TATWrapItemFinal;
     bInitial: boolean;
     procedure Init(ALineIndex, ACharIndex, ALength, AIndent: integer; AFinal: TATWrapItemFinal; AInitial: boolean); inline;
+    function ContainsPos(AX, AY: integer): boolean;
     class operator=(const A, B: TATWrapItem): boolean;
   end;
 
@@ -53,13 +55,15 @@ type
   public
     VisibleColumns: integer;
     WrapColumn: integer;
+    EditorIndex: integer;
     constructor Create; virtual;
     destructor Destroy; override;
     procedure Clear;
     property StringsObj: TATStrings read FStrings write FStrings;
     property VirtualMode: boolean read FVirtualMode write SetVirtualMode;
     function Count: integer; inline;
-    function IsIndexValid(N: integer): boolean; inline;
+    function IsIndexValid(AIndex: integer): boolean; inline;
+    function IsIndexUniqueForLine(AIndex: integer): boolean;
     property Data[N: integer]: TATWrapItem read GetData; default;
     procedure Add(const AData: TATWrapItem);
     procedure Delete(N: integer);
@@ -89,6 +93,16 @@ begin
   bInitial:= AInitial;
 end;
 
+function TATWrapItem.ContainsPos(AX, AY: integer): boolean;
+begin
+  Result:= false;
+  if AY<>NLineIndex then exit;
+  if AX<NCharIndex-1 then exit;
+  if NFinal<>cWrapItemFinal then
+    if AX>=NCharIndex-1+NLength then exit;
+  Result:= true;
+end;
+
 class operator TATWrapItem.=(const A, B: TATWrapItem): boolean;
 begin
   Result:= false;
@@ -99,13 +113,18 @@ end;
 function TATWrapInfo.GetData(AIndex: integer): TATWrapItem;
 begin
   if FVirtualMode then
-    Result.Init(AIndex, 1, FStrings.LinesLen[AIndex], 0, cWrapItemFinal, true)
+  begin
+    if FStrings.IsIndexValid(AIndex) then
+      Result.Init(AIndex, 1, FStrings.LinesLen[AIndex], 0, cWrapItemFinal, true)
+    else
+      Result:= Default(TATWrapItem);
+  end
   else
   begin
-    if AIndex>=0 then
+    if (AIndex>=0) and (AIndex<FList.Count) then
       Result:= FList[AIndex]
     else
-      FillChar(Result, SizeOf(Result), 0);
+      Result:= Default(TATWrapItem);
   end;
 end;
 
@@ -123,12 +142,11 @@ begin
 end;
 
 function TATWrapInfo.IsLineFolded(ALine: integer): boolean;
-const
-  FEditorIndex = 0;
 begin
-  Result:= false;
-  if not StringsObj.IsIndexValid(ALine) then exit;
-  Result:= StringsObj.LinesHidden[ALine, FEditorIndex];
+  if StringsObj.IsIndexValid(ALine) then
+    Result:= StringsObj.LinesHidden[ALine, EditorIndex]
+  else
+    Result:= false;
 end;
 
 constructor TATWrapInfo.Create;
@@ -157,9 +175,23 @@ begin
     Result:= FList.Count;
 end;
 
-function TATWrapInfo.IsIndexValid(N: integer): boolean; inline;
+function TATWrapInfo.IsIndexValid(AIndex: integer): boolean; inline;
 begin
-  Result:= (N>=0) and (N<Count);
+  Result:= (AIndex>=0) and (AIndex<Count);
+end;
+
+function TATWrapInfo.IsIndexUniqueForLine(AIndex: integer): boolean;
+var
+  NLineIndex: integer;
+begin
+  if FVirtualMode then
+    Exit(true);
+  NLineIndex:= FList._GetItemPtr(AIndex)^.NLineIndex;
+  if (AIndex>0) and (FList._GetItemPtr(AIndex-1)^.NLineIndex=NLineIndex) then
+    Exit(false);
+  if (AIndex<FList.Count-1) and (FList._GetItemPtr(AIndex+1)^.NLineIndex=NLineIndex) then
+    Exit(false);
+  Result:= true;
 end;
 
 procedure TATWrapInfo.Add(const AData: TATWrapItem); inline;
@@ -187,6 +219,13 @@ procedure TATWrapInfo.FindIndexesOfLineNumber(ALineNum: integer; out AFrom, ATo:
 var
   a, b, m, dif: integer;
 begin
+  if FVirtualMode then
+  begin
+    AFrom:= ALineNum;
+    ATo:= ALineNum;
+    Exit;
+  end;
+
   AFrom:= -1;
   ATo:= -1;
 
@@ -199,7 +238,7 @@ begin
     if a>b then exit;
     m:= (a+b+1) div 2;
 
-    dif:= Data[m].NLineIndex-ALineNum;
+    dif:= FList._GetItemPtr(m)^.NLineIndex-ALineNum;
     if dif=0 then
       Break;
     if dif>0 then
@@ -210,8 +249,10 @@ begin
 
   AFrom:= m;
   ATo:= m;
-  while (AFrom>0) and (Data[AFrom-1].NLineIndex=ALineNum) do Dec(AFrom);
-  while (ATo<Count-1) and (Data[ATo+1].NLineIndex=ALineNum) do Inc(ATo);
+  while (AFrom>0) and (FList._GetItemPtr(AFrom-1)^.NLineIndex=ALineNum) do
+    Dec(AFrom);
+  while (ATo<Count-1) and (FList._GetItemPtr(ATo+1)^.NLineIndex=ALineNum) do
+    Inc(ATo);
 end;
 
 function TATWrapInfo.FindIndexOfCaretPos(APos: TPoint): integer;

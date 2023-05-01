@@ -28,6 +28,8 @@ type
     FontName: string;
     FontSize: integer;
     FontReset: boolean;
+    FFontProportional: boolean;
+    FTabSize: integer;
     SizeAvg: integer;
     FPanel: TPanel;
     FOwner: TComponent;
@@ -37,26 +39,15 @@ type
   public
     constructor Create(AOwner: TComponent);
     destructor Destroy; override;
-    procedure Init(const AFontName: string; AFontSize: integer);
+    procedure Init(const AFontName: string; AFontSize: integer; ATabSize: integer; AFontProportional: boolean);
     function GetCharWidth(ch: WideChar): integer;
+    function GetSpaceWidth: integer;
     //function GetStrWidth(const S: WideString): integer;
   end;
 
 var
-  GlobalCharSizer: TATCharSizer = nil;
   //must be created after MainForm is inited, e.g. in TATSynEdit.Create
-
-var
-  OptCharSizeProportional: boolean = true;
-  OptCharScaleFullWidth: word = 190; //width of fullsize chars (CJK and others) in percents
-
-const
-  OptCharScaleHex_Small = 300; //width of hex show: "xNN"
-  OptCharScaleHex_Big = 500; //width of hex show: "xNNNN"
-
-var
-  OptUnprintedReplaceSpec: boolean = false;
-  OptUnprintedReplaceSpecToCode: integer = 164; //char 164 is small circle
+  GlobalCharSizer: TATCharSizer = nil;
 
 function IsCharAsciiControl(ch: WideChar): boolean; inline;
 function IsCharAccent(ch: WideChar): boolean; inline;
@@ -69,6 +60,7 @@ function IsStringWithUnusualWidthChars(const S: UnicodeString): boolean;
 implementation
 
 uses
+  ATSynEdit_Globals,
   ATSynEdit_CharSizeArray;
 
 function IsCharAsciiControl(ch: WideChar): boolean; inline;
@@ -78,17 +70,17 @@ end;
 
 function IsCharHexDisplayed(ch: WideChar): boolean;
 begin
-  Result:= FixedSizes[Ord(ch)]=_hexshow;
+  Result:= FixedSizes[Ord(ch)]=uw_hexshow;
 end;
 
 function IsCharAccent(ch: WideChar): boolean;
 begin
-  Result:= FixedSizes[Ord(ch)]=_comb;
+  Result:= FixedSizes[Ord(ch)]=uw_combined;
 end;
 
 function IsCharUnicodeSpace(ch: WideChar): boolean;
 begin
-  Result:= FixedSizes[Ord(ch)]=_space;
+  Result:= FixedSizes[Ord(ch)]=uw_space;
 end;
 
 function IsCharUnusualWidth(ch: WideChar): boolean;
@@ -98,7 +90,7 @@ begin
     exit(true);
 
   case FixedSizes[Ord(ch)] of
-    _norm, _space:
+    uw_normal, uw_space:
       Result:= false
     else
       Result:= true;
@@ -115,7 +107,7 @@ begin
   Result:= false;
 end;
 
-{$ifdef windows}
+{$IF Defined(LCLWin32)}
 function _WidestrWidth(C: TCanvas; S: WideChar): integer; inline;
 var
   Size: TSize;
@@ -134,16 +126,21 @@ end;
 
 { TATCharSizer }
 
-procedure TATCharSizer.Init(const AFontName: string; AFontSize: integer);
+procedure TATCharSizer.Init(const AFontName: string; AFontSize: integer;
+  ATabSize: integer; AFontProportional: boolean);
 begin
-  if (FontName<>AFontName) or (FontSize<>AFontSize) then
+  if (FontName<>AFontName) or
+    (FontSize<>AFontSize) or
+    (FFontProportional<>AFontProportional) then
   begin
     FontReset:= true;
-    FontName:= AFontName;
-    FontSize:= AFontSize;
     FillChar(Sizes, SizeOf(Sizes), 0);
   end;
+  FontName:= AFontName;
+  FontSize:= AFontSize;
   SizeAvg:= 0;
+  FTabSize:= ATabSize;
+  FFontProportional:= AFontProportional;
 end;
 
 function TATCharSizer.GetCharWidth_FromCache(ch: WideChar): integer;
@@ -154,7 +151,7 @@ begin
     InitPanel;
 
     if SizeAvg=0 then
-      SizeAvg:= _WidestrWidth(FPanel.Canvas, 'N');
+      SizeAvg:= _WidestrWidth(FPanel.Canvas, ATEditorOptions.SampleChar);
 
     Result:= _WidestrWidth(FPanel.Canvas, ch) * 100 div SizeAvg;
     Sizes[Ord(ch)]:= Math.Min(255, Result div SaveScale);
@@ -164,6 +161,7 @@ end;
 constructor TATCharSizer.Create(AOwner: TComponent);
 begin
   FOwner:= AOwner;
+  FTabSize:= 8;
 end;
 
 procedure TATCharSizer.InitPanel;
@@ -196,43 +194,83 @@ begin
   inherited;
 end;
 
+function TATCharSizer.GetSpaceWidth: integer;
+begin
+  Result:= GetCharWidth_FromCache(' ');
+end;
+
 function TATCharSizer.GetCharWidth(ch: WideChar): integer;
+const
+  CharScaleHex_Small = 300; //width of 'xNN'
+  CharScaleHex_Big = 500; //width of 'xNNNN'
+  CharScale_Combined = 100;
 var
   n: word absolute ch;
 begin
   Result:= 100;
 
+  if FFontProportional then
+  begin
+    case FixedSizes[n] of
+      uw_normal,
+      uw_fullwidth,
+      uw_space:
+        begin
+          if ch=#9 then
+            exit(GetSpaceWidth*FTabSize)
+          else
+            exit(GetCharWidth_FromCache(ch));
+        end;
+      uw_combined:
+        exit(CharScale_Combined);
+      uw_hexshow:
+        begin
+          if n<$100 then
+            exit(CharScaleHex_Small)
+          else
+            exit(CharScaleHex_Big);
+        end;
+     end;
+  end
+  else
   case FixedSizes[n] of
-    _norm: exit;
-    _full: exit(OptCharScaleFullWidth);
-    _space: exit;
-    _comb: exit(0);
-    _hexshow:
+    uw_normal:
+      exit;
+    uw_fullwidth:
+      exit(ATEditorOptions.CharScaleFullWidth);
+    uw_space:
+      exit;
+    uw_combined:
+      exit(CharScale_Combined);
+    uw_hexshow:
       begin
         if n<$100 then
-          exit(OptCharScaleHex_Small)
+          exit(CharScaleHex_Small)
         else
-          exit(OptCharScaleHex_Big);
+          exit(CharScaleHex_Big);
       end;
   end;
 
-  if OptUnprintedReplaceSpec and IsCharAsciiControl(ch) then
+  if ATEditorOptions.UnprintedReplaceSpec and IsCharAsciiControl(ch) then
     exit;
 
   if IsCharHexDisplayed(ch) then
   begin
     if n<$100 then
-      exit(OptCharScaleHex_Small)
+      exit(CharScaleHex_Small)
     else
-      exit(OptCharScaleHex_Big);
+      exit(CharScaleHex_Big);
   end;
 
-  if OptCharSizeProportional then
+  if FFontProportional then
+    exit(GetCharWidth_FromCache(ch));
+
+  if ATEditorOptions.CharSizeProportional then
     if n>=128 then
       exit(GetCharWidth_FromCache(ch));
 
   //for other codes, use full-width size
-  Result:= OptCharScaleFullWidth;
+  Result:= ATEditorOptions.CharScaleFullWidth;
 end;
 
 {
@@ -248,4 +286,3 @@ finalization
     FreeAndNil(GlobalCharSizer);
 
 end.
-

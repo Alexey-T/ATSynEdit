@@ -2,7 +2,7 @@
 
 function TATSynEdit.DoCalcLineHiliteEx(ALineIndex: integer;
   var AParts: TATLineParts;
-  AColorBG: TColor; out AColorAfter: TColor): boolean;
+  AColorBG: TColor; out AColorAfter: TColor; AWithSelection: boolean): boolean;
 const
   cMaxCharsInLine = 50*1024;
 var
@@ -20,17 +20,25 @@ begin
   if Data.NLength=0 then exit;
 
   AColorAfter:= AColorBG;
-  DoCalcLineHilite(Data, AParts, 0, cMaxCharsInLine,
-    AColorBG, false, AColorAfter, true);
+  DoCalcLineHilite(
+    Data,
+    AParts,
+    0,
+    cMaxCharsInLine,
+    AColorBG,
+    false,
+    AColorAfter,
+    true,
+    AWithSelection);
 end;
 
 
 procedure TATSynEdit.DoCalcLineHilite(const AData: TATWrapItem;
-  out AParts: TATLineParts;
+  var AParts: TATLineParts;
   ACharsSkipped, ACharsMax: integer;
   AColorBG: TColor; AColorForced: boolean;
   var AColorAfter: TColor;
-  AMainText: boolean);
+  AMainText: boolean; AWithSelection: boolean=true);
 var
   nMaxOffset, nCharIndex, nLineIndex, nLineLen: integer;
   bEnableHilite: boolean;
@@ -39,27 +47,43 @@ begin
   nLineIndex:= AData.NLineIndex;
   nLineLen:= AData.NLength;
   nCharIndex:= AData.NCharIndex+ACharsSkipped;
-  bEnableHilite:= Strings.LinesLen[nLineIndex]<=FOptMaxLineLenToTokenize;
+
+  ///the following line gives problems with huge lines (len>10K) in HTML, CudaText issue #3694
+  //bEnableHilite:= St.LinesLen[nLineIndex]<=FOptMaxLineLenToTokenize;
+  bEnableHilite:= true;
 
   FillChar(AParts, SizeOf(AParts), 0);
   if nLineLen=0 then exit;
 
-  //1) get hilites from adapter
-  if bEnableHilite then
-  if Assigned(FAdapterHilite) then
-  begin
-    FAdapterHilite.OnEditorCalcHilite(Self, AParts,
-      nLineIndex,
-      nCharIndex,
-      nLineLen,
-      AColorAfter,
-      AMainText);
-  end;
+  (*
+  if FHighlightGitConflicts then
+    if (nLineLen>=7{Git marker len}) then
+      if St.IsIndexValid(nLineIndex) and
+        (St.LinesGitMarker[nLineIndex]<>cGitMarkNone) then
+      begin
+        bEnableHilite:= false; //avoid normal highlighting for this line
+        AParts[0].Len:= nLineLen;
+        AParts[0].Offset:= 0;
+        AParts[0].ColorBG:= Colors.GitMarkerBG;
+        AParts[0].ColorFont:= Colors.TextBG;
+      end;
+      *)
 
-  //2) get hilites from OnCalcHilite
   if bEnableHilite then
-  if Assigned(FOnCalcHilite) then
-    FOnCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfter);
+  begin
+    //1) get highlight from adapter
+    if Assigned(FAdapterHilite) then
+      FAdapterHilite.OnEditorCalcHilite(Self, AParts,
+        nLineIndex,
+        nCharIndex,
+        nLineLen,
+        AColorAfter,
+        AMainText);
+
+    //2) get highlight from OnCalcHilite
+    if Assigned(FOnCalcHilite) then
+      FOnCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfter);
+  end;
 
   DoPartSetColorBG(AParts, AColorBG, AColorForced);
   if AColorForced then
@@ -70,93 +94,126 @@ begin
   if AMainText then
     DoPartCalc_ApplyAttribsOver(AParts, nMaxOffset, nLineIndex, nCharIndex-1, AColorBG);
 
-  //CreateNew makes parts for selection and fills empty AParts with these parts.
-  //ApplyOver makes parts for selection and inserts these one-by-one over ready AParts
-  //calculated before (in adapter or OnCalc event).
-  //Maybe possible to always use ApplyOver but it's slower so i made CreateNew for
-  //faster render w/out adapter
+  //_CreateNew makes parts for selection and fills empty AParts with these parts.
+  //_ApplySelectionOver makes parts for selection and inserts these one-by-one over ready AParts
+  //calculated before (in adapter or OnCalcHilite event).
+  //Maybe it's possible to always use _ApplySelectionOver, but it's slower so I made _CreateNew
+  //for faster rendering w/out adapter.
   if (AParts[0].Len>0) then
   begin
-    if TempSel_IsLineWithSelection(nLineIndex) then
+    if AWithSelection and TempSel_IsLineWithSelection(nLineIndex) then
       DoPartCalc_ApplySelectionOver(AParts, nMaxOffset, nLineIndex, nCharIndex-1);
   end
   else
   begin
     //this must work w/o adapter, it makes simple long part in AParts
-    DoPartCalc_CreateNew(AParts, nMaxOffset, nLineIndex, nCharIndex-1, AColorBG);
+    DoPartCalc_CreateNew(AParts, nMaxOffset, nLineIndex, nCharIndex-1, AColorBG, AWithSelection);
   end;
 end;
 
 procedure TATSynEdit.DoPartCalc_CreateNew(var AParts: TATLineParts;
-  AOffsetMax, ALineIndex, ACharIndex: integer; AColorBG: TColor);
+  AOffsetMax, ALineIndex, ACharIndex: integer; AColorBG: TColor; AWithSelection: boolean);
 var
+  St: TATStrings;
   bSel, bSelPrev, bAdd: boolean;
-  nPart, nOffset, nLen, nIndex, i: integer;
-  ch: WideChar;
+  bWord, bWordPrev: boolean;
+  nPartIndex, nPartOffset, nPartLen, nCharOffset, nCharInLine: integer;
+  SLine: atString;
+const
+  //fix sub-pixel trembling of text after selection, visible on Qt5 and Cocoa.
+  //we split long line to words => only one word (touched by selection edge) is trembling.
+  bFixFontTrembling = {$if defined(LCLQt) or defined(LCLQt5) or defined(LCLQt6) or defined(LCLCocoa)} true {$else} false {$endif};
 begin
-  if not TempSel_IsLineWithSelection(ALineIndex) then
+  St:= Strings;
+  if not AWithSelection or
+    (TempSel_IsRangeSelected(ACharIndex, ALineIndex, ACharIndex+AOffsetMax, ALineIndex)=cRangeAllUnselected) then
   begin
-    nOffset:= 0;
-    nLen:= Min(Strings.LinesLen[ALineIndex], AOffsetMax);
-    nPart:= 0;
+    nPartOffset:= 0;
+    nPartLen:= Min(St.LinesLen[ALineIndex], AOffsetMax);
+    nPartIndex:= 0;
 
     //split leading tab-chars to separate part
     //this is much needed for gtk2, which paints ExtTextOut with Dx much slower
     repeat
-      if nLen=0 then Break;
-      ch:= Strings.LineCharAt(ALineIndex, ACharIndex+nOffset+1);
-      if ch<>#9 then Break;
+      if nPartLen=0 then Break;
+      if St.LineCharAt(ALineIndex, ACharIndex+nPartOffset+1)<>#9 then Break;
       AParts[0].Offset:= 0;
       Inc(AParts[0].Len);
       AParts[0].ColorFont:= FColorFont;
       AParts[0].ColorBG:= AColorBG;
-      Inc(nOffset);
-      Dec(nLen);
-      nPart:= 1;
+      Inc(nPartOffset);
+      Dec(nPartLen);
+      nPartIndex:= 1;
     until false;
 
-    AParts[nPart].Offset:= nOffset;
-    AParts[nPart].Len:= nLen;
-    AParts[nPart].ColorFont:= FColorFont;
-    AParts[nPart].ColorBG:= AColorBG;
+    AParts[nPartIndex].Offset:= nPartOffset;
+    AParts[nPartIndex].Len:= nPartLen;
+    AParts[nPartIndex].ColorFont:= FColorFont;
+    AParts[nPartIndex].ColorBG:= AColorBG;
     exit;
   end;
 
   bSel:= false;
   bSelPrev:= false;
-  nIndex:= -1;
+  bWord:= false;
+  bWordPrev:= false;
+  nPartIndex:= -1;
 
-  for i:= 0 to AOffsetMax do
+  if bFixFontTrembling then
+    SLine:= St.Lines[ALineIndex]
+  else
+    SLine:= '';
+
+  for nCharOffset:= 0 to AOffsetMax do
   begin
-    bSel:= IsPosSelected(ACharIndex+i, ALineIndex);
+    bSel:= IsPosSelected(ACharIndex+nCharOffset, ALineIndex);
 
-    if nIndex<0 then
+    if bFixFontTrembling then
+    begin
+      nCharInLine:= ACharIndex+nCharOffset+1;
+      if nCharInLine<=Length(SLine) then
+        bWord:= IsCharWord(SLine[nCharInLine]);
+    end;
+
+    if nPartIndex<0 then
       bAdd:= true
     else
-      bAdd:= bSel<>bSelPrev;
+      bAdd:= (bSel<>bSelPrev) or (bWord<>bWordPrev);
     bSelPrev:= bSel;
+    bWordPrev:= bWord;
 
     if not bAdd then
     begin
-      Inc(AParts[nIndex].Len);
+      Inc(AParts[nPartIndex].Len);
     end
     else
     begin
-      Inc(nIndex);
-      if nIndex>=High(AParts) then Break;
-      with AParts[nIndex] do
+      Inc(nPartIndex);
+      if nPartIndex>=High(AParts) then Break;
+      with AParts[nPartIndex] do
       begin
-        Offset:= i;
+        Offset:= nCharOffset;
         Len:= 1;
         if bSel then
         begin
-          ColorFont:= FColors.TextSelFont;//random($ffff);
+          if FColors.TextSelFont<>clNone then
+            ColorFont:= FColors.TextSelFont
+          else
+            ColorFont:= FColors.TextFont;
           ColorBG:= FColors.TextSelBG;
         end
         else
         begin
-          ColorFont:= FColorFont;//random($ffff);
+          ColorFont:= FColorFont;
           ColorBG:= AColorBG;
+          {
+          //debug
+          ColorFont:= Random($ffff);
+          if bWord then
+            ColorBG:= clYellow
+          else
+            ColorBg:= clGray;
+          }
         end;
       end;
     end;
@@ -182,7 +239,8 @@ begin
         Break
       else
       begin
-        AParts[i].ColorFont:= Colors.TextSelFont;
+        if Colors.TextSelFont<>clNone then
+          AParts[i].ColorFont:= Colors.TextSelFont;
         AParts[i].ColorBG:= Colors.TextSelBG;
       end;
     exit;
@@ -209,7 +267,8 @@ begin
     case IsRangeSelected(nRangeX1, ALineIndex, nRangeX2, ALineIndex) of
       cRangeAllSelected:
         begin
-          AParts[i].ColorFont:= Part.ColorFont;
+          if Part.ColorFont<>clNone then
+            AParts[i].ColorFont:= Part.ColorFont;
           AParts[i].ColorBG:= Part.ColorBG; //clGreen
         end;
       cRangePartlySelected:
@@ -275,9 +334,11 @@ procedure TATSynEdit.DoCalcLineEntireColor(ALine: integer;
   out AColor: TColor; out AColorForced: boolean;
   AHiliteLineWithSelection: boolean);
 var
+  St: TATStrings;
   NIndex, BmKind: integer;
 begin
   AColor:= clNone;
+  St:= Strings;
 
   if AUseColorOfCurrentLine then
     AColor:= Colors.CurrentLineBG
@@ -286,20 +347,20 @@ begin
     AColor:= Colors.CurrentLineBG
   else
   begin
-    NIndex:= Strings.Bookmarks.Find(ALine);
+    NIndex:= St.Bookmarks.Find(ALine);
     if NIndex>=0 then
     begin
-      BmKind:= Strings.Bookmarks[NIndex]^.Data.Kind;
+      BmKind:= St.Bookmarks[NIndex]^.Data.Kind;
       AColor:= Colors.BookmarkBG;
       if Assigned(FOnCalcBookmarkColor) then
         FOnCalcBookmarkColor(Self, BmKind, AColor);
     end
     else
     begin
-      NIndex:= Strings.Bookmarks2.Find(ALine);
+      NIndex:= St.Bookmarks2.Find(ALine);
       if NIndex>=0 then
       begin
-        BmKind:= Strings.Bookmarks2[NIndex]^.Data.Kind;
+        BmKind:= St.Bookmarks2[NIndex]^.Data.Kind;
         AColor:= Colors.BookmarkBG;
         if Assigned(FOnCalcBookmarkColor) then
           FOnCalcBookmarkColor(Self, BmKind, AColor);
@@ -324,7 +385,6 @@ procedure TATSynEdit.DoPartCalc_ApplyAttribsOver(var AParts: TATLineParts;
 var
   Attr: TATMarkerItem;
   Part: TATLinePart;
-  PartObj: TATLinePartClass;
   nAttrIndex, nOffset, i: integer;
   bExact: boolean;
 begin
@@ -343,36 +403,32 @@ begin
     if Attr.PosY<ALineIndex then Continue;
     if Attr.PosY>ALineIndex then Break;
 
-    PartObj:= TATLinePartClass(Attr.Ptr);
-    if Assigned(PartObj) then
-      begin
-        //must check offset, for part of wrapped line
-        nOffset:= Attr.PosX-ACharIndex;
-        if (nOffset>=AOffsetMax) then Continue;
-        if (nOffset+Attr.SelX<=0) then Continue;
+    //must check offset, for part of wrapped line
+    nOffset:= Attr.PosX-ACharIndex;
+    if (nOffset>=AOffsetMax) then Continue;
+    if (nOffset+Attr.SelX<=0) then Continue;
 
-        //fix part visible partly, because of horz scroll
-        if (nOffset<0) then
-        begin
-          Inc(Attr.SelX, nOffset);
-          nOffset:= 0;
-        end;
+    //fix part visible partly, because of horz scroll
+    if (nOffset<0) then
+    begin
+      Inc(Attr.SelX, nOffset);
+      nOffset:= 0;
+    end;
 
-        //empty parts? init part for whole line, for DoPartInsert to work
-        if AParts[0].Len=0 then
-        begin
-          AParts[0].Offset:= 0;
-          AParts[0].Len:= AOffsetMax;
-          AParts[0].ColorBG:= AColorBG;
-          AParts[0].ColorFont:= FColorFont;
-        end;
+    //empty parts? init part for whole line, for DoPartInsert to work
+    if AParts[0].Len=0 then
+    begin
+      AParts[0].Offset:= 0;
+      AParts[0].Len:= AOffsetMax;
+      AParts[0].ColorBG:= AColorBG;
+      AParts[0].ColorFont:= FColorFont;
+    end;
 
-        Part:= PartObj.Data;
-        Part.Len:= Attr.SelX;
-        Part.Offset:= nOffset;
-        //note: don't change Part.ColorBG here
-        DoPartInsert(AParts, Part, false);
-      end;
+    Part:= Attr.LinePart;
+    Part.Len:= Attr.SelX;
+    Part.Offset:= nOffset;
+    //note: don't change Part.ColorBG here
+    DoPartInsert(AParts, Part, false);
   end;
 end;
 

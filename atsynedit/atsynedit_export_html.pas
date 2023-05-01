@@ -9,214 +9,231 @@ unit ATSynEdit_Export_HTML;
 interface
 
 uses
-  Classes, SysUtils, Graphics, StrUtils,
-  ATSynEdit,
-  ATSynEdit_LineParts,
-  ATStringProc_HtmlColor;
+  Classes, SysUtils, Graphics,
+  ATSynEdit;
 
-procedure DoEditorExportToHTML(Ed: TATSynEdit;
-  const AFilename, APageTitle, AFontName: string;
-  AFontSize: integer; AWithNumbers: boolean;
+procedure EditorExportToHTML(Ed: TATSynEdit;
+  AOutput: TStringList;
+  APosBegin, APosEnd: TPoint;
+  const APageTitle: string;
+  const AFontName: string;
+  AFontSize: integer;
+  AWithNumbers: boolean;
   AColorBg, AColorNumbers: TColor);
 
 implementation
 
+uses
+  Math,
+  StrUtils,
+  ATStrings,
+  ATSynEdit_LineParts,
+  ATStringProc_HtmlColor;
 
-procedure DoCssStyle(AColorFont, AColorBg, AColorFontDef, AColorBgDef: TColor;
-  out StyleName, StyleText: string);
+function EditorIsEmpty(Ed: TATSynEdit): boolean;
 var
-  NameF, TextF, NameBg, TextBg: string;
+  Str: TATStrings;
 begin
-  if AColorFont<>AColorFontDef then
-  begin
-    NameF:= TATHtmlColorParserA.ColorToHtmlString(AColorFont);
-    TextF:= 'color: '+NameF+'; ';
-    Delete(NameF, 1, 1);
-  end
-  else
-  begin
-    NameF:= '';
-    TextF:= '';
-  end;
-
-  if AColorBg<>AColorBgDef then
-  begin
-    NameBg:= TATHtmlColorParserA.ColorToHtmlString(AColorBg);
-    TextBg:= 'background: '+NameBg+'; ';
-    Delete(NameBg, 1, 1);
-  end
-  else
-  begin
-    NameBg:= '';
-    TextBg:= '';
-  end;
-
-  StyleName:= '_'+NameF;
-  if NameBg<>'' then
-    StyleName+= '_'+NameBg;
-  StyleText:= '    .'+StyleName+' {'+TextF+TextBg+'}';
+  Str:= Ed.Strings;
+  Result:=
+    (Str.Count=0) or ((Str.Count=1) and (Str.LinesLen[0]=0));
 end;
-
 
 function _IsSpaces(const S: string): boolean;
 var
   i: integer;
 begin
   for i:= 1 to Length(S) do
-    if S[i]<>' ' then exit(false);
+    if (S[i]<>' ') and (S[i]<>#9) then
+      exit(false);
   Result:= true;
 end;
 
-
-procedure _AddPreToStrings(L: TStringList);
+procedure _AddPreToStrings(L: TStringList; const Attrs: string);
 begin
-  if L.Count=0 then exit;
-  L[0]:= '<pre><code>'+L[0];
-  L[L.Count-1]:= L[L.Count-1]+'</code></pre>';
+  if L.Count>0 then
+  begin
+    L[0]:= '<pre><code '+Attrs+'>'+L[0];
+    L[L.Count-1]:= L[L.Count-1]+'</code></pre>';
+  end;
 end;
 
-procedure EscapeSpecChars(var S: string); inline;
+procedure _EscapeSpecChars(var S: string);
 begin
   S:= StringReplace(S, '&', '&amp;', [rfReplaceAll]);
   S:= StringReplace(S, '<', '&lt;', [rfReplaceAll]);
   S:= StringReplace(S, '>', '&gt;', [rfReplaceAll]);
 end;
 
-procedure DoEditorExportToHTML(Ed: TATSynEdit; const AFilename, APageTitle,
-  AFontName: string; AFontSize: integer; AWithNumbers: boolean; AColorBg,
-  AColorNumbers: TColor);
+procedure EditorExportToHTML(Ed: TATSynEdit;
+  AOutput: TStringList;
+  APosBegin, APosEnd: TPoint;
+  const APageTitle: string;
+  const AFontName: string;
+  AFontSize: integer;
+  AWithNumbers: boolean;
+  AColorBg, AColorNumbers: TColor);
+  //
+  function _CssBodyAttrs: string;
+  var
+    SFontName: string;
+  begin
+    if AFontName<>'' then
+      SFontName:= AFontName+',Consolas,Monaco,Lucida Console,monospace'
+    else
+      SFontName:= 'Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New,monospace';
+    Result:= Format('style="background: %s; font-family: %s; font-size: %dpx;"', [
+      TATHtmlColorParserA.ColorToHtmlString(AColorBg),
+      SFontName,
+      AFontSize
+      ]);
+  end;
+  //
+  function _CssTableCellAttrs(IsGutter: boolean): string;
+  var
+    SAlign, SColor: string;
+  begin
+    if IsGutter then
+    begin
+      SAlign:= 'right';
+      SColor:= 'color: '+TATHtmlColorParserA.ColorToHtmlString(AColorNumbers)+';'
+    end
+    else
+    begin
+      SAlign:= 'left';
+      SColor:= '';
+    end;
+    Result:= Format('style="border-style: hidden; vertical-align: top; text-align: %s; %s"',
+      [SAlign, SColor]);
+  end;
+  //
 var
-  L, LStyles, LCode, LNums: TStringList;
+  St: TATStrings;
+  ListLines, ListNums: TStringList;
   Parts: TATLineParts;
   PPart: ^TATLinePart;
-  NColorFont: TColor;
   NColorAfter: TColor;
   NeedStyleFont, NeedStyleBg, NeedStyle: boolean;
-  S, StrText: string;
-  StyleName, StyleText: string;
-  i, j: integer;
+  SLine, SToken: string;
+  iLine, iPart, NDelta: integer;
 begin
-  if Ed.Strings.Count=0 then exit;
+  St:= Ed.Strings;
+  if EditorIsEmpty(Ed) then exit;
 
-  NColorFont:= clBlack;
-  FillChar(Parts, Sizeof(Parts), 0);
+  FillChar(Parts{%H-}, Sizeof(Parts), 0);
 
-  if FileExists(AFilename) then
-    DeleteFile(AFilename);
-
-  L:= TStringList.Create;
-  LStyles:= TStringList.Create;
-  LCode:= TStringList.Create;
-  LNums:= TStringList.Create;
+  ListLines:= TStringList.Create;
+  if AWithNumbers then
+    ListNums:= TStringList.Create
+  else
+    ListNums:= nil;
 
   try
-    for i:= 0 to Ed.Strings.Count-1 do
-      LNums.Add(IntToStr(i+1)+'&nbsp;');
-    _AddPreToStrings(LNums);
-
-    for i:= 0 to Ed.Strings.Count-1 do
+    if AWithNumbers then
     begin
-      S:= '';
-      if not Ed.DoCalcLineHiliteEx(i, Parts, AColorBG, NColorAfter) then break;
-      for j:= 0 to High(Parts) do
+      for iLine:= 0 to St.Count-1 do
+        ListNums.Add(IntToStr(iLine+1)+'&nbsp;');
+      _AddPreToStrings(ListNums, _CssBodyAttrs);
+    end;
+
+    for iLine:= APosBegin.Y to Min(St.Count-1, APosEnd.Y) do
+    begin
+      SLine:= '';
+      if not Ed.DoCalcLineHiliteEx(iLine, Parts, AColorBG, NColorAfter, false) then Break;
+      for iPart:= 0 to High(Parts) do
       begin
-        PPart:= @Parts[j];
+        PPart:= @Parts[iPart];
         if PPart^.Len=0 then Break;
 
-        NeedStyleFont:= PPart^.ColorFont<>NColorFont;
+        if iLine=APosBegin.Y then
+        begin
+          NDelta:= PPart^.Offset-APosBegin.X;
+          if NDelta<0 then
+          begin
+            if PPart^.Offset+PPart^.Len<=APosBegin.X then Continue;
+            Inc(PPart^.Offset, -NDelta);
+            Inc(PPart^.Len, NDelta);
+          end;
+        end;
+
+        if iLine=APosEnd.Y then
+        begin
+          if PPart^.Offset>=APosEnd.X then Break;
+          NDelta:= PPart^.Offset+PPart^.Len-APosEnd.X;
+          if NDelta>0 then
+            Dec(PPart^.Len, NDelta);
+        end;
+
+        NeedStyleFont:= true;
         NeedStyleBg:= PPart^.ColorBG<>AColorBG;
         NeedStyle:= NeedStyleFont or NeedStyleBg;
 
-        StrText:= Ed.Strings.LineSub(i, PPart^.Offset+1, PPart^.Len);
-        EscapeSpecChars(StrText);
+        SToken:= St.LineSub(iLine, PPart^.Offset+1, PPart^.Len);
+        _EscapeSpecChars(SToken);
 
-        if _IsSpaces(StrText) and not NeedStyleBg then
+        if _IsSpaces(SToken) and not NeedStyleBg then
         begin
-          S+= StrText;
-          Continue;
-        end;
-
-        if (PPart^.FontStyles and afsFontBold)<>0 then S+= '<b>';
-        if (PPart^.FontStyles and afsFontItalic)<>0  then S+= '<i>';
-        if (PPart^.FontStyles and afsFontCrossed)<>0 then S+= '<s>';
-
-        if NeedStyle then
+          SLine+= SToken;
+        end
+        else
         begin
-          DoCssStyle(
-            PPart^.ColorFont, PPart^.ColorBG,
-            NColorFont, AColorBG,
-            StyleName, StyleText
-            );
-          if LStyles.IndexOf(StyleText)<0 then
-            LStyles.Add(StyleText);
-          S+= Format('<span class="%s">', [StyleName]);
+          if (PPart^.FontStyles and afsFontBold)<>0 then SLine+= '<b>';
+          if (PPart^.FontStyles and afsFontItalic)<>0  then SLine+= '<i>';
+          if (PPart^.FontStyles and afsFontCrossed)<>0 then SLine+= '<s>';
+
+          if NeedStyle then
+          begin
+            SLine+= '<span style="';
+            if NeedStyleFont then
+              SLine+= 'color:' + TATHtmlColorParserA.ColorToHtmlString(PPart^.ColorFont) + ';';
+            if NeedStyleBg then
+              SLine+= 'background:' + TATHtmlColorParserA.ColorToHtmlString(PPart^.ColorBG) + ';';
+            SLine+= '">';
+          end;
+
+          SLine+= SToken;
+          if NeedStyle then
+            SLine+= '</span>';
+
+          if (PPart^.FontStyles and afsFontCrossed)<>0  then SLine+= '</s>';
+          if (PPart^.FontStyles and afsFontItalic)<>0  then SLine+= '</i>';
+          if (PPart^.FontStyles and afsFontBold)<>0  then SLine+= '</b>';
         end;
-
-        S:= S+StrText;
-        if NeedStyle then
-          S+= '</span>';
-
-        if (PPart^.FontStyles and afsFontCrossed)<>0  then S+= '</s>';
-        if (PPart^.FontStyles and afsFontItalic)<>0  then S+= '</i>';
-        if (PPart^.FontStyles and afsFontBold)<>0  then S+= '</b>';
       end;
-      LCode.Add(S);
+      ListLines.Add(SLine);
     end;
 
-    _AddPreToStrings(LCode);
+    _AddPreToStrings(ListLines, _CssBodyAttrs);
 
-    L.Add('<!-- Generated by ATSynEdit Exporter -->');
-    L.Add('<html>');
-    L.Add('<head>');
-    L.Add('  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />');
-    L.Add('  <title>'+APageTitle+'</title>');
-    L.Add('  <style>');
-    L.Add('    body, table {');
-    L.Add('      color: '+TATHtmlColorParserA.ColorToHtmlString(NColorFont)+';');
-    L.Add('      background-color: '+TATHtmlColorParserA.ColorToHtmlString(AColorBg)+';');
-    L.Add('    }');
-    L.Add('    pre, code {');
-    L.Add('      font-family: "'+AFontName+'", sans-serif;');
-    L.Add('      font-size: '+IntToStr(AFontSize)+'px;');
-    L.Add('    }');
-    L.Add('    table, td {');
-    L.Add('      border-style: hidden;');
-    L.Add('    }');
-    L.Add('    td {');
-    L.Add('      vertical-align: top;');
-    L.Add('    }');
-    L.Add('    td.num {');
-    L.Add('      color: '+TATHtmlColorParserA.ColorToHtmlString(AColorNumbers)+';');
-    L.Add('      text-align: right;');
-    L.Add('    }');
-    L.AddStrings(LStyles);
-    L.Add('  </style>');
-    L.Add('</head>');
-    L.Add('<body>');
+    AOutput.Add('<html>');
+    AOutput.Add('<head>');
+    AOutput.Add('  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />');
+    AOutput.Add('  <title>'+APageTitle+'</title>');
+    AOutput.Add('</head>');
+    AOutput.Add('<body>');
 
     if AWithNumbers then
     begin
-      L.Add('<table>');
-      L.Add('<tr><td class="num">');
-      L.AddStrings(LNums);
-      L.Add('</td>');
-      L.Add('<td>');
+      AOutput.Add('<table style="border-style: hidden;">');
+      AOutput.Add('<tr>');
+      AOutput.Add('<td '+_CssTableCellAttrs(true)+'>');
+      AOutput.AddStrings(ListNums);
+      AOutput.Add('</td>');
+      AOutput.Add('<td '+_CssTableCellAttrs(false)+'>');
     end;
 
-    L.AddStrings(LCode);
+    AOutput.AddStrings(ListLines);
 
     if AWithNumbers then
-      L.Add('</td></tr></table>');
+      AOutput.Add('</td></tr></table>');
 
-    L.Add('</body>');
-    L.Add('</html>');
+    AOutput.Add('</body>');
+    AOutput.Add('</html>');
 
-    L.SaveToFile(AFilename);
   finally
-    FreeAndNil(LNums);
-    FreeAndNil(LCode);
-    FreeAndNil(LStyles);
-    FreeAndNil(L);
+    if Assigned(ListNums) then
+      FreeAndNil(ListNums);
+    FreeAndNil(ListLines);
   end;
 end;
 
