@@ -1473,7 +1473,7 @@ begin
   end
   else
   begin
-    Result:= Count>=MaxInt-2;
+    Result:= Count>=MaxListSize-2;
   end;
 end;
 
