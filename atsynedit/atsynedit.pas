@@ -9457,16 +9457,12 @@ begin
 end;
 
 procedure TATSynEdit.OnNewScrollbarVertChanged(Sender: TObject);
-var
-  Msg: TLMVScroll;
+//don't call WMVScroll with SB_THUMBPOSITION, because it is limited by LongInt,
+//and we need to support big Int64 values
 begin
   if FScrollbarLock then exit;
-
-  FillChar(Msg{%H-}, SizeOf(Msg), 0);
-  Msg.ScrollCode:= SB_THUMBPOSITION;
-  Msg.Pos:= FScrollbarVert.Position;
-  WMVScroll(Msg);
-
+  UpdateScrollInfoFromSmoothPos(FScrollVert, FScrollbarVert.Position);
+  InvalidateEx(true, true);
   //show scroll hint
   DoHintShowForScrolling;
 end;
