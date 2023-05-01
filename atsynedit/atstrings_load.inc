@@ -530,7 +530,7 @@ var
       _FindNextEol(NStart, NEnd, LineEnd);
       Len:= NEnd-NStart;
       if Len>=MaxInt-12 then
-        raise EEditorTooLongLine.Create('Too long line in file: 0x'+IntToHex(Len));
+        raise EEditorTooLongLine.Create('Too long line on reading: 0x'+IntToHex(Len));
       {
       if Count>=MaxInt-2 then
         raise EEditorTooManyLines.Create('Too many lines');
