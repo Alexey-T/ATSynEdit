@@ -61,7 +61,7 @@ type
     procedure Clear;
     property StringsObj: TATStrings read FStrings write FStrings;
     property VirtualMode: boolean read FVirtualMode write SetVirtualMode;
-    function Count: SizeInt; inline;
+    function Count: integer; inline;
     function IsIndexValid(AIndex: integer): boolean; inline;
     function IsIndexUniqueForLine(AIndex: integer): boolean;
     property Data[N: integer]: TATWrapItem read GetData; default;
@@ -167,7 +167,7 @@ begin
   FList.Clear;
 end;
 
-function TATWrapInfo.Count: SizeInt; inline;
+function TATWrapInfo.Count: integer; inline;
 begin
   if FVirtualMode then
     Result:= FStrings.Count
