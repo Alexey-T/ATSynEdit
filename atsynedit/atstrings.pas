@@ -316,6 +316,7 @@ type
     function IsIndexValid(N: SizeInt): boolean; inline;
     function IsLastLineFake: boolean;
     function IsPosFolded(AX, AY, AIndexClient: SizeInt): boolean;
+    function IsSizeBig(const ALimit: SizeInt): boolean;
     procedure LineAddRaw_NoUndo(const S: string; AEnd: TATLineEnds; AllowBadCharsOfLen1: boolean);
     procedure LineAddRaw_NoUndo(const S: UnicodeString; AEnd: TATLineEnds);
     procedure LineAddRaw(const AString: atString; AEnd: TATLineEnds; AWithEvent: boolean=true);
@@ -2784,6 +2785,20 @@ begin
   DoEventLog(0);
 end;
 
+
+function TATStrings.IsSizeBig(const ALimit: SizeInt): boolean;
+var
+  NTotal, i: SizeInt;
+begin
+  Result:= false;
+  NTotal:= 0;
+  for i:= 0 to Count-1 do
+  begin
+    Inc(NTotal, LinesLen[i]);
+    if NTotal>ALimit then
+      exit(true);
+  end;
+end;
 
 {$I atstrings_editing.inc}
 {$I atstrings_load.inc}
