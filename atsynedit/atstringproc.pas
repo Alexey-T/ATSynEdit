@@ -29,9 +29,6 @@ type
   TATPoint = record
     X, Y: Int64;
   end;
-  TATRect = record
-    Left, Top, Right, Bottom: Int64;
-  end;
 
 type
   TATEditorCharSize = record
