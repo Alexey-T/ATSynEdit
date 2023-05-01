@@ -127,6 +127,7 @@ type
     property Line: UnicodeString read GetLine write SetLineW;
     property LineState: TATLineState read GetLineState;
     property LineEnds: TATLineEnds read GetLineEnds;
+    function LineSubLen(AFrom, ALen: SizeInt): SizeInt;
     function LineSub(AFrom, ALen: SizeInt): UnicodeString;
     procedure LineToBuffer(OtherBuf: PWideChar);
     function CharAt(AIndex: SizeInt): WideChar;
@@ -339,6 +340,7 @@ type
     property LinesState[Index: SizeInt]: TATLineState read GetLineState write SetLineState;
     property LinesUpdated[Index: SizeInt]: boolean read GetLineUpdated write SetLineUpdated;
     property LinesSeparator[Index: SizeInt]: TATLineSeparator read GetLineSep write SetLineSep;
+    function LineSubLen(ALineIndex, APosFrom, ALen: SizeInt): SizeInt;
     function LineSub(ALineIndex, APosFrom, ALen: SizeInt): atString;
     function LineCharAt(ALineIndex, ACharIndex: SizeInt): WideChar;
     procedure GetIndentProp(ALineIndex: SizeInt; out ACharCount: SizeInt; out AKind: TATLineIndentKind);
@@ -809,24 +811,32 @@ begin
   Ex.State:= TATBits2(cLineStateNone);
 end;
 
+function TATStringItem.LineSubLen(AFrom, ALen: SizeInt): SizeInt;
+var
+  NLen: SizeInt;
+begin
+  NLen:= Length(Buf);
+  if NLen=0 then exit(0);
+  if Ex.Wide then
+    Result:= Max(0, Min(ALen, NLen div 2 - AFrom + 1))
+  else
+    Result:= Max(0, Min(ALen, NLen-AFrom+1));
+end;
+
 function TATStringItem.LineSub(AFrom, ALen: SizeInt): UnicodeString;
 var
-  NLen, ResLen, i: SizeInt;
+  ResLen, i: SizeInt;
 begin
   Result:= '';
-  NLen:= Length(Buf);
-  if NLen=0 then exit;
+  ResLen:= LineSubLen(AFrom, ALen);
+  if ResLen=0 then exit;
+  SetLength(Result, ResLen);
   if Ex.Wide then
   begin
-    ResLen:= Max(0, Min(ALen, NLen div 2 - AFrom + 1));
-    SetLength(Result, ResLen);
-    if ResLen>0 then
-      Move(Buf[AFrom*2-1], Result[1], ResLen*2);
+    Move(Buf[AFrom*2-1], Result[1], ResLen*2);
   end
   else
   begin
-    ResLen:= Max(0, Min(ALen, NLen-AFrom+1));
-    SetLength(Result, ResLen);
     for i:= 1 to ResLen do
       Result[i]:= WideChar(Ord(Buf[i+AFrom-1]));
   end;
@@ -1625,6 +1635,15 @@ begin
 
   NLineMin:= Min(AIndexFrom, AIndexTo);
   DoEventLog(NLineMin);
+end;
+
+function TATStrings.LineSubLen(ALineIndex, APosFrom, ALen: SizeInt): SizeInt;
+var
+  Item: PATStringItem;
+begin
+  if ALen=0 then exit(0);
+  Item:= GetItemPtr(ALineIndex);
+  Result:= Item^.LineSubLen(APosFrom, ALen);
 end;
 
 function TATStrings.LineSub(ALineIndex, APosFrom, ALen: SizeInt): atString;
