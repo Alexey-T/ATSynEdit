@@ -18,7 +18,8 @@ type
   private
     FSelText: UnicodeString;
     position: Integer;
-    buffer, clbuffer: array[0..256] of WideChar;        { use static buffer. to avoid unexpected exception on FPC }
+    buffer: array[0..256] of WideChar;        { use static buffer. to avoid unexpected exception on FPC }
+    clbuffer: array[0..256] of longint;
     attrsize: Integer;
     attrbuf: array[0..255] of Byte;
     procedure UpdateWindowPos(Sender: TObject);
@@ -34,6 +35,7 @@ type
 implementation
 
 uses
+  SysUtils,
   Windows, Imm,
   Classes,
   Forms,
@@ -82,30 +84,34 @@ begin
   //VisRect:= Screen.WorkAreaRect;
 
   imc:= ImmGetContext(Ed.Handle);
-  if imc<>0 then
-  begin
-    CandiForm.dwIndex:= 0;
-    CandiForm.dwStyle:= CFS_FORCE_POSITION;
-    CandiForm.ptCurrentPos.X:= Caret.CoordX;
-    CandiForm.ptCurrentPos.Y:= Caret.CoordY+Ed.TextCharSize.Y+1;
-    ImmSetCandidateWindow(imc, @CandiForm);
-
-    (*
-    if ImmGetCandidateWindow(imc, 0, @CandiForm) then
+  try
+    if imc<>0 then
     begin
-      Y:= CandiForm.rcArea.Bottom;
-      if Y>=VisRect.Bottom then
-      begin
-        CandiForm.dwIndex:= 0;
-        CandiForm.dwStyle:= CFS_FORCE_POSITION;
-        CandiForm.ptCurrentPos.X:= Caret.CoordX;
-        CandiForm.ptCurrentPos.Y:= 0;
-        ImmSetCandidateWindow(imc, @CandiForm);
-      end;
-    end;
-    *)
+      CandiForm.dwIndex:= 0;
+      CandiForm.dwStyle:= CFS_FORCE_POSITION;
+      CandiForm.ptCurrentPos.X:= Caret.CoordX;
+      CandiForm.ptCurrentPos.Y:= Caret.CoordY+Ed.TextCharSize.Y+1;
+      ImmSetCandidateWindow(imc, @CandiForm);
 
-    ImmReleaseContext(Ed.Handle, imc);
+      (*
+      if ImmGetCandidateWindow(imc, 0, @CandiForm) then
+      begin
+        Y:= CandiForm.rcArea.Bottom;
+        if Y>=VisRect.Bottom then
+        begin
+          CandiForm.dwIndex:= 0;
+          CandiForm.dwStyle:= CFS_FORCE_POSITION;
+          CandiForm.ptCurrentPos.X:= Caret.CoordX;
+          CandiForm.ptCurrentPos.Y:= 0;
+          ImmSetCandidateWindow(imc, @CandiForm);
+        end;
+      end;
+      *)
+
+    end;
+  finally
+    if imc<>0 then
+      ImmReleaseContext(Ed.Handle, imc);
   end;
 end;
 
@@ -153,6 +159,7 @@ begin
     IMN_OPENCANDIDATE:
       UpdateWindowPos(Sender);
   end;
+  //writeln(Format('ImeNotify %d',[Msg.WParam]));
 end;
 
 procedure TATAdapterIMEStandard.ImeStartComposition(Sender: TObject;
@@ -167,7 +174,7 @@ procedure TATAdapterIMEStandard.ImeComposition(Sender: TObject; var Msg: TMessag
 var
   Ed: TATSynEdit;
   IMC: HIMC;
-  imeCode, len, ImmGCode: Integer;
+  imeCode, len, ImmGCode, i, cllen, ilen: Integer;
   bOverwrite, bSelect: Boolean;
 begin
   Ed:= TATSynEdit(Sender);
@@ -181,7 +188,7 @@ begin
           { Insert IME Composition string }
           if ImmGCode<>$1b then
           begin
-            { for janpanese IME, process result and composition separately.
+            { for janpanese IME, process GCS_RESULTSTR and GCS_COMPSTR separately.
               It comes togetther }
             { insert result string }
             if imecode and GCS_RESULTSTR<>0 then
@@ -203,23 +210,31 @@ begin
               len:=ImmGetCompositionStringW(IMC,GCS_COMPSTR,@buffer[0],sizeof(buffer)-sizeof(WideChar));
               if len>0 then
                 len := len shr 1;
-              // chinese and japanese
-              if imeCode and GCS_COMPATTR<>0 then
-                attrsize:=ImmGetCompositionStringW(IMC, GCS_COMPATTR, @attrbuf[0], sizeof(attrbuf))
-                else
-                  attrsize:=0;
+              { Position change when pressing left right move on candidate composition window.
+                It need to virtual caret for this. The best idea is add composition modaless form for IME. }
               if imeCode and GCS_CURSORPOS<>0 then
                 position:=ImmGetCompositionStringW(IMC, GCS_CURSORPOS, nil, 0)
                 else
                   position:=0;
-              if lParam and GCS_COMPCLAUSE<>0 then
-				ImmGetCompositionStringW(IMC, GCS_COMPCLAUSE, @clbuffer[0],sizeof(clbuffer)-sizeof(WideChar));
-              // for chinese
-              if attrsize>0 then begin
-                len:=0;
+              // for japanese and chinese, not used
+              if imeCode and GCS_COMPATTR<>0 then
+                attrsize:=ImmGetCompositionStringW(IMC, GCS_COMPATTR, @attrbuf[0], sizeof(attrbuf))
+                else
+                  attrsize:=0;
+              //Writeln(Format('len %d, attrsize %d, position %d',[len,attrsize,position]));
+              // for japanese, not used
+              if imeCode and GCS_COMPCLAUSE<>0 then begin
+		cllen:=ImmGetCompositionStringA(IMC, GCS_COMPCLAUSE, @clbuffer[0],sizeof(clbuffer));
+                Writeln(Format('CLAUSE %d',[cllen]));
+                cllen:=cllen div sizeof(LongInt);
+              end;
+
+              // for chinese, not used
+              if (attrsize>0) then begin
+                ilen:=0;
                 for i:=position to attrsize-1 do begin
-                  if attrbuf[i]==1 then
-                    Inc(len)
+                  if attrbuf[i]=1 then
+                    Inc(ilen)
                     else
                       break;
                 end;                
@@ -249,11 +264,12 @@ begin
   Ed:= TATSynEdit(Sender);
   Len:= Length(FSelText);
   Ed.TextInsertAtCarets(FSelText, False, False, Len>0);
-  // tweak for emoji window, but don't work currently
-  // it shows emoji window on previous position.
-  SetFocus(0);
-  SetFocus(Ed.Handle);
-  //WriteLn(Format('set STRING %d, %s',[Len,FSelText]));
+  { tweak for emoji window, but don't work currently
+    it shows emoji window on previous position.
+    but not work good with chinese IME. }
+  //SetFocus(0);
+  //SetFocus(Ed.Handle);
+
   //WriteLn(Format('WM_IME_ENDCOMPOSITION %x, %x',[Msg.wParam,Msg.lParam]));
   Msg.Result:= -1;
 end;
