@@ -531,12 +531,8 @@ begin
 end;
 
 function TATCaretItem.IsInVisibleRect(const R: TRect): boolean;
-var
-  PntCoord: TATPoint;
 begin
-  PntCoord.X:= CoordX;
-  PntCoord.Y:= CoordY;
-  Result:= ATPointInRect(R, PntCoord);
+  Result:= ATPointInRect(R, ATPoint(CoordX, CoordY));
 end;
 
 function TATCaretItem.FirstTouchedLine: integer;

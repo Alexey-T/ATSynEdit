@@ -483,7 +483,7 @@ var
   Coord1, Coord2: TATPoint;
   LineCoord1, LineCoord2: TPoint;
   Details: TATEditorPosDetails;
-  Y, YMin, YMax: integer;
+  Y, YMin, YMax: Int64;
 begin
   Coord1:= CaretPosToClientPos(P1);
   Coord2:= CaretPosToClientPos(P2);
