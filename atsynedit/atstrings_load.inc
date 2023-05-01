@@ -531,9 +531,10 @@ var
       Len:= NEnd-NStart;
       if Len>=MaxInt-12 then
         raise EEditorTooLongLine.Create('Too long line on reading: 0x'+IntToHex(Len));
+
       {
-      if Count>=MaxInt-2 then
-        raise EEditorTooManyLines.Create('Too many lines');
+      if Count>=(MaxInt div 16) then
+        raise EEditorTooManyLines.Create('Too many lines: 0x'+IntToHex(Count));
         }
 
       {
@@ -697,6 +698,11 @@ begin
         _LoadItems;
       end;
       on E: EEditorTooLongLine do
+      begin
+        Clear;
+        raise;
+      end;
+      on EListError do
       begin
         Clear;
         raise;

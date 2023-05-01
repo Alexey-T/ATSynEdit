@@ -1472,9 +1472,7 @@ begin
         LineDelete(Count-1);
   end
   else
-  begin
-    Result:= Count>=MaxListSize-2;
-  end;
+    Result:= false;
 end;
 
 procedure TATStrings.LineInsertRaw(ALineIndex: SizeInt; const AString: atString;
