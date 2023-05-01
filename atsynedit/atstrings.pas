@@ -2795,6 +2795,7 @@ begin
   for i:= 0 to Count-1 do
   begin
     Inc(NTotal, LinesLen[i]);
+    Inc(NTotal); //EOL char
     if NTotal>ALimit then
       exit(true);
   end;
