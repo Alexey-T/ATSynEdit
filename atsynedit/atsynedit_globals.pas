@@ -93,6 +93,7 @@ type
     MaxTabPositionToExpand: integer; //no sense to expand too far tabs
     MinWordWrapOffset: integer;
     PunctuationToWrapWithWords: UnicodeString;
+    MaxLineLenForUndo: integer;
     MaxLineLenForAccurateCharWidths: integer; //must be <= cMaxFixedArray
     TextoutNeedsOffsets: boolean;
     CaretTextOverInvertedRect: boolean;
@@ -399,6 +400,7 @@ initialization
     MaxTabPositionToExpand:= 500;
     MinWordWrapOffset:= 3;
     PunctuationToWrapWithWords:= '.,;:''"`~?!&%$()[]';
+    MaxLineLenForUndo:= 100*1024;
     MaxLineLenForAccurateCharWidths:= 500;
 
     //Win: seems no slowdown from offsets

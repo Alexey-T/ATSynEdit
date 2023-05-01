@@ -2129,6 +2129,12 @@ begin
   else
     exit;
 
+  if Length(AText)>ATEditorOptions.MaxLineLenForUndo then
+  begin
+    CurList.Clear;
+    exit
+  end;
+
   //handle CaretJump:
   //if last item was also CaretJump, delete the last item  (don't make huge list on many clicks)
   if AAction=aeaCaretJump then
