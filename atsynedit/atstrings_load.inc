@@ -689,9 +689,10 @@ begin
       _LoadItems;
     except
       on E: Exception do
+      begin
+        Clear;
         if E is EEditorBadUTF8 then
         begin
-          Clear;
           //failed to load text as UTF8, so load again as ANSI
           AForcedToANSI:= true;
           FEncoding:= cEncAnsi;
@@ -699,10 +700,8 @@ begin
           _LoadItems;
         end
         else
-        begin
-          Clear;
           raise;
-        end;
+      end;
     end;
   finally
     FreeMem(Buf);
