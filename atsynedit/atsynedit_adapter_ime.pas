@@ -9,6 +9,7 @@ interface
 
 uses
   Messages,
+  Forms,
   ATSynEdit_Adapters;
 
 type
@@ -19,10 +20,13 @@ type
     FSelText: UnicodeString;
     position: Integer;
     buffer: array[0..256] of WideChar;        { use static buffer. to avoid unexpected exception on FPC }
-    clbuffer: array[0..256] of longint;
-    attrsize: Integer;
-    attrbuf: array[0..255] of Byte;
+    //clbuffer: array[0..256] of longint;
+    //attrsize: Integer;
+    //attrbuf: array[0..255] of Byte;
+    CompForm: TForm;
+    procedure CompFormPaint(Sender: TObject);
     procedure UpdateWindowPos(Sender: TObject);
+    procedure UpdateCompForm(Sender: TObject);
   public
     procedure Stop(Sender: TObject; Success: boolean); override;
     procedure ImeRequest(Sender: TObject; var Msg: TMessage); override;
@@ -38,7 +42,8 @@ uses
   SysUtils,
   Windows, Imm,
   Classes,
-  Forms,
+  Controls,
+  Graphics,
   ATSynEdit,
   ATSynEdit_Carets;
 
@@ -64,6 +69,29 @@ begin
       ImmNotifyIME(imc, NI_COMPOSITIONSTR, CPS_CANCEL, 0);
     ImmReleaseContext(Ed.Handle, imc);
   end;
+end;
+
+procedure TATAdapterIMEStandard.CompFormPaint(Sender: TObject);
+var
+  tm, cm: TSize;
+  s: UnicodeString;
+  i: Integer;
+begin
+  // draw text
+  tm:=CompForm.Canvas.TextExtent(buffer);
+  CompForm.Width:=tm.cx+2;
+  CompForm.Height:=tm.cy+2;
+  CompForm.Canvas.TextOut(1,0,buffer);
+  // draw IME Caret
+  s:='';
+  for i:=0 to position-1 do
+    s:=s+buffer[i];
+  cm:=CompForm.Canvas.TextExtent(s);
+  cm.cy:=tm.cy+2;
+  CompForm.Canvas.Pen.Color:=clInfoText;
+  CompForm.Canvas.Pen.Mode:=pmNotXor;
+  CompForm.Canvas.Line(cm.cx  ,0,cm.cx  ,cm.cy+2);
+  CompForm.Canvas.Line(cm.cx+1,0,cm.cx+1,cm.cy+2);
 end;
 
 procedure TATAdapterIMEStandard.UpdateWindowPos(Sender: TObject);
@@ -113,6 +141,37 @@ begin
     if imc<>0 then
       ImmReleaseContext(Ed.Handle, imc);
   end;
+end;
+
+procedure TATAdapterIMEStandard.UpdateCompForm(Sender: TObject);
+var
+  ed: TATSynEdit;
+  CompPos: TPoint;
+  Caret: TATCaretItem;
+begin
+  ed:=TATSynEdit(Sender);
+  if not Assigned(CompForm) then begin
+    CompForm:=TForm.Create(ed);
+    try
+      CompForm.Parent:=ed;
+      CompForm.BorderStyle:=bsNone;
+      CompForm.FormStyle:=fsStayOnTop;
+      CompForm.Top:=0;
+      CompForm.Left:=0;
+      CompForm.Height:=16;
+      CompForm.Width:=16;
+      CompForm.Color:=clInfoBk;
+      CompForm.OnPaint:=@CompFormPaint;
+    except
+    end;
+  end;
+  CompForm.Font:=ed.Font;
+  Caret:=ed.Carets[0];
+  CompPos:=ed.CaretPosToClientPos(Point(Caret.PosX,Caret.PosY));
+  CompForm.Left:=CompPos.X;
+  CompForm.Top:=CompPos.Y;
+  CompForm.Show;
+  CompForm.Invalidate;
 end;
 
 procedure TATAdapterIMEStandard.ImeRequest(Sender: TObject; var Msg: TMessage);
@@ -174,7 +233,7 @@ procedure TATAdapterIMEStandard.ImeComposition(Sender: TObject; var Msg: TMessag
 var
   Ed: TATSynEdit;
   IMC: HIMC;
-  imeCode, len, ImmGCode, i, cllen, ilen: Integer;
+  imeCode, len, ImmGCode{, i, cllen, ilen}: Integer;
   bOverwrite, bSelect: Boolean;
 begin
   Ed:= TATSynEdit(Sender);
@@ -204,31 +263,34 @@ begin
                                    bOverwrite,
                                    False);
               FSelText:='';
+              CompForm.Hide;
             end;
             { insert composition string }
             if imeCode and GCS_COMPSTR<>0 then begin
               len:=ImmGetCompositionStringW(IMC,GCS_COMPSTR,@buffer[0],sizeof(buffer)-sizeof(WideChar));
               if len>0 then
-                len := len shr 1;
+                len := len shr 1
+                else
+                  CompForm.Hide;
               { Position change when pressing left right move on candidate composition window.
                 It need to virtual caret for this. The best idea is add composition modaless form for IME. }
               if imeCode and GCS_CURSORPOS<>0 then
                 position:=ImmGetCompositionStringW(IMC, GCS_CURSORPOS, nil, 0)
                 else
                   position:=0;
+              //Writeln(Format('len %d, attrsize %d, position %d',[len,attrsize,position]));
+              // for japanese, not used
+              {if imeCode and GCS_COMPCLAUSE<>0 then begin
+                // due to chinese IME bug, using A API function
+		cllen:=ImmGetCompositionStringA(IMC, GCS_COMPCLAUSE, @clbuffer[0],sizeof(clbuffer));
+                //Writeln(Format('CLAUSE %d',[cllen]));
+                cllen:=cllen div sizeof(LongInt);
+              end;
               // for japanese and chinese, not used
               if imeCode and GCS_COMPATTR<>0 then
                 attrsize:=ImmGetCompositionStringW(IMC, GCS_COMPATTR, @attrbuf[0], sizeof(attrbuf))
                 else
                   attrsize:=0;
-              //Writeln(Format('len %d, attrsize %d, position %d',[len,attrsize,position]));
-              // for japanese, not used
-              if imeCode and GCS_COMPCLAUSE<>0 then begin
-		cllen:=ImmGetCompositionStringA(IMC, GCS_COMPCLAUSE, @clbuffer[0],sizeof(clbuffer));
-                Writeln(Format('CLAUSE %d',[cllen]));
-                cllen:=cllen div sizeof(LongInt);
-              end;
-
               // for chinese, not used
               if (attrsize>0) then begin
                 ilen:=0;
@@ -238,13 +300,14 @@ begin
                     else
                       break;
                 end;                
-              end;
+              end;}
               buffer[len]:=#0;
-              bSelect:=len>0;
+              UpdateCompForm(Sender);
+              //bSelect:=len>0;
               // insert
-              Ed.TextInsertAtCarets(buffer, False,
+              {Ed.TextInsertAtCarets(buffer, False,
                                    False,
-                                   bSelect);
+                                   bSelect);}
             end;
           end;
       finally
@@ -264,6 +327,7 @@ begin
   Ed:= TATSynEdit(Sender);
   Len:= Length(FSelText);
   Ed.TextInsertAtCarets(FSelText, False, False, Len>0);
+  CompForm.Hide;
   { tweak for emoji window, but don't work currently
     it shows emoji window on previous position.
     but not work good with chinese IME. }
