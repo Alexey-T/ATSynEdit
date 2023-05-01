@@ -153,18 +153,15 @@ begin
   ed:=TATSynEdit(Sender);
   if not Assigned(CompForm) then begin
     CompForm:=TForm.Create(ed);
-    try
-      CompForm.Parent:=ed;
-      CompForm.BorderStyle:=bsNone;
-      CompForm.FormStyle:=fsStayOnTop;
-      CompForm.Top:=0;
-      CompForm.Left:=0;
-      CompForm.Height:=16;
-      CompForm.Width:=16;
-      CompForm.Color:=clInfoBk;
-      CompForm.OnPaint:=@CompFormPaint;
-    except
-    end;
+    CompForm.Parent:=ed;
+    CompForm.BorderStyle:=bsNone;
+    CompForm.FormStyle:=fsStayOnTop;
+    CompForm.Top:=0;
+    CompForm.Left:=0;
+    CompForm.Height:=16;
+    CompForm.Width:=16;
+    CompForm.Color:=clInfoBk;
+    CompForm.OnPaint:=@CompFormPaint;
   end;
   CompForm.Font:=ed.Font;
   Caret:=ed.Carets[0];
