@@ -678,7 +678,7 @@ begin
   if FCapacity > 127 then Inc(IncSize, FCapacity shr 2);
 
   //AT changed to allow more items up to MaxListSize
-  if FCapacity>=MaxListSize then
+  if FCapacity >= MaxListSize then
     Error(SListCapacityError, FCapacity);
 
   NewVal := FCapacity + IncSize;
