@@ -1471,6 +1471,10 @@ begin
     if Result then
       while Count>1 do
         LineDelete(Count-1);
+  end
+  else
+  begin
+    Result:= Count>=MaxInt-2;
   end;
 end;
 
