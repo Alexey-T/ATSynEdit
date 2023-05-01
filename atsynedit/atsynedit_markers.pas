@@ -46,9 +46,9 @@ type
     LineLen: integer;
 
     //screen coords
-    CoordX, CoordY: integer;
+    CoordX, CoordY: Int64;
     //screen coords of line end, when LineLen<>0
-    CoordX2, CoordY2: integer;
+    CoordX2, CoordY2: Int64;
 
     //used in CudaText: when "Collect marker" gets this marker, caret will be with selection
     //if SelY=0 - LenX is length of sel (single line)

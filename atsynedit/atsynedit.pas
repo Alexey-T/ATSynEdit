@@ -9155,7 +9155,8 @@ end;
 procedure TATSynEdit.DoPaintMarkersTo(C: TCanvas);
 var
   Mark: TATMarkerItem;
-  Pnt: TPoint;
+  PntCoord: TATPoint;
+  PntShort: TPoint;
   NMarkSize, NLineW: integer;
   iMark: integer;
   R: TRect;
@@ -9171,18 +9172,20 @@ begin
     if Mark.CoordX<0 then Continue;
     if Mark.CoordY<0 then Continue;
 
-    Pnt.X:= Mark.CoordX;
-    Pnt.Y:= Mark.CoordY+FCharSize.Y;
+    PntCoord.X:= Mark.CoordX;
+    PntCoord.Y:= Mark.CoordY+FCharSize.Y;
 
-    if PtInRect(FRectMain, Pnt) then
+    if ATPointInRect(FRectMain, PntCoord) then
     begin
-      CanvasPaintTriangleUp(C, Colors.Markers, Pnt, NMarkSize);
+      PntShort.X:= PntCoord.X;
+      PntShort.Y:= PntCoord.Y;
+      CanvasPaintTriangleUp(C, Colors.Markers, PntShort, NMarkSize);
 
       if (Mark.LineLen<>0) and (Mark.CoordY=Mark.CoordY2) then
       begin
-        R.Left:= Min(Pnt.X, Mark.CoordX2);
-        R.Right:= Max(Pnt.X, Mark.CoordX2)+1;
-        R.Bottom:= Pnt.Y+NMarkSize+1;
+        R.Left:= Min(PntShort.X, Mark.CoordX2);
+        R.Right:= Max(PntShort.X, Mark.CoordX2)+1;
+        R.Bottom:= PntShort.Y+NMarkSize+1;
         R.Top:= R.Bottom-NLineW;
 
         //avoid painting part of the line over minimap/gutter
