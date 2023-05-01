@@ -27,14 +27,14 @@ type
 
   PATWrapItem = ^TATWrapItem;
   TATWrapItem = packed record
-    NLineIndex: integer;
-    NCharIndex: integer;
-    NLength: integer;
+    NLineIndex: SizeInt;
+    NCharIndex: SizeInt;
+    NLength: SizeInt;
     NIndent: word;
     NFinal: TATWrapItemFinal;
     bInitial: boolean;
-    procedure Init(ALineIndex, ACharIndex, ALength, AIndent: integer; AFinal: TATWrapItemFinal; AInitial: boolean); inline;
-    function ContainsPos(AX, AY: integer): boolean;
+    procedure Init(ALineIndex, ACharIndex, ALength, AIndent: SizeInt; AFinal: TATWrapItemFinal; AInitial: boolean); inline;
+    function ContainsPos(AX, AY: Int64): boolean;
     class operator=(const A, B: TATWrapItem): boolean;
   end;
 
@@ -51,7 +51,7 @@ type
     FVirtualMode: boolean;
     function GetData(AIndex: integer): TATWrapItem;
     procedure SetVirtualMode(AValue: boolean);
-    function IsLineFolded(ALine: integer): boolean;
+    function IsLineFolded(ALine: SizeInt): boolean;
   public
     VisibleColumns: integer;
     WrapColumn: integer;
@@ -61,14 +61,14 @@ type
     procedure Clear;
     property StringsObj: TATStrings read FStrings write FStrings;
     property VirtualMode: boolean read FVirtualMode write SetVirtualMode;
-    function Count: integer; inline;
+    function Count: SizeInt; inline;
     function IsIndexValid(AIndex: integer): boolean; inline;
     function IsIndexUniqueForLine(AIndex: integer): boolean;
     property Data[N: integer]: TATWrapItem read GetData; default;
     procedure Add(const AData: TATWrapItem);
     procedure Delete(N: integer);
     procedure Insert(N: integer; const AItem: TATWrapItem);
-    procedure FindIndexesOfLineNumber(ALineNum: integer; out AFrom, ATo: integer);
+    procedure FindIndexesOfLineNumber(ALineNum: SizeInt; out AFrom, ATo: integer);
     function FindIndexOfCaretPos(APos: TPoint): integer;
     procedure SetCapacity(N: integer);
     procedure ReplaceItems(AFrom, ATo: integer; AItems: TATWrapItems);
@@ -82,7 +82,7 @@ uses
 
 { TATWrapItem }
 
-procedure TATWrapItem.Init(ALineIndex, ACharIndex, ALength, AIndent: integer;
+procedure TATWrapItem.Init(ALineIndex, ACharIndex, ALength, AIndent: SizeInt;
   AFinal: TATWrapItemFinal; AInitial: boolean);
 begin
   NLineIndex:= ALineIndex;
@@ -93,7 +93,7 @@ begin
   bInitial:= AInitial;
 end;
 
-function TATWrapItem.ContainsPos(AX, AY: integer): boolean;
+function TATWrapItem.ContainsPos(AX, AY: Int64): boolean;
 begin
   Result:= false;
   if AY<>NLineIndex then exit;
@@ -141,7 +141,7 @@ begin
   //  Clear;
 end;
 
-function TATWrapInfo.IsLineFolded(ALine: integer): boolean;
+function TATWrapInfo.IsLineFolded(ALine: SizeInt): boolean;
 begin
   if StringsObj.IsIndexValid(ALine) then
     Result:= StringsObj.LinesHidden[ALine, EditorIndex]
@@ -167,7 +167,7 @@ begin
   FList.Clear;
 end;
 
-function TATWrapInfo.Count: integer; inline;
+function TATWrapInfo.Count: SizeInt; inline;
 begin
   if FVirtualMode then
     Result:= FStrings.Count
@@ -215,7 +215,7 @@ begin
     FList.Insert(N, AItem);
 end;
 
-procedure TATWrapInfo.FindIndexesOfLineNumber(ALineNum: integer; out AFrom, ATo: integer);
+procedure TATWrapInfo.FindIndexesOfLineNumber(ALineNum: SizeInt; out AFrom, ATo: integer);
 var
   a, b, m, dif: integer;
 begin
