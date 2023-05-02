@@ -101,7 +101,7 @@ var
   Ed: TATSynEdit;
   Caret: TATCaretItem;
   imc: HIMC;
-  CandiForm: CANDIDATEFORM;
+  CandiForm, exrect: CANDIDATEFORM;
   i: Integer;
   s: UnicodeString;
   cm: TSize;
@@ -115,7 +115,8 @@ begin
     if imc<>0 then
     begin
       CandiForm.dwIndex:= 0;
-      CandiForm.dwStyle:= CFS_FORCE_POSITION;
+      CandiForm.dwStyle:= CFS_CANDIDATEPOS;
+      CandiForm.rcArea:= Rect(0,0,0,0);
       if position>0 then begin
         s:='';
         for i:=0 to position-1 do
@@ -125,7 +126,15 @@ begin
       end else
         CandiForm.ptCurrentPos.X:= Caret.CoordX;
       CandiForm.ptCurrentPos.Y:= Caret.CoordY+Ed.TextCharSize.Y+1;
+
+      exrect:=CandiForm;
       ImmSetCandidateWindow(imc, @CandiForm);
+      exrect.dwStyle:=CFS_EXCLUDE;
+      exrect.rcArea:=Rect(exrect.ptCurrentPos.X,
+                          exrect.ptCurrentPos.Y,
+                          exrect.ptCurrentPos.X,
+                          exrect.ptCurrentPos.Y+Ed.TextCharSize.Y+1);
+      ImmSetCandidateWindow(imc,@exrect);
     end;
   finally
     if imc<>0 then
@@ -211,7 +220,7 @@ begin
     IMN_OPENCANDIDATE:
       UpdateWindowPos(Sender);
   end;
-  //writeln(Format('ImeNotify %d',[Msg.WParam]));
+  //writeln(Format('ImeNotify %d %d',[Msg.WParam,Msg.LParam]));
 end;
 
 procedure TATAdapterWindowsIME.ImeStartComposition(Sender: TObject;
@@ -265,12 +274,13 @@ begin
                 len := len shr 1
                 else
                   CompForm.Hide;
+              buffer[len]:=#0;
               { Position change when pressing left right move on candidate composition window.
                 It need to virtual caret for this. The best idea is add composition modaless form for IME. }
-              if imeCode and GCS_CURSORPOS<>0 then
-                position:=ImmGetCompositionStringW(IMC, GCS_CURSORPOS, nil, 0)
-                else
-                  position:=0;
+              if imeCode and GCS_CURSORPOS<>0 then begin
+                position:=ImmGetCompositionStringW(IMC, GCS_CURSORPOS, nil, 0);
+                ImmNotifyIME(IMC,NI_OPENCANDIDATE,0,0);
+              end;
               //Writeln(Format('len %d, attrsize %d, position %d',[len,attrsize,position]));
               // for japanese, not used
               {if imeCode and GCS_COMPCLAUSE<>0 then begin
@@ -294,15 +304,7 @@ begin
                       break;
                 end;                
               end;}
-              buffer[len]:=#0;
               UpdateCompForm(Sender);
-              //bSelect:=len>0;
-              // insert
-              {Ed.TextInsertAtCarets(buffer, False,
-                                   False,
-                                   bSelect);}
-              if position>0 then
-                UpdateWindowPos(Sender);
             end;
           end;
       finally
@@ -320,6 +322,7 @@ var
   Len: Integer;
 begin
   Ed:= TATSynEdit(Sender);
+  position:=0;
   Len:= Length(FSelText);
   Ed.TextInsertAtCarets(FSelText, False, False, Len>0);
   CompForm.Hide;
