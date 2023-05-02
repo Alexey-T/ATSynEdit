@@ -85,8 +85,9 @@ begin
   CompForm.Canvas.TextOut(1,0,buffer);
   // draw IME Caret
   s:='';
-  for i:=0 to position-1 do
-    s:=s+buffer[i];
+  if position>0 then
+    for i:=0 to position-1 do
+      s:=s+buffer[i];
   cm:=CompForm.Canvas.TextExtent(s);
   cm.cy:=tm.cy+2;
   CompForm.Canvas.Pen.Color:=clInfoText;
@@ -101,16 +102,13 @@ var
   Caret: TATCaretItem;
   imc: HIMC;
   CandiForm: CANDIDATEFORM;
-  {
-  VisRect: TRect;
-  Y: integer;
-  }
+  i: Integer;
+  s: UnicodeString;
+  cm: TSize;
 begin
   Ed:= TATSynEdit(Sender);
   if Ed.Carets.Count=0 then exit;
   Caret:= Ed.Carets[0];
-
-  //VisRect:= Screen.WorkAreaRect;
 
   imc:= ImmGetContext(Ed.Handle);
   try
@@ -118,25 +116,16 @@ begin
     begin
       CandiForm.dwIndex:= 0;
       CandiForm.dwStyle:= CFS_FORCE_POSITION;
-      CandiForm.ptCurrentPos.X:= Caret.CoordX;
+      if position>0 then begin
+        s:='';
+        for i:=0 to position-1 do
+          s:=s+buffer[i];
+        cm:=CompForm.Canvas.TextExtent(s);
+        CandiForm.ptCurrentPos.X:=Caret.CoordX+cm.cx;
+      end else
+        CandiForm.ptCurrentPos.X:= Caret.CoordX;
       CandiForm.ptCurrentPos.Y:= Caret.CoordY+Ed.TextCharSize.Y+1;
       ImmSetCandidateWindow(imc, @CandiForm);
-
-      (*
-      if ImmGetCandidateWindow(imc, 0, @CandiForm) then
-      begin
-        Y:= CandiForm.rcArea.Bottom;
-        if Y>=VisRect.Bottom then
-        begin
-          CandiForm.dwIndex:= 0;
-          CandiForm.dwStyle:= CFS_FORCE_POSITION;
-          CandiForm.ptCurrentPos.X:= Caret.CoordX;
-          CandiForm.ptCurrentPos.Y:= 0;
-          ImmSetCandidateWindow(imc, @CandiForm);
-        end;
-      end;
-      *)
-
     end;
   finally
     if imc<>0 then
@@ -164,10 +153,16 @@ begin
     CompForm.OnPaint:=@CompFormPaint;
   end;
   CompForm.Font:=ed.Font;
-  Caret:=ed.Carets[0];
-  CompPos:=ed.CaretPosToClientPos(Point(Caret.PosX,Caret.PosY));
-  CompForm.Left:=CompPos.X;
-  CompForm.Top:=CompPos.Y;
+  if ed.Carets.Count>0 then begin
+    Caret:=ed.Carets[0];
+    CompPos:=ed.CaretPosToClientPos(Point(Caret.PosX,Caret.PosY));
+    CompForm.Left:=CompPos.X;
+    CompForm.Top:=CompPos.Y;
+  end else begin
+    CompForm.Left:=0;
+    CompForm.Top:=0;
+  end;
+
   CompForm.Show;
   CompForm.Invalidate;
 end;
@@ -306,6 +301,8 @@ begin
               {Ed.TextInsertAtCarets(buffer, False,
                                    False,
                                    bSelect);}
+              if position>0 then
+                UpdateWindowPos(Sender);
             end;
           end;
       finally
