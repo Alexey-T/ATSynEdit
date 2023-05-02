@@ -442,7 +442,6 @@ const
   cInitFoldTooltipVisible = true;
   cInitFoldTooltipLineCount = 15;
   cInitFoldTooltipWidthPercents = 80;
-  cInitMaxLineLenToTokenize = 4000;
   cInitMinLineLenToCalcURL = 4;
   cInitMaxLineLenToCalcURL = 1200; //AliExpress has URLs of len 520
   cInitDragDropMarkerWidth = 4;
@@ -854,7 +853,6 @@ type
     FOptPasteAtEndMakesFinalEmptyLine: boolean;
     FOptPasteMultilineTextSpreadsToCarets: boolean;
     FOptPasteWithEolAtLineStart: boolean;
-    FOptMaxLineLenToTokenize: integer;
     FOptMinLineLenToCalcURL: integer;
     FOptMaxLineLenToCalcURL: integer;
     FOptMaxLinesToCountUnindent: integer;
@@ -1933,7 +1931,6 @@ type
     property OptShowDragDropMarker: boolean read FOptShowDragDropMarker write FOptShowDragDropMarker default true;
     property OptShowDragDropMarkerWidth: integer read FOptShowDragDropMarkerWidth write FOptShowDragDropMarkerWidth default cInitDragDropMarkerWidth;
     property OptShowFoldedMarkWithSelectionBG: boolean read FOptShowFoldedMarkWithSelectionBG write FOptShowFoldedMarkWithSelectionBG default cInitShowFoldedMarkWithSelectionBG;
-    property OptMaxLineLenToTokenize: integer read FOptMaxLineLenToTokenize write FOptMaxLineLenToTokenize default cInitMaxLineLenToTokenize;
     property OptMinLineLenToCalcURL: integer read FOptMinLineLenToCalcURL write FOptMinLineLenToCalcURL default cInitMinLineLenToCalcURL;
     property OptMaxLineLenToCalcURL: integer read FOptMaxLineLenToCalcURL write FOptMaxLineLenToCalcURL default cInitMaxLineLenToCalcURL;
     property OptMaxLinesToCountUnindent: integer read FOptMaxLinesToCountUnindent write FOptMaxLinesToCountUnindent default 100;
@@ -4981,7 +4978,6 @@ begin
   FOptShowDragDropMarkerWidth:= cInitDragDropMarkerWidth;
   FOptShowFoldedMarkWithSelectionBG:= cInitShowFoldedMarkWithSelectionBG;
 
-  FOptMaxLineLenToTokenize:= cInitMaxLineLenToTokenize;
   FOptMinLineLenToCalcURL:= cInitMinLineLenToCalcURL;
   FOptMaxLineLenToCalcURL:= cInitMaxLineLenToCalcURL;
   FOptMaxLinesToCountUnindent:= 100;
