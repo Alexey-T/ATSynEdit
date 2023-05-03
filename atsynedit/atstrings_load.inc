@@ -537,7 +537,7 @@ var
       _FindNextEol(NStart, NEnd, LineEnd);
       Len:= NEnd-NStart;
       if Len>=MaxInt-12 then
-        raise EEditorTooLongLine.Create('Too big line length on reading: 0x'+IntToHex(Len));
+        raise EEditorTooLongLine.Create('Too big line length on reading: 0x'+IntToHex(Len, 8));
 
       {
       //call OnProgress each 1M chars
