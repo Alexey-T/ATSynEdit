@@ -5,12 +5,11 @@ refactored to separate unit by Alexey T.
 }
 unit ATSynEdit_Adapter_WindowsIME;
 
-{.$define IME_ATTR_FUNC}  //It has no functional code.
-
 interface
 
 uses
   Messages,
+  Forms,
   ATSynEdit_Adapters;
 
 type
@@ -19,11 +18,15 @@ type
   TATAdapterWindowsIME = class(TATAdapterIME)
   private
     FSelText: UnicodeString;
-    {$ifdef IME_ATTR_FUNC}
     position: Integer;
-    {$endif}
     buffer: array[0..256] of WideChar;        { use static buffer. to avoid unexpected exception on FPC }
+    //clbuffer: array[0..256] of longint;
+    //attrsize: Integer;
+    //attrbuf: array[0..255] of Byte;
+    CompForm: TForm;
+    procedure CompFormPaint(Sender: TObject);
     procedure UpdateWindowPos(Sender: TObject);
+    procedure UpdateCompForm(Sender: TObject);
   public
     procedure Stop(Sender: TObject; Success: boolean); override;
     procedure ImeRequest(Sender: TObject; var Msg: TMessage); override;
@@ -36,9 +39,12 @@ type
 implementation
 
 uses
+  SysUtils,
   Windows, Imm,
   Classes,
-  Forms,
+  Controls,
+  Graphics,
+  ATStringProc,
   ATSynEdit,
   ATSynEdit_Carets;
 
@@ -66,49 +72,108 @@ begin
   end;
 end;
 
+procedure TATAdapterWindowsIME.CompFormPaint(Sender: TObject);
+var
+  tm, cm: TSize;
+  s: UnicodeString;
+  i: Integer;
+begin
+  // draw text
+  tm:=CompForm.Canvas.TextExtent(buffer);
+  CompForm.Width:=tm.cx+2;
+  CompForm.Height:=tm.cy+2;
+  CompForm.Canvas.TextOut(1,0,buffer);
+  // draw IME Caret
+  s:='';
+  if position>0 then
+    for i:=0 to position-1 do
+      s:=s+buffer[i];
+  cm:=CompForm.Canvas.TextExtent(s);
+  cm.cy:=tm.cy+2;
+  CompForm.Canvas.Pen.Color:=clInfoText;
+  CompForm.Canvas.Pen.Mode:=pmNotXor;
+  CompForm.Canvas.Line(cm.cx  ,0,cm.cx  ,cm.cy+2);
+  CompForm.Canvas.Line(cm.cx+1,0,cm.cx+1,cm.cy+2);
+end;
+
 procedure TATAdapterWindowsIME.UpdateWindowPos(Sender: TObject);
 var
   Ed: TATSynEdit;
   Caret: TATCaretItem;
   imc: HIMC;
-  CandiForm: CANDIDATEFORM;
-  {
-  VisRect: TRect;
-  Y: integer;
-  }
+  CandiForm, exrect: CANDIDATEFORM;
+  i: Integer;
+  s: UnicodeString;
+  cm: TSize;
 begin
   Ed:= TATSynEdit(Sender);
   if Ed.Carets.Count=0 then exit;
   Caret:= Ed.Carets[0];
 
-  //VisRect:= Screen.WorkAreaRect;
-
   imc:= ImmGetContext(Ed.Handle);
-  if imc<>0 then
-  begin
-    CandiForm.dwIndex:= 0;
-    CandiForm.dwStyle:= CFS_FORCE_POSITION;
-    CandiForm.ptCurrentPos.X:= Caret.CoordX;
-    CandiForm.ptCurrentPos.Y:= Caret.CoordY+Ed.TextCharSize.Y+1;
-    ImmSetCandidateWindow(imc, @CandiForm);
-
-    (*
-    if ImmGetCandidateWindow(imc, 0, @CandiForm) then
+  try
+    if imc<>0 then
     begin
-      Y:= CandiForm.rcArea.Bottom;
-      if Y>=VisRect.Bottom then
-      begin
-        CandiForm.dwIndex:= 0;
-        CandiForm.dwStyle:= CFS_FORCE_POSITION;
+      CandiForm.dwIndex:= 0;
+      CandiForm.dwStyle:= CFS_CANDIDATEPOS;
+      CandiForm.rcArea:= Rect(0,0,0,0);
+      if position>0 then begin
+        s:='';
+        for i:=0 to position-1 do
+          s:=s+buffer[i];
+        cm:=CompForm.Canvas.TextExtent(s);
+        CandiForm.ptCurrentPos.X:=Caret.CoordX+cm.cx;
+      end else
         CandiForm.ptCurrentPos.X:= Caret.CoordX;
-        CandiForm.ptCurrentPos.Y:= 0;
-        ImmSetCandidateWindow(imc, @CandiForm);
-      end;
-    end;
-    *)
+      CandiForm.ptCurrentPos.Y:= Caret.CoordY+Ed.TextCharSize.Y+1;
 
-    ImmReleaseContext(Ed.Handle, imc);
+      exrect:=CandiForm;
+      ImmSetCandidateWindow(imc, @CandiForm);
+      exrect.dwStyle:=CFS_EXCLUDE;
+      exrect.rcArea:=Rect(exrect.ptCurrentPos.X,
+                          exrect.ptCurrentPos.Y,
+                          exrect.ptCurrentPos.X,
+                          exrect.ptCurrentPos.Y+Ed.TextCharSize.Y+1);
+      ImmSetCandidateWindow(imc,@exrect);
+    end;
+  finally
+    if imc<>0 then
+      ImmReleaseContext(Ed.Handle, imc);
   end;
+end;
+
+procedure TATAdapterWindowsIME.UpdateCompForm(Sender: TObject);
+var
+  ed: TATSynEdit;
+  CompPos: TATPoint;
+  Caret: TATCaretItem;
+begin
+  ed:=TATSynEdit(Sender);
+  if not Assigned(CompForm) then begin
+    CompForm:=TForm.Create(ed);
+    CompForm.Parent:=ed;
+    CompForm.BorderStyle:=bsNone;
+    CompForm.FormStyle:=fsStayOnTop;
+    CompForm.Top:=0;
+    CompForm.Left:=0;
+    CompForm.Height:=16;
+    CompForm.Width:=16;
+    CompForm.Color:=clInfoBk;
+    CompForm.OnPaint:=@CompFormPaint;
+  end;
+  CompForm.Font:=ed.Font;
+  if ed.Carets.Count>0 then begin
+    Caret:=ed.Carets[0];
+    CompPos:=ed.CaretPosToClientPos(Point(Caret.PosX,Caret.PosY));
+    CompForm.Left:=CompPos.X;
+    CompForm.Top:=CompPos.Y;
+  end else begin
+    CompForm.Left:=0;
+    CompForm.Top:=0;
+  end;
+
+  CompForm.Show;
+  CompForm.Invalidate;
 end;
 
 procedure TATAdapterWindowsIME.ImeRequest(Sender: TObject; var Msg: TMessage);
@@ -155,6 +220,7 @@ begin
     IMN_OPENCANDIDATE:
       UpdateWindowPos(Sender);
   end;
+  //writeln(Format('ImeNotify %d %d',[Msg.WParam,Msg.LParam]));
 end;
 
 procedure TATAdapterWindowsIME.ImeStartComposition(Sender: TObject;
@@ -162,90 +228,36 @@ procedure TATAdapterWindowsIME.ImeStartComposition(Sender: TObject;
 begin
   UpdateWindowPos(Sender);
   FSelText:= TATSynEdit(Sender).TextSelected;
-  {$ifdef IME_ATTR_FUNC}
-  position:=0;
-  {$endif}
   Msg.Result:= -1;
 end;
 
-{$ifdef IME_ATTR_FUNC}
-procedure getCompositionStrCovertedRange(imc: HIMC; var selstart, sellength: Integer);
-const
-  attrbufsize = MaxImeBufSize;
-var
-  attrbuf: array[0..attrbufsize-1] of byte;
-  len, astart, aend: Integer;
-begin
-  selstart:=0;
-  sellength:=0;
-
-  len:=ImmGetCompositionString(imc, GCS_COMPATTR, @attrbuf[0], attrbufsize);
-  if len<>0 then
-  begin
-    astart:=0;
-    while (astart < len) and (attrbuf[astart] and ATTR_TARGET_CONVERTED=0) do
-      Inc(astart);
-    if astart< len then
-    begin
-      aend:=astart+1;
-      while (aend < len) and (attrbuf[aend] and ATTR_TARGET_CONVERTED<>0) do
-        Inc(aend);
-      selstart:=astart;
-      sellength:=aend-astart;
-    end;
-  end;
-end;
-{$endif}
-
 procedure TATAdapterWindowsIME.ImeComposition(Sender: TObject; var Msg: TMessage);
-const
-  IME_COMPFLAG = GCS_COMPSTR or GCS_COMPATTR or GCS_CURSORPOS;
-  IME_RESULTFLAG = GCS_RESULTCLAUSE or GCS_RESULTSTR;
 var
   Ed: TATSynEdit;
   IMC: HIMC;
-  imeCode, len, ImmGCode: Integer;
-  {$ifdef IME_ATTR_FUNC}
-  astart, alen: Integer;
-  {$endif}
+  imeCode, len, ImmGCode{, i, cllen, ilen}: Integer;
   bOverwrite, bSelect: Boolean;
 begin
   Ed:= TATSynEdit(Sender);
   if not Ed.ModeReadOnly then
   begin
-    { work with GCS_COMPREADSTR and GCS_COMPSTR and GCS_RESULTREADSTR and GCS_RESULTSTR }
-    imeCode:=Msg.lParam and (IME_COMPFLAG or IME_RESULTFLAG);
+    imeCode:=Msg.lParam;
     { check compositon state }
-    if imeCode<>0 then
-    begin
       IMC := ImmGetContext(Ed.Handle);
       try
          ImmGCode:=Msg.wParam;
           { Insert IME Composition string }
           if ImmGCode<>$1b then
           begin
-            { for janpanese IME, process result and composition separately.
+            { for janpanese IME, process GCS_RESULTSTR and GCS_COMPSTR separately.
               It comes togetther }
             { insert result string }
-            if imecode and IME_RESULTFLAG<>0 then
+            if imecode and GCS_RESULTSTR<>0 then
             begin
               len:=ImmGetCompositionStringW(IMC,GCS_RESULTSTR,@buffer[0],sizeof(buffer)-sizeof(WideChar));
               if len>0 then
                 len := len shr 1;
               buffer[len]:=#0;
-              {$ifdef IME_ATTR_FUNC}
-              // NOT USED
-              if imeCode and GCS_CURSORPOS<>0 then
-                position:=ImmGetCompositionStringW(IMC,GCS_CURSORPOS,nil,0);
-              getCompositionStrCovertedRange(IMC, astart, alen);
-              if (Msg.lParam and CS_INSERTCHAR<>0) and (Msg.lParam and CS_NOMOVECARET<>0) then
-              begin
-                astart:=0;
-                alen:=len;
-              end;
-              if alen=0 then
-                astart:=0;
-              {$endif}
               // insert
               bOverwrite:=Ed.ModeOverwrite and
                           (Length(FSelText)=0);
@@ -253,37 +265,51 @@ begin
                                    bOverwrite,
                                    False);
               FSelText:='';
+              CompForm.Hide;
             end;
             { insert composition string }
-            if imeCode and IME_COMPFLAG<>0 then begin
+            if imeCode and GCS_COMPSTR<>0 then begin
               len:=ImmGetCompositionStringW(IMC,GCS_COMPSTR,@buffer[0],sizeof(buffer)-sizeof(WideChar));
               if len>0 then
-                len := len shr 1;
+                len := len shr 1
+                else
+                  CompForm.Hide;
               buffer[len]:=#0;
-              bSelect:=len>0;
-              {$ifdef IME_ATTR_FUNC}
-              // NOT USED
-              if imeCode and GCS_CURSORPOS<>0 then
-                position:=ImmGetCompositionStringW(IMC,GCS_CURSORPOS,nil,0);
-              getCompositionStrCovertedRange(IMC, astart, alen);
-              if (Msg.lParam and CS_INSERTCHAR<>0) and (Msg.lParam and CS_NOMOVECARET<>0) then
-              begin
-                astart:=0;
-                alen:=len;
+              { Position change when pressing left right move on candidate composition window.
+                It need to virtual caret for this. The best idea is add composition modaless form for IME. }
+              if imeCode and GCS_CURSORPOS<>0 then begin
+                position:=ImmGetCompositionStringW(IMC, GCS_CURSORPOS, nil, 0);
+                ImmNotifyIME(IMC,NI_OPENCANDIDATE,0,0);
               end;
-              if alen=0 then
-                astart:=0;
-              {$endif}
-              // insert
-              Ed.TextInsertAtCarets(buffer, False,
-                                   False,
-                                   bSelect);
+              //Writeln(Format('len %d, attrsize %d, position %d',[len,attrsize,position]));
+              // for japanese, not used
+              {if imeCode and GCS_COMPCLAUSE<>0 then begin
+                // due to chinese IME bug, using A API function
+		cllen:=ImmGetCompositionStringA(IMC, GCS_COMPCLAUSE, @clbuffer[0],sizeof(clbuffer));
+                //Writeln(Format('CLAUSE %d',[cllen]));
+                cllen:=cllen div sizeof(LongInt);
+              end;
+              // for japanese and chinese, not used
+              if imeCode and GCS_COMPATTR<>0 then
+                attrsize:=ImmGetCompositionStringW(IMC, GCS_COMPATTR, @attrbuf[0], sizeof(attrbuf))
+                else
+                  attrsize:=0;
+              // for chinese, not used
+              if (attrsize>0) then begin
+                ilen:=0;
+                for i:=position to attrsize-1 do begin
+                  if attrbuf[i]=1 then
+                    Inc(ilen)
+                    else
+                      break;
+                end;                
+              end;}
+              UpdateCompForm(Sender);
             end;
           end;
       finally
         ImmReleaseContext(Ed.Handle,IMC);
       end;
-    end;
   end;
   //WriteLn(Format('WM_IME_COMPOSITION %x, %x',[Msg.wParam,Msg.lParam]));
   Msg.Result:= -1;
@@ -296,12 +322,16 @@ var
   Len: Integer;
 begin
   Ed:= TATSynEdit(Sender);
+  position:=0;
   Len:= Length(FSelText);
   Ed.TextInsertAtCarets(FSelText, False, False, Len>0);
-  {$ifdef IME_ATTR_FUNC}
-  position:=0;
-  {$endif}
-  //WriteLn(Format('set STRING %d, %s',[Len,FSelText]));
+  CompForm.Hide;
+  { tweak for emoji window, but don't work currently
+    it shows emoji window on previous position.
+    but not work good with chinese IME. }
+  //SetFocus(0);
+  //SetFocus(Ed.Handle);
+
   //WriteLn(Format('WM_IME_ENDCOMPOSITION %x, %x',[Msg.wParam,Msg.lParam]));
   Msg.Result:= -1;
 end;
