@@ -693,7 +693,7 @@ var
 begin
   NLen:= Length(S);
   if NLen>=MaxInt-1 then
-    raise EEditorTooLongLine.Create('Storing too long line: 0x'+IntToHex(NLen));
+    raise EEditorTooLongLine.Create('Storing too long line: 0x'+IntToHex(NLen, 8));
   if NLen=0 then
   begin
     Ex.Wide:= false;
@@ -731,7 +731,7 @@ begin
 
   NLen:= Length(S);
   if NLen>=MaxInt-1 then
-    raise EEditorTooLongLine.Create('Storing too long line: 0x'+IntToHex(NLen));
+    raise EEditorTooLongLine.Create('Storing too long line: 0x'+IntToHex(NLen, 8));
   if NLen=0 then
   begin
     Ex.Wide:= false;
