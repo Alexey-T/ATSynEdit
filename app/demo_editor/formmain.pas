@@ -226,7 +226,7 @@ type
     procedure EditStringsChangeBlock(Sender: TObject; const AStartPos,
       AEndPos: TPoint; AChange: TATBlockChangeKind; ABlock: TStringList);
     procedure EditClickGap(Sender: TObject; AGapItem: TATGapItem; APos: TPoint);
-    procedure EditStringsChange(Sender: TObject; AChange: TATLineChangeKind; ALineIndex, AItemCount: integer);
+    procedure EditStringsChange(Sender: TObject; AChange: TATLineChangeKind; ALineIndex, AItemCount: SizeInt);
     function EditCalcTabSize(Sender: TObject; ALineIndex, APos: integer): integer;
     procedure FinderConfirmReplace(Sender: TObject; APos1, APos2: TPoint;
       AForMany: boolean; var AConfirm, AContinue: boolean; var AReplacement: UnicodeString);
@@ -655,7 +655,7 @@ begin
     if ADetectEnc then
       ed.Strings.EncodingCodepage:= eidUTF8;
     ed.Strings.EncodingDetect:= ADetectEnc;
-    ed.LoadFromFile(fn);
+    ed.LoadFromFile(fn, []);
     ed.Strings.EncodingDetect:= true;
   finally
     ed.EndUpdate;
@@ -1008,10 +1008,12 @@ end;
 
 procedure TfmMain.mnuTestConvPosClick(Sender: TObject);
 var
-  P: TPoint;
+  PntText: TPoint;
+  PntCoord: TATPoint;
 begin
-  P:= ed.CaretPosToClientPos(Point(0, ed.Strings.Count{after end-of-file!}));
-  ShowMessage(Format('Client pos (%d, %d)', [P.X, P.Y]));
+  PntText:= Point(0, ed.Strings.Count{after end-of-file!});
+  PntCoord:= ed.CaretPosToClientPos(PntText);
+  ShowMessage(Format('Client pos (%d, %d)', [PntCoord.X, PntCoord.Y]));
 end;
 
 procedure TfmMain.mnuTestGapAddClick(Sender: TObject);
@@ -1259,7 +1261,7 @@ begin
 end;
 
 procedure TfmMain.EditStringsChange(Sender: TObject;
-  AChange: TATLineChangeKind; ALineIndex, AItemCount: integer);
+  AChange: TATLineChangeKind; ALineIndex, AItemCount: SizeInt);
 const
   cEvent: array[TATLineChangeKind] of string = (
     'cLineChangeEdited',

@@ -112,7 +112,7 @@ begin
   adapter.Lexer:= nil;
   Tree.Items.Clear;
 
-  ed.LoadFromFile(fn);
+  ed.LoadFromFile(fn, []);
   ed.SetFocus;
 
   an:= Lexer_FindForFilename(manager, fn);
