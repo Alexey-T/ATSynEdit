@@ -6347,6 +6347,14 @@ begin
           FOnClickMoveCaret(Self, Point(Carets[0].PosX, Carets[0].PosY), FMouseDownPnt);
 
         DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
+        DoShowPos(
+          FMouseDownPnt,
+          FOptScrollIndentCaretHorz,
+          FOptScrollIndentCaretVert,
+          true,
+          false,
+          true
+          );
         DoSelect_None;
       end;
     end;
