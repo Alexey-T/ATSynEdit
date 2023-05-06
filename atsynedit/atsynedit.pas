@@ -2788,6 +2788,7 @@ var
   bVert1, bVert2, bHorz1, bHorz2: boolean;
   bVertOur1, bVertOur2, bHorzOur1, bHorzOur2: boolean;
   bChangedBarsOs, bChangedBarsOur: boolean;
+  bScrolled: boolean;
   NPos, NLineIndex, NGapPos, NGapAll: integer;
   CharSizeScaled_Prev: integer;
 begin
@@ -2893,10 +2894,15 @@ begin
     if FScrollHorz.NPos<>FPrevHorz.NPos then
       Include(FPaintFlags, cIntFlagScrolledHorz);
 
+    bScrolled:=
+      (FPrevHorz.SmoothPos<>FScrollHorz.SmoothPos) or
+      (FPrevVert.SmoothPos<>FScrollVert.SmoothPos);
+
     FPrevHorz:= FScrollHorz;
     FPrevVert:= FScrollVert;
 
-    DoEventScroll;
+    if bScrolled then
+      DoEventScroll;
   end;
 end;
 
