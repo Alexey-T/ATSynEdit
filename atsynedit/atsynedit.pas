@@ -9437,11 +9437,20 @@ begin
     (TATSynEdit(Source).Carets[0].IsSelection);
 
   if Accept then
+  begin
     Update;
+
+    if GetActualDragDropIsCopying then
+      Cur:= crMultiDrag
+    else
+      Cur:= crDrag;
+    Cursor:= Cur;
+    DragCursor:= Cur;
+  end;
 
   {$ifdef change_screen_cursor}
   if Accept then
-    Screen.Cursor:= crDrag
+    Screen.Cursor:= Cur
   else
     Screen.Cursor:= crDefault;
   {$endif}
