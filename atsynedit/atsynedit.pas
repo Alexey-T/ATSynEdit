@@ -9438,8 +9438,16 @@ begin
 
   if Accept then
   begin
-    Screen.Cursor:= Self.Cursor; //needed for gtk2
+    {$ifdef LCLGTK2}
+    Screen.Cursor:= crDrag;
+    {$endif}
     Update;
+  end
+  else
+  begin
+    {$ifdef LCLGTK2}
+    Screen.Cursor:= crDefault;
+    {$endif}
   end;
 end;
 
@@ -9450,6 +9458,10 @@ var
   PntCoord: TATPoint;
   Details: TATEditorPosDetails;
 begin
+  {$ifdef LCLGTK2}
+  Screen.Cursor:= crDefault;
+  {$endif}
+
   if not (Source is TATSynEdit) then exit;
 
   //this check means: method runs only on drop from another editor
