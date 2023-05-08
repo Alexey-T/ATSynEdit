@@ -9440,14 +9440,6 @@ begin
   if Accept then
   begin
     Update;
-    {
-    if GetActualDragDropIsCopying then
-      Cur:= crMultiDrag
-    else
-      Cur:= crDrag;
-    Cursor:= Cur;
-    DragCursor:= Cur;
-    }
   end;
 end;
 
