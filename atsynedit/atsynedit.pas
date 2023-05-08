@@ -7636,8 +7636,10 @@ var
   R: TRect;
 begin
   if not FOptShowDragDropMarker then exit;
-  if not FMouseDragDropping then exit;
-  if not FMouseDragDroppingReal then exit;
+
+  //if not FMouseDragDropping or not FMouseDragDroppingReal then exit;
+  ////drag-drop from another control may be active
+  if not DragManager.IsDragging then exit;
 
   PntMouse:= ScreenToClient(Mouse.CursorPos);
   if not PtInRect(ClientRect, PntMouse) then exit;
