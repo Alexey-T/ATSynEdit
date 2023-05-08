@@ -7587,8 +7587,8 @@ begin
 
     if FCaretBlinkEnabled then
     begin
-      //this block is to solve 'ghost caret on typing'
-      //CudaText issue #3167
+      //this block is to solve 'ghost caret on typing', CudaText issue #3167
+      //check (Caret.OldRect<>R) is to fix CudaText issue #5054
       if not FCaretShown and (Caret.OldRect<>R) then
       begin
         RectCaretOld:= Caret.OldRect;
