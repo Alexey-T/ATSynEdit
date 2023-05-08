@@ -9435,6 +9435,9 @@ begin
     (Source is TATSynEdit) and
     (TATSynEdit(Source).Carets.Count>0) and
     (TATSynEdit(Source).Carets[0].IsSelection);
+
+  if Accept then
+    Update;
 end;
 
 procedure TATSynEdit.DragDrop(Source: TObject; X, Y: Integer);
