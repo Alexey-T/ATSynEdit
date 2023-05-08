@@ -6514,8 +6514,8 @@ begin
     Exit
   end;
 
-  if ATPointInRect(ClientRect, PosCoord) then
-  if FMouseDragDropping then
+  if ATPointInRect(ClientRect, PosCoord) and FMouseDragDropping and IsVisible then
+    //check IsVisible because we may drag-drop to another editor control
   begin
     //drag-drop really started
     if FMouseDragDroppingReal then
