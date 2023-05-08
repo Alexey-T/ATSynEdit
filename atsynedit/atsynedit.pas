@@ -9440,21 +9440,15 @@ begin
   if Accept then
   begin
     Update;
-
+    {
     if GetActualDragDropIsCopying then
       Cur:= crMultiDrag
     else
       Cur:= crDrag;
     Cursor:= Cur;
     DragCursor:= Cur;
+    }
   end;
-
-  {$ifdef change_screen_cursor}
-  if Accept then
-    Screen.Cursor:= Cur
-  else
-    Screen.Cursor:= crDefault;
-  {$endif}
 end;
 
 procedure TATSynEdit.DragDrop(Source: TObject; X, Y: Integer);
@@ -9464,10 +9458,6 @@ var
   PntCoord: TATPoint;
   Details: TATEditorPosDetails;
 begin
-  {$ifdef change_screen_cursor}
-  Screen.Cursor:= crDefault;
-  {$endif}
-
   if not (Source is TATSynEdit) then exit;
 
   //this check means: method runs only on drop from another editor
