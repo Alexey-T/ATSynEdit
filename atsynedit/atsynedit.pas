@@ -7589,7 +7589,7 @@ begin
     begin
       //this block is to solve 'ghost caret on typing'
       //CudaText issue #3167
-      if not FCaretShown then
+      if not FCaretShown and (Caret.OldRect<>R) then
       begin
         RectCaretOld:= Caret.OldRect;
         if RectCaretOld.Width>0 then
