@@ -6650,7 +6650,8 @@ begin
   PntClient:= ScreenToClient(Mouse.CursorPos);
   if not PtInRect(ClientRect, PntClient) then exit;
 
-  if FMouseDragDropping and FMouseDragDroppingReal then
+  //if FMouseDragDropping and FMouseDragDroppingReal then
+  if DragManager.IsDragging then
   begin
     //don't check here PtInRect(FRectMain, P), to have ok cursor
     //when dragging to another editor
