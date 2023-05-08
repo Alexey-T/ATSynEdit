@@ -9437,7 +9437,10 @@ begin
     (TATSynEdit(Source).Carets[0].IsSelection);
 
   if Accept then
+  begin
+    Screen.Cursor:= Self.Cursor; //needed for gtk2
     Update;
+  end;
 end;
 
 procedure TATSynEdit.DragDrop(Source: TObject; X, Y: Integer);
