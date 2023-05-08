@@ -9411,7 +9411,7 @@ var
   Cur: TCursor;
   EdOther: TATSynEdit;
 begin
-  Sleep(30);
+  Sleep(30); //avoid bug CPU load, as method is called often
 
   if (Source is TATSynEdit) and (Source<>Self) then
   begin
@@ -9437,18 +9437,14 @@ begin
     (TATSynEdit(Source).Carets[0].IsSelection);
 
   if Accept then
-  begin
-    {$ifdef LCLGTK2}
-    Screen.Cursor:= crDrag;
-    {$endif}
     Update;
-  end
+
+  {$ifdef change_screen_cursor}
+  if Accept then
+    Screen.Cursor:= crDrag
   else
-  begin
-    {$ifdef LCLGTK2}
     Screen.Cursor:= crDefault;
-    {$endif}
-  end;
+  {$endif}
 end;
 
 procedure TATSynEdit.DragDrop(Source: TObject; X, Y: Integer);
@@ -9458,7 +9454,7 @@ var
   PntCoord: TATPoint;
   Details: TATEditorPosDetails;
 begin
-  {$ifdef LCLGTK2}
+  {$ifdef change_screen_cursor}
   Screen.Cursor:= crDefault;
   {$endif}
 

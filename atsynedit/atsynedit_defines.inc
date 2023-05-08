@@ -8,3 +8,7 @@
 
 {$define map_th} //render minimap in thread
 
+{$ifdef LCLGTK2}
+  {$define change_screen_cursor}
+{$endif}
+
