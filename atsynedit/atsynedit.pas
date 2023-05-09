@@ -9432,7 +9432,7 @@ begin
     FOptMouseDragDrop and
     (not ModeReadOnly) and
     (Source is TATSynEdit) and
-    (TATSynEdit(Source).Carets.Count>0) and
+    (TATSynEdit(Source).Carets.Count=1) and
     (TATSynEdit(Source).Carets[0].IsSelection) and
     (not ModeOneLine or not TATSynEdit(Source).Carets[0].IsMultilineSelection);
 
