@@ -5420,14 +5420,13 @@ begin
     OptGutterVisible:= false;
     OptRulerVisible:= false;
     OptMinimapVisible:= false;
-    //OptMicromapVisible:= false;
     OptCaretVirtual:= false;
     OptCaretManyAllowed:= false;
     OptUnprintedVisible:= false;
     OptWrapMode:= cWrapOff;
     OptScrollStyleHorz:= aessHide;
     OptScrollStyleVert:= aessHide;
-    OptMouseDragDrop:= false;
+    //OptMouseDragDrop:= false;
     OptMarginRight:= 1000;
     OptUndoLimit:= 200;
 
@@ -9432,10 +9431,10 @@ begin
   Accept:=
     FOptMouseDragDrop and
     (not ModeReadOnly) and
-    (not ModeOneLine) and
     (Source is TATSynEdit) and
     (TATSynEdit(Source).Carets.Count>0) and
-    (TATSynEdit(Source).Carets[0].IsSelection);
+    (TATSynEdit(Source).Carets[0].IsSelection) and
+    (not ModeOneLine or not TATSynEdit(Source).Carets[0].IsMultilineSelection);
 
   if Accept then
   begin
