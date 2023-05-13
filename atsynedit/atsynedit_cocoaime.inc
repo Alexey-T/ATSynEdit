@@ -158,23 +158,27 @@ end;
 
 function TATAdapterCocoaIME.calcBound( var params: TCocoaIMEParameters ) : TRect;
 var
-  p1: TPoint;
-  p2: TPoint;
+  PntText1, PntText2: TPoint;
+  PntCoord1, PntCoord2: TATPoint;
 begin
   // two vertexs in chars
-  p1:= _IntermediateTextBeginPos;
-  p2:= p1;
-  p1.X:= p1.X + params.selectedStart;
-  p2.X:= p1.X + params.selectedLength;
+  PntText1:= _IntermediateTextBeginPos;
+  PntText2:= PntText1;
+  PntText1.X:= PntText1.X + params.selectedStart;
+  PntText2.X:= PntText2.X + params.selectedLength;
 
   // two vertexs in pixels
-  p1:= _editor.CaretPosToClientPos( p1 );
-  p1.Y:= p1.Y - _editor.TextCharSize.Y div 2;
-  p2:= _editor.CaretPosToClientPos( p2 );
-  p2.Y:= p2.Y + _editor.TextCharSize.Y;
+  PntCoord1:= _editor.CaretPosToClientPos( PntText1 );
+  PntCoord1.Y:= PntCoord1.Y - _editor.TextCharSize.Y div 2;
+
+  PntCoord2:= _editor.CaretPosToClientPos( PntText2 );
+  PntCoord2.Y:= PntCoord2.Y + _editor.TextCharSize.Y;
 
   // client rect in pixels
-  Result:= TRect.Create( p1, p2 );
+  Result.Left:= PntCoord1.X;
+  Result.Top:= PntCoord1.Y;
+  Result.Right:= PntCoord2.X;
+  Result.Bottom:= PntCoord2.Y;
 end;
 
 // todo: can be improved by getting the most suitable Caret in the viewbound
