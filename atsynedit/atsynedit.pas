@@ -6241,7 +6241,7 @@ begin
       FMouseDownOnMinimap:= false;
 
       ////discussed at CudaText issue #4928, now minimap click scrolls to the clicked place
-      if ssShift in Shift then
+      if (Button=mbMiddle) or ((Button=mbLeft) and (ssShift in Shift)) then
         DoMinimapDrag(Y)
       else
       begin
@@ -6793,7 +6793,7 @@ begin
     if FMouseDragMinimap then
     begin
       if bMovedMinimal then
-        if Shift-[ssShift]=[ssLeft] then
+        if (Shift=[ssMiddle]) or (Shift-[ssShift]=[ssLeft]) then
           DoMinimapDrag(Y);
       Exit
     end;
