@@ -6241,11 +6241,13 @@ begin
       FMouseDownOnMinimap:= false;
 
       ////discussed at CudaText issue #4928, now minimap click scrolls to the clicked place
-      ////was:
-      //DoMinimapDrag(Y);
-      ////changed to:
-      DoMinimapClick(Y);
-      FMouseDragMinimapDelta:= Y-RectMinimapSel.Top;
+      if ssShift in Shift then
+        DoMinimapDrag(Y)
+      else
+      begin
+        DoMinimapClick(Y);
+        FMouseDragMinimapDelta:= Y-RectMinimapSel.Top;
+      end;
     end
     else
     if ATPointInRect(RectMinimapSel, PosCoord) then
@@ -6791,7 +6793,7 @@ begin
     if FMouseDragMinimap then
     begin
       if bMovedMinimal then
-        if Shift=[ssLeft] then
+        if Shift-[ssShift]=[ssLeft] then
           DoMinimapDrag(Y);
       Exit
     end;
