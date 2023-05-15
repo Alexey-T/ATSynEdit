@@ -6246,8 +6246,8 @@ begin
       else
       begin
         DoMinimapClick(Y);
-        //FMouseDragMinimapDelta:= Y-RectMinimapSel.Top;
-          //commented the line above to fix https://github.com/Alexey-T/CudaText/issues/5074#issuecomment-1547852513
+        FMouseDragMinimapDelta:= Y-RectMinimapSel.Top;
+          //see bugreport: https://github.com/Alexey-T/CudaText/issues/5074#issuecomment-1547852513
       end;
     end
     else
