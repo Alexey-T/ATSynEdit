@@ -6261,9 +6261,15 @@ begin
         UpdateScrollbars(true);
         UpdateScrollbarsOfMinimap;
 
+        {
+        //this block moves Mouse.CursorPos, which don't work in Wayland session
         FMouseDragMinimapDelta:= FMouseDragMinimapSelHeight div 2;
         FMouseDragHandlerDisabled:= true;
         Mouse.CursorPos:= ClientToScreen(Point(X, GetMinimapSelTop+FMouseDragMinimapSelHeight div 2));
+        }
+
+        //this block don't move Mouse.CursorPos
+        FMouseDragMinimapDelta:= Y-GetMinimapSelTop;
         //see also bugreport: https://github.com/Alexey-T/CudaText/issues/5074#issuecomment-1547852513
       end;
     end
