@@ -6802,7 +6802,7 @@ begin
     if bOnMinimap<>FCursorOnMinimap then
       bUpdateForMinimap:= true;
     FCursorOnMinimap:= bOnMinimap;
-    if FMinimapTooltipVisible and bOnMinimap then
+    if FMinimapTooltipVisible and bOnMinimap and (Shift*[ssLeft, ssMiddle]=[]) then
     begin
       FMinimapTooltipEnabled:= true;
       bUpdateForMinimap:= true;
