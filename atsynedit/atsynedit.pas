@@ -650,6 +650,7 @@ type
     FMouseRightClickOnGutterIsHandled: boolean;
     FMouseAutoScrollDirection: TATEditorDirection;
     FMouseActions: TATEditorMouseActions;
+    FMouseMoveHandlerDisabled: boolean;
     FLockInput: boolean;
     FLastControlWidth: integer;
     FLastControlHeight: integer;
@@ -6257,7 +6258,10 @@ begin
         UpdateScrollbars(true);
         UpdateScrollbarsOfMinimap;
 
-        FMouseDragMinimapDelta:= Y-GetMinimapSelTop;
+        FMouseDragMinimapDelta:= FMouseDragMinimapSelHeight div 2;
+        FMouseMoveHandlerDisabled:= true;
+        Mouse.CursorPos:= ClientToScreen(Point(X, GetMinimapSelTop+FMouseDragMinimapSelHeight div 2));
+        FMouseMoveHandlerDisabled:= false;
         //see also bugreport: https://github.com/Alexey-T/CudaText/issues/5074#issuecomment-1547852513
       end;
     end
@@ -6738,6 +6742,7 @@ var
   Caret: TATCaretItem;
 begin
   if not OptMouseEnableAll then exit;
+  if FMouseMoveHandlerDisabled then exit;
   inherited;
 
   PntCoord:= ATPoint(X, Y);
