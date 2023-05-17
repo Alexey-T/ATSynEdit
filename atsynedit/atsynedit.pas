@@ -1054,7 +1054,6 @@ type
     procedure UpdateClipboardRecents(const AText: string);
     procedure UpdateGapForms(ABeforePaint: boolean);
     procedure UpdateAndWait(AUpdateWrapInfo: boolean; APause: integer);
-    procedure UpdateScrollInfoVertPartial(out APage, AMax: Int64);
     procedure SetFoldingAsString(const AValue: string);
     procedure SetOptShowURLsRegex(const AValue: string);
     procedure SetShowOsBarVert(AValue: boolean);
@@ -1332,6 +1331,8 @@ type
     procedure UpdateGutterBandIndexes;
     procedure UpdateScrollbarVert;
     procedure UpdateScrollbarHorz;
+    procedure UpdateScrollbarsOfMinimap;
+    procedure UpdateScrollInfoVertPartial(out APage, AMax: Int64);
     procedure UpdateSelRectFromPoints(const P1, P2: TPoint);
     procedure UpdateInitialVars(C: TCanvas);
     procedure UpdateLinksAttribs(ALineFrom: integer);
@@ -4472,17 +4473,22 @@ begin
   end;
 end;
 
+procedure TATSynEdit.UpdateScrollbarsOfMinimap;
+begin
+  FScrollHorzMinimap.Clear;
+  FScrollVertMinimap.Clear;
+
+  FScrollVertMinimap.NPos:= GetMinimapScrollPos;
+  FScrollVertMinimap.NPosLast:= MaxInt div 2;
+end;
+
 procedure TATSynEdit.DoPaintMinimapAllToBGRABitmap;
 begin
   //avoid too often minimap repainting
   if not FAdapterIsDataReady then exit;
   FTickMinimap:= GetTickCount64;
 
-  FScrollHorzMinimap.Clear;
-  FScrollVertMinimap.Clear;
-
-  FScrollVertMinimap.NPos:= GetMinimapScrollPos;
-  FScrollVertMinimap.NPosLast:= MaxInt div 2;
+  UpdateScrollbarsOfMinimap;
 
   DoPaintMinimapTextToBGRABitmap(FRectMinimap, FCharSizeMinimap, FScrollHorzMinimap, FScrollVertMinimap);
   DoPaintMinimapSelToBGRABitmap;
