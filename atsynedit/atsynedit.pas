@@ -646,11 +646,11 @@ type
     FMouseDragMinimap: boolean;
     FMouseDragMinimapDelta: integer;
     FMouseDragMinimapSelHeight: integer;
+    FMouseDragHandlerDisabled: boolean;
     FMouseDownAndColumnSelection: boolean;
     FMouseRightClickOnGutterIsHandled: boolean;
     FMouseAutoScrollDirection: TATEditorDirection;
     FMouseActions: TATEditorMouseActions;
-    FMouseMoveHandlerDisabled: boolean;
     FLockInput: boolean;
     FLastControlWidth: integer;
     FLastControlHeight: integer;
@@ -6262,7 +6262,7 @@ begin
         UpdateScrollbarsOfMinimap;
 
         FMouseDragMinimapDelta:= FMouseDragMinimapSelHeight div 2;
-        FMouseMoveHandlerDisabled:= true;
+        FMouseDragHandlerDisabled:= true;
         Mouse.CursorPos:= ClientToScreen(Point(X, GetMinimapSelTop+FMouseDragMinimapSelHeight div 2));
         //see also bugreport: https://github.com/Alexey-T/CudaText/issues/5074#issuecomment-1547852513
       end;
@@ -6812,8 +6812,8 @@ begin
     begin
       if bMovedMinimal then
         if (Shift=[ssMiddle]) or (Shift-[ssShift]=[ssLeft]) then
-          if FMouseMoveHandlerDisabled then
-            FMouseMoveHandlerDisabled:= false
+          if FMouseDragHandlerDisabled then
+            FMouseDragHandlerDisabled:= false
           else
             DoMinimapDrag(Y);
       Exit
