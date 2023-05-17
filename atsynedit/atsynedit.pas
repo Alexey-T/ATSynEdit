@@ -4421,6 +4421,9 @@ end;
 function TATSynEdit.GetMinimap_ClickedPosToWrapIndex(APosY: integer): integer;
 begin
   Result:= (APosY-FRectMinimap.Top) div FCharSizeMinimap.Y + FScrollVertMinimap.NPos;
+  if Result>FWrapInfo.Count-1 then
+    Result:= FWrapInfo.Count-1
+  else
   if not FWrapInfo.IsIndexValid(Result) then
     Result:= -1;
 end;
