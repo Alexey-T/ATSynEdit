@@ -6252,7 +6252,11 @@ begin
       else
       begin
         DoMinimapClick(Y);
-        Application.ProcessMessages; //important, so GetMinimapSelTop will return updated value
+
+        //important, so GetMinimapSelTop will return updated value
+        UpdateScrollbars(true);
+        UpdateScrollbarsOfMinimap;
+
         FMouseDragMinimapDelta:= Y-GetMinimapSelTop;
         //see also bugreport: https://github.com/Alexey-T/CudaText/issues/5074#issuecomment-1547852513
       end;
