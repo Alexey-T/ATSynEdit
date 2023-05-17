@@ -4064,7 +4064,8 @@ begin
   else
   begin
     //paint wrapped-line-part mark
-    if FUnprintedVisible and FUnprintedEnds then
+    if FUnprintedVisible and FUnprintedEnds and
+      (not FUnprintedSpacesOnlyInSelection or bLineEolSelected) then
       DoPaintUnprintedWrapMark(C,
         CoordAfterText.X,
         CoordAfterText.Y,
