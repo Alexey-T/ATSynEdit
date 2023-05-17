@@ -6809,7 +6809,10 @@ begin
     begin
       if bMovedMinimal then
         if (Shift=[ssMiddle]) or (Shift-[ssShift]=[ssLeft]) then
-          DoMinimapDrag(Y);
+          if FMouseMoveHandlerDisabled then
+            FMouseMoveHandlerDisabled:= false
+          else
+            DoMinimapDrag(Y);
       Exit
     end;
   end;
@@ -8470,12 +8473,6 @@ procedure TATSynEdit.DoMinimapDrag(APosY: integer);
 var
   NPos: integer;
 begin
-  if FMouseMoveHandlerDisabled then
-  begin
-    FMouseMoveHandlerDisabled:= false;
-    exit;
-  end;
-
   NPos:= GetMinimap_DraggedPosToWrapIndex(APosY);
   DoScroll_SetPos(FScrollVert, NPos);
   Update;
