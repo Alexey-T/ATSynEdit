@@ -6246,8 +6246,9 @@ begin
       else
       begin
         DoMinimapClick(Y);
-        FMouseDragMinimapDelta:= Y-RectMinimapSel.Top;
-          //see bugreport: https://github.com/Alexey-T/CudaText/issues/5074#issuecomment-1547852513
+        Application.ProcessMessages; //important, so GetMinimapSelTop will return updated value
+        FMouseDragMinimapDelta:= Y-GetMinimapSelTop;
+        //see also bugreport: https://github.com/Alexey-T/CudaText/issues/5074#issuecomment-1547852513
       end;
     end
     else
