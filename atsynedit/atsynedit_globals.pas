@@ -32,7 +32,7 @@ type
     FClipboardColumnFormat: TClipboardFormat;
     FClipboardIndentFormat: TClipboardFormat;
   public const
-    ProgressLoadChars = 1024*1024;
+    ProgressLoadChars = 512*1024;
     ProgressSaveLines = 128*1024;
 
     //set it to number of editors, which share the same Strings object
