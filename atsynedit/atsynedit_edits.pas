@@ -189,7 +189,10 @@ begin
     R:= RectMicromap;
     //Application.MessageBox(PChar(Format('click %d:%d, rect map %d:%d-%d:%d', [AX, AY, R.Left, R.Top, R.Right, R.Bottom])), 'click');
     if AX < R.Width div 2 then
-      Text:= ''
+    begin
+      Text:= '';
+      OnChange(Self);
+    end
     else
       DoComboMenu;
   end
