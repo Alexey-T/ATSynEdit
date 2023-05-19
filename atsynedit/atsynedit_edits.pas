@@ -213,7 +213,8 @@ begin
     CanvasPaintXMark(C,
       Rect(ARect.Left, ARect.Top, (ARect.Left+ARect.Right) div 2, ARect.Bottom),
       Colors.ComboboxArrow,
-      3, 3,
+      ATEditorScale(3),
+      ATEditorScale(3),
       ATEditorScale(1)
       );
 
