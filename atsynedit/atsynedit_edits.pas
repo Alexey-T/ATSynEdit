@@ -42,7 +42,7 @@ type
   private
     FItems: TStringList;
     FItemIndex: integer;
-    FOptMicromapShowXIcon: boolean;
+    FOptComboboxShowX: boolean;
     FMenu: TPopupMenu;
     procedure DoComboMenu;
     procedure DoComboUpDown(ADown: boolean);
@@ -58,7 +58,7 @@ type
     procedure DoCommand(ACmd: integer; AInvoke: TATEditorCommandInvoke; const AText: atString = ''); override;
     procedure DoAddLineToHistory(const AStr: atString; AMaxItems: integer);
   published
-    property OptMicromapShowXIcon: boolean read FOptMicromapShowXIcon write FOptMicromapShowXIcon default false;
+    property OptComboboxShowX: boolean read FOptComboboxShowX write FOptComboboxShowX default false;
   end;
 
 
@@ -171,7 +171,7 @@ begin
   FMenu:= TPopupMenu.Create(Self);
 
   OptMicromapVisible:= true;
-  OptMicromapShowXIcon:= true;
+  OptComboboxShowX:= true;
   Micromap.Columns[0].NWidthPercents:= 300;
 
   OnClickMicromap:= @MicromapClick;
@@ -184,14 +184,14 @@ procedure TATComboEdit.MicromapClick(Sender: TObject; AX, AY: integer);
 var
   R: TRect;
 begin
-  if FOptMicromapShowXIcon then
+  if FOptComboboxShowX then
   begin
     R:= RectMicromap;
     //Application.MessageBox(PChar(Format('click %d:%d, rect map %d:%d-%d:%d', [AX, AY, R.Left, R.Top, R.Right, R.Bottom])), 'click');
     if AX < R.Width div 2 then
     begin
       Text:= '';
-      OnChange(Self);
+      DoEventChange(0);
     end
     else
       DoComboMenu;
@@ -211,7 +211,7 @@ begin
   C.Brush.Color:= Colors.ComboboxArrowBG;
   C.FillRect(ARect);
 
-  if FOptMicromapShowXIcon then
+  if FOptComboboxShowX then
   begin
     W_Icon:= ATEditorScale(8);
     W_Line:= ATEditorScale(1);

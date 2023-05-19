@@ -1,5 +1,5 @@
 2023.05.19
-+ add: TATComboEdit.OptMicromapShowXIcon
++ add: TATComboEdit.OptComboboxShowX
 
 2023.05.01
 + add: ATEditorOptions.MaxLineLenForUndo
