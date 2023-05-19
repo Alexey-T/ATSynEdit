@@ -42,6 +42,7 @@ type
   private
     FItems: TStringList;
     FItemIndex: integer;
+    FOptMicromapShowXIcon: boolean;
     FMenu: TPopupMenu;
     procedure DoComboMenu;
     procedure DoComboUpDown(ADown: boolean);
@@ -57,6 +58,7 @@ type
     procedure DoCommand(ACmd: integer; AInvoke: TATEditorCommandInvoke; const AText: atString = ''); override;
     procedure DoAddLineToHistory(const AStr: atString; AMaxItems: integer);
   published
+    property OptMicromapShowXIcon: boolean read FOptMicromapShowXIcon write FOptMicromapShowXIcon default false;
   end;
 
 
@@ -169,6 +171,7 @@ begin
   FMenu:= TPopupMenu.Create(Self);
 
   OptMicromapVisible:= true;
+  OptMicromapShowXIcon:= true;
   Micromap.Columns[0].NWidthPercents:= 300;
 
   OnClickMicromap:= @MicromapClick;
@@ -178,8 +181,22 @@ begin
 end;
 
 procedure TATComboEdit.MicromapClick(Sender: TObject; AX, AY: integer);
+var
+  R: TRect;
 begin
-  DoComboMenu;
+  if FOptMicromapShowXIcon then
+  begin
+    R:= RectMicromap;
+    //Application.MessageBox(PChar(Format('click %d:%d, rect map %d:%d-%d:%d', [AX, AY, R.Left, R.Top, R.Right, R.Bottom])), 'click');
+    if AX < R.Width div 2 then
+      Text:= ''
+    else
+      DoComboMenu;
+  end
+  else
+  begin
+    DoComboMenu;
+  end;
 end;
 
 procedure TATComboEdit.MicromapDraw(Sender: TObject; C: TCanvas;
@@ -188,11 +205,29 @@ begin
   C.Brush.Color:= Colors.ComboboxArrowBG;
   C.FillRect(ARect);
 
-  CanvasPaintTriangleDown(C, Colors.ComboboxArrow,
-    Point(
-      (ARect.Left+ARect.Right) div 2,
-      (ARect.Top+ARect.Bottom) div 2),
-    ATEditorScale(ATScrollbarTheme.ArrowSize));
+  if FOptMicromapShowXIcon then
+  begin
+    CanvasPaintXMark(C,
+      Rect(ARect.Left, ARect.Top, (ARect.Left+ARect.Right) div 2, ARect.Bottom),
+      Colors.ComboboxArrow,
+      3, 3,
+      ATEditorScale(1)
+      );
+
+    CanvasPaintTriangleDown(C, Colors.ComboboxArrow,
+      Point(
+        ARect.Left + ARect.Width div 4 * 3,
+        (ARect.Top+ARect.Bottom) div 2),
+      ATEditorScale(ATScrollbarTheme.ArrowSize));
+  end
+  else
+  begin
+    CanvasPaintTriangleDown(C, Colors.ComboboxArrow,
+      Point(
+        (ARect.Left+ARect.Right) div 2,
+        (ARect.Top+ARect.Bottom) div 2),
+      ATEditorScale(ATScrollbarTheme.ArrowSize));
+  end;
 end;
 
 procedure TATComboEdit.DoComboMenu;
