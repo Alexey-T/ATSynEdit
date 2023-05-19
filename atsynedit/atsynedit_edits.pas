@@ -216,7 +216,7 @@ begin
     W_Icon:= ATEditorScale(8);
     W_Line:= ATEditorScale(1);
     X:= ARect.Left+ARect.Width div 4;
-    Y:= ARect.Top+ARect.Height div 2;
+    Y:= (ARect.Top+ARect.Bottom) div 2;
     RectX.Left:= X-W_Icon div 2;
     RectX.Right:= RectX.Left+W_Icon;
     RectX.Top:= Y-W_Icon div 2;
