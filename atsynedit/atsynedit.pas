@@ -1225,7 +1225,7 @@ type
       AIndentSize: integer;
       AColorBG: TColor;
       AScrollPos: integer;
-      AIndentLines: boolean);
+      AShowIndentLines: boolean);
     procedure DoPaintMinimapAllToBGRABitmap;
     procedure DoPaintMinimapTextToBGRABitmap(
       const ARect: TRect;
@@ -7716,7 +7716,7 @@ procedure TATSynEdit.DoPaintLineIndent(C: TCanvas;
   AIndentSize: integer;
   AColorBG: TColor;
   AScrollPos: integer;
-  AIndentLines: boolean);
+  AShowIndentLines: boolean);
 var
   i: integer;
   RBack: TRect;
@@ -7729,7 +7729,7 @@ begin
   C.Brush.Color:= AColorBG;
   C.FillRect(RBack);
 
-  if AIndentLines then
+  if AShowIndentLines then
     for i:= 0 to AIndentSize-1 do
       if i mod FOptTabSize = 0 then
         CanvasLine_DottedVertAlt(C,
