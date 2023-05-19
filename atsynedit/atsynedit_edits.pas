@@ -204,18 +204,29 @@ end;
 
 procedure TATComboEdit.MicromapDraw(Sender: TObject; C: TCanvas;
   const ARect: TRect);
+var
+  X, Y, W_Icon, W_Line: integer;
+  RectX: TRect;
 begin
   C.Brush.Color:= Colors.ComboboxArrowBG;
   C.FillRect(ARect);
 
   if FOptMicromapShowXIcon then
   begin
+    W_Icon:= ATEditorScale(8);
+    W_Line:= ATEditorScale(1);
+    X:= ARect.Left+ARect.Width div 4;
+    Y:= ARect.Top+ARect.Height div 2;
+    RectX.Left:= X-W_Icon div 2;
+    RectX.Right:= RectX.Left+W_Icon;
+    RectX.Top:= Y-W_Icon div 2;
+    RectX.Bottom:= RectX.Top+W_Icon;
+
     CanvasPaintXMark(C,
-      Rect(ARect.Left, ARect.Top, (ARect.Left+ARect.Right) div 2, ARect.Bottom),
+      RectX,
       Colors.ComboboxArrow,
-      ATEditorScale(3),
-      ATEditorScale(3),
-      ATEditorScale(1)
+      0, 0,
+      W_Line
       );
 
     CanvasPaintTriangleDown(C, Colors.ComboboxArrow,
