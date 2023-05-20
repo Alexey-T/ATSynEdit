@@ -601,6 +601,7 @@ type
     FCaretHideUnfocused: boolean;
     FCaretAllowNextBlink: boolean;
     FIsEntered: boolean;
+    FIsIniting: boolean;
     FMarkers: TATMarkers;
     FAttribs: TATMarkers;
     FMarkedRange: TATMarkers;
@@ -1700,6 +1701,7 @@ type
     function TextCurrentWord: atString;
     //LastCommandChangedLines: count of lines changed by last call of Strings.ActionTrimSpaces
     property LastCommandChangedLines: integer read GetLastCommandChangedLines write SetLastCommandChangedLines;
+    property IsIniting: boolean read FIsIniting write FIsIniting;
     property IsRunningCommand: boolean read FIsRunningCommand;
     property IsReadOnlyChanged: boolean read FIsReadOnlyChanged write FIsReadOnlyChanged;
     property IsReadOnlyAutodetected: boolean read FIsReadOnlyAutodetected write FIsReadOnlyAutodetected;
@@ -8364,10 +8366,10 @@ procedure TATSynEdit.SetModified(AValue: boolean);
 var
   bChange: boolean;
 begin
-  bChange:= Strings.Modified<>AValue;
+  bChange:= (Strings.Modified<>AValue) or (FPrevModified<>AValue);
   Strings.Modified:= AValue;
   FPrevModified:= AValue;
-  if bChange and AValue then
+  if bChange and not FIsIniting then
     DoEventChangeModified;
 end;
 
