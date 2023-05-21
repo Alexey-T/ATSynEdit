@@ -214,8 +214,8 @@ begin
   M.Add(cCommand_CaretsExtendDownPage, 'carets extend: down a page', [], []);
   M.Add(cCommand_CaretsExtendDownToEnd, 'carets extend: down to end', [], []);
 
-  M.Add(cCommand_ZoomIn, 'current document font size: bigger', [], []);
-  M.Add(cCommand_ZoomOut, 'current document font size: smaller', [], []);
+  M.Add(cCommand_ZoomIn, 'current document font size: bigger', [{$ifndef darwin}scCtrl+VK_ADD{$endif}], []);
+  M.Add(cCommand_ZoomOut, 'current document font size: smaller', [{$ifndef darwin}scCtrl+VK_SUBTRACT{$endif}], []);
   M.Add(cCommand_ZoomReset, 'current document font size: reset', [], []);
 
   M.Add(cCommand_TextCaseLower, 'convert case: lower case', [], []);
