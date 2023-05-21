@@ -743,6 +743,12 @@ type
       GlobalScale: integer;
       GlobalScaleFont: integer;
     end;
+    FPrevCaret: record
+      PosX,
+      PosY,
+      EndX,
+      EndY: integer;
+    end;
     FCharSize: TATEditorCharSize;
     FCharSizeMinimap: TATEditorCharSize;
     FSpacingY: integer;
@@ -4880,6 +4886,11 @@ begin
   FMarginList:= nil;
   FFoldedMarkList:= nil;
 
+  FPrevCaret.PosX:= -1;
+  FPrevCaret.PosY:= -1;
+  FPrevCaret.EndX:= -1;
+  FPrevCaret.EndY:= -1;
+
   FOptFlickerReducingPause:= 0;
   FOptInputNumberOnly:= false;
   FOptInputNumberAllowNegative:= cInitInputNumberAllowNegative;
@@ -7930,7 +7941,28 @@ procedure TATSynEdit.DoEventCarets;
 var
   SClip: string;
   NCaretY: integer;
+  Caret: TATCaretItem;
 begin
+  if Carets.Count=1 then
+  begin
+    Caret:= Carets[0];
+    if (FPrevCaret.PosX=Caret.PosX) and
+      (FPrevCaret.PosY=Caret.PosY) and
+      (FPrevCaret.EndX=Caret.EndX) and
+      (FPrevCaret.EndY=Caret.EndY) then exit;
+    FPrevCaret.PosX:= Caret.PosX;
+    FPrevCaret.PosY:= Caret.PosY;
+    FPrevCaret.EndX:= Caret.EndX;
+    FPrevCaret.EndY:= Caret.EndY;
+  end
+  else
+  begin
+    FPrevCaret.PosX:= -1;
+    FPrevCaret.PosY:= -1;
+    FPrevCaret.EndX:= -1;
+    FPrevCaret.EndY:= -1;
+  end;
+
   if Assigned(FAdapterHilite) then
     FAdapterHilite.OnEditorCaretMove(Self);
 
