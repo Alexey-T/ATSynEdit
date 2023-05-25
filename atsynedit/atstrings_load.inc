@@ -359,7 +359,7 @@ begin
   ActionAddFakeLineIfNeeded;
   Modified:= true;
   for i:= 0 to Count-1 do
-    SetLineState(i, cLineStateAdded);
+    SetLineState(i, TATLineState.Added);
 end;
 
 procedure TATStrings.LoadFromString(const AText: string);
@@ -381,7 +381,7 @@ begin
   begin
     Str:= UTF8Decode(AText);
     SDeleteFromEol(Str);
-    LineAddEx(Str, cEndNone);
+    LineAddEx(Str, TATLineEnds.None);
   end
   else
   begin
@@ -409,7 +409,7 @@ begin
 
   Modified:= true;
   for i:= 0 to Count-1 do
-    SetLineState(i, cLineStateAdded);
+    SetLineState(i, TATLineState.Added);
 end;
 
 type
@@ -479,7 +479,7 @@ var
     bCancel: boolean;
   begin
     AFoundPos:= AFromPos;
-    AEnding:= cEndNone;
+    AEnding:= TATLineEnds.None;
     repeat
       if AFoundPos>=BufSize then exit;
 
@@ -502,16 +502,16 @@ var
           end;
         cCharEnding10:
           begin
-            AEnding:= cEndUnix;
+            AEnding:= TATLineEnds.Unix;
             exit
           end;
         cCharEnding13:
           begin
             if AFoundPos+CharSize<BufSize then
               if _GetBufferEnding(Buf, AFoundPos+CharSize, FEncoding)=cCharEnding10 then
-                AEnding:= cEndWin
+                AEnding:= TATLineEnds.Windows
               else
-                AEnding:= cEndMac;
+                AEnding:= TATLineEnds.Mac;
             exit
           end;
       end;
@@ -553,7 +553,7 @@ var
       end;
       }
 
-      if LineEnd=cEndWin then
+      if LineEnd=TATLineEnds.Windows then
         Inc(NEnd, CharSize*2)
       else
         Inc(NEnd, CharSize);

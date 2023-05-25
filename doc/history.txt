@@ -1,3 +1,6 @@
+2023.05.25
+* change: enumerations were changed to 'scoped', ie you must replace cEndNone -> TATLineEnds.None
+
 2023.05.19
 + add: TATComboEdit.OptComboboxShowX
 

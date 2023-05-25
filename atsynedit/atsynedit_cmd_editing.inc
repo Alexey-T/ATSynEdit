@@ -739,7 +739,7 @@ begin
 
       //universal code, for selection or not
       Caret.GetSelLines(Line1, Line2, true);
-      if St.LinesEnds[Line2]=cEndNone then
+      if St.LinesEnds[Line2]=TATLineEnds.None then
         St.LinesEnds[Line2]:= St.Endings;
       for iLine:= Line2 downto Line1 do
       begin
@@ -1407,7 +1407,7 @@ begin
   UpdateMarkersOnDeleting(Caret.PosX, Caret.PosY, 0, St.Count);
 
   if Caret.PosY>=St.Count-1 then
-    St.LinesEnds[Caret.PosY]:= cEndNone;
+    St.LinesEnds[Caret.PosY]:= TATLineEnds.None;
 
   St.ChangeBlockActive:= false;
 

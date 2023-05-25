@@ -3501,10 +3501,10 @@ begin
 
   if AWithGutter then
   begin
-    FColorOfStates[cLineStateNone]:= -1;
-    FColorOfStates[cLineStateChanged]:= Colors.StateChanged;
-    FColorOfStates[cLineStateAdded]:= Colors.StateAdded;
-    FColorOfStates[cLineStateSaved]:= Colors.StateSaved;
+    FColorOfStates[TATLineState.None]:= -1;
+    FColorOfStates[TATLineState.Changed]:= Colors.StateChanged;
+    FColorOfStates[TATLineState.Added]:= Colors.StateAdded;
+    FColorOfStates[TATLineState.Saved]:= Colors.StateSaved;
 
     C.Brush.Color:= FColorGutterBG;
     C.FillRect(FRectGutter);
@@ -4352,7 +4352,7 @@ begin
   if GutterItem.Visible then
   begin
     LineState:= St.LinesState[NLinesIndex];
-    if LineState<>cLineStateNone then
+    if LineState<>TATLineState.None then
       DoPaintGutterBandBG(C,
         FColorOfStates[LineState],
         GutterItem.Left,
@@ -8665,7 +8665,7 @@ begin
     if St.IsIndexValid(FLastLineOfSlowEvents) then
     begin
       St.DoEventLog(FLastLineOfSlowEvents);
-      St.DoEventChange(cLineChangeEdited, FLastLineOfSlowEvents, 1);
+      St.DoEventChange(TATLineChangeKind.Edited, FLastLineOfSlowEvents, 1);
       FLastLineOfSlowEvents:= -1;
     end;
   end;
@@ -8691,7 +8691,7 @@ begin
   begin
     Result.Y:= St.Count-1;
     Result.X:= St.LinesLen[Result.Y];
-    if St.LinesEnds[Result.Y]<>cEndNone then
+    if St.LinesEnds[Result.Y]<>TATLineEnds.None then
       Inc(Result.X);
   end
   else

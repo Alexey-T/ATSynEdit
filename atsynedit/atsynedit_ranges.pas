@@ -734,10 +734,10 @@ var
   i: integer;
 begin
   case AChange of
-    cLineChangeDeletedAll:
+    TATLineChangeKind.DeletedAll:
       Clear;
 
-    cLineChangeDeleted:
+    TATLineChangeKind.Deleted:
       for i:= FList.Count-1 downto 0 do
         begin
           Rng:= FList.ItemPtr(i);
@@ -766,7 +766,7 @@ begin
           end;
         end;
 
-    cLineChangeAdded:
+    TATLineChangeKind.Added:
       for i:= FList.Count-1 downto 0 do
         begin
           Rng:= FList.ItemPtr(i);

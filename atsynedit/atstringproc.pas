@@ -6,6 +6,7 @@ unit ATStringProc;
 
 {$mode objfpc}{$H+}
 {$codepage utf8}
+{$SCOPEDENUMS ON}
 
 interface
 
@@ -48,10 +49,10 @@ type
 
 type
   TATLineChangeKind = (
-    cLineChangeEdited,
-    cLineChangeAdded,
-    cLineChangeDeleted,
-    cLineChangeDeletedAll
+    Edited,
+    Added,
+    Deleted,
+    DeletedAll
     );
 
 type
@@ -128,17 +129,12 @@ function StringOfCharW(ch: WideChar; Len: integer): UnicodeString;
 
 {$Z1}
 type
-  TATLineEnds = (cEndNone, cEndWin, cEndUnix, cEndMac);
+  TATLineEnds = (None, Windows, Unix, Mac);
 
-  TATLineState = (
-    cLineStateNone,
-    cLineStateChanged,
-    cLineStateAdded,
-    cLineStateSaved
-    );
+  TATLineState = (None, Changed, Added, Saved);
 
 const
-  cLineEndOsDefault = {$ifdef windows} cEndWin {$else} cEndUnix {$endif};
+  cLineEndOsDefault = {$ifdef windows} TATLineEnds.Windows {$else} TATLineEnds.Unix {$endif};
   cLineEndStrings: array[TATLineEnds] of UnicodeString = ('', #13#10, #10, #13);
   cLineEndNiceNames: array[TATLineEnds] of string = ('', 'CRLF', 'LF', 'CR');
   cLineEndLength: array[TATLineEnds] of integer = (0, 2, 1, 1);

@@ -242,7 +242,7 @@ begin
     //move lines down
     begin
       if NTo>=NLastLine then Exit;
-      bLastNoEol:= (NTo+1=NLastLine) and (St.LinesEnds[NLastLine]=cEndNone);
+      bLastNoEol:= (NTo+1=NLastLine) and (St.LinesEnds[NLastLine]=TATLineEnds.None);
 
       {
       S:= St.Lines[NTo+1];
@@ -270,7 +270,7 @@ begin
     //move lines up
     begin
       if NFrom<=0 then Exit;
-      bLastNoEol:= (NTo=NLastLine) and (St.LinesEnds[NTo]=cEndNone);
+      bLastNoEol:= (NTo=NLastLine) and (St.LinesEnds[NTo]=TATLineEnds.None);
 
       if bLastNoEol then
         St.LinesEnds[NTo]:= St.Endings;

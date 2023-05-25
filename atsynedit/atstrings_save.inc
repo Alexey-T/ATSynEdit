@@ -89,10 +89,10 @@ begin
     //write line-end as additional string
     ItemEnd:= Item^.LineEnds;
     //don't break file if ending of some non-last line is unset
-    if (ItemEnd=cEndNone) and (i<NLast) then
+    if (ItemEnd=TATLineEnds.None) and (i<NLast) then
       ItemEnd:= FEndings;
 
-    if ItemEnd<>cEndNone then
+    if ItemEnd<>TATLineEnds.None then
     begin
       SAnsi:= cLineEndMatrix[ItemEnd, AEncoding];
       AStream.WriteBuffer(SAnsi[1], Length(SAnsi));

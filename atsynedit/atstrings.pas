@@ -525,7 +525,7 @@ function TATStringItem.IsFake: boolean; inline;
 begin
   Result:=
     (Buf='') and
-    (LineEnds=cEndNone);
+    (LineEnds=TATLineEnds.None);
 end;
 
 procedure TATStringItem.GetIndentProp(out ACharCount: SizeInt; out AKind: TATLineIndentKind);
@@ -775,7 +775,7 @@ begin
   SetLineA(S, AllowBadCharsOfLen1);
 
   Ex.Ends:= TATBits2(AEnd);
-  Ex.State:= TATBits2(cLineStateAdded);
+  Ex.State:= TATBits2(TATLineState.Added);
   Ex.Updated:= true;
 end;
 
@@ -785,7 +785,7 @@ begin
   SetLineW(S);
 
   Ex.Ends:= TATBits2(AEnd);
-  Ex.State:= TATBits2(cLineStateAdded);
+  Ex.State:= TATBits2(TATLineState.Added);
   Ex.Updated:= true;
 end;
 
@@ -795,21 +795,21 @@ procedure TATStringItem.LineStateToChanged;
 // https://github.com/Alexey-T/CudaText/issues/2617
 begin
   case TATLineState(Ex.State) of
-    cLineStateNone,
-    cLineStateSaved:
-      Ex.State:= TATBits2(cLineStateChanged);
+    TATLineState.None,
+    TATLineState.Saved:
+      Ex.State:= TATBits2(TATLineState.Changed);
   end;
 end;
 
 procedure TATStringItem.LineStateToSaved;
 begin
-  if TATLineState(Ex.State)<>cLineStateNone then
-    Ex.State:= TATBits2(cLineStateSaved);
+  if TATLineState(Ex.State)<>TATLineState.None then
+    Ex.State:= TATBits2(TATLineState.Saved);
 end;
 
 procedure TATStringItem.LineStateToNone;
 begin
-  Ex.State:= TATBits2(cLineStateNone);
+  Ex.State:= TATBits2(TATLineState.None);
 end;
 
 function TATStringItem.LineSubLen(AFrom, ALen: SizeInt): SizeInt;
@@ -1127,7 +1127,7 @@ begin
   for i:= 0 to Count-1 do
   begin
     typ:= LinesEnds[i];
-    if (typ<>AValue) and (typ<>cEndNone) then
+    if (typ<>AValue) and (typ<>TATLineEnds.None) then
       LinesEnds[i]:= AValue;
   end;
 end;
@@ -1144,7 +1144,7 @@ begin
   UpdateModified;
   AddUndoItem(aeaChange, AIndex, Item^.Line, Item^.LineEnds, Item^.LineState, FCommandCode);
   DoEventLog(AIndex);
-  DoEventChange(cLineChangeEdited, AIndex, 1);
+  DoEventChange(TATLineChangeKind.Edited, AIndex, 1);
 
   Item^.Line:= AValue;
 
@@ -1267,7 +1267,7 @@ begin
   Item:= FList.GetItem(LastIndex);
   Inc(Len, Item^.CharLen);
 
-  bFinalEol:= LinesEnds[LastIndex]<>cEndNone;
+  bFinalEol:= LinesEnds[LastIndex]<>TATLineEnds.None;
   if bFinalEol then
     Inc(Len, LenEol);
 
@@ -1380,7 +1380,7 @@ function TATStrings.IsLastFakeLineUnneeded: boolean;
 begin
   Result:= (Count>1) and
     IsLastLineFake and
-    (FList.GetItem(FList.Count-2)^.LineEnds=cEndNone);
+    (FList.GetItem(FList.Count-2)^.LineEnds=TATLineEnds.None);
 end;
 
 procedure TATStrings.ActionDeleteFakeLine;
@@ -1393,24 +1393,24 @@ procedure TATStrings.ActionDeleteFakeLineAndFinalEol;
 begin
   ActionDeleteFakeLine;
   if Count>0 then
-    if LinesEnds[Count-1]<>cEndNone then
-      LinesEnds[Count-1]:= cEndNone;
+    if LinesEnds[Count-1]<>TATLineEnds.None then
+      LinesEnds[Count-1]:= TATLineEnds.None;
 end;
 
 function TATStrings.ActionAddFakeLineIfNeeded: boolean;
 begin
   if Count=0 then
   begin
-    LineAddRaw('', cEndNone, false{AWithEvent});
+    LineAddRaw('', TATLineEnds.None, false{AWithEvent});
     Exit(true);
   end;
 
   if IsLastLineFake then
     Exit(false);
 
-  if LinesEnds[Count-1]<>cEndNone then
+  if LinesEnds[Count-1]<>TATLineEnds.None then
   begin
-    LineAddRaw('', cEndNone, false{AWithEvent});
+    LineAddRaw('', TATLineEnds.None, false{AWithEvent});
     Exit(true);
   end;
 
@@ -1425,11 +1425,11 @@ begin
   if IsFilled then Exit;
 
   UpdateModified;
-  AddUndoItem(aeaInsert, Count, '', cEndNone, cLineStateNone, FCommandCode);
+  AddUndoItem(aeaInsert, Count, '', TATLineEnds.None, TATLineState.None, FCommandCode);
   if AWithEvent then
   begin
     DoEventLog(Count);
-    DoEventChange(cLineChangeAdded, Count, 1);
+    DoEventChange(TATLineChangeKind.Added, Count, 1);
   end;
 
   Item.Init(AString, AEnd);
@@ -1444,7 +1444,7 @@ begin
   if FReadOnly then Exit;
 
   AEndInside:= AEnd;
-  if AEndInside=cEndNone then
+  if AEndInside=TATLineEnds.None then
     AEndInside:= FEndings;
 
   if IsLastLineFake then
@@ -1452,8 +1452,8 @@ begin
   else
   begin
     LineAddRaw(AString, AEnd);
-    if AEnd<>cEndNone then
-      LineAddRaw('', cEndNone);
+    if AEnd<>TATLineEnds.None then
+      LineAddRaw('', TATLineEnds.None);
   end;
 end;
 
@@ -1485,12 +1485,12 @@ begin
   if IsFilled then Exit;
 
   UpdateModified;
-  AddUndoItem(aeaInsert, ALineIndex, '', cEndNone, cLineStateNone, FCommandCode);
+  AddUndoItem(aeaInsert, ALineIndex, '', TATLineEnds.None, TATLineState.None, FCommandCode);
 
   if AWithEvent then
   begin
     DoEventLog(ALineIndex);
-    DoEventChange(cLineChangeAdded, ALineIndex, 1);
+    DoEventChange(TATLineChangeKind.Added, ALineIndex, 1);
   end;
 
   Item.Init(AString, AEnd);
@@ -1509,7 +1509,7 @@ begin
   if ALineIndex=Count then
   begin
     if AString='' then //avoid adding _two_ lines at end
-      AEnd:= cEndNone;
+      AEnd:= TATLineEnds.None;
     LineAddEx(AString, AEnd);
   end;
   //else
@@ -1541,7 +1541,7 @@ begin
   begin
     for i:= 0 to NCount-1 do
     begin
-      AddUndoItem(aeaInsert, ALineIndex+i, '', cEndNone, cLineStateNone, FCommandCode);
+      AddUndoItem(aeaInsert, ALineIndex+i, '', TATLineEnds.None, TATLineState.None, FCommandCode);
 
       Item.Init(
         ABlock.GetLine(i),
@@ -1552,7 +1552,7 @@ begin
     end;
 
     DoEventLog(ALineIndex);
-    DoEventChange(cLineChangeAdded, ALineIndex, NCount);
+    DoEventChange(TATLineChangeKind.Added, ALineIndex, NCount);
   end;
 
   //insert last item specially, if no eol
@@ -1596,7 +1596,7 @@ begin
     if AWithEvent then
     begin
       DoEventLog(ALineIndex);
-      DoEventChange(cLineChangeDeleted, ALineIndex, 1);
+      DoEventChange(TATLineChangeKind.Deleted, ALineIndex, 1);
     end;
 
     FList.Delete(ALineIndex);
@@ -1626,10 +1626,10 @@ begin
 
   FList.Move(AIndexFrom, AIndexTo);
 
-  LinesState[AIndexFrom]:= cLineStateChanged;
-  if LinesEnds[AIndexFrom]=cEndNone then
+  LinesState[AIndexFrom]:= TATLineState.Changed;
+  if LinesEnds[AIndexFrom]=TATLineEnds.None then
     LinesEnds[AIndexFrom]:= Endings;
-  if LinesEnds[AIndexTo]=cEndNone then
+  if LinesEnds[AIndexTo]=TATLineEnds.None then
     LinesEnds[AIndexTo]:= Endings;
 
   ActionAddFakeLineIfNeeded;
@@ -1707,7 +1707,7 @@ begin
   if AWithEvent then
   begin
     DoEventLog(0);
-    DoEventChange(cLineChangeDeletedAll, -1, 1);
+    DoEventChange(TATLineChangeKind.DeletedAll, -1, 1);
   end;
 
   FList.Clear;
@@ -1785,7 +1785,7 @@ procedure TATStrings.DoDetectEndings;
 begin
   if not IsIndexValid(0) then Exit;
   FEndings:= LinesEnds[0]; //no range-check needed
-  if FEndings=cEndNone then
+  if FEndings=TATLineEnds.None then
     FEndings:= cLineEndOsDefault;
 end;
 
@@ -2043,8 +2043,8 @@ begin
             CurAction,
             0,
             '',
-            cEndNone,
-            cLineStateNone,
+            TATLineEnds.None,
+            TATLineState.None,
             CurCaretsArray,
             CurMarkersArray,
             CurAttribsArray,
@@ -2372,7 +2372,7 @@ begin
     ClearUndo;
     ClearLineStates(false);
 
-    DoEventChange(cLineChangeDeletedAll, -1, 1);
+    DoEventChange(TATLineChangeKind.DeletedAll, -1, 1);
     DoEventLog(0);
   end;
 end;
@@ -2397,7 +2397,7 @@ begin
     ActionAddFakeLineIfNeeded;
     ClearLineStates(false);
 
-    DoEventChange(cLineChangeDeletedAll, -1, 1);
+    DoEventChange(TATLineChangeKind.DeletedAll, -1, 1);
     DoEventLog(0);
   end;
 end;
@@ -2422,7 +2422,7 @@ begin
     ActionAddFakeLineIfNeeded;
     ClearLineStates(false);
 
-    DoEventChange(cLineChangeDeletedAll, -1, 1);
+    DoEventChange(TATLineChangeKind.DeletedAll, -1, 1);
     DoEventLog(0);
   end;
 end;
@@ -2456,7 +2456,7 @@ begin
     ActionAddFakeLineIfNeeded;
     ClearLineStates(false);
 
-    DoEventChange(cLineChangeDeletedAll, -1, 1);
+    DoEventChange(TATLineChangeKind.DeletedAll, -1, 1);
     DoEventLog(0);
   end;
 end;
@@ -2489,7 +2489,7 @@ begin
   ActionAddFakeLineIfNeeded;
   ClearLineStates(false);
 
-  DoEventChange(cLineChangeDeletedAll, -1, 1);
+  DoEventChange(TATLineChangeKind.DeletedAll, -1, 1);
   DoEventLog(0);
 end;
 
@@ -2518,7 +2518,7 @@ begin
   ActionAddFakeLineIfNeeded;
   ClearLineStates(false);
 
-  DoEventChange(cLineChangeDeletedAll, -1, 1);
+  DoEventChange(TATLineChangeKind.DeletedAll, -1, 1);
   DoEventLog(0);
 end;
 
@@ -2527,7 +2527,7 @@ var
   Item: TATUndoItem;
 begin
   if FUndoList.Locked then exit;
-  AddUndoItem(aeaCaretJump, 0, '', cEndNone, cLineStateNone, FCommandCode);
+  AddUndoItem(aeaCaretJump, 0, '', TATLineEnds.None, TATLineState.None, FCommandCode);
   Item:= FUndoList.Last;
   if Assigned(Item) then
     if Length(ACaretsArray)>0 then
@@ -2573,7 +2573,7 @@ begin
   if IsLastLineFake then Exit;
   if Count>0 then
   begin
-    if LinesEnds[Count-1]=cEndNone then
+    if LinesEnds[Count-1]=TATLineEnds.None then
     begin
       LinesEnds[Count-1]:= Endings;
       ActionAddFakeLineIfNeeded;
@@ -2655,7 +2655,7 @@ var
   Item: TATStringItem;
 begin
   Item.Init(S, AEnd, AllowBadCharsOfLen1);
-  Item.Ex.State:= TATBits2(cLineStateAdded);
+  Item.Ex.State:= TATBits2(TATLineState.Added);
   FList.Add(@Item);
   FillChar(Item, SizeOf(Item), 0);
 end;
@@ -2665,7 +2665,7 @@ var
   Item: TATStringItem;
 begin
   Item.Init(S, AEnd);
-  Item.Ex.State:= TATBits2(cLineStateAdded);
+  Item.Ex.State:= TATBits2(TATLineState.Added);
   FList.Add(@Item);
   FillChar(Item, SizeOf(Item), 0);
 end;
@@ -2802,7 +2802,7 @@ begin
   ChangeLineStates(AFrom, ATo);
 
   //this clears all bookmarks, ranges, decors - it's ok
-  DoEventChange(cLineChangeDeletedAll, -1, 1);
+  DoEventChange(TATLineChangeKind.DeletedAll, -1, 1);
   DoEventLog(0);
 end;
 
