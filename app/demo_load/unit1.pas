@@ -62,7 +62,7 @@ begin
   s:= List.GetPathFromItem(List.Selected);
   if not FileExists(s) then Exit;
 
-  ed.LoadFromFile(s);
+  ed.LoadFromFile(s, []);
   ed.SetFocus;
   Caption:= 'App - '+ExtractFileName(s);
 end;

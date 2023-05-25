@@ -388,21 +388,21 @@ end;
 
 procedure TfmMain.mnuEndMacClick(Sender: TObject);
 begin
-  ed.Strings.Endings:= cEndMac;
+  ed.Strings.Endings:= TATLineEnds.Mac;
   ed.Update;
   UpdateStatus;
 end;
 
 procedure TfmMain.mnuEndUnixClick(Sender: TObject);
 begin
-  ed.Strings.Endings:= cEndUnix;
+  ed.Strings.Endings:= TATLineEnds.Unix;
   ed.Update;
   UpdateStatus;
 end;
 
 procedure TfmMain.mnuEndWinClick(Sender: TObject);
 begin
-  ed.Strings.Endings:= cEndWin;
+  ed.Strings.Endings:= TATLineEnds.Windows;
   ed.Update;
   UpdateStatus;
 end;
@@ -529,7 +529,7 @@ begin
       chkWrapOff.Checked:= true;
     TATEditorWrapMode.ModeOn:
       chkWrapOn.Checked:= true;
-    cWrapAtWindowOrMargin:
+    TATEditorWrapMode.AtWindowOrMargin:
       chkWrapWndMargin.Checked:= true;
   end;
   chkWrapIndent.Checked:= ed.OptWrapIndented;
@@ -1423,7 +1423,7 @@ end;
 procedure TfmMain.chkWrapMarginChange(Sender: TObject);
 begin
   if wait then Exit;
-  ed.OptWrapMode:= cWrapAtWindowOrMargin;
+  ed.OptWrapMode:= TATEditorWrapMode.AtWindowOrMargin;
 end;
 
 procedure TfmMain.chkWrapOffChange(Sender: TObject);
@@ -1441,7 +1441,7 @@ end;
 procedure TfmMain.chkWrapWndMarginChange(Sender: TObject);
 begin
   if wait then Exit;
-  ed.OptWrapMode:= cWrapAtWindowOrMargin;
+  ed.OptWrapMode:= TATEditorWrapMode.AtWindowOrMargin;
 end;
 
 procedure TfmMain.chkWrapIndentChange(Sender: TObject);

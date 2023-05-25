@@ -95,7 +95,7 @@ begin
 
   fn:= ExtractFilePath(Application.ExeName)+'unit1.pas';
   if FileExists(fn) then
-    Ed.Strings.LoadFromFile(fn);
+    Ed.Strings.LoadFromFile(fn, []);
 end;
 
 procedure TfmMain.MemoWhatChange(Sender: TObject);

@@ -57,7 +57,7 @@ end;
 
 procedure TForm1.DoOpen(const fn: string);
 begin
-  ed.LoadFromFile(fn);
+  ed.LoadFromFile(fn, []);
   ActiveControl:= ed;
   Caption:= 'Demo - '+ExtractFileName(fn);
 end;
