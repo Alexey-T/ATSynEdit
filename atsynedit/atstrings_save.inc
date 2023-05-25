@@ -26,15 +26,15 @@ begin
   if AWithSignature then
   begin
     case FEncoding of
-      cEncUTF8:
+      TATFileEncoding.UTF8:
         Sign:= cSignUTF8;
-      cEncWideLE:
+      TATFileEncoding.WideLE:
         Sign:= cSignWideLE;
-      cEncWideBE:
+      TATFileEncoding.WideBE:
         Sign:= cSignWideBE;
-      cEnc32LE:
+      TATFileEncoding.Bit32LE:
         Sign:= cSign32LE;
-      cEnc32BE:
+      TATFileEncoding.Bit32BE:
         Sign:= cSign32BE;
       else
         Sign:= '';
@@ -52,32 +52,32 @@ begin
     SWide:= Item^.Line;
     if SWide<>'' then
     case AEncoding of
-      cEncAnsi:
+      TATFileEncoding.Ansi:
         begin
           SAnsi:= UTF8Encode(SWide);
           SAnsi:= EncConvertFromUTF8(SAnsi, FEncodingCodepage);
           AStream.WriteBuffer(SAnsi[1], Length(SAnsi));
         end;
 
-      cEncUTF8:
+      TATFileEncoding.UTF8:
         begin
           SAnsi:= UTF8Encode(SWide);
           AStream.WriteBuffer(SAnsi[1], Length(SAnsi));
         end;
 
-      cEncWideLE,
-      cEncWideBE:
+      TATFileEncoding.WideLE,
+      TATFileEncoding.WideBE:
         begin
-          if AEncoding=cEncWideBE then
+          if AEncoding=TATFileEncoding.WideBE then
             SSwapEndianWide(SWide);
           AStream.WriteBuffer(SWide[1], Length(SWide)*2);
         end;
 
-      cEnc32LE,
-      cEnc32BE:
+      TATFileEncoding.Bit32LE,
+      TATFileEncoding.Bit32BE:
         begin
           SQuad:= UnicodeStringToUCS4String(SWide);
-          if AEncoding=cEnc32BE then
+          if AEncoding=TATFileEncoding.Bit32BE then
             SSwapEndianUCS4(SQuad);
           AStream.WriteBuffer(SQuad[0], (Length(SQuad)-1)*4);
         end;
@@ -100,7 +100,7 @@ begin
 
     if (i mod TATEditorOptions.ProgressSaveLines) = TATEditorOptions.ProgressSaveLines div 2 then
     begin
-      FProgressKind:= cStringsProgressSaving;
+      FProgressKind:= TATStringsProgressKind.Saving;
       FProgressValue:= Int64(i)*100 div Count;
       bCancel:= false;
       if Assigned(FOnProgress) then
@@ -109,20 +109,20 @@ begin
   end;
 
   FProgressValue:= 0;
-  FProgressKind:= cStringsProgressNone;
+  FProgressKind:= TATStringsProgressKind.None;
 end;
 
 function TATStrings.IsSavingWithSignature: boolean;
 begin
   case FEncoding of
-    cEncAnsi:
+    TATFileEncoding.Ansi:
       Result:= false;
-    cEncUTF8:
+    TATFileEncoding.UTF8:
       Result:= FSaveSignUtf8;
-    cEncWideLE,
-    cEncWideBE,
-    cEnc32LE,
-    cEnc32BE:
+    TATFileEncoding.WideLE,
+    TATFileEncoding.WideBE,
+    TATFileEncoding.Bit32LE,
+    TATFileEncoding.Bit32BE:
       Result:= FSaveSignWide;
     else
       raise Exception.Create('Unknown encoding on saving');

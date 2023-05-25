@@ -1350,7 +1350,7 @@ begin
   St.DoOnChangeBlock(
     0, 0,
     Caret.PosX, Caret.PosY,
-    cBlockDeleteLines,
+    TATBlockChangeKind.DeleteLines,
     nil
     );
 
@@ -1398,7 +1398,7 @@ begin
   St.DoOnChangeBlock(
     Caret.PosX, Caret.PosY,
     0, St.Count,
-    cBlockDeleteLines,
+    TATBlockChangeKind.DeleteLines,
     nil
     );
 

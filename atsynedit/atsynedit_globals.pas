@@ -6,6 +6,7 @@ unit ATSynEdit_Globals;
 
 {$mode objfpc}{$H+}
 {$ModeSwitch advancedrecords}
+{$ScopedEnums on}
 
 interface
 
@@ -18,9 +19,9 @@ uses
 
 type
   TATEditorUnptintedEolSymbol = (
-    aeueDot,
-    aeueArrowDown,
-    aeuePilcrow
+    Dot,
+    ArrowDown,
+    Pilcrow
     );
 
 type
@@ -378,7 +379,7 @@ initialization
     UnprintedSpaceDotScale:= 15;
     UnprintedEndDotScale:= 30;
     UnprintedEndFontScale:= 40;
-    UnprintedEndSymbol:= aeueArrowDown;
+    UnprintedEndSymbol:= TATEditorUnptintedEolSymbol.ArrowDown;
     UnprintedEndArrowLength:= 70;
     UnprintedPilcrowScale:= 80;
     UnprintedWrapArrowLength:= 40;

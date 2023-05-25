@@ -206,7 +206,7 @@ begin
         DoOnChangeBlock(
           0, AY,
           0, 0,
-          cBlockInsertLines,
+          TATBlockChangeKind.InsertLines,
           BlockUTF8);
       finally
         FreeAndNil(BlockUTF8);
@@ -454,7 +454,7 @@ begin
   DoOnChangeBlock(
     0, ALine1,
     0, ALine2,
-    cBlockDeleteLines,
+    TATBlockChangeKind.DeleteLines,
     nil);
 
   if (ALine2-ALine1)<FUndoList.MaxCount then
@@ -486,7 +486,7 @@ begin
   DoOnChangeBlock(
     0, ALineFrom,
     0, 0,
-    cBlockInsertLines,
+    TATBlockChangeKind.InsertLines,
     ANewLines);
 
   for i:= ANewLines.Count-1 downto 0 do
@@ -629,12 +629,12 @@ begin
         DoOnChangeBlock(
           AX, AY,
           AX + Length(ABlock.Lines[0]), AY + ABlock.Count,
-          cBlockDeleteColumn,
+          TATBlockChangeKind.DeleteColumn,
           nil);
       DoOnChangeBlock(
         AX, AY,
         0, 0,
-        cBlockInsertColumn,
+        TATBlockChangeKind.InsertColumn,
         BlockUTF8);
     finally
       FreeAndNil(BlockUTF8);

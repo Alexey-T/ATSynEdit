@@ -572,10 +572,10 @@ begin
     cCommand_ScrollToCaretRight:       Result:= [TATCommandResult.CaretRight];
     cCommand_ScrollToLeft:             Result:= DoCommand_ScrollToLeft;
 
-    cCommand_Sort_Asc:                 Result:= DoCommand_Sort(cSortActionAsc);
-    cCommand_Sort_AscNoCase:           Result:= DoCommand_Sort(cSortActionAscNoCase);
-    cCommand_Sort_Desc:                Result:= DoCommand_Sort(cSortActionDesc);
-    cCommand_Sort_DescNoCase:          Result:= DoCommand_Sort(cSortActionDescNoCase);
+    cCommand_Sort_Asc:                 Result:= DoCommand_Sort(TATStringsSortAction.Asc);
+    cCommand_Sort_AscNoCase:           Result:= DoCommand_Sort(TATStringsSortAction.AscNoCase);
+    cCommand_Sort_Desc:                Result:= DoCommand_Sort(TATStringsSortAction.Desc);
+    cCommand_Sort_DescNoCase:          Result:= DoCommand_Sort(TATStringsSortAction.DescNoCase);
 
     cCommand_DeleteAllBlanks:          Result:= DoCommand_DeleteAllBlanks;
     cCommand_DeleteAdjacentBlanks:     Result:= DoCommand_DeleteAdjacentBlanks;
@@ -638,9 +638,9 @@ begin
     cCommand_TextCaseInvert:           Result:= DoCommand_TextChangeCase(TATEditorCaseConvert.Invert);
     cCommand_TextCaseSentence:         Result:= DoCommand_TextChangeCase(TATEditorCaseConvert.Sentence);
 
-    cCommand_TextTrimSpacesLeft:       Result:= DoCommand_TextTrimSpaces(cTrimLeft);
-    cCommand_TextTrimSpacesRight:      Result:= DoCommand_TextTrimSpaces(cTrimRight);
-    cCommand_TextTrimSpacesAll:        Result:= DoCommand_TextTrimSpaces(cTrimAll);
+    cCommand_TextTrimSpacesLeft:       Result:= DoCommand_TextTrimSpaces(TATTrimSpaces.Left);
+    cCommand_TextTrimSpacesRight:      Result:= DoCommand_TextTrimSpaces(TATTrimSpaces.Right);
+    cCommand_TextTrimSpacesAll:        Result:= DoCommand_TextTrimSpaces(TATTrimSpaces.All);
 
     cCommand_FoldAll:                  Result:= DoCommand_FoldAll;
     cCommand_UnfoldAll:                Result:= DoCommand_FoldUnAll;

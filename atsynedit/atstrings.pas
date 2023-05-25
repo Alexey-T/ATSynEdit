@@ -6,6 +6,7 @@ unit ATStrings;
 
 {$mode objfpc}{$H+}
 {$ModeSwitch advancedrecords}
+{$ScopedEnums on}
 {$MinEnumSize 1}
 
 interface
@@ -34,38 +35,38 @@ type
 
 type
   TATLineIndentKind = (
-    cLineIndentOther,
-    cLineIndentSpaces,
-    cLineIndentTabs
+    Other,
+    Spaces,
+    Tabs
     );
 
   TATLineSeparator = (
-    cLineSepNone,
-    cLineSepTop,
-    cLineSepBottom
+    None,
+    Top,
+    Bottom
     );
 
   TATFileEncoding = (
-    cEncAnsi,
-    cEncUTF8,
-    cEncWideLE,
-    cEncWideBE,
-    cEnc32LE,
-    cEnc32BE
+    Ansi,
+    UTF8,
+    WideLE,
+    WideBE,
+    Bit32LE,
+    Bit32BE
     );
 
   TATBlockChangeKind = (
-    cBlockDeleteLines,
-    cBlockInsertLines,
-    cBlockDeleteColumn,
-    cBlockInsertColumn
+    DeleteLines,
+    InsertLines,
+    DeleteColumn,
+    InsertColumn
   );
 
   TATStringGitMarker = (
-    cGitMarkNone,
-    cGitMarkBegin,
-    cGitMarkMiddle,
-    cGitMarkEnd
+    None,
+    SBegin,
+    SMiddle,
+    SEnd
     );
 
 const
@@ -73,23 +74,23 @@ const
 
 type
   TATTrimSpaces = (
-    cTrimLeft,
-    cTrimRight,
-    cTrimAll
+    Left,
+    Right,
+    All
     );
 
 type
   TATLineFlag = (
-    cFlagUnknown,
-    cFlagNo,
-    cFlagYes
+    Unknown,
+    No,
+    Yes
     );
 
   TATStringsSortAction = (
-    cSortActionAsc,
-    cSortActionDesc,
-    cSortActionAscNoCase,
-    cSortActionDescNoCase
+    Asc,
+    Desc,
+    AscNoCase,
+    DescNoCase
     );
 
 type
@@ -158,15 +159,15 @@ type
 
 type
   TATStringsProgressKind = (
-    cStringsProgressNone,
-    cStringsProgressLoading,
-    cStringsProgressSaving
+    None,
+    Loading,
+    Saving
     );
 
   TATLoadStreamOption = (
-    cLoadOpFromUTF8,
-    cLoadOpAllowBadCharsOfLen1,
-    cLoadOpKeepScroll
+    FromUTF8,
+    AllowBadCharsOfLen1,
+    KeepScroll
     );
   TATLoadStreamOptions = set of TATLoadStreamOption;
 
@@ -533,7 +534,7 @@ var
   NSpaces, NTabs, i: SizeInt;
 begin
   ACharCount:= 0;
-  AKind:= cLineIndentOther;
+  AKind:= TATLineIndentKind.Other;
   NSpaces:= 0;
   NTabs:= 0;
 
@@ -558,9 +559,9 @@ begin
   if ACharCount=0 then exit;
   if (NSpaces>0) and (NTabs>0) then exit;
   if NSpaces>0 then
-    AKind:= cLineIndentSpaces
+    AKind:= TATLineIndentKind.Spaces
   else
-    AKind:= cLineIndentTabs;
+    AKind:= TATLineIndentKind.Tabs;
 end;
 
 function TATStringItem.CharLenWithoutSpace: SizeInt;
@@ -607,7 +608,7 @@ const
 var
   NLen: SizeInt;
 begin
-  Result:= cGitMarkNone;
+  Result:= TATStringGitMarker.None;
   if Ex.Wide then exit;
   NLen:= Length(Buf);
   if NLen>=7 then
@@ -615,13 +616,13 @@ begin
     if NLen>=8 then
     begin
       if strlcomp(PChar(Buf), MarkBegin, 8)=0 then
-        exit(cGitMarkBegin);
+        exit(TATStringGitMarker.SBegin);
       if strlcomp(PChar(Buf), MarkEnd, 8)=0 then
-        exit(cGitMarkEnd);
+        exit(TATStringGitMarker.SEnd);
     end;
     if NLen=7 then
       if strlcomp(PChar(Buf), MarkMiddle, 7)=0 then
-        exit(cGitMarkMiddle);
+        exit(TATStringGitMarker.SMiddle);
   end;
 end;
 
@@ -864,9 +865,9 @@ var
   Ptr: PWideChar;
 begin
   case TATLineFlag(Ex.HasTab) of
-    cFlagNo:
+    TATLineFlag.No:
       exit(false);
-    cFlagYes:
+    TATLineFlag.Yes:
       exit(true);
   end;
 
@@ -897,9 +898,9 @@ begin
     end;
 
   if Result then
-    Value:= cFlagYes
+    Value:= TATLineFlag.Yes
   else
-    Value:= cFlagNo;
+    Value:= TATLineFlag.No;
   Ex.HasTab:= TATBits2(Value);
 end;
 
@@ -911,9 +912,9 @@ var
   Ptr: PWideChar;
 begin
   case TATLineFlag(Ex.HasAsciiNoTabs) of
-    cFlagNo:
+    TATLineFlag.No:
       exit(false);
-    cFlagYes:
+    TATLineFlag.Yes:
       exit(true);
   end;
 
@@ -948,9 +949,9 @@ begin
     end;
 
   if Result then
-    Value:= cFlagYes
+    Value:= TATLineFlag.Yes
   else
-    Value:= cFlagNo;
+    Value:= TATLineFlag.No;
   Ex.HasAsciiNoTabs:= TATBits2(Value);
 end;
 
@@ -1313,7 +1314,7 @@ begin
   FEnabledBookmarksUpdate:= true;
   FEnabledChangeEvents:= true;
 
-  FEncoding:= cEncUTF8;
+  FEncoding:= TATFileEncoding.UTF8;
   FEncodingDetect:= true;
   FEncodingDetectDefaultUtf8:= true;
   FEncodingCodepage:= ATEditorOptions.FallbackEncoding;
@@ -1329,7 +1330,7 @@ begin
   FUndoAfterSave:= true;
   FOneLine:= false;
   FProgressValue:= 0;
-  FProgressKind:= cStringsProgressNone;
+  FProgressKind:= TATStringsProgressKind.None;
   CaretsAfterLastEdition:= nil;
 
   ActionAddFakeLineIfNeeded;
@@ -2606,19 +2607,19 @@ begin
     if S1='' then Continue;
 
     case AMode of
-      cTrimLeft:
+      TATTrimSpaces.Left:
         begin
           if not IsCharSpace(S1[1]) then
             Continue;
           S2:= STrimLeft(S1);
         end;
-      cTrimRight:
+      TATTrimSpaces.Right:
         begin
           if not IsCharSpace(S1[Length(S1)]) then
             Continue;
           S2:= STrimRight(S1);
         end;
-      cTrimAll:
+      TATTrimSpaces.All:
         begin
           if not IsCharSpace(S1[1]) and not IsCharSpace(S1[Length(S1)]) then
             Continue;
@@ -2710,7 +2711,7 @@ begin
   for i:= 0 to Count-1 do
   begin
     Item:= FList.GetItem(i);
-    Item^.Ex.Sep:= TATBits2(cLineSepNone);
+    Item^.Ex.Sep:= TATBits2(TATLineSeparator.None);
   end;
 end;
 
@@ -2778,13 +2779,13 @@ begin
   end;
 
   case AAction of
-    cSortActionAsc:
+    TATStringsSortAction.Asc:
       Func:= @Compare_Asc;
-    cSortActionAscNoCase:
+    TATStringsSortAction.AscNoCase:
       Func:= @Compare_AscNoCase;
-    cSortActionDesc:
+    TATStringsSortAction.Desc:
       Func:= @Compare_Desc;
-    cSortActionDescNoCase:
+    TATStringsSortAction.DescNoCase:
       Func:= @Compare_DescNoCase;
   end;
 
