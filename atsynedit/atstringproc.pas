@@ -6,7 +6,7 @@ unit ATStringProc;
 
 {$mode objfpc}{$H+}
 {$codepage utf8}
-{$SCOPEDENUMS ON}
+{$ScopedEnums on}
 
 interface
 

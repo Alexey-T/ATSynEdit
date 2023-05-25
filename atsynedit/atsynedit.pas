@@ -5,7 +5,7 @@ License: MPL 2.0 or LGPL
 
 {$mode objfpc}{$H+}
 {$ModeSwitch advancedrecords}
-{$SCOPEDENUMS ON}
+{$ScopedEnums on}
 
 {$I atsynedit_defines.inc}
 
