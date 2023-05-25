@@ -28,13 +28,13 @@ begin
     case FEncoding of
       TATFileEncoding.UTF8:
         Sign:= cSignUTF8;
-      TATFileEncoding.WideLE:
+      TATFileEncoding.UTF16LE:
         Sign:= cSignWideLE;
-      TATFileEncoding.WideBE:
+      TATFileEncoding.UTF16BE:
         Sign:= cSignWideBE;
-      TATFileEncoding.Bit32LE:
+      TATFileEncoding.UTF32LE:
         Sign:= cSign32LE;
-      TATFileEncoding.Bit32BE:
+      TATFileEncoding.UTF32BE:
         Sign:= cSign32BE;
       else
         Sign:= '';
@@ -52,7 +52,7 @@ begin
     SWide:= Item^.Line;
     if SWide<>'' then
     case AEncoding of
-      TATFileEncoding.Ansi:
+      TATFileEncoding.ANSI:
         begin
           SAnsi:= UTF8Encode(SWide);
           SAnsi:= EncConvertFromUTF8(SAnsi, FEncodingCodepage);
@@ -65,19 +65,19 @@ begin
           AStream.WriteBuffer(SAnsi[1], Length(SAnsi));
         end;
 
-      TATFileEncoding.WideLE,
-      TATFileEncoding.WideBE:
+      TATFileEncoding.UTF16LE,
+      TATFileEncoding.UTF16BE:
         begin
-          if AEncoding=TATFileEncoding.WideBE then
+          if AEncoding=TATFileEncoding.UTF16BE then
             SSwapEndianWide(SWide);
           AStream.WriteBuffer(SWide[1], Length(SWide)*2);
         end;
 
-      TATFileEncoding.Bit32LE,
-      TATFileEncoding.Bit32BE:
+      TATFileEncoding.UTF32LE,
+      TATFileEncoding.UTF32BE:
         begin
           SQuad:= UnicodeStringToUCS4String(SWide);
-          if AEncoding=TATFileEncoding.Bit32BE then
+          if AEncoding=TATFileEncoding.UTF32BE then
             SSwapEndianUCS4(SQuad);
           AStream.WriteBuffer(SQuad[0], (Length(SQuad)-1)*4);
         end;
@@ -115,14 +115,14 @@ end;
 function TATStrings.IsSavingWithSignature: boolean;
 begin
   case FEncoding of
-    TATFileEncoding.Ansi:
+    TATFileEncoding.ANSI:
       Result:= false;
     TATFileEncoding.UTF8:
       Result:= FSaveSignUtf8;
-    TATFileEncoding.WideLE,
-    TATFileEncoding.WideBE,
-    TATFileEncoding.Bit32LE,
-    TATFileEncoding.Bit32BE:
+    TATFileEncoding.UTF16LE,
+    TATFileEncoding.UTF16BE,
+    TATFileEncoding.UTF32LE,
+    TATFileEncoding.UTF32BE:
       Result:= FSaveSignWide;
     else
       raise Exception.Create('Unknown encoding on saving');

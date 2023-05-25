@@ -1,5 +1,5 @@
 2023.05.25
-* change: enumerations were changed to 'scoped', ie you must replace cEndNone -> TATLineEnds.None
+* change: enums changed to 'scoped', e.g. you must replace cEndNone -> TATLineEnds.None etc
 
 2023.05.19
 + add: TATComboEdit.OptComboboxShowX

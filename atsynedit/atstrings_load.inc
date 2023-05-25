@@ -155,7 +155,7 @@ begin
       exit;
     else
       begin
-        AEnc:= TATFileEncoding.Ansi;
+        AEnc:= TATFileEncoding.ANSI;
         AEncCodepage:= TempEnc;
         Result:= true;
       end;
@@ -243,7 +243,7 @@ begin
             AEncCodepage:= eidUTF8;
           end
         else
-          AEnc:= TATFileEncoding.Ansi;
+          AEnc:= TATFileEncoding.ANSI;
       end;
       Result:= true;
       exit;
@@ -276,7 +276,7 @@ begin
 
   if IsStreamWithSignature(Stream, cSign32LE) then
   begin
-    Enc:= TATFileEncoding.Bit32LE;
+    Enc:= TATFileEncoding.UTF32LE;
     EncWithBom:= true;
     SignLen:= Length(cSign32LE);
     Exit
@@ -284,7 +284,7 @@ begin
 
   if IsStreamWithSignature(Stream, cSign32BE) then
   begin
-    Enc:= TATFileEncoding.Bit32BE;
+    Enc:= TATFileEncoding.UTF32BE;
     EncWithBom:= true;
     SignLen:= Length(cSign32BE);
     Exit
@@ -292,7 +292,7 @@ begin
 
   if IsStreamWithSignature(Stream, cSignWideLE) then
   begin
-    Enc:= TATFileEncoding.WideLE;
+    Enc:= TATFileEncoding.UTF16LE;
     EncWithBom:= true;
     SignLen:= Length(cSignWideLE);
     Exit
@@ -300,7 +300,7 @@ begin
 
   if IsStreamWithSignature(Stream, cSignWideBE) then
   begin
-    Enc:= TATFileEncoding.WideBE;
+    Enc:= TATFileEncoding.UTF16BE;
     EncWithBom:= true;
     SignLen:= Length(cSignWideBE);
     Exit
@@ -317,7 +317,7 @@ begin
       u8sNo:
         begin
           // https://github.com/Alexey-T/CudaText/issues/2928
-          Enc:= TATFileEncoding.Ansi;
+          Enc:= TATFileEncoding.ANSI;
         end;
     end;
 
@@ -333,9 +333,9 @@ begin
     if DetectStreamUtf16NoBom(Stream, BufSizeUTF16, IsLE) then
     begin
       if IsLE then
-        Enc:= TATFileEncoding.WideLE
+        Enc:= TATFileEncoding.UTF16LE
       else
-        Enc:= TATFileEncoding.WideBE;
+        Enc:= TATFileEncoding.UTF16BE;
       Exit
     end;
 end;
@@ -426,29 +426,29 @@ var
 begin
   Result:= TATCharEnding.NotEnding;
   case AEnc of
-    TATFileEncoding.Ansi,
+    TATFileEncoding.ANSI,
     TATFileEncoding.UTF8:
       begin
         Check:= p[APos];
       end;
-    TATFileEncoding.WideLE:
+    TATFileEncoding.UTF16LE:
       begin
         if p[APos+1]<>0 then exit;
         Check:= p[APos];
       end;
-    TATFileEncoding.WideBE:
+    TATFileEncoding.UTF16BE:
       begin
         if p[APos]<>0 then exit;
         Check:= p[APos+1];
       end;
-    TATFileEncoding.Bit32LE:
+    TATFileEncoding.UTF32LE:
       begin
         if p[APos+3]<>0 then exit;
         if p[APos+2]<>0 then exit;
         if p[APos+1]<>0 then exit;
         Check:= p[APos];
       end;
-    TATFileEncoding.Bit32BE:
+    TATFileEncoding.UTF32BE:
       begin
         if p[APos]<>0 then exit;
         if p[APos+1]<>0 then exit;
@@ -563,7 +563,7 @@ var
       else
       begin
         case FEncoding of
-          TATFileEncoding.Ansi:
+          TATFileEncoding.ANSI:
             begin
               SetString(SA, @Buf[NStart], Len);
               SUtf8:= EncConvertToUTF8(SA, FEncodingCodepage);
@@ -577,23 +577,23 @@ var
               LineAddRaw_NoUndo(SA, LineEnd, TATLoadStreamOption.AllowBadCharsOfLen1 in AOptions);
             end;
 
-          TATFileEncoding.WideLE,
-          TATFileEncoding.WideBE:
+          TATFileEncoding.UTF16LE,
+          TATFileEncoding.UTF16BE:
             begin
               SWide:= '';
               SetLength(SWide, Len div 2);
               Move(Buf[NStart], SWide[1], Len);
-              if FEncoding=TATFileEncoding.WideBE then
+              if FEncoding=TATFileEncoding.UTF16BE then
                 SSwapEndianWide(SWide);
               LineAddRaw_NoUndo(SWide, LineEnd);
             end;
 
-          TATFileEncoding.Bit32LE,
-          TATFileEncoding.Bit32BE:
+          TATFileEncoding.UTF32LE,
+          TATFileEncoding.UTF32BE:
             begin
               SetLength(SQuad{%H-}, Len div 4+1);
               Move(Buf[NStart], SQuad[0], Len);
-              if FEncoding=TATFileEncoding.Bit32BE then
+              if FEncoding=TATFileEncoding.UTF32BE then
                 SSwapEndianUCS4(SQuad);
               SWide:= UCS4StringToUnicodeString(SQuad);
               LineAddRaw_NoUndo(SWide, LineEnd);
@@ -650,7 +650,7 @@ begin
     if FEncodingDetectDefaultUtf8 then
       FEncoding:= TATFileEncoding.UTF8
     else
-      FEncoding:= TATFileEncoding.Ansi;
+      FEncoding:= TATFileEncoding.ANSI;
     DetectStreamEncoding(Stream, FEncoding, FEncodingCodepage, NSignatureLen, bWithBom,
       ATEditorOptions.DetectUTF8BufferKb,
       ATEditorOptions.DetectUTF16BufferWords,
@@ -672,8 +672,8 @@ begin
   case FEncoding of
     TATFileEncoding.UTF8:
       SaveSignUtf8:= bWithBom;
-    TATFileEncoding.WideBE,
-    TATFileEncoding.WideLE:
+    TATFileEncoding.UTF16BE,
+    TATFileEncoding.UTF16LE:
       SaveSignWide:= bWithBom;
   end;
 
@@ -697,7 +697,7 @@ begin
         begin
           //failed to load text as UTF8, so load again as ANSI
           AForcedToANSI:= true;
-          FEncoding:= TATFileEncoding.Ansi;
+          FEncoding:= TATFileEncoding.ANSI;
           CharSize:= 1;
           _LoadItems;
         end

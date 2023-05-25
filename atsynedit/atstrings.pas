@@ -47,12 +47,12 @@ type
     );
 
   TATFileEncoding = (
-    Ansi,
+    ANSI,
     UTF8,
-    WideLE,
-    WideBE,
-    Bit32LE,
-    Bit32BE
+    UTF16LE,
+    UTF16BE,
+    UTF32LE,
+    UTF32BE
     );
 
   TATBlockChangeKind = (

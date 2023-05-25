@@ -9993,7 +9993,7 @@ var
 begin
   St:= Strings;
   case St.Encoding of
-    TATFileEncoding.Ansi:
+    TATFileEncoding.ANSI:
       begin
         Result:= cEncConvNames[St.EncodingCodepage];
       end;
@@ -10004,28 +10004,28 @@ begin
         else
           Result:= cEncNameUtf8_NoBom;
       end;
-    TATFileEncoding.WideLE:
+    TATFileEncoding.UTF16LE:
       begin
         if St.SaveSignWide then
           Result:= cEncNameUtf16LE_WithBom
         else
           Result:= cEncNameUtf16LE_NoBom;
       end;
-    TATFileEncoding.WideBE:
+    TATFileEncoding.UTF16BE:
       begin
         if St.SaveSignWide then
           Result:= cEncNameUtf16BE_WithBom
         else
           Result:= cEncNameUtf16BE_NoBom;
       end;
-    TATFileEncoding.Bit32LE:
+    TATFileEncoding.UTF32LE:
       begin
         if St.SaveSignWide then
           Result:= cEncNameUtf32LE_WithBom
         else
           Result:= cEncNameUtf32LE_NoBom;
       end;
-    TATFileEncoding.Bit32BE:
+    TATFileEncoding.UTF32BE:
       begin
         if St.SaveSignWide then
           Result:= cEncNameUtf32BE_WithBom
@@ -10045,16 +10045,16 @@ begin
 
   if SameText(AName, cEncNameUtf8_WithBom) then begin St.Encoding:= TATFileEncoding.UTF8; St.SaveSignUtf8:= true; end else
   if SameText(AName, cEncNameUtf8_NoBom) then begin St.Encoding:= TATFileEncoding.UTF8; St.SaveSignUtf8:= false; end else
-  if SameText(AName, cEncNameUtf16LE_WithBom) then begin St.Encoding:= TATFileEncoding.WideLE; St.SaveSignWide:= true; end else
-  if SameText(AName, cEncNameUtf16LE_NoBom) then begin St.Encoding:= TATFileEncoding.WideLE; St.SaveSignWide:= false; end else
-  if SameText(AName, cEncNameUtf16BE_WithBom) then begin St.Encoding:= TATFileEncoding.WideBE; St.SaveSignWide:= true; end else
-  if SameText(AName, cEncNameUtf16BE_NoBom) then begin St.Encoding:= TATFileEncoding.WideBE; St.SaveSignWide:= false; end else
-  if SameText(AName, cEncNameUtf32LE_WithBom) then begin St.Encoding:= TATFileEncoding.Bit32LE; St.SaveSignWide:= true; end else
-  if SameText(AName, cEncNameUtf32LE_NoBom) then begin St.Encoding:= TATFileEncoding.Bit32LE; St.SaveSignWide:= false; end else
-  if SameText(AName, cEncNameUtf32BE_WithBom) then begin St.Encoding:= TATFileEncoding.Bit32BE; St.SaveSignWide:= true; end else
-  if SameText(AName, cEncNameUtf32BE_NoBom) then begin St.Encoding:= TATFileEncoding.Bit32BE; St.SaveSignWide:= false; end else
+  if SameText(AName, cEncNameUtf16LE_WithBom) then begin St.Encoding:= TATFileEncoding.UTF16LE; St.SaveSignWide:= true; end else
+  if SameText(AName, cEncNameUtf16LE_NoBom) then begin St.Encoding:= TATFileEncoding.UTF16LE; St.SaveSignWide:= false; end else
+  if SameText(AName, cEncNameUtf16BE_WithBom) then begin St.Encoding:= TATFileEncoding.UTF16BE; St.SaveSignWide:= true; end else
+  if SameText(AName, cEncNameUtf16BE_NoBom) then begin St.Encoding:= TATFileEncoding.UTF16BE; St.SaveSignWide:= false; end else
+  if SameText(AName, cEncNameUtf32LE_WithBom) then begin St.Encoding:= TATFileEncoding.UTF32LE; St.SaveSignWide:= true; end else
+  if SameText(AName, cEncNameUtf32LE_NoBom) then begin St.Encoding:= TATFileEncoding.UTF32LE; St.SaveSignWide:= false; end else
+  if SameText(AName, cEncNameUtf32BE_WithBom) then begin St.Encoding:= TATFileEncoding.UTF32BE; St.SaveSignWide:= true; end else
+  if SameText(AName, cEncNameUtf32BE_NoBom) then begin St.Encoding:= TATFileEncoding.UTF32BE; St.SaveSignWide:= false; end else
   begin
-    St.Encoding:= TATFileEncoding.Ansi;
+    St.Encoding:= TATFileEncoding.ANSI;
     St.EncodingCodepage:= EncConvFindEncoding(LowerCase(AName), eidCP1252);
   end;
 end;
