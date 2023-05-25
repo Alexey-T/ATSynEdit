@@ -58,7 +58,7 @@ begin
   if NCmd>0 then
   begin
     TimerBlinkDisable;
-    DoCommand(NCmd, cInvokeHotkey);
+    DoCommand(NCmd, TATEditorCommandInvoke.Hotkey);
     TimerBlinkEnable;
   end;
 end;
@@ -146,7 +146,7 @@ begin
   end;
 
   TimerBlinkDisable;
-  DoCommand(cCommand_TextInsert, cInvokeHotkeyChar, Str);
+  DoCommand(cCommand_TextInsert, TATEditorCommandInvoke.HotkeyChar, Str);
   TimerBlinkEnable;
 
   Utf8Key:= '';
@@ -182,11 +182,11 @@ end;
 function TATSynEdit.IsCommandResults_CaretMove(Res: TATCommandResults): boolean;
 begin
   Result:= Res*[
-    cResultCaretAny,
-    cResultCaretLeft,
-    cResultCaretRight,
-    cResultCaretTop,
-    cResultCaretBottom
+    TATCommandResult.CaretAny,
+    TATCommandResult.CaretLeft,
+    TATCommandResult.CaretRight,
+    TATCommandResult.CaretTop,
+    TATCommandResult.CaretBottom
     ] <> [];
 end;
 
@@ -204,8 +204,8 @@ var
 begin
   bNeedRepaint:= false;
   bAllowRepaint:= true;
-  bTextChanged:= cResultText in Res;
-  bUndoRedo:= cResultUndoRedo in Res;
+  bTextChanged:= TATCommandResult.Text in Res;
+  bUndoRedo:= TATCommandResult.UndoRedo in Res;
   bCaretMoved:= false;
   St:= Strings;
 
@@ -214,11 +214,11 @@ begin
     if bTextChanged then
     begin
       FScrollHorz.SetZero;
-      Include(Res, cResultCaretTop);
+      Include(Res, TATCommandResult.CaretTop);
     end;
 
   if bTextChanged or
-     (cResultFoldChange in Res) then
+     (TATCommandResult.FoldChange in Res) then
   begin
     bNeedRepaint:= true;
     FWrapUpdateNeeded:= true;
@@ -256,27 +256,27 @@ begin
     if Carets.Count=1 then
       bAllowCaretScroll:= true
     else
-    if cResultCaretLazy in Res then
+    if TATCommandResult.CaretLazy in Res then
       bAllowCaretScroll:= not IsCaretOnVisibleRect
     else
       bAllowCaretScroll:= true;
 
     if bAllowCaretScroll then
     begin
-      if cResultCaretTop in Res then
+      if TATCommandResult.CaretTop in Res then
         DoGotoCaret(cEdgeTop, bUndoRedo, false, false, false)
       else
-      if cResultCaretBottom in Res then
+      if TATCommandResult.CaretBottom in Res then
         DoGotoCaret(cEdgeBottom, bUndoRedo, false, false, false)
       else
-      if cResultCaretLeft in Res then
+      if TATCommandResult.CaretLeft in Res then
         DoGotoCaret(cEdgeLeft, bUndoRedo, false, false, false)
       else
-      if cResultCaretRight in Res then
+      if TATCommandResult.CaretRight in Res then
         DoGotoCaret(cEdgeRight, bUndoRedo, false, false, false);
     end;
 
-    if not (cResultKeepColumnSel in Res) then
+    if not (TATCommandResult.KeepColumnSel in Res) then
       FSelRect:= cRectEmpty;
 
     //update pixel coords, so that CudaText python code
@@ -289,10 +289,10 @@ begin
     NProximityVert:= GetActualProximityVert;
     if (NProximityVert>0)
       and (ACmd<>cCommand_SelectAll) //don't apply Proximity if 'select all' is called
-      and (cResultCaretFarFromEdge in Res) //don't apply Proximity if caret was near the edge, before the command
+      and (TATCommandResult.CaretFarFromEdge in Res) //don't apply Proximity if caret was near the edge, before the command
       then
     begin
-      if (Carets.Count=1) or (Res*[cResultCaretTop, cResultCaretAny]<>[]) then
+      if (Carets.Count=1) or (Res*[TATCommandResult.CaretTop, TATCommandResult.CaretAny]<>[]) then
       begin
         Caret:= Carets[0];
         if DoCaretApplyProximityToVertEdge(
@@ -303,7 +303,7 @@ begin
           UpdateCaretsCoords(false, true);
       end
       else
-      if (Carets.Count>1) and (Res*[cResultCaretBottom]<>[]) then
+      if (Carets.Count>1) and (Res*[TATCommandResult.CaretBottom]<>[]) then
       begin
         Caret:= Carets[Carets.Count-1];
         if DoCaretApplyProximityToVertEdge(
@@ -317,13 +317,13 @@ begin
   end
   else
   //scroll should do UpdateCaretsCoords, CudaText issue #3777
-  if cResultScroll in Res then
+  if TATCommandResult.Scroll in Res then
     UpdateCaretsCoords(false, true);
 
 
   if bTextChanged then
   begin
-    if not (cResultKeepColumnSel in Res) then
+    if not (TATCommandResult.KeepColumnSel in Res) then
       FSelRect:= cRectEmpty;
     //fixing CudaText issue #3708, syntax highlight is broken after Undo,
     //with "Commands History" plugin (cannot find how plugin breaks it)
@@ -338,7 +338,7 @@ begin
   if bCaretMoved then
     DoEventCarets;
 
-  if cResultState in Res then
+  if TATCommandResult.State in Res then
     DoEventState;
 
   //when caret goes to left/top edge, must reset the NPixelOffset
@@ -359,7 +359,7 @@ begin
     //- Paint call needed, to repaint after "Fold all" (Linux gtk2)
     //and it helps to not skip repaints in big files with EControl lexer
     UpdateCursor;
-    if cResultFoldChange in Res then
+    if TATCommandResult.FoldChange in Res then
       Paint;
     if bAllowRepaint then
       Invalidate;
@@ -383,7 +383,7 @@ begin
     cCommand_KeyLeft_Sel:
       begin
         if OptMouseColumnSelectionWithoutKey then
-          Result:= DoCommand_SelectColumnToDirection(cDirColumnLeft)
+          Result:= DoCommand_SelectColumnToDirection(TATEditorSelectColumnDirection.Left)
         else
           Result:= DoCommand_KeyLeft(true);
        end;
@@ -393,7 +393,7 @@ begin
     cCommand_KeyRight_Sel:
       begin
         if OptMouseColumnSelectionWithoutKey then
-          Result:= DoCommand_SelectColumnToDirection(cDirColumnRight)
+          Result:= DoCommand_SelectColumnToDirection(TATEditorSelectColumnDirection.Right)
         else
           Result:= DoCommand_KeyRight(true);
       end;
@@ -403,7 +403,7 @@ begin
     cCommand_KeyUp_Sel:
       begin
         if OptMouseColumnSelectionWithoutKey then
-          Result:= DoCommand_SelectColumnToDirection(cDirColumnUp)
+          Result:= DoCommand_SelectColumnToDirection(TATEditorSelectColumnDirection.Up)
         else
           Result:= DoCommand_KeyUpDown(false, 1, false);
         end;
@@ -413,7 +413,7 @@ begin
     cCommand_KeyDown_Sel:
       begin
         if OptMouseColumnSelectionWithoutKey then
-          Result:= DoCommand_SelectColumnToDirection(cDirColumnDown)
+          Result:= DoCommand_SelectColumnToDirection(TATEditorSelectColumnDirection.Down)
         else
           Result:= DoCommand_KeyUpDown(true, 1, false);
       end;
@@ -443,7 +443,7 @@ begin
     cCommand_KeyPageUp_Sel:
       begin
         if OptMouseColumnSelectionWithoutKey then
-          Result:= DoCommand_SelectColumnToDirection(cDirColumnPageUp)
+          Result:= DoCommand_SelectColumnToDirection(TATEditorSelectColumnDirection.PageUp)
         else
           Result:= DoCommand_KeyUpDown(false, GetPageLines, FOptKeyPageKeepsRelativePos);
       end;
@@ -453,17 +453,17 @@ begin
     cCommand_KeyPageDown_Sel:
       begin
         if OptMouseColumnSelectionWithoutKey then
-          Result:= DoCommand_SelectColumnToDirection(cDirColumnPageDown)
+          Result:= DoCommand_SelectColumnToDirection(TATEditorSelectColumnDirection.PageDown)
         else
           Result:= DoCommand_KeyUpDown(true, GetPageLines, FOptKeyPageKeepsRelativePos);
       end;
 
-    cCommand_ColSelectLeft:        Result:= DoCommand_SelectColumnToDirection(cDirColumnLeft);
-    cCommand_ColSelectRight:       Result:= DoCommand_SelectColumnToDirection(cDirColumnRight);
-    cCommand_ColSelectUp:          Result:= DoCommand_SelectColumnToDirection(cDirColumnUp);
-    cCommand_ColSelectDown:        Result:= DoCommand_SelectColumnToDirection(cDirColumnDown);
-    cCommand_ColSelectPageUp:      Result:= DoCommand_SelectColumnToDirection(cDirColumnPageUp);
-    cCommand_ColSelectPageDown:    Result:= DoCommand_SelectColumnToDirection(cDirColumnPageDown);
+    cCommand_ColSelectLeft:        Result:= DoCommand_SelectColumnToDirection(TATEditorSelectColumnDirection.Left);
+    cCommand_ColSelectRight:       Result:= DoCommand_SelectColumnToDirection(TATEditorSelectColumnDirection.Right);
+    cCommand_ColSelectUp:          Result:= DoCommand_SelectColumnToDirection(TATEditorSelectColumnDirection.Up);
+    cCommand_ColSelectDown:        Result:= DoCommand_SelectColumnToDirection(TATEditorSelectColumnDirection.Down);
+    cCommand_ColSelectPageUp:      Result:= DoCommand_SelectColumnToDirection(TATEditorSelectColumnDirection.PageUp);
+    cCommand_ColSelectPageDown:    Result:= DoCommand_SelectColumnToDirection(TATEditorSelectColumnDirection.PageDown);
     cCommand_ColSelectToLineBegin: Result:= DoCommand_SelectColumnToLineEdge(false);
     cCommand_ColSelectToLineEnd:   Result:= DoCommand_SelectColumnToLineEdge(true);
 
@@ -474,7 +474,7 @@ begin
     cCommand_ColSelectWithoutKey_Toggle:
       begin
         OptMouseColumnSelectionWithoutKey:= not OptMouseColumnSelectionWithoutKey;
-        Result:= [cResultState];
+        Result:= [TATCommandResult.State];
       end;
 
     cCommand_RemoveFirstCaret:    Result:= DoCommand_RemoveOneCaret(true);
@@ -505,7 +505,7 @@ begin
     cCommand_TextDeleteWordEntire:     Result:= DoCommand_TextDeleteWordEntire;
 
     cCommand_SelectAll:                Result:= DoCommand_SelectAll;
-    cCommand_SelectNone:               Result:= [cResultCaretAny];
+    cCommand_SelectNone:               Result:= [TATCommandResult.CaretAny];
     cCommand_SelectInverted:           Result:= DoCommand_SelectInverted;
     cCommand_SelectSplitToLines:       Result:= DoCommand_SelectSplitToLines;
     cCommand_SelectExtendByLine:       Result:= DoCommand_SelectExtendByLine(false);
@@ -566,10 +566,10 @@ begin
     cCommand_ScrollPageDown:           Result:= DoCommand_ScrollByDelta(GetPageLines, 0, FOptScrollLineCommandsKeepCaretOnScreen);
     cCommand_ScrollColumnLeft:         Result:= DoCommand_ScrollByDelta(0, -1, FOptScrollLineCommandsKeepCaretOnScreen);
     cCommand_ScrollColumnRight:        Result:= DoCommand_ScrollByDelta(0, 1, FOptScrollLineCommandsKeepCaretOnScreen);
-    cCommand_ScrollToCaretTop:         Result:= [cResultCaretTop];
-    cCommand_ScrollToCaretBottom:      Result:= [cResultCaretBottom];
-    cCommand_ScrollToCaretLeft:        Result:= [cResultCaretLeft];
-    cCommand_ScrollToCaretRight:       Result:= [cResultCaretRight];
+    cCommand_ScrollToCaretTop:         Result:= [TATCommandResult.CaretTop];
+    cCommand_ScrollToCaretBottom:      Result:= [TATCommandResult.CaretBottom];
+    cCommand_ScrollToCaretLeft:        Result:= [TATCommandResult.CaretLeft];
+    cCommand_ScrollToCaretRight:       Result:= [TATCommandResult.CaretRight];
     cCommand_ScrollToLeft:             Result:= DoCommand_ScrollToLeft;
 
     cCommand_Sort_Asc:                 Result:= DoCommand_Sort(cSortActionAsc);
@@ -632,11 +632,11 @@ begin
     cCommand_TextInsertEmptyAbove:     Result:= DoCommand_TextInsertEmptyAboveBelow(false);
     cCommand_TextInsertEmptyBelow:     Result:= DoCommand_TextInsertEmptyAboveBelow(true);
 
-    cCommand_TextCaseLower:            Result:= DoCommand_TextChangeCase(cCaseLower);
-    cCommand_TextCaseUpper:            Result:= DoCommand_TextChangeCase(cCaseUpper);
-    cCommand_TextCaseTitle:            Result:= DoCommand_TextChangeCase(cCaseTitle);
-    cCommand_TextCaseInvert:           Result:= DoCommand_TextChangeCase(cCaseInvert);
-    cCommand_TextCaseSentence:         Result:= DoCommand_TextChangeCase(cCaseSentence);
+    cCommand_TextCaseLower:            Result:= DoCommand_TextChangeCase(TATEditorCaseConvert.Lower);
+    cCommand_TextCaseUpper:            Result:= DoCommand_TextChangeCase(TATEditorCaseConvert.Upper);
+    cCommand_TextCaseTitle:            Result:= DoCommand_TextChangeCase(TATEditorCaseConvert.Title);
+    cCommand_TextCaseInvert:           Result:= DoCommand_TextChangeCase(TATEditorCaseConvert.Invert);
+    cCommand_TextCaseSentence:         Result:= DoCommand_TextChangeCase(TATEditorCaseConvert.Sentence);
 
     cCommand_TextTrimSpacesLeft:       Result:= DoCommand_TextTrimSpaces(cTrimLeft);
     cCommand_TextTrimSpacesRight:      Result:= DoCommand_TextTrimSpaces(cTrimRight);
@@ -647,9 +647,9 @@ begin
     cCommand_FoldLevel1..
     cCommand_FoldLevel9:               Result:= DoCommand_FoldLevel(ACmd-cCommand_FoldLevel1);
 
-    cCommand_FoldingFoldAtCurLine:     Result:= DoCommand_FoldRangeAtCurLine(cFoldingFold);
-    cCommand_FoldingUnfoldAtCurLine:   Result:= DoCommand_FoldRangeAtCurLine(cFoldingUnfold);
-    cCommand_FoldingToggleAtCurLine:   Result:= DoCommand_FoldRangeAtCurLine(cFoldingToggle);
+    cCommand_FoldingFoldAtCurLine:     Result:= DoCommand_FoldRangeAtCurLine(TATEditorFoldRangeCommand.Fold);
+    cCommand_FoldingUnfoldAtCurLine:   Result:= DoCommand_FoldRangeAtCurLine(TATEditorFoldRangeCommand.Unfold);
+    cCommand_FoldingToggleAtCurLine:   Result:= DoCommand_FoldRangeAtCurLine(TATEditorFoldRangeCommand.Toggle);
     cCommand_FoldingFoldSelection:     Result:= DoCommand_FoldSelection;
 
     cCommand_Cancel:                   Result:= DoCommand_Cancel(false, false);
@@ -667,7 +667,7 @@ begin
     cCommand_ZoomIn:                   Result:= DoCommand_ScaleDelta(true);
     cCommand_ZoomOut:                  Result:= DoCommand_ScaleDelta(false);
     cCommand_ZoomReset:                Result:= DoCommand_ScaleReset;
-    cCommand_RepeatTextCommand:        DoCommand(FLastTextCmd, cInvokeInternal, FLastTextCmdText);
+    cCommand_RepeatTextCommand:        DoCommand(FLastTextCmd, TATEditorCommandInvoke.Internal, FLastTextCmdText);
   end;
 end;
 
@@ -694,7 +694,7 @@ begin
   else
     Str:= '';
 
-  if AInvoke<>cInvokeHotkeyChar then
+  if AInvoke<>TATEditorCommandInvoke.HotkeyChar then
     FCommandLog.Add(ACmd, AInvoke, Str);
 
   if DoEventCommand(ACmd, AInvoke, Str) then Exit;
@@ -745,7 +745,7 @@ begin
   try
     Res:= DoCommandCore(ACmd, AText);
   finally
-    EndEditing(cResultText in Res);
+    EndEditing(TATCommandResult.Text in Res);
 
     if bTooManyCarets then
       SetEnabledSlowEvents(true);
@@ -759,7 +759,7 @@ begin
 
   FLastCommand:= ACmd;
   FLastCommandChangedText2:= FLastCommandChangedText;
-  FLastCommandChangedText:= cResultText in Res;
+  FLastCommandChangedText:= TATCommandResult.Text in Res;
   if FLastCommandChangedText then
   begin
     if ACmd<>cCommand_RepeatTextCommand then
@@ -810,7 +810,7 @@ begin
   if NCommandCode<>0 then
     St.CommandCode:= 0;
   if bCaretFarFromVertEdge then
-    Include(Res, cResultCaretFarFromEdge);
+    Include(Res, TATCommandResult.CaretFarFromEdge);
 
   DoCommandResults(ACmd, Res);
   DoEventCommandAfter(ACmd, AText);

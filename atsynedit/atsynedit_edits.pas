@@ -290,7 +290,7 @@ begin
 
     //scroll to left, select all
     DoScrollByDelta(-10000, 0);
-    DoCommand(cCommand_SelectAll, cInvokeMenuContext);
+    DoCommand(cCommand_SelectAll, TATEditorCommandInvoke.MenuContext);
   end;
 end;
 
@@ -354,7 +354,7 @@ begin
   ScrollHorz.SetZero;
 
   DoEventChange(0);
-  DoCommand(cCommand_SelectAll, cInvokeInternal);
+  DoCommand(cCommand_SelectAll, TATEditorCommandInvoke.Internal);
 end;
 
 destructor TATComboEdit.Destroy;

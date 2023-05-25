@@ -82,7 +82,7 @@ begin
 
   // need to eat some chars, such as DeadKeys
   if params.eatAmount<>0 then
-    _editor.DoCommand( cCommand_KeyBackspace, cInvokeInternalIME );
+    _editor.DoCommand( cCommand_KeyBackspace, TATEditorCommandInvoke.InternalIME );
 
   // insert Intermediate Text and highlight the selected part
   _editor.TextInsertAtCarets( atString(params.text), false, false, false );
@@ -109,7 +109,7 @@ begin
 
   // need to eat some chars, such as DeadKeys
   if params.eatAmount<>0 then
-    _editor.DoCommand( cCommand_KeyBackspace, cInvokeInternalIME );
+    _editor.DoCommand( cCommand_KeyBackspace, TATEditorCommandInvoke.InternalIME );
 
   _editor.TextInsertAtCarets( atString(params.text), false, false, false );
 end;
@@ -150,10 +150,10 @@ begin
   end;
 
   for i:=params.textCharLength-start downto 1 do
-    _editor.DoCommand( cCommand_KeyLeft, cInvokeInternalIME );
+    _editor.DoCommand( cCommand_KeyLeft, TATEditorCommandInvoke.InternalIME );
 
   for i:=length downto 1 do
-    _editor.DoCommand( cCommand_KeyRight_Sel, cInvokeInternalIME );
+    _editor.DoCommand( cCommand_KeyRight_Sel, TATEditorCommandInvoke.InternalIME );
 end;
 
 function TATAdapterCocoaIME.calcBound( var params: TCocoaIMEParameters ) : TRect;

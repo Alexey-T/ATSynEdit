@@ -45,7 +45,7 @@ begin
   ed.Font.Name:= 'Courier New';
   ed.OptUnprintedVisible:= false;
   ed.OptRulerVisible:= false;
-  ed.OptWrapMode:= cWrapOff;
+  ed.OptWrapMode:= TATEditorWrapMode.ModeOff;
 
   fDir:= ExtractFilePath(Application.Exename)+'../../test_files';
 end;

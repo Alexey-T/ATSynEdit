@@ -5,6 +5,7 @@ License: MPL 2.0 or LGPL
 
 {$mode objfpc}{$H+}
 {$ModeSwitch advancedrecords}
+{$SCOPEDENUMS ON}
 
 {$I atsynedit_defines.inc}
 
@@ -71,20 +72,20 @@ type
 
 type
   TATEditorCommandInvoke = (
-    cInvokeInternal,
-    cInvokeInternalIME,
-    cInvokeHotkey,
-    cInvokeHotkeyChar,
-    cInvokeMenuContext,
-    cInvokeMenuMain,
-    cInvokeMenuAPI,
-    cInvokeAppInternal,
-    cInvokeAppPalette,
-    cInvokeAppToolbar,
-    cInvokeAppSidebar,
-    cInvokeAppCharMap,
-    cInvokeAppDragDrop,
-    cInvokeAppAPI
+    Internal,
+    InternalIME,
+    Hotkey,
+    HotkeyChar,
+    MenuContext,
+    MenuMain,
+    MenuAPI,
+    AppInternal,
+    AppPalette,
+    AppToolbar,
+    AppSidebar,
+    AppCharMap,
+    AppDragDrop,
+    AppAPI
     );
 
 const
@@ -123,8 +124,9 @@ type
     procedure Add(ACode: integer; AInvoke: TATEditorCommandInvoke; const AText: string);
   end;
 
+  TATEditorWheelRecordKind = (Vert, Horz, Zoom);
   TATEditorWheelRecord = record
-    Kind: (wqkVert, wqkHorz, wqkZoom);
+    Kind: TATEditorWheelRecordKind;
     Delta: integer;
   end;
 
@@ -132,22 +134,22 @@ type
 
 type
   TATTokenKind = (
-    atkOther,
-    atkComment,
-    atkString
+    Other,
+    Comment,
+    Str
     );
 
   TATEditorScrollbarStyle = (
-    aessHide,
-    aessShow,
-    aessAuto
+    Hide,
+    Show,
+    Auto
     );
 
   TATEditorMiddleClickAction = (
-    mcaNone,
-    mcaScrolling,
-    mcaPaste,
-    mcaGotoDefinition
+    None,
+    Scrolling,
+    Paste,
+    GotoDefinition
     );
 
   TATEditorPosDetails = record
@@ -157,21 +159,21 @@ type
   end;
 
   TATEditorDoubleClickAction = (
-    cMouseDblClickNone,
-    cMouseDblClickSelectWordChars,
-    cMouseDblClickSelectAnyChars,
-    cMouseDblClickSelectEntireLine
+    None,
+    SelectWordChars,
+    SelectAnyChars,
+    SelectEntireLine
     );
 
   TATEditorMouseAction = (
-    cMouseActionNone,
-    cMouseActionClickSimple,
-    cMouseActionClickRight,
-    cMouseActionClickAndSelNormalBlock,
-    cMouseActionClickAndSelVerticalBlock,
-    cMouseActionClickMiddle,
-    cMouseActionMakeCaret,
-    cMouseActionMakeCaretsColumn
+    None,
+    ClickSimple,
+    ClickRight,
+    ClickAndSelNormalBlock,
+    ClickAndSelVerticalBlock,
+    ClickMiddle,
+    MakeCaret,
+    MakeCaretsColumn
     );
 
   TATEditorMouseActionRecord = record
@@ -182,10 +184,10 @@ type
   TATEditorMouseActions = array of TATEditorMouseActionRecord;
 
   TATFoldBarState = (
-    cFoldbarNone,
-    cFoldbarBegin,
-    cFoldbarEnd,
-    cFoldbarMiddle
+    None,
+    SBegin,
+    SEnd,
+    SMiddle
     );
 
   TATFoldBarProps = record
@@ -199,135 +201,135 @@ type
   TATFoldBarPropsArray = array of TATFoldBarProps;
 
   TATEditorDirection = (
-    cDirNone,
-    cDirLeft,
-    cDirRight,
-    cDirUp,
-    cDirDown
+    None,
+    Left,
+    Right,
+    Up,
+    Down
     );
 
   TATEditorRulerNumeration = (
-    cRulerNumeration_0_10_20,
-    cRulerNumeration_1_11_21,
-    cRulerNumeration_1_10_20
+    Num_0_10_20,
+    Num_1_11_21,
+    Num_1_10_20
     );
 
   TATEditorSelectColumnDirection = (
-    cDirColumnLeft,
-    cDirColumnRight,
-    cDirColumnUp,
-    cDirColumnDown,
-    cDirColumnPageUp,
-    cDirColumnPageDown
+    Left,
+    Right,
+    Up,
+    Down,
+    PageUp,
+    PageDown
     );
 
   TATEditorScrollbarsArrowsKind = (
-    cScrollArrowsNormal,
-    cScrollArrowsHidden,
-    cScrollArrowsAbove,
-    cScrollArrowsBelow,
-    cScrollArrowsCorner
+    Normal,
+    Hidden,
+    Above,
+    Below,
+    Corner
     );
 
   TATEditorCaseConvert = (
-    cCaseLower,
-    cCaseUpper,
-    cCaseTitle,
-    cCaseInvert,
-    cCaseSentence
+    Lower,
+    Upper,
+    Title,
+    Invert,
+    Sentence
     );
 
   TATCommandResult = (
-    cResultText,             //Text was changed.
-    cResultFoldChange,       //Folding range(s) were changed or folded/unfolded.
-    cResultCaretAny,         //Caret(s) pos/selection was changed. Don't scroll to caret.
-    cResultCaretLeft,        //Caret(s) pos/selection was changed. Scroll to the most left caret.
-    cResultCaretTop,         //Caret(s) pos/selection was changed. Scroll to the first caret.
-    cResultCaretRight,       //Caret(s) pos/selection was changed. Scroll to the most right caret.
-    cResultCaretBottom,      //Caret(s) pos/selection was changed. Scroll to the last caret.
-    cResultCaretLazy,  //Additional to CaretLeft/CaretRight/CaretTop/CaretBottom, scrolls only if no carets are left in visible area.
-    cResultCaretFarFromEdge, //Before running the command, caret was far from both vertical edges
-    cResultKeepColumnSel,    //Restore previous column selection, if command changed it.
-    cResultScroll,           //Some scrolling was made.
-    cResultUndoRedo,         //Undo or Redo action was made.
-    cResultState             //Some properties of editor were changed (e.g. word-wrap state).
+    Text,             //Text was changed.
+    FoldChange,       //Folding range(s) were changed or folded/unfolded.
+    CaretAny,         //Caret(s) pos/selection was changed. Don't scroll to caret.
+    CaretLeft,        //Caret(s) pos/selection was changed. Scroll to the most left caret.
+    CaretTop,         //Caret(s) pos/selection was changed. Scroll to the first caret.
+    CaretRight,       //Caret(s) pos/selection was changed. Scroll to the most right caret.
+    CaretBottom,      //Caret(s) pos/selection was changed. Scroll to the last caret.
+    CaretLazy,  //Additional to CaretLeft/CaretRight/CaretTop/CaretBottom, scrolls only if no carets are left in visible area.
+    CaretFarFromEdge, //Before running the command, caret was far from both vertical edges
+    KeepColumnSel,    //Restore previous column selection, if command changed it.
+    Scroll,           //Some scrolling was made.
+    UndoRedo,         //Undo or Redo action was made.
+    State             //Some properties of editor were changed (e.g. word-wrap state).
     );
   TATCommandResults = set of TATCommandResult;
 
   TATEditorGapCoordAction = (
-    cGapCoordIgnore,
-    cGapCoordToLineEnd,
-    cGapCoordMoveDown
+    Ignore,
+    ToLineEnd,
+    MoveDown
     );
 
   TATEditorGutterIcons = (
-    cGutterIconsPlusMinus,
-    cGutterIconsTriangles
+    PlusMinus,
+    Triangles
     );
 
   TATEditorPasteCaret = (
-    cPasteCaretNoChange,
-    cPasteCaretLeftBottom,
-    cPasteCaretRightBottom,
-    cPasteCaretRightTop,
-    cPasteCaretColumnLeft,
-    cPasteCaretColumnRight
+    NoChange,
+    LeftBottom,
+    RightBottom,
+    RightTop,
+    ColumnLeft,
+    ColumnRight
     );
 
   TATEditorFoldStyle = ( //affects folding of blocks without "text hint" passed from adapter
-    cFoldHereWithDots, //show "..." from fold-pos
-    cFoldHereWithTruncatedText, //show truncated line instead of "..."
-    cFoldFromEndOfLine, //looks like Lazarus: show "..." after line, bad with 2 blocks starting at the same line
-    cFoldFromEndOfLineAlways, //same, even if HintText not empty
-    cFoldFromNextLine //looks like SynWrite: don't show "...", show separator line
+    HereWithDots, //show "..." from fold-pos
+    HereWithTruncatedText, //show truncated line instead of "..."
+    FromEndOfLine, //looks like Lazarus: show "..." after line, bad with 2 blocks starting at the same line
+    FromEndOfLineAlways, //same, even if HintText not empty
+    FromNextLine //looks like SynWrite: don't show "...", show separator line
     );
 
   TATEditorFoldRangeCommand = (
-    cFoldingFold,
-    cFoldingUnfold,
-    cFoldingToggle
+    Fold,
+    Unfold,
+    Toggle
     );
 
   TATEditorStapleEdge = (
-    cStapleEdgeNone,
-    cStapleEdgeAngle,
-    cStapleEdgeLine
+    None,
+    Angle,
+    Line
     );
 
 type
   TATEditorAutoIndentKind = (
-    cIndentAsPrevLine,
-    cIndentSpacesOnly,
-    cIndentTabsAndSpaces,
-    cIndentTabsOnly,
-    cIndentToOpeningBracket
+    AsPrevLine,
+    SpacesOnly,
+    TabsAndSpaces,
+    TabsOnly,
+    ToOpeningBracket
     );
 
   TATEditorPageDownSize = (
-    cPageSizeFull,
-    cPageSizeFullMinus1,
-    cPageSizeHalf
+    Full,
+    FullMinus1,
+    Half
     );
 
   TATEditorWrapMode = (
-    cWrapOff,
-    cWrapOn,
-    cWrapAtWindowOrMargin
+    ModeOff,
+    ModeOn,
+    AtWindowOrMargin
     );
 
   TATEditorNumbersStyle = (
-    cNumbersAll,
-    cNumbersNone,
-    cNumbersEach10th,
-    cNumbersEach5th,
-    cNumbersRelative
+    All,
+    None,
+    Each10th,
+    Each5th,
+    Relative
     );
 
   TATEditorInternalFlag = (
-    cIntFlagBitmap, //flag "bitmap should be repainted"
-    cIntFlagScrolledHorz, //flag "horizontal scroll _position_ is changed"
-    cIntFlagRepaintNeeded, //last paint changes some state, so repainting is needed
-    cIntFlagResize
+    Bitmap, //flag "bitmap should be repainted"
+    ScrolledHorz, //flag "horizontal scroll _position_ is changed"
+    RepaintNeeded, //last paint changes some state, so repainting is needed
+    Resize
     );
   TATEditorInternalFlags = set of TATEditorInternalFlag;
 
@@ -410,13 +412,13 @@ const
   cInitBorderWidth = 1;
   cInitBorderWidthFocused = 1;
   cInitBorderWidthMacro = 3;
-  cInitRulerNumeration = cRulerNumeration_0_10_20;
+  cInitRulerNumeration = TATEditorRulerNumeration.Num_0_10_20;
   cInitRulerHeightPercents = 100;
   cInitRulerFontSizePercents = 80;
   cInitRulerMarkCaret = 1;
   cInitRulerMarkSmall = 3;
   cInitRulerMarkBig = 7;
-  cInitWrapMode = cWrapOff;
+  cInitWrapMode = TATEditorWrapMode.ModeOff;
   cInitWrapEnabledForMaxLines = 60*1000;
   cInitSpacingY = 1;
   cInitCaretBlinkTime = 600;
@@ -431,13 +433,13 @@ const
   cInitShowMouseSelFrame = true;
   cInitMarginRight = 80;
   cInitTabSize = 8;
-  cInitNumbersStyle = cNumbersEach5th;
+  cInitNumbersStyle = TATEditorNumbersStyle.Each5th;
   cInitNumbersIndentPercents = 60;
   cInitBitmapWidth = 1000;
   cInitBitmapHeight = 800;
   cInitGutterPlusSize = 4;
   cInitMarkerSize = 30;
-  cInitFoldStyle = cFoldHereWithTruncatedText;
+  cInitFoldStyle = TATEditorFoldStyle.HereWithTruncatedText;
   cInitFoldUnderlineOffset = 3;
   cInitFoldTooltipVisible = true;
   cInitFoldTooltipLineCount = 15;
@@ -1626,7 +1628,7 @@ type
     function CaretPosToClientPos(const P: TPoint): TATPoint;
     function ClientPosToCaretPos(P: TATPoint;
       out ADetails: TATEditorPosDetails;
-      AGapCoordAction: TATEditorGapCoordAction=cGapCoordToLineEnd): TPoint;
+      AGapCoordAction: TATEditorGapCoordAction=TATEditorGapCoordAction.ToLineEnd): TPoint;
     function IsLineWithCaret(ALine: integer; ADisableSelected: boolean=false): boolean;
     function OffsetToCaretPos(const APos: integer): TPoint;
     function CaretPosToOffset(const ACaret: TPoint): integer;
@@ -1915,7 +1917,7 @@ type
     property OptTextHintCenter: boolean read FTextHintCenter write FTextHintCenter default false;
     property OptTextCenteringCharWidth: integer read FOptTextCenteringCharWidth write FOptTextCenteringCharWidth default 0;
     property OptAutoIndent: boolean read FOptAutoIndent write FOptAutoIndent default true;
-    property OptAutoIndentKind: TATEditorAutoIndentKind read FOptAutoIndentKind write FOptAutoIndentKind default cIndentAsPrevLine;
+    property OptAutoIndentKind: TATEditorAutoIndentKind read FOptAutoIndentKind write FOptAutoIndentKind default TATEditorAutoIndentKind.AsPrevLine;
     property OptAutoIndentBetterBracketsCurly: boolean read FOptAutoIndentBetterBracketsCurly write FOptAutoIndentBetterBracketsCurly default true;
     property OptAutoIndentBetterBracketsRound: boolean read FOptAutoIndentBetterBracketsRound write FOptAutoIndentBetterBracketsRound default false;
     property OptAutoIndentBetterBracketsSquare: boolean read FOptAutoIndentBetterBracketsSquare write FOptAutoIndentBetterBracketsSquare default false;
@@ -1926,8 +1928,8 @@ type
     property OptLastLineOnTop: boolean read FOptLastLineOnTop write FOptLastLineOnTop default false;
     property OptOverwriteSel: boolean read FOptOverwriteSel write FOptOverwriteSel default true;
     property OptOverwriteAllowedOnPaste: boolean read FOptOverwriteAllowedOnPaste write FOptOverwriteAllowedOnPaste default false;
-    property OptScrollStyleHorz: TATEditorScrollbarStyle read FOptScrollStyleHorz write FOptScrollStyleHorz default aessAuto;
-    property OptScrollStyleVert: TATEditorScrollbarStyle read FOptScrollStyleVert write FOptScrollStyleVert default aessShow;
+    property OptScrollStyleHorz: TATEditorScrollbarStyle read FOptScrollStyleHorz write FOptScrollStyleHorz default TATEditorScrollbarStyle.Auto;
+    property OptScrollStyleVert: TATEditorScrollbarStyle read FOptScrollStyleVert write FOptScrollStyleVert default TATEditorScrollbarStyle.Show;
     property OptScrollSmooth: boolean read FOptScrollSmooth write FOptScrollSmooth default true;
     property OptScrollIndentCaretHorz: integer read FOptScrollIndentCaretHorz write FOptScrollIndentCaretHorz default 10;
     property OptScrollIndentCaretVert: integer read FOptScrollIndentCaretVert write FOptScrollIndentCaretVert default 0;
@@ -1949,8 +1951,8 @@ type
     property OptStapleWidthPercent: integer read FOptStapleWidthPercent write FOptStapleWidthPercent default 100;
     property OptStapleHiliteActive: boolean read FOptStapleHiliteActive write FOptStapleHiliteActive default true;
     property OptStapleHiliteActiveAlpha: integer read FOptStapleHiliteActiveAlpha write FOptStapleHiliteActiveAlpha default cInitStapleHiliteAlpha;
-    property OptStapleEdge1: TATEditorStapleEdge read FOptStapleEdge1 write FOptStapleEdge1 default cStapleEdgeAngle;
-    property OptStapleEdge2: TATEditorStapleEdge read FOptStapleEdge2 write FOptStapleEdge2 default cStapleEdgeAngle;
+    property OptStapleEdge1: TATEditorStapleEdge read FOptStapleEdge1 write FOptStapleEdge1 default TATEditorStapleEdge.Angle;
+    property OptStapleEdge2: TATEditorStapleEdge read FOptStapleEdge2 write FOptStapleEdge2 default TATEditorStapleEdge.Angle;
     property OptStapleIndentConsidersEnd: boolean read FOptStapleIndentConsidersEnd write FOptStapleIndentConsidersEnd default false;
     property OptShowFullWidthForSelection: boolean read FOptShowFullSel write FOptShowFullSel default false;
     property OptShowFullWidthForSyntaxHilite: boolean read FOptShowFullHilite write FOptShowFullHilite default true;
@@ -1968,7 +1970,7 @@ type
     property OptCaretStopUnfocused: boolean read FCaretStopUnfocused write FCaretStopUnfocused default true;
     property OptCaretHideUnfocused: boolean read FCaretHideUnfocused write FCaretHideUnfocused default true;
     property OptCaretPreferLeftSide: boolean read FOptCaretPreferLeftSide write FOptCaretPreferLeftSide default true;
-    property OptCaretPosAfterPasteColumn: TATEditorPasteCaret read FOptCaretPosAfterPasteColumn write FOptCaretPosAfterPasteColumn default cPasteCaretColumnRight;
+    property OptCaretPosAfterPasteColumn: TATEditorPasteCaret read FOptCaretPosAfterPasteColumn write FOptCaretPosAfterPasteColumn default TATEditorPasteCaret.ColumnRight;
     property OptCaretsPrimitiveColumnSelection: boolean read FOptCaretsPrimitiveColumnSelection write FOptCaretsPrimitiveColumnSelection default cInitCaretsPrimitiveColumnSelection;
     property OptCaretsAddedToColumnSelection: boolean read FOptCaretsAddedToColumnSelection write FOptCaretsAddedToColumnSelection default true;
     property OptCaretFixAfterRangeFolded: boolean read FOptCaretFixAfterRangeFolded write FOptCaretFixAfterRangeFolded default true;
@@ -1981,7 +1983,7 @@ type
     property OptGutterShowFoldLines: boolean read FOptGutterShowFoldLines write FOptGutterShowFoldLines default true;
     property OptGutterShowFoldLinesAll: boolean read FOptGutterShowFoldLinesAll write FOptGutterShowFoldLinesAll default false;
     property OptGutterShowFoldLinesForCaret: boolean read FOptGutterShowFoldLinesForCaret write FOptGutterShowFoldLinesForCaret default true;
-    property OptGutterIcons: TATEditorGutterIcons read FOptGutterIcons write FOptGutterIcons default cGutterIconsPlusMinus;
+    property OptGutterIcons: TATEditorGutterIcons read FOptGutterIcons write FOptGutterIcons default TATEditorGutterIcons.PlusMinus;
     property OptBorderVisible: boolean read FOptBorderVisible write FOptBorderVisible default cInitBorderVisible;
     property OptBorderWidth: integer read FOptBorderWidth write FOptBorderWidth default cInitBorderWidth;
     property OptBorderWidthFocused: integer read FOptBorderWidthFocused write FOptBorderWidthFocused default cInitBorderWidthFocused;
@@ -2049,7 +2051,7 @@ type
     property OptMouseClickNumberSelectsLine: boolean read FOptMouseClickNumberSelectsLine write FOptMouseClickNumberSelectsLine default true;
     property OptMouseClickNumberSelectsLineWithEOL: boolean read FOptMouseClickNumberSelectsLineWithEOL write FOptMouseClickNumberSelectsLineWithEOL default true;
     property OptMouseClickNumberSelectsFoldedRange: boolean read FOptMouseClickNumberSelectsFoldedRange write FOptMouseClickNumberSelectsFoldedRange default true;
-    property OptMouse2ClickAction: TATEditorDoubleClickAction read FOptMouse2ClickAction write FOptMouse2ClickAction default cMouseDblClickSelectAnyChars;
+    property OptMouse2ClickAction: TATEditorDoubleClickAction read FOptMouse2ClickAction write FOptMouse2ClickAction default TATEditorDoubleClickAction.SelectAnyChars;
     property OptMouse2ClickOpensURL: boolean read FOptMouse2ClickOpensURL write FOptMouse2ClickOpensURL default true;
     property OptMouse2ClickOnFoldMarkSelectsFoldedLines: boolean read FOptMouse2ClickOnFoldMarkSelectsFoldedLines write FOptMouse2ClickOnFoldMarkSelectsFoldedLines default true;
     property OptMouse2ClickDragSelectsWords: boolean read FOptMouse2ClickDragSelectsWords write FOptMouse2ClickDragSelectsWords default true;
@@ -2057,7 +2059,7 @@ type
     property OptMouseDragDrop: boolean read FOptMouseDragDrop write FOptMouseDragDrop default true;
     property OptMouseDragDropCopying: boolean read FOptMouseDragDropCopying write FOptMouseDragDropCopying default true;
     property OptMouseDragDropCopyingWithState: TShiftStateEnum read FOptMouseDragDropCopyingWithState write FOptMouseDragDropCopyingWithState default ssModifier;
-    property OptMouseMiddleClickAction: TATEditorMiddleClickAction read FOptMouseMiddleClickAction write FOptMouseMiddleClickAction default mcaScrolling;
+    property OptMouseMiddleClickAction: TATEditorMiddleClickAction read FOptMouseMiddleClickAction write FOptMouseMiddleClickAction default TATEditorMiddleClickAction.Scrolling;
     property OptMouseRightClickMovesCaret: boolean read FOptMouseRightClickMovesCaret write FOptMouseRightClickMovesCaret default false;
     property OptMouseWheelScrollVert: boolean read FOptMouseWheelScrollVert write FOptMouseWheelScrollVert default true;
     property OptMouseWheelScrollVertSpeed: integer read FOptMouseWheelScrollVertSpeed write FOptMouseWheelScrollVertSpeed default 3;
@@ -2074,7 +2076,7 @@ type
     property OptKeyUpDownAllowToEdge: boolean read FOptKeyUpDownAllowToEdge write FOptKeyUpDownAllowToEdge default false;
     property OptKeyUpDownKeepColumn: boolean read FOptKeyUpDownKeepColumn write FOptKeyUpDownKeepColumn default true;
     property OptKeyHomeEndNavigateWrapped: boolean read FOptKeyHomeEndNavigateWrapped write FOptKeyHomeEndNavigateWrapped default true;
-    property OptKeyPageUpDownSize: TATEditorPageDownSize read FOptKeyPageUpDownSize write FOptKeyPageUpDownSize default cPageSizeFullMinus1;
+    property OptKeyPageUpDownSize: TATEditorPageDownSize read FOptKeyPageUpDownSize write FOptKeyPageUpDownSize default TATEditorPageDownSize.FullMinus1;
     property OptKeyLeftRightGoToNextLineWithCarets: boolean read FOptKeyLeftRightGoToNextLineWithCarets write FOptKeyLeftRightGoToNextLineWithCarets default true;
     property OptKeyLeftRightSwapSel: boolean read FOptKeyLeftRightSwapSel write FOptKeyLeftRightSwapSel default true;
     property OptKeyLeftRightSwapSelAndSelect: boolean read FOptKeyLeftRightSwapSelAndSelect write FOptKeyLeftRightSwapSelAndSelect default false;
@@ -2206,7 +2208,7 @@ begin
     NCoordX:= FRectMain.Left + (i-NRulerStart) * FCharSize.XScaled div ATEditorCharXScale;
 
     case FOptRulerNumeration of
-      cRulerNumeration_0_10_20:
+      TATEditorRulerNumeration.Num_0_10_20:
         begin
           NOutput:= i;
           if (i mod 10 = 0) then
@@ -2215,7 +2217,7 @@ begin
             CanvasTextOutSimplest(C, NCoordX - NCharWidthScaled*Length(Str) div 2 div ATEditorCharXScale, NTopIndent, Str);
           end;
         end;
-      cRulerNumeration_1_11_21:
+      TATEditorRulerNumeration.Num_1_11_21:
         begin
           NOutput:= i;
           if (i mod 10 = 0) then
@@ -2224,7 +2226,7 @@ begin
             CanvasTextOutSimplest(C, NCoordX - NCharWidthScaled*Length(Str) div 2 div ATEditorCharXScale, NTopIndent, Str);
           end;
         end;
-      cRulerNumeration_1_10_20:
+      TATEditorRulerNumeration.Num_1_10_20:
         begin
           NOutput:= i+1;
           if (NOutput=1) or (NOutput mod 10 = 0) then
@@ -2299,7 +2301,7 @@ begin
   else
     NLen:= 2;
 
-  if FOptNumbersStyle=cNumbersRelative then //add space for '-'
+  if FOptNumbersStyle=TATEditorNumbersStyle.Relative then //add space for '-'
     Inc(NLen);
 
   NBandIndex:= FGutter.FindIndexByTag(ATEditorOptions.GutterTagNumbers);
@@ -2338,7 +2340,7 @@ function TATSynEdit.DoFormatLineNumber(N: integer): string;
 var
   NCurLine: integer;
 begin
-  if FOptNumbersStyle=cNumbersRelative then
+  if FOptNumbersStyle=TATEditorNumbersStyle.Relative then
   begin
     if Carets.Count=0 then
       exit(IntToStr(N));
@@ -2359,11 +2361,11 @@ begin
       Exit(IntToStr(N));
 
   case FOptNumbersStyle of
-    cNumbersAll:
+    TATEditorNumbersStyle.All:
       Result:= IntToStr(N);
-    cNumbersNone:
+    TATEditorNumbersStyle.None:
       Result:= '.';
-    cNumbersEach10th:
+    TATEditorNumbersStyle.Each10th:
       begin
         if (N mod 10 = 0) then
           Result:= IntToStr(N)
@@ -2373,7 +2375,7 @@ begin
         else
           Result:= '.';
       end;
-    cNumbersEach5th:
+    TATEditorNumbersStyle.Each5th:
       begin
         if (N mod 5 = 0) then
           Result:= IntToStr(N)
@@ -2400,7 +2402,7 @@ procedure TATSynEdit.SetMarginRight(AValue: integer);
 begin
   if AValue=FMarginRight then Exit;
   FMarginRight:= Max(AValue, ATEditorOptions.MinMarginRt);
-  if FWrapMode=cWrapAtWindowOrMargin then
+  if FWrapMode=TATEditorWrapMode.AtWindowOrMargin then
     FWrapUpdateNeeded:= true;
 end;
 
@@ -2427,7 +2429,7 @@ begin
   //but handle this in UpdateCharSize(), via GetDC(0)
 
   if not HandleAllocated then
-    if FWrapMode<>cWrapOff then
+    if FWrapMode<>TATEditorWrapMode.ModeOff then
       exit;
 
   //must init FRect* if called before first paint (wrapped items need it)
@@ -2446,7 +2448,7 @@ begin
   NLinesCount:= CurStrings.Count;
   FWrapInfo.StringsObj:= CurStrings;
   FWrapInfo.VirtualMode:=
-    (FWrapMode=cWrapOff) and
+    (FWrapMode=TATEditorWrapMode.ModeOff) and
     (Fold.Count=0) and
     (NLinesCount>2);
   if FWrapInfo.VirtualMode then exit;
@@ -2459,7 +2461,7 @@ begin
     FWrapUpdateNeeded:= true
   else
   if (not FWrapUpdateNeeded) and
-    (FWrapMode<>cWrapOff) and
+    (FWrapMode<>TATEditorWrapMode.ModeOff) and
     (FWrapInfo.VisibleColumns<>NNewVisibleColumns) then
     FWrapUpdateNeeded:= true;
 
@@ -2468,11 +2470,11 @@ begin
   FWrapInfo.VisibleColumns:= NNewVisibleColumns;
 
   case FWrapMode of
-    cWrapOff:
+    TATEditorWrapMode.ModeOff:
       FWrapInfo.WrapColumn:= 0;
-    cWrapOn:
+    TATEditorWrapMode.ModeOn:
       FWrapInfo.WrapColumn:= Max(ATEditorOptions.MinWrapColumn, NNewVisibleColumns-FWrapAddSpace);
-    cWrapAtWindowOrMargin:
+    TATEditorWrapMode.AtWindowOrMargin:
       FWrapInfo.WrapColumn:= Max(ATEditorOptions.MinWrapColumn, Min(NNewVisibleColumns-FWrapAddSpace, FMarginRight));
   end;
 
@@ -2744,7 +2746,7 @@ begin
   if FWrapMode=AValue then Exit;
 
   //disable setting wrap=on for too big files
-  if FWrapMode=cWrapOff then
+  if FWrapMode=TATEditorWrapMode.ModeOff then
     if Strings.Count>=FWrapEnabledForMaxLines then exit;
 
   NLine:= LineTop;
@@ -2754,14 +2756,14 @@ begin
   UpdateWrapInfo; //helps to solve https://github.com/Alexey-T/CudaText/issues/2879
                   //FWrapUpdateNeeded:=true and Update() is not enough
 
-  if FWrapMode<>cWrapOff then
+  if FWrapMode<>TATEditorWrapMode.ModeOff then
     FScrollHorz.SetZero;
 
   Update;
   LineTop:= NLine;
 
   //when very long line has caret at end, and we toggle wordwrap, let's scroll to new caret pos
-  if FWrapMode=cWrapOff then
+  if FWrapMode=TATEditorWrapMode.ModeOff then
     if Carets.Count=1 then
     begin
       Caret:= Carets[0];
@@ -2780,7 +2782,7 @@ procedure TATSynEdit.SetWrapIndented(AValue: boolean);
 begin
   if FWrapIndented=AValue then Exit;
   FWrapIndented:=AValue;
-  if FWrapMode<>cWrapOff then
+  if FWrapMode<>TATEditorWrapMode.ModeOff then
     FWrapUpdateNeeded:= true;
 end;
 
@@ -2854,7 +2856,7 @@ begin
     NPage:= Max(1, GetVisibleColumns);
     //NMax is calculated in DoPaintText
     //hide horz bar for word-wrap:
-    if FWrapMode<>cWrapOff then
+    if FWrapMode<>TATEditorWrapMode.ModeOff then
     begin
       NPos:= 0;
       SmoothPos:= 0;
@@ -2902,7 +2904,7 @@ begin
     (FPrevVert<>FScrollVert) then
   begin
     if FScrollHorz.NPos<>FPrevHorz.NPos then
-      Include(FPaintFlags, cIntFlagScrolledHorz);
+      Include(FPaintFlags, TATEditorInternalFlag.ScrolledHorz);
 
     bScrolled:=
       (FPrevHorz.SmoothPos<>FScrollHorz.SmoothPos) or
@@ -2922,11 +2924,11 @@ var
   si: TScrollInfo;
 begin
   case FOptScrollStyleVert of
-    aessHide:
+    TATEditorScrollbarStyle.Hide:
       NeedBar:= false;
-    aessShow:
+    TATEditorScrollbarStyle.Show:
       NeedBar:= true;
-    aessAuto:
+    TATEditorScrollbarStyle.Auto:
       NeedBar:= (FScrollVert.SmoothPos>0) or (FScrollVert.NMax>FScrollVert.NPage);
   end;
 
@@ -2973,11 +2975,11 @@ var
   si: TScrollInfo;
 begin
   case FOptScrollStyleHorz of
-    aessHide:
+    TATEditorScrollbarStyle.Hide:
       NeedBar:= false;
-    aessShow:
+    TATEditorScrollbarStyle.Show:
       NeedBar:= true;
-    aessAuto:
+    TATEditorScrollbarStyle.Auto:
       NeedBar:= (FScrollHorz.SmoothPos>0) or (FScrollHorz.NMax>FScrollHorz.NPage);
   end;
 
@@ -3822,9 +3824,9 @@ begin
   //horz scrollbar max: is calculated here, to make variable horz bar
   //vert scrollbar max: is calculated in UpdateScrollbars
   case FWrapMode of
-    cWrapOn:
+    TATEditorWrapMode.ModeOn:
       AScrollHorz.NMax:= GetVisibleColumns;
-    cWrapAtWindowOrMargin:
+    TATEditorWrapMode.AtWindowOrMargin:
       AScrollHorz.NMax:= Min(GetVisibleColumns, FMarginRight);
     else
       begin
@@ -4793,7 +4795,7 @@ begin
   {$endif}
 
   FPaintLocked:= 0;
-  FPaintFlags:= [cIntFlagBitmap];
+  FPaintFlags:= [TATEditorInternalFlag.Bitmap];
 
   FColors:= TATEditorColors.Create;
   InitDefaultColors(FColors);
@@ -4935,7 +4937,7 @@ begin
   FOptGutterShowFoldLines:= true;
   FOptGutterShowFoldLinesAll:= false;
   FOptGutterShowFoldLinesForCaret:= true;
-  FOptGutterIcons:= cGutterIconsPlusMinus;
+  FOptGutterIcons:= TATEditorGutterIcons.PlusMinus;
 
   FGutterDecorAlignment:= taCenter;
   FGutterBandDecor:= -1;
@@ -4991,8 +4993,8 @@ begin
   FCharSizeMinimap.XSpacePercents:= 100;
   FCharSizeMinimap.Y:= 2;
 
-  FOptScrollStyleHorz:= aessAuto;
-  FOptScrollStyleVert:= aessShow;
+  FOptScrollStyleHorz:= TATEditorScrollbarStyle.Auto;
+  FOptScrollStyleVert:= TATEditorScrollbarStyle.Show;
   FOptScrollSmooth:= true;
   FOptScrollIndentCaretHorz:= 10;
   FOptScrollIndentCaretVert:= 0;
@@ -5017,8 +5019,8 @@ begin
   FOptStapleWidthPercent:= 100;
   FOptStapleHiliteActive:= true;
   FOptStapleHiliteActiveAlpha:= cInitStapleHiliteAlpha;
-  FOptStapleEdge1:= cStapleEdgeAngle;
-  FOptStapleEdge2:= cStapleEdgeAngle;
+  FOptStapleEdge1:= TATEditorStapleEdge.Angle;
+  FOptStapleEdge2:= TATEditorStapleEdge.Angle;
   FOptStapleIndentConsidersEnd:= false;
 
   FOptTextCenteringCharWidth:= 0;
@@ -5038,7 +5040,7 @@ begin
   FOptOverwriteAllowedOnPaste:= false;
   FOptNonWordChars:= ATEditorOptions.DefaultNonWordChars;
   FOptAutoIndent:= true;
-  FOptAutoIndentKind:= cIndentAsPrevLine;
+  FOptAutoIndentKind:= TATEditorAutoIndentKind.AsPrevLine;
   FOptAutoIndentBetterBracketsCurly:= true;
   FOptAutoIndentBetterBracketsRound:= false;
   FOptAutoIndentBetterBracketsSquare:= false;
@@ -5053,14 +5055,14 @@ begin
   FOptMouseDragDrop:= true;
   FOptMouseDragDropCopying:= true;
   FOptMouseDragDropCopyingWithState:= ssModifier;
-  FOptMouseMiddleClickAction:= mcaScrolling;
+  FOptMouseMiddleClickAction:= TATEditorMiddleClickAction.Scrolling;
   FOptMouseHideCursor:= false;
 
   FOptMouseClickOpensURL:= false;
   FOptMouseClickNumberSelectsLine:= true;
   FOptMouseClickNumberSelectsLineWithEOL:= true;
   FOptMouseClickNumberSelectsFoldedRange:= true;
-  FOptMouse2ClickAction:= cMouseDblClickSelectAnyChars;
+  FOptMouse2ClickAction:= TATEditorDoubleClickAction.SelectAnyChars;
   FOptMouse2ClickOpensURL:= true;
   FOptMouse2ClickOnFoldMarkSelectsFoldedLines:= true;
   FOptMouse2ClickDragSelectsWords:= true;
@@ -5087,7 +5089,7 @@ begin
   FOptShowCurColumn:= false;
   FOptShowMouseSelFrame:= cInitShowMouseSelFrame;
 
-  FOptKeyPageUpDownSize:= cPageSizeFullMinus1;
+  FOptKeyPageUpDownSize:= TATEditorPageDownSize.FullMinus1;
   FOptKeyLeftRightGoToNextLineWithCarets:= true;
   FOptKeyLeftRightSwapSel:= true;
   FOptKeyLeftRightSwapSelAndSelect:= false;
@@ -5105,7 +5107,7 @@ begin
   FOptSavingTrimSpaces:= false;
   FOptShowScrollHint:= false;
   FOptCaretPreferLeftSide:= true;
-  FOptCaretPosAfterPasteColumn:= cPasteCaretColumnRight;
+  FOptCaretPosAfterPasteColumn:= TATEditorPasteCaret.ColumnRight;
   FOptCaretsAddedToColumnSelection:= true;
   FOptCaretFixAfterRangeFolded:= true;
   FOptCaretsPrimitiveColumnSelection:= cInitCaretsPrimitiveColumnSelection;
@@ -5447,9 +5449,9 @@ begin
     OptCaretVirtual:= false;
     OptCaretManyAllowed:= false;
     OptUnprintedVisible:= false;
-    OptWrapMode:= cWrapOff;
-    OptScrollStyleHorz:= aessHide;
-    OptScrollStyleVert:= aessHide;
+    OptWrapMode:= TATEditorWrapMode.ModeOff;
+    OptScrollStyleHorz:= TATEditorScrollbarStyle.Hide;
+    OptScrollStyleVert:= TATEditorScrollbarStyle.Hide;
     //OptMouseDragDrop:= false;
     OptMarginRight:= 1000;
     OptUndoLimit:= 200;
@@ -5589,11 +5591,11 @@ end;
 function TATSynEdit.GetPageLines: integer;
 begin
   case FOptKeyPageUpDownSize of
-    cPageSizeFull:
+    TATEditorPageDownSize.Full:
       Result:= GetVisibleLines;
-    cPageSizeFullMinus1:
+    TATEditorPageDownSize.FullMinus1:
       Result:= GetVisibleLines-1;
-    cPageSizeHalf:
+    TATEditorPageDownSize.Half:
       Result:= GetVisibleLines div 2;
   end;
 end;
@@ -5665,7 +5667,7 @@ end;
 
 procedure TATSynEdit.DoPaint(ALineFrom: integer);
 begin
-  Exclude(FPaintFlags, cIntFlagRepaintNeeded);
+  Exclude(FPaintFlags, TATEditorInternalFlag.RepaintNeeded);
   if csLoading in ComponentState then exit;
   if csDestroying in ComponentState then exit;
 
@@ -5674,7 +5676,7 @@ begin
   if DoubleBuffered then
   begin
     if Assigned(FBitmap) then
-      if cIntFlagBitmap in FPaintFlags then
+      if TATEditorInternalFlag.Bitmap in FPaintFlags then
       begin
         FBitmap.BeginUpdate(true);
         try
@@ -5688,7 +5690,7 @@ begin
     DoPaintAll(Canvas, ALineFrom);
 
   if UpdateScrollbars(false) then
-    Include(FPaintFlags, cIntFlagRepaintNeeded);
+    Include(FPaintFlags, TATEditorInternalFlag.RepaintNeeded);
 end;
 
 procedure TATSynEdit.DoPaintLockedWarning(C: TCanvas);
@@ -5744,9 +5746,9 @@ begin
 
   FPaintWorking:= true;
   try
-    if cIntFlagResize in FPaintFlags then
+    if TATEditorInternalFlag.Resize in FPaintFlags then
     begin
-      Exclude(FPaintFlags, cIntFlagResize);
+      Exclude(FPaintFlags, TATEditorInternalFlag.Resize);
       if DoubleBuffered then
         if Assigned(FBitmap) then
           BitmapResizeBySteps(FBitmap, Width, Height);
@@ -5816,12 +5818,12 @@ begin
   //block is folded at the end? deleted something at the end? repaint needed
   if not FOptLastLineOnTop then
     if FScrollVert.NPos>FScrollVert.NPosLast then
-      Include(FPaintFlags, cIntFlagRepaintNeeded);
+      Include(FPaintFlags, TATEditorInternalFlag.RepaintNeeded);
 
-  if cIntFlagRepaintNeeded in FPaintFlags then
+  if TATEditorInternalFlag.RepaintNeeded in FPaintFlags then
     DoPaint(ALineNumber);
-  Exclude(FPaintFlags, cIntFlagRepaintNeeded);
-  Exclude(FPaintFlags, cIntFlagBitmap);
+  Exclude(FPaintFlags, TATEditorInternalFlag.RepaintNeeded);
+  Exclude(FPaintFlags, TATEditorInternalFlag.Bitmap);
 
   if DoubleBuffered then
   //buf mode: timer tick don't give painting of whole bitmap
@@ -5868,8 +5870,8 @@ begin
 
   FLineTopTodo:= GetLineTop;
 
-  Include(FPaintFlags, cIntFlagResize);
-  if FWrapMode<>cWrapOff then
+  Include(FPaintFlags, TATEditorInternalFlag.Resize);
+  if FWrapMode<>TATEditorWrapMode.ModeOff then
     FWrapUpdateNeeded:= true;
 
   if not FPaintStarted then exit;
@@ -6328,14 +6330,14 @@ begin
       if DoHandleClickEvent(FOnClickMiddle) then Exit;
 
     //Ctrl+click on selection must not be ignored, but must start drag-drop with copying
-    if ActionId=cMouseActionMakeCaret then
+    if ActionId=TATEditorMouseAction.MakeCaret then
       if bClickOnSelection then
-        ActionId:= cMouseActionClickSimple;
+        ActionId:= TATEditorMouseAction.ClickSimple;
 
-    if ActionId=cMouseActionClickMiddle then
+    if ActionId=TATEditorMouseAction.ClickMiddle then
     begin
       case FOptMouseMiddleClickAction of
-        mcaScrolling:
+        TATEditorMiddleClickAction.Scrolling:
           begin
             if not ModeOneLine then
             begin
@@ -6343,25 +6345,25 @@ begin
               MouseNiceScroll:= true;
             end;
           end;
-        mcaPaste:
+        TATEditorMiddleClickAction.Paste:
           begin
             //set caret to the clicked position, like Kate and VSCode do:
             DoCaretSingle(PosTextClicked.X, PosTextClicked.Y);
-            DoCommand(cCommand_ClipboardAltPaste, cInvokeInternal); //uses PrimarySelection:TClipboard
+            DoCommand(cCommand_ClipboardAltPaste, TATEditorCommandInvoke.Internal); //uses PrimarySelection:TClipboard
           end;
-        mcaGotoDefinition:
+        TATEditorMiddleClickAction.GotoDefinition:
           begin
             if (not ModeOneLine) and (cCommand_GotoDefinition>0) then
             begin
               DoCaretSingle(PosTextClicked.X, PosTextClicked.Y);
-              DoCommand(cCommand_GotoDefinition, cInvokeInternal);
+              DoCommand(cCommand_GotoDefinition, TATEditorCommandInvoke.Internal);
             end;
           end;
       end;
       Exit
     end;
 
-    if ActionId=cMouseActionClickSimple then
+    if ActionId=TATEditorMouseAction.ClickSimple then
     begin
       ActionAddJumpToUndo;
       Strings.SetGroupMark;
@@ -6398,14 +6400,14 @@ begin
       end;
     end;
 
-    if ActionId=cMouseActionClickAndSelNormalBlock then
+    if ActionId=TATEditorMouseAction.ClickAndSelNormalBlock then
     begin
       FSelRect:= cRectEmpty;
       DoCaretSingleAsIs;
       Carets[0].SelectToPoint(FMouseDownPnt.X, FMouseDownPnt.Y);
     end;
 
-    if ActionId=cMouseActionClickAndSelVerticalBlock then
+    if ActionId=TATEditorMouseAction.ClickAndSelVerticalBlock then
     begin
       FSelRect:= cRectEmpty;
       DoCaretSingleAsIs;
@@ -6416,13 +6418,13 @@ begin
           );
     end;
 
-    if ActionId=cMouseActionMakeCaret then
+    if ActionId=TATEditorMouseAction.MakeCaret then
     begin
       FSelRect:= cRectEmpty;
       DoCaretAddToPoint(FMouseDownPnt.X, FMouseDownPnt.Y);
     end;
 
-    if ActionId=cMouseActionMakeCaretsColumn then
+    if ActionId=TATEditorMouseAction.MakeCaretsColumn then
     begin
       FSelRect:= cRectEmpty;
       DoCaretsColumnToPoint(FMouseDownPnt.X, FMouseDownPnt.Y);
@@ -6438,7 +6440,7 @@ begin
     if bClickHandled then exit;
 
     //Shift+click on gutter numbers
-    if ActionId=cMouseActionClickAndSelNormalBlock then
+    if ActionId=TATEditorMouseAction.ClickAndSelNormalBlock then
     begin
       NGutterIndex:= FGutter.FindIndexAtCoordX(X);
       if NGutterIndex=FGutterBandNumbers then
@@ -6467,7 +6469,7 @@ begin
     end;
 
     //simple click on gutter numbers / foldbar
-    if ActionId=cMouseActionClickSimple then
+    if ActionId=TATEditorMouseAction.ClickSimple then
     begin
       if NGutterIndex=FGutterBandNumbers then
       begin
@@ -6503,7 +6505,7 @@ begin
   end;
 
   if FMicromapVisible and not FMicromapOnScrollbar and ATPointInRect(FRectMicromap, PosCoord) then
-    if ActionId=cMouseActionClickSimple then
+    if ActionId=TATEditorMouseAction.ClickSimple then
     begin
       DoEventClickMicromap(X-FRectMicromap.Left, Y-FRectMicromap.Top);
       Exit
@@ -6880,15 +6882,15 @@ begin
   if Assigned(FTimerScroll) then
     FTimerScroll.Enabled:= bStartTimerScroll;
 
-  FMouseAutoScrollDirection:= cDirNone;
+  FMouseAutoScrollDirection:= TATEditorDirection.None;
   if (PntCoord.Y<RectMainCopy.Top) and (not ModeOneLine) then
-    FMouseAutoScrollDirection:= cDirUp else
+    FMouseAutoScrollDirection:= TATEditorDirection.Up else
   if (PntCoord.Y>=RectMainCopy.Bottom) and (not ModeOneLine) then
-    FMouseAutoScrollDirection:= cDirDown else
+    FMouseAutoScrollDirection:= TATEditorDirection.Down else
   if (PntCoord.X<RectMainCopy.Left) then
-    FMouseAutoScrollDirection:= cDirLeft else
+    FMouseAutoScrollDirection:= TATEditorDirection.Left else
   if (PntCoord.X>=RectMainCopy.Right) then
-    FMouseAutoScrollDirection:= cDirRight;
+    FMouseAutoScrollDirection:= TATEditorDirection.Right;
 
   //mouse dragged on gutter numbers (only if drag started on gutter numbers)
   if bSelectingGutterNumbers then
@@ -7086,9 +7088,9 @@ end;
 
 type
   TATMouseWheelMode = (
-    aWheelModeNormal,
-    aWheelModeHoriz,
-    aWheelModeZoom
+    Normal,
+    Horiz,
+    Zoom
     );
 
 procedure TATSynEdit.DoHideAllTooltips;
@@ -7120,29 +7122,29 @@ begin
   DoHideAllTooltips;
 
   if AForceHorz then
-    Mode:= aWheelModeHoriz
+    Mode:= TATMouseWheelMode.Horiz
   else
   if (Shift=[FOptMouseWheelZoomsWithState]) then
-    Mode:= aWheelModeZoom
+    Mode:= TATMouseWheelMode.Zoom
   else
   // -[ssLeft] to ignore pressed mouse button
   if (Shift-[ssLeft]=[FOptMouseWheelScrollHorzWithState]) then
-    Mode:= aWheelModeHoriz
+    Mode:= TATMouseWheelMode.Horiz
   else
   // -[ssLeft] to ignore pressed mouse button
   if (Shift-[ssLeft]=[]) then
-    Mode:= aWheelModeNormal
+    Mode:= TATMouseWheelMode.Normal
   else
     exit;
 
   WheelRecord:= Default(TATEditorWheelRecord);
 
   case Mode of
-    aWheelModeNormal:
+    TATMouseWheelMode.Normal:
       begin
         if FOptMouseWheelScrollVert then
         begin
-          WheelRecord.Kind:= wqkVert;
+          WheelRecord.Kind:= TATEditorWheelRecordKind.Vert;
           WheelRecord.Delta:= AWheelDelta;
           //FWheelQueue.Push(WheelRecord);
           DoHandleWheelRecord(WheelRecord);
@@ -7151,11 +7153,11 @@ begin
         Result:= true;
       end;
 
-    aWheelModeHoriz:
+    TATMouseWheelMode.Horiz:
       begin
         if FOptMouseWheelScrollHorz then
         begin
-          WheelRecord.Kind:= wqkHorz;
+          WheelRecord.Kind:= TATEditorWheelRecordKind.Horz;
           WheelRecord.Delta:= AWheelDelta;
           //FWheelQueue.Push(WheelRecord);
           DoHandleWheelRecord(WheelRecord);
@@ -7164,11 +7166,11 @@ begin
         Result:= true;
       end;
 
-    aWheelModeZoom:
+    TATMouseWheelMode.Zoom:
       begin
         if FOptMouseWheelZooms then
         begin
-          WheelRecord.Kind:= wqkZoom;
+          WheelRecord.Kind:= TATEditorWheelRecordKind.Zoom;
           WheelRecord.Delta:= AWheelDelta;
           //FWheelQueue.Push(WheelRecord);
           DoHandleWheelRecord(WheelRecord);
@@ -7235,16 +7237,16 @@ begin
     end;
 
   case FOptMouse2ClickAction of
-    cMouseDblClickSelectEntireLine:
+    TATEditorDoubleClickAction.SelectEntireLine:
       begin
         DoSelect_Line_ByClick;
       end;
-    cMouseDblClickSelectWordChars:
+    TATEditorDoubleClickAction.SelectWordChars:
       begin
         FMouseDownDouble:= true;
         DoSelect_ByDoubleClick(true);
       end;
-    cMouseDblClickSelectAnyChars:
+    TATEditorDoubleClickAction.SelectAnyChars:
       begin
         FMouseDownDouble:= true;
         DoSelect_ByDoubleClick(false);
@@ -7347,7 +7349,7 @@ begin
   if Assigned(AdapterForHilite) and
     AdapterForHilite.ImplementsDataReady and
     not AForceRepaint and
-    not (cIntFlagResize in FPaintFlags) then
+    not (TATEditorInternalFlag.Resize in FPaintFlags) then
   begin
     if FOptFlickerReducingPause>=1000 then
       //value 1000 is the special value of CudaText option "renderer_anti_flicker"
@@ -7367,7 +7369,7 @@ begin
     end;
   end;
 
-  Include(FPaintFlags, cIntFlagBitmap);
+  Include(FPaintFlags, TATEditorInternalFlag.Bitmap);
   inherited Invalidate;
 
   if AForceOnScroll then
@@ -7440,13 +7442,13 @@ begin
   PClient.Y:= Min(FRectMain.Bottom, PClient.Y);
 
   case FMouseAutoScrollDirection of
-    cDirUp:
+    TATEditorDirection.Up:
       DoScrollByDelta(0, -ATEditorOptions.SpeedScrollAutoVert);
-    cDirDown:
+    TATEditorDirection.Down:
       DoScrollByDelta(0, ATEditorOptions.SpeedScrollAutoVert);
-    cDirLeft:
+    TATEditorDirection.Left:
       DoScrollByDelta(-ATEditorOptions.SpeedScrollAutoHorz, 0);
-    cDirRight:
+    TATEditorDirection.Right:
       DoScrollByDelta(ATEditorOptions.SpeedScrollAutoHorz, 0);
     else
       Exit;
@@ -7502,19 +7504,19 @@ begin
       Exit;
     end;
 
-  if (Dy<0) and (Abs(Dy)>Abs(Dx)) then Dir:= cDirUp else
-    if (Dy>0) and (Abs(Dy)>Abs(Dx)) then Dir:= cDirDown else
-      if Dx<0 then Dir:= cDirLeft else
-        Dir:= cDirRight;
+  if (Dy<0) and (Abs(Dy)>Abs(Dx)) then Dir:= TATEditorDirection.Up else
+    if (Dy>0) and (Abs(Dy)>Abs(Dx)) then Dir:= TATEditorDirection.Down else
+      if Dx<0 then Dir:= TATEditorDirection.Left else
+        Dir:= TATEditorDirection.Right;
 
   case Dir of
-    cDirLeft:
+    TATEditorDirection.Left:
       Cursor:= crNiceScrollLeft;
-    cDirRight:
+    TATEditorDirection.Right:
       Cursor:= crNiceScrollRight;
-    cDirUp:
+    TATEditorDirection.Up:
       Cursor:= crNiceScrollUp;
-    cDirDown:
+    TATEditorDirection.Down:
       Cursor:= crNiceScrollDown;
   end;
 
@@ -7522,7 +7524,7 @@ begin
   Dx:= Sign(Dx)*((Abs(Dx)-NBitmapSize div 2) + 1) div ATEditorOptions.SpeedScrollNice;
   Dy:= Sign(Dy)*((Abs(Dy)-NBitmapSize div 2) + 1) div ATEditorOptions.SpeedScrollNice;
 
-  if Dir in [cDirLeft, cDirRight] then
+  if Dir in [TATEditorDirection.Left, TATEditorDirection.Right] then
     DoScrollByDeltaInPixels(Dx, 0)
   else
     DoScrollByDeltaInPixels(0, Dy);
@@ -7770,7 +7772,7 @@ begin
   if not IsSelRectEmpty then
   begin
    //avoid weird look when empty area is filled in word-wrap mode
-   if FWrapMode=cWrapOff then
+   if FWrapMode=TATEditorWrapMode.ModeOff then
     if (NLineIndex>=FSelRect.Top) and (NLineIndex<=FSelRect.Bottom) then
     begin
       NLeft:= APointLeft.X+ACharSize.XScaled*(FSelRect.Left-AScrollHorz.NPos) div ATEditorCharXScale;
@@ -7999,9 +8001,9 @@ procedure TATSynEdit.DoEventScroll;
 begin
   //horizontal scroll must clear CaretItem.SavedX values
   if not FCaretVirtual then
-    if cIntFlagScrolledHorz in FPaintFlags then
+    if TATEditorInternalFlag.ScrolledHorz in FPaintFlags then
     begin
-      Exclude(FPaintFlags, cIntFlagScrolledHorz);
+      Exclude(FPaintFlags, TATEditorInternalFlag.ScrolledHorz);
       Carets.UpdateMemory(cCaretMem_ClearX, false);
     end;
 
@@ -8149,7 +8151,7 @@ begin
   Cmd:= (Sender as TMenuItem).Tag;
   if Cmd>0 then
   begin
-    DoCommand(Cmd, cInvokeMenuContext);
+    DoCommand(Cmd, TATEditorCommandInvoke.MenuContext);
     Invalidate;
   end;
 end;
@@ -8369,15 +8371,15 @@ begin
   NSpaces:= Length(FTabHelper.TabsToSpaces(APosY, StrIndent));
 
   case FOptAutoIndentKind of
-    cIndentAsPrevLine:
+    TATEditorAutoIndentKind.AsPrevLine:
       Result:= StrIndent;
-    cIndentSpacesOnly:
+    TATEditorAutoIndentKind.SpacesOnly:
       Result:= StringOfCharW(' ', NSpaces);
-    cIndentTabsOnly:
+    TATEditorAutoIndentKind.TabsOnly:
       Result:= StringOfCharW(#9, NSpaces div FOptTabSize);
-    cIndentTabsAndSpaces:
+    TATEditorAutoIndentKind.TabsAndSpaces:
       Result:= StringOfCharW(#9, NSpaces div FOptTabSize) + StringOfCharW(' ', NSpaces mod FOptTabSize);
-    cIndentToOpeningBracket:
+    TATEditorAutoIndentKind.ToOpeningBracket:
       begin
         //indent like in prev line + spaces up to opening bracket
         NSpaces:= SGetIndentCharsToOpeningBracket(StrPrev);
@@ -8740,25 +8742,25 @@ begin
 
   if Rng^.Y=NLineIndex then
   begin
-    AProps.State:= cFoldbarBegin;
+    AProps.State:= TATFoldBarState.SBegin;
     //don't override found [+], 2 blocks can start at same pos
     if not AProps.IsPlus then
       AProps.IsPlus:= Rng^.Folded;
   end;
 
   if Rng^.Y2=NLineIndex then
-    if AProps.State<>cFoldbarBegin then
-      AProps.State:= cFoldbarEnd;
+    if AProps.State<>TATFoldBarState.SBegin then
+      AProps.State:= TATFoldBarState.SEnd;
 
   //correct state for wrapped line
-  if AProps.State=cFoldbarBegin then
+  if AProps.State=TATFoldBarState.SBegin then
     if not WrapItem.bInitial then
-      AProps.State:= cFoldbarMiddle;
+      AProps.State:= TATFoldBarState.SMiddle;
 
   //correct state for wrapped line
-  if AProps.State=cFoldbarEnd then
+  if AProps.State=TATFoldBarState.SEnd then
     if WrapItem.NFinal=cWrapItemMiddle then
-      AProps.State:= cFoldbarMiddle;
+      AProps.State:= TATFoldBarState.SMiddle;
 
   Result:= true;
 end;
@@ -8841,7 +8843,7 @@ begin
   CoordYCenter:= (ACoordY1+ACoordY2) div 2;
 
   case Props.State of
-    cFoldbarBegin:
+    TATFoldBarState.SBegin:
       begin
         if FOptGutterShowFoldLinesAll then
         begin
@@ -8855,7 +8857,7 @@ begin
         DoPaintGutterPlusMinus(C,
           CoordXCenter, CoordYCenter, Props.IsPlus, NColorPlus);
       end;
-    cFoldbarEnd:
+    TATFoldBarState.SEnd:
       begin
         if FOptGutterShowFoldLinesAll then
         begin
@@ -8875,7 +8877,7 @@ begin
           CoordXCenter + DoScaleFont(FOptGutterPlusSize)
           );
       end;
-    cFoldbarMiddle:
+    TATFoldBarState.SMiddle:
       begin
         CanvasLineVert(C,
           CoordXCenter,
@@ -9093,21 +9095,21 @@ var
 begin
   if FOptStapleStyle=cLineStyleNone then Exit;
 
-  if FOptStapleEdge1=cStapleEdgeAngle then
+  if FOptStapleEdge1=TATEditorStapleEdge.Angle then
     CanvasLineEx(C, AColor, FOptStapleStyle, R.Left, R.Top, R.Right, R.Top, false);
 
   X1:= R.Left;
   Y1:= R.Top;
   X2:= R.Left;
   Y2:= R.Bottom;
-  if FOptStapleEdge1=cStapleEdgeNone then
+  if FOptStapleEdge1=TATEditorStapleEdge.None then
     Inc(Y1, FCharSize.Y);
-  if FOptStapleEdge2=cStapleEdgeNone then
+  if FOptStapleEdge2=TATEditorStapleEdge.None then
     Dec(Y2, FCharSize.Y);
 
   CanvasLineEx(C, AColor, FOptStapleStyle, X1, Y1, X2, Y2, false);
 
-  if FOptStapleEdge2=cStapleEdgeAngle then
+  if FOptStapleEdge2=TATEditorStapleEdge.Angle then
     CanvasLineEx(C, AColor, FOptStapleStyle, R.Left, R.Bottom, R.Right, R.Bottom, true);
 end;
 
@@ -9281,7 +9283,7 @@ begin
   Inc(AY, FTextOffsetFromTop);
 
   case OptGutterIcons of
-    cGutterIconsPlusMinus:
+    TATEditorGutterIcons.PlusMinus:
       begin
         CanvasPaintPlusMinus(C,
           ALineColor,
@@ -9291,7 +9293,7 @@ begin
           DoScaleFont(1),
           APlus);
       end;
-    cGutterIconsTriangles:
+    TATEditorGutterIcons.Triangles:
       begin
         if APlus then
           CanvasPaintTriangleRight(C,
@@ -9526,14 +9528,14 @@ begin
   if Strings.IsIndexValid(Pnt.Y) then
   begin
     DoCaretSingle(Pnt.X, Pnt.Y);
-    DoCommand(cCommand_TextInsert, cInvokeInternal, SText);
+    DoCommand(cCommand_TextInsert, TATEditorCommandInvoke.Internal, SText);
     if ATEditorOptions.MouseDragDropFocusesTargetEditor then
       SetFocus;
 
     //Ctrl is pressed: delete block from src
     //note: it's opposite to the drag-drop in the single document
     if GetActualDragDropIsCopying then
-      TATSynEdit(Source).DoCommand(cCommand_TextDeleteSelection, cInvokeInternal);
+      TATSynEdit(Source).DoCommand(cCommand_TextDeleteSelection, TATEditorCommandInvoke.Internal);
   end;
 end;
 
@@ -9630,7 +9632,7 @@ end;
 procedure TATSynEdit.TimerFlickerTick(Sender: TObject);
 begin
   FTimerFlicker.Enabled:= false;
-  Include(FPaintFlags, cIntFlagBitmap);
+  Include(FPaintFlags, TATEditorInternalFlag.Bitmap);
   inherited Invalidate;
 end;
 
@@ -10343,7 +10345,7 @@ begin
   if NCount<=1 then
     exit(true);
 
-  if OptWrapMode=cWrapOff then
+  if OptWrapMode=TATEditorWrapMode.ModeOff then
   begin
     Result:= AY<=NTop+GetVisibleLines;
   end
@@ -10546,7 +10548,7 @@ end;
 procedure TATSynEdit.DoHandleWheelRecord(const ARec: TATEditorWheelRecord);
 begin
   case ARec.Kind of
-    wqkVert:
+    TATEditorWheelRecordKind.Vert:
       begin
         //w/o this handler wheel works only with OS scrollbars, need with new scrollbars too
         DoScrollByDeltaInPixels(
@@ -10555,7 +10557,7 @@ begin
           );
       end;
 
-    wqkHorz:
+    TATEditorWheelRecordKind.Horz:
       begin
         DoScrollByDelta(
           -FOptMouseWheelScrollHorzSpeed * ARec.Delta div 120,
@@ -10563,7 +10565,7 @@ begin
           );
       end;
 
-    wqkZoom:
+    TATEditorWheelRecordKind.Zoom:
       begin
         DoScaleFontDelta(ARec.Delta>0, false);
         DoEventZoom;

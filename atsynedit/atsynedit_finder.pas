@@ -1336,17 +1336,17 @@ begin
   FOnGetToken(Editor, AX, AY, Kind);
   case OptTokens of
     cTokensOnlyComments:
-      Result:= Kind=atkComment;
+      Result:= Kind=TATTokenKind.Comment;
     cTokensOnlyStrings:
-      Result:= Kind=atkString;
+      Result:= Kind=TATTokenKind.Str;
     cTokensOnlyCommentsAndStrings:
-      Result:= Kind<>atkOther; //Kind in [atkComment, atkString];
+      Result:= Kind<>TATTokenKind.Other; //Kind in [TATTokenKind.Comment, atkString];
     cTokensNoComments:
-      Result:= Kind<>atkComment;
+      Result:= Kind<>TATTokenKind.Comment;
     cTokensNoStrings:
-      Result:= Kind<>atkString;
+      Result:= Kind<>TATTokenKind.Str;
     cTokensNoCommentsAndStrings:
-      Result:= Kind=atkOther; //not (Kind in [atkComment, atkString]);
+      Result:= Kind=TATTokenKind.Other; //not (Kind in [TATTokenKind.Comment, atkString]);
   end;
 end;
 

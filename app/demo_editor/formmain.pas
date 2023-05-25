@@ -525,9 +525,9 @@ begin
   edSpaceY.Value:= ed.OptSpacingY;
   edMarginFixed.Value:= ed.OptMarginRight;
   case ed.OptWrapMode of
-    cWrapOff:
+    TATEditorWrapMode.ModeOff:
       chkWrapOff.Checked:= true;
-    cWrapOn:
+    TATEditorWrapMode.ModeOn:
       chkWrapOn.Checked:= true;
     cWrapAtWindowOrMargin:
       chkWrapWndMargin.Checked:= true;
@@ -873,7 +873,7 @@ begin
   Cmd:= DoCommandDialog(ed);
   if Cmd>0 then
   begin
-    ed.DoCommand(Cmd, cInvokeAppPalette);
+    ed.DoCommand(Cmd, TATEditorCommandInvoke.AppPalette);
     ed.Update;
   end;
 end;
@@ -1429,13 +1429,13 @@ end;
 procedure TfmMain.chkWrapOffChange(Sender: TObject);
 begin
   if wait then Exit;
-  ed.OptWrapMode:= cWrapOff;
+  ed.OptWrapMode:= TATEditorWrapMode.ModeOff;
 end;
 
 procedure TfmMain.chkWrapOnChange(Sender: TObject);
 begin
   if wait then Exit;
-  ed.OptWrapMode:= cWrapOn;
+  ed.OptWrapMode:= TATEditorWrapMode.ModeOn;
 end;
 
 procedure TfmMain.chkWrapWndMarginChange(Sender: TObject);
@@ -1621,7 +1621,7 @@ begin
     EndY:= APos2.Y;
   end;
 
-  Ed.DoCommand(cCommand_ScrollToCaretTop, cInvokeAppInternal);
+  Ed.DoCommand(cCommand_ScrollToCaretTop, TATEditorCommandInvoke.AppInternal);
   Ed.Update(true);
 
   Buttons:= [mbYes, mbNo];

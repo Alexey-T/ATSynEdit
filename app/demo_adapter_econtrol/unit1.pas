@@ -159,7 +159,7 @@ begin
   adapter.OnParseDone:=@AdapterParseDone;
   adapter.AddEditor(ed);
 
-  chkWrap.Checked:= ed.OptWrapMode=cWrapOn;
+  chkWrap.Checked:= ed.OptWrapMode=TATEditorWrapMode.ModeOn;
   chkFullSel.Checked:= ed.OptShowFullWidthForSelection;
   chkFullHilite.Checked:= ed.OptShowFullWidthForSyntaxHilite;
   chkUnpri.Checked:= ed.OptUnprintedVisible;
@@ -215,9 +215,9 @@ end;
 procedure TfmMain.chkWrapChange(Sender: TObject);
 begin
   if chkWrap.checked then
-    ed.OptWrapMode:= cWrapOn
+    ed.OptWrapMode:= TATEditorWrapMode.ModeOn
   else
-    ed.OptWrapMode:= cWrapOff;
+    ed.OptWrapMode:= TATEditorWrapMode.ModeOff;
 end;
 
 procedure TfmMain.EditorChangeCaretPos(Sender: TObject);

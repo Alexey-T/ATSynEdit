@@ -3,63 +3,63 @@
 function TATSynEdit.DoCommand_ToggleOverwrite: TATCommandResults;
 begin
   ModeOverwrite:= not ModeOverwrite;
-  Result:= [cResultState];
+  Result:= [TATCommandResult.State];
 end;
 
 function TATSynEdit.DoCommand_ToggleWordWrap(AltOrder: boolean): TATCommandResults;
 begin
   case FWrapMode of
-    cWrapOff:
-      OptWrapMode:= cWrapOn;
-    cWrapOn:
+    TATEditorWrapMode.ModeOff:
+      OptWrapMode:= TATEditorWrapMode.ModeOn;
+    TATEditorWrapMode.ModeOn:
       begin
         if AltOrder then
-          OptWrapMode:= cWrapAtWindowOrMargin
+          OptWrapMode:= TATEditorWrapMode.AtWindowOrMargin
         else
-          OptWrapMode:= cWrapOff;
+          OptWrapMode:= TATEditorWrapMode.ModeOff;
       end;
-    cWrapAtWindowOrMargin:
-      OptWrapMode:= cWrapOff;
+    TATEditorWrapMode.AtWindowOrMargin:
+      OptWrapMode:= TATEditorWrapMode.ModeOff;
   end;
 
   IsModifiedWrapMode:= true;
 
-  Result:= [cResultState];
+  Result:= [TATCommandResult.State];
 end;
 
 function TATSynEdit.DoCommand_ToggleUnprinted: TATCommandResults;
 begin
   OptUnprintedVisible:= not OptUnprintedVisible;
   IsModifiedUnprintedVisible:= true;
-  Result:= [cResultState];
+  Result:= [TATCommandResult.State];
 end;
 
 function TATSynEdit.DoCommand_ToggleUnprintedSpaces: TATCommandResults;
 begin
   OptUnprintedSpaces:= not OptUnprintedSpaces;
   IsModifiedUnprintedSpaces:= true;
-  Result:= [cResultState];
+  Result:= [TATCommandResult.State];
 end;
 
 function TATSynEdit.DoCommand_ToggleUnprintedSpacesTrailing: TATCommandResults;
 begin
   OptUnprintedSpacesTrailing:= not OptUnprintedSpacesTrailing;
   IsModifiedUnprintedTrailingOnly:= true;
-  Result:= [cResultState];
+  Result:= [TATCommandResult.State];
 end;
 
 function TATSynEdit.DoCommand_ToggleUnprintedEnds: TATCommandResults;
 begin
   OptUnprintedEnds:= not OptUnprintedEnds;
   IsModifiedUnprintedEnds:= true;
-  Result:= [cResultState];
+  Result:= [TATCommandResult.State];
 end;
 
 function TATSynEdit.DoCommand_ToggleUnprintedEndDetails: TATCommandResults;
 begin
   OptUnprintedEndsDetails:= not OptUnprintedEndsDetails;
   IsModifiedUnprintedEndDetails:= true;
-  Result:= [cResultState];
+  Result:= [TATCommandResult.State];
 end;
 
 function TATSynEdit.DoCommand_ToggleLineNums: TATCommandResults;
@@ -67,7 +67,7 @@ begin
   with Gutter.Items[FGutterBandNumbers] do
     Visible:= not Visible;
   IsModifiedGutterNumbersVisible:= true;
-  Result:= [cResultState];
+  Result:= [TATCommandResult.State];
 end;
 
 function TATSynEdit.DoCommand_ToggleFolding: TATCommandResults;
@@ -75,57 +75,57 @@ begin
   with Gutter.Items[FGutterBandFolding] do
     Visible:= not Visible;
   IsModifiedGutterFoldingVisible:= true;
-  Result:= [cResultState];
+  Result:= [TATCommandResult.State];
 end;
 
 function TATSynEdit.DoCommand_ToggleRuler: TATCommandResults;
 begin
   OptRulerVisible:= not OptRulerVisible;
   IsModifiedRulerVisible:= true;
-  Result:= [cResultState];
+  Result:= [TATCommandResult.State];
 end;
 
 function TATSynEdit.DoCommand_ToggleMiniMap: TATCommandResults;
 begin
   OptMinimapVisible:= not OptMinimapVisible;
   IsModifiedMinimapVisible:= true;
-  Result:= [cResultState];
+  Result:= [TATCommandResult.State];
 end;
 
 function TATSynEdit.DoCommand_ToggleMicroMap: TATCommandResults;
 begin
   OptMicromapVisible:= not OptMicromapVisible;
   IsModifiedMicromapVisible:= true;
-  Result:= [cResultState];
+  Result:= [TATCommandResult.State];
 end;
 
 function TATSynEdit.DoCommand_ToggleReadOnly: TATCommandResults;
 begin
   ModeReadOnly:= not ModeReadOnly;
   FIsReadOnlyChanged:= true;
-  Result:= [cResultState];
+  Result:= [TATCommandResult.State];
 end;
 
 function TATSynEdit.DoCommand_CaretsExtend(ADown: boolean; ALines: integer): TATCommandResults;
 begin
   DoCaretsExtend(ADown, ALines);
   if ADown then
-    Result:= [cResultCaretBottom]
+    Result:= [TATCommandResult.CaretBottom]
   else
-    Result:= [cResultCaretTop];
+    Result:= [TATCommandResult.CaretTop];
 end;
 
 function TATSynEdit.DoCommand_ScaleDelta(AIncrease: boolean): TATCommandResults;
 begin
   DoScaleFontDelta(AIncrease, true);
-  Result:= [cResultState];
+  Result:= [TATCommandResult.State];
 end;
 
 function TATSynEdit.DoCommand_ScaleReset: TATCommandResults;
 begin
   //use OptScaleFont setter, not FOptScaleFont
   OptScaleFont:= 0;
-  Result:= [cResultState];
+  Result:= [TATCommandResult.State];
 end;
 
 function TATSynEdit.DoCommand_FoldAll: TATCommandResults;
@@ -151,7 +151,7 @@ begin
   if NeedFixCaret then
     DoCaretSingle(0, 0);
 
-  Result:= [cResultCaretTop, cResultScroll, cResultFoldChange];
+  Result:= [TATCommandResult.CaretTop, TATCommandResult.Scroll, TATCommandResult.FoldChange];
 end;
 
 procedure TATSynEdit.DoMarkAllRangesUnfolded;
@@ -188,14 +188,14 @@ begin
   DoMarkAllRangesUnfolded;
   DoMarkAllLinesVisible;
 
-  Result:= [cResultCaretTop, cResultScroll, cResultFoldChange];
+  Result:= [TATCommandResult.CaretTop, TATCommandResult.Scroll, TATCommandResult.FoldChange];
 end;
 
 function TATSynEdit.DoCommand_FoldLevel(ALevel: integer): TATCommandResults;
 begin
   DoCommand_FoldUnAll;
   DoFoldForLevelEx(ALevel, -1);
-  Result:= [cResultCaretAny, cResultScroll, cResultFoldChange];
+  Result:= [TATCommandResult.CaretAny, TATCommandResult.Scroll, TATCommandResult.FoldChange];
 end;
 
 
@@ -204,7 +204,7 @@ begin
   Result:= [];
   //if Carets.Count<>1 then Exit; //we don't need this cmd for multi-carets
   if DoFoldUnfoldRangeAtCurLine(ACommand) then
-    Result:= [cResultCaretAny, cResultScroll, cResultFoldChange];
+    Result:= [TATCommandResult.CaretAny, TATCommandResult.Scroll, TATCommandResult.FoldChange];
 end;
 
 procedure TATSynEdit.UpdateFoldLineIndexer;
@@ -239,7 +239,7 @@ begin
   Fold.AddSorted(1, Y1, Y2, false, '', cTagPersistentFoldRange, NRangeIndex);
   DoRangeFold(NRangeIndex);
 
-  Result:= [cResultCaretAny, cResultFoldChange];
+  Result:= [TATCommandResult.CaretAny, TATCommandResult.FoldChange];
 end;
 
 

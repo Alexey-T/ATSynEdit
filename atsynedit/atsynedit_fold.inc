@@ -135,29 +135,29 @@ begin
 
   //partially hide first line
   case FFoldStyle of
-    cFoldHereWithDots:
+    TATEditorFoldStyle.HereWithDots:
       begin
         St.LinesFoldFrom[Range^.Y, FEditorIndex]:= Range^.X;
       end;
-    cFoldHereWithTruncatedText:
+    TATEditorFoldStyle.HereWithTruncatedText:
       begin
         St.LinesFoldFrom[Range^.Y, FEditorIndex]:= Range^.X;
         if Range^.Hint='' then
           Range^.Hint:= St.LineSub(Range^.Y, Range^.X, ATEditorOptions.FoldedLenOfEmptyHint)+'...';
       end;
-    cFoldFromEndOfLine:
+    TATEditorFoldStyle.FromEndOfLine:
       begin
         if Range^.Hint<>'' then
           St.LinesFoldFrom[Range^.Y, FEditorIndex]:= Range^.X
         else
           St.LinesFoldFrom[Range^.Y, FEditorIndex]:= St.LinesLen[Range^.Y]+1;
       end;
-    cFoldFromEndOfLineAlways:
+    TATEditorFoldStyle.FromEndOfLineAlways:
       begin
         St.LinesFoldFrom[Range^.Y, FEditorIndex]:= St.LinesLen[Range^.Y]+1;
         Range^.Hint:= '...';
       end;
-    cFoldFromNextLine:
+    TATEditorFoldStyle.FromNextLine:
       begin
         //don't fold line
       end;
@@ -230,7 +230,7 @@ var
 begin
   Result:= '';
 
-  if FFoldStyle=cFoldFromEndOfLineAlways then
+  if FFoldStyle=TATEditorFoldStyle.FromEndOfLineAlways then
     exit(cDefaultHint);
 
   N:= FFold.FindRangeWithPlusAtLine(ALine);
@@ -261,7 +261,7 @@ begin
     NFoldFrom:= St.LinesFoldFrom[R^.Y, FEditorIndex];
 
     case OptFoldStyle of
-      cFoldFromEndOfLine:
+      TATEditorFoldStyle.FromEndOfLine:
         begin
           if R^.Hint='' then
           begin
@@ -273,12 +273,12 @@ begin
             bFold:= R^.X=NFoldFrom;
           end;
         end;
-      cFoldFromEndOfLineAlways:
+      TATEditorFoldStyle.FromEndOfLineAlways:
         begin
           NPosAfterEnd:= St.LinesLen[R^.Y]+1;
           bFold:= NFoldFrom=NPosAfterEnd;
         end;
-      cFoldFromNextLine:
+      TATEditorFoldStyle.FromNextLine:
         begin
           bFold:= (R^.Y+1<=NMaxLine) and St.LinesHidden[R^.Y+1, FEditorIndex];
         end
@@ -434,7 +434,7 @@ end;
 
 procedure TATSynEdit.MenuFoldFoldAllClick(Sender: TObject);
 begin
-  DoCommand(cCommand_FoldAll, cInvokeMenuContext);
+  DoCommand(cCommand_FoldAll, TATEditorCommandInvoke.MenuContext);
 end;
 
 procedure TATSynEdit.MenuFoldLevelClick(Sender: TObject);
@@ -444,7 +444,7 @@ end;
 
 procedure TATSynEdit.MenuFoldUnfoldAllClick(Sender: TObject);
 begin
-  DoCommand(cCommand_UnfoldAll, cInvokeMenuContext);
+  DoCommand(cCommand_UnfoldAll, TATEditorCommandInvoke.MenuContext);
 end;
 
 
@@ -485,7 +485,7 @@ begin
   FFoldEnabled:= AValue;
   if not FFoldEnabled then
   begin
-    DoCommand(cCommand_UnfoldAll, cInvokeInternal);
+    DoCommand(cCommand_UnfoldAll, TATEditorCommandInvoke.Internal);
     FFold.Clear;
   end;
   Update;
@@ -509,7 +509,7 @@ begin
     bFolded:= Fold.ItemPtr(NRange)^.Folded;
 
     case AOp of
-      cFoldingFold:
+      TATEditorFoldRangeCommand.Fold:
         begin
           if not bFolded then
           begin
@@ -518,7 +518,7 @@ begin
             Result:= true;
           end;
         end;
-      cFoldingUnfold:
+      TATEditorFoldRangeCommand.Unfold:
         begin
           if bFolded then
           begin
@@ -527,7 +527,7 @@ begin
             Result:= true;
           end;
         end;
-      cFoldingToggle:
+      TATEditorFoldRangeCommand.Toggle:
         begin
           if bFolded then
             DoRangeUnfold(NRange)

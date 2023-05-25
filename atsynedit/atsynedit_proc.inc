@@ -147,27 +147,27 @@ begin
   //realloc to some big length
   SetLength(M, 25);
 
-  Add(cMouseActionClickSimple, [ssLeft]);
-  Add(cMouseActionClickSimple, [ssLeft, ssMeta]); //like VSCode
-  Add(cMouseActionClickRight, [ssRight]);
-  Add(cMouseActionClickRight, [ssRight, ssMeta]); //like VSCode
-  Add(cMouseActionClickAndSelNormalBlock, [ssLeft, ssShift]);
-  Add(cMouseActionClickAndSelVerticalBlock, [ssLeft, ssAlt, ssShift]);
+  Add(TATEditorMouseAction.ClickSimple, [ssLeft]);
+  Add(TATEditorMouseAction.ClickSimple, [ssLeft, ssMeta]); //like VSCode
+  Add(TATEditorMouseAction.ClickRight, [ssRight]);
+  Add(TATEditorMouseAction.ClickRight, [ssRight, ssMeta]); //like VSCode
+  Add(TATEditorMouseAction.ClickAndSelNormalBlock, [ssLeft, ssShift]);
+  Add(TATEditorMouseAction.ClickAndSelVerticalBlock, [ssLeft, ssAlt, ssShift]);
 
   if ANoCtrlClickForCaret then
-    Add(cMouseActionClickSimple, [ssLeft, ssXControl])
+    Add(TATEditorMouseAction.ClickSimple, [ssLeft, ssXControl])
   else
-    Add(cMouseActionMakeCaret, [ssLeft, ssXControl]);
+    Add(TATEditorMouseAction.MakeCaret, [ssLeft, ssXControl]);
 
-  Add(cMouseActionMakeCaretsColumn, [ssLeft, ssXControl, ssShift]);
+  Add(TATEditorMouseAction.MakeCaretsColumn, [ssLeft, ssXControl, ssShift]);
 
-  Add(cMouseActionClickMiddle, [ssMiddle]);
-  Add(cMouseActionMakeCaret, [ssMiddle, ssXControl]);
+  Add(TATEditorMouseAction.ClickMiddle, [ssMiddle]);
+  Add(TATEditorMouseAction.MakeCaret, [ssMiddle, ssXControl]);
 
-  Add(cMouseActionClickSimple, [ssLeft, ssAlt]);
-  Add(cMouseActionClickSimple, [ssLeft, ssAltGr]);
-  Add(cMouseActionClickSimple, [ssLeft, ssAlt, ssXControl]);
-  Add(cMouseActionClickSimple, [ssLeft, ssAlt, ssShift, ssXControl]);
+  Add(TATEditorMouseAction.ClickSimple, [ssLeft, ssAlt]);
+  Add(TATEditorMouseAction.ClickSimple, [ssLeft, ssAltGr]);
+  Add(TATEditorMouseAction.ClickSimple, [ssLeft, ssAlt, ssXControl]);
+  Add(TATEditorMouseAction.ClickSimple, [ssLeft, ssAlt, ssShift, ssXControl]);
 
   //realloc at end, to actual count
   SetLength(M, NCount);
@@ -178,7 +178,7 @@ function EditorMouseActionId(const M: TATEditorMouseActions; State: TShiftState)
 var
   i: integer;
 begin
-  Result:= cMouseActionNone;
+  Result:= TATEditorMouseAction.None;
   if State=[] then exit;
 
   for i:= Low(M) to High(M) do
