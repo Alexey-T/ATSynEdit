@@ -1,5 +1,6 @@
 2023.05.25
 * change: enums changed to 'scoped', e.g. you must replace cEndNone -> TATLineEnds.None etc
+* change: rename TATEditorCommandInvoke -> TATCommandInvoke
 
 2023.05.19
 + add: TATComboEdit.OptComboboxShowX
