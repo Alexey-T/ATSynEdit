@@ -55,7 +55,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     property Items: TStringList read FItems;
-    procedure DoCommand(ACmd: integer; AInvoke: TATEditorCommandInvoke; const AText: atString = ''); override;
+    procedure DoCommand(ACmd: integer; AInvoke: TATCommandInvoke; const AText: atString = ''); override;
     procedure DoAddLineToHistory(const AStr: atString; AMaxItems: integer);
   published
     property OptComboboxShowX: boolean read FOptComboboxShowX write FOptComboboxShowX default false;
@@ -290,7 +290,7 @@ begin
 
     //scroll to left, select all
     DoScrollByDelta(-10000, 0);
-    DoCommand(cCommand_SelectAll, TATEditorCommandInvoke.MenuContext);
+    DoCommand(cCommand_SelectAll, TATCommandInvoke.MenuContext);
   end;
 end;
 
@@ -307,7 +307,7 @@ begin
 end;
 
 procedure TATComboEdit.DoCommand(ACmd: integer;
-  AInvoke: TATEditorCommandInvoke; const AText: atString);
+  AInvoke: TATCommandInvoke; const AText: atString);
 begin
   inherited;
   case ACmd of
@@ -354,7 +354,7 @@ begin
   ScrollHorz.SetZero;
 
   DoEventChange(0);
-  DoCommand(cCommand_SelectAll, TATEditorCommandInvoke.Internal);
+  DoCommand(cCommand_SelectAll, TATCommandInvoke.Internal);
 end;
 
 destructor TATComboEdit.Destroy;

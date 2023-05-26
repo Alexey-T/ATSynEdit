@@ -190,7 +190,7 @@ begin
     ClipExItem:= ATEditorClipboardRecents.Items[NTag];
     DoCommand(
       cCommand_TextInsert,
-      TATEditorCommandInvoke.Internal,
+      TATCommandInvoke.Internal,
       UTF8Decode(ClipExItem.Text)
       );
   end;

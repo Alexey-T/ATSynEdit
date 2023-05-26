@@ -71,7 +71,7 @@ type
   end;
 
 type
-  TATEditorCommandInvoke = (
+  TATCommandInvoke = (
     Internal,
     InternalIME,
     Hotkey,
@@ -89,7 +89,7 @@ type
     );
 
 const
-  cEditorCommandInvoke: array[TATEditorCommandInvoke] of string = (
+  cEditorCommandInvoke: array[TATCommandInvoke] of string = (
     'int',
     'int_ime',
     'key',
@@ -107,21 +107,21 @@ const
     );
 
 type
-  TATEditorCommandLogItem = record
+  TATCommandLogItem = record
   public
-    ItemInvoke: TATEditorCommandInvoke;
+    ItemInvoke: TATCommandInvoke;
     ItemCode: integer;
     //don't use 'string' here! it gives crashes on freeing of editor objects
     ItemText: string[220];
   end;
 
-  { TATEditorCommandLog }
+  { TATCommandLog }
 
-  TATEditorCommandLog = class(specialize TDeque<TATEditorCommandLogItem>)
+  TATCommandLog = class(specialize TDeque<TATCommandLogItem>)
   public
     MaxCount: integer;
     constructor Create;
-    procedure Add(ACode: integer; AInvoke: TATEditorCommandInvoke; const AText: string);
+    procedure Add(ACode: integer; AInvoke: TATCommandInvoke; const AText: string);
   end;
 
   TATEditorWheelRecordKind = (Vert, Horz, Zoom);
@@ -473,7 +473,7 @@ type
   TATSynEditClickEvent = procedure(Sender: TObject; var AHandled: boolean) of object;
   TATSynEditClickMoveCaretEvent = procedure(Sender: TObject; APrevPnt, ANewPnt: TPoint) of object;
   TATSynEditClickGapEvent = procedure(Sender: TObject; AGapItem: TATGapItem; APos: TPoint) of object;
-  TATSynEditCommandEvent = procedure(Sender: TObject; ACommand: integer; AInvoke: TATEditorCommandInvoke; const AText: string; var AHandled: boolean) of object;
+  TATSynEditCommandEvent = procedure(Sender: TObject; ACommand: integer; AInvoke: TATCommandInvoke; const AText: string; var AHandled: boolean) of object;
   TATSynEditCommandAfterEvent = procedure(Sender: TObject; ACommand: integer; const AText: string) of object;
   TATSynEditClickGutterEvent = procedure(Sender: TObject; ABand: integer; ALineNum: integer; var AHandled: boolean) of object;
   TATSynEditClickMicromapEvent = procedure(Sender: TObject; AX, AY: integer) of object;
@@ -588,7 +588,7 @@ type
     FSelRectBegin: TPoint;
     FSelRectEnd: TPoint;
     FVisibleColumns: integer;
-    FCommandLog: TATEditorCommandLog;
+    FCommandLog: TATCommandLog;
     FCarets: TATCarets;
     FCaretShowEnabled: boolean;
     FCaretShown: boolean;
@@ -1285,7 +1285,7 @@ type
     procedure DoEventBeforeCalcHilite;
     procedure DoEventClickMicromap(AX, AY: integer);
     procedure DoEventClickGutter(ABandIndex, ALineNumber: integer; var AHandled: boolean);
-    function DoEventCommand(ACommand: integer; AInvoke: TATEditorCommandInvoke; const AText: string): boolean;
+    function DoEventCommand(ACommand: integer; AInvoke: TATCommandInvoke; const AText: string): boolean;
     procedure DoEventDrawBookmarkIcon(C: TCanvas; ALineNumber: integer; const ARect: TRect);
     procedure DoEventCommandAfter(ACommand: integer; const AText: string);
     //
@@ -1546,7 +1546,7 @@ type
     property Hotspots: TATHotspots read GetHotspots;
     property Gaps: TATGaps read GetGaps;
     property Keymap: TATKeymap read FKeymap write FKeymap;
-    property CommandLog: TATEditorCommandLog read FCommandLog;
+    property CommandLog: TATCommandLog read FCommandLog;
     property MouseActions: TATEditorMouseActions read FMouseActions write FMouseActions;
     property TabHelper: TATStringTabHelper read FTabHelper;
     property WrapInfo: TATWrapInfo read FWrapInfo;
@@ -1697,7 +1697,7 @@ type
     function GetVisibleLines: integer;
     function GetVisibleColumns: integer;
     function GetVisibleLinesMinimap: integer;
-    procedure DoCommand(ACmd: integer; AInvoke: TATEditorCommandInvoke; const AText: atString = ''); virtual;
+    procedure DoCommand(ACmd: integer; AInvoke: TATCommandInvoke; const AText: atString = ''); virtual;
     procedure BeginUpdate;
     procedure EndUpdate;
     procedure BeginEditing;
@@ -4763,7 +4763,7 @@ begin
 
   //FWheelQueue:= TATEditorWheelQueue.Create;
 
-  FCommandLog:= TATEditorCommandLog.Create;
+  FCommandLog:= TATCommandLog.Create;
 
   FCarets:= TATCarets.Create;
   FCarets.Add(0, 0);
@@ -6349,14 +6349,14 @@ begin
           begin
             //set caret to the clicked position, like Kate and VSCode do:
             DoCaretSingle(PosTextClicked.X, PosTextClicked.Y);
-            DoCommand(cCommand_ClipboardAltPaste, TATEditorCommandInvoke.Internal); //uses PrimarySelection:TClipboard
+            DoCommand(cCommand_ClipboardAltPaste, TATCommandInvoke.Internal); //uses PrimarySelection:TClipboard
           end;
         TATEditorMiddleClickAction.GotoDefinition:
           begin
             if (not ModeOneLine) and (cCommand_GotoDefinition>0) then
             begin
               DoCaretSingle(PosTextClicked.X, PosTextClicked.Y);
-              DoCommand(cCommand_GotoDefinition, TATEditorCommandInvoke.Internal);
+              DoCommand(cCommand_GotoDefinition, TATCommandInvoke.Internal);
             end;
           end;
       end;
@@ -7925,7 +7925,7 @@ end;
 
 
 function TATSynEdit.DoEventCommand(ACommand: integer;
-  AInvoke: TATEditorCommandInvoke; const AText: string): boolean;
+  AInvoke: TATCommandInvoke; const AText: string): boolean;
 begin
   Result:= false;
   if Assigned(FOnCommand) then
@@ -8151,7 +8151,7 @@ begin
   Cmd:= (Sender as TMenuItem).Tag;
   if Cmd>0 then
   begin
-    DoCommand(Cmd, TATEditorCommandInvoke.MenuContext);
+    DoCommand(Cmd, TATCommandInvoke.MenuContext);
     Invalidate;
   end;
 end;
@@ -9528,14 +9528,14 @@ begin
   if Strings.IsIndexValid(Pnt.Y) then
   begin
     DoCaretSingle(Pnt.X, Pnt.Y);
-    DoCommand(cCommand_TextInsert, TATEditorCommandInvoke.Internal, SText);
+    DoCommand(cCommand_TextInsert, TATCommandInvoke.Internal, SText);
     if ATEditorOptions.MouseDragDropFocusesTargetEditor then
       SetFocus;
 
     //Ctrl is pressed: delete block from src
     //note: it's opposite to the drag-drop in the single document
     if GetActualDragDropIsCopying then
-      TATSynEdit(Source).DoCommand(cCommand_TextDeleteSelection, TATEditorCommandInvoke.Internal);
+      TATSynEdit(Source).DoCommand(cCommand_TextDeleteSelection, TATCommandInvoke.Internal);
   end;
 end;
 

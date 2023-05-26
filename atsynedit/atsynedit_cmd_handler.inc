@@ -58,7 +58,7 @@ begin
   if NCmd>0 then
   begin
     TimerBlinkDisable;
-    DoCommand(NCmd, TATEditorCommandInvoke.Hotkey);
+    DoCommand(NCmd, TATCommandInvoke.Hotkey);
     TimerBlinkEnable;
   end;
 end;
@@ -146,7 +146,7 @@ begin
   end;
 
   TimerBlinkDisable;
-  DoCommand(cCommand_TextInsert, TATEditorCommandInvoke.HotkeyChar, Str);
+  DoCommand(cCommand_TextInsert, TATCommandInvoke.HotkeyChar, Str);
   TimerBlinkEnable;
 
   Utf8Key:= '';
@@ -667,11 +667,11 @@ begin
     cCommand_ZoomIn:                   Result:= DoCommand_ScaleDelta(true);
     cCommand_ZoomOut:                  Result:= DoCommand_ScaleDelta(false);
     cCommand_ZoomReset:                Result:= DoCommand_ScaleReset;
-    cCommand_RepeatTextCommand:        DoCommand(FLastTextCmd, TATEditorCommandInvoke.Internal, FLastTextCmdText);
+    cCommand_RepeatTextCommand:        DoCommand(FLastTextCmd, TATCommandInvoke.Internal, FLastTextCmdText);
   end;
 end;
 
-procedure TATSynEdit.DoCommand(ACmd: integer; AInvoke: TATEditorCommandInvoke; const AText: atString = '');
+procedure TATSynEdit.DoCommand(ACmd: integer; AInvoke: TATCommandInvoke; const AText: atString = '');
 // AInvoke is used only by CudaText, you may pass any value here
 var
   St: TATStrings;
@@ -694,7 +694,7 @@ begin
   else
     Str:= '';
 
-  if AInvoke<>TATEditorCommandInvoke.HotkeyChar then
+  if AInvoke<>TATCommandInvoke.HotkeyChar then
     FCommandLog.Add(ACmd, AInvoke, Str);
 
   if DoEventCommand(ACmd, AInvoke, Str) then Exit;

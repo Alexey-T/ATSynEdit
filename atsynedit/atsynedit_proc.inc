@@ -2,18 +2,18 @@ const
   //under Mac don't use Ctrl key, use Meta key as default (e.g. Meta+C, Meta+A)
   ssXControl = {$ifndef darwin} ssCtrl {$else} ssMeta {$endif};
 
-{ TATEditorCommandLog }
+{ TATCommandLog }
 
-constructor TATEditorCommandLog.Create;
+constructor TATCommandLog.Create;
 begin
   inherited;
   MaxCount:= 200;
 end;
 
-procedure TATEditorCommandLog.Add(ACode: integer;
-  AInvoke: TATEditorCommandInvoke; const AText: string);
+procedure TATCommandLog.Add(ACode: integer;
+  AInvoke: TATCommandInvoke; const AText: string);
 var
-  Item: TATEditorCommandLogItem;
+  Item: TATCommandLogItem;
 begin
   if MaxCount<=0 then exit;
   while Size()>=MaxCount do
