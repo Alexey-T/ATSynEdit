@@ -184,7 +184,7 @@ procedure TATComboEdit.MicromapClick(Sender: TObject; AX, AY: integer);
 var
   R: TRect;
 begin
-  if FOptComboboxShowX then
+  if FOptComboboxShowX and not ModeReadOnly then
   begin
     R:= RectMicromap;
     //Application.MessageBox(PChar(Format('click %d:%d, rect map %d:%d-%d:%d', [AX, AY, R.Left, R.Top, R.Right, R.Bottom])), 'click');
@@ -211,7 +211,7 @@ begin
   C.Brush.Color:= Colors.ComboboxArrowBG;
   C.FillRect(ARect);
 
-  if FOptComboboxShowX then
+  if FOptComboboxShowX and not ModeReadOnly then
   begin
     W_Icon:= ATEditorScale(8);
     W_Line:= ATEditorScale(1);
