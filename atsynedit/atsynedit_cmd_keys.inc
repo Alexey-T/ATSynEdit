@@ -404,7 +404,7 @@ begin
   else
     NDirection:= TATEditorDirection.None;
 
-  if AKeepCaretOnScreen then
+  if AKeepCaretOnScreen and not Carets.IsSelection then
     if DoCaretsKeepOnScreen(NDirection) then
       Include(Result, TATCommandResult.CaretAny);
 end;
@@ -425,7 +425,7 @@ begin
   Result:= [TATCommandResult.Scroll];
 
   if AKeepCaretOnScreen then
-    if Carets.Count=1 then //keeping caret works bad with multi-carets
+    if (Carets.Count=1) and (not Carets.IsSelection) then //keeping caret works bad with multi-carets
     begin
       Include(Result, TATCommandResult.CaretAny);
       St:= Strings;
