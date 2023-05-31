@@ -7551,14 +7551,17 @@ begin
     exit;
   end;
 
-  CanvasInvertRect(C, ARect, Colors.Caret);
-
   if ACaretShape.EmptyInside then
   begin
-    InflateRect(ARect, -1, -1);
-    CanvasInvertRect(C, ARect, Colors.Caret);
-  end
-  else
+    CanvasInvertRect(C, Rect(ARect.Left, ARect.Top, ARect.Right, ARect.Top+1), Colors.Caret);
+    CanvasInvertRect(C, Rect(ARect.Left, ARect.Bottom-1, ARect.Right, ARect.Bottom), Colors.Caret);
+    CanvasInvertRect(C, Rect(ARect.Left, ARect.Top+1, ARect.Left, ARect.Bottom-1), Colors.Caret);
+    CanvasInvertRect(C, Rect(ARect.Right-1, ARect.Top+1, ARect.Right-1, ARect.Bottom-1), Colors.Caret);
+    exit;
+  end;
+
+  CanvasInvertRect(C, ARect, Colors.Caret);
+
   if ATEditorOptions.CaretTextOverInvertedRect and not ACaretShape.IsNarrow then
   begin
     if (ACaret.CharStr<>'') and (ACaret.CharColor<>clNone) and not IsCharUnicodeSpace(ACaret.CharStr[1]) then
