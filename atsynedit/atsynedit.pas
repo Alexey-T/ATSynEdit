@@ -7553,10 +7553,7 @@ begin
 
   if ACaretShape.EmptyInside then
   begin
-    CanvasInvertRect(C, Rect(ARect.Left, ARect.Top, ARect.Right, ARect.Top+1), Colors.Caret);
-    CanvasInvertRect(C, Rect(ARect.Left, ARect.Bottom-1, ARect.Right, ARect.Bottom), Colors.Caret);
-    CanvasInvertRect(C, Rect(ARect.Left, ARect.Top+1, ARect.Left, ARect.Bottom-1), Colors.Caret);
-    CanvasInvertRect(C, Rect(ARect.Right-1, ARect.Top+1, ARect.Right-1, ARect.Bottom-1), Colors.Caret);
+    CanvasInvertFrameRect(C, ARect, Colors.Caret);
     exit;
   end;
 
