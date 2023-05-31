@@ -57,6 +57,7 @@ type
     procedure SelectNone;
     procedure SelectNoneIfEmptySelection;
     procedure SelectToPoint(AX, AY: integer);
+    procedure SelectToPoint_Bigger(AX, AY: integer);
     procedure GetRange(out AX1, AY1, AX2, AY2: integer; out ASel: boolean);
     procedure GetSelLines(out AFrom, ATo: integer; AllowNoSel: boolean=false);
     function GetLeftEdge: TPoint;
@@ -625,6 +626,26 @@ procedure TATCaretItem.SelectToPoint(AX, AY: integer);
 begin
   if EndX<0 then EndX:= PosX;
   if EndY<0 then EndY:= PosY;
+  PosX:= AX;
+  PosY:= AY;
+end;
+
+procedure TATCaretItem.SelectToPoint_Bigger(AX, AY: integer);
+begin
+  if EndY<0 then
+  begin
+    EndX:= PosX;
+    EndY:= PosY;
+    PosX:= AX;
+    PosY:= AY;
+    exit;
+  end;
+
+  if IsPosSorted(PosX, PosY, AX, AY, false) xor IsForwardSelection then
+  begin
+    EndX:= PosX;
+    EndY:= PosY;
+  end;
   PosX:= AX;
   PosY:= AY;
 end;

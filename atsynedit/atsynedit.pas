@@ -6404,7 +6404,7 @@ begin
     begin
       FSelRect:= cRectEmpty;
       DoCaretSingleAsIs;
-      Carets[0].SelectToPoint(FMouseDownPnt.X, FMouseDownPnt.Y);
+      Carets[0].SelectToPoint_Bigger(FMouseDownPnt.X, FMouseDownPnt.Y);
     end;
 
     if ActionId=TATEditorMouseAction.ClickAndSelVerticalBlock then
