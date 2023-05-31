@@ -7555,10 +7555,7 @@ begin
 
   if ACaretShape.EmptyInside then
   begin
-    Inc(ARect.Left);
-    Inc(ARect.Top);
-    Dec(ARect.Right);
-    Dec(ARect.Bottom);
+    InflateRect(ARect, -1, -1);
     CanvasInvertRect(C, ARect, Colors.Caret);
   end
   else
