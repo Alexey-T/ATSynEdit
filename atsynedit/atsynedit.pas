@@ -7553,7 +7553,7 @@ begin
 
   if ACaretShape.EmptyInside then
   begin
-    CanvasInvertFrameRect(C, ARect, Colors.Caret);
+    CanvasInvertRectEmptyInside(C, ARect, Colors.Caret);
     exit;
   end;
 
