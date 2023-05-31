@@ -57,7 +57,7 @@ type
     procedure SelectNone;
     procedure SelectNoneIfEmptySelection;
     procedure SelectToPoint(AX, AY: integer);
-    procedure SelectToPoint_Bigger(AX, AY: integer);
+    procedure SelectToPoint_KeepingOldSel(AX, AY: integer);
     procedure GetRange(out AX1, AY1, AX2, AY2: integer; out ASel: boolean);
     procedure GetSelLines(out AFrom, ATo: integer; AllowNoSel: boolean=false);
     function GetLeftEdge: TPoint;
@@ -630,7 +630,7 @@ begin
   PosY:= AY;
 end;
 
-procedure TATCaretItem.SelectToPoint_Bigger(AX, AY: integer);
+procedure TATCaretItem.SelectToPoint_KeepingOldSel(AX, AY: integer);
 begin
   if EndY<0 then
   begin
