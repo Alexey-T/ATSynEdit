@@ -7411,13 +7411,19 @@ begin
 end;
 
 procedure TATSynEdit.TimerBlinkTick(Sender: TObject);
+var
+  bFocused: boolean;
 begin
   if not FCaretShowEnabled then exit;
   if not Application.Active then exit;
 
-  if FCaretStopUnfocused and not _IsFocused then
-    if FCaretShown then
-      exit;
+  if FCaretStopUnfocused then
+  begin
+    bFocused:= _IsFocused;
+    if not bFocused then
+      if FCaretShown then
+        exit;
+  end;
 
   if not DoubleBuffered then
     FCaretAllowNextBlink:= not FCaretAllowNextBlink;
