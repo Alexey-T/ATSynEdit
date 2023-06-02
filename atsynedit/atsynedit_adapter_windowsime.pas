@@ -129,6 +129,7 @@ begin
 
       exrect:=CandiForm;
       ImmSetCandidateWindow(imc, @CandiForm);
+
       exrect.dwStyle:=CFS_EXCLUDE;
       exrect.rcArea:=Rect(exrect.ptCurrentPos.X,
                           exrect.ptCurrentPos.Y,
@@ -151,6 +152,7 @@ begin
   ed:=TATSynEdit(Sender);
   if not Assigned(CompForm) then begin
     CompForm:=TForm.Create(ed);
+    CompForm.OnPaint:=@CompFormPaint;
     CompForm.Parent:=ed;
     CompForm.BorderStyle:=bsNone;
     CompForm.FormStyle:=fsStayOnTop;
@@ -159,7 +161,6 @@ begin
     CompForm.Height:=16;
     CompForm.Width:=16;
     CompForm.Color:=clInfoBk;
-    CompForm.OnPaint:=@CompFormPaint;
   end;
   CompForm.Font:=ed.Font;
   if ed.Carets.Count>0 then begin
@@ -219,6 +220,8 @@ begin
     IMN_OPENCANDIDATE_CH,
     IMN_OPENCANDIDATE:
       UpdateWindowPos(Sender);
+    IMN_SETCOMPOSITIONWINDOW:
+      UpdateCompForm(Sender);
   end;
   //writeln(Format('ImeNotify %d %d',[Msg.WParam,Msg.LParam]));
 end;
