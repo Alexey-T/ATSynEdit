@@ -1506,6 +1506,7 @@ type
     IsModifiedUnprintedTrailingOnly: boolean;
     IsModifiedUnprintedEnds: boolean;
     IsModifiedUnprintedEndDetails: boolean;
+    IsModifiedLastLineOnTop: boolean;
 
     //overrides
     constructor Create(AOwner: TComponent); override;
@@ -5330,6 +5331,7 @@ begin
     IsModifiedUnprintedTrailingOnly:= false;
     IsModifiedUnprintedEnds:= false;
     IsModifiedUnprintedEndDetails:= false;
+    IsModifiedLastLineOnTop:= false;
     FLastHotspot:= -1;
     FLastCaretY:= -1;
 
