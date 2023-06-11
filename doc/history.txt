@@ -1,3 +1,6 @@
+2023.06.11
+* change: deleted event OnChangeCaretLine
+
 2023.05.25
 * change: enums changed to 'scoped', e.g. you must replace cEndNone -> TATLineEnds.None etc
 * change: rename TATEditorCommandInvoke -> TATCommandInvoke

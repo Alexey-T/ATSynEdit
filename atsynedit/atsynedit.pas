@@ -693,7 +693,6 @@ type
     FOnChange: TNotifyEvent;
     FOnChangeLog: TATStringsChangeLogEvent;
     FOnChangeCaretPos: TNotifyEvent;
-    FOnChangeCaretLine: TNotifyEvent;
     FOnChangeState: TNotifyEvent;
     FOnChangeZoom: TNotifyEvent;
     FOnChangeModified: TNotifyEvent;
@@ -1843,7 +1842,6 @@ type
     property OnChangeLog: TATStringsChangeLogEvent read FOnChangeLog write FOnChangeLog;
     property OnChangeModified: TNotifyEvent read FOnChangeModified write FOnChangeModified;
     property OnChangeCaretPos: TNotifyEvent read FOnChangeCaretPos write FOnChangeCaretPos;
-    property OnChangeCaretLine: TNotifyEvent read FOnChangeCaretLine write FOnChangeCaretLine;
     property OnChangeState: TNotifyEvent read FOnChangeState write FOnChangeState;
     property OnChangeZoom: TNotifyEvent read FOnChangeZoom write FOnChangeZoom;
     property OnChangeBookmarks: TNotifyEvent read FOnChangeBookmarks write FOnChangeBookmarks;
@@ -7976,6 +7974,8 @@ begin
   if Assigned(FOnChangeCaretPos) then
     FOnChangeCaretPos(Self);
 
+  {
+  //event is not needed
   if Assigned(FOnChangeCaretLine) then
     if Carets.Count=1 then
     begin
@@ -7986,6 +7986,7 @@ begin
         FOnChangeCaretLine(Self);
       end;
     end;
+  }
 
   if ATEditorOptions.AutoCopyToClipboard or
     ATEditorOptions.AutoCopyToPrimarySel then
