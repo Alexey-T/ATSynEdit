@@ -347,7 +347,7 @@ type
     function LineCharAt(ALineIndex, ACharIndex: SizeInt): WideChar;
     procedure GetIndentProp(ALineIndex: SizeInt; out ACharCount: SizeInt; out AKind: TATLineIndentKind);
     function LineLenWithoutSpace(ALineIndex: SizeInt): SizeInt;
-    procedure LineBlockDelete(ALine1, ALine2: SizeInt);
+    procedure LineBlockDelete(ALine1, ALine2: SizeInt; AForceLast: boolean = true);
     procedure LineBlockInsert(ALineFrom: SizeInt; ANewLines: TStringList);
     function ColumnPosToCharPos(AIndex: SizeInt; AX: SizeInt; ATabHelper: TATStringTabHelper): SizeInt;
     function CharPosToColumnPos(AIndex: SizeInt; AX: SizeInt; ATabHelper: TATStringTabHelper): SizeInt;

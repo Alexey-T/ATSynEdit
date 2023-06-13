@@ -443,7 +443,7 @@ begin
 end;
 
 
-procedure TATStrings.LineBlockDelete(ALine1, ALine2: SizeInt);
+procedure TATStrings.LineBlockDelete(ALine1, ALine2: SizeInt; AForceLast: boolean = true);
 var
   i: SizeInt;
 begin
@@ -462,7 +462,7 @@ begin
     //delete slowly with undo
     //AWithEvent=false to fix freeze by NN sec, by Ctrl+A,Del during lexer parsing
     for i:= ALine2 downto ALine1 do
-      LineDelete(i, true, false{WithEvent});
+      LineDelete(i, false{AForceLast}, false{WithEvent});
   end
   else
   begin
@@ -470,6 +470,9 @@ begin
     FList.DeleteRange(ALine1, ALine2);
     ClearUndo;
   end;
+
+  if AForceLast then
+    ActionAddFakeLineIfNeeded;
 
   DoEventChange(TATLineChangeKind.Deleted, ALine1, ALine2-ALine1+1);
   DoEventLog(ALine1);
