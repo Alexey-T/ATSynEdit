@@ -282,7 +282,8 @@ begin
                 It need to virtual caret for this. The best idea is add composition modaless form for IME. }
               if imeCode and GCS_CURSORPOS<>0 then begin
                 position:=ImmGetCompositionStringW(IMC, GCS_CURSORPOS, nil, 0);
-                ImmNotifyIME(IMC,NI_OPENCANDIDATE,0,0);
+                //ImmNotifyIME(IMC,NI_OPENCANDIDATE,0,0);
+                UpdateWindowPos(Sender);
               end;
               //Writeln(Format('len %d, attrsize %d, position %d',[len,attrsize,position]));
               // for japanese, not used
