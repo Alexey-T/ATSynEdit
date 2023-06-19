@@ -25,7 +25,7 @@ begin
     NLine:= Caret.PosY;
     if not Strings.IsIndexValid(NLine) then Continue;
 
-    if FOptKeyHomeEndNavigateWrapped and (FWrapMode<>cWrapOff) then
+    if FOptKeyHomeEndNavigateWrapped and (FWrapMode<>TATEditorWrapMode.ModeOff) then
     begin
       PntCoord.X:= 0;
       PntCoord.Y:= Caret.CoordY;
@@ -54,7 +54,7 @@ begin
     FScrollHorz.NPixelOffset:= 0;
   end;
 
-  Result:= [cResultCaretLeft];
+  Result:= [TATCommandResult.CaretLeft];
 end;
 
 function TATSynEdit.DoCommand_KeyEnd: TATCommandResults;
@@ -85,7 +85,7 @@ begin
     NLen:= 0;
     NWrapped:= 0;
 
-    if FOptKeyHomeEndNavigateWrapped and (FWrapMode<>cWrapOff) then
+    if FOptKeyHomeEndNavigateWrapped and (FWrapMode<>TATEditorWrapMode.ModeOff) then
     begin
       PntCoord.X:= ClientWidth;
       PntCoord.Y:= Caret.CoordY;
@@ -111,7 +111,7 @@ begin
       Caret.PosX:= NLenTotal;
   end;
 
-  Result:= [cResultCaretRight];
+  Result:= [TATCommandResult.CaretRight];
 end;
 
 function TATSynEdit.DoCommand_KeyLeft(ASelCommand: boolean): TATCommandResults;
@@ -121,7 +121,7 @@ var
   i: integer;
 begin
   //changed because of issue CudaText#3065
-  Result:= [cResultCaretLeft, cResultCaretLazy];
+  Result:= [TATCommandResult.CaretLeft, TATCommandResult.CaretLazy];
 
   bMultiCarets:= FCarets.Count>1;
 
@@ -163,7 +163,7 @@ var
   i: integer;
 begin
   //changed because of issue CudaText#3065
-  Result:= [cResultCaretRight, cResultCaretLazy];
+  Result:= [TATCommandResult.CaretRight, TATCommandResult.CaretLazy];
 
   St:= Strings;
   bMultiCarets:= FCarets.Count>1;
@@ -208,7 +208,7 @@ begin
   if AKeepRelativePos then
     NRelative:= LinesFromTop;
 
-  //don't check here FWrapMode<>cWrapOff
+  //don't check here FWrapMode<>TATEditorWrapMode.ModeOff
   if FOptKeyUpDownNavigateWrapped then
     Result:= DoCommand_KeyUpDown_Wrapped(ADown, ALines)
   else
@@ -259,9 +259,9 @@ begin
   end;
 
   if ADown then
-    Result:= [cResultCaretBottom]
+    Result:= [TATCommandResult.CaretBottom]
   else
-    Result:= [cResultCaretTop];
+    Result:= [TATCommandResult.CaretTop];
 end;
 
 function TATSynEdit.DoCommand_KeyUpDown_Wrapped(ADown: boolean; ALines: integer): TATCommandResults;
@@ -274,7 +274,7 @@ var
   NWrapIndex, iCaret: integer;
 const
   cGapActions: array[boolean] of TATEditorGapCoordAction =
-    (cGapCoordIgnore, cGapCoordMoveDown);
+    (TATEditorGapCoordAction.Ignore, TATEditorGapCoordAction.MoveDown);
 begin
   St:= Strings;
   for iCaret:= 0 to FCarets.Count-1 do
@@ -331,7 +331,7 @@ begin
       begin
         PosCoord2:= CaretPosToClientPos(PosText);
         PosCoord2.X:= PosCoord.X;
-        PosText:= ClientPosToCaretPos(PosCoord2, Details, cGapCoordIgnore);
+        PosText:= ClientPosToCaretPos(PosCoord2, Details, TATEditorGapCoordAction.Ignore);
       end;
 
     Caret.PosX:= PosText.X;
@@ -339,9 +339,9 @@ begin
   end;
 
   if ADown then
-    Result:= [cResultCaretBottom]
+    Result:= [TATCommandResult.CaretBottom]
   else
-    Result:= [cResultCaretTop];
+    Result:= [TATCommandResult.CaretTop];
 end;
 
 function TATSynEdit.DoCommand_TextBackspace: TATCommandResults;
@@ -368,7 +368,7 @@ begin
   DoCaretSingle(0, 0, false);
   DoScrollToBeginOrEnd(true);
 
-  Result:= [cResultCaretTop];
+  Result:= [TATCommandResult.CaretTop];
 end;
 
 function TATSynEdit.DoCommand_GotoTextEnd: TATCommandResults;
@@ -379,7 +379,7 @@ begin
   if NLine<0 then exit([]);
   DoCaretSingle(Strings.LinesLen[NLine], NLine, false);
 
-  Result:= [cResultCaretTop];
+  Result:= [TATCommandResult.CaretTop];
 end;
 
 function TATSynEdit.DoCommand_ScrollByDelta(ALines, AColumns: integer;
@@ -388,31 +388,31 @@ var
   NDirection: TATEditorDirection;
 begin
   DoScrollByDelta(AColumns, ALines);
-  Result:= [cResultScroll];
+  Result:= [TATCommandResult.Scroll];
 
   if ALines>0 then
-    NDirection:= cDirDown
+    NDirection:= TATEditorDirection.Down
   else
   if ALines<0 then
-    NDirection:= cDirUp
+    NDirection:= TATEditorDirection.Up
   else
   if AColumns>0 then
-    NDirection:= cDirRight
+    NDirection:= TATEditorDirection.Right
   else
   if AColumns<0 then
-    NDirection:= cDirLeft
+    NDirection:= TATEditorDirection.Left
   else
-    NDirection:= cDirNone;
+    NDirection:= TATEditorDirection.None;
 
-  if AKeepCaretOnScreen then
+  if AKeepCaretOnScreen and not Carets.IsSelection then
     if DoCaretsKeepOnScreen(NDirection) then
-      Include(Result, cResultCaretAny);
+      Include(Result, TATCommandResult.CaretAny);
 end;
 
 function TATSynEdit.DoCommand_ScrollToLeft: TATCommandResults;
 begin
   FScrollHorz.SetZero;
-  Result:= [cResultScroll];
+  Result:= [TATCommandResult.Scroll];
 end;
 
 
@@ -422,12 +422,12 @@ var
   St: TATStrings;
 begin
   DoScrollToBeginOrEnd(AToBegin);
-  Result:= [cResultScroll];
+  Result:= [TATCommandResult.Scroll];
 
   if AKeepCaretOnScreen then
-    if Carets.Count=1 then //keeping caret works bad with multi-carets
+    if (Carets.Count=1) and (not Carets.IsSelection) then //keeping caret works bad with multi-carets
     begin
-      Include(Result, cResultCaretAny);
+      Include(Result, TATCommandResult.CaretAny);
       St:= Strings;
       if AToBegin then
       begin
@@ -435,7 +435,7 @@ begin
       end
       else
       begin
-        if FWrapMode=cWrapOff then
+        if FWrapMode=TATEditorWrapMode.ModeOff then
           DoCaretSingle(0, St.Count-1)
         else
           DoCaretSingle(St.LinesLen[St.Count-1], St.Count-1);
@@ -503,11 +503,11 @@ begin
     end;
   end;
 
-  //cResultCaretLazy is to fix CudaText #3065
+  //TATCommandResult.CaretLazy is to fix CudaText #3065
   if AJump=cWordjumpToPrev then
-    Result:= [cResultCaretTop, cResultCaretLazy]
+    Result:= [TATCommandResult.CaretTop, TATCommandResult.CaretLazy]
   else
-    Result:= [cResultCaretBottom, cResultCaretLazy];
+    Result:= [TATCommandResult.CaretBottom, TATCommandResult.CaretLazy];
 end;
 
 function TATSynEdit.DoCommand_GotoLineEdge(ABegin: boolean): TATCommandResults;
@@ -526,7 +526,7 @@ begin
       Caret.PosX:= Strings.LinesLen[Caret.PosY];
   end;
 
-  Result:= [cResultCaretTop];
+  Result:= [TATCommandResult.CaretTop];
 end;
 
 
@@ -580,7 +580,7 @@ begin
   end;
 
   DoCaretSingle(PntText.X, PntText.Y);
-  Result:= [cResultCaretTop];
+  Result:= [TATCommandResult.CaretTop];
 end;
 
 
@@ -602,7 +602,7 @@ begin
   ClearMouseDownVariables;
   UpdateCursor;
 
-  Result:= [cResultCaretTop];
+  Result:= [TATCommandResult.CaretTop];
 end;
 
 

@@ -55,7 +55,7 @@ begin
       (St.Count>0) and
       (Carets.Count=1) and
       (Carets[0].PosY=St.Count-1) and
-      (St.LinesEnds[St.Count-1]=cEndNone) and
+      (St.LinesEnds[St.Count-1]=TATLineEnds.None) and
       not SEndsWithEol(Str);
 
   //paste
@@ -190,7 +190,7 @@ begin
     ClipExItem:= ATEditorClipboardRecents.Items[NTag];
     DoCommand(
       cCommand_TextInsert,
-      cInvokeInternal,
+      TATCommandInvoke.Internal,
       UTF8Decode(ClipExItem.Text)
       );
   end;

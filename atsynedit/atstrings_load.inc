@@ -147,7 +147,7 @@ begin
     eidUTF8,
     eidUTF8BOM:
       begin
-        AEnc:= cEncUTF8;
+        AEnc:= TATFileEncoding.UTF8;
         Result:= true;
       end;
     eidUCS2LE,
@@ -155,7 +155,7 @@ begin
       exit;
     else
       begin
-        AEnc:= cEncAnsi;
+        AEnc:= TATFileEncoding.ANSI;
         AEncCodepage:= TempEnc;
         Result:= true;
       end;
@@ -239,11 +239,11 @@ begin
         eidUCS2LE,
         eidUCS2BE:
           begin
-            AEnc:= cEncUTF8;
+            AEnc:= TATFileEncoding.UTF8;
             AEncCodepage:= eidUTF8;
           end
         else
-          AEnc:= cEncAnsi;
+          AEnc:= TATFileEncoding.ANSI;
       end;
       Result:= true;
       exit;
@@ -268,7 +268,7 @@ begin
 
   if IsStreamWithSignature(Stream, cSignUTF8) then
   begin
-    Enc:= cEncUTF8;
+    Enc:= TATFileEncoding.UTF8;
     EncWithBom:= true;
     SignLen:= Length(cSignUTF8);
     Exit
@@ -276,7 +276,7 @@ begin
 
   if IsStreamWithSignature(Stream, cSign32LE) then
   begin
-    Enc:= cEnc32LE;
+    Enc:= TATFileEncoding.UTF32LE;
     EncWithBom:= true;
     SignLen:= Length(cSign32LE);
     Exit
@@ -284,7 +284,7 @@ begin
 
   if IsStreamWithSignature(Stream, cSign32BE) then
   begin
-    Enc:= cEnc32BE;
+    Enc:= TATFileEncoding.UTF32BE;
     EncWithBom:= true;
     SignLen:= Length(cSign32BE);
     Exit
@@ -292,7 +292,7 @@ begin
 
   if IsStreamWithSignature(Stream, cSignWideLE) then
   begin
-    Enc:= cEncWideLE;
+    Enc:= TATFileEncoding.UTF16LE;
     EncWithBom:= true;
     SignLen:= Length(cSignWideLE);
     Exit
@@ -300,7 +300,7 @@ begin
 
   if IsStreamWithSignature(Stream, cSignWideBE) then
   begin
-    Enc:= cEncWideBE;
+    Enc:= TATFileEncoding.UTF16BE;
     EncWithBom:= true;
     SignLen:= Length(cSignWideBE);
     Exit
@@ -310,14 +310,14 @@ begin
     case DetectStreamUtf8NoBom(Stream, BufSizeUTF8) of
       u8sYes:
         begin
-          Enc:= cEncUTF8;
+          Enc:= TATFileEncoding.UTF8;
           EncWithBom:= false;
           Exit
         end;
       u8sNo:
         begin
           // https://github.com/Alexey-T/CudaText/issues/2928
-          Enc:= cEncAnsi;
+          Enc:= TATFileEncoding.ANSI;
         end;
     end;
 
@@ -333,9 +333,9 @@ begin
     if DetectStreamUtf16NoBom(Stream, BufSizeUTF16, IsLE) then
     begin
       if IsLE then
-        Enc:= cEncWideLE
+        Enc:= TATFileEncoding.UTF16LE
       else
-        Enc:= cEncWideBE;
+        Enc:= TATFileEncoding.UTF16BE;
       Exit
     end;
 end;
@@ -359,7 +359,7 @@ begin
   ActionAddFakeLineIfNeeded;
   Modified:= true;
   for i:= 0 to Count-1 do
-    SetLineState(i, cLineStateAdded);
+    SetLineState(i, TATLineState.Added);
 end;
 
 procedure TATStrings.LoadFromString(const AText: string);
@@ -381,7 +381,7 @@ begin
   begin
     Str:= UTF8Decode(AText);
     SDeleteFromEol(Str);
-    LineAddEx(Str, cEndNone);
+    LineAddEx(Str, TATLineEnds.None);
   end
   else
   begin
@@ -391,9 +391,9 @@ begin
       MS.Write(AText[1], Length(AText)*1);
       MS.Position:= 0;
       try
-        Encoding:= cEncUTF8;
+        Encoding:= TATFileEncoding.UTF8;
         EncodingDetect:= false;
-        LoadFromStream(MS, [cLoadOpFromUTF8]);
+        LoadFromStream(MS, [TATLoadStreamOption.FromUTF8]);
 
         //fixing CudaText issue #4172
         if not SEndsWithEol(AText) then
@@ -409,14 +409,14 @@ begin
 
   Modified:= true;
   for i:= 0 to Count-1 do
-    SetLineState(i, cLineStateAdded);
+    SetLineState(i, TATLineState.Added);
 end;
 
 type
   TATCharEnding = (
-    cCharNotEnding,
-    cCharEnding10,
-    cCharEnding13
+    NotEnding,
+    Ending10,
+    Ending13
     );
 
 function _GetBufferEnding(ABuffer: pointer; APos: SizeInt; AEnc: TATFileEncoding): TATCharEnding; inline;
@@ -424,31 +424,31 @@ var
   p: PByte absolute ABuffer;
   Check: byte;
 begin
-  Result:= cCharNotEnding;
+  Result:= TATCharEnding.NotEnding;
   case AEnc of
-    cEncAnsi,
-    cEncUTF8:
+    TATFileEncoding.ANSI,
+    TATFileEncoding.UTF8:
       begin
         Check:= p[APos];
       end;
-    cEncWideLE:
+    TATFileEncoding.UTF16LE:
       begin
         if p[APos+1]<>0 then exit;
         Check:= p[APos];
       end;
-    cEncWideBE:
+    TATFileEncoding.UTF16BE:
       begin
         if p[APos]<>0 then exit;
         Check:= p[APos+1];
       end;
-    cEnc32LE:
+    TATFileEncoding.UTF32LE:
       begin
         if p[APos+3]<>0 then exit;
         if p[APos+2]<>0 then exit;
         if p[APos+1]<>0 then exit;
         Check:= p[APos];
       end;
-    cEnc32BE:
+    TATFileEncoding.UTF32BE:
       begin
         if p[APos]<>0 then exit;
         if p[APos+1]<>0 then exit;
@@ -458,8 +458,8 @@ begin
   end;
 
   case Check of
-    10: Result:= cCharEnding10;
-    13: Result:= cCharEnding13;
+    10: Result:= TATCharEnding.Ending10;
+    13: Result:= TATCharEnding.Ending13;
   end;
 end;
 
@@ -475,9 +475,11 @@ var
   procedure _FindNextEol(AFromPos: SizeInt;
     out AFoundPos: SizeInt;
     out AEnding: TATLineEnds);
+  var
+    bCancel: boolean;
   begin
     AFoundPos:= AFromPos;
-    AEnding:= cEndNone;
+    AEnding:= TATLineEnds.None;
     repeat
       if AFoundPos>=BufSize then exit;
 
@@ -485,26 +487,31 @@ var
       begin
         FProgressValue:= Int64(AFoundPos)*100 div NStreamSize;
         if Assigned(FOnProgress) then
-          FOnProgress(Self);
+        begin
+          bCancel:= false;
+          FOnProgress(Self, bCancel);
+          if bCancel then
+            raise EEditorUserStopped.Create('User stopped');
+        end;
       end;
 
       case _GetBufferEnding(Buf, AFoundPos, FEncoding) of
-        cCharNotEnding:
+        TATCharEnding.NotEnding:
           begin
             Inc(AFoundPos, CharSize);
           end;
-        cCharEnding10:
+        TATCharEnding.Ending10:
           begin
-            AEnding:= cEndUnix;
+            AEnding:= TATLineEnds.Unix;
             exit
           end;
-        cCharEnding13:
+        TATCharEnding.Ending13:
           begin
             if AFoundPos+CharSize<BufSize then
-              if _GetBufferEnding(Buf, AFoundPos+CharSize, FEncoding)=cCharEnding10 then
-                AEnding:= cEndWin
+              if _GetBufferEnding(Buf, AFoundPos+CharSize, FEncoding)=TATCharEnding.Ending10 then
+                AEnding:= TATLineEnds.Windows
               else
-                AEnding:= cEndMac;
+                AEnding:= TATLineEnds.Mac;
             exit
           end;
       end;
@@ -523,18 +530,14 @@ var
     NStart:= 0;
     //NPrevProgressPos:= 0;
 
-    FProgressKind:= cStringsProgressLoading;
+    FProgressKind:= TATStringsProgressKind.Loading;
     FProgressValue:= 0;
 
     repeat
       _FindNextEol(NStart, NEnd, LineEnd);
       Len:= NEnd-NStart;
       if Len>=MaxInt-12 then
-        raise EEditorTooLongLine.Create('Too long line on reading: 0x'+IntToHex(Len));
-      {
-      if Count>=MaxInt-2 then
-        raise EEditorTooManyLines.Create('Too many lines');
-        }
+        raise EEditorTooLongLine.Create('Too big line length on reading: 0x'+IntToHex(Len, 8));
 
       {
       //call OnProgress each 1M chars
@@ -550,7 +553,7 @@ var
       end;
       }
 
-      if LineEnd=cEndWin then
+      if LineEnd=TATLineEnds.Windows then
         Inc(NEnd, CharSize*2)
       else
         Inc(NEnd, CharSize);
@@ -560,37 +563,37 @@ var
       else
       begin
         case FEncoding of
-          cEncAnsi:
+          TATFileEncoding.ANSI:
             begin
               SetString(SA, @Buf[NStart], Len);
               SUtf8:= EncConvertToUTF8(SA, FEncodingCodepage);
-              LineAddRaw_NoUndo(SUtf8, LineEnd, cLoadOpAllowBadCharsOfLen1 in AOptions);
+              LineAddRaw_NoUndo(SUtf8, LineEnd, TATLoadStreamOption.AllowBadCharsOfLen1 in AOptions);
             end;
 
-          cEncUTF8:
+          TATFileEncoding.UTF8:
             begin
               //this now raises exception if UTF8 content is bad, it's needed
               SetString(SA, @Buf[NStart], Len);
-              LineAddRaw_NoUndo(SA, LineEnd, cLoadOpAllowBadCharsOfLen1 in AOptions);
+              LineAddRaw_NoUndo(SA, LineEnd, TATLoadStreamOption.AllowBadCharsOfLen1 in AOptions);
             end;
 
-          cEncWideLE,
-          cEncWideBE:
+          TATFileEncoding.UTF16LE,
+          TATFileEncoding.UTF16BE:
             begin
               SWide:= '';
               SetLength(SWide, Len div 2);
               Move(Buf[NStart], SWide[1], Len);
-              if FEncoding=cEncWideBE then
+              if FEncoding=TATFileEncoding.UTF16BE then
                 SSwapEndianWide(SWide);
               LineAddRaw_NoUndo(SWide, LineEnd);
             end;
 
-          cEnc32LE,
-          cEnc32BE:
+          TATFileEncoding.UTF32LE,
+          TATFileEncoding.UTF32BE:
             begin
               SetLength(SQuad{%H-}, Len div 4+1);
               Move(Buf[NStart], SQuad[0], Len);
-              if FEncoding=cEnc32BE then
+              if FEncoding=TATFileEncoding.UTF32BE then
                 SSwapEndianUCS4(SQuad);
               SWide:= UCS4StringToUnicodeString(SQuad);
               LineAddRaw_NoUndo(SWide, LineEnd);
@@ -620,10 +623,10 @@ begin
   NStreamSize:= Stream.Size;
   NSignatureLen:= 0;
 
-  if cLoadOpFromUTF8 in AOptions then
+  if TATLoadStreamOption.FromUTF8 in AOptions then
   begin
     //func param forces UTF8
-    FEncoding:= cEncUTF8;
+    FEncoding:= TATFileEncoding.UTF8;
   end
   else
   if NStreamSize>ATEditorOptions.MaxFileSizeMbToDetectEncoding*1024*1024 then
@@ -638,16 +641,16 @@ begin
     //no signature?
     //it's safe to set here UTF8 even for binary files, later contents will be checked
     if not bWithBom then
-      FEncoding:= cEncUTF8;
+      FEncoding:= TATFileEncoding.UTF8;
   end
   else
   if FEncodingDetect then
   begin
     //detect encoding by signature and by buffer content
     if FEncodingDetectDefaultUtf8 then
-      FEncoding:= cEncUTF8
+      FEncoding:= TATFileEncoding.UTF8
     else
-      FEncoding:= cEncAnsi;
+      FEncoding:= TATFileEncoding.ANSI;
     DetectStreamEncoding(Stream, FEncoding, FEncodingCodepage, NSignatureLen, bWithBom,
       ATEditorOptions.DetectUTF8BufferKb,
       ATEditorOptions.DetectUTF16BufferWords,
@@ -667,10 +670,10 @@ begin
   end;
 
   case FEncoding of
-    cEncUTF8:
+    TATFileEncoding.UTF8:
       SaveSignUtf8:= bWithBom;
-    cEncWideBE,
-    cEncWideLE:
+    TATFileEncoding.UTF16BE,
+    TATFileEncoding.UTF16LE:
       SaveSignWide:= bWithBom;
   end;
 
@@ -687,25 +690,25 @@ begin
     try
       _LoadItems;
     except
-      on E: EEditorBadUTF8 do
+      on E: Exception do
       begin
         Clear;
-        //failed to load text as UTF8, so load again as ANSI
-        AForcedToANSI:= true;
-        FEncoding:= cEncAnsi;
-        CharSize:= 1;
-        _LoadItems;
-      end;
-      on E: EEditorTooLongLine do
-      begin
-        Clear;
-        raise;
+        if E is EEditorBadUTF8 then
+        begin
+          //failed to load text as UTF8, so load again as ANSI
+          AForcedToANSI:= true;
+          FEncoding:= TATFileEncoding.ANSI;
+          CharSize:= 1;
+          _LoadItems;
+        end
+        else
+          raise;
       end;
     end;
   finally
     FreeMem(Buf);
     FProgressValue:= 0;
-    FProgressKind:= cStringsProgressNone;
+    FProgressKind:= TATStringsProgressKind.None;
   end;
 end;
 

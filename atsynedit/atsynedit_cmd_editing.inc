@@ -161,7 +161,7 @@ begin
   end;
 
   //changed for issue CudaText#3065
-  Result:= [cResultText, cResultCaretBottom, cResultCaretLazy];
+  Result:= [TATCommandResult.Text, TATCommandResult.CaretBottom, TATCommandResult.CaretLazy];
 end;
 
 
@@ -202,7 +202,7 @@ begin
     St.EndUndoGroup;
   end;
 
-  Result:= [cResultText, cResultCaretBottom];
+  Result:= [TATCommandResult.Text, TATCommandResult.CaretBottom];
 end;
 
 
@@ -306,7 +306,7 @@ begin
     Caret.SelectNone;
   end;
 
-  Result:= [cResultText, cResultCaretBottom, cResultCaretLazy];
+  Result:= [TATCommandResult.Text, TATCommandResult.CaretBottom, TATCommandResult.CaretLazy];
 end;
 
 
@@ -414,10 +414,10 @@ begin
     St.EndUndoGroup;
 
   //changed for CudaText issue #3065
-  Result:= [cResultCaretTop, cResultCaretLazy];
+  Result:= [TATCommandResult.CaretTop, TATCommandResult.CaretLazy];
   //changed for CudaText issue #3883
   if bChange then
-    Include(Result, cResultText);
+    Include(Result, TATCommandResult.Text);
 end;
 
 function TATSynEdit.DoCommand_TextDelete: TATCommandResults;
@@ -464,7 +464,7 @@ begin
   if not IsSelRectEmpty and not OptCaretManyAllowed then
   begin
     DoSelectionDeleteColumnBlock;
-    Result:= [cResultText, cResultCaretTop];
+    Result:= [TATCommandResult.Text, TATCommandResult.CaretTop];
     Exit
   end;
 
@@ -513,7 +513,7 @@ begin
   //CudaText issue #1615
   Carets.Sort;
 
-  Result:= [cResultText, cResultCaretTop];
+  Result:= [TATCommandResult.Text, TATCommandResult.CaretTop];
 end;
 
 
@@ -588,7 +588,7 @@ begin
   if bNeedGroup then
     St.EndUndoGroup;
 
-  Result:= [cResultText, cResultCaretAny];
+  Result:= [TATCommandResult.Text, TATCommandResult.CaretAny];
 end;
 
 function TATSynEdit.DoCommand_TextInsertEol(AKeepCaret: boolean): TATCommandResults;
@@ -662,7 +662,7 @@ begin
   if Assigned(FOnCommandKeyEnter) then
     FOnCommandKeyEnter(Self);
 
-  Result:= [cResultText, cResultCaretBottom];
+  Result:= [TATCommandResult.Text, TATCommandResult.CaretBottom];
 end;
 
 function TATSynEdit.DoCommand_TextDeleteLines: TATCommandResults;
@@ -714,7 +714,7 @@ begin
     St.EndUndoGroup;
   end;
 
-  Result:= [cResultText, cResultCaretTop];
+  Result:= [TATCommandResult.Text, TATCommandResult.CaretTop];
 end;
 
 function TATSynEdit.DoCommand_TextDuplicateLine: TATCommandResults;
@@ -739,7 +739,7 @@ begin
 
       //universal code, for selection or not
       Caret.GetSelLines(Line1, Line2, true);
-      if St.LinesEnds[Line2]=cEndNone then
+      if St.LinesEnds[Line2]=TATLineEnds.None then
         St.LinesEnds[Line2]:= St.Endings;
       for iLine:= Line2 downto Line1 do
       begin
@@ -758,7 +758,7 @@ begin
     St.EndUndoGroup;
   end;
 
-  Result:= [cResultText, cResultCaretTop];
+  Result:= [TATCommandResult.Text, TATCommandResult.CaretTop];
 end;
 
 function TATSynEdit.DoCommand_TextDeleteToLineBegin: TATCommandResults;
@@ -792,9 +792,9 @@ begin
     bChange:= true;
   end;
 
-  Result:= [cResultCaretLeft];
+  Result:= [TATCommandResult.CaretLeft];
   if bChange then
-    Include(Result, cResultText);
+    Include(Result, TATCommandResult.Text);
 end;
 
 function TATSynEdit.DoCommand_TextDeleteToLineEnd: TATCommandResults;
@@ -827,9 +827,9 @@ begin
     end;
   end;
 
-  Result:= [cResultCaretAny];
+  Result:= [TATCommandResult.CaretAny];
   if bChange then
-    Include(Result, cResultText);
+    Include(Result, TATCommandResult.Text);
 end;
 
 function TATSynEdit.DoCommand_TextDeleteWord(ANext: boolean): TATCommandResults;
@@ -948,14 +948,14 @@ begin
   St.BeginUndoGroup;
   St.EndUndoGroup;
 
-  //cResultCaretLazy is to fix CudaText #3065
+  //TATCommandResult.CaretLazy is to fix CudaText #3065
   if ANext then
-    Result:= [cResultCaretBottom, cResultCaretLazy]
+    Result:= [TATCommandResult.CaretBottom, TATCommandResult.CaretLazy]
   else
-    Result:= [cResultCaretTop, cResultCaretLazy];
+    Result:= [TATCommandResult.CaretTop, TATCommandResult.CaretLazy];
 
   if bChange then
-    Include(Result, cResultText);
+    Include(Result, TATCommandResult.Text);
 end;
 
 function TATSynEdit.DoCommand_TextDeleteWordEntire: TATCommandResults;
@@ -1028,9 +1028,9 @@ begin
   if bNeedGroup then
     St.EndUndoGroup;
 
-  Result:= [cResultCaretBottom];
+  Result:= [TATCommandResult.CaretBottom];
   if bChange then
-    Include(Result, cResultText);
+    Include(Result, TATCommandResult.Text);
 end;
 
 
@@ -1064,9 +1064,9 @@ begin
       bChange:= true;
   end;
 
-  Result:= [cResultCaretAny];
+  Result:= [TATCommandResult.CaretAny];
   if bChange then
-    Include(Result, cResultText);
+    Include(Result, TATCommandResult.Text);
 end;
 
 procedure TATSynEdit.DoCommand_TextIndentUnindent_StreamBlock_OneCaret(ARight: boolean;
@@ -1218,9 +1218,9 @@ begin
     St.EndUndoGroup;
   end;
 
-  Result:= [cResultCaretAny, cResultKeepColumnSel];
+  Result:= [TATCommandResult.CaretAny, TATCommandResult.KeepColumnSel];
   if bChange then
-    Include(Result, cResultText);
+    Include(Result, TATCommandResult.Text);
 end;
 
 
@@ -1267,7 +1267,7 @@ begin
     end;
   end;
 
-  Result:= [cResultText, cResultCaretBottom, cResultCaretLazy, cResultUndoRedo];
+  Result:= [TATCommandResult.Text, TATCommandResult.CaretBottom, TATCommandResult.CaretLazy, TATCommandResult.UndoRedo];
 end;
 
 
@@ -1299,27 +1299,27 @@ begin
 
     if not AKeepCaret then
       case FOptCaretPosAfterPasteColumn of
-        cPasteCaretNoChange:
+        TATEditorPasteCaret.NoChange:
           begin
           end;
-        cPasteCaretLeftBottom:
+        TATEditorPasteCaret.LeftBottom:
           begin
             Inc(Caret.PosY, Block.Count-1);
           end;
-        cPasteCaretRightBottom:
+        TATEditorPasteCaret.RightBottom:
           begin
             Inc(Caret.PosX, Block.LinesLen[0]);
             Inc(Caret.PosY, Block.Count-1);
           end;
-        cPasteCaretRightTop:
+        TATEditorPasteCaret.RightTop:
           begin
             Inc(Caret.PosX, Block.LinesLen[0]);
           end;
-        cPasteCaretColumnLeft:
+        TATEditorPasteCaret.ColumnLeft:
           begin
             DoCaretsColumnToPoint(Caret.PosX, Caret.PosY + Block.Count-1);
           end;
-        cPasteCaretColumnRight:
+        TATEditorPasteCaret.ColumnRight:
           begin
             Inc(Caret.PosX, Block.LinesLen[0]);
             DoCaretsColumnToPoint(Caret.PosX, Caret.PosY + Block.Count-1);
@@ -1329,7 +1329,7 @@ begin
     FreeAndNil(Block);
   end;
 
-  Result:= [cResultText, cResultCaretBottom];
+  Result:= [TATCommandResult.Text, TATCommandResult.CaretBottom];
 end;
 
 function TATSynEdit.DoCommand_TextDeleteToDocumentBegin: TATCommandResults;
@@ -1350,7 +1350,7 @@ begin
   St.DoOnChangeBlock(
     0, 0,
     Caret.PosX, Caret.PosY,
-    cBlockDeleteLines,
+    TATBlockChangeKind.DeleteLines,
     nil
     );
 
@@ -1377,7 +1377,7 @@ begin
   //move caret to beginning
   DoCaretSingle(0, 0);
 
-  Result:= [cResultText, cResultCaretBottom];
+  Result:= [TATCommandResult.Text, TATCommandResult.CaretBottom];
 end;
 
 
@@ -1398,7 +1398,7 @@ begin
   St.DoOnChangeBlock(
     Caret.PosX, Caret.PosY,
     0, St.Count,
-    cBlockDeleteLines,
+    TATBlockChangeKind.DeleteLines,
     nil
     );
 
@@ -1407,11 +1407,11 @@ begin
   UpdateMarkersOnDeleting(Caret.PosX, Caret.PosY, 0, St.Count);
 
   if Caret.PosY>=St.Count-1 then
-    St.LinesEnds[Caret.PosY]:= cEndNone;
+    St.LinesEnds[Caret.PosY]:= TATLineEnds.None;
 
   St.ChangeBlockActive:= false;
 
-  Result:= [cResultText, cResultCaretBottom];
+  Result:= [TATCommandResult.Text, TATCommandResult.CaretBottom];
 end;
 
 
@@ -1447,7 +1447,7 @@ begin
     Caret.PosY:= PosAfter.Y;
   end;
 
-  Result:= [cResultText, cResultCaretAny];
+  Result:= [TATCommandResult.Text, TATCommandResult.CaretAny];
 end;
 
 function TATSynEdit.DoCommand_TextChangeCase(AMode: TATEditorCaseConvert): TATCommandResults;
@@ -1482,15 +1482,15 @@ begin
 
       Str1:= St.TextSubstring(X1, Y1, X2, Y2);
       case AMode of
-        cCaseLower:
+        TATEditorCaseConvert.Lower:
           Str2:= UnicodeLowerCase(Str1);
-        cCaseUpper:
+        TATEditorCaseConvert.Upper:
           Str2:= UnicodeUpperCase(Str1);
-        cCaseTitle:
+        TATEditorCaseConvert.Title:
           Str2:= SCaseTitle(Str1, FOptNonWordChars);
-        cCaseInvert:
+        TATEditorCaseConvert.Invert:
           Str2:= SCaseInvert(Str1);
-        cCaseSentence:
+        TATEditorCaseConvert.Sentence:
           Str2:= SCaseSentence(Str1, FOptNonWordChars);
       end;
 
@@ -1504,9 +1504,9 @@ begin
     St.EndUndoGroup;
   end;
 
-  Result:= [cResultCaretAny];
+  Result:= [TATCommandResult.CaretAny];
   if bChange then
-    Include(Result, cResultText);
+    Include(Result, TATCommandResult.Text);
 end;
 
 
@@ -1518,7 +1518,7 @@ begin
   if Strings.ActionTrimSpaces(AMode) then
   begin
     DoCaretsFixIncorrectPos(true);
-    Result:= [cResultCaretAny, cResultText];
+    Result:= [TATCommandResult.CaretAny, TATCommandResult.Text];
   end;
 end;
 
@@ -1532,7 +1532,7 @@ begin
   if St.ActionEnsureFinalEol then
   begin
     St.ActionAddFakeLineIfNeeded;
-    Result:= [cResultText];
+    Result:= [TATCommandResult.Text];
   end
   else
     Result:= [];
@@ -1550,7 +1550,7 @@ begin
   if (N>0) and (St.LinesLen[N-1]=0) then
   begin
     St.ActionDeleteFakeLineAndFinalEol;
-    Result:= [cResultText];
+    Result:= [TATCommandResult.Text];
   end
   else
     Result:= [];
@@ -1572,7 +1572,7 @@ begin
   end;
 
   Strings.ActionSort(AAction, NFrom, NTo);
-  Result:= [cResultText];
+  Result:= [TATCommandResult.Text];
 end;
 
 function TATSynEdit.DoCommand_DeleteAllBlanks: TATCommandResults;
@@ -1580,9 +1580,9 @@ begin
   if ModeReadOnly then exit([]);
   DoCaretSingle(0, 0);
   if Strings.ActionDeleteAllBlanks then
-    Result:= [cResultText, cResultCaretTop]
+    Result:= [TATCommandResult.Text, TATCommandResult.CaretTop]
   else
-    Result:= [cResultCaretTop];
+    Result:= [TATCommandResult.CaretTop];
 end;
 
 function TATSynEdit.DoCommand_DeleteAdjacentBlanks: TATCommandResults;
@@ -1590,9 +1590,9 @@ begin
   if ModeReadOnly then exit([]);
   DoCaretSingle(0, 0);
   if Strings.ActionDeleteAdjacentBlanks then
-    Result:= [cResultText, cResultCaretTop]
+    Result:= [TATCommandResult.Text, TATCommandResult.CaretTop]
   else
-    Result:= [cResultCaretTop]
+    Result:= [TATCommandResult.CaretTop]
 end;
 
 function TATSynEdit.DoCommand_DeleteAdjacentDups: TATCommandResults;
@@ -1600,9 +1600,9 @@ begin
   if ModeReadOnly then exit([]);
   DoCaretSingle(0, 0);
   if Strings.ActionDeleteAdjacentDups then
-    Result:= [cResultText, cResultCaretTop]
+    Result:= [TATCommandResult.Text, TATCommandResult.CaretTop]
   else
-    Result:= [cResultCaretTop];
+    Result:= [TATCommandResult.CaretTop];
 end;
 
 function TATSynEdit.DoCommand_DeleteAllDups(AKeepBlanks: boolean): TATCommandResults;
@@ -1610,9 +1610,9 @@ begin
   if ModeReadOnly then exit([]);
   DoCaretSingle(0, 0);
   if Strings.ActionDeleteAllDups(AKeepBlanks) then
-    Result:= [cResultText, cResultCaretTop]
+    Result:= [TATCommandResult.Text, TATCommandResult.CaretTop]
   else
-    Result:= [cResultCaretTop];
+    Result:= [TATCommandResult.CaretTop];
 end;
 
 function TATSynEdit.DoCommand_ReverseLines: TATCommandResults;
@@ -1620,7 +1620,7 @@ begin
   if ModeReadOnly then exit([]);
   DoCaretSingle(0, 0);
   Strings.ActionReverseLines;
-  Result:= [cResultText, cResultCaretTop];
+  Result:= [TATCommandResult.Text, TATCommandResult.CaretTop];
 end;
 
 function TATSynEdit.DoCommand_ShuffleLines: TATCommandResults;
@@ -1628,6 +1628,6 @@ begin
   if ModeReadOnly then exit([]);
   DoCaretSingle(0, 0);
   Strings.ActionShuffleLines;
-  Result:= [cResultText, cResultCaretTop];
+  Result:= [TATCommandResult.Text, TATCommandResult.CaretTop];
 end;
 

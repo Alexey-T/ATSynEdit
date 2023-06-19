@@ -608,19 +608,19 @@ procedure DoPaintUnprintedEndSymbol(C: TCanvas;
   AColorFont, AColorBg: TColor);
 begin
   case ATEditorOptions.UnprintedEndSymbol of
-    aeueDot:
+    TATEditorUnptintedEolSymbol.Dot:
       CanvasUnprintedSpace(C,
         Rect(AX, AY, AX+ACharSize.XScaled div ATEditorCharXScale, AY+ACharSize.Y),
         ATEditorOptions.UnprintedEndDotScale,
         AColorFont);
-    aeueArrowDown:
+    TATEditorUnptintedEolSymbol.ArrowDown:
       CanvasArrowDown(C,
         Rect(AX, AY, AX+ACharSize.XScaled div ATEditorCharXScale, AY+ACharSize.Y),
         AColorFont,
         ATEditorOptions.UnprintedEndArrowLength,
         ATEditorOptions.UnprintedTabPointerScale
         );
-    aeuePilcrow:
+    TATEditorUnptintedEolSymbol.Pilcrow:
       CanvasPilcrowChar(C,
         Rect(AX, AY, AX+ACharSize.XScaled div ATEditorCharXScale, AY+ACharSize.Y),
         AColorFont,

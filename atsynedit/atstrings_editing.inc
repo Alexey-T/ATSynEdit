@@ -36,7 +36,7 @@ begin
   Lines[AY]:= Copy(Str, 1, AX1) + ATextPart1;
 
   //line AY becomes not last, so set ending for it
-  if LinesEnds[AY]=cEndNone then
+  if LinesEnds[AY]=TATLineEnds.None then
     LinesEnds[AY]:= FEndings;
   //line AY+1 can be last, so keep old eol
   LineInsertEx(AY+1, ATextPart2 + Copy(Str, AX2+1, MaxInt), NEnd);
@@ -139,7 +139,7 @@ begin
     else
     begin
       LastItem:= FList.GetItem(Count-1);
-      bTrimRedundantEol:= (LastItem^.CharLen>0) and (LastItem^.LineEnds=cEndNone);
+      bTrimRedundantEol:= (LastItem^.CharLen>0) and (LastItem^.LineEnds=TATLineEnds.None);
     end
   end
   else
@@ -206,7 +206,7 @@ begin
         DoOnChangeBlock(
           0, AY,
           0, 0,
-          cBlockInsertLines,
+          TATBlockChangeKind.InsertLines,
           BlockUTF8);
       finally
         FreeAndNil(BlockUTF8);
@@ -310,7 +310,7 @@ begin
       //  nil);
 
       LineDelete(AY, false);
-      LinesEnds[AY-1]:= cEndNone;
+      LinesEnds[AY-1]:= TATLineEnds.None;
       AShift.Y:= -1;
       APosAfter.X:= Length(Lines[AY-1]);
       APosAfter.Y:= AY-1;
@@ -372,7 +372,7 @@ begin
   Str:= Lines[AY];
 
   //special case: last fake line
-  if (AY=Count-1) and (Str='') and (LinesEnds[AY]=cEndNone) then
+  if (AY=Count-1) and (Str='') and (LinesEnds[AY]=TATLineEnds.None) then
     Exit;
 
   bNeedGroup:= true; //ALen>1; //must not create undo-group for usual Delete pressing
@@ -427,11 +427,11 @@ begin
           LineDelete(AY+1, false{not force});
           //maybe also eol
           if AY=Count-1 then
-            LinesEnds[AY]:= cEndNone;
+            LinesEnds[AY]:= TATLineEnds.None;
         end
         else
           //last line: del eol
-          LinesEnds[AY]:= cEndNone;
+          LinesEnds[AY]:= TATLineEnds.None;
 
         AShift.Y:= -1;
       end;
@@ -443,7 +443,7 @@ begin
 end;
 
 
-procedure TATStrings.LineBlockDelete(ALine1, ALine2: SizeInt);
+procedure TATStrings.LineBlockDelete(ALine1, ALine2: SizeInt; AForceLast: boolean = true);
 var
   i: SizeInt;
 begin
@@ -454,7 +454,7 @@ begin
   DoOnChangeBlock(
     0, ALine1,
     0, ALine2,
-    cBlockDeleteLines,
+    TATBlockChangeKind.DeleteLines,
     nil);
 
   if (ALine2-ALine1)<FUndoList.MaxCount then
@@ -462,7 +462,7 @@ begin
     //delete slowly with undo
     //AWithEvent=false to fix freeze by NN sec, by Ctrl+A,Del during lexer parsing
     for i:= ALine2 downto ALine1 do
-      LineDelete(i, true, false{WithEvent});
+      LineDelete(i, false{AForceLast}, false{WithEvent});
   end
   else
   begin
@@ -471,7 +471,10 @@ begin
     ClearUndo;
   end;
 
-  DoEventChange(cLineChangeDeleted, ALine1, ALine2-ALine1+1);
+  if AForceLast then
+    ActionAddFakeLineIfNeeded;
+
+  DoEventChange(TATLineChangeKind.Deleted, ALine1, ALine2-ALine1+1);
   DoEventLog(ALine1);
   Modified:= true;
 
@@ -486,7 +489,7 @@ begin
   DoOnChangeBlock(
     0, ALineFrom,
     0, 0,
-    cBlockInsertLines,
+    TATBlockChangeKind.InsertLines,
     ANewLines);
 
   for i:= ANewLines.Count-1 downto 0 do
@@ -494,7 +497,7 @@ begin
   FChangeBlockActive:= false;
 
   DoEventLog(ALineFrom);
-  DoEventChange(cLineChangeAdded, ALineFrom, ANewLines.Count);
+  DoEventChange(TATLineChangeKind.Added, ALineFrom, ANewLines.Count);
 end;
 
 
@@ -571,7 +574,7 @@ begin
     //  bDelEmpty:= true;
 
     //remember no final eol
-    bDeleteEol_Alt:= (AFromY=0) and (AToY=Count-1) and (LinesEnds[AToY]=cEndNone);
+    bDeleteEol_Alt:= (AFromY=0) and (AToY=Count-1) and (LinesEnds[AToY]=TATLineEnds.None);
 
     //concat remaining parts of 1st+last lines
     Str:= '';
@@ -591,7 +594,7 @@ begin
     if bDeleteEol then
     begin
       if Count>0 then
-        LinesEnds[Count-1]:= cEndNone;
+        LinesEnds[Count-1]:= TATLineEnds.None;
       ActionDeleteFakeLineAndFinalEol;
     end
     else
@@ -629,12 +632,12 @@ begin
         DoOnChangeBlock(
           AX, AY,
           AX + Length(ABlock.Lines[0]), AY + ABlock.Count,
-          cBlockDeleteColumn,
+          TATBlockChangeKind.DeleteColumn,
           nil);
       DoOnChangeBlock(
         AX, AY,
         0, 0,
-        cBlockInsertColumn,
+        TATBlockChangeKind.InsertColumn,
         BlockUTF8);
     finally
       FreeAndNil(BlockUTF8);
@@ -646,7 +649,7 @@ begin
     TextInsert(AX, AY+i, ABlock.Lines[i], AOverwrite, Shift, PosAfter);
     LinesEnds[AY+i]:= Endings; //force eol
     if not IsIndexValid(AY+i+1) then
-      LineAddRaw('', cEndNone);
+      LineAddRaw('', TATLineEnds.None);
   end;
 
   FChangeBlockActive:= false;
@@ -691,7 +694,7 @@ begin
     //handle situation when we at non-eol line, this must give
     //inserted line also w/o eol
     NewEnd:= LinesEnds[AY];
-    if NewEnd=cEndNone then
+    if NewEnd=TATLineEnds.None then
       LinesEnds[AY]:= Endings; //force eol to cur line
     LineInsertRaw(AY+1, AStrIndent+StrMove, NewEnd);
 
@@ -722,13 +725,13 @@ begin
   LineDelete(AY, false{AForceLast});
 
   if Count=0 then
-    LineAddEx('', cEndNone)
+    LineAddEx('', TATLineEnds.None)
   else
   if bOnLastLine then
   begin
     Dec(AY);
     if AY>=0 then
-      LinesEnds[AY]:= cEndNone;
+      LinesEnds[AY]:= TATLineEnds.None;
   end;
 end;
 

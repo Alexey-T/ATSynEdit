@@ -45,7 +45,7 @@ begin
   ed.Font.Name:= 'Courier New';
   ed.OptUnprintedVisible:= false;
   ed.OptRulerVisible:= false;
-  ed.OptWrapMode:= cWrapOff;
+  ed.OptWrapMode:= TATEditorWrapMode.ModeOff;
 
   fDir:= ExtractFilePath(Application.Exename)+'../../test_files';
 end;
@@ -62,7 +62,7 @@ begin
   s:= List.GetPathFromItem(List.Selected);
   if not FileExists(s) then Exit;
 
-  ed.LoadFromFile(s);
+  ed.LoadFromFile(s, []);
   ed.SetFocus;
   Caption:= 'App - '+ExtractFileName(s);
 end;

@@ -226,7 +226,7 @@ type
     procedure EditStringsChangeBlock(Sender: TObject; const AStartPos,
       AEndPos: TPoint; AChange: TATBlockChangeKind; ABlock: TStringList);
     procedure EditClickGap(Sender: TObject; AGapItem: TATGapItem; APos: TPoint);
-    procedure EditStringsChange(Sender: TObject; AChange: TATLineChangeKind; ALineIndex, AItemCount: integer);
+    procedure EditStringsChange(Sender: TObject; AChange: TATLineChangeKind; ALineIndex, AItemCount: SizeInt);
     function EditCalcTabSize(Sender: TObject; ALineIndex, APos: integer): integer;
     procedure FinderConfirmReplace(Sender: TObject; APos1, APos2: TPoint;
       AForMany: boolean; var AConfirm, AContinue: boolean; var AReplacement: UnicodeString);
@@ -240,7 +240,7 @@ type
     procedure EditCalcLine(Sender: TObject; var AParts: TATLineParts;
       ALineIndex, ACharIndex, ALineLen: integer; var AColorAfterEol: TColor);
     procedure EditScroll(Sender: TObject);
-    procedure EditCommand(Sender: TObject; ACmd{%H-}: integer; AInvoke: TATEditorCommandInvoke; const AText: string; var AHandled: boolean);
+    procedure EditCommand(Sender: TObject; ACmd{%H-}: integer; AInvoke: TATCommandInvoke; const AText: string; var AHandled: boolean);
     procedure EditClickGutter(Sender: TObject; ABand, ALine: integer; var AHandled: boolean);
     procedure EditClickMicromap(Sender: TObject; AX, AY: integer);
     procedure EditDrawBm(Sender: TObject; C: TCanvas; ALineNum{%H-}: integer; const ARect: TRect);
@@ -388,21 +388,21 @@ end;
 
 procedure TfmMain.mnuEndMacClick(Sender: TObject);
 begin
-  ed.Strings.Endings:= cEndMac;
+  ed.Strings.Endings:= TATLineEnds.Mac;
   ed.Update;
   UpdateStatus;
 end;
 
 procedure TfmMain.mnuEndUnixClick(Sender: TObject);
 begin
-  ed.Strings.Endings:= cEndUnix;
+  ed.Strings.Endings:= TATLineEnds.Unix;
   ed.Update;
   UpdateStatus;
 end;
 
 procedure TfmMain.mnuEndWinClick(Sender: TObject);
 begin
-  ed.Strings.Endings:= cEndWin;
+  ed.Strings.Endings:= TATLineEnds.Windows;
   ed.Update;
   UpdateStatus;
 end;
@@ -525,11 +525,11 @@ begin
   edSpaceY.Value:= ed.OptSpacingY;
   edMarginFixed.Value:= ed.OptMarginRight;
   case ed.OptWrapMode of
-    cWrapOff:
+    TATEditorWrapMode.ModeOff:
       chkWrapOff.Checked:= true;
-    cWrapOn:
+    TATEditorWrapMode.ModeOn:
       chkWrapOn.Checked:= true;
-    cWrapAtWindowOrMargin:
+    TATEditorWrapMode.AtWindowOrMargin:
       chkWrapWndMargin.Checked:= true;
   end;
   chkWrapIndent.Checked:= ed.OptWrapIndented;
@@ -546,7 +546,7 @@ begin
 end;
 
 procedure TfmMain.EditCommand(Sender: TObject; ACmd: integer;
-  AInvoke: TATEditorCommandInvoke; const AText: string; var AHandled: boolean);
+  AInvoke: TATCommandInvoke; const AText: string; var AHandled: boolean);
 begin
   AHandled:= false;
   {
@@ -655,7 +655,7 @@ begin
     if ADetectEnc then
       ed.Strings.EncodingCodepage:= eidUTF8;
     ed.Strings.EncodingDetect:= ADetectEnc;
-    ed.LoadFromFile(fn);
+    ed.LoadFromFile(fn, []);
     ed.Strings.EncodingDetect:= true;
   finally
     ed.EndUpdate;
@@ -873,7 +873,7 @@ begin
   Cmd:= DoCommandDialog(ed);
   if Cmd>0 then
   begin
-    ed.DoCommand(Cmd, cInvokeAppPalette);
+    ed.DoCommand(Cmd, TATCommandInvoke.AppPalette);
     ed.Update;
   end;
 end;
@@ -1008,10 +1008,12 @@ end;
 
 procedure TfmMain.mnuTestConvPosClick(Sender: TObject);
 var
-  P: TPoint;
+  PntText: TPoint;
+  PntCoord: TATPoint;
 begin
-  P:= ed.CaretPosToClientPos(Point(0, ed.Strings.Count{after end-of-file!}));
-  ShowMessage(Format('Client pos (%d, %d)', [P.X, P.Y]));
+  PntText:= Point(0, ed.Strings.Count{after end-of-file!});
+  PntCoord:= ed.CaretPosToClientPos(PntText);
+  ShowMessage(Format('Client pos (%d, %d)', [PntCoord.X, PntCoord.Y]));
 end;
 
 procedure TfmMain.mnuTestGapAddClick(Sender: TObject);
@@ -1259,7 +1261,7 @@ begin
 end;
 
 procedure TfmMain.EditStringsChange(Sender: TObject;
-  AChange: TATLineChangeKind; ALineIndex, AItemCount: integer);
+  AChange: TATLineChangeKind; ALineIndex, AItemCount: SizeInt);
 const
   cEvent: array[TATLineChangeKind] of string = (
     'cLineChangeEdited',
@@ -1421,25 +1423,25 @@ end;
 procedure TfmMain.chkWrapMarginChange(Sender: TObject);
 begin
   if wait then Exit;
-  ed.OptWrapMode:= cWrapAtWindowOrMargin;
+  ed.OptWrapMode:= TATEditorWrapMode.AtWindowOrMargin;
 end;
 
 procedure TfmMain.chkWrapOffChange(Sender: TObject);
 begin
   if wait then Exit;
-  ed.OptWrapMode:= cWrapOff;
+  ed.OptWrapMode:= TATEditorWrapMode.ModeOff;
 end;
 
 procedure TfmMain.chkWrapOnChange(Sender: TObject);
 begin
   if wait then Exit;
-  ed.OptWrapMode:= cWrapOn;
+  ed.OptWrapMode:= TATEditorWrapMode.ModeOn;
 end;
 
 procedure TfmMain.chkWrapWndMarginChange(Sender: TObject);
 begin
   if wait then Exit;
-  ed.OptWrapMode:= cWrapAtWindowOrMargin;
+  ed.OptWrapMode:= TATEditorWrapMode.AtWindowOrMargin;
 end;
 
 procedure TfmMain.chkWrapIndentChange(Sender: TObject);
@@ -1619,7 +1621,7 @@ begin
     EndY:= APos2.Y;
   end;
 
-  Ed.DoCommand(cCommand_ScrollToCaretTop, cInvokeAppInternal);
+  Ed.DoCommand(cCommand_ScrollToCaretTop, TATCommandInvoke.AppInternal);
   Ed.Update(true);
 
   Buttons:= [mbYes, mbNo];

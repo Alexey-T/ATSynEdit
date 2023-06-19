@@ -42,6 +42,7 @@ type
   private
     FItems: TStringList;
     FItemIndex: integer;
+    FOptComboboxShowX: boolean;
     FMenu: TPopupMenu;
     procedure DoComboMenu;
     procedure DoComboUpDown(ADown: boolean);
@@ -54,9 +55,10 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     property Items: TStringList read FItems;
-    procedure DoCommand(ACmd: integer; AInvoke: TATEditorCommandInvoke; const AText: atString = ''); override;
+    procedure DoCommand(ACmd: integer; AInvoke: TATCommandInvoke; const AText: atString = ''); override;
     procedure DoAddLineToHistory(const AStr: atString; AMaxItems: integer);
   published
+    property OptComboboxShowX: boolean read FOptComboboxShowX write FOptComboboxShowX default false;
   end;
 
 
@@ -169,6 +171,7 @@ begin
   FMenu:= TPopupMenu.Create(Self);
 
   OptMicromapVisible:= true;
+  OptComboboxShowX:= true;
   Micromap.Columns[0].NWidthPercents:= 300;
 
   OnClickMicromap:= @MicromapClick;
@@ -178,21 +181,68 @@ begin
 end;
 
 procedure TATComboEdit.MicromapClick(Sender: TObject; AX, AY: integer);
+var
+  R: TRect;
 begin
-  DoComboMenu;
+  if FOptComboboxShowX and not ModeReadOnly then
+  begin
+    R:= RectMicromap;
+    //Application.MessageBox(PChar(Format('click %d:%d, rect map %d:%d-%d:%d', [AX, AY, R.Left, R.Top, R.Right, R.Bottom])), 'click');
+    if AX < R.Width div 2 then
+    begin
+      Text:= '';
+      DoEventChange(0);
+    end
+    else
+      DoComboMenu;
+  end
+  else
+  begin
+    DoComboMenu;
+  end;
 end;
 
 procedure TATComboEdit.MicromapDraw(Sender: TObject; C: TCanvas;
   const ARect: TRect);
+var
+  X, Y, W_Icon, W_Line: integer;
+  RectX: TRect;
 begin
   C.Brush.Color:= Colors.ComboboxArrowBG;
   C.FillRect(ARect);
 
-  CanvasPaintTriangleDown(C, Colors.ComboboxArrow,
-    Point(
-      (ARect.Left+ARect.Right) div 2,
-      (ARect.Top+ARect.Bottom) div 2),
-    ATEditorScale(ATScrollbarTheme.ArrowSize));
+  if FOptComboboxShowX and not ModeReadOnly then
+  begin
+    W_Icon:= ATEditorScale(8);
+    W_Line:= ATEditorScale(1);
+    X:= ARect.Left+ARect.Width div 4;
+    Y:= (ARect.Top+ARect.Bottom) div 2;
+    RectX.Left:= X-W_Icon div 2;
+    RectX.Right:= RectX.Left+W_Icon;
+    RectX.Top:= Y-W_Icon div 2;
+    RectX.Bottom:= RectX.Top+W_Icon;
+
+    CanvasPaintXMark(C,
+      RectX,
+      Colors.ComboboxArrow,
+      0, 0,
+      W_Line
+      );
+
+    CanvasPaintTriangleDown(C, Colors.ComboboxArrow,
+      Point(
+        ARect.Left + ARect.Width div 4 * 3,
+        (ARect.Top+ARect.Bottom) div 2),
+      ATEditorScale(ATScrollbarTheme.ArrowSize));
+  end
+  else
+  begin
+    CanvasPaintTriangleDown(C, Colors.ComboboxArrow,
+      Point(
+        (ARect.Left+ARect.Right) div 2,
+        (ARect.Top+ARect.Bottom) div 2),
+      ATEditorScale(ATScrollbarTheme.ArrowSize));
+  end;
 end;
 
 procedure TATComboEdit.DoComboMenu;
@@ -240,7 +290,7 @@ begin
 
     //scroll to left, select all
     DoScrollByDelta(-10000, 0);
-    DoCommand(cCommand_SelectAll, cInvokeMenuContext);
+    DoCommand(cCommand_SelectAll, TATCommandInvoke.MenuContext);
   end;
 end;
 
@@ -257,7 +307,7 @@ begin
 end;
 
 procedure TATComboEdit.DoCommand(ACmd: integer;
-  AInvoke: TATEditorCommandInvoke; const AText: atString);
+  AInvoke: TATCommandInvoke; const AText: atString);
 begin
   inherited;
   case ACmd of
@@ -304,7 +354,7 @@ begin
   ScrollHorz.SetZero;
 
   DoEventChange(0);
-  DoCommand(cCommand_SelectAll, cInvokeInternal);
+  DoCommand(cCommand_SelectAll, TATCommandInvoke.Internal);
 end;
 
 destructor TATComboEdit.Destroy;

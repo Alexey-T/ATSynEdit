@@ -43,7 +43,7 @@ begin
   ed.Align:= alClient;
   ed.OptUnprintedVisible:= false;
   ed.OptRulerVisible:= false;
-  ed.OptWrapMode:= cWrapOff;
+  ed.OptWrapMode:= TATEditorWrapMode.ModeOff;
   ed.Colors.TextBG:= $e0f0f0;
 end;
 
@@ -57,7 +57,7 @@ end;
 
 procedure TForm1.DoOpen(const fn: string);
 begin
-  ed.LoadFromFile(fn);
+  ed.LoadFromFile(fn, []);
   ActiveControl:= ed;
   Caption:= 'Demo - '+ExtractFileName(fn);
 end;

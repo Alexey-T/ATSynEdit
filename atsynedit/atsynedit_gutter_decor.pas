@@ -368,11 +368,11 @@ var
   NIndexPlaced, i: integer;
 begin
   case AChange of
-    cLineChangeEdited:
+    TATLineChangeKind.Edited:
       begin
       end;
 
-    cLineChangeAdded:
+    TATLineChangeKind.Added:
       begin
         for i:= 0 to Count-1 do
         begin
@@ -384,12 +384,12 @@ begin
         end;
       end;
 
-    cLineChangeDeletedAll:
+    TATLineChangeKind.DeletedAll:
       begin
         Clear;
       end;
 
-    cLineChangeDeleted:
+    TATLineChangeKind.Deleted:
       begin
         for i:= 0 to AItemCount-1 do
         begin

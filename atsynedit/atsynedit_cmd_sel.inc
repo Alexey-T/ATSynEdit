@@ -3,30 +3,30 @@
 function TATSynEdit.DoCommand_SelectAll: TATCommandResults;
 begin
   DoSelect_All;
-  Result:= [cResultCaretAny];
-  //don't return [cResultCaretBottom] - this scrolls to file end,
+  Result:= [TATCommandResult.CaretAny];
+  //don't return [TATCommandResult.CaretBottom] - this scrolls to file end,
   //while Sublime & EmEditor & GEdit keep scroll position after "select all"
 end;
 
 function TATSynEdit.DoCommand_SelectInverted: TATCommandResults;
 begin
   DoSelect_Inverted;
-  Result:= [cResultCaretBottom];
+  Result:= [TATCommandResult.CaretBottom];
 end;
 
 function TATSynEdit.DoCommand_SelectSplitToLines: TATCommandResults;
 begin
   DoSelect_SplitSelectionToLines;
-  Result:= [cResultCaretBottom];
+  Result:= [TATCommandResult.CaretBottom];
 end;
 
 function TATSynEdit.DoCommand_SelectExtendByLine(AUp: boolean): TATCommandResults;
 begin
   DoSelect_ExtendSelectionByLine(AUp);
   if AUp then
-    Result:= [cResultCaretTop]
+    Result:= [TATCommandResult.CaretTop]
   else
-    Result:= [cResultCaretBottom];
+    Result:= [TATCommandResult.CaretBottom];
 end;
 
 procedure TATSynEdit.DoSelect_ColumnBlock_MoveEndUpDown(var AX, AY: integer; ALineDelta: integer);
@@ -112,46 +112,46 @@ begin
 
   if FSelRectEnd.Y<0 then Exit;
 
-  if ADir in [cDirColumnPageUp, cDirColumnPageDown] then
+  if ADir in [TATEditorSelectColumnDirection.PageUp, TATEditorSelectColumnDirection.PageDown] then
     NPageLines:= GetPageLines
   else
     NPageLines:= 1;
 
-  bDown:= ADir in [cDirColumnDown, cDirColumnPageDown];
+  bDown:= ADir in [TATEditorSelectColumnDirection.Down, TATEditorSelectColumnDirection.PageDown];
   if not bDown then
     NPageLines:= -NPageLines;
 
   //make correct FSelRectEnd, w/o making any carets
   case ADir of
-    cDirColumnLeft:
+    TATEditorSelectColumnDirection.Left:
       begin
         N:= Strings.ColumnPosToCharPos(FSelRectEnd.Y, FSelRectEnd.X, FTabHelper);
         if N>0 then Dec(N);
         N:= Strings.CharPosToColumnPos(FSelRectEnd.Y, N, FTabHelper);
         FSelRectEnd.X:= N;
-        Result:= [cResultKeepColumnSel, cResultCaretLeft];
+        Result:= [TATCommandResult.KeepColumnSel, TATCommandResult.CaretLeft];
       end;
 
-    cDirColumnRight:
+    TATEditorSelectColumnDirection.Right:
       begin
         N:= Strings.ColumnPosToCharPos(FSelRectEnd.Y, FSelRectEnd.X, FTabHelper);
         Inc(N);
         N:= Strings.CharPosToColumnPos(FSelRectEnd.Y, N, FTabHelper);
         FSelRectEnd.X:= N;
-        Result:= [cResultKeepColumnSel, cResultCaretRight];
+        Result:= [TATCommandResult.KeepColumnSel, TATCommandResult.CaretRight];
       end;
 
-    cDirColumnUp,
-    cDirColumnPageUp,
-    cDirColumnDown,
-    cDirColumnPageDown:
+    TATEditorSelectColumnDirection.Up,
+    TATEditorSelectColumnDirection.PageUp,
+    TATEditorSelectColumnDirection.Down,
+    TATEditorSelectColumnDirection.PageDown:
       begin
         DoSelect_ColumnBlock_MoveEndUpDown(FSelRectEnd.X, FSelRectEnd.Y, NPageLines);
 
         if FSelRectEnd.Y>=FSelRectBegin.Y then
-          Result:= [cResultKeepColumnSel, cResultCaretBottom]
+          Result:= [TATCommandResult.KeepColumnSel, TATCommandResult.CaretBottom]
         else
-          Result:= [cResultKeepColumnSel, cResultCaretTop];
+          Result:= [TATCommandResult.KeepColumnSel, TATCommandResult.CaretTop];
       end;
   end;
 
@@ -194,7 +194,7 @@ begin
   end;
 
   DoSelect_ColumnBlock_FromPointsColumns(FSelRectBegin, FSelRectEnd);
-  Result:= [cResultKeepColumnSel, cResultCaretBottom];
+  Result:= [TATCommandResult.KeepColumnSel, TATCommandResult.CaretBottom];
 end;
 
 function TATSynEdit.DoCommand_RemoveOneCaret(AFirstCaret: boolean): TATCommandResults;
@@ -205,7 +205,7 @@ begin
       Carets.Delete(0)
     else
       Carets.Delete(Carets.Count-1);
-    Result:= [cResultCaretAny];
+    Result:= [TATCommandResult.CaretAny];
   end
   else
     Result:= [];
@@ -242,7 +242,7 @@ begin
     //move lines down
     begin
       if NTo>=NLastLine then Exit;
-      bLastNoEol:= (NTo+1=NLastLine) and (St.LinesEnds[NLastLine]=cEndNone);
+      bLastNoEol:= (NTo+1=NLastLine) and (St.LinesEnds[NLastLine]=TATLineEnds.None);
 
       {
       S:= St.Lines[NTo+1];
@@ -270,7 +270,7 @@ begin
     //move lines up
     begin
       if NFrom<=0 then Exit;
-      bLastNoEol:= (NTo=NLastLine) and (St.LinesEnds[NTo]=cEndNone);
+      bLastNoEol:= (NTo=NLastLine) and (St.LinesEnds[NTo]=TATLineEnds.None);
 
       if bLastNoEol then
         St.LinesEnds[NTo]:= St.Endings;
@@ -295,7 +295,7 @@ begin
     St.EnabledBookmarksUpdate:= true;
   end;
 
-  Result:= [cResultText, cResultCaretTop];
+  Result:= [TATCommandResult.Text, TATCommandResult.CaretTop];
 end;
 
 function TATSynEdit.DoCommand_SelectWords: TATCommandResults;
@@ -321,7 +321,7 @@ begin
     end;
   end;
 
-  Result:= [cResultCaretAny];
+  Result:= [TATCommandResult.CaretAny];
 end;
 
 function TATSynEdit.DoCommand_SelectLines: TATCommandResults;
@@ -341,12 +341,12 @@ begin
     Item.PosX:= Length(Str);
   end;
 
-  Result:= [cResultCaretAny];
+  Result:= [TATCommandResult.CaretAny];
 end;
 
 function TATSynEdit.DoCommand_ColumnSelectWithoutKey(AValue: boolean): TATCommandResults;
 begin
   FOptMouseColumnSelectionWithoutKey:= AValue;
-  Result:= [cResultState];
+  Result:= [TATCommandResult.State];
 end;
 

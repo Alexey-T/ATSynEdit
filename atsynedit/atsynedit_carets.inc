@@ -392,6 +392,7 @@ var
   Item: TATWrapItem;
   ItemGap: TATGapItem;
   Str: atString;
+  StrLen: SizeInt;
   AllowVirtual, bGapGoesToEnd: boolean;
 begin
   Result.X:= 0;
@@ -447,9 +448,9 @@ begin
             ADetails.OnGapPos.X:= P.X - ARect.Left;
 
           case AGapCoordAction of
-            cGapCoordToLineEnd:
+            TATEditorGapCoordAction.ToLineEnd:
               bGapGoesToEnd:= true;
-            cGapCoordMoveDown:
+            TATEditorGapCoordAction.MoveDown:
               begin
                 if AWrapInfo.IsIndexValid(NIndex+1) then
                   Inc(NIndex);
@@ -507,16 +508,18 @@ begin
     Str:= StringOfCharW(ATEditorOptions.SampleChar, Min(NLineLenOriginal, cMaxFixedArray));
 
     ATabHelper.CalcCharOffsets(Item.NLineIndex, Str, CharOffsets, 0);
-    Str:= AStrings.LineSub(Item.NLineIndex, Item.NCharIndex, NLineLenTrimmed);
+    Str:= AStrings.LineSub(Item.NLineIndex, Item.NCharIndex, Min(NLineLenTrimmed, cMaxFixedArray));
+    StrLen:= AStrings.LineSubLen(Item.NLineIndex, Item.NCharIndex, NLineLenTrimmed);
   end
   else
   begin
     Str:= AStrings.LineSub(Item.NLineIndex, Item.NCharIndex, NLineLenTrimmed);
+    StrLen:= Length(Str);
     ATabHelper.CalcCharOffsets(Item.NLineIndex, Str, CharOffsets, 0);
   end;
 
   if bGapGoesToEnd then
-    Result.X:= Length(Str) + Item.NCharIndex-1
+    Result.X:= StrLen + Item.NCharIndex-1
   else
   begin
     AllowVirtual:= AVirtualPos and (Item.NFinal=cWrapItemFinal);
@@ -524,6 +527,7 @@ begin
     Result.X:= ATabHelper.FindClickedPosition(
       Result.Y,
       Str,
+      StrLen,
       CharOffsets,
       NPixels,
       AllowVirtual,
@@ -560,7 +564,7 @@ begin
     Inc(Result.Y, FTextOffsetFromTop1);
 
   {
-  if OptWrapMode<>cWrapOff then
+  if OptWrapMode<>TATEditorWrapMode.ModeOff then
     if Result.X>Width then
       raise Exception.Create('CaretPosToClientPos.X is too big in word-wrap mode, report to the author');
   }
@@ -568,7 +572,7 @@ end;
 
 function TATSynEdit.ClientPosToCaretPos(P: TATPoint;
   out ADetails: TATEditorPosDetails;
-  AGapCoordAction: TATEditorGapCoordAction = cGapCoordToLineEnd): TPoint;
+  AGapCoordAction: TATEditorGapCoordAction = TATEditorGapCoordAction.ToLineEnd): TPoint;
 begin
   Dec(P.Y, FTextOffsetFromTop1);
 
@@ -1283,7 +1287,7 @@ begin
   begin
     Caret:= Carets[iCaret];
     case ADirection of
-      cDirUp:
+      TATEditorDirection.Up:
         begin
           if (Caret.CoordY>=NRectBottom-2*FCharSize.Y-cPixelsIndent) then
           begin
@@ -1294,7 +1298,7 @@ begin
             Result:= true;
           end;
         end;
-      cDirDown:
+      TATEditorDirection.Down:
         begin
           if (Caret.CoordY<=NRectTop+cPixelsIndent) then
           begin
@@ -1305,7 +1309,7 @@ begin
             Result:= true;
           end;
         end;
-      cDirLeft:
+      TATEditorDirection.Left:
         begin
           if (Caret.CoordX>=NRectRight - 2*FCharSize.XScaled div ATEditorCharXScale - cPixelsIndent) then
           begin
@@ -1316,7 +1320,7 @@ begin
             Result:= true;
           end;
         end;
-      cDirRight:
+      TATEditorDirection.Right:
         begin
           if (Caret.CoordX<=NRectLeft+cPixelsIndent) then
           begin

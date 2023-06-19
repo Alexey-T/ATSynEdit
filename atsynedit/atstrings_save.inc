@@ -16,6 +16,7 @@ var
   SWide: UnicodeString;
   SQuad: UCS4String;
   NLast, i: integer;
+  bCancel: boolean;
 begin
   AStream.Size:= 0;
   AStream.Seek(0, soFromBeginning);
@@ -25,15 +26,15 @@ begin
   if AWithSignature then
   begin
     case FEncoding of
-      cEncUTF8:
+      TATFileEncoding.UTF8:
         Sign:= cSignUTF8;
-      cEncWideLE:
+      TATFileEncoding.UTF16LE:
         Sign:= cSignWideLE;
-      cEncWideBE:
+      TATFileEncoding.UTF16BE:
         Sign:= cSignWideBE;
-      cEnc32LE:
+      TATFileEncoding.UTF32LE:
         Sign:= cSign32LE;
-      cEnc32BE:
+      TATFileEncoding.UTF32BE:
         Sign:= cSign32BE;
       else
         Sign:= '';
@@ -51,32 +52,32 @@ begin
     SWide:= Item^.Line;
     if SWide<>'' then
     case AEncoding of
-      cEncAnsi:
+      TATFileEncoding.ANSI:
         begin
           SAnsi:= UTF8Encode(SWide);
           SAnsi:= EncConvertFromUTF8(SAnsi, FEncodingCodepage);
           AStream.WriteBuffer(SAnsi[1], Length(SAnsi));
         end;
 
-      cEncUTF8:
+      TATFileEncoding.UTF8:
         begin
           SAnsi:= UTF8Encode(SWide);
           AStream.WriteBuffer(SAnsi[1], Length(SAnsi));
         end;
 
-      cEncWideLE,
-      cEncWideBE:
+      TATFileEncoding.UTF16LE,
+      TATFileEncoding.UTF16BE:
         begin
-          if AEncoding=cEncWideBE then
+          if AEncoding=TATFileEncoding.UTF16BE then
             SSwapEndianWide(SWide);
           AStream.WriteBuffer(SWide[1], Length(SWide)*2);
         end;
 
-      cEnc32LE,
-      cEnc32BE:
+      TATFileEncoding.UTF32LE,
+      TATFileEncoding.UTF32BE:
         begin
           SQuad:= UnicodeStringToUCS4String(SWide);
-          if AEncoding=cEnc32BE then
+          if AEncoding=TATFileEncoding.UTF32BE then
             SSwapEndianUCS4(SQuad);
           AStream.WriteBuffer(SQuad[0], (Length(SQuad)-1)*4);
         end;
@@ -88,10 +89,10 @@ begin
     //write line-end as additional string
     ItemEnd:= Item^.LineEnds;
     //don't break file if ending of some non-last line is unset
-    if (ItemEnd=cEndNone) and (i<NLast) then
+    if (ItemEnd=TATLineEnds.None) and (i<NLast) then
       ItemEnd:= FEndings;
 
-    if ItemEnd<>cEndNone then
+    if ItemEnd<>TATLineEnds.None then
     begin
       SAnsi:= cLineEndMatrix[ItemEnd, AEncoding];
       AStream.WriteBuffer(SAnsi[1], Length(SAnsi));
@@ -99,28 +100,29 @@ begin
 
     if (i mod TATEditorOptions.ProgressSaveLines) = TATEditorOptions.ProgressSaveLines div 2 then
     begin
-      FProgressKind:= cStringsProgressSaving;
+      FProgressKind:= TATStringsProgressKind.Saving;
       FProgressValue:= Int64(i)*100 div Count;
+      bCancel:= false;
       if Assigned(FOnProgress) then
-        FOnProgress(Self);
+        FOnProgress(Self, bCancel);
     end;
   end;
 
   FProgressValue:= 0;
-  FProgressKind:= cStringsProgressNone;
+  FProgressKind:= TATStringsProgressKind.None;
 end;
 
 function TATStrings.IsSavingWithSignature: boolean;
 begin
   case FEncoding of
-    cEncAnsi:
+    TATFileEncoding.ANSI:
       Result:= false;
-    cEncUTF8:
+    TATFileEncoding.UTF8:
       Result:= FSaveSignUtf8;
-    cEncWideLE,
-    cEncWideBE,
-    cEnc32LE,
-    cEnc32BE:
+    TATFileEncoding.UTF16LE,
+    TATFileEncoding.UTF16BE,
+    TATFileEncoding.UTF32LE,
+    TATFileEncoding.UTF32BE:
       Result:= FSaveSignWide;
     else
       raise Exception.Create('Unknown encoding on saving');

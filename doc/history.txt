@@ -1,3 +1,16 @@
+2023.06.11
+* change: deleted event OnChangeCaretLine
+
+2023.05.25
+* change: enums changed to 'scoped', e.g. you must replace cEndNone -> TATLineEnds.None etc
+* change: rename TATEditorCommandInvoke -> TATCommandInvoke
+
+2023.05.19
++ add: TATComboEdit.OptComboboxShowX
+
+2023.05.01
++ add: ATEditorOptions.MaxLineLenForUndo
+
 2023.04.13
 * change: renamed OptMinimapTooltipLinesCount to OptMinimapTooltipHeight
 + add: OptMinimapTooltipFontSize (0: use main font size)

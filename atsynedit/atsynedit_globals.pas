@@ -6,6 +6,7 @@ unit ATSynEdit_Globals;
 
 {$mode objfpc}{$H+}
 {$ModeSwitch advancedrecords}
+{$ScopedEnums on}
 
 interface
 
@@ -18,9 +19,9 @@ uses
 
 type
   TATEditorUnptintedEolSymbol = (
-    aeueDot,
-    aeueArrowDown,
-    aeuePilcrow
+    Dot,
+    ArrowDown,
+    Pilcrow
     );
 
 type
@@ -32,7 +33,7 @@ type
     FClipboardColumnFormat: TClipboardFormat;
     FClipboardIndentFormat: TClipboardFormat;
   public const
-    ProgressLoadChars = 1024*1024;
+    ProgressLoadChars = 512*1024;
     ProgressSaveLines = 128*1024;
 
     //set it to number of editors, which share the same Strings object
@@ -378,7 +379,7 @@ initialization
     UnprintedSpaceDotScale:= 15;
     UnprintedEndDotScale:= 30;
     UnprintedEndFontScale:= 40;
-    UnprintedEndSymbol:= aeueArrowDown;
+    UnprintedEndSymbol:= TATEditorUnptintedEolSymbol.ArrowDown;
     UnprintedEndArrowLength:= 70;
     UnprintedPilcrowScale:= 80;
     UnprintedWrapArrowLength:= 40;

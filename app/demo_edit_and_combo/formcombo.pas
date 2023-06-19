@@ -36,7 +36,7 @@ type
     procedure edMaxLenChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
-    procedure ComboCommand(Sender: TObject; ACmd: integer; AInvoke: TATEditorCommandInvoke;
+    procedure ComboCommand(Sender: TObject; ACmd: integer; AInvoke: TATCommandInvoke;
       const AText: string; var AHandled: boolean);
     { private declarations }
   public
@@ -124,7 +124,7 @@ begin
 end;
 
 procedure TfmCombo.ComboCommand(Sender: TObject; ACmd: integer;
-  AInvoke: TATEditorCommandInvoke; const AText: string; var AHandled: boolean);
+  AInvoke: TATCommandInvoke; const AText: string; var AHandled: boolean);
 var
   s: string;
   n: integer;
