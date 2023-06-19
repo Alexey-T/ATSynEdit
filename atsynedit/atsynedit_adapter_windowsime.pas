@@ -25,8 +25,9 @@ type
     //attrbuf: array[0..255] of Byte;
     CompForm: TForm;
     procedure CompFormPaint(Sender: TObject);
-    procedure UpdateWindowPos(Sender: TObject);
+    procedure UpdateCandidatePos(Sender: TObject);
     procedure UpdateCompForm(Sender: TObject);
+    procedure HideCompForm;
   public
     procedure Stop(Sender: TObject; Success: boolean); override;
     procedure ImeRequest(Sender: TObject; var Msg: TMessage); override;
@@ -96,7 +97,7 @@ begin
   CompForm.Canvas.Line(cm.cx+1,0,cm.cx+1,cm.cy+2);
 end;
 
-procedure TATAdapterWindowsIME.UpdateWindowPos(Sender: TObject);
+procedure TATAdapterWindowsIME.UpdateCandidatePos(Sender: TObject);
 var
   Ed: TATSynEdit;
   Caret: TATCaretItem;
@@ -129,6 +130,7 @@ begin
 
       exrect:=CandiForm;
       ImmSetCandidateWindow(imc, @CandiForm);
+
       exrect.dwStyle:=CFS_EXCLUDE;
       exrect.rcArea:=Rect(exrect.ptCurrentPos.X,
                           exrect.ptCurrentPos.Y,
@@ -151,6 +153,7 @@ begin
   ed:=TATSynEdit(Sender);
   if not Assigned(CompForm) then begin
     CompForm:=TForm.Create(ed);
+    CompForm.OnPaint:=@CompFormPaint;
     CompForm.Parent:=ed;
     CompForm.BorderStyle:=bsNone;
     CompForm.FormStyle:=fsStayOnTop;
@@ -159,7 +162,6 @@ begin
     CompForm.Height:=16;
     CompForm.Width:=16;
     CompForm.Color:=clInfoBk;
-    CompForm.OnPaint:=@CompFormPaint;
   end;
   CompForm.Font:=ed.Font;
   if ed.Carets.Count>0 then begin
@@ -174,6 +176,12 @@ begin
 
   CompForm.Show;
   CompForm.Invalidate;
+end;
+
+procedure TATAdapterWindowsIME.HideCompForm;
+begin
+  if Assigned(CompForm) then
+    CompForm.Hide;
 end;
 
 procedure TATAdapterWindowsIME.ImeRequest(Sender: TObject; var Msg: TMessage);
@@ -218,7 +226,9 @@ begin
   case Msg.WParam of
     IMN_OPENCANDIDATE_CH,
     IMN_OPENCANDIDATE:
-      UpdateWindowPos(Sender);
+      UpdateCandidatePos(Sender);
+    IMN_SETCOMPOSITIONWINDOW:
+      UpdateCompForm(Sender);
   end;
   //writeln(Format('ImeNotify %d %d',[Msg.WParam,Msg.LParam]));
 end;
@@ -226,7 +236,8 @@ end;
 procedure TATAdapterWindowsIME.ImeStartComposition(Sender: TObject;
   var Msg: TMessage);
 begin
-  UpdateWindowPos(Sender);
+  position:=0;
+  UpdateCompForm(Sender); // initialize composition form
   FSelText:= TATSynEdit(Sender).TextSelected;
   Msg.Result:= -1;
 end;
@@ -265,7 +276,7 @@ begin
                                    bOverwrite,
                                    False);
               FSelText:='';
-              CompForm.Hide;
+              HideCompForm;
             end;
             { insert composition string }
             if imeCode and GCS_COMPSTR<>0 then begin
@@ -273,13 +284,14 @@ begin
               if len>0 then
                 len := len shr 1
                 else
-                  CompForm.Hide;
+                  HideCompForm;
               buffer[len]:=#0;
               { Position change when pressing left right move on candidate composition window.
                 It need to virtual caret for this. The best idea is add composition modaless form for IME. }
               if imeCode and GCS_CURSORPOS<>0 then begin
                 position:=ImmGetCompositionStringW(IMC, GCS_CURSORPOS, nil, 0);
-                ImmNotifyIME(IMC,NI_OPENCANDIDATE,0,0);
+                //ImmNotifyIME(IMC,NI_OPENCANDIDATE,0,0);
+                UpdateCandidatePos(Sender);
               end;
               //Writeln(Format('len %d, attrsize %d, position %d',[len,attrsize,position]));
               // for japanese, not used
@@ -325,7 +337,7 @@ begin
   position:=0;
   Len:= Length(FSelText);
   Ed.TextInsertAtCarets(FSelText, False, False, Len>0);
-  CompForm.Hide;
+  HideCompForm;
   { tweak for emoji window, but don't work currently
     it shows emoji window on previous position.
     but not work good with chinese IME. }
