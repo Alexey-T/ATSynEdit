@@ -25,7 +25,7 @@ type
     //attrbuf: array[0..255] of Byte;
     CompForm: TForm;
     procedure CompFormPaint(Sender: TObject);
-    procedure UpdateWindowPos(Sender: TObject);
+    procedure UpdateCandidatePos(Sender: TObject);
     procedure UpdateCompForm(Sender: TObject);
   public
     procedure Stop(Sender: TObject; Success: boolean); override;
@@ -70,6 +70,8 @@ begin
       ImmNotifyIME(imc, NI_COMPOSITIONSTR, CPS_CANCEL, 0);
     ImmReleaseContext(Ed.Handle, imc);
   end;
+  if Assigned(CompForm) then
+    CompForm.Hide;
 end;
 
 procedure TATAdapterWindowsIME.CompFormPaint(Sender: TObject);
@@ -96,7 +98,7 @@ begin
   CompForm.Canvas.Line(cm.cx+1,0,cm.cx+1,cm.cy+2);
 end;
 
-procedure TATAdapterWindowsIME.UpdateWindowPos(Sender: TObject);
+procedure TATAdapterWindowsIME.UpdateCandidatePos(Sender: TObject);
 var
   Ed: TATSynEdit;
   Caret: TATCaretItem;
@@ -219,7 +221,7 @@ begin
   case Msg.WParam of
     IMN_OPENCANDIDATE_CH,
     IMN_OPENCANDIDATE:
-      UpdateWindowPos(Sender);
+      UpdateCandidatePos(Sender);
     IMN_SETCOMPOSITIONWINDOW:
       UpdateCompForm(Sender);
   end;
@@ -229,7 +231,8 @@ end;
 procedure TATAdapterWindowsIME.ImeStartComposition(Sender: TObject;
   var Msg: TMessage);
 begin
-  UpdateWindowPos(Sender);
+  position:=0;
+  UpdateCandidatePos(Sender);
   FSelText:= TATSynEdit(Sender).TextSelected;
   Msg.Result:= -1;
 end;
@@ -281,9 +284,9 @@ begin
               { Position change when pressing left right move on candidate composition window.
                 It need to virtual caret for this. The best idea is add composition modaless form for IME. }
               if imeCode and GCS_CURSORPOS<>0 then begin
-                position:=ImmGetCompositionStringW(IMC, GCS_CURSORPOS, nil, 0);
+                position:=ImmGetCompositionStringA(IMC, GCS_CURSORPOS, nil, 0);
                 //ImmNotifyIME(IMC,NI_OPENCANDIDATE,0,0);
-                UpdateWindowPos(Sender);
+                UpdateCandidatePos(Sender);
               end;
               //Writeln(Format('len %d, attrsize %d, position %d',[len,attrsize,position]));
               // for japanese, not used
