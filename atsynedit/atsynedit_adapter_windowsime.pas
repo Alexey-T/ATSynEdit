@@ -27,6 +27,7 @@ type
     procedure CompFormPaint(Sender: TObject);
     procedure UpdateCandidatePos(Sender: TObject);
     procedure UpdateCompForm(Sender: TObject);
+    procedure HideCompForm;
   public
     procedure Stop(Sender: TObject; Success: boolean); override;
     procedure ImeRequest(Sender: TObject; var Msg: TMessage); override;
@@ -70,8 +71,6 @@ begin
       ImmNotifyIME(imc, NI_COMPOSITIONSTR, CPS_CANCEL, 0);
     ImmReleaseContext(Ed.Handle, imc);
   end;
-  if Assigned(CompForm) then
-    CompForm.Hide;
 end;
 
 procedure TATAdapterWindowsIME.CompFormPaint(Sender: TObject);
@@ -179,6 +178,12 @@ begin
   CompForm.Invalidate;
 end;
 
+procedure TATAdapterWindowsIME.HideCompForm;
+begin
+  if Assigned(CompForm) then
+    CompForm.Hide;
+end;
+
 procedure TATAdapterWindowsIME.ImeRequest(Sender: TObject; var Msg: TMessage);
 var
   Ed: TATSynEdit;
@@ -232,7 +237,7 @@ procedure TATAdapterWindowsIME.ImeStartComposition(Sender: TObject;
   var Msg: TMessage);
 begin
   position:=0;
-  UpdateCandidatePos(Sender);
+  UpdateCompForm(Sender); // initialize composition form
   FSelText:= TATSynEdit(Sender).TextSelected;
   Msg.Result:= -1;
 end;
@@ -271,7 +276,7 @@ begin
                                    bOverwrite,
                                    False);
               FSelText:='';
-              CompForm.Hide;
+              HideCompForm;
             end;
             { insert composition string }
             if imeCode and GCS_COMPSTR<>0 then begin
@@ -279,12 +284,12 @@ begin
               if len>0 then
                 len := len shr 1
                 else
-                  CompForm.Hide;
+                  HideCompForm;
               buffer[len]:=#0;
               { Position change when pressing left right move on candidate composition window.
                 It need to virtual caret for this. The best idea is add composition modaless form for IME. }
               if imeCode and GCS_CURSORPOS<>0 then begin
-                position:=ImmGetCompositionStringA(IMC, GCS_CURSORPOS, nil, 0);
+                position:=ImmGetCompositionStringW(IMC, GCS_CURSORPOS, nil, 0);
                 //ImmNotifyIME(IMC,NI_OPENCANDIDATE,0,0);
                 UpdateCandidatePos(Sender);
               end;
@@ -332,7 +337,7 @@ begin
   position:=0;
   Len:= Length(FSelText);
   Ed.TextInsertAtCarets(FSelText, False, False, Len>0);
-  CompForm.Hide;
+  HideCompForm;
   { tweak for emoji window, but don't work currently
     it shows emoji window on previous position.
     but not work good with chinese IME. }
