@@ -341,7 +341,6 @@ begin
   { Emoji tweak }
   if FQueryCharPos then begin
     FQueryCharPos:=False;
-    Ed:=TATSynEdit(Sender);
     if Ed.Focused then begin
       SetFocus(0);
       SetFocus(Ed.Handle);
