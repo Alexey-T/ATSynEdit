@@ -6394,7 +6394,7 @@ begin
           FOptScrollIndentCaretVert,
           true,
           false,
-          true
+          false //False is to fix CudaText issue #5139
           );
         DoSelect_None;
       end;
