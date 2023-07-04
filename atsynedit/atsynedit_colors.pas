@@ -103,7 +103,6 @@ type
     property UnprintedBG: TColor read FUnprintedBG write FUnprintedBG;
     property UnprintedHexFont: TColor read FUnprintedHexFont write FUnprintedHexFont;
     property MinimapBorder: TColor read FMinimapBorder write FMinimapBorder;
-    property MinimapSelBG: TColor read FMinimapSelBG write FMinimapSelBG;
     property MinimapTooltipBG: TColor read FMinimapTooltipBG write FMinimapTooltipBG;
     property MinimapTooltipBorder: TColor read FMinimapTooltipBorder write FMinimapTooltipBorder;
     property StateChanged: TColor read FStateChanged write FStateChanged;
@@ -165,7 +164,6 @@ begin
   C.UnprintedBG:= $e0e0e0;
   C.UnprintedHexFont:= clMedGray;
   C.MinimapBorder:= clLtGray;
-  C.MinimapSelBG:= $eeeeee;
   C.MinimapTooltipBG:= clMoneyGreen;
   C.MinimapTooltipBorder:= clGray;
   C.StateChanged:= $00f0f0;
