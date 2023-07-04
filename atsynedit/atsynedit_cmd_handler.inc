@@ -287,6 +287,15 @@ begin
 
 
     NProximityVert:= GetActualProximityVert;
+
+    //if user clicked near the edge (distance_from_edge<proximity), decrease the proximity
+    if (FCaretDistanceFromTop>=0) and
+      (FCaretDistanceFromTop<NProximityVert) then
+      NProximityVert:= FCaretDistanceFromTop;
+    if (FCaretDistanceFromBottom>=0) and
+      (FCaretDistanceFromBottom<NProximityVert) then
+      NProximityVert:= FCaretDistanceFromBottom;
+
     if (NProximityVert>0)
       and (ACmd<>cCommand_SelectAll) //don't apply Proximity if 'select all' is called
       and (
