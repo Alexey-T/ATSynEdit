@@ -1370,13 +1370,16 @@ begin
   Result:= Carets.IsAnyCaretInVisibleRect(FRectMain);
 end;
 
-function TATSynEdit.IsCaretFarFromVertEdge(ACommand: integer): boolean;
+procedure TATSynEdit.CalcCaretDistanceFromEdges(ACommand: integer;
+  out ALinesFromTop, ALinesFromBottom: integer);
 var
   NProximity, NPixels1, NPixels2: integer;
   Caret: TATCaretItem;
   bAllowMultiCarets, bMoveDown: boolean;
 begin
-  Result:= false;
+  ALinesFromTop:= -1;
+  ALinesFromBottom:= -1;
+
   NProximity:= GetActualProximityVert;
   if NProximity=0 then exit;
 
@@ -1397,11 +1400,8 @@ begin
 
   if Caret.CoordY=-1 then exit;
 
-  NPixels1:= NProximity*FCharSize.Y;
-  NPixels2:= (NProximity+1)*FCharSize.Y;
-  Result:=
-    (Abs(Caret.CoordY-FRectMain.Top)>=NPixels1) and
-    (Abs(Caret.CoordY-FRectMain.Bottom)>=NPixels2);
+  ALinesFromTop:= Abs(Caret.CoordY-FRectMain.Top) div FCharSize.Y;
+  ALinesFromBottom:= Abs(Caret.CoordY-FRectMain.Bottom) div FCharSize.Y - 1;
 end;
 
 { TATCaretShape }

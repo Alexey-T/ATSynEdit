@@ -248,7 +248,6 @@ type
     CaretRight,       //Caret(s) pos/selection was changed. Scroll to the most right caret.
     CaretBottom,      //Caret(s) pos/selection was changed. Scroll to the last caret.
     CaretLazy,  //Additional to CaretLeft/CaretRight/CaretTop/CaretBottom, scrolls only if no carets are left in visible area.
-    CaretFarFromEdge, //Before running the command, caret was far from both vertical edges
     KeepColumnSel,    //Restore previous column selection, if command changed it.
     Scroll,           //Some scrolling was made.
     UndoRedo,         //Undo or Redo action was made.
@@ -602,6 +601,8 @@ type
     FCaretStopUnfocused: boolean;
     FCaretHideUnfocused: boolean;
     FCaretAllowNextBlink: boolean;
+    FCaretDistanceFromTop: integer;
+    FCaretDistanceFromBottom: integer;
     FIsEntered: boolean;
     FIsIniting: boolean;
     FMarkers: TATMarkers;
@@ -1051,7 +1052,8 @@ type
     function GetGutterDecor: TATGutterDecor;
     procedure InitFoldbarCache(ACacheStartIndex: integer);
     procedure InitLengthArray(out Lens: TATIntArray);
-    function IsCaretFarFromVertEdge(ACommand: integer): boolean;
+    procedure CalcCaretDistanceFromEdges(ACommand: integer;
+      out ALinesFromTop, ALinesFromBottom: integer);
     function IsNormalLexerActive: boolean;
     procedure MenuitemClipboardRecentsClick(Sender: TObject);
     procedure SetEditorIndex(AValue: integer);
