@@ -49,7 +49,6 @@ type
     FUnprintedBG,
     FUnprintedHexFont,
     FMinimapBorder,
-    FMinimapSelBG,
     FMinimapTooltipBG,
     FMinimapTooltipBorder,
     FStateChanged,
