@@ -4460,6 +4460,7 @@ var
   C: TBGRABitmap;
   R: TRect;
   rColor: TBGRAPixel;
+  nAlphaValue: integer;
 begin
   C:= FMinimapBmp;
   if FMinimapShowSelAlways or FCursorOnMinimap then
@@ -4468,10 +4469,11 @@ begin
     OffsetRect(R, -FRectMinimap.Left, -FRectMinimap.Top);
 
     // https://forum.lazarus.freepascal.org/index.php/topic,51383.msg377195.html#msg377195
+    nAlphaValue:= FMinimapSelColorChange*255 div 100;
     if _IsColorDark(FColorBG) then
-      rColor.FromRGB(255, 255, 255, FMinimapSelColorChange*255 div 100)
+      rColor.FromRGB(255, 255, 255, nAlphaValue)
     else
-      rColor.FromRGB(0, 0, 0, FMinimapSelColorChange*255 div 100);
+      rColor.FromRGB(0, 0, 0, nAlphaValue);
 
     C.FillRect(R, rColor, dmDrawWithTransparency);
 
