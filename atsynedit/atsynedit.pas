@@ -5464,6 +5464,11 @@ begin
 
     while St.Count>1 do
       St.LineDelete(St.Count-1, false, false, false);
+  end
+  else
+  begin
+    OptScrollStyleHorz:= TATEditorScrollbarStyle.Auto;
+    OptScrollStyleVert:= TATEditorScrollbarStyle.Show;
   end;
 end;
 
