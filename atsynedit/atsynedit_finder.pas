@@ -11,6 +11,7 @@ interface
 
 uses
   SysUtils, Classes, Graphics,
+  LCLType,
   Dialogs, Forms, Math, Character,
   ATSynEdit,
   ATSynEdit_FGL,
@@ -169,6 +170,7 @@ type
     //FReplacedAtEndOfText: boolean;
     FIsSearchWrapped: boolean;
     //
+    function ConfirmWrappedSearch: boolean;
     function IsSelStartsAtMatch: boolean;
     procedure UpdateCarets(ASimpleAction: boolean);
     procedure SetVirtualCaretsAsString(const AValue: string);
@@ -267,6 +269,13 @@ type
 
 function IsFinderWholeWordRange(const S: UnicodeString; APos1, APos2: integer): boolean; inline;
 
+const
+  MsgConfirmWrappedFwd: string = 'The document end has been reached by forward search.';
+  MsgConfirmWrappedBack: string = 'The document beginning has been reached by backward search.';
+  MsgConfirmWrapped2: string = 'Continue search from the opposite edge?';
+
+var
+  MsgBox_InFinder: function(const AText: string; AFlags: Longint): integer;
 
 implementation
 
@@ -937,6 +946,20 @@ begin
   inherited;
 end;
 
+function TATEditorFinder.ConfirmWrappedSearch: boolean;
+var
+  Str: string;
+begin
+  if not Assigned(MsgBox_InFinder) then
+    exit(false);
+  if OptBack then
+    Str:= MsgConfirmWrappedBack
+  else
+    Str:= MsgConfirmWrappedFwd;
+  Str+= ' '+MsgConfirmWrapped2;
+  Result:= MsgBox_InFinder(Str, MB_OKCANCEL) = ID_OK;
+end;
+
 function TATEditorFinder.DoAction_FindSimple(const APosStart: TPoint): boolean;
 var
   Cnt: integer;
@@ -1548,7 +1571,7 @@ begin
   else
     bStartAtEdge:= (PosStart.X=NLastX) and (PosStart.Y=NLastY);
 
-  if not Result and OptWrapped and not OptInSelection and not bStartAtEdge then
+  if not Result and (OptWrapped or ConfirmWrappedSearch) and not OptInSelection and not bStartAtEdge then
   begin
     FIsSearchWrapped:= true;
 
@@ -1673,7 +1696,7 @@ begin
   else
     bStartAtEdge:= NStartPos>=Length(StrText);
 
-  if not Result and OptWrapped and not OptInSelection
+  if not Result and (OptWrapped or ConfirmWrappedSearch) and not OptInSelection
     and not bStartAtEdge then
     begin
       FIsSearchWrapped:= true;
