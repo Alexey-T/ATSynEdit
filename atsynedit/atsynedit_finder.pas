@@ -271,9 +271,8 @@ type
 function IsFinderWholeWordRange(const S: UnicodeString; APos1, APos2: integer): boolean; inline;
 
 const
-  MsgConfirmWrappedFwd: string = 'The document end has been reached by forward search.';
-  MsgConfirmWrappedBack: string = 'The document beginning has been reached by backward search.';
-  MsgConfirmWrapped2: string = 'Continue search from the opposite edge?';
+  msgConfirmWrappedFwd: string = 'The document end has been reached by forward search. Continue from the beginning?';
+  msgConfirmWrappedBack: string = 'The document beginning has been reached by backward search. Continue from the end?';
 
 var
   MsgBox_InFinder: function(const AText: string; AFlags: Longint): integer;
@@ -956,10 +955,9 @@ begin
   if not Assigned(MsgBox_InFinder) then
     exit(false);
   if OptBack then
-    Str:= MsgConfirmWrappedBack
+    Str:= msgConfirmWrappedBack
   else
-    Str:= MsgConfirmWrappedFwd;
-  Str+= ' '+MsgConfirmWrapped2;
+    Str:= msgConfirmWrappedFwd;
   Result:= MsgBox_InFinder(Str, MB_OKCANCEL) = ID_OK;
 end;
 
