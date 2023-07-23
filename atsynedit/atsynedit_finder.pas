@@ -271,8 +271,8 @@ type
 function IsFinderWholeWordRange(const S: UnicodeString; APos1, APos2: integer): boolean; inline;
 
 const
-  msgConfirmWrappedFwd: string = 'The document end has been reached by forward search. Continue from the beginning?';
-  msgConfirmWrappedBack: string = 'The document beginning has been reached by backward search. Continue from the end?';
+  msgConfirmWrappedFwd: string = 'The document end has been reached by forward search. Continue from the opposite edge?';
+  msgConfirmWrappedBack: string = 'The document beginning has been reached by backward search. Continue from the opposite edge?';
 
 var
   MsgBox_InFinder: function(const AText: string; AFlags: Longint): integer;
