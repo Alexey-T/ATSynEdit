@@ -111,6 +111,7 @@ type
     OptRegex: boolean;
     OptRegexSubst: boolean;
     OptWrapped: boolean;
+    OptWrappedConfirm: boolean;
     OptTokens: TATFinderTokensAllowed;
     StrText: UnicodeString;
     property StrFind: UnicodeString read FStrFind write SetStrFind;
@@ -950,6 +951,8 @@ function TATEditorFinder.ConfirmWrappedSearch: boolean;
 var
   Str: string;
 begin
+  if not OptWrappedConfirm then
+    exit(false);
   if not Assigned(MsgBox_InFinder) then
     exit(false);
   if OptBack then
@@ -1901,6 +1904,8 @@ begin
   OptWords:= false;
   OptRegex:= false;
   OptRegexSubst:= true;
+  OptWrapped:= false;
+  OptWrappedConfirm:= true;
   OptTokens:= cTokensAll;
   ClearMatchPos;
 
@@ -2411,6 +2416,7 @@ begin
   OptCase:= false;
   OptRegex:= false;
   OptWrapped:= false;
+  OptWrappedConfirm:= true;
   OptTokens:= cTokensAll;
 
   OptFromCaret:= false;
