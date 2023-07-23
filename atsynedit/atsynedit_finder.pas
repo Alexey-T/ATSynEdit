@@ -149,6 +149,7 @@ type
     FBuffer: TATStringBuffer;
     FSkipLen: integer;
     FOnFound: TATFinderFound;
+    FOnWrapAtEdge: TNotifyEvent;
     FOnConfirmReplace: TATFinderConfirmReplace;
     FFragments: TATEditorFragments;
     FFragmentIndex: integer;
@@ -264,6 +265,7 @@ type
       AStyleBorder: TATLineStyle; ATagValue, AMaxLines: integer): integer;
     //
     property OnFound: TATFinderFound read FOnFound write FOnFound;
+    property OnWrapAtEdge: TNotifyEvent read FOnWrapAtEdge write FOnWrapAtEdge;
     property OnConfirmReplace: TATFinderConfirmReplace read FOnConfirmReplace write FOnConfirmReplace;
  end;
 
@@ -1575,6 +1577,9 @@ begin
   if not Result and (OptWrapped or ConfirmWrappedSearch) and not OptInSelection and not bStartAtEdge then
   begin
     FIsSearchWrapped:= true;
+    if OptWrapped then
+      if Assigned(FOnWrapAtEdge) then
+        FOnWrapAtEdge(Self);
 
     if not OptBack then
     begin
@@ -1701,6 +1706,9 @@ begin
     and not bStartAtEdge then
     begin
       FIsSearchWrapped:= true;
+      if OptWrapped then
+        if Assigned(FOnWrapAtEdge) then
+          FOnWrapAtEdge(Self);
 
       //we must have AReplace=false
       //(if not, need more actions: don't allow to replace in wrapped part if too big pos)
