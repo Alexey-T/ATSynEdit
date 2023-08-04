@@ -23,10 +23,11 @@ type
     Hint: string[95];
     X: integer; //start column
     Y: integer; //start line
-    Y2: integer; //end line which is fully folded (can't partially fold)
+    X2: integer; //ending column
+    Y2: integer; //ending line, which is fully folded (can't partially fold)
     Folded: boolean;
     Staple: boolean;
-    procedure Init(AX, AY, AY2: integer; AStaple: boolean; const AHint: string; const ATag: Int64);
+    procedure Init(AX, AY, AX2, AY2: integer; AStaple: boolean; const AHint: string; const ATag: Int64);
     function IsSimple: boolean;
     function IsLineInside(ALine: integer): boolean;
     function MessageText: string;
@@ -62,12 +63,12 @@ type
     function CountOfLineIndexer: integer;
     function IsIndexValid(N: integer): boolean; inline;
     function IsRangesTouch(N1, N2: integer): boolean;
-    function Add(AX, AY, AY2: integer; AWithStaple: boolean; const AHint: string;
+    function Add(AX, AY, AX2, AY2: integer; AWithStaple: boolean; const AHint: string;
       const ATag: Int64=0): TATSynRange;
-    function AddSorted(AX, AY, AY2: integer; AWithStaple: boolean;
+    function AddSorted(AX, AY, AX2, AY2: integer; AWithStaple: boolean;
       const AHint: string; const ATag: Int64;
       out AItemIndex: integer): TATSynRange;
-    function Insert(AIndex: integer; AX, AY, AY2: integer; AWithStaple: boolean;
+    function Insert(AIndex: integer; AX, AY, AX2, AY2: integer; AWithStaple: boolean;
       const AHint: string; const ATag: Int64=0): TATSynRange;
     procedure Clear;
     procedure ClearLineIndexer(ALineCount: integer; ASetLenOnly: boolean=false);
@@ -122,16 +123,21 @@ end;
 
 { TATSynRange }
 
-procedure TATSynRange.Init(AX, AY, AY2: integer; AStaple: boolean;
+procedure TATSynRange.Init(AX, AY, AX2, AY2: integer; AStaple: boolean;
   const AHint: string; const ATag: Int64);
 begin
-  if (AX<=0) then raise Exception.Create('Incorrect range with x<=0: '+MessageText);
-  if (AY<0) then raise Exception.Create('Incorrect range with y<0: '+MessageText);
-  //if (AY>AY2) then raise Exception.Create('Incorrect range with y>y2: '+MessageText);
-  if (AY>AY2) then AY2:= AY; //hide this error, it happens in Rexx lexer
+  if (AX<=0) then
+    raise Exception.Create('Incorrect range with x<=0: '+MessageText);
+  if (AY<0) then
+    raise Exception.Create('Incorrect range with y<0: '+MessageText);
+  //if (AY>AY2) then
+  //  raise Exception.Create('Incorrect range with y>y2: '+MessageText);
+  if (AY>AY2) then
+    AY2:= AY; //hide this error, it happens in Rexx lexer
 
   X:= AX;
   Y:= AY;
+  X2:= AX2;
   Y2:= AY2;
   Staple:= AStaple;
   Hint:= AHint;
@@ -229,13 +235,13 @@ begin
   FHasStaples:= false;
 end;
 
-function TATSynRanges.Add(AX, AY, AY2: integer; AWithStaple: boolean;
+function TATSynRanges.Add(AX, AY, AX2, AY2: integer; AWithStaple: boolean;
   const AHint: string;
   const ATag: Int64=0): TATSynRange;
 var
   NIndex: integer;
 begin
-  Result.Init(AX, AY, AY2, AWithStaple, AHint, ATag);
+  Result.Init(AX, AY, AX2, AY2, AWithStaple, AHint, ATag);
   NIndex:= FList.Add(Result);
 
   if ATag=cTagPersistentFoldRange then
@@ -246,7 +252,7 @@ begin
   AddToLineIndexer(AY, AY2, NIndex);
 end;
 
-function TATSynRanges.AddSorted(AX, AY, AY2: integer; AWithStaple: boolean;
+function TATSynRanges.AddSorted(AX, AY, AX2, AY2: integer; AWithStaple: boolean;
   const AHint: string;
   const ATag: Int64;
   out AItemIndex: integer): TATSynRange;
@@ -255,7 +261,7 @@ var
   i: integer;
 begin
   AItemIndex:= -1;
-  Result.Init(AX, AY, AY2, AWithStaple, AHint, ATag);
+  Result.Init(AX, AY, AX2, AY2, AWithStaple, AHint, ATag);
 
   for i:= 0 to Count-1 do
   begin
@@ -307,12 +313,12 @@ begin
         Inc(FLineIndexer[i][j]);
 end;
 
-function TATSynRanges.Insert(AIndex: integer; AX, AY, AY2: integer;
+function TATSynRanges.Insert(AIndex: integer; AX, AY, AX2, AY2: integer;
   AWithStaple: boolean;
   const AHint: string;
   const ATag: Int64=0): TATSynRange;
 begin
-  Result.Init(AX, AY, AY2, AWithStaple, AHint, ATag);
+  Result.Init(AX, AY, AX2, AY2, AWithStaple, AHint, ATag);
   FList.Insert(AIndex, Result);
 
   if ATag=cTagPersistentFoldRange then
@@ -392,6 +398,7 @@ begin
     AddSorted(
       ItemFrom^.X,
       ItemFrom^.Y,
+      ItemFrom^.X2,
       ItemFrom^.Y2,
       ItemFrom^.Staple,
       ItemFrom^.Hint,

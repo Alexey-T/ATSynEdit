@@ -236,7 +236,7 @@ begin
   //range 'for selection' is added unsorted
   if Fold.FindRangeWithPlusAtLine_ViaIndexer(Y1)>=0 then exit;
 
-  Fold.AddSorted(1, Y1, Y2, false, '', cTagPersistentFoldRange, NRangeIndex);
+  Fold.AddSorted(1, Y1, 1, Y2, false, '', cTagPersistentFoldRange, NRangeIndex);
   DoRangeFold(NRangeIndex);
 
   Result:= [TATCommandResult.CaretAny, TATCommandResult.FoldChange];
