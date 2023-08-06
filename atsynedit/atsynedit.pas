@@ -386,85 +386,6 @@ type
     procedure Execute; override;
   end;
 
-const
-  cInitTextOffsetLeft = 0;
-  cInitTextOffsetTop = 2;
-  cInitAutoPairForMultiCarets = true;
-  cInitInputNumberAllowNegative = true;
-  cInitMaskChar = '*';
-  cInitScrollAnimationSteps = 4;
-  cInitScrollAnimationSleep = 0;
-  cInitUndoLimit = 5000;
-  cInitUndoMaxCarets = 20000;
-  cInitUndoIndentVert = 15;
-  cInitUndoIndentHorz = 20;
-  cInitUndoPause = 300;
-  cInitUndoPause2 = 1000;
-  cInitUndoPauseHighlightLine = true;
-  cInitUndoForCaretJump = true;
-  cInitMicromapShowForMinCount = 2;
-  cInitScrollbarHorzAddSpace = 2;
-  cInitIdleInterval = 0; //1000; //0 dont fire OnIdle, faster
-  cInitCaretsPrimitiveColumnSelection = true;
-  cInitCaretsMultiToColumnSel = true;
-  cInitBorderVisible = true;
-  cInitBorderWidth = 1;
-  cInitBorderWidthFocused = 1;
-  cInitBorderWidthMacro = 3;
-  cInitRulerNumeration = TATEditorRulerNumeration.Num_0_10_20;
-  cInitRulerHeightPercents = 100;
-  cInitRulerFontSizePercents = 80;
-  cInitRulerMarkCaret = 1;
-  cInitRulerMarkSmall = 3;
-  cInitRulerMarkBig = 7;
-  cInitWrapMode = TATEditorWrapMode.ModeOff;
-  cInitWrapEnabledForMaxLines = 60*1000;
-  cInitSpacingY = 1;
-  cInitCaretBlinkTime = 600;
-  cInitMinimapVisible = false;
-  cInitMinimapSelColorChange = 6; //how much minimap sel-rect is darker, in %
-  cInitMinimapTooltipVisible = true;
-  cInitMinimapTooltipHeight = 6;
-  cInitMinimapTooltipWidthPercents = 60;
-  cInitMicromapVisible = false;
-  cInitMicromapOnScrollbar = false;
-  cInitMicromapBookmarks = false;
-  cInitShowMouseSelFrame = true;
-  cInitMarginRight = 80;
-  cInitTabSize = 8;
-  cInitNumbersStyle = TATEditorNumbersStyle.Each5th;
-  cInitNumbersIndentPercents = 60;
-  cInitBitmapWidth = 1000;
-  cInitBitmapHeight = 800;
-  cInitGutterPlusSize = 4;
-  cInitMarkerSize = 30;
-  cInitFoldStyle = TATEditorFoldStyle.HereWithTruncatedText;
-  cInitFoldUnderlineOffset = 3;
-  cInitFoldTooltipVisible = true;
-  cInitFoldTooltipLineCount = 15;
-  cInitFoldTooltipWidthPercents = 80;
-  cInitMinLineLenToCalcURL = 4;
-  cInitMaxLineLenToCalcURL = 1200; //AliExpress has URLs of len 520
-  cInitDragDropMarkerWidth = 4;
-  cInitStapleHiliteAlpha = 180;
-  cInitZebraAlphaBlend = 235;
-  cInitDimUnfocusedBack = 0;
-  cInitShowFoldedMarkWithSelectionBG = true;
-
-const
-  cUrlRegex_Email = '\b(mailto:)?\w[\w\-\+\.]*@\w[\w\-\.]*\.\w{2,}\b';
-  cUrlRegex_WebBegin = 'https?://|ftp://|magnet:\?|www\.|ftp\.';
-  cUrlRegex_WebSite = '\w[\w\-\.@]*(:\d+)?'; // @ for password; :\d+ is port
-  cUrlRegex_WebAnchor = '(\#[\w\-%]*)?';
-  cUrlRegex_WebParams = '(\?[^<>''"\s]+)?';
-  cUrlRegex_Web =
-    '\b(' + cUrlRegex_WebBegin + ')'
-    + cUrlRegex_WebSite
-    + '(/[~\w\.\-\+\/%@!%\#]*)?' //folders
-    + cUrlRegex_WebParams
-    + cUrlRegex_WebAnchor;
-  cUrlRegexInitial = cUrlRegex_Email + '|' + cUrlRegex_Web;
-
 var
   cRectEmpty: TRect = (Left: 0; Top: 0; Right: 0; Bottom: 0);
 
@@ -531,6 +452,84 @@ type
   { TATSynEdit }
 
   TATSynEdit = class(TCustomControl)
+  public const
+    cInitTextOffsetLeft = 0;
+    cInitTextOffsetTop = 2;
+    cInitAutoPairForMultiCarets = true;
+    cInitInputNumberAllowNegative = true;
+    cInitMaskChar = '*';
+    cInitScrollAnimationSteps = 4;
+    cInitScrollAnimationSleep = 0;
+    cInitUndoLimit = 5000;
+    cInitUndoMaxCarets = 20000;
+    cInitUndoIndentVert = 15;
+    cInitUndoIndentHorz = 20;
+    cInitUndoPause = 300;
+    cInitUndoPause2 = 1000;
+    cInitUndoPauseHighlightLine = true;
+    cInitUndoForCaretJump = true;
+    cInitMicromapShowForMinCount = 2;
+    cInitScrollbarHorzAddSpace = 2;
+    cInitIdleInterval = 0; //1000; //0 dont fire OnIdle, faster
+    cInitCaretsPrimitiveColumnSelection = true;
+    cInitCaretsMultiToColumnSel = true;
+    cInitBorderVisible = true;
+    cInitBorderWidth = 1;
+    cInitBorderWidthFocused = 1;
+    cInitBorderWidthMacro = 3;
+    cInitRulerNumeration = TATEditorRulerNumeration.Num_0_10_20;
+    cInitRulerHeightPercents = 100;
+    cInitRulerFontSizePercents = 80;
+    cInitRulerMarkCaret = 1;
+    cInitRulerMarkSmall = 3;
+    cInitRulerMarkBig = 7;
+    cInitWrapMode = TATEditorWrapMode.ModeOff;
+    cInitWrapEnabledForMaxLines = 60*1000;
+    cInitSpacingY = 1;
+    cInitCaretBlinkTime = 600;
+    cInitMinimapVisible = false;
+    cInitMinimapSelColorChange = 6; //how much minimap sel-rect is darker, in %
+    cInitMinimapTooltipVisible = true;
+    cInitMinimapTooltipHeight = 6;
+    cInitMinimapTooltipWidthPercents = 60;
+    cInitMicromapVisible = false;
+    cInitMicromapOnScrollbar = false;
+    cInitMicromapBookmarks = false;
+    cInitShowMouseSelFrame = true;
+    cInitMarginRight = 80;
+    cInitTabSize = 8;
+    cInitNumbersStyle = TATEditorNumbersStyle.Each5th;
+    cInitNumbersIndentPercents = 60;
+    cInitBitmapWidth = 1000;
+    cInitBitmapHeight = 800;
+    cInitGutterPlusSize = 4;
+    cInitMarkerSize = 30;
+    cInitFoldStyle = TATEditorFoldStyle.HereWithTruncatedText;
+    cInitFoldUnderlineOffset = 3;
+    cInitFoldTooltipVisible = true;
+    cInitFoldTooltipLineCount = 15;
+    cInitFoldTooltipWidthPercents = 80;
+    cInitMinLineLenToCalcURL = 4;
+    cInitMaxLineLenToCalcURL = 1200; //AliExpress has URLs of len 520
+    cInitDragDropMarkerWidth = 4;
+    cInitStapleHiliteAlpha = 180;
+    cInitZebraAlphaBlend = 235;
+    cInitDimUnfocusedBack = 0;
+    cInitShowFoldedMarkWithSelectionBG = true;
+
+    cUrlRegex_Email = '\b(mailto:)?\w[\w\-\+\.]*@\w[\w\-\.]*\.\w{2,}\b';
+    cUrlRegex_WebBegin = 'https?://|ftp://|magnet:\?|www\.|ftp\.';
+    cUrlRegex_WebSite = '\w[\w\-\.@]*(:\d+)?'; // @ for password; :\d+ is port
+    cUrlRegex_WebAnchor = '(\#[\w\-%]*)?';
+    cUrlRegex_WebParams = '(\?[^<>''"\s]+)?';
+    cUrlRegex_Web =
+      '\b(' + cUrlRegex_WebBegin + ')'
+      + cUrlRegex_WebSite
+      + '(/[~\w\.\-\+\/%@!%\#]*)?' //folders
+      + cUrlRegex_WebParams
+      + cUrlRegex_WebAnchor;
+    cUrlRegexInitial = cUrlRegex_Email + '|' + cUrlRegex_Web;
+
   private
     FFontProportional: boolean;
     FFontItalic: TFont;
