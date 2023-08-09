@@ -924,6 +924,7 @@ type
     FOptBorderFocusedActive: boolean;
     FOptBorderRounded: boolean;
     FOptBorderColor: TColor;
+    FOptBorderColorFont: TColor;
     FOptBorderText: string;
     FOptRulerVisible: boolean;
     FOptRulerNumeration: TATEditorRulerNumeration;
@@ -1990,6 +1991,7 @@ type
     property OptBorderRounded: boolean read FOptBorderRounded write FOptBorderRounded default false;
     property OptBorderFocusedActive: boolean read FOptBorderFocusedActive write FOptBorderFocusedActive default false;
     property OptBorderColor: TColor read FOptBorderColor write FOptBorderColor default clNone;
+    property OptBorderColorFont: TColor read FOptBorderColorFont write FOptBorderColorFont default clBlack;
     property OptBorderText: string read FOptBorderText write FOptBorderText;
     property OptRulerVisible: boolean read FOptRulerVisible write FOptRulerVisible default true;
     property OptRulerNumeration: TATEditorRulerNumeration read FOptRulerNumeration write FOptRulerNumeration default cInitRulerNumeration;
@@ -3291,7 +3293,7 @@ begin
   begin
     DoPaintBorder(C, FOptBorderColor, FOptBorderWidthWithColor, true);
     C.Brush.Color:= FOptBorderColor;
-    C.Font.Color:= Colors.TextSelFont;
+    C.Font.Color:= FOptBorderColorFont;
     CanvasTextOutSimplest(C,
       FRectMain.Right-Length(FOptBorderText)*FCharSize.XScaled div ATEditorCharXScale - FOptBorderWidthWithColor,
       FRectMain.Bottom-FCharSize.Y,
@@ -4963,6 +4965,7 @@ begin
   FOptBorderWidthWithColor:= cInitBorderWidthWithColor;
   FOptBorderFocusedActive:= false;
   FOptBorderColor:= clNone;
+  FOptBorderColorFont:= clBlack;
   FOptBorderText:= '';
 
   FOptRulerVisible:= true;

@@ -2,6 +2,7 @@
 * removed: property ModeMacroRecording
 * removed: OptBorderMacroRecording
 + add: OptBorderColor
++ add: OptBorderColorFont
 + add: OptBorderWidthWithColor
 + add: OptBorderText
 
