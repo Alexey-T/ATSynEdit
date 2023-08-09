@@ -22,7 +22,6 @@ type
     FTextSelBG,
     FCaret,
     FMarkers,
-    FMacroRecordBorder,
     FDragDropMarker,
     FGitMarkerBG,
     FGutterFont,
@@ -75,7 +74,6 @@ type
     property TextSelBG: TColor read FTextSelBG write FTextSelBG;
     property Caret: TColor read FCaret write FCaret;
     property Markers: TColor read FMarkers write FMarkers;
-    property MacroRecordBorder: TColor read FMacroRecordBorder write FMacroRecordBorder;
     property DragDropMarker: TColor read FDragDropMarker write FDragDropMarker;
     property GitMarkerBG: TColor read FGitMarkerBG write FGitMarkerBG;
     property GutterFont: TColor read FGutterFont write FGutterFont;
@@ -136,7 +134,6 @@ begin
   C.TextDisabledBG:= $f0f0f0;
   C.Caret:= clBlack;
   C.Markers:= $0000c0;
-  C.MacroRecordBorder:= C.Markers;
   C.DragDropMarker:= C.Markers;
   C.GitMarkerBG:= C.Markers;
   C.GutterFont:= clGray;

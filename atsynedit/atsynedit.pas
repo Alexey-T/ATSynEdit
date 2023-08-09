@@ -476,7 +476,7 @@ type
     cInitBorderVisible = true;
     cInitBorderWidth = 1;
     cInitBorderWidthFocused = 1;
-    cInitBorderWidthMacro = 3;
+    cInitBorderWidthWithColor = 3;
     cInitRulerNumeration = TATEditorRulerNumeration.Num_0_10_20;
     cInitRulerHeightPercents = 100;
     cInitRulerFontSizePercents = 80;
@@ -673,7 +673,6 @@ type
     FIsCaretShapeChangedFromAPI: boolean;
     FIsReadOnlyChanged: boolean;
     FIsReadOnlyAutodetected: boolean;
-    FIsMacroRecording: boolean;
     FIsRunningCommand: boolean;
     FCursorOnMinimap: boolean;
     FCursorOnGutter: boolean;
@@ -921,10 +920,11 @@ type
     FOptBorderVisible: boolean;
     FOptBorderWidth: integer;
     FOptBorderWidthFocused: integer;
-    FOptBorderWidthMacro: integer;
+    FOptBorderWidthWithColor: integer;
     FOptBorderFocusedActive: boolean;
-    FOptBorderMacroRecording: boolean;
     FOptBorderRounded: boolean;
+    FOptBorderColor: TColor;
+    FOptBorderText: string;
     FOptRulerVisible: boolean;
     FOptRulerNumeration: TATEditorRulerNumeration;
     FOptRulerHeightPercents: integer;
@@ -1574,7 +1574,6 @@ type
     property ModeOverwrite: boolean read FOverwrite write FOverwrite;
     property ModeReadOnly: boolean read GetReadOnly write SetReadOnly;
     property ModeOneLine: boolean read GetOneLine write SetOneLine;
-    property ModeMacroRecording: boolean read FIsMacroRecording write FIsMacroRecording;
     property UndoCount: integer read GetUndoCount;
     property RedoCount: integer read GetRedoCount;
     property UndoAsString: string read GetUndoAsString write SetUndoAsString;
@@ -1987,10 +1986,11 @@ type
     property OptBorderVisible: boolean read FOptBorderVisible write FOptBorderVisible default cInitBorderVisible;
     property OptBorderWidth: integer read FOptBorderWidth write FOptBorderWidth default cInitBorderWidth;
     property OptBorderWidthFocused: integer read FOptBorderWidthFocused write FOptBorderWidthFocused default cInitBorderWidthFocused;
-    property OptBorderWidthMacro: integer read FOptBorderWidthMacro write FOptBorderWidthMacro default cInitBorderWidthMacro;
+    property OptBorderWidthWithColor: integer read FOptBorderWidthWithColor write FOptBorderWidthWithColor default cInitBorderWidthWithColor;
     property OptBorderRounded: boolean read FOptBorderRounded write FOptBorderRounded default false;
     property OptBorderFocusedActive: boolean read FOptBorderFocusedActive write FOptBorderFocusedActive default false;
-    property OptBorderMacroRecording: boolean read FOptBorderMacroRecording write FOptBorderMacroRecording default true;
+    property OptBorderColor: TColor read FOptBorderColor write FOptBorderColor default clNone;
+    property OptBorderText: string read FOptBorderText write FOptBorderText;
     property OptRulerVisible: boolean read FOptRulerVisible write FOptRulerVisible default true;
     property OptRulerNumeration: TATEditorRulerNumeration read FOptRulerNumeration write FOptRulerNumeration default cInitRulerNumeration;
     property OptRulerHeightPercents: integer read FOptRulerHeightPercents write FOptRulerHeightPercents default cInitRulerHeightPercents;
@@ -3228,8 +3228,6 @@ begin
 end;
 
 procedure TATSynEdit.DoPaintMain(C: TCanvas; ALineFrom: integer);
-const
-  cTextMacro = 'R';
 var
   NWrapIndex, NWrapIndexDummy: integer;
   bRulerHandled: boolean;
@@ -3289,15 +3287,15 @@ begin
   if FMicromapVisible and not FMicromapOnScrollbar then
     DoPaintMicromap(C);
 
-  if FOptBorderMacroRecording and FIsMacroRecording then
+  if (FOptBorderColor<>clNone) and (FOptBorderWidthWithColor>0) then
   begin
-    DoPaintBorder(C, Colors.MacroRecordBorder, FOptBorderWidthMacro, true);
-    C.Brush.Color:= Colors.MacroRecordBorder;
+    DoPaintBorder(C, FOptBorderColor, FOptBorderWidthWithColor, true);
+    C.Brush.Color:= FOptBorderColor;
     C.Font.Color:= Colors.TextSelFont;
     CanvasTextOutSimplest(C,
-      FRectMain.Right-Length(cTextMacro)*FCharSize.XScaled div ATEditorCharXScale - FOptBorderWidthMacro,
+      FRectMain.Right-Length(FOptBorderText)*FCharSize.XScaled div ATEditorCharXScale - FOptBorderWidthWithColor,
       FRectMain.Bottom-FCharSize.Y,
-      cTextMacro);
+      FOptBorderText);
   end
   else
   if FOptBorderFocusedActive and FIsEntered and (FOptBorderWidthFocused>0) then
@@ -4962,9 +4960,10 @@ begin
   FOptBorderVisible:= cInitBorderVisible;
   FOptBorderWidth:= cInitBorderWidth;
   FOptBorderWidthFocused:= cInitBorderWidthFocused;
-  FOptBorderWidthMacro:= cInitBorderWidthMacro;
+  FOptBorderWidthWithColor:= cInitBorderWidthWithColor;
   FOptBorderFocusedActive:= false;
-  FOptBorderMacroRecording:= true;
+  FOptBorderColor:= clNone;
+  FOptBorderText:= '';
 
   FOptRulerVisible:= true;
   FOptRulerNumeration:= cInitRulerNumeration;
