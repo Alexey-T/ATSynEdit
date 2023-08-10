@@ -924,9 +924,9 @@ type
     FOptBorderFocusedActive: boolean;
     FOptBorderRounded: boolean;
     FOptBorderColor: TColor;
-    FOptBorderColorFont: TColor;
-    FOptBorderColorBack: TColor;
     FOptBorderText: string;
+    FOptBorderTextColorFont: TColor;
+    FOptBorderTextColorBack: TColor;
     FOptRulerVisible: boolean;
     FOptRulerNumeration: TATEditorRulerNumeration;
     FOptRulerHeightPercents: integer;
@@ -1993,9 +1993,9 @@ type
     property OptBorderRounded: boolean read FOptBorderRounded write FOptBorderRounded default false;
     property OptBorderFocusedActive: boolean read FOptBorderFocusedActive write FOptBorderFocusedActive default false;
     property OptBorderColor: TColor read FOptBorderColor write FOptBorderColor default clNone;
-    property OptBorderColorFont: TColor read FOptBorderColorFont write FOptBorderColorFont default clBlack;
-    property OptBorderColorBack: TColor read FOptBorderColorBack write FOptBorderColorBack default clWhite;
     property OptBorderText: string read FOptBorderText write FOptBorderText;
+    property OptBorderTextColorFont: TColor read FOptBorderTextColorFont write FOptBorderTextColorFont default clBlack;
+    property OptBorderTextColorBack: TColor read FOptBorderTextColorBack write FOptBorderTextColorBack default clWhite;
     property OptRulerVisible: boolean read FOptRulerVisible write FOptRulerVisible default true;
     property OptRulerNumeration: TATEditorRulerNumeration read FOptRulerNumeration write FOptRulerNumeration default cInitRulerNumeration;
     property OptRulerHeightPercents: integer read FOptRulerHeightPercents write FOptRulerHeightPercents default cInitRulerHeightPercents;
@@ -3248,10 +3248,10 @@ begin
   if FOptBorderVisible and (FOptBorderWidth>0) then
     DoPaintBorder(C, Colors.BorderLine, FOptBorderWidth, FOptBorderRounded);
 
-  if (FOptBorderText<>'') and (FOptBorderColorFont<>clNone) then
+  if (FOptBorderText<>'') and (FOptBorderTextColorFont<>clNone) then
   begin
-    C.Font.Color:= FOptBorderColorFont;
-    C.Brush.Color:= FOptBorderColorBack;
+    C.Font.Color:= FOptBorderTextColorFont;
+    C.Brush.Color:= FOptBorderTextColorBack;
     TextSize:= C.TextExtent(FOptBorderText);
     C.TextOut(
       ClientWidth-TextSize.cx,
@@ -4977,8 +4977,8 @@ begin
   FOptBorderWidthWithColor:= cInitBorderWidthWithColor;
   FOptBorderFocusedActive:= false;
   FOptBorderColor:= clNone;
-  FOptBorderColorFont:= clBlack;
-  FOptBorderColorBack:= clWhite;
+  FOptBorderTextColorFont:= clBlack;
+  FOptBorderTextColorBack:= clWhite;
   FOptBorderText:= '';
 
   FOptRulerVisible:= true;
