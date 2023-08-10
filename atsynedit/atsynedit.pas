@@ -3239,8 +3239,8 @@ begin
     C.Brush.Color:= FOptBorderColor;
     C.Font.Color:= FOptBorderColorFont;
     C.TextOut(
-      FRectMain.Right-C.TextWidth(FOptBorderText)-FOptBorderWidthWithColor,
-      FRectMain.Bottom-FCharSize.Y,
+      ClientWidth-C.TextWidth(FOptBorderText)-FOptBorderWidthWithColor,
+      ClientHeight-FCharSize.Y,
       FOptBorderText
       );
   end
