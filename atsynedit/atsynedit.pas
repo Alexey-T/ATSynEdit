@@ -3294,10 +3294,11 @@ begin
     DoPaintBorder(C, FOptBorderColor, FOptBorderWidthWithColor, true);
     C.Brush.Color:= FOptBorderColor;
     C.Font.Color:= FOptBorderColorFont;
-    CanvasTextOutSimplest(C,
-      FRectMain.Right-Length(FOptBorderText)*FCharSize.XScaled div ATEditorCharXScale - FOptBorderWidthWithColor,
+    C.TextOut(
+      FRectMain.Right-C.TextWidth(FOptBorderText)-FOptBorderWidthWithColor,
       FRectMain.Bottom-FCharSize.Y,
-      FOptBorderText);
+      FOptBorderText
+      );
   end
   else
   if FOptBorderFocusedActive and FIsEntered and (FOptBorderWidthFocused>0) then
