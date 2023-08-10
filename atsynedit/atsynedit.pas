@@ -3247,7 +3247,7 @@ begin
   else
   //border for 'focused' state (dark blue by default)
   if FOptBorderFocusedActive and FIsEntered and (FOptBorderWidthFocused>0) then
-    DoPaintBorder(C, Colors.BorderLineFocused, FOptBorderWidthFocused, false)
+    DoPaintBorder(C, Colors.BorderLineFocused, FOptBorderWidthFocused, FOptBorderRounded)
   else
   //normal border
   if FOptBorderVisible and (FOptBorderWidth>0) then
