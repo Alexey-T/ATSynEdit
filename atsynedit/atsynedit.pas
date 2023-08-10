@@ -3237,6 +3237,8 @@ end;
 procedure TATSynEdit.DoPaintBorders(C: TCanvas);
 var
   TextSize: Types.TSize;
+const
+  cBrushStyles: array[boolean] of TBrushStyle = (bsClear, bsSolid);
 begin
   //border for e.g. macro-recording
   if (FOptBorderColor<>clNone) and (FOptBorderWidthWithColor>0) then
@@ -3254,11 +3256,13 @@ begin
   begin
     C.Font.Color:= FOptCornerTextColorFont;
     C.Brush.Color:= FOptCornerTextColorBack;
+    C.Brush.Style:= cBrushStyles[FOptCornerTextColorBack<>clNone];
     TextSize:= C.TextExtent(FOptCornerText);
     C.TextOut(
       ClientWidth-TextSize.cx,
       ClientHeight-TextSize.cy,
       FOptCornerText);
+    C.Brush.Style:= bsSolid;
     if FOptCornerTextColorBorder<>clNone then
     begin
       C.Pen.Color:= FOptCornerTextColorBorder;
