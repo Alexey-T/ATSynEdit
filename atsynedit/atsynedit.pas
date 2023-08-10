@@ -925,6 +925,7 @@ type
     FOptBorderRounded: boolean;
     FOptBorderColor: TColor;
     FOptBorderColorFont: TColor;
+    FOptBorderColorBack: TColor;
     FOptBorderText: string;
     FOptRulerVisible: boolean;
     FOptRulerNumeration: TATEditorRulerNumeration;
@@ -1993,6 +1994,7 @@ type
     property OptBorderFocusedActive: boolean read FOptBorderFocusedActive write FOptBorderFocusedActive default false;
     property OptBorderColor: TColor read FOptBorderColor write FOptBorderColor default clNone;
     property OptBorderColorFont: TColor read FOptBorderColorFont write FOptBorderColorFont default clBlack;
+    property OptBorderColorBack: TColor read FOptBorderColorBack write FOptBorderColorBack default clWhite;
     property OptBorderText: string read FOptBorderText write FOptBorderText;
     property OptRulerVisible: boolean read FOptRulerVisible write FOptRulerVisible default true;
     property OptRulerNumeration: TATEditorRulerNumeration read FOptRulerNumeration write FOptRulerNumeration default cInitRulerNumeration;
@@ -3249,10 +3251,7 @@ begin
   if (FOptBorderText<>'') and (FOptBorderColorFont<>clNone) then
   begin
     C.Font.Color:= FOptBorderColorFont;
-    if FOptBorderColor<>clNone then
-      C.Brush.Color:= FOptBorderColor
-    else
-      C.Brush.Color:= Colors.TextBG;
+    C.Brush.Color:= FOptBorderColorBack;
     TextSize:= C.TextExtent(FOptBorderText);
     C.TextOut(
       ClientWidth-TextSize.cx-FOptBorderWidthWithColor,
@@ -4979,6 +4978,7 @@ begin
   FOptBorderFocusedActive:= false;
   FOptBorderColor:= clNone;
   FOptBorderColorFont:= clBlack;
+  FOptBorderColorBack:= clWhite;
   FOptBorderText:= '';
 
   FOptRulerVisible:= true;
