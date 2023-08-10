@@ -927,6 +927,7 @@ type
     FOptBorderText: string;
     FOptBorderTextColorFont: TColor;
     FOptBorderTextColorBack: TColor;
+    FOptBorderTextColorBorder: TColor;
     FOptRulerVisible: boolean;
     FOptRulerNumeration: TATEditorRulerNumeration;
     FOptRulerHeightPercents: integer;
@@ -1996,6 +1997,7 @@ type
     property OptBorderText: string read FOptBorderText write FOptBorderText;
     property OptBorderTextColorFont: TColor read FOptBorderTextColorFont write FOptBorderTextColorFont default clBlack;
     property OptBorderTextColorBack: TColor read FOptBorderTextColorBack write FOptBorderTextColorBack default clWhite;
+    property OptBorderTextColorBorder: TColor read FOptBorderTextColorBorder write FOptBorderTextColorBorder default clNone;
     property OptRulerVisible: boolean read FOptRulerVisible write FOptRulerVisible default true;
     property OptRulerNumeration: TATEditorRulerNumeration read FOptRulerNumeration write FOptRulerNumeration default cInitRulerNumeration;
     property OptRulerHeightPercents: integer read FOptRulerHeightPercents write FOptRulerHeightPercents default cInitRulerHeightPercents;
@@ -3257,6 +3259,20 @@ begin
       ClientWidth-TextSize.cx,
       ClientHeight-TextSize.cy,
       FOptBorderText);
+    if FOptBorderTextColorBorder<>clNone then
+    begin
+      C.Pen.Color:= FOptBorderTextColorBorder;
+      C.Line(
+        ClientWidth-TextSize.cx,
+        ClientHeight-TextSize.cy,
+        ClientWidth,
+        ClientHeight-TextSize.cy);
+      C.Line(
+        ClientWidth-TextSize.cx,
+        ClientHeight-TextSize.cy,
+        ClientWidth-TextSize.cx,
+        ClientHeight);
+    end;
   end;
 end;
 
@@ -4980,6 +4996,7 @@ begin
   FOptBorderText:= '';
   FOptBorderTextColorFont:= clBlack;
   FOptBorderTextColorBack:= clWhite;
+  FOptBorderTextColorBorder:= clNone;
 
   FOptRulerVisible:= true;
   FOptRulerNumeration:= cInitRulerNumeration;

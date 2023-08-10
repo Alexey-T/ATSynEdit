@@ -4,6 +4,7 @@
 + add: OptBorderText
 + add: OptBorderTextColorFont
 + add: OptBorderTextColorBack
++ add: OptBorderTextColorBorder
 + add: OptBorderColor
 + add: OptBorderWidthWithColor
 
