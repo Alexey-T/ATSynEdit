@@ -3232,7 +3232,7 @@ end;
 
 procedure TATSynEdit.DoPaintBorders(C: TCanvas);
 begin
-  //paint colored border with text in the corner (e.g. for macro-recording)
+  //colored border with text in the corner (e.g. for macro-recording)
   if (FOptBorderColor<>clNone) and (FOptBorderWidthWithColor>0) then
   begin
     DoPaintBorder(C, FOptBorderColor, FOptBorderWidthWithColor, true);
@@ -3245,11 +3245,11 @@ begin
       );
   end
   else
-  //paint border because of 'focused' state
+  //border for 'focused' state (dark blue by default)
   if FOptBorderFocusedActive and FIsEntered and (FOptBorderWidthFocused>0) then
     DoPaintBorder(C, Colors.BorderLineFocused, FOptBorderWidthFocused, false)
   else
-  //paint normal border
+  //normal border
   if FOptBorderVisible and (FOptBorderWidth>0) then
     DoPaintBorder(C, Colors.BorderLine, FOptBorderWidth, false);
 end;
