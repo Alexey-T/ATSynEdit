@@ -3281,9 +3281,9 @@ begin
         ClientWidth,
         ClientHeight-TextSize.cy);
       C.Line(
-        ClientWidth-TextSize.cx,
+        ClientWidth-TextSize.cx-1,
         ClientHeight-TextSize.cy,
-        ClientWidth-TextSize.cx,
+        ClientWidth-TextSize.cx-1,
         ClientHeight);
     end;
   end;
@@ -3304,10 +3304,10 @@ begin
     begin
       C.Pen.Color:= FOptCornerText2ColorBorder;
       C.Line(
-        ClientWidth-TextSize.cx,
+        ClientWidth-TextSize.cx-1,
         0,
-        ClientWidth-TextSize.cx,
-        TextSize.cy);
+        ClientWidth-TextSize.cx-1,
+        TextSize.cy+1);
       C.Line(
         ClientWidth-TextSize.cx,
         TextSize.cy,
