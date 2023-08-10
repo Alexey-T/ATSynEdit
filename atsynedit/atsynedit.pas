@@ -1192,7 +1192,7 @@ type
     procedure PaintEx(ALineNumber: integer);
     procedure DoPaint(ALineFrom: integer);
     procedure DoPaintBorders(C: TCanvas);
-    procedure DoPaintBorder(C: TCanvas; AColor: TColor; ABorderWidth: integer);
+    procedure DoPaintBorder(C: TCanvas; AColor: TColor; ABorderWidth: integer; ABorderRounded: boolean);
     procedure DoPaintAll(C: TCanvas; ALineFrom: integer);
     procedure DoPaintMain(C: TCanvas; ALineFrom: integer);
     procedure DoPaintLine(C: TCanvas;
@@ -3235,7 +3235,7 @@ begin
   //colored border with text in the corner (e.g. for macro-recording)
   if (FOptBorderColor<>clNone) and (FOptBorderWidthWithColor>0) then
   begin
-    DoPaintBorder(C, FOptBorderColor, FOptBorderWidthWithColor);
+    DoPaintBorder(C, FOptBorderColor, FOptBorderWidthWithColor, false);
     C.Brush.Color:= FOptBorderColor;
     C.Font.Color:= FOptBorderColorFont;
     C.TextOut(
@@ -3247,11 +3247,11 @@ begin
   else
   //border for 'focused' state (dark blue by default)
   if FOptBorderFocusedActive and FIsEntered and (FOptBorderWidthFocused>0) then
-    DoPaintBorder(C, Colors.BorderLineFocused, FOptBorderWidthFocused)
+    DoPaintBorder(C, Colors.BorderLineFocused, FOptBorderWidthFocused, false)
   else
   //normal border
   if FOptBorderVisible and (FOptBorderWidth>0) then
-    DoPaintBorder(C, Colors.BorderLine, FOptBorderWidth);
+    DoPaintBorder(C, Colors.BorderLine, FOptBorderWidth, FOptBorderRounded);
 end;
 
 procedure TATSynEdit.DoPaintMain(C: TCanvas; ALineFrom: integer);
@@ -3371,7 +3371,7 @@ begin
 end;
 
 procedure TATSynEdit.DoPaintBorder(C: TCanvas; AColor: TColor;
-  ABorderWidth: integer);
+  ABorderWidth: integer; ABorderRounded: boolean);
 var
   NColorBG, NColorFore: TColor;
   X, Y, W, H, i: integer;
@@ -3387,11 +3387,12 @@ begin
   for i:= 0 to ABorderWidth-1 do
     C.Frame(X+i, Y+i, X+W-i, Y+H-i);
 
-  if FOptBorderVisible and FOptBorderRounded and (ABorderWidth=1) then
+  if ABorderRounded and (ABorderWidth=1) then
   begin
     NColorBG:= ColorToRGB(Colors.BorderParentBG);
     NColorFore:= ColorToRGB(Colors.TextBG);
 
+    //left top+bottom corners, with one color
     CanvasPaintRoundedCorners(C,
       Rect(X, Y, X+W, Y+H),
       [acckLeftTop, acckLeftBottom],
@@ -3400,6 +3401,7 @@ begin
     if ModeOneLine and FMicromapVisible then
       NColorFore:= Colors.ComboboxArrowBG;
 
+    //right top+bottom corners, maybe with different color
     CanvasPaintRoundedCorners(C,
       Rect(X, Y, X+W, Y+H),
       [acckRightTop, acckRightBottom],
