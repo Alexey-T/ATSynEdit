@@ -928,6 +928,10 @@ type
     FOptCornerTextColorFont: TColor;
     FOptCornerTextColorBack: TColor;
     FOptCornerTextColorBorder: TColor;
+    FOptCornerText2: string;
+    FOptCornerText2ColorFont: TColor;
+    FOptCornerText2ColorBack: TColor;
+    FOptCornerText2ColorBorder: TColor;
     FOptRulerVisible: boolean;
     FOptRulerNumeration: TATEditorRulerNumeration;
     FOptRulerHeightPercents: integer;
@@ -1998,6 +2002,10 @@ type
     property OptCornerTextColorFont: TColor read FOptCornerTextColorFont write FOptCornerTextColorFont default clBlack;
     property OptCornerTextColorBack: TColor read FOptCornerTextColorBack write FOptCornerTextColorBack default clWhite;
     property OptCornerTextColorBorder: TColor read FOptCornerTextColorBorder write FOptCornerTextColorBorder default clNone;
+    property OptCornerText2: string read FOptCornerText2 write FOptCornerText2;
+    property OptCornerText2ColorFont: TColor read FOptCornerText2ColorFont write FOptCornerText2ColorFont default clBlack;
+    property OptCornerText2ColorBack: TColor read FOptCornerText2ColorBack write FOptCornerText2ColorBack default clWhite;
+    property OptCornerText2ColorBorder: TColor read FOptCornerText2ColorBorder write FOptCornerText2ColorBorder default clNone;
     property OptRulerVisible: boolean read FOptRulerVisible write FOptRulerVisible default true;
     property OptRulerNumeration: TATEditorRulerNumeration read FOptRulerNumeration write FOptRulerNumeration default cInitRulerNumeration;
     property OptRulerHeightPercents: integer read FOptRulerHeightPercents write FOptRulerHeightPercents default cInitRulerHeightPercents;
@@ -3252,6 +3260,7 @@ begin
   if FOptBorderVisible and (FOptBorderWidth>0) then
     DoPaintBorder(C, Colors.BorderLine, FOptBorderWidth, FOptBorderRounded);
 
+  //corner text 1st
   if (FOptCornerText<>'') and (FOptCornerTextColorFont<>clNone) then
   begin
     C.Font.Color:= FOptCornerTextColorFont;
@@ -3276,6 +3285,34 @@ begin
         ClientHeight-TextSize.cy,
         ClientWidth-TextSize.cx,
         ClientHeight);
+    end;
+  end;
+
+  //corner text 2nd
+  if (FOptCornerText2<>'') and (FOptCornerText2ColorFont<>clNone) then
+  begin
+    C.Font.Color:= FOptCornerText2ColorFont;
+    C.Brush.Color:= FOptCornerText2ColorBack;
+    C.Brush.Style:= cBrushStyles[FOptCornerText2ColorBack<>clNone];
+    TextSize:= C.TextExtent(FOptCornerText2);
+    C.TextOut(
+      ClientWidth-TextSize.cx,
+      0,
+      FOptCornerText2);
+    C.Brush.Style:= bsSolid;
+    if FOptCornerText2ColorBorder<>clNone then
+    begin
+      C.Pen.Color:= FOptCornerText2ColorBorder;
+      C.Line(
+        ClientWidth-TextSize.cx,
+        0,
+        ClientWidth-TextSize.cx,
+        TextSize.cy);
+      C.Line(
+        ClientWidth-TextSize.cx,
+        TextSize.cy,
+        ClientWidth,
+        TextSize.cy);
     end;
   end;
 end;
@@ -4997,10 +5034,15 @@ begin
   FOptBorderWidthWithColor:= cInitBorderWidthWithColor;
   FOptBorderFocusedActive:= false;
   FOptBorderColor:= clNone;
+
   FOptCornerText:= '';
   FOptCornerTextColorFont:= clBlack;
   FOptCornerTextColorBack:= clWhite;
   FOptCornerTextColorBorder:= clNone;
+  FOptCornerText2:= '';
+  FOptCornerText2ColorFont:= clBlack;
+  FOptCornerText2ColorBack:= clWhite;
+  FOptCornerText2ColorBorder:= clNone;
 
   FOptRulerVisible:= true;
   FOptRulerNumeration:= cInitRulerNumeration;

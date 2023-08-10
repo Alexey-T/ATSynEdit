@@ -1,12 +1,16 @@
 2023.08.10
 * change: removed property ModeMacroRecording
 * change: removed OptBorderMacroRecording
++ add: OptBorderColor
++ add: OptBorderWidthWithColor
 + add: OptCornerText
 + add: OptCornerTextColorFont
 + add: OptCornerTextColorBack
 + add: OptCornerTextColorBorder
-+ add: OptBorderColor
-+ add: OptBorderWidthWithColor
++ add: OptCornerText2
++ add: OptCornerText2ColorFont
++ add: OptCornerText2ColorBack
++ add: OptCornerText2ColorBorder
 
 2023.06.11
 * change: deleted event OnChangeCaretLine
