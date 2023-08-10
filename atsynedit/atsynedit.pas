@@ -3238,14 +3238,16 @@ begin
   if (FOptBorderColor<>clNone) and (FOptBorderWidthWithColor>0) then
   begin
     DoPaintBorder(C, FOptBorderColor, FOptBorderWidthWithColor, false);
-    TextSize:= C.TextExtent(FOptBorderText);
-    C.Brush.Color:= FOptBorderColor;
-    C.Font.Color:= FOptBorderColorFont;
-    C.TextOut(
-      ClientWidth-TextSize.cx-FOptBorderWidthWithColor,
-      ClientHeight-TextSize.cy,
-      FOptBorderText
-      );
+    if FOptBorderText<>'' then
+    begin
+      TextSize:= C.TextExtent(FOptBorderText);
+      C.Brush.Color:= FOptBorderColor;
+      C.Font.Color:= FOptBorderColorFont;
+      C.TextOut(
+        ClientWidth-TextSize.cx-FOptBorderWidthWithColor,
+        ClientHeight-TextSize.cy,
+        FOptBorderText);
+    end;
   end
   else
   //border for 'focused' state (dark blue by default)
