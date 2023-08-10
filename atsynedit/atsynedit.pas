@@ -924,10 +924,10 @@ type
     FOptBorderFocusedActive: boolean;
     FOptBorderRounded: boolean;
     FOptBorderColor: TColor;
-    FOptBorderText: string;
-    FOptBorderTextColorFont: TColor;
-    FOptBorderTextColorBack: TColor;
-    FOptBorderTextColorBorder: TColor;
+    FOptCornerText: string;
+    FOptCornerTextColorFont: TColor;
+    FOptCornerTextColorBack: TColor;
+    FOptCornerTextColorBorder: TColor;
     FOptRulerVisible: boolean;
     FOptRulerNumeration: TATEditorRulerNumeration;
     FOptRulerHeightPercents: integer;
@@ -1994,10 +1994,10 @@ type
     property OptBorderRounded: boolean read FOptBorderRounded write FOptBorderRounded default false;
     property OptBorderFocusedActive: boolean read FOptBorderFocusedActive write FOptBorderFocusedActive default false;
     property OptBorderColor: TColor read FOptBorderColor write FOptBorderColor default clNone;
-    property OptBorderText: string read FOptBorderText write FOptBorderText;
-    property OptBorderTextColorFont: TColor read FOptBorderTextColorFont write FOptBorderTextColorFont default clBlack;
-    property OptBorderTextColorBack: TColor read FOptBorderTextColorBack write FOptBorderTextColorBack default clWhite;
-    property OptBorderTextColorBorder: TColor read FOptBorderTextColorBorder write FOptBorderTextColorBorder default clNone;
+    property OptCornerText: string read FOptCornerText write FOptCornerText;
+    property OptCornerTextColorFont: TColor read FOptCornerTextColorFont write FOptCornerTextColorFont default clBlack;
+    property OptCornerTextColorBack: TColor read FOptCornerTextColorBack write FOptCornerTextColorBack default clWhite;
+    property OptCornerTextColorBorder: TColor read FOptCornerTextColorBorder write FOptCornerTextColorBorder default clNone;
     property OptRulerVisible: boolean read FOptRulerVisible write FOptRulerVisible default true;
     property OptRulerNumeration: TATEditorRulerNumeration read FOptRulerNumeration write FOptRulerNumeration default cInitRulerNumeration;
     property OptRulerHeightPercents: integer read FOptRulerHeightPercents write FOptRulerHeightPercents default cInitRulerHeightPercents;
@@ -3250,18 +3250,18 @@ begin
   if FOptBorderVisible and (FOptBorderWidth>0) then
     DoPaintBorder(C, Colors.BorderLine, FOptBorderWidth, FOptBorderRounded);
 
-  if (FOptBorderText<>'') and (FOptBorderTextColorFont<>clNone) then
+  if (FOptCornerText<>'') and (FOptCornerTextColorFont<>clNone) then
   begin
-    C.Font.Color:= FOptBorderTextColorFont;
-    C.Brush.Color:= FOptBorderTextColorBack;
-    TextSize:= C.TextExtent(FOptBorderText);
+    C.Font.Color:= FOptCornerTextColorFont;
+    C.Brush.Color:= FOptCornerTextColorBack;
+    TextSize:= C.TextExtent(FOptCornerText);
     C.TextOut(
       ClientWidth-TextSize.cx,
       ClientHeight-TextSize.cy,
-      FOptBorderText);
-    if FOptBorderTextColorBorder<>clNone then
+      FOptCornerText);
+    if FOptCornerTextColorBorder<>clNone then
     begin
-      C.Pen.Color:= FOptBorderTextColorBorder;
+      C.Pen.Color:= FOptCornerTextColorBorder;
       C.Line(
         ClientWidth-TextSize.cx,
         ClientHeight-TextSize.cy,
@@ -4993,10 +4993,10 @@ begin
   FOptBorderWidthWithColor:= cInitBorderWidthWithColor;
   FOptBorderFocusedActive:= false;
   FOptBorderColor:= clNone;
-  FOptBorderText:= '';
-  FOptBorderTextColorFont:= clBlack;
-  FOptBorderTextColorBack:= clWhite;
-  FOptBorderTextColorBorder:= clNone;
+  FOptCornerText:= '';
+  FOptCornerTextColorFont:= clBlack;
+  FOptCornerTextColorBack:= clWhite;
+  FOptCornerTextColorBorder:= clNone;
 
   FOptRulerVisible:= true;
   FOptRulerNumeration:= cInitRulerNumeration;
