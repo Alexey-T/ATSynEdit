@@ -1191,6 +1191,7 @@ type
     //paint
     procedure PaintEx(ALineNumber: integer);
     procedure DoPaint(ALineFrom: integer);
+    procedure DoPaintBorders(C: TCanvas);
     procedure DoPaintBorder(C: TCanvas; AColor: TColor; ABorderWidth: integer; AUseRectMain: boolean);
     procedure DoPaintAll(C: TCanvas; ALineFrom: integer);
     procedure DoPaintMain(C: TCanvas; ALineFrom: integer);
@@ -3229,6 +3230,30 @@ begin
   FRectMinimapTooltip:= Rect(0, 0, 0, 0);
 end;
 
+procedure TATSynEdit.DoPaintBorders(C: TCanvas);
+begin
+  //paint colored border with text in the corner (e.g. for macro-recording)
+  if (FOptBorderColor<>clNone) and (FOptBorderWidthWithColor>0) then
+  begin
+    DoPaintBorder(C, FOptBorderColor, FOptBorderWidthWithColor, true);
+    C.Brush.Color:= FOptBorderColor;
+    C.Font.Color:= FOptBorderColorFont;
+    C.TextOut(
+      FRectMain.Right-C.TextWidth(FOptBorderText)-FOptBorderWidthWithColor,
+      FRectMain.Bottom-FCharSize.Y,
+      FOptBorderText
+      );
+  end
+  else
+  //paint border because of 'focused' state
+  if FOptBorderFocusedActive and FIsEntered and (FOptBorderWidthFocused>0) then
+    DoPaintBorder(C, Colors.BorderLineFocused, FOptBorderWidthFocused, false)
+  else
+  //paint normal border
+  if FOptBorderVisible and (FOptBorderWidth>0) then
+    DoPaintBorder(C, Colors.BorderLine, FOptBorderWidth, false);
+end;
+
 procedure TATSynEdit.DoPaintMain(C: TCanvas; ALineFrom: integer);
 var
   NWrapIndex, NWrapIndexDummy: integer;
@@ -3289,23 +3314,7 @@ begin
   if FMicromapVisible and not FMicromapOnScrollbar then
     DoPaintMicromap(C);
 
-  if (FOptBorderColor<>clNone) and (FOptBorderWidthWithColor>0) then
-  begin
-    DoPaintBorder(C, FOptBorderColor, FOptBorderWidthWithColor, true);
-    C.Brush.Color:= FOptBorderColor;
-    C.Font.Color:= FOptBorderColorFont;
-    C.TextOut(
-      FRectMain.Right-C.TextWidth(FOptBorderText)-FOptBorderWidthWithColor,
-      FRectMain.Bottom-FCharSize.Y,
-      FOptBorderText
-      );
-  end
-  else
-  if FOptBorderFocusedActive and FIsEntered and (FOptBorderWidthFocused>0) then
-    DoPaintBorder(C, Colors.BorderLineFocused, FOptBorderWidthFocused, false)
-  else
-  if FOptBorderVisible and (FOptBorderWidth>0) then
-    DoPaintBorder(C, Colors.BorderLine, FOptBorderWidth, false);
+  DoPaintBorders(C);
 
   if FOptShowMouseSelFrame then
     if FMouseDragCoord.X>=0 then
