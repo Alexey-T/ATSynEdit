@@ -4977,9 +4977,9 @@ begin
   FOptBorderWidthWithColor:= cInitBorderWidthWithColor;
   FOptBorderFocusedActive:= false;
   FOptBorderColor:= clNone;
+  FOptBorderText:= '';
   FOptBorderTextColorFont:= clBlack;
   FOptBorderTextColorBack:= clWhite;
-  FOptBorderText:= '';
 
   FOptRulerVisible:= true;
   FOptRulerNumeration:= cInitRulerNumeration;
