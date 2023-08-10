@@ -1192,7 +1192,7 @@ type
     procedure PaintEx(ALineNumber: integer);
     procedure DoPaint(ALineFrom: integer);
     procedure DoPaintBorders(C: TCanvas);
-    procedure DoPaintBorder(C: TCanvas; AColor: TColor; ABorderWidth: integer; AUseRectMain: boolean);
+    procedure DoPaintBorder(C: TCanvas; AColor: TColor; ABorderWidth: integer);
     procedure DoPaintAll(C: TCanvas; ALineFrom: integer);
     procedure DoPaintMain(C: TCanvas; ALineFrom: integer);
     procedure DoPaintLine(C: TCanvas;
@@ -3235,7 +3235,7 @@ begin
   //colored border with text in the corner (e.g. for macro-recording)
   if (FOptBorderColor<>clNone) and (FOptBorderWidthWithColor>0) then
   begin
-    DoPaintBorder(C, FOptBorderColor, FOptBorderWidthWithColor, true);
+    DoPaintBorder(C, FOptBorderColor, FOptBorderWidthWithColor);
     C.Brush.Color:= FOptBorderColor;
     C.Font.Color:= FOptBorderColorFont;
     C.TextOut(
@@ -3247,11 +3247,11 @@ begin
   else
   //border for 'focused' state (dark blue by default)
   if FOptBorderFocusedActive and FIsEntered and (FOptBorderWidthFocused>0) then
-    DoPaintBorder(C, Colors.BorderLineFocused, FOptBorderWidthFocused, false)
+    DoPaintBorder(C, Colors.BorderLineFocused, FOptBorderWidthFocused)
   else
   //normal border
   if FOptBorderVisible and (FOptBorderWidth>0) then
-    DoPaintBorder(C, Colors.BorderLine, FOptBorderWidth, false);
+    DoPaintBorder(C, Colors.BorderLine, FOptBorderWidth);
 end;
 
 procedure TATSynEdit.DoPaintMain(C: TCanvas; ALineFrom: integer);
@@ -3314,8 +3314,6 @@ begin
   if FMicromapVisible and not FMicromapOnScrollbar then
     DoPaintMicromap(C);
 
-  DoPaintBorders(C);
-
   if FOptShowMouseSelFrame then
     if FMouseDragCoord.X>=0 then
       DoPaintMouseSelFrame(C);
@@ -3335,6 +3333,8 @@ begin
     FMinimapBmp.Draw(C, FRectMinimap.Left, FRectMinimap.Top);
     {$endif}
   end;
+
+  DoPaintBorders(C);
 end;
 
 procedure TATSynEdit.DoPaintMouseSelFrame(C: TCanvas);
@@ -3371,27 +3371,21 @@ begin
 end;
 
 procedure TATSynEdit.DoPaintBorder(C: TCanvas; AColor: TColor;
-  ABorderWidth: integer; AUseRectMain: boolean);
+  ABorderWidth: integer);
 var
   NColorBG, NColorFore: TColor;
-  W, H, i: integer;
+  X, Y, W, H, i: integer;
 begin
   if ABorderWidth<1 then exit;
   C.Pen.Color:= AColor;
 
-  if AUseRectMain then
-  begin
-    W:= FRectMain.Right;
-    H:= FRectMain.Bottom;
-  end
-  else
-  begin
-    W:= ClientWidth;
-    H:= ClientHeight;
-  end;
+  X:= 0;
+  Y:= 0;
+  W:= ClientWidth;
+  H:= ClientHeight;
 
   for i:= 0 to ABorderWidth-1 do
-    C.Frame(i, i, W-i, H-i);
+    C.Frame(X+i, Y+i, X+W-i, Y+H-i);
 
   if FOptBorderVisible and FOptBorderRounded and (ABorderWidth=1) then
   begin
@@ -3399,7 +3393,7 @@ begin
     NColorFore:= ColorToRGB(Colors.TextBG);
 
     CanvasPaintRoundedCorners(C,
-      Rect(0, 0, W, H),
+      Rect(X, Y, X+W, Y+H),
       [acckLeftTop, acckLeftBottom],
       NColorBG, AColor, NColorFore);
 
@@ -3407,7 +3401,7 @@ begin
       NColorFore:= Colors.ComboboxArrowBG;
 
     CanvasPaintRoundedCorners(C,
-      Rect(0, 0, W, H),
+      Rect(X, Y, X+W, Y+H),
       [acckRightTop, acckRightBottom],
       NColorBG, AColor, NColorFore);
   end;
