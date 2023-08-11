@@ -4,13 +4,13 @@
 + add: OptBorderColor
 + add: OptBorderWidthWithColor
 + add: OptCornerText
-+ add: OptCornerTextColorFont
-+ add: OptCornerTextColorBack
-+ add: OptCornerTextColorBorder
-+ add: OptCornerText2
-+ add: OptCornerText2ColorFont
-+ add: OptCornerText2ColorBack
-+ add: OptCornerText2ColorBorder
++ add: OptCornerColorFont
++ add: OptCornerColorBack
++ add: OptCornerColorBorder
++ add: OptCorner2Text
++ add: OptCorner2ColorFont
++ add: OptCorner2ColorBack
++ add: OptCorner2ColorBorder
 
 2023.06.11
 * change: deleted event OnChangeCaretLine
