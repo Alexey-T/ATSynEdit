@@ -445,10 +445,11 @@ end;
 
 procedure TATStrings.LineBlockDelete(ALine1, ALine2: SizeInt; AForceLast: boolean = true);
 var
-  i: SizeInt;
+  NCount, i: SizeInt;
 begin
-  if ALine1>=Count then ALine1:= Count-1;
-  if ALine2>=Count then ALine2:= Count-1;
+  NCount:= Count;
+  if ALine1>=NCount then ALine1:= NCount-1;
+  if ALine2>=NCount then ALine2:= NCount-1;
 
   FChangeBlockActive:= true;
   DoOnChangeBlock(
