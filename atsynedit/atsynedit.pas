@@ -2526,8 +2526,7 @@ begin
       for i:= 0 to ListNums.Count-1 do
       begin
         NLine:= ListNums[i];
-
-        //fix EListError when selecting huge text block by Ctrl+Shift+End and pressing space
+        //check index to avoid EListError
         if not CurStrings.IsIndexValid(NLine) then Continue;
 
         DoCalcWrapInfos(NLine, NIndentMaximal, FWrapTemps, bConsiderFolding);
