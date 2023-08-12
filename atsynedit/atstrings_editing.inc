@@ -458,6 +458,10 @@ begin
     TATBlockChangeKind.DeleteLines,
     nil);
 
+  //delete slowly with undo; yes, we do it for any count of deleted lines
+  for i:= ALine2 downto ALine1 do
+    LineDelete(i, false{AForceLast}, false{WithEvent});
+  (*
   if (ALine2-ALine1)<FUndoList.MaxCount then
   begin
     //delete slowly with undo
@@ -471,6 +475,7 @@ begin
     FList.DeleteRange(ALine1, ALine2);
     ClearUndo;
   end;
+  *)
 
   if AForceLast then
     ActionAddFakeLineIfNeeded;
