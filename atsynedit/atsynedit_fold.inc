@@ -204,7 +204,7 @@ procedure TATSynEdit.DoFoldbarClick_RangeIndex(ARangeIndex: integer);
 var
   FoldItemPtr: PATSynRange;
   bUnfold: boolean;
-  bCaretOnLastPage: boolean;
+  bScrolledToLastPage: boolean;
 begin
   if not FFold.IsIndexValid(ARangeIndex) then exit;
   FoldItemPtr:= FFold.ItemPtr(ARangeIndex);
@@ -220,16 +220,16 @@ begin
   //because next click on gutter-fold-mark will be ignored. CudaText issue #4850
   if not FOptLastLineOnTop and not bUnfold then
   begin
-    bCaretOnLastPage:= FScrollVert.NPos>=FScrollVert.NPosLast;
+    bScrolledToLastPage:= FScrollVert.NPos>=FScrollVert.NPosLast;
 
     //for CudaText issue #5180
     //we folded a big range, which ends on the last page?
-    if not bCaretOnLastPage then
+    if not bScrolledToLastPage then
       if (FWrapInfo.IsIndexValid(FScrollVert.NPosLast)) and
         (FoldItemPtr^.Y2>=FWrapInfo.Data[FScrollVert.NPosLast].NLineIndex) then
-        bCaretOnLastPage:= true;
+        bScrolledToLastPage:= true;
 
-    if bCaretOnLastPage then
+    if bScrolledToLastPage then
     begin
       Application.ProcessMessages;
       Update;
