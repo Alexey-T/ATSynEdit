@@ -200,24 +200,39 @@ begin
     DoFoldbarClick_RangeIndex(NRange);
 end;
 
-procedure TATSynEdit.DoFoldbarClick_RangeIndex(ARange: integer);
+procedure TATSynEdit.DoFoldbarClick_RangeIndex(ARangeIndex: integer);
 var
+  FoldItemPtr: PATSynRange;
   bUnfold: boolean;
+  bCaretNearEnd: boolean;
 begin
-  bUnfold:= FFold.ItemPtr(ARange)^.Folded;
+  if not FFold.IsIndexValid(ARangeIndex) then exit;
+  FoldItemPtr:= FFold.ItemPtr(ARangeIndex);
+  bUnfold:= FoldItemPtr^.Folded;
   if bUnfold then
-    DoRangeUnfold(ARange)
+    DoRangeUnfold(ARangeIndex)
   else
-    DoRangeFold(ARange);
+    DoRangeFold(ARangeIndex);
 
   Update;
 
   //force repaint, if after 'fold' editor has empty space below the last line,
   //because next click on gutter-fold-mark will be ignored. CudaText issue #4850
-  if not FOptLastLineOnTop and not bUnfold and (FScrollVert.NPos>=FScrollVert.NPosLast) then
+  if not FOptLastLineOnTop and not bUnfold then
   begin
-    Application.ProcessMessages;
-    Update;
+    bCaretNearEnd:= FScrollVert.NPos>=FScrollVert.NPosLast;
+
+    //for CudaText issue #5180
+    //we folded a big range, which ends near the file end?
+    if (FWrapInfo.IsIndexValid(FScrollVert.NPosLast)) and
+      (FoldItemPtr^.Y2>=FWrapInfo.Data[FScrollVert.NPosLast].NLineIndex) then
+      bCaretNearEnd:= true;
+
+    if bCaretNearEnd then
+    begin
+      Application.ProcessMessages;
+      Update;
+    end;
   end;
 end;
 

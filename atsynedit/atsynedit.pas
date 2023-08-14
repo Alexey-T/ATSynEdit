@@ -1093,7 +1093,7 @@ type
     procedure DoMarkAllRangesUnfolded;
     procedure DoMarkAllLinesVisible;
     procedure DoFoldbarClick_LineIndex(ALine: integer);
-    procedure DoFoldbarClick_RangeIndex(ARange: integer);
+    procedure DoFoldbarClick_RangeIndex(ARangeIndex: integer);
     procedure DoHandleRightClick(X, Y: integer);
     function DoHandleClickEvent(AEvent: TATSynEditClickEvent): boolean;
     procedure DoHotspotsExit;
