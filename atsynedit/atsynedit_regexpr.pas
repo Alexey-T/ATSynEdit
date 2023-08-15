@@ -1815,7 +1815,7 @@ begin
   if (AStr <> fExpression) or not IsCompiled then
   begin
     fExpression := AStr;
-    UniqueString(fExpression);
+    //UniqueString(fExpression);
     fRegexStart := PRegExprChar(fExpression);
     fRegexEnd := fRegexStart + Length(fExpression);
     InvalidateProgramm;
@@ -5704,7 +5704,7 @@ begin
   ClearMatches;
 
   fInputString := AInputString;
-  UniqueString(fInputString);
+  //UniqueString(fInputString);
 
   fInputStart := PRegExprChar(fInputString);
   fInputEnd := fInputStart + Length(fInputString);
