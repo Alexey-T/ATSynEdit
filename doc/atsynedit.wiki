@@ -94,9 +94,13 @@ Some details about this:
 
 = Help topics =
 ==Compilation errors==
-'''GTK2 error on ATSynEdit compiling regarding IME.'''
+'''IME error on GTK2.'''
 
-To fix this error, edit the file atsynedit/atsynedit_package.lpk and remove this block there:
+You may get this error:
+
+ atsynedit.pas(9067,9) Error: (5000) Identifier not found "IM_Context_Set_Cursor_Pos"
+
+To fix it, edit the file "atsynedit/atsynedit_package.lpk" and remove this block there:
 <syntaxhighlight lang="xml">
       <Other>
         <CustomOptions Value="-dGTK2_IME_CODE"/>
