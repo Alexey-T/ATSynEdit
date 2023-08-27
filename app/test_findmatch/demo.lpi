@@ -7,7 +7,7 @@
         <CompatibilityMode Value="True"/>
       </Flags>
       <SessionStorage Value="InProjectDir"/>
-      <Title Value="Demo"/>
+      <Title Value="Finder test"/>
       <ResourceType Value="res"/>
       <UseXPManifest Value="True"/>
     </General>
@@ -26,69 +26,41 @@
         <Mode0 Name="default"/>
       </Modes>
     </RunParams>
-    <RequiredPackages Count="4">
+    <RequiredPackages Count="2">
       <Item1>
-        <PackageName Value="atsynedit_ex_package"/>
+        <PackageName Value="atsynedit_package"/>
       </Item1>
       <Item2>
-        <PackageName Value="atsynedit_package"/>
-      </Item2>
-      <Item3>
-        <PackageName Value="econtrol_package"/>
-      </Item3>
-      <Item4>
         <PackageName Value="LCL"/>
-      </Item4>
+      </Item2>
     </RequiredPackages>
-    <Units Count="4">
+    <Units Count="2">
       <Unit0>
-        <Filename Value="lex_lib_demo.lpr"/>
+        <Filename Value="demo.lpr"/>
         <IsPartOfProject Value="True"/>
       </Unit0>
       <Unit1>
-        <Filename Value="unmain.pas"/>
+        <Filename Value="unit1.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="fmMain"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <UnitName Value="Unit1"/>
       </Unit1>
-      <Unit2>
-        <Filename Value="formlexerlib.pas"/>
-        <IsPartOfProject Value="True"/>
-        <HasResources Value="True"/>
-      </Unit2>
-      <Unit3>
-        <Filename Value="formlexerprop.pas"/>
-        <IsPartOfProject Value="True"/>
-        <ComponentName Value="fmLexerProp"/>
-        <HasResources Value="True"/>
-        <ResourceBaseClass Value="Form"/>
-      </Unit3>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="11"/>
     <Target>
-      <Filename Value="lex_lib_demo"/>
+      <Filename Value="demo"/>
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
+      <OtherUnitFiles Value="../../atsynedit"/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
-    <Parsing>
-      <SyntaxOptions>
-        <IncludeAssertionCode Value="True"/>
-      </SyntaxOptions>
-    </Parsing>
-    <CodeGeneration>
-      <Checks>
-        <RangeChecks Value="True"/>
-        <OverflowChecks Value="True"/>
-      </Checks>
-    </CodeGeneration>
     <Linking>
       <Debugging>
-        <DebugInfoType Value="dsDwarf3"/>
         <UseExternalDbgSyms Value="True"/>
       </Debugging>
       <Options>
@@ -97,6 +69,9 @@
         </Win32>
       </Options>
     </Linking>
+    <Other>
+      <CustomOptions Value="-dUnicode"/>
+    </Other>
   </CompilerOptions>
   <Debugging>
     <Exceptions Count="3">

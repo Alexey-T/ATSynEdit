@@ -1,4 +1,4 @@
-program test_loop;
+program demo;
 
 {$mode objfpc}{$H+}
 

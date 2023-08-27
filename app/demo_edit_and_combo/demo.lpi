@@ -2,19 +2,15 @@
 <CONFIG>
   <ProjectOptions>
     <Version Value="12"/>
-    <PathDelim Value="\"/>
     <General>
       <Flags>
         <CompatibilityMode Value="True"/>
       </Flags>
       <SessionStorage Value="InProjectDir"/>
-      <Title Value="project1"/>
+      <Title Value="demo"/>
       <ResourceType Value="res"/>
       <UseXPManifest Value="True"/>
     </General>
-    <i18n>
-      <EnableI18N LFM="False"/>
-    </i18n>
     <BuildModes Count="1">
       <Item1 Name="Default" Default="True"/>
     </BuildModes>
@@ -27,57 +23,40 @@
         <Mode0 Name="default"/>
       </Modes>
     </RunParams>
-    <RequiredPackages Count="3">
+    <RequiredPackages Count="2">
       <Item1>
-        <PackageName Value="encconv_package"/>
+        <PackageName Value="atsynedit_package"/>
       </Item1>
       <Item2>
-        <PackageName Value="atsynedit_package"/>
-      </Item2>
-      <Item3>
         <PackageName Value="LCL"/>
-      </Item3>
+      </Item2>
     </RequiredPackages>
     <Units Count="2">
       <Unit0>
-        <Filename Value="project1.lpr"/>
+        <Filename Value="demo.lpr"/>
         <IsPartOfProject Value="True"/>
       </Unit0>
       <Unit1>
-        <Filename Value="unit1.pas"/>
+        <Filename Value="formcombo.pas"/>
         <IsPartOfProject Value="True"/>
-        <ComponentName Value="fmMain"/>
+        <ComponentName Value="fmCombo"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <UnitName Value="Unit1"/>
       </Unit1>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="11"/>
-    <PathDelim Value="\"/>
     <Target>
-      <Filename Value="project1"/>
+      <Filename Value="demo"/>
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+      <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
-    <Parsing>
-      <SyntaxOptions>
-        <IncludeAssertionCode Value="True"/>
-      </SyntaxOptions>
-    </Parsing>
-    <CodeGeneration>
-      <Checks>
-        <RangeChecks Value="True"/>
-        <OverflowChecks Value="True"/>
-        <StackChecks Value="True"/>
-      </Checks>
-    </CodeGeneration>
     <Linking>
       <Debugging>
-        <DebugInfoType Value="dsDwarf3"/>
+        <DebugInfoType Value="dsDwarf2Set"/>
         <UseExternalDbgSyms Value="True"/>
       </Debugging>
       <Options>
@@ -86,11 +65,6 @@
         </Win32>
       </Options>
     </Linking>
-    <Other>
-      <ConfigFile>
-        <WriteConfigFilePath Value="$(ProjOutDir)\fpclaz.cfg"/>
-      </ConfigFile>
-    </Other>
   </CompilerOptions>
   <Debugging>
     <Exceptions Count="3">

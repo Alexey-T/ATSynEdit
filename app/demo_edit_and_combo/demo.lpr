@@ -1,4 +1,4 @@
-program project1;
+program demo;
 
 {$mode objfpc}{$H+}
 
@@ -7,14 +7,15 @@ uses
   cthreads,
   {$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, Unit1;
+  Forms, formcombo
+  { you can add units after this };
 
 {$R *.res}
 
 begin
   RequireDerivedFormResource:=True;
   Application.Initialize;
-  Application.CreateForm(TfmMain, fmMain);
+  Application.CreateForm(TfmCombo, fmCombo);
   Application.Run;
 end.
 

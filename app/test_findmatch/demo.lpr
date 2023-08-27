@@ -1,19 +1,19 @@
-program lex_lib_demo;
+program demo;
 
 {$mode objfpc}{$H+}
 
 uses
-  {$IFDEF UNIX}
+  {$IFDEF UNIX}{$IFDEF UseCThreads}
   cthreads,
-  {$ENDIF}
+  {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, unmain
+  Forms, Unit1
   { you can add units after this };
 
 {$R *.res}
 
 begin
-  Application.Title:='Demo';
+  Application.Title:='Finder test';
   RequireDerivedFormResource:=True;
   Application.Initialize;
   Application.CreateForm(TfmMain, fmMain);

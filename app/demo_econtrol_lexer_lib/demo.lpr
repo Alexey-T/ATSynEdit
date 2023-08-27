@@ -1,21 +1,22 @@
-program project1;
+program demo;
 
 {$mode objfpc}{$H+}
 
 uses
-  {$IFDEF UNIX}{$IFDEF UseCThreads}
+  {$IFDEF UNIX}
   cthreads,
-  {$ENDIF}{$ENDIF}
+  {$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, Unit1, atstringproc_textbuffer
+  Forms, unmain
   { you can add units after this };
 
 {$R *.res}
 
 begin
-  RequireDerivedFormResource:= True;
+  Application.Title:='Demo';
+  RequireDerivedFormResource:=True;
   Application.Initialize;
-  Application.CreateForm(TForm1, Form1);
+  Application.CreateForm(TfmMain, fmMain);
   Application.Run;
 end.
 
