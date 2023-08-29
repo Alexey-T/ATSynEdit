@@ -9912,6 +9912,9 @@ var
 begin
   Pnt:= ScreenToClient(Mouse.CursorPos);
 
+  //workaround for LCL bug on Windows: MouseLeave is not called with _fast_ mouse moving
+  if not PtInRect(FRectMinimap, Pnt) then exit;
+
   NPanelWidth:= FRectMain.Width * FMinimapTooltipWidthPercents div 100;
   if FMinimapAtLeft then
     NPanelLeft:= FRectMinimap.Right + 1
