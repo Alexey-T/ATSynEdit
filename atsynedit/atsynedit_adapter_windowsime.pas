@@ -80,6 +80,8 @@ var
   s: UnicodeString;
   i: Integer;
 begin
+  if not Assigned(CompForm) then
+    exit;
   // draw text
   tm:=CompForm.Canvas.TextExtent(buffer);
   CompForm.Width:=tm.cx+2;
@@ -206,6 +208,7 @@ begin
       begin
         FQueryCharPos:=True;
         cp := PIMECHARPOSITION(Msg.lParam);
+        cp^.dwSize:=sizeof(IMECHARPOSITION);
         cp^.cLineHeight := Ed.TextCharSize.Y;
         cp^.pt.x := Pnt.X;
         cp^.pt.y := Pnt.Y;
