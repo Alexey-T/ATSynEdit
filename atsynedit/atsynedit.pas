@@ -440,8 +440,8 @@ type
     ShowNumbers: boolean;
     ShowFolding: boolean;
     ShowUnprinted: boolean;
-    SavingTrimSpaces: boolean; //plugin EditorConfig needs it
-    SavingTrimFinalEmptyLines: boolean; //plugin EditorConfig needs it
+    SavingTrimSpaces: boolean; //CudaText plugin EditorConfig needs it
+    SavingTrimFinalEmptyLines: boolean; //CudaText plugin EditorConfig needs it
     UnprintedSpaces: boolean;
     UnprintedSpacesTrail: boolean;
     UnprintedSpacesInSel: boolean;
