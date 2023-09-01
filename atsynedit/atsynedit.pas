@@ -432,16 +432,16 @@ type
   end;
 
   TATEditorTempOptions = record
-    FontSize: integer;
-    WrapMode: TATEditorWrapMode;
-    ShowMinimap: boolean;
-    ShowMicromap: boolean;
-    ShowRuler: boolean;
-    ShowNumbers: boolean;
-    ShowFolding: boolean;
-    ShowUnprinted: boolean;
-    SavingTrimSpaces: boolean; //CudaText plugin EditorConfig needs it
-    SavingTrimFinalEmptyLines: boolean; //CudaText plugin EditorConfig needs it
+    FontSize: integer;                  //can be changed by Ctrl+mouse_wheel
+    WrapMode: TATEditorWrapMode;        //can be changed by CudaText UI
+    ShowMinimap: boolean;               //can be changed by CudaText UI
+    ShowMicromap: boolean;              //can be changed by CudaText UI
+    ShowRuler: boolean;                 //can be changed by CudaText UI
+    ShowNumbers: boolean;               //can be changed by CudaText UI
+    ShowFolding: boolean;               //can be changed by CudaText UI
+    ShowUnprinted: boolean;             //can be changed by CudaText UI
+    SavingTrimSpaces: boolean;          //changed by CudaText plugin EditorConfig
+    SavingTrimFinalEmptyLines: boolean; //changed by CudaText plugin EditorConfig
     UnprintedSpaces: boolean;
     UnprintedSpacesTrail: boolean;
     UnprintedSpacesInSel: boolean;
