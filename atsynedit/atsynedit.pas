@@ -1523,7 +1523,7 @@ type
   public
     TagString: string; //to store plugin specific data in CudaText
     InitialOptions: TATEditorTempOptions;
-    ModifiedOptions: TATEditorModifiedOptions; //for CudaText: e.g. has item 'wrap' if WordWrap prop was modified during file work
+    ModifiedOptions: TATEditorModifiedOptions;
 
     //overrides
     constructor Create(AOwner: TComponent); override;
