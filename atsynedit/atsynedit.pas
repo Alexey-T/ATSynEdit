@@ -1506,20 +1506,7 @@ type
   public
     TagString: string; //to store plugin specific data in CudaText
     InitialOptions: TATEditorTempOptions;
-
-    IsModifiedWrapMode: boolean;
-    IsModifiedMinimapVisible: boolean;
-    IsModifiedMicromapVisible: boolean;
-    IsModifiedRulerVisible: boolean;
-    IsModifiedGutterNumbersVisible: boolean;
-    IsModifiedGutterFoldingVisible: boolean;
-    IsModifiedGutterBookmarksVisible: boolean;
-    IsModifiedUnprintedVisible: boolean;
-    IsModifiedUnprintedSpaces: boolean;
-    IsModifiedUnprintedTrailingOnly: boolean;
-    IsModifiedUnprintedEnds: boolean;
-    IsModifiedUnprintedEndDetails: boolean;
-    IsModifiedLastLineOnTop: boolean;
+    ModifiedOptions: array of string; //for CudaText: e.g. has item 'wrap' if WordWrap prop was modified during file work
 
     //overrides
     constructor Create(AOwner: TComponent); override;
@@ -1538,6 +1525,7 @@ type
     function UpdateScrollbars(AdjustSmoothPos: boolean): boolean;
     procedure UpdateCaretsAndMarkersOnEditing(AFromCaret: integer; APos, APosEnd, AShift, APosAfter: TPoint);
     procedure UpdateMarkersOnDeleting(AX1, AY1, AX2, AY2: integer);
+    procedure SetModifiedProp(const AProp: string);
     //events
     procedure DoEventCarets; virtual;
     procedure DoEventScroll; virtual;
@@ -2165,6 +2153,7 @@ uses
   Dialogs,
   Types,
   Math,
+  StrUtils,
   {$ifdef LCLGTK2}
   Gtk2Globals,
   {$endif}
@@ -5406,19 +5395,7 @@ begin
     IsReadOnlyChanged:= false;
     IsReadOnlyAutodetected:= false;
     InitialOptions:= Default(TATEditorTempOptions);
-    IsModifiedWrapMode:= false;
-    IsModifiedMinimapVisible:= false;
-    IsModifiedMicromapVisible:= false;
-    IsModifiedRulerVisible:= false;
-    IsModifiedGutterNumbersVisible:= false;
-    IsModifiedGutterFoldingVisible:= false;
-    IsModifiedGutterBookmarksVisible:= false;
-    IsModifiedUnprintedVisible:= false;
-    IsModifiedUnprintedSpaces:= false;
-    IsModifiedUnprintedTrailingOnly:= false;
-    IsModifiedUnprintedEnds:= false;
-    IsModifiedUnprintedEndDetails:= false;
-    IsModifiedLastLineOnTop:= false;
+    ModifiedOptions:= nil;
     FLastHotspot:= -1;
     FLastCaretY:= -1;
 
@@ -10748,6 +10725,13 @@ begin
     FStringsInt.OnSetAttribsArray:= nil;
   end;
 end;
+
+procedure TATSynEdit.SetModifiedProp(const AProp: string);
+begin
+  if not (AProp in ModifiedOptions) then
+    ModifiedOptions:= Concat(ModifiedOptions, [AProp]);
+end;
+
 
 {$I atsynedit_carets.inc}
 {$I atsynedit_hilite.inc}

@@ -22,43 +22,42 @@ begin
       OptWrapMode:= TATEditorWrapMode.ModeOff;
   end;
 
-  IsModifiedWrapMode:= true;
-
+  SetModifiedProp('wrap');
   Result:= [TATCommandResult.State];
 end;
 
 function TATSynEdit.DoCommand_ToggleUnprinted: TATCommandResults;
 begin
   OptUnprintedVisible:= not OptUnprintedVisible;
-  IsModifiedUnprintedVisible:= true;
+  SetModifiedProp('unprinted_visible');
   Result:= [TATCommandResult.State];
 end;
 
 function TATSynEdit.DoCommand_ToggleUnprintedSpaces: TATCommandResults;
 begin
   OptUnprintedSpaces:= not OptUnprintedSpaces;
-  IsModifiedUnprintedSpaces:= true;
+  SetModifiedProp('unprinted_spaces');
   Result:= [TATCommandResult.State];
 end;
 
 function TATSynEdit.DoCommand_ToggleUnprintedSpacesTrailing: TATCommandResults;
 begin
   OptUnprintedSpacesTrailing:= not OptUnprintedSpacesTrailing;
-  IsModifiedUnprintedTrailingOnly:= true;
+  SetModifiedProp('unprinted_tailing_only');
   Result:= [TATCommandResult.State];
 end;
 
 function TATSynEdit.DoCommand_ToggleUnprintedEnds: TATCommandResults;
 begin
   OptUnprintedEnds:= not OptUnprintedEnds;
-  IsModifiedUnprintedEnds:= true;
+  SetModifiedProp('unprinted_ends');
   Result:= [TATCommandResult.State];
 end;
 
 function TATSynEdit.DoCommand_ToggleUnprintedEndDetails: TATCommandResults;
 begin
   OptUnprintedEndsDetails:= not OptUnprintedEndsDetails;
-  IsModifiedUnprintedEndDetails:= true;
+  SetModifiedProp('unprinted_end_details');
   Result:= [TATCommandResult.State];
 end;
 
@@ -66,7 +65,7 @@ function TATSynEdit.DoCommand_ToggleLineNums: TATCommandResults;
 begin
   with Gutter.Items[FGutterBandNumbers] do
     Visible:= not Visible;
-  IsModifiedGutterNumbersVisible:= true;
+  SetModifiedProp('gutter_numbers');
   Result:= [TATCommandResult.State];
 end;
 
@@ -74,28 +73,28 @@ function TATSynEdit.DoCommand_ToggleFolding: TATCommandResults;
 begin
   with Gutter.Items[FGutterBandFolding] do
     Visible:= not Visible;
-  IsModifiedGutterFoldingVisible:= true;
+  SetModifiedProp('gutter_folding');
   Result:= [TATCommandResult.State];
 end;
 
 function TATSynEdit.DoCommand_ToggleRuler: TATCommandResults;
 begin
   OptRulerVisible:= not OptRulerVisible;
-  IsModifiedRulerVisible:= true;
+  SetModifiedProp('ruler');
   Result:= [TATCommandResult.State];
 end;
 
 function TATSynEdit.DoCommand_ToggleMiniMap: TATCommandResults;
 begin
   OptMinimapVisible:= not OptMinimapVisible;
-  IsModifiedMinimapVisible:= true;
+  SetModifiedProp('minimap');
   Result:= [TATCommandResult.State];
 end;
 
 function TATSynEdit.DoCommand_ToggleMicroMap: TATCommandResults;
 begin
   OptMicromapVisible:= not OptMicromapVisible;
-  IsModifiedMicromapVisible:= true;
+  SetModifiedProp('micromap');
   Result:= [TATCommandResult.State];
 end;
 
