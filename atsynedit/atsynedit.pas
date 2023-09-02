@@ -333,6 +333,7 @@ type
     GutterFolding,
     GutterBookmarks,
     LastLineOnTop,
+    CaretShape,
     UnprintedVisible,
     UnprintedSpaces,
     UnprintedTrailingOnly,
@@ -692,7 +693,6 @@ type
     FLastUndoPaused: boolean;
     FLastCaretY: integer;
     FLineTopTodo: integer;
-    FIsCaretShapeChangedFromAPI: boolean;
     FIsReadOnlyChanged: boolean;
     FIsReadOnlyAutodetected: boolean;
     FIsRunningCommand: boolean;
@@ -1730,7 +1730,6 @@ type
     property IsRunningCommand: boolean read FIsRunningCommand;
     property IsReadOnlyChanged: boolean read FIsReadOnlyChanged write FIsReadOnlyChanged;
     property IsReadOnlyAutodetected: boolean read FIsReadOnlyAutodetected write FIsReadOnlyAutodetected;
-    property IsCaretShapeChangedFromAPI: boolean read FIsCaretShapeChangedFromAPI write FIsCaretShapeChangedFromAPI;
     procedure DoSelect_All;
     procedure DoSelect_None;
     procedure DoSelect_Inverted;
