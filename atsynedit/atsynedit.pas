@@ -335,6 +335,7 @@ type
     LastLineOnTop,
     CaretShape,
     ReadOnly,
+    ReadOnlyIsDetected,
     UnprintedVisible,
     UnprintedSpaces,
     UnprintedTrailingOnly,
@@ -694,7 +695,6 @@ type
     FLastUndoPaused: boolean;
     FLastCaretY: integer;
     FLineTopTodo: integer;
-    FIsReadOnlyAutodetected: boolean;
     FIsRunningCommand: boolean;
     FCursorOnMinimap: boolean;
     FCursorOnGutter: boolean;
@@ -1728,7 +1728,6 @@ type
     property LastCommandChangedLines: integer read GetLastCommandChangedLines write SetLastCommandChangedLines;
     property IsIniting: boolean read FIsIniting write FIsIniting;
     property IsRunningCommand: boolean read FIsRunningCommand;
-    property IsReadOnlyAutodetected: boolean read FIsReadOnlyAutodetected write FIsReadOnlyAutodetected;
     procedure DoSelect_All;
     procedure DoSelect_None;
     procedure DoSelect_Inverted;
@@ -5406,7 +5405,6 @@ begin
   finally
     EndUpdate;
 
-    IsReadOnlyAutodetected:= false;
     InitialOptions:= Default(TATEditorTempOptions);
     ModifiedOptions:= [];
     FLastHotspot:= -1;
