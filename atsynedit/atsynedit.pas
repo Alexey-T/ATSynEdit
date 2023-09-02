@@ -324,6 +324,14 @@ type
     Relative
     );
 
+  TATEditorInternalFlag = (
+    Bitmap, //flag "bitmap should be repainted"
+    ScrolledHorz, //flag "horizontal scroll _position_ is changed"
+    RepaintNeeded, //last paint changes some state, so repainting is needed
+    Resize
+    );
+  TATEditorInternalFlags = set of TATEditorInternalFlag;
+
   TATEditorModifiedOption = (
     WordWrap,
     MinimapVisible,
@@ -344,14 +352,7 @@ type
     );
   TATEditorModifiedOptions = set of TATEditorModifiedOption;
 
-  TATEditorInternalFlag = (
-    Bitmap, //flag "bitmap should be repainted"
-    ScrolledHorz, //flag "horizontal scroll _position_ is changed"
-    RepaintNeeded, //last paint changes some state, so repainting is needed
-    Resize
-    );
-  TATEditorInternalFlags = set of TATEditorInternalFlag;
-
+type
   { TATEditorScrollInfo }
 
   TATEditorScrollInfo = record
