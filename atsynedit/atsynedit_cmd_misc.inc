@@ -43,7 +43,7 @@ end;
 function TATSynEdit.DoCommand_ToggleUnprintedSpacesTrailing: TATCommandResults;
 begin
   OptUnprintedSpacesTrailing:= not OptUnprintedSpacesTrailing;
-  SetModifiedProp('unprinted_tailing_only');
+  SetModifiedProp('unprinted_trailing_only');
   Result:= [TATCommandResult.State];
 end;
 
