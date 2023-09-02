@@ -348,7 +348,10 @@ type
     UnprintedSpaces,
     UnprintedTrailingOnly,
     UnprintedEnds,
-    UnprintedEndDetails
+    UnprintedEndDetails,
+    SavingTrimSpaces,
+    SavingTrimFinalEmptyLines,
+    SavingForceFinalEol
     );
   TATEditorModifiedOptions = set of TATEditorModifiedOption;
 
