@@ -452,28 +452,6 @@ type
     function FindByCoord(ACoord: TPoint): TATFoldedMark;
   end;
 
-  TATEditorTempOptions = record
-    FontSize: integer;                  //can be changed by Ctrl+mouse_wheel
-    TabSize: integer;                   //can be changed by CudaText UI
-    TabSpaces: boolean;                 //can be changed by CudaText UI
-    WrapMode: TATEditorWrapMode;        //can be changed by CudaText UI
-    ShowMinimap: boolean;               //can be changed by CudaText UI
-    ShowMicromap: boolean;              //can be changed by CudaText UI
-    ShowRuler: boolean;                 //can be changed by CudaText UI
-    ShowNumbers: boolean;               //can be changed by CudaText UI
-    ShowFolding: boolean;               //can be changed by CudaText UI
-    ShowUnprinted: boolean;             //can be changed by CudaText UI
-    SavingTrimSpaces: boolean;          //changed by CudaText plugin EditorConfig
-    SavingTrimFinalEmptyLines: boolean; //changed by CudaText plugin EditorConfig
-    SavingForceFinalEol: boolean;       //changed by CudaText plugin EditorConfig
-    UnprintedSpaces: boolean;
-    UnprintedSpacesTrail: boolean;
-    UnprintedSpacesInSel: boolean;
-    UnprintedEnds: boolean;
-    UnprintedEndsDetails: boolean;
-    UnprintedForceTabs: boolean;
-  end;
-
 type
   { TATSynEdit }
 
@@ -1523,7 +1501,6 @@ type
 
   public
     TagString: string; //to store plugin specific data in CudaText
-    InitialOptions: TATEditorTempOptions;
     ModifiedOptions: TATEditorModifiedOptions;
 
     //overrides
@@ -5406,7 +5383,6 @@ begin
   finally
     EndUpdate;
 
-    InitialOptions:= Default(TATEditorTempOptions);
     ModifiedOptions:= [];
     FLastHotspot:= -1;
     FLastCaretY:= -1;
