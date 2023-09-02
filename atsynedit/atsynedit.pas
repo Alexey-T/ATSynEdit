@@ -324,7 +324,7 @@ type
     Relative
     );
 
-  TATEditorModifiedPropId = (
+  TATEditorModifiedOption = (
     WordWrap,
     MinimapVisible,
     MicromapVisible,
@@ -339,7 +339,7 @@ type
     UnprintedEnds,
     UnprintedEndDetails
     );
-  TATEditorModifiedPropIds = set of TATEditorModifiedPropId;
+  TATEditorModifiedOptions = set of TATEditorModifiedOption;
 
   TATEditorInternalFlag = (
     Bitmap, //flag "bitmap should be repainted"
@@ -1523,7 +1523,7 @@ type
   public
     TagString: string; //to store plugin specific data in CudaText
     InitialOptions: TATEditorTempOptions;
-    ModifiedOptions: TATEditorModifiedPropIds; //for CudaText: e.g. has item 'wrap' if WordWrap prop was modified during file work
+    ModifiedOptions: TATEditorModifiedOptions; //for CudaText: e.g. has item 'wrap' if WordWrap prop was modified during file work
 
     //overrides
     constructor Create(AOwner: TComponent); override;
