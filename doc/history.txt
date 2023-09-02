@@ -1,5 +1,5 @@
 2023.09.02
-* change: removed all props IsModified*, added instead prop ModifiedOptions
+* change: removed props IsModified* and IsReadOnlyChanged, added instead prop ModifiedOptions
 
 2023.08.10
 * change: removed property ModeMacroRecording

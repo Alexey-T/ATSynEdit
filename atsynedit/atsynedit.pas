@@ -334,6 +334,7 @@ type
     GutterBookmarks,
     LastLineOnTop,
     CaretShape,
+    ReadOnly,
     UnprintedVisible,
     UnprintedSpaces,
     UnprintedTrailingOnly,
@@ -693,7 +694,6 @@ type
     FLastUndoPaused: boolean;
     FLastCaretY: integer;
     FLineTopTodo: integer;
-    FIsReadOnlyChanged: boolean;
     FIsReadOnlyAutodetected: boolean;
     FIsRunningCommand: boolean;
     FCursorOnMinimap: boolean;
@@ -1728,7 +1728,6 @@ type
     property LastCommandChangedLines: integer read GetLastCommandChangedLines write SetLastCommandChangedLines;
     property IsIniting: boolean read FIsIniting write FIsIniting;
     property IsRunningCommand: boolean read FIsRunningCommand;
-    property IsReadOnlyChanged: boolean read FIsReadOnlyChanged write FIsReadOnlyChanged;
     property IsReadOnlyAutodetected: boolean read FIsReadOnlyAutodetected write FIsReadOnlyAutodetected;
     procedure DoSelect_All;
     procedure DoSelect_None;
@@ -5407,7 +5406,6 @@ begin
   finally
     EndUpdate;
 
-    IsReadOnlyChanged:= false;
     IsReadOnlyAutodetected:= false;
     InitialOptions:= Default(TATEditorTempOptions);
     ModifiedOptions:= [];

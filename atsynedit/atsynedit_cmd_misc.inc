@@ -101,7 +101,7 @@ end;
 function TATSynEdit.DoCommand_ToggleReadOnly: TATCommandResults;
 begin
   ModeReadOnly:= not ModeReadOnly;
-  FIsReadOnlyChanged:= true;
+  Include(ModifiedOptions, TATEditorModifiedOption.ReadOnly);
   Result:= [TATCommandResult.State];
 end;
 
