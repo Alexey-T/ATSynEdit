@@ -324,6 +324,23 @@ type
     Relative
     );
 
+  TATEditorModifiedPropId = (
+    WordWrap,
+    MinimapVisible,
+    MicromapVisible,
+    RulerVisible,
+    GutterNumbers,
+    GutterFolding,
+    GutterBookmarks,
+    LastLineOnTop,
+    UnprintedVisible,
+    UnprintedSpaces,
+    UnprintedTrailingOnly,
+    UnprintedEnds,
+    UnprintedEndDetails
+    );
+  TATEditorModifiedPropIds = set of TATEditorModifiedPropId;
+
   TATEditorInternalFlag = (
     Bitmap, //flag "bitmap should be repainted"
     ScrolledHorz, //flag "horizontal scroll _position_ is changed"
@@ -1506,7 +1523,7 @@ type
   public
     TagString: string; //to store plugin specific data in CudaText
     InitialOptions: TATEditorTempOptions;
-    ModifiedOptions: array of string; //for CudaText: e.g. has item 'wrap' if WordWrap prop was modified during file work
+    ModifiedOptions: TATEditorModifiedPropIds; //for CudaText: e.g. has item 'wrap' if WordWrap prop was modified during file work
 
     //overrides
     constructor Create(AOwner: TComponent); override;
@@ -1525,7 +1542,6 @@ type
     function UpdateScrollbars(AdjustSmoothPos: boolean): boolean;
     procedure UpdateCaretsAndMarkersOnEditing(AFromCaret: integer; APos, APosEnd, AShift, APosAfter: TPoint);
     procedure UpdateMarkersOnDeleting(AX1, AY1, AX2, AY2: integer);
-    procedure SetModifiedProp(const AProp: string);
     //events
     procedure DoEventCarets; virtual;
     procedure DoEventScroll; virtual;
@@ -5395,7 +5411,7 @@ begin
     IsReadOnlyChanged:= false;
     IsReadOnlyAutodetected:= false;
     InitialOptions:= Default(TATEditorTempOptions);
-    ModifiedOptions:= nil;
+    ModifiedOptions:= [];
     FLastHotspot:= -1;
     FLastCaretY:= -1;
 
@@ -10724,12 +10740,6 @@ begin
     FStringsInt.OnGetAttribsArray:= nil;
     FStringsInt.OnSetAttribsArray:= nil;
   end;
-end;
-
-procedure TATSynEdit.SetModifiedProp(const AProp: string);
-begin
-  if not (AProp in ModifiedOptions) then
-    ModifiedOptions:= Concat(ModifiedOptions, [AProp]);
 end;
 
 
