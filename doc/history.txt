@@ -1,3 +1,6 @@
+2023.09.07
++ add: OptGapBitmapOnTheLeft
+
 2023.09.02
 * change: removed props IsModified* and IsReadOnlyChanged and IsReadOnlyAutodetected, added instead prop ModifiedOptions
 
