@@ -855,7 +855,7 @@ type
     FOptAutocompleteCommitIfSingleItem: boolean;
 
     //options
-    FOptGapBitmapOnTheLeft: boolean;
+    FOptGapBitmapAlignment: TAlignment;
     FOptFlickerReducingPause: integer;
     FOptInputNumberOnly: boolean;
     FOptInputNumberAllowNegative: boolean;
@@ -1888,7 +1888,7 @@ type
     property OptAutocompleteUpDownAtEdge: integer read FOptAutocompleteUpDownAtEdge write FOptAutocompleteUpDownAtEdge default 1;
     property OptAutocompleteCommitIfSingleItem: boolean read FOptAutocompleteCommitIfSingleItem write FOptAutocompleteCommitIfSingleItem default false;
 
-    property OptGapBitmapOnTheLeft: boolean read FOptGapBitmapOnTheLeft write FOptGapBitmapOnTheLeft default false;
+    property OptGapBitmapAlignment: TAlignment read FOptGapBitmapAlignment write FOptGapBitmapAlignment default taCenter;
     property OptFlickerReducingPause: integer read FOptFlickerReducingPause write FOptFlickerReducingPause default 0;
     property OptInputNumberOnly: boolean read FOptInputNumberOnly write FOptInputNumberOnly default false;
     property OptInputNumberAllowNegative: boolean read FOptInputNumberAllowNegative write FOptInputNumberAllowNegative default cInitInputNumberAllowNegative;
@@ -4606,11 +4606,15 @@ begin
   if Assigned(AGap.Bitmap) then
   begin
     RBmp:= Rect(0, 0, AGap.Bitmap.Width, AGap.Bitmap.Height);
-    //RHere is rect of bitmap's size, located in the center of ARect
-    if FOptGapBitmapOnTheLeft then
-      RHere.Left:= ARect.Left
-    else
-      RHere.Left:= GetGapBitmapPosLeft(ARect, AGap.Bitmap.Width);
+    //RHere is rect of bitmap's size
+    case FOptGapBitmapAlignment of
+      taCenter:
+        RHere.Left:= GetGapBitmapPosLeft(ARect, AGap.Bitmap.Width);
+      taLeftJustify:
+        RHere.Left:= ARect.Left;
+      taRightJustify:
+        RHere.Left:= Max(ARect.Left, ARect.Right-AGap.Bitmap.Width);
+    end;
     RHere.Top:= (ARect.Top+ARect.Bottom-RBmp.Bottom) div 2;
     RHere.Right:= RHere.Left + RBmp.Right;
     RHere.Bottom:= RHere.Top + RBmp.Bottom;
@@ -4962,7 +4966,7 @@ begin
   FPrevCaret.EndX:= -1;
   FPrevCaret.EndY:= -1;
 
-  FOptGapBitmapOnTheLeft:= false;
+  FOptGapBitmapAlignment:= taCenter;
   FOptFlickerReducingPause:= 0;
   FOptInputNumberOnly:= false;
   FOptInputNumberAllowNegative:= cInitInputNumberAllowNegative;
