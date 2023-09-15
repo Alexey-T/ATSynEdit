@@ -54,8 +54,8 @@ type
     CharAtCaret: WideChar; //char which is rendered above the inverted-rect, if ATEditorOptions.CaretTextOverInvertedRect
     CharColor: TColor;
     CharStyles: TFontStyles;
-    DoubleClickRange: record
-      XFrom, XTo, Y: integer
+    DoubleClickRange: record //must be filled only when selection is made by double-click (and like it)
+      XFrom, XTo, Y: integer;
     end;
     procedure SelectNone;
     procedure SelectNoneIfEmptySelection;
