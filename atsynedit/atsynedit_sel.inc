@@ -102,7 +102,15 @@ begin
     Carets.Sort;
   end
   else
+  begin
     DoCaretSingle(XTo, P.Y, XFrom, P.Y);
+    with Carets[0] do
+    begin
+      DoubleClickRange.XFrom:= XFrom;
+      DoubleClickRange.XTo:= XTo;
+      DoubleClickRange.Y:= P.Y;
+    end;
+  end;
 end;
 
 procedure TATSynEdit.DoSelect_WordRange(ACaretIndex: integer; P1, P2: TPoint);

@@ -6479,9 +6479,7 @@ begin
       FSelRect:= cRectEmpty;
       DoCaretSingleAsIs;
       //see CudaText issue #5221
-      //keep caret's old EndX/EndY, to be like Chromium/Firefox
-      //let's ignore what GEdit does by Shift+click (it is not like in Firefox)
-      Carets[0].SelectToPoint(FMouseDownPnt.X, FMouseDownPnt.Y);
+      Carets[0].SelectToPoint_ByShiftClick(FMouseDownPnt.X, FMouseDownPnt.Y);
     end;
 
     if ActionId=TATEditorMouseAction.ClickAndSelVerticalBlock then

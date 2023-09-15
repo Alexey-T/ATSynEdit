@@ -54,9 +54,13 @@ type
     CharAtCaret: WideChar; //char which is rendered above the inverted-rect, if ATEditorOptions.CaretTextOverInvertedRect
     CharColor: TColor;
     CharStyles: TFontStyles;
+    DoubleClickRange: record
+      XFrom, XTo, Y: integer
+    end;
     procedure SelectNone;
     procedure SelectNoneIfEmptySelection;
     procedure SelectToPoint(AX, AY: integer);
+    procedure SelectToPoint_ByShiftClick(AX, AY: integer);
     procedure GetRange(out AX1, AY1, AX2, AY2: integer; out ASel: boolean);
     procedure GetSelLines(out AFrom, ATo: integer; AllowNoSel: boolean=false);
     function GetLeftEdge: TPoint;
@@ -67,7 +71,9 @@ type
     function IsForwardSelection: boolean;
     function IsMultilineSelection: boolean;
     function IsInVisibleRect(const R: TRect): boolean;
+    function IsFromDoubleClick: boolean;
     function FirstTouchedLine: integer;
+    procedure ClearDoubleClickRange;
     procedure UpdateMemory(AMode: TATCaretMemoryAction; AArrowUpDown: boolean);
     procedure UpdateOnEditing(APos, APosEnd, AShift: TPoint);
   end;
@@ -502,6 +508,7 @@ begin
     PosY:= APosY;
     EndX:= AEndX;
     EndY:= AEndY;
+    ClearDoubleClickRange;
   end;
 end;
 
@@ -613,6 +620,12 @@ procedure TATCaretItem.SelectNone;
 begin
   EndX:= -1;
   EndY:= -1;
+  ClearDoubleClickRange;
+end;
+
+procedure TATCaretItem.ClearDoubleClickRange;
+begin
+  FillChar(DoubleClickRange, SizeOf(DoubleClickRange), 0);
 end;
 
 procedure TATCaretItem.SelectNoneIfEmptySelection;
@@ -627,6 +640,36 @@ begin
   if EndY<0 then EndY:= PosY;
   PosX:= AX;
   PosY:= AY;
+end;
+
+function TATCaretItem.IsFromDoubleClick: boolean;
+begin
+  Result:=
+    (DoubleClickRange.XTo<>0) or
+    (DoubleClickRange.Y<>0);
+end;
+
+procedure TATCaretItem.SelectToPoint_ByShiftClick(AX, AY: integer);
+begin
+  //emulate VSCode behaviour after double-click
+  //see CudaText issue #5221
+  if IsSelection and IsFromDoubleClick then
+  begin
+    if IsPosSorted(DoubleClickRange.XFrom, DoubleClickRange.Y, AX, AY, true) then
+    begin
+      EndX:= DoubleClickRange.XFrom;
+      EndY:= DoubleClickRange.Y;
+    end
+    else
+    begin
+      EndX:= DoubleClickRange.XTo;
+      EndY:= DoubleClickRange.Y;
+    end;
+    PosX:= AX;
+    PosY:= AY;
+  end
+  else
+    SelectToPoint(AX, AY);
 end;
 
 { TATCarets }
@@ -716,9 +759,15 @@ begin
 end;
 
 procedure TATCarets.Sort(AJoinAdjacentCarets: boolean=true);
+var
+  i: integer;
 begin
   FList.Sort(@_ListCaretsCompare);
   DeleteDups(AJoinAdjacentCarets);
+
+  if Count>1 then
+    for i:= Count-1 downto 0 do
+      GetItem(i).ClearDoubleClickRange;
 end;
 
 procedure TATCarets.DeleteDups(AJoinAdjacentCarets: boolean);
