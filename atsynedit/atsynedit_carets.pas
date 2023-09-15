@@ -636,12 +636,9 @@ begin
   begin
     EndX:= PosX;
     EndY:= PosY;
-    PosX:= AX;
-    PosY:= AY;
-    exit;
   end;
 
-  //keep old EndX/EndY, to be like Kate/GEdit, see CudaText issue #5221
+  //keep old EndX/EndY, to be like Chromium/Firefox, see CudaText issue #5221
   PosX:= AX;
   PosY:= AY;
 end;
