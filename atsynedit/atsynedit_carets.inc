@@ -135,6 +135,7 @@ var
   NCaretCount, NStart: integer;
   //NLineTop, NLineBottom: integer;
   iCaret: integer;
+  TempStr: UnicodeString;
 begin
   if Assigned(FOnCalcCaretsCoords) then
     FOnCalcCaretsCoords(Self);
@@ -185,12 +186,16 @@ begin
 
     if ATEditorOptions.CaretTextOverInvertedRect then
     begin
-      Caret.CharStr:= '';
+      Caret.CharStr:= #0;
       Caret.CharColor:= clNone;
       Caret.CharStyles:= [];
       if Caret.PosX<St.LinesLen[Caret.PosY] then
       begin
-        Caret.CharStr:= St.LineSub(Caret.PosY, Caret.PosX+1, 1);
+        TempStr:= St.LineSub(Caret.PosY, Caret.PosX+1, 1);
+        if TempStr<>'' then
+          Caret.CharStr:= TempStr[1]
+        else
+          Caret.CharStr:= #0;
 
         if not DoCalcForegroundFromAttribs(
                  Caret.PosX,

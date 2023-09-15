@@ -7638,7 +7638,7 @@ begin
 
   if ATEditorOptions.CaretTextOverInvertedRect and not ACaretShape.IsNarrow then
   begin
-    if (ACaret.CharStr<>'') and (ACaret.CharColor<>clNone) and not IsCharUnicodeSpace(ACaret.CharStr[1]) then
+    if (ACaret.CharStr<>#0) and (ACaret.CharColor<>clNone) and not IsCharUnicodeSpace(ACaret.CharStr) then
     begin
       C.Font.Color:= ACaret.CharColor;
       C.Font.Style:= ACaret.CharStyles;
@@ -7647,7 +7647,7 @@ begin
       NCoordY:= ACaret.CoordY;
       if OptSpacingY<0 then
         Inc(NCoordY, OptSpacingY);
-      CanvasTextOutSimplest(C, NCoordX, NCoordY, ACaret.CharStr);
+      CanvasTextOutSimplest(C, NCoordX, NCoordY, UnicodeString(ACaret.CharStr));
     end;
   end;
 end;
