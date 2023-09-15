@@ -142,12 +142,12 @@ type
     constructor Create; virtual;
     destructor Destroy; override;
     procedure Clear;
-    procedure Delete(N: integer);
+    procedure Delete(N: integer; AWithEvent: boolean=true);
     function Count: integer; inline;
     function IsIndexValid(N: integer): boolean; inline;
     function IsPosSelected(AX, AY: integer; AllowAtEdge: boolean=false): boolean;
     property Items[N: integer]: TATCaretItem read GetItem; default;
-    procedure Add(APosX, APosY: integer; AEndX: integer=-1; AEndY: integer=-1);
+    procedure Add(APosX, APosY: integer; AEndX: integer=-1; AEndY: integer=-1; AWithEvent: boolean=true);
     procedure Sort(AJoinAdjacentCarets: boolean=true);
     procedure Assign(Obj: TATCarets);
     function FindCaretBeforePos(APosX, APosY: integer; ARequireSel: boolean): integer;
@@ -728,13 +728,14 @@ begin
   FList.Clear;
 end;
 
-procedure TATCarets.Delete(N: integer);
+procedure TATCarets.Delete(N: integer; AWithEvent: boolean=true);
 begin
   if IsIndexValid(N) then
   begin
     TObject(FList[N]).Free;
     FList.Delete(N);
-    DoChanged;
+    if AWithEvent then
+      DoChanged;
   end;
 end;
 
@@ -748,7 +749,8 @@ begin
   Result:= (N>=0) and (N<FList.Count);
 end;
 
-procedure TATCarets.Add(APosX, APosY: integer; AEndX: integer=-1; AEndY: integer=-1);
+procedure TATCarets.Add(APosX, APosY: integer; AEndX: integer=-1; AEndY: integer=-1;
+  AWithEvent: boolean=true);
 var
   Item: TATCaretItem;
 begin
@@ -766,7 +768,8 @@ begin
   Item.EndY:= AEndY;
 
   FList.Add(Item);
-  DoChanged;
+  if AWithEvent then
+    DoChanged;
 end;
 
 function _ListCaretsCompare(Item1, Item2: Pointer): Integer;
@@ -794,17 +797,23 @@ end;
 
 procedure TATCarets.DeleteDups(AJoinAdjacentCarets: boolean);
 var
-  i: integer;
   Item1, Item2: TATCaretItem;
   OutPosX, OutPosY, OutEndX, OutEndY: integer;
+  bChanged: boolean;
+  i: integer;
 begin
-  for i:= Count-1 downto 1 do
+  bChanged:= false;
+
+  for i:= Count-1 downto 1{>0} do
   begin
     Item1:= GetItem(i);
     Item2:= GetItem(i-1);
 
     if (Item1.PosY=Item2.PosY) and (Item1.PosX=Item2.PosX) then
+    begin
       Delete(i);
+      bChanged:= true;
+    end;
 
     if AJoinAdjacentCarets and
       IsJoinNeeded(i, i-1, OutPosX, OutPosY, OutEndX, OutEndY) then
@@ -814,10 +823,12 @@ begin
       Item2.PosY:= OutPosY;
       Item2.EndX:= OutEndX;
       Item2.EndY:= OutEndY;
+      bChanged:= true;
     end;
   end;
 
-  DoChanged;
+  if bChanged then
+    DoChanged;
 end;
 
 
@@ -830,7 +841,7 @@ begin
   for i:= 0 to Obj.Count-1 do
   begin
     Caret:= Obj[i];
-    Add(Caret.PosX, Caret.PosY, Caret.EndX, Caret.EndY);
+    Add(Caret.PosX, Caret.PosY, Caret.EndX, Caret.EndY, false{AWithEvent});
   end;
   DoChanged;
 end;
@@ -1168,7 +1179,8 @@ begin
       Res[i*2].X,
       Res[i*2].Y,
       Res[i*2+1].X,
-      Res[i*2+1].Y
+      Res[i*2+1].Y,
+      false{AWithEvent}
       );
   DoChanged;
 end;
