@@ -135,7 +135,6 @@ var
   NCaretCount, NStart: integer;
   //NLineTop, NLineBottom: integer;
   iCaret: integer;
-  TempStr: UnicodeString;
 begin
   if Assigned(FOnCalcCaretsCoords) then
     FOnCalcCaretsCoords(Self);
@@ -191,11 +190,7 @@ begin
       Caret.CharStyles:= [];
       if Caret.PosX<St.LinesLen[Caret.PosY] then
       begin
-        TempStr:= St.LineSub(Caret.PosY, Caret.PosX+1, 1);
-        if TempStr<>'' then
-          Caret.CharStr:= TempStr[1]
-        else
-          Caret.CharStr:= #0;
+        Caret.CharStr:= St.LineCharAt(Caret.PosY, Caret.PosX+1);
 
         if not DoCalcForegroundFromAttribs(
                  Caret.PosX,
