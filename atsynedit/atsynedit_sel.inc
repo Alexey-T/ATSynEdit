@@ -492,6 +492,7 @@ var
   LineCoord1, LineCoord2: TPoint;
   Details: TATEditorPosDetails;
   Y, YMin, YMax: Int64;
+  NPosX, NPosY, NEndX, NEndY: integer;
 begin
   Coord1:= CaretPosToClientPos(P1);
   Coord2:= CaretPosToClientPos(P2);
@@ -505,8 +506,20 @@ begin
   repeat
     LineCoord1:= ClientPosToCaretPos(ATPoint(Coord1.X, Y), Details);
     LineCoord2:= ClientPosToCaretPos(ATPoint(Coord2.X, Y), Details);
+
+    NPosX:= LineCoord2.X;
+    NPosY:= LineCoord2.Y;
+    NEndX:= LineCoord1.X;
+    NEndY:= LineCoord1.Y;
+    //avoid empty selection
+    if (NPosX=NEndX) and (NPosY=NEndY) then
+    begin
+      NEndX:= -1;
+      NEndY:= -1;
+    end;
+
     if (LineCoord1.Y>=0) and (LineCoord2.Y>=0) then
-      Carets.Add(LineCoord2.X, LineCoord2.Y, LineCoord1.X, LineCoord1.Y);
+      Carets.Add(NPosX, NPosY, NEndX, NEndY);
     Inc(Y, FCharSize.Y);
   until Y-FCharSize.Y>YMax;
 
