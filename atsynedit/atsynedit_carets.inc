@@ -945,37 +945,6 @@ begin
   DoCaretSingle(AX, AY, NEndX, NEndY);
 end;
 
-function TATSynEdit.DoCaretSwapEdge(Item: TATCaretItem; AMoveLeft: boolean): boolean;
-var
-  X1, Y1, X2, Y2: integer;
-  bSel, bAtLeft: boolean;
-begin
-  Result:= false;
-  Item.GetRange(X1, Y1, X2, Y2, bSel);
-  if not bSel then Exit;
-  Result:= true;
-
-  bAtLeft:= not Item.IsForwardSelection;
-
-  //Left/Rt pressed at left/rt side of selection?
-  //yes: cancel selection, don't move caret
-  if bAtLeft=AMoveLeft then
-  begin
-    Item.EndX:= -1;
-    Item.EndY:= -1;
-    Exit
-  end;
-
-  //else swap edge
-  Item.SwapSelection;
-
-  if not FOptKeyLeftRightSwapSelAndSelect then
-  begin
-    Item.EndX:= -1;
-    Item.EndY:= -1;
-  end;
-end;
-
 function TATSynEdit.GetCaretsArray: TATPointArray;
 begin
   Result:= nil;

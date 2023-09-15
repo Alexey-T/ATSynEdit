@@ -1295,7 +1295,6 @@ type
     //carets
     procedure DoCaretsExtend(ADown: boolean; ALines: integer);
     function GetCaretManyAllowed: boolean;
-    function DoCaretSwapEdge(Item: TATCaretItem; AMoveLeft: boolean): boolean;
     //events
     procedure DoEventBeforeCalcHilite;
     procedure DoEventClickMicromap(AX, AY: integer);

@@ -130,7 +130,7 @@ begin
     Caret:= FCarets[i];
     if not Strings.IsIndexValid(Caret.PosY) then Continue;
 
-    if not ASelCommand and FOptKeyLeftRightSwapSel and DoCaretSwapEdge(Caret, true) then
+    if not ASelCommand and FOptKeyLeftRightSwapSel and Caret.SwapEdge(true, FOptKeyLeftRightSwapSelAndSelect) then
     begin
       //none
     end
@@ -173,7 +173,7 @@ begin
     Caret:= FCarets[i];
     if not St.IsIndexValid(Caret.PosY) then Continue;
 
-    if not ASelCommand and FOptKeyLeftRightSwapSel and DoCaretSwapEdge(Caret, false) then
+    if not ASelCommand and FOptKeyLeftRightSwapSel and Caret.SwapEdge(false, FOptKeyLeftRightSwapSelAndSelect) then
     begin
       //none
     end

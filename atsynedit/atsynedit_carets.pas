@@ -67,6 +67,7 @@ type
     function GetRightEdge: TPoint;
     function Change(APosX, APosY, AEndX, AEndY: integer): boolean;
     procedure SwapSelection;
+    function SwapEdge(AMoveLeft, AOptionKeyLeftRightSwapSelAndSelect: boolean): boolean;
     function IsSelection: boolean;
     function IsForwardSelection: boolean;
     function IsMultilineSelection: boolean;
@@ -670,6 +671,32 @@ begin
   end
   else
     SelectToPoint(AX, AY);
+end;
+
+function TATCaretItem.SwapEdge(AMoveLeft, AOptionKeyLeftRightSwapSelAndSelect: boolean): boolean;
+var
+  X1, Y1, X2, Y2: integer;
+  bSel, bAtLeft: boolean;
+begin
+  Result:= false;
+  GetRange(X1, Y1, X2, Y2, bSel);
+  if not bSel then Exit;
+  Result:= true;
+
+  bAtLeft:= not IsForwardSelection;
+
+  //Left/Rt pressed at left/rt side of selection?
+  //yes: cancel selection, don't move caret
+  if bAtLeft=AMoveLeft then
+  begin
+    SelectNone;
+  end
+  else
+  begin
+    SwapSelection;
+    if not AOptionKeyLeftRightSwapSelAndSelect then
+      SelectNone;
+  end;
 end;
 
 { TATCarets }
