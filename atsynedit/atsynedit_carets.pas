@@ -67,7 +67,7 @@ type
     function GetRightEdge: TPoint;
     function Change(APosX, APosY, AEndX, AEndY: integer): boolean;
     procedure SwapSelection;
-    function SwapEdge(AMoveLeft, AOptionKeyLeftRightSwapSelAndSelect: boolean): boolean;
+    function SwapEdge(AMoveLeft, AKeepSelection: boolean): boolean;
     function IsSelection: boolean;
     function IsSelectionEmpty: boolean;
     function IsForwardSelection: boolean;
@@ -680,28 +680,23 @@ begin
     SelectToPoint(AX, AY);
 end;
 
-function TATCaretItem.SwapEdge(AMoveLeft, AOptionKeyLeftRightSwapSelAndSelect: boolean): boolean;
+function TATCaretItem.SwapEdge(AMoveLeft, AKeepSelection: boolean): boolean;
 var
-  X1, Y1, X2, Y2: integer;
-  bSel, bAtLeft: boolean;
+  bCaretAtLeft: boolean;
 begin
   Result:= false;
-  GetRange(X1, Y1, X2, Y2, bSel);
-  if not bSel then Exit;
+  if not IsSelection then Exit;
   Result:= true;
 
-  bAtLeft:= not IsForwardSelection;
-
-  //Left/Rt pressed at left/rt side of selection?
-  //yes: cancel selection, don't move caret
-  if bAtLeft=AMoveLeft then
+  bCaretAtLeft:= not IsForwardSelection;
+  if bCaretAtLeft=AMoveLeft then
   begin
     SelectNone;
   end
   else
   begin
     SwapSelection;
-    if not AOptionKeyLeftRightSwapSelAndSelect then
+    if not AKeepSelection then
       SelectNone;
   end;
 end;
