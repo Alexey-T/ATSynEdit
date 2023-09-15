@@ -618,7 +618,8 @@ begin
     if not St.IsIndexValid(Caret.PosY) then Continue;
 
     //reset empty selection, fixing CudaText issue #4271
-    Caret.SelectNoneIfEmptySelection;
+    if Caret.IsSelectionEmpty then
+      Caret.SelectNone;
 
     NShiftX:= 0;
     NShiftY:= 0;

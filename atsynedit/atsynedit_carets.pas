@@ -58,7 +58,6 @@ type
       XFrom, XTo, Y: integer;
     end;
     procedure SelectNone;
-    procedure SelectNoneIfEmptySelection;
     procedure SelectToPoint(AX, AY: integer);
     procedure SelectToPoint_ByShiftClick(AX, AY: integer);
     procedure GetRange(out AX1, AY1, AX2, AY2: integer; out ASel: boolean);
@@ -634,12 +633,6 @@ end;
 procedure TATCaretItem.ClearDoubleClickRange;
 begin
   FillChar(DoubleClickRange, SizeOf(DoubleClickRange), 0);
-end;
-
-procedure TATCaretItem.SelectNoneIfEmptySelection;
-begin
-  if IsSelectionEmpty then
-    SelectNone;
 end;
 
 procedure TATCaretItem.SelectToPoint(AX, AY: integer);
