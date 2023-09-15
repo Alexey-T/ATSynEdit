@@ -638,7 +638,7 @@ end;
 
 procedure TATCaretItem.SelectNoneIfEmptySelection;
 begin
-  if (PosY=EndY) and (PosX=EndX) then
+  if IsSelectionEmpty then
     SelectNone;
 end;
 
