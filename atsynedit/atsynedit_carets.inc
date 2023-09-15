@@ -185,12 +185,12 @@ begin
 
     if ATEditorOptions.CaretTextOverInvertedRect then
     begin
-      Caret.CharStr:= #0;
+      Caret.CharAtCaret:= #0;
       Caret.CharColor:= clNone;
       Caret.CharStyles:= [];
       if Caret.PosX<St.LinesLen[Caret.PosY] then
       begin
-        Caret.CharStr:= St.LineCharAt(Caret.PosY, Caret.PosX+1);
+        Caret.CharAtCaret:= St.LineCharAt(Caret.PosY, Caret.PosX+1);
 
         if not DoCalcForegroundFromAttribs(
                  Caret.PosX,
