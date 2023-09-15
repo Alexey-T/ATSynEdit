@@ -27,9 +27,11 @@ end;
 procedure TATSynEdit.DoCaretsAddOnColumnBlock(APos1, APos2: TPoint; const ARect: TRect);
 var
   St: TATStrings;
+  bChanged: boolean;
   i: integer;
 begin
   St:= Strings;
+  bChanged:= false;
   for i:= APos1.Y to APos2.Y do
   begin
     if i=APos1.Y then
@@ -38,9 +40,13 @@ begin
       St.ColumnPosToCharPos(i, ARect.Right, FTabHelper),
       i,
       St.ColumnPosToCharPos(i, ARect.Left, FTabHelper),
-      i
+      i,
+      false{AWithEvent}
       );
-  end
+    bChanged:= true;
+  end;
+  if bChanged then
+    Carets.DoChanged;
 end;
 
 procedure TATSynEdit.DoCaretAddToPoint(AX, AY: integer);
@@ -85,18 +91,20 @@ begin
   Carets.Clear;
   PCaret:= ClientPosToCaretPos(PCoord1, Details);
   if PCaret.Y>=0 then
-    Carets.Add(PCaret.X, PCaret.Y);
+    Carets.Add(PCaret.X, PCaret.Y, -1, -1, false{AWithEvent});
 
   repeat
     Inc(PCoord1.Y, FCharSize.Y);
     PCaret:= ClientPosToCaretPos(PCoord1, Details);
     if PCaret.Y>=0 then
       if not Carets.IsLineWithCaret(PCaret.Y) then
-        Carets.Add(PCaret.X, PCaret.Y);
+        Carets.Add(PCaret.X, PCaret.Y, -1, -1, false{AWithEvent});
   until PCoord1.Y>=PCoord2.Y;
 
   if Carets.Count=0 then
-    Carets.Add(AX, AY);
+    Carets.Add(AX, AY)
+  else
+    Carets.DoChanged;
 end;
 
 function TATSynEdit.DoCalcForegroundFromAttribs(AX, AY: integer; var AColor: TColor; var AFontStyles: TFontStyles): boolean;
@@ -1013,6 +1021,7 @@ var
   NLen: integer;
   X, Y: integer;
   i, j: integer;
+  bChanged: boolean;
 begin
   if Carets.Count=0 then exit;
   St:= Strings;
@@ -1069,13 +1078,17 @@ begin
       end;
     end;
 
+    bChanged:= false;
     for i:= 0 to MoreCarets.Count-1 do
     begin
       Caret:= MoreCarets[i];
-      Carets.Add(Caret.PosX, Caret.PosY);
+      Carets.Add(Caret.PosX, Caret.PosY, -1, -1, false{AWithEvent});
+      bChanged:= true;
       if not FCaretVirtual then
         Carets[Carets.Count-1].BeforeExtendX:= Caret.BeforeExtendX;
     end;
+    if bChanged then
+      Carets.DoChanged;
 
     //must remove many dups
     Carets.Sort;

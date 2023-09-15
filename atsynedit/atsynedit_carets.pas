@@ -1224,10 +1224,11 @@ begin
     if Y1<0 then Continue;
     Sep2.GetItemInt(X2, -1, -1{no sel}, MaxInt);
     Sep2.GetItemInt(Y2, -1, -1{no sel}, MaxInt);
-    Add(X1, Y1, X2, Y2);
+    Add(X1, Y1, X2, Y2, false{AWithEvent});
   end;
 
   Sort;
+  DoChanged;
 end;
 
 procedure TATCarets.UpdateMemory(AMode: TATCaretMemoryAction; AArrowUpDown: boolean);

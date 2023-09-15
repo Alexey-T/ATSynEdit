@@ -519,13 +519,15 @@ begin
     end;
 
     if (LineCoord1.Y>=0) and (LineCoord2.Y>=0) then
-      Carets.Add(NPosX, NPosY, NEndX, NEndY);
+      Carets.Add(NPosX, NPosY, NEndX, NEndY, false{AWithEvent});
     Inc(Y, FCharSize.Y);
   until Y-FCharSize.Y>YMax;
 
   //don't allow no carets
   if Carets.Count=0 then
-    DoCaretSingle(P2.X, P2.Y);
+    DoCaretSingle(P2.X, P2.Y)
+  else
+    Carets.DoChanged;
 end;
 
 procedure TATSynEdit.DoSelect_ColumnBlock_FromPoints(P1Char, P2Char: TPoint;

@@ -318,11 +318,13 @@ begin
   for i:= 0 to St.Bookmarks.Count-1 do
   begin
     NLine:= St.Bookmarks[i]^.Data.LineNum;
-    Carets.Add(0, NLine);
+    Carets.Add(0, NLine, -1, -1, false{AWithEvent});
   end;
 
   if Carets.Count=0 then
-    DoCaretSingle(X1, Y1, X2, Y2);
+    DoCaretSingle(X1, Y1, X2, Y2)
+  else
+    Carets.DoChanged;
 end;
 
 
