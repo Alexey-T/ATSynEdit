@@ -641,11 +641,7 @@ begin
     exit;
   end;
 
-  if IsPosSorted(PosX, PosY, AX, AY, false) xor IsForwardSelection then
-  begin
-    EndX:= PosX;
-    EndY:= PosY;
-  end;
+  //keep old EndX/EndY, to be like Kate/GEdit, see CudaText issue #5221
   PosX:= AX;
   PosY:= AY;
 end;
