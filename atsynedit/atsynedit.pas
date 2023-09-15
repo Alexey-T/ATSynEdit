@@ -6478,7 +6478,8 @@ begin
     begin
       FSelRect:= cRectEmpty;
       DoCaretSingleAsIs;
-      Carets[0].SelectToPoint_KeepingOldSel(FMouseDownPnt.X, FMouseDownPnt.Y);
+      //keep caret's old EndX/EndY, to be like Chromium/Firefox, see CudaText issue #5221
+      Carets[0].SelectToPoint(FMouseDownPnt.X, FMouseDownPnt.Y);
     end;
 
     if ActionId=TATEditorMouseAction.ClickAndSelVerticalBlock then
