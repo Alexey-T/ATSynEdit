@@ -811,19 +811,19 @@ begin
 
     if (Item1.PosY=Item2.PosY) and (Item1.PosX=Item2.PosX) then
     begin
-      Delete(i);
+      Delete(i, false{AWithEvent});
       bChanged:= true;
     end;
 
     if AJoinAdjacentCarets and
       IsJoinNeeded(i, i-1, OutPosX, OutPosY, OutEndX, OutEndY) then
     begin
-      Delete(i);
+      Delete(i, false{AWithEvent});
+      bChanged:= true;
       Item2.PosX:= OutPosX;
       Item2.PosY:= OutPosY;
       Item2.EndX:= OutEndX;
       Item2.EndY:= OutEndY;
-      bChanged:= true;
     end;
   end;
 

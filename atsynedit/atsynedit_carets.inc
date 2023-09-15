@@ -897,17 +897,25 @@ end;
 
 procedure TATSynEdit.DoCaretsDeleteOnSameLines;
 var
+  bChanged: boolean;
   i: integer;
 begin
+  bChanged:= false;
   for i:= Carets.Count-1 downto 1{!} do
   begin
     if Carets[i].PosY=Carets[i-1].PosY then
-      Carets.Delete(i);
+    begin
+      Carets.Delete(i, false{AWithEvent});
+      bChanged:= true;
+    end;
   end;
+  if bChanged then
+    Carets.DoChanged;
 end;
 
 procedure TATSynEdit.DoCaretSingleAsIs;
 var
+  bChanged: boolean;
   i: integer;
 begin
   FSelRect:= cRectEmpty;
@@ -915,8 +923,16 @@ begin
   if Carets.Count=0 then
     Carets.Add(0, 0)
   else
-  for i:= Carets.Count-1 downto 1{not 0} do
-    Carets.Delete(i);
+  begin
+    bChanged:= false;
+    for i:= Carets.Count-1 downto 1{not 0} do
+    begin
+      Carets.Delete(i, false{AWithEvent});
+      bChanged:= true;
+    end;
+    if bChanged then
+      Carets.DoChanged;
+  end;
 end;
 
 

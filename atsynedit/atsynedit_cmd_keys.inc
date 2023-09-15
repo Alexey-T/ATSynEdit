@@ -592,12 +592,19 @@ end;
 
 function TATSynEdit.DoCommand_Cancel(AKeepLastCaret, AKeepSelection: boolean): TATCommandResults;
 var
+  bChanged: boolean;
   i: integer;
 begin
   if AKeepLastCaret and (Carets.Count>0) then
   begin
+    bChanged:= false;
     for i:= Carets.Count-2 downto 0 do
-      Carets.Delete(i);
+    begin
+      Carets.Delete(i, false{AWithEvent});
+      bChanged:= true;
+    end;
+    if bChanged then
+      Carets.DoChanged;
   end
   else
     DoCaretSingleAsIs;
