@@ -150,7 +150,10 @@ begin
     end;
 
     //fixing CudaText #4391
-    if not ASelCommand then
+    if not ASelCommand and bMultiCarets then
+      Caret.SelectNone
+    else
+    if not bMultiCarets and Caret.IsSelectionEmpty then
       Caret.SelectNone;
   end;
 end;
@@ -193,7 +196,10 @@ begin
     end;
 
     //fixing CudaText #4391
-    if not ASelCommand then
+    if not ASelCommand and bMultiCarets then
+      Caret.SelectNone
+    else
+    if not bMultiCarets and Caret.IsSelectionEmpty then
       Caret.SelectNone;
   end;
 end;

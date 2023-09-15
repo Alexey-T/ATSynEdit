@@ -69,6 +69,7 @@ type
     procedure SwapSelection;
     function SwapEdge(AMoveLeft, AOptionKeyLeftRightSwapSelAndSelect: boolean): boolean;
     function IsSelection: boolean;
+    function IsSelectionEmpty: boolean;
     function IsForwardSelection: boolean;
     function IsMultilineSelection: boolean;
     function IsInVisibleRect(const R: TRect): boolean;
@@ -526,6 +527,12 @@ function TATCaretItem.IsSelection: boolean;
 begin
   Result:= (EndY>=0) and
     ((PosX<>EndX) or (PosY<>EndY));
+end;
+
+function TATCaretItem.IsSelectionEmpty: boolean;
+begin
+  Result:= (EndY>=0) and
+    (PosX=EndX) and (PosY=EndY);
 end;
 
 function TATCaretItem.IsForwardSelection: boolean;
