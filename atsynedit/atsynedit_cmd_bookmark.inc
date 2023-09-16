@@ -2,6 +2,7 @@
 
 procedure TATSynEdit.DoChangeBookmarks;
 begin
+  ModifiedBookmarks:= true;
   if Assigned(FOnChangeBookmarks) then
     FOnChangeBookmarks(Self);
 end;

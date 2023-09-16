@@ -1507,6 +1507,7 @@ type
   public
     TagString: string; //to store plugin specific data in CudaText
     ModifiedOptions: TATEditorModifiedOptions;
+    ModifiedBookmarks: boolean;
 
     //overrides
     constructor Create(AOwner: TComponent); override;
