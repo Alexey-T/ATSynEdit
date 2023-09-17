@@ -1574,7 +1574,10 @@ begin
   else
     bStartAtEdge:= (PosStart.X=NLastX) and (PosStart.Y=NLastY);
 
-  if not Result and (OptWrapped or ConfirmWrappedSearch) and not OptInSelection and not bStartAtEdge then
+  if not Result and
+    not OptInSelection and
+    not bStartAtEdge and
+    (OptWrapped or ConfirmWrappedSearch) then
   begin
     FIsSearchWrapped:= true;
     if OptWrapped then
@@ -1702,8 +1705,10 @@ begin
   else
     bStartAtEdge:= NStartPos>=Length(StrText);
 
-  if not Result and (OptWrapped or ConfirmWrappedSearch) and not OptInSelection
-    and not bStartAtEdge then
+  if not Result and
+    not OptInSelection and
+    not bStartAtEdge and
+    (OptWrapped or ConfirmWrappedSearch) then
     begin
       FIsSearchWrapped:= true;
       if OptWrapped then
