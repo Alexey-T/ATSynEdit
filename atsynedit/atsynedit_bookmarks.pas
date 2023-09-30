@@ -6,6 +6,7 @@ unit ATSynEdit_Bookmarks;
 
 {$mode objfpc}{$H+}
 {$ModeSwitch advancedrecords}
+{$ScopedEnums on}
 
 interface
 
@@ -16,7 +17,11 @@ uses
   ATSynEdit_FGL;
 
 type
-  TATBookmarkAutoDelete = (bmadDontDelete, bmadDelete, bmadOption);
+  TATBookmarkAutoDelete = (
+    DontDelete,
+    Delete,
+    ByOption
+    );
 
 type
   { TATBookmarkData }
@@ -349,7 +354,7 @@ begin
           if (NIndexPlaced>=0) then
           begin
             fAutoDel:= FList.ItemPtr(NIndexPlaced)^.Data.AutoDelete;
-            if (fAutoDel=bmadDelete) or ((fAutoDel=bmadOption) and ATEditorOptions.BookmarksAutoDelete) then
+            if (fAutoDel=TATBookmarkAutoDelete.Delete) or ((fAutoDel=TATBookmarkAutoDelete.ByOption) and ATEditorOptions.BookmarksAutoDelete) then
             begin
               Delete(NIndexPlaced);
               FModified:= true;

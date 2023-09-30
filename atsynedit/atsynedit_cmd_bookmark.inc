@@ -167,7 +167,7 @@ begin
   Data:= Default(TATBookmarkData);
   Data.Kind:= 1;
   Data.ShowInBookmarkList:= true;
-  Data.AutoDelete:= bmadOption;
+  Data.AutoDelete:= TATBookmarkAutoDelete.ByOption;
 
   L:= TFPList.Create;
   try
@@ -339,7 +339,7 @@ begin
   Data:= Default(TATBookmarkData);
   Data.Kind:= 1;
   Data.ShowInBookmarkList:= true;
-  Data.AutoDelete:= bmadOption;
+  Data.AutoDelete:= TATBookmarkAutoDelete.ByOption;
 
   BookmarkDeleteAll(false);
 
