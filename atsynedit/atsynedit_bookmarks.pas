@@ -54,6 +54,7 @@ type
   TATBookmarks = class
   private
     FList: TATBookmarkItems;
+    FModified: boolean;
     function GetItemPtr(N: integer): PATBookmarkItem;
   public
     constructor Create; virtual;
@@ -71,6 +72,7 @@ type
     function FindHintForLine(ALineNum: integer): string;
     procedure DeleteDups;
     procedure Update(AChange: TATLineChangeKind; ALine, AItemCount, ALineCount: integer);
+    property Modified: boolean read FModified write FModified;
   end;
 
 implementation
@@ -324,13 +326,18 @@ begin
           if Item^.Data.LineNum>=ALine then
           begin
             Item^.Data.LineNum+= AItemCount;
+            FModified:= true;
           end;
         end;
       end;
 
     TATLineChangeKind.DeletedAll:
       begin
-        Clear;
+        if Count>0 then
+        begin
+          Clear;
+          FModified:= true;
+        end;
       end;
 
     TATLineChangeKind.Deleted:
@@ -359,6 +366,7 @@ begin
           begin
             NewLine:= Max(Item^.Data.LineNum-AItemCount, ALine);
             Item^.Data.LineNum:= NewLine;
+            FModified:= true;
           end;
         end;
 

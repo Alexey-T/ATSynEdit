@@ -1155,6 +1155,8 @@ type
     function GetAutoIndentString(APosX, APosY: integer; AUseIndentRegexRule: boolean): atString;
     function GetFoldedMarkText(ALine: integer): string;
     function GetModified: boolean;
+    function GetModifiedBookmarks: boolean;
+    procedure SetModifiedBookmarks(AValue: boolean);
     function Unfolded_NextLineNumber(ALine: integer; ADown: boolean): integer;
     function Unfolded_FirstLineNumber: integer;
     function Unfolded_LastLineNumber: integer;
@@ -1507,7 +1509,6 @@ type
   public
     TagString: string; //to store plugin specific data in CudaText
     ModifiedOptions: TATEditorModifiedOptions;
-    ModifiedBookmarks: boolean;
 
     //overrides
     constructor Create(AOwner: TComponent); override;
@@ -1561,6 +1562,7 @@ type
     property CaretShapeOverwrite: TATCaretShape read FCaretShapeOverwrite;
     property CaretShapeReadonly: TATCaretShape read FCaretShapeReadonly;
     function IsCaretOnVisibleRect: boolean;
+    property ModifiedBookmarks: boolean read GetModifiedBookmarks write SetModifiedBookmarks;
     //common
     property FontProportional: boolean read FFontProportional;
     property EncodingName: string read GetEncodingName write SetEncodingName;
@@ -8475,6 +8477,16 @@ end;
 function TATSynEdit.GetModified: boolean;
 begin
   Result:= Strings.Modified;
+end;
+
+function TATSynEdit.GetModifiedBookmarks: boolean;
+begin
+  Result:= Strings.Bookmarks.Modified;
+end;
+
+procedure TATSynEdit.SetModifiedBookmarks(AValue: boolean);
+begin
+  Strings.Bookmarks.Modified:= AValue;
 end;
 
 procedure TATSynEdit.SetModified(AValue: boolean);
