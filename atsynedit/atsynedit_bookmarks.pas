@@ -352,6 +352,7 @@ begin
             if (fAutoDel=bmadDelete) or ((fAutoDel=bmadOption) and ATEditorOptions.BookmarksAutoDelete) then
             begin
               Delete(NIndexPlaced);
+              FModified:= true;
               NIndexPlaced:= -1;
             end;
           end;
@@ -370,7 +371,7 @@ begin
           end;
         end;
 
-        //dups may appeared, if many bookmarks were in 1 block
+        //dups may appear, if many bookmarks were in 1 block
         DeleteDups;
       end;
   end;
