@@ -1536,7 +1536,7 @@ type
     procedure DoEventZoom;
     procedure TimersStart;
     procedure TimersStop;
-    //complex props
+    //complex objects
     property Strings: TATStrings read GetStrings write SetStrings;
     property Fold: TATSynRanges read FFold;
     property Carets: TATCarets read FCarets;
@@ -1553,6 +1553,7 @@ type
     property MouseActions: TATEditorMouseActions read FMouseActions write FMouseActions;
     property TabHelper: TATStringTabHelper read FTabHelper;
     property WrapInfo: TATWrapInfo read FWrapInfo;
+    //common
     property ScrollVert: TATEditorScrollInfo read FScrollVert write FScrollVert;
     property ScrollHorz: TATEditorScrollInfo read FScrollHorz write FScrollHorz;
     property ScrollbarVert: TATScrollbar read FScrollbarVert;
@@ -1563,7 +1564,6 @@ type
     property CaretShapeReadonly: TATCaretShape read FCaretShapeReadonly;
     function IsCaretOnVisibleRect: boolean;
     property ModifiedBookmarks: boolean read GetModifiedBookmarks write SetModifiedBookmarks;
-    //common
     property FontProportional: boolean read FFontProportional;
     property EncodingName: string read GetEncodingName write SetEncodingName;
     property Modified: boolean read GetModified write SetModified;
