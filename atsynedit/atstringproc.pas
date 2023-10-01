@@ -135,8 +135,6 @@ type
 
 const
   cLineEndOsDefault = {$ifdef windows} TATLineEnds.Windows {$else} TATLineEnds.Unix {$endif};
-  cLineEndStrings: array[TATLineEnds] of UnicodeString = ('', #13#10, #10, #13);
-  cLineEndNiceNames: array[TATLineEnds] of string = ('', 'CRLF', 'LF', 'CR');
   cLineEndLength: array[TATLineEnds] of integer = (0, 2, 1, 1);
 
 const

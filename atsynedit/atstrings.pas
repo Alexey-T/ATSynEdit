@@ -2070,6 +2070,8 @@ begin
 end;
 
 function TATStrings.DebugText: string;
+const
+  cLineEndNiceNames: array[TATLineEnds] of string = ('', 'CRLF', 'LF', 'CR');
 var
   Item: PATStringItem;
   i: SizeInt;
