@@ -6,6 +6,7 @@ unit ATSynEdit_Markers;
 
 {$mode objfpc}{$H+}
 {$ModeSwitch advancedrecords}
+{$ScopedEnums on}
 
 interface
 
@@ -19,9 +20,9 @@ uses
 
 type
   TATMarkerMicromapMode = (
-    mmmShowInTextOnly,
-    mmmShowInMicromapOnly,
-    mmmShowInTextAndMicromap
+    TextOnly,
+    MicromapOnly,
+    TextAndMicromap
     );
 
 type
@@ -115,7 +116,7 @@ type
       ASel: TPoint;
       const ATags: TATMarkerTags;
       ALinePart: PATLinePart=nil;
-      AMicromapMode: TATMarkerMicromapMode=mmmShowInTextOnly;
+      AMicromapMode: TATMarkerMicromapMode=TATMarkerMicromapMode.TextOnly;
       ALineLen: integer=0);
     function DeleteInRange(AX1, AY1, AX2, AY2: integer): boolean;
     function DeleteWithTag(const ATag: Int64): boolean;

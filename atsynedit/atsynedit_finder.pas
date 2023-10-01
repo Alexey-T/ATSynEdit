@@ -1834,7 +1834,7 @@ begin
       Point(0, 0),
       TATMarkerTags.Init(cTag, 0),
       nil,
-      mmmShowInTextOnly,
+      TATMarkerMicromapMode.TextOnly,
       NLineLen
       );
   end
@@ -2567,7 +2567,7 @@ var
   bMatchVisible: boolean;
   iRes, iLine: integer;
 const
-  MicromapMode: TATMarkerMicromapMode = mmmShowInTextAndMicromap;
+  MicromapMode: TATMarkerMicromapMode = TATMarkerMicromapMode.TextAndMicromap;
   MicromapColumnTag = 1;
 begin
   Result:= 0;

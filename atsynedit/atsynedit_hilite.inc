@@ -398,7 +398,7 @@ begin
   for i:= nAttrIndex to FAttribs.Count-1 do
   begin
     Attr:= FAttribs[i];
-    if Attr.MicromapMode=mmmShowInMicromapOnly then Continue;
+    if Attr.MicromapMode=TATMarkerMicromapMode.MicromapOnly then Continue;
     if Attr.PosY<ALineIndex then Continue;
     if Attr.PosY>ALineIndex then Break;
 
