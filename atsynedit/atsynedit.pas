@@ -1944,7 +1944,7 @@ type
     property OptMinLineLenToCalcURL: integer read FOptMinLineLenToCalcURL write FOptMinLineLenToCalcURL default cInitMinLineLenToCalcURL;
     property OptMaxLineLenToCalcURL: integer read FOptMaxLineLenToCalcURL write FOptMaxLineLenToCalcURL default cInitMaxLineLenToCalcURL;
     property OptMaxLinesToCountUnindent: integer read FOptMaxLinesToCountUnindent write FOptMaxLinesToCountUnindent default 100;
-    property OptStapleStyle: TATLineStyle read FOptStapleStyle write FOptStapleStyle default cLineStyleSolid;
+    property OptStapleStyle: TATLineStyle read FOptStapleStyle write FOptStapleStyle default TATLineStyle.Solid;
     property OptStapleIndent: integer read FOptStapleIndent write FOptStapleIndent default -1;
     property OptStapleWidthPercent: integer read FOptStapleWidthPercent write FOptStapleWidthPercent default 100;
     property OptStapleHiliteActive: boolean read FOptStapleHiliteActive write FOptStapleHiliteActive default true;
@@ -5097,7 +5097,7 @@ begin
   FOptMaxLineLenToCalcURL:= cInitMaxLineLenToCalcURL;
   FOptMaxLinesToCountUnindent:= 100;
 
-  FOptStapleStyle:= cLineStyleSolid;
+  FOptStapleStyle:= TATLineStyle.Solid;
   FOptStapleIndent:= -1;
   FOptStapleWidthPercent:= 100;
   FOptStapleHiliteActive:= true;
@@ -9184,7 +9184,7 @@ procedure TATSynEdit.DoPaintStaple(C: TCanvas; const R: TRect; AColor: TColor);
 var
   X1, Y1, X2, Y2: integer;
 begin
-  if FOptStapleStyle=cLineStyleNone then Exit;
+  if FOptStapleStyle=TATLineStyle.None then Exit;
 
   if FOptStapleEdge1=TATEditorStapleEdge.Angle then
     CanvasLineEx(C, AColor, FOptStapleStyle, R.Left, R.Top, R.Right, R.Top, false);
@@ -9220,7 +9220,7 @@ var
   NColor, NColorNormal, NColorActive: TColor;
   i: integer;
 begin
-  if FOptStapleStyle=cLineStyleNone then Exit;
+  if FOptStapleStyle=TATLineStyle.None then Exit;
   if not FFold.HasStaples then Exit;
 
   St:= Strings;
@@ -9521,7 +9521,7 @@ begin
       LinePart.ColorFont:= Colors.Links;
       LinePart.ColorBG:= clNone;
       LinePart.ColorBorder:= Colors.Links;
-      LinePart.BorderDown:= cLineStyleSolid;
+      LinePart.BorderDown:= TATLineStyle.Solid;
 
       FAttribs.Add(
         Point(MatchPos-1, iLine),

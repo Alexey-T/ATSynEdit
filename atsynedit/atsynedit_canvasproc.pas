@@ -408,16 +408,16 @@ procedure CanvasLineEx(C: TCanvas; Color: TColor; Style: TATLineStyle; X1, Y1, X
   //
 begin
   case Style of
-    cLineStyleNone:
+    TATLineStyle.None:
       exit;
 
-    cLineStyleSolid:
+    TATLineStyle.Solid:
       begin
         C.Pen.Color:= Color;
         CanvasLine_WithEnd(X1, Y1, X2, Y2);
       end;
 
-    cLineStyleSolid2px:
+    TATLineStyle.Solid2px:
       begin
         C.Pen.Color:= Color;
         CanvasLine_WithEnd(X1, Y1, X2, Y2);
@@ -438,7 +438,7 @@ begin
         CanvasLine_WithEnd(X1, Y1, X2, Y2);
       end;
 
-    cLineStyleDash:
+    TATLineStyle.Dash:
       begin
         C.Pen.Color:= Color;
         C.Pen.Style:= psDot;
@@ -446,13 +446,13 @@ begin
         C.Pen.Style:= psSolid;
       end;
 
-    cLineStyleDotted:
+    TATLineStyle.Dotted:
       CanvasLine_Dotted(C, Color, X1, Y1, X2, Y2);
 
-    cLineStyleRounded:
+    TATLineStyle.Rounded:
       CanvasLine_RoundedEdge(C, Color, X1, Y1, X2, Y2, AtDown);
 
-    cLineStyleWave:
+    TATLineStyle.Wave:
       CanvasLine_WavyHorz(C, Color, X1, Y1, X2, Y2, AtDown);
   end;
 end;

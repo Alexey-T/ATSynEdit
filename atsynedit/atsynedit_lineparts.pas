@@ -5,6 +5,7 @@ License: MPL 2.0 or LGPL
 unit ATSynEdit_LineParts;
 
 {$mode objfpc}{$H+}
+{$ScopedEnums on}
 
 interface
 
@@ -13,13 +14,13 @@ uses
 
 type
   TATLineStyle = (
-    cLineStyleNone,
-    cLineStyleSolid,
-    cLineStyleDash,
-    cLineStyleSolid2px,
-    cLineStyleDotted,
-    cLineStyleRounded,
-    cLineStyleWave
+    None,
+    Solid,
+    Dash,
+    Solid2px,
+    Dotted,
+    Rounded,
+    Wave
     );
 
 const
