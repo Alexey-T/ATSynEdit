@@ -53,17 +53,31 @@ begin
     case AEncoding of
       TATFileEncoding.ANSI:
         begin
-          SWide:= Item^.Line;
-          SAnsi:= UTF8Encode(SWide);
-          SAnsi:= EncConvertFromUTF8(SAnsi, FEncodingCodepage);
-          AStream.WriteBuffer(SAnsi[1], Length(SAnsi));
+          if Item^.Ex.Wide then
+          begin
+            SWide:= Item^.Line;
+            SAnsi:= UTF8Encode(SWide);
+            SAnsi:= EncConvertFromUTF8(SAnsi, FEncodingCodepage);
+            AStream.WriteBuffer(SAnsi[1], Length(SAnsi));
+          end
+          else
+          begin
+            AStream.WriteBuffer(Item^.Buf[1], Length(Item^.Buf));
+          end;
         end;
 
       TATFileEncoding.UTF8:
         begin
-          SWide:= Item^.Line;
-          SAnsi:= UTF8Encode(SWide);
-          AStream.WriteBuffer(SAnsi[1], Length(SAnsi));
+          if Item^.Ex.Wide then
+          begin
+            SWide:= Item^.Line;
+            SAnsi:= UTF8Encode(SWide);
+            AStream.WriteBuffer(SAnsi[1], Length(SAnsi));
+          end
+          else
+          begin
+            AStream.WriteBuffer(Item^.Buf[1], Length(Item^.Buf));
+          end;
         end;
 
       TATFileEncoding.UTF16LE,
