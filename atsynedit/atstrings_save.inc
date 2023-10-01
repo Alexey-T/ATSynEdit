@@ -48,7 +48,7 @@ begin
   begin
     Item:= FList.GetItem(i);
 
-    //write line without line-end
+    //write line without line-ending
     if Item^.CharLen>0 then
     case AEncoding of
       TATFileEncoding.ANSI:
@@ -103,9 +103,9 @@ begin
         DoEncError;
     end;
 
-    //write line-end as additional string
+    //write line-ending as additional string
     ItemEnd:= Item^.LineEnds;
-    //don't break file if ending of some non-last line is unset
+    //don't break the file if some middle ending is unset
     if (ItemEnd=TATLineEnds.None) and (i<NLast) then
       ItemEnd:= FEndings;
 
