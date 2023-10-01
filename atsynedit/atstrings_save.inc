@@ -49,11 +49,11 @@ begin
     Item:= FList.GetItem(i);
 
     //write line without line-end
-    SWide:= Item^.Line;
-    if SWide<>'' then
+    if Item^.CharLen>0 then
     case AEncoding of
       TATFileEncoding.ANSI:
         begin
+          SWide:= Item^.Line;
           SAnsi:= UTF8Encode(SWide);
           SAnsi:= EncConvertFromUTF8(SAnsi, FEncodingCodepage);
           AStream.WriteBuffer(SAnsi[1], Length(SAnsi));
@@ -61,6 +61,7 @@ begin
 
       TATFileEncoding.UTF8:
         begin
+          SWide:= Item^.Line;
           SAnsi:= UTF8Encode(SWide);
           AStream.WriteBuffer(SAnsi[1], Length(SAnsi));
         end;
@@ -68,6 +69,7 @@ begin
       TATFileEncoding.UTF16LE,
       TATFileEncoding.UTF16BE:
         begin
+          SWide:= Item^.Line;
           if AEncoding=TATFileEncoding.UTF16BE then
             SSwapEndianWide(SWide);
           AStream.WriteBuffer(SWide[1], Length(SWide)*2);
@@ -76,6 +78,7 @@ begin
       TATFileEncoding.UTF32LE,
       TATFileEncoding.UTF32BE:
         begin
+          SWide:= Item^.Line;
           SQuad:= UnicodeStringToUCS4String(SWide);
           if AEncoding=TATFileEncoding.UTF32BE then
             SSwapEndianUCS4(SQuad);
