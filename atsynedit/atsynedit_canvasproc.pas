@@ -525,7 +525,10 @@ begin
   end;
 end;
 
-procedure CanvasChar(C: TCanvas; AColorFont, AColorBg: TColor; ch: char; X, Y, W, H: integer);
+procedure CanvasRenderChar(C: TCanvas;
+  AColorFont, AColorBg: TColor;
+  AChar: AnsiChar;
+  X, Y, W, H: integer);
 begin
   C.Pen.Color:= AColorFont;
   if AColorBg<>clNone then
@@ -534,7 +537,7 @@ begin
     C.FillRect(X-1, Y-1, X+W+2, Y+H+2);
   end;
 
-  case ch of
+  case AChar of
     'L':
       begin
         CanvasLineVert(C, X, Y, Y+H, true);
@@ -598,7 +601,7 @@ begin
   SText:= cText[ASymbols];
   for i:= 1 to Length(SText) do
   begin
-    CanvasChar(C, AColorFont, AColorBG, SText[i], X, Y, W, H);
+    CanvasRenderChar(C, AColorFont, AColorBG, SText[i], X, Y, W, H);
     Inc(X, W+2);
   end;
 end;
