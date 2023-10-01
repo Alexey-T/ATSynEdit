@@ -118,7 +118,7 @@ begin
     if (i mod TATEditorOptions.ProgressSaveLines) = TATEditorOptions.ProgressSaveLines div 2 then
     begin
       FProgressKind:= TATStringsProgressKind.Saving;
-      FProgressValue:= Int64(i)*100 div Count;
+      FProgressValue:= Int64(i)*100 div NLast;
       bCancel:= false;
       if Assigned(FOnProgress) then
         FOnProgress(Self, bCancel);
