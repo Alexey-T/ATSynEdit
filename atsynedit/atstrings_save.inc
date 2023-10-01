@@ -149,6 +149,7 @@ end;
 procedure TATStrings.SaveToFile(const AFilename: string);
 var
   fs: TFileStream;
+  ms: TMemoryStream;
   NMode: word;
 begin
   NMode:= fmOpenWrite or fmShareDenyWrite;
@@ -156,11 +157,26 @@ begin
   if not FileExists(AFilename) then
     NMode:= NMode or fmCreate;
 
-  fs:= TFileStream.Create(AFilename, NMode);
   try
-    SaveToStream(fs, FEncoding, IsSavingWithSignature);
-  finally
-    FreeAndNil(fs);
+    //new method to save, with MemoryStream, takes much more memory
+    ms:= TMemoryStream.Create;
+    fs:= TFileStream.Create(AFilename, NMode);
+    try
+      SaveToStream(ms, FEncoding, IsSavingWithSignature);
+      ms.Seek(0, soFromBeginning);
+      fs.CopyFrom(ms, ms.Size);
+    finally
+      FreeAndNil(fs);
+      FreeAndNil(ms);
+    end;
+  except
+    //revert to old slower method
+    fs:= TFileStream.Create(AFilename, NMode);
+    try
+      SaveToStream(fs, FEncoding, IsSavingWithSignature);
+    finally
+      FreeAndNil(fs);
+    end;
   end;
 
   DoFinalizeSaving;
