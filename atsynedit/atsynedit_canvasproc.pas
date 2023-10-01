@@ -577,6 +577,8 @@ begin
         CanvasLineHorz(C, X+1, Y, X+W-1, true);
         CanvasLineHorz(C, X+1, Y+H, X+W-1, true);
       end;
+    else
+      raise Exception.Create('Unsupported char in CanvasRenderChar');
   end;
 end;
 
