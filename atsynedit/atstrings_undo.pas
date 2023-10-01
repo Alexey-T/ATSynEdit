@@ -5,6 +5,7 @@ License: MPL 2.0 or LGPL
 unit ATStrings_Undo;
 
 {$mode objfpc}{$H+}
+{$ScopedEnums on}
 
 interface
 
@@ -16,12 +17,12 @@ uses
 
 type
   TATEditAction = (
-    aeaChange,
-    aeaChangeEol,
-    aeaInsert,
-    aeaDelete,
-    aeaClearModified,
-    aeaCaretJump
+    Change,
+    ChangeEol,
+    Insert,
+    Delete,
+    ClearModified,
+    CaretJump
     );
 
 const
@@ -315,7 +316,7 @@ begin
   if i1=nil then Exit;
   if i2=nil then Exit;
   Result:=
-    (i1.ItemAction=aeaChange) and
+    (i1.ItemAction=TATEditAction.Change) and
     (i1.ItemAction=i2.ItemAction) and
     (i1.ItemIndex=i2.ItemIndex) and
     (i1.ItemText=i2.ItemText);
@@ -371,7 +372,7 @@ begin
     NGlobalCounter:= 0;
 
   //not duplicate change?
-  if bNotEmpty and (AAction in [aeaChange, aeaChangeEol]) then
+  if bNotEmpty and (AAction in [TATEditAction.Change, TATEditAction.ChangeEol]) then
   begin
     Item:= Last;
     if (Item.ItemAction=AAction) and
@@ -436,14 +437,14 @@ begin
   //don't do two marks
   Item:= Last;
   if Assigned(Item) then
-    if Item.ItemAction=aeaClearModified then exit;
+    if Item.ItemAction=TATEditAction.ClearModified then exit;
 
   Carets:= nil;
   Markers:= nil;
   Attribs:= nil;
 
   Item:= TATUndoItem.Create(
-    aeaClearModified,
+    TATEditAction.ClearModified,
     0,
     '',
     TATLineEnds.None,
@@ -464,13 +465,13 @@ var
   i: integer;
 begin
   for i:= Count-1 downto 0 do
-    if Items[i].ItemAction=aeaClearModified then
+    if Items[i].ItemAction=TATEditAction.ClearModified then
       Delete(i);
 end;
 
 procedure TATUndoList.DeleteTrailingCaretJumps;
 begin
-  while (Count>0) and (Last.ItemAction=aeaCaretJump) do
+  while (Count>0) and (Last.ItemAction=TATEditAction.CaretJump) do
     DeleteLast;
 end;
 
@@ -507,8 +508,8 @@ begin
       exit(true);
     case Items[N].ItemAction of
       //ignore some kind of items for IsEmpty
-      aeaClearModified,
-      aeaCaretJump:
+      TATEditAction.ClearModified,
+      TATEditAction.CaretJump:
         Continue;
       else
         exit(false);

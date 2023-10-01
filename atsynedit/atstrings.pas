@@ -1143,7 +1143,7 @@ begin
   Item:= FList.GetItem(AIndex);
 
   UpdateModified;
-  AddUndoItem(aeaChange, AIndex, Item^.Line, Item^.LineEnds, Item^.LineState, FCommandCode);
+  AddUndoItem(TATEditAction.Change, AIndex, Item^.Line, Item^.LineEnds, Item^.LineState, FCommandCode);
   DoEventLog(AIndex);
   DoEventChange(TATLineChangeKind.Edited, AIndex, 1);
 
@@ -1189,7 +1189,7 @@ begin
   Item:= FList.GetItem(AIndex);
 
   UpdateModified;
-  AddUndoItem(aeaChangeEol, AIndex, '', Item^.LineEnds, Item^.LineState, FCommandCode);
+  AddUndoItem(TATEditAction.ChangeEol, AIndex, '', Item^.LineEnds, Item^.LineState, FCommandCode);
 
   Item^.Ex.Ends:= TATBits2(AValue);
   Item^.LineStateToChanged;
@@ -1426,7 +1426,7 @@ begin
   if IsFilled then Exit;
 
   UpdateModified;
-  AddUndoItem(aeaInsert, Count, '', TATLineEnds.None, TATLineState.None, FCommandCode);
+  AddUndoItem(TATEditAction.Insert, Count, '', TATLineEnds.None, TATLineState.None, FCommandCode);
   if AWithEvent then
   begin
     DoEventLog(Count);
@@ -1486,7 +1486,7 @@ begin
   if IsFilled then Exit;
 
   UpdateModified;
-  AddUndoItem(aeaInsert, ALineIndex, '', TATLineEnds.None, TATLineState.None, FCommandCode);
+  AddUndoItem(TATEditAction.Insert, ALineIndex, '', TATLineEnds.None, TATLineState.None, FCommandCode);
 
   if AWithEvent then
   begin
@@ -1542,7 +1542,7 @@ begin
   begin
     for i:= 0 to NCount-1 do
     begin
-      AddUndoItem(aeaInsert, ALineIndex+i, '', TATLineEnds.None, TATLineState.None, FCommandCode);
+      AddUndoItem(TATEditAction.Insert, ALineIndex+i, '', TATLineEnds.None, TATLineState.None, FCommandCode);
 
       Item.Init(
         ABlock.GetLine(i),
@@ -1592,7 +1592,7 @@ begin
 
     UpdateModified;
     if AWithUndo then
-      AddUndoItem(aeaDelete, ALineIndex, Item^.Line, Item^.LineEnds, Item^.LineState, FCommandCode);
+      AddUndoItem(TATEditAction.Delete, ALineIndex, Item^.Line, Item^.LineEnds, Item^.LineState, FCommandCode);
 
     if AWithEvent then
     begin
@@ -1621,8 +1621,8 @@ begin
     ItemFrom:= GetItemPtr(AIndexFrom);
     ItemTo:= GetItemPtr(AIndexTo);
 
-    AddUndoItem(aeaDelete, AIndexFrom, ItemFrom^.Line, ItemFrom^.LineEnds, ItemFrom^.LineState, FCommandCode);
-    AddUndoItem(aeaInsert, AIndexTo, ItemTo^.Line, ItemTo^.LineEnds, ItemTo^.LineState, FCommandCode);
+    AddUndoItem(TATEditAction.Delete, AIndexFrom, ItemFrom^.Line, ItemFrom^.LineEnds, ItemFrom^.LineState, FCommandCode);
+    AddUndoItem(TATEditAction.Insert, AIndexTo, ItemTo^.Line, ItemTo^.LineEnds, ItemTo^.LineState, FCommandCode);
   end;
 
   FList.Move(AIndexFrom, AIndexTo);
@@ -1936,7 +1936,7 @@ begin
   begin
     PrevItem:= ACurList[NCount-2];
     AHardMarkedNext:= PrevItem.ItemHardMark;
-    AUnmodifiedNext:= PrevItem.ItemAction=aeaClearModified;
+    AUnmodifiedNext:= PrevItem.ItemAction=TATEditAction.ClearModified;
   end;
 
   //don't undo if one item left: unmodified-mark
@@ -1952,13 +1952,13 @@ begin
     OtherList:= FUndoList;
 
   case CurAction of
-    aeaChange,
-    aeaDelete,
-    aeaInsert:
+    TATEditAction.Change,
+    TATEditAction.Delete,
+    TATEditAction.Insert:
       begin
         bEnableEventAfter:= ASoftMarked or AHardMarked;
       end;
-    aeaCaretJump:
+    TATEditAction.CaretJump:
       begin
         bEnableEventAfter:= true;
       end;
@@ -1998,7 +1998,7 @@ begin
 
   try
     case CurAction of
-      aeaChange:
+      TATEditAction.Change:
         begin
           if IsIndexValid(CurIndex) then
           begin
@@ -2007,7 +2007,7 @@ begin
           end;
         end;
 
-      aeaChangeEol:
+      TATEditAction.ChangeEol:
         begin
           if IsIndexValid(CurIndex) then
           begin
@@ -2016,13 +2016,13 @@ begin
           end;
         end;
 
-      aeaInsert:
+      TATEditAction.Insert:
         begin
           if IsIndexValid(CurIndex) then
             LineDelete(CurIndex);
         end;
 
-      aeaDelete:
+      TATEditAction.Delete:
         begin
           if CurIndex>=Count then
             LineAddRaw(CurText, CurLineEnd)
@@ -2032,13 +2032,13 @@ begin
             LinesState[CurIndex]:= CurLineState;
         end;
 
-      aeaClearModified:
+      TATEditAction.ClearModified:
         begin
           OtherList.AddUnmodifiedMark;
           exit;
         end;
 
-      aeaCaretJump:
+      TATEditAction.CaretJump:
         begin
           OtherList.Add(
             CurAction,
@@ -2160,7 +2160,7 @@ begin
 
   //handle CaretJump:
   //if last item was also CaretJump, delete the last item  (don't make huge list on many clicks)
-  if AAction=aeaCaretJump then
+  if AAction=TATEditAction.CaretJump then
   begin
     if (CurList.Count>0) and (CurList.Last.ItemAction=AAction) then
       CurList.DeleteLast;
@@ -2528,7 +2528,7 @@ var
   Item: TATUndoItem;
 begin
   if FUndoList.Locked then exit;
-  AddUndoItem(aeaCaretJump, 0, '', TATLineEnds.None, TATLineState.None, FCommandCode);
+  AddUndoItem(TATEditAction.CaretJump, 0, '', TATLineEnds.None, TATLineState.None, FCommandCode);
   Item:= FUndoList.Last;
   if Assigned(Item) then
     if Length(ACaretsArray)>0 then
@@ -2540,7 +2540,7 @@ procedure TATStrings.AddUpdatesAction(N: integer; AAction: TATEditAction);
 begin
   if not Assigned(FIndexesOfEditedLines) then Exit;
 
-  if AAction in [aeaDelete, aeaInsert] then
+  if AAction in [TATEditAction.Delete, TATEditAction.Insert] then
   begin
     FEnableCachedWrapinfoUpdate:= false;
     Exit
