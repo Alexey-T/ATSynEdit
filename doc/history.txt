@@ -1,3 +1,6 @@
+2023.10.01
+* change: removed methods DoConvertIndentation, DoConvertTabsToSpaces (moved to CudaText project)
+
 2023.09.07
 + add: OptGapBitmapAlignment
 
