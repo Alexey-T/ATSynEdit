@@ -1736,8 +1736,6 @@ type
     procedure DoGetMarkedLines(out ALine1, ALine2: integer);
     function DoGetLinkAtPos(AX, AY: integer): atString;
     function DoGetGapRect(AIndex: integer; out ARect: TRect): boolean;
-    procedure DoConvertIndentation(ASpacesToTabs: boolean);
-    procedure DoConvertTabsToSpaces;
 
   protected
     IsRepaintEnabled: boolean;
