@@ -6,6 +6,7 @@ unit ATSynEdit_CanvasProc;
 
 {$mode objfpc}{$H+}
 {$MinEnumSize 1}
+{$ScopedEnums on}
 
 {$I atsynedit_defines.inc}
 
@@ -44,19 +45,19 @@ type
 
 type
   TATLineEndsSymbols = (
-    cEndingTextNone,
-    cEndingTextLF,
-    cEndingTextCRLF,
-    cEndingTextCR,
-    cEndingTextEOF
+    None,
+    LF,
+    CRLF,
+    CR,
+    EOF
     );
 
 const
   cLineEndsToSymbols: array[TATLineEnds] of TATLineEndsSymbols = (
-    cEndingTextNone,
-    cEndingTextCRLF,
-    cEndingTextLF,
-    cEndingTextCR
+    TATLineEndsSymbols.None,
+    TATLineEndsSymbols.CRLF,
+    TATLineEndsSymbols.LF,
+    TATLineEndsSymbols.CR
     );
 
 type

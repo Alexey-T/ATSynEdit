@@ -3643,7 +3643,7 @@ begin
         if OptUnprintedVisible and OptUnprintedEof then
           if OptUnprintedEndsDetails then
             DoPaintUnprintedSymbols(C,
-              cEndingTextEOF,
+              TATLineEndsSymbols.EOF,
               ARect.Left,
               RectLine.Top,
               ACharSize,
