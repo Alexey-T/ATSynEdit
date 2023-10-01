@@ -369,9 +369,9 @@ begin
     end;
   end;
 
-  DoGetMarkedLines(NMarkedLine1, NMarkedLine2);
-  if (ALine<=NMarkedLine2) and (ALine>=NMarkedLine1) then
-    AColor:= Colors.MarkedLinesBG;
+  if DoGetMarkedLines(NMarkedLine1, NMarkedLine2) then
+    if (ALine>=NMarkedLine1) and (ALine<=NMarkedLine2) then
+      AColor:= Colors.MarkedLinesBG;
 
   AColorForced:= AColor<>clNone;
   if not AColorForced then

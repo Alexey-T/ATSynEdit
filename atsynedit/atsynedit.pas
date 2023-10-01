@@ -1733,7 +1733,7 @@ type
     function DoCalcLineHiliteEx(ALineIndex: integer; var AParts: TATLineParts;
       AColorBG: TColor; out AColorAfter: TColor; AWithSelection: boolean): boolean;
     procedure DoSetMarkedLines(ALine1, ALine2: integer);
-    procedure DoGetMarkedLines(out ALine1, ALine2: integer);
+    function DoGetMarkedLines(out ALine1, ALine2: integer): boolean;
     function DoGetLinkAtPos(AX, AY: integer): atString;
     function DoGetGapRect(AIndex: integer; out ARect: TRect): boolean;
 
@@ -9420,16 +9420,19 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoGetMarkedLines(out ALine1, ALine2: integer);
+function TATSynEdit.DoGetMarkedLines(out ALine1, ALine2: integer): boolean;
 begin
-  ALine1:= -1;
-  ALine2:= -1;
-  if Assigned(FMarkedRange) then
-    if FMarkedRange.Count=2 then
-    begin
-      ALine1:= FMarkedRange.Items[0].PosY;
-      ALine2:= FMarkedRange.Items[1].PosY;
-    end;
+  Result:= Assigned(FMarkedRange) and (FMarkedRange.Count=2);
+  if Result then
+  begin
+    ALine1:= FMarkedRange.Items[0].PosY;
+    ALine2:= FMarkedRange.Items[1].PosY;
+  end
+  else
+  begin
+    ALine1:= -1;
+    ALine2:= -1;
+  end;
 end;
 
 
