@@ -18,9 +18,6 @@ var
   NLast, i: integer;
   bCancel: boolean;
 begin
-  //AStream.Size:= 0;
-  //AStream.Seek(0, soFromBeginning);
-
   EncConvErrorMode:= eemException;
 
   if AWithSignature then
@@ -148,7 +145,8 @@ end;
 
 procedure TATStrings.SaveToFile(const AFilename: string);
 var
-  fs: TBufferedFileStream; //improves saving speed a lot
+  fs: TFileStream;
+  ms: TMemoryStream;
   NMode: word;
 begin
   NMode:= fmOpenReadWrite or fmShareDenyWrite;
@@ -156,11 +154,30 @@ begin
   if not FileExists(AFilename) then
     NMode:= NMode or fmCreate;
 
-  fs:= TBufferedFileStream.Create(AFilename, NMode);
   try
-    SaveToStream(fs, FEncoding, IsSavingWithSignature);
-  finally
-    FreeAndNil(fs);
+    //new method to save, with MemoryStream, takes much more memory
+    ms:= TMemoryStream.Create;
+    fs:= TFileStream.Create(AFilename, NMode);
+    try
+      SaveToStream(ms, FEncoding, IsSavingWithSignature);
+      ms.Seek(0, soFromBeginning);
+      fs.Size:= 0; //important to avoid tail from old contents
+      fs.Seek(0, soFromBeginning);
+      fs.CopyFrom(ms, ms.Size);
+    finally
+      FreeAndNil(fs);
+      FreeAndNil(ms);
+    end;
+  except
+    //revert to old slower method
+    fs:= TFileStream.Create(AFilename, NMode);
+    try
+      fs.Size:= 0; //important to avoid tail from old contents
+      fs.Seek(0, soFromBeginning);
+      SaveToStream(fs, FEncoding, IsSavingWithSignature);
+    finally
+      FreeAndNil(fs);
+    end;
   end;
 
   DoFinalizeSaving;
