@@ -474,6 +474,7 @@ function DetectStreamUtf16NoBom(Stream: TStream; BufSizeWords: integer; out IsLE
 implementation
 
 uses
+  bufstream,
   FileUtil,
   LCLVersion,
   Math,
