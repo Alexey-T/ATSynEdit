@@ -712,11 +712,11 @@ begin
   end;
 end;
 
-procedure TATStrings.LoadFromStream(Stream: TStream; AOptions: TATLoadStreamOptions);
+procedure TATStrings.LoadFromStream(AStream: TStream; AOptions: TATLoadStreamOptions);
 begin
   ClearUndo(true);
   try
-    DoLoadFromStream(Stream, AOptions, FLoadingForcedANSI);
+    DoLoadFromStream(AStream, AOptions, FLoadingForcedANSI);
   finally
     DoFinalizeLoading;
   end;
@@ -734,6 +734,7 @@ begin
       LoadFromStream(fs, AOptions)
     else
     begin
+      //code for stream which Size cannot be detected, ie special Linux files in /proc
       ms:= TMemoryStream.Create;
       try
         _ReadFileToStream(ms, AFilename);

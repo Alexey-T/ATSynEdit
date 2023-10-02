@@ -393,7 +393,7 @@ type
     procedure ActionShuffleLines;
     procedure ActionAddJumpToUndo(constref ACaretsArray: TATPointArray);
     //file
-    procedure LoadFromStream(Stream: TStream; AOptions: TATLoadStreamOptions);
+    procedure LoadFromStream(AStream: TStream; AOptions: TATLoadStreamOptions);
     procedure LoadFromFile(const AFilename: string; AOptions: TATLoadStreamOptions);
     procedure LoadFromString(const AText: string);
     procedure LoadFromStrings(AList: TStrings; AEnds: TATLineEnds; AllowBadCharsOfLen1: boolean);
