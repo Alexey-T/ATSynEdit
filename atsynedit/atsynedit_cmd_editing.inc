@@ -230,10 +230,11 @@ end;
 
 function TATSynEdit.DoCommand_TextInsertTabSmart: TATCommandResults;
 //mimic smart-tabs option, known from several text editors, and from Lazarus IDE.
-//return [] if smart-tab cannot be used in caret position.
+//returns [] if smart-tab cannot be used in caret position.
   //
   function SmartMove(Caret: TATCaretItem): integer;
-  //returns the length of move, in chars
+  //returns the length of move, in chars.
+  //returns 0 if smart move cannot be used for this caret.
   var
     St: TATStrings;
     SLine, SLineWithCaret: UnicodeString;
