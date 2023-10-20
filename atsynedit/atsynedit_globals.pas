@@ -47,6 +47,13 @@ type
     SampleChar = '0';
     MaxVisibleColumns = 500;
 
+    GutterTagBookmarks = 1;
+    GutterTagNumbers = 2;
+    GutterTagLineStates = 3;
+    GutterTagFolding = 4;
+    GutterTagSeparator = 8;
+    GutterTagEmpty = 9;
+
   public
     //force UTF8 for huge files on loading
     MaxFileSizeMbToDetectEncoding: integer;
@@ -110,13 +117,6 @@ type
     GutterSizeLineStates: integer;
     GutterSizeSeparator: integer;
     GutterSizeEmpty: integer;
-
-    GutterTagBookmarks: Int64;
-    GutterTagNumbers: Int64;
-    GutterTagLineStates: Int64;
-    GutterTagFolding: Int64;
-    GutterTagSeparator: Int64;
-    GutterTagEmpty: Int64;
 
     UsePaintStatic: boolean;
     FoldedLenOfEmptyHint: integer;
@@ -429,13 +429,6 @@ initialization
     GutterSizeLineStates:= 3;
     GutterSizeSeparator:= 1;
     GutterSizeEmpty:= 2;
-
-    GutterTagBookmarks:= 1;
-    GutterTagNumbers:= 2;
-    GutterTagLineStates:= 3;
-    GutterTagFolding:= 4;
-    GutterTagSeparator:= 8;
-    GutterTagEmpty:= 9;
 
     UsePaintStatic:= true;
     FoldedLenOfEmptyHint:= 50;
