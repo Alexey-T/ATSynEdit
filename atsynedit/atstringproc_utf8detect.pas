@@ -64,7 +64,8 @@ begin
     if utf8bytes>0 then
     begin  {Expecting secondary AnsiChar}
       hadutf8bytes:=true;
-      if not IsSecondaryUTF8Char(p^) then exit(u8sNo);  {Fail!}
+      if not IsSecondaryUTF8Char(p^) then
+        exit(u8sNo);  {Fail!}
       dec(utf8bytes);
     end
     else
