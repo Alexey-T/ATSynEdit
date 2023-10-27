@@ -83,8 +83,10 @@ begin
   Result:= u8sUnknown;
   if Stream.Size<cMinLen then Exit;
 
-  if BufSizeKb=0 then BufSizeKb:= 1;
-  Size:= BufSizeKb*1024;
+  if BufSizeKb=0 then
+    BufSizeKb:= 1;
+  Size:= Min(BufSizeKb*1024, Stream.Size);
+
   GetMem(Buf, Size);
   try
     FillChar(Buf^, Size, 0);
