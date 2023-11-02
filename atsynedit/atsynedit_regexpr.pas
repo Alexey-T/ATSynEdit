@@ -2049,35 +2049,38 @@ begin
   Result := -1;
   if Length(GrpIndexes) = 0 then
     Exit;
+  if (Idx < 0) or (Idx >= Length(GrpIndexes)) then
+    Exit;
   Idx := GrpIndexes[Idx];
   if (Idx >= 0) and (GrpBounds[0].GrpStart[Idx] <> nil) then
     Result := GrpBounds[0].GrpStart[Idx] - fInputStart + 1;
-end; { of function TRegExpr.GetMatchPos
-  -------------------------------------------------------------- }
+end;
 
 function TRegExpr.GetMatchLen(Idx: integer): PtrInt;
 begin
   Result := -1;
   if Length(GrpIndexes) = 0 then
     Exit;
+  if (Idx < 0) or (Idx >= Length(GrpIndexes)) then
+    Exit;
   Idx := GrpIndexes[Idx];
   if (Idx >= 0) and (GrpBounds[0].GrpStart[Idx] <> nil) then
     Result := GrpBounds[0].GrpEnd[Idx] - GrpBounds[0].GrpStart[Idx];
-end; { of function TRegExpr.GetMatchLen
-  -------------------------------------------------------------- }
+end;
 
 function TRegExpr.GetMatch(Idx: integer): RegExprString;
 begin
   Result := '';
   if Length(GrpIndexes) = 0 then
     Exit;
+  if (Idx < 0) or (Idx >= Length(GrpIndexes)) then
+    Exit;
   Idx := GrpIndexes[Idx];
   if (Idx >= 0) and (GrpBounds[0].GrpStart[Idx] <> nil) and
      (GrpBounds[0].GrpEnd[Idx] > GrpBounds[0].GrpStart[Idx])
   then
     SetString(Result, GrpBounds[0].GrpStart[Idx], GrpBounds[0].GrpEnd[Idx] - GrpBounds[0].GrpStart[Idx]);
-end; { of function TRegExpr.GetMatch
-  -------------------------------------------------------------- }
+end;
 
 function TRegExpr.MatchFromName(const AName: RegExprString): RegExprString;
 var
