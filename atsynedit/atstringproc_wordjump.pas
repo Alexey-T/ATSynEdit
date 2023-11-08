@@ -192,9 +192,14 @@ begin
     //not on word-char? exit
     if not IsCharWord(S[AOffset+1], ANonWordChars) then exit;
 
+    //for caret initially after length=1 word
+    if (AOffset=0) then
+      AOffset1:= AOffset;
+
     //jump left only if at middle of word
     if (AOffset>0) and IsCharWord(S[AOffset], ANonWordChars) then
       AOffset1:= SFindWordOffset(S, AOffset, cWordjumpToPrev, false, ANonWordChars);
+
     //jump right always
     AOffset2:= SFindWordOffset(S, AOffset, cWordjumpToNext, false, ANonWordChars);
   end;
