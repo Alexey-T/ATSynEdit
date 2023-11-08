@@ -184,12 +184,12 @@ begin
 
   if (AOffset>=0) and (AOffset<Length(S)) then
   begin
-    //not on wrdchar?
+    //not on word-char?
     //move left
     if (AOffset>0) and not IsCharWord(S[AOffset+1], ANonWordChars) then
       Dec(AOffset);
 
-    //not on wrdchar? exit
+    //not on word-char? exit
     if not IsCharWord(S[AOffset+1], ANonWordChars) then exit;
 
     //jump left only if at middle of word
