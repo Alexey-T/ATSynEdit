@@ -4175,7 +4175,10 @@ begin
       Colors.CollapseLine,
       ARectLine.Left+FFoldUnderlineOffset,
       NCoordSep,
-      ARectLine.Right-FFoldUnderlineOffset,
+      Min(
+        ARectLine.Right-FFoldUnderlineOffset,
+        ARectLine.Left+NOutputStrWidth
+        ),
       DoScaleFont(ATEditorOptions.DashedLine_DashLen),
       DoScaleFont(ATEditorOptions.DashedLine_EmptyLen)
       );
