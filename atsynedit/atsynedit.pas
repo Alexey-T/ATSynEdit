@@ -1593,7 +1593,6 @@ type
     function IsLineFolded(ALine: integer; ADetectPartialFold: boolean = false): boolean;
     function IsCharWord(ch: Widechar): boolean;
     property TextCharSize: TATEditorCharSize read FCharSize;
-    procedure DoUnfoldLine(ALine: integer);
     property RectMain: TRect read FRectMain;
     property RectGutter: TRect read FRectGutter;
     property RectMinimap: TRect read FRectMinimap;
@@ -1678,9 +1677,10 @@ type
     procedure DoFoldForLevel(ALevel: integer);
     procedure DoFoldForLevelEx(ALevel: integer; AOuterRange: integer);
     function DoFoldUnfoldRangeAtCurLine(AOp: TATEditorFoldRangeCommand): boolean;
-    procedure DoUnfoldLinesWithCarets;
     property FoldingAsString: string read GetFoldingAsString write SetFoldingAsString;
     property FoldingAsStringTodo: string read FFoldingAsStringTodo write FFoldingAsStringTodo;
+    procedure DoUnfoldLine(ALine: integer);
+    procedure DoUnfoldLinesWithCarets;
     //markers
     procedure MarkerClearAll;
     procedure MarkerDrop;
@@ -6469,14 +6469,16 @@ begin
              TATEditorFoldStyle.HereWithTruncatedText,
              TATEditorFoldStyle.FromEndOfLine
              ] then
-        DoShowPos(
-          FMouseDownPnt,
-          FOptScrollIndentCaretHorz,
-          FOptScrollIndentCaretVert,
-          true,
-          false,
-          false //False is to fix CudaText issue #5139
-          );
+          if FFoldedMarkList.FindByCoord(Point(X, Y)).LineFrom<0 then //ignore click on [...] fold-mark
+            DoShowPos(
+              FMouseDownPnt,
+              FOptScrollIndentCaretHorz,
+              FOptScrollIndentCaretVert,
+              true,
+              false,
+              false //False is to fix CudaText issue #5139
+              );
+
         DoSelect_None;
 
         if Assigned(FOnClickMoveCaret) then
