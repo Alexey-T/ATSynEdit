@@ -152,6 +152,13 @@ type
     GotoDefinition
     );
 
+  TATEditorFoldUnderlineStyle = (
+    None,
+    Solid,
+    Dashed,
+    Dotted
+    );
+
   TATEditorPosDetails = record
     EndOfWrappedLine: boolean;
     OnGapItem: TATGapItem;
@@ -479,6 +486,7 @@ type
     cInitUndoForCaretJump = true;
     cInitMicromapShowForMinCount = 2;
     cInitScrollbarHorzAddSpace = 2;
+    cInitFoldUnderlineStyle = TATEditorFoldUnderlineStyle.Dashed;
     cInitIdleInterval = 0; //1000; //0 dont fire OnIdle, faster
     cInitCaretsPrimitiveColumnSelection = true;
     cInitCaretsMultiToColumnSel = true;
@@ -889,6 +897,7 @@ type
     FOptScrollbarHorizontalAddSpace: integer;
     FOptScrollLineCommandsKeepCaretOnScreen: boolean;
     FOptShowFontLigatures: boolean;
+    FOptShowFoldUnderlineStyle: TATEditorFoldUnderlineStyle;
     FOptShowFoldUnderlineFully: boolean;
     FOptShowURLs: boolean;
     FOptShowURLsRegex: string;
@@ -1939,6 +1948,7 @@ type
     property OptScrollLineCommandsKeepCaretOnScreen: boolean read FOptScrollLineCommandsKeepCaretOnScreen write FOptScrollLineCommandsKeepCaretOnScreen default true;
 
     property OptShowFontLigatures: boolean read FOptShowFontLigatures write FOptShowFontLigatures default true;
+    property OptShowFoldUnderlineStyle: TATEditorFoldUnderlineStyle read FOptShowFoldUnderlineStyle write FOptShowFoldUnderlineStyle default cInitFoldUnderlineStyle;
     property OptShowFoldUnderlineFully: boolean read FOptShowFoldUnderlineFully write FOptShowFoldUnderlineFully default false;
     property OptShowURLs: boolean read FOptShowURLs write FOptShowURLs default true;
     property OptShowURLsRegex: string read FOptShowURLsRegex write SetOptShowURLsRegex stored false;
@@ -4181,14 +4191,30 @@ begin
     if not FOptShowFoldUnderlineFully then
       NCoordRight:= Min(NCoordRight, ARectLine.Left+NOutputStrWidth);
 
-    CanvasLineHorz_Dashed(C,
-      Colors.CollapseLine,
-      NCoordLeft,
-      NCoordTop,
-      NCoordRight,
-      DoScaleFont(ATEditorOptions.DashedLine_DashLen),
-      DoScaleFont(ATEditorOptions.DashedLine_EmptyLen)
-      );
+    case FOptShowFoldUnderlineStyle of
+      TATEditorFoldUnderlineStyle.Solid:
+        CanvasLine(C,
+          Point(NCoordLeft, NCoordTop),
+          Point(NCoordRight, NCoordTop),
+          Colors.CollapseLine);
+      TATEditorFoldUnderlineStyle.Dashed:
+        CanvasLineHorz_Dashed(C,
+          Colors.CollapseLine,
+          NCoordLeft,
+          NCoordTop,
+          NCoordRight,
+          DoScaleFont(ATEditorOptions.DashedLine_DashLen),
+          DoScaleFont(ATEditorOptions.DashedLine_EmptyLen)
+          );
+      TATEditorFoldUnderlineStyle.Dotted:
+        CanvasLine_Dotted(C,
+          Colors.CollapseLine,
+          NCoordLeft,
+          NCoordTop,
+          NCoordRight,
+          NCoordTop
+          );
+    end;
   end;
 end;
 
@@ -5097,6 +5123,7 @@ begin
   FOptScrollLineCommandsKeepCaretOnScreen:= true;
 
   FOptShowFontLigatures:= true;
+  FOptShowFoldUnderlineStyle:= cInitFoldUnderlineStyle;
   FOptShowFoldUnderlineFully:= false;
   FOptShowURLs:= true;
   FOptShowURLsRegex:= cUrlRegexInitial;

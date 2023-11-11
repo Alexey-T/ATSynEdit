@@ -1,4 +1,5 @@
 2023.11.11
++ add: OptShowFoldUnderlineStyle
 + add: OptShowFoldUnderlineFully
 
 2023.10.01
