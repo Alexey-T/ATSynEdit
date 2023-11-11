@@ -3807,6 +3807,7 @@ var
   WrapItem: TATWrapItem;
   StringItem: PATStringItem;
   LineIndentKind: TATLineIndentKind;
+  NIndentChars: SizeInt;
   NColorEntire, NColorAfter: TColor;
   NDimValue: integer;
   StrOutput: atString;
@@ -4191,16 +4192,17 @@ begin
   if (WrapItem.NFinal=cWrapItemFinal) and IsFoldingUnderlineNeededForWrapitem(AWrapIndex) then
   begin
     StringItem:= St.GetItemPtr(WrapItem.NLineIndex);
-    StringItem^.GetIndentProp(NOutputCharsSkipped, LineIndentKind);
+    StringItem^.GetIndentProp(NIndentChars, LineIndentKind);
 
-    NOutputTextStart:= 0;
-    if NOutputCharsSkipped>0 then
+    if NIndentChars>0 then
     begin
-      NOutputTextStart:= NOutputCharsSkipped*ACharSize.XScaled*ACharSize.XSpacePercents div ATEditorCharXScale div 100;
+      NOutputTextStart:= NIndentChars*ACharSize.XScaled*ACharSize.XSpacePercents div ATEditorCharXScale div 100;
       if LineIndentKind=TATLineIndentKind.Tabs then
         NOutputTextStart *= FTabHelper.TabSize;
-      //code handles OK only Spaces and Tabs indent, but not mixed indent (Other)
-    end;
+      //code handles Spaces and Tabs indent, but not mixed indent (Other). todo?
+    end
+    else
+      NOutputTextStart:= 0;
 
     if WrapItem.NIndent>0 then
       Inc(NOutputStrWidth, WrapItem.NIndent*ACharSize.XScaled*ACharSize.XSpacePercents div ATEditorCharXScale div 100);
