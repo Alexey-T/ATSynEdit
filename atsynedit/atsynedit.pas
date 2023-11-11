@@ -6465,23 +6465,22 @@ begin
       begin
         DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
 
-        bUnfoldClickedPos:= FFoldStyle in [
-             TATEditorFoldStyle.HereWithDots,
-             TATEditorFoldStyle.HereWithTruncatedText,
-             TATEditorFoldStyle.FromEndOfLine
-             ];
+        bUnfoldClickedPos:= (FFoldStyle in [
+          TATEditorFoldStyle.HereWithDots,
+          TATEditorFoldStyle.HereWithTruncatedText,
+          TATEditorFoldStyle.FromEndOfLine
+          ])
+          //ignore click on fold-mark, because we handle double-click on it (select entire range)
+          and not IsCoordInFoldMark(X, Y);
 
-        //ignore mouse-down on fold-mark, because we handle double-click on it (select entire range)
-        if not IsCoordInFoldMark(X, Y) then
-          DoShowPos(
-            FMouseDownPnt,
-            FOptScrollIndentCaretHorz,
-            FOptScrollIndentCaretVert,
-            bUnfoldClickedPos,
-            false,
-            false //False is to fix CudaText issue #5139
-            );
-
+        DoShowPos(
+          FMouseDownPnt,
+          FOptScrollIndentCaretHorz,
+          FOptScrollIndentCaretVert,
+          bUnfoldClickedPos,
+          false,
+          false //False is to fix CudaText issue #5139
+          );
         DoSelect_None;
 
         if Assigned(FOnClickMoveCaret) then
