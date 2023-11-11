@@ -1068,6 +1068,7 @@ type
     procedure CalcCaretDistanceFromEdges(ACommand: integer;
       out ALinesFromTop, ALinesFromBottom: integer);
     function IsNormalLexerActive: boolean;
+    function IsPosInFoldMark(APos: TPoint): boolean;
     procedure MenuitemClipboardRecentsClick(Sender: TObject);
     procedure SetEditorIndex(AValue: integer);
     function GetUndoForMarkers: boolean;
@@ -6469,8 +6470,8 @@ begin
              TATEditorFoldStyle.HereWithTruncatedText,
              TATEditorFoldStyle.FromEndOfLine
              ] then
-          //ignore click on [...] fold-mark
-          if not FFoldedMarkList.FindByCoord(Point(X, Y)).IsInited then
+          //ignore click on [...] fold-mark, because we must react to double-click on it
+          if not IsPosInFoldMark(Point(X, Y)) then
             DoShowPos(
               FMouseDownPnt,
               FOptScrollIndentCaretHorz,

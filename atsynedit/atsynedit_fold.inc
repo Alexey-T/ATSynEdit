@@ -565,3 +565,10 @@ begin
     DoUnfoldLine(Carets[iCaret].PosY);
 end;
 
+
+function TATSynEdit.IsPosInFoldMark(APos: TPoint): boolean;
+begin
+  Result:= Assigned(FFoldedMarkList) and
+    FFoldedMarkList.FindByCoord(APos).IsInited;
+end;
+
