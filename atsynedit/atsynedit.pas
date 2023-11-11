@@ -6270,7 +6270,7 @@ var
   PosTextClicked: TPoint;
   PosDetails: TATEditorPosDetails;
   ActionId: TATEditorMouseAction;
-  bClickOnSelection, bClickHandled: boolean;
+  bClickOnSelection, bClickHandled, bUnfoldClickedPos: boolean;
   NGutterIndex, NRangeIndex, NLineRangeEnd: integer;
   RectMinimapSel: TRect;
   Caret: TATCaretItem;
@@ -6465,20 +6465,22 @@ begin
       begin
         DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
 
-        if (FFoldStyle in [
+        bUnfoldClickedPos:= FFoldStyle in [
              TATEditorFoldStyle.HereWithDots,
              TATEditorFoldStyle.HereWithTruncatedText,
              TATEditorFoldStyle.FromEndOfLine
-             ])
-          and not IsCoordInFoldMark(X, Y) then
-            DoShowPos(
-              FMouseDownPnt,
-              FOptScrollIndentCaretHorz,
-              FOptScrollIndentCaretVert,
-              true,
-              false,
-              false //False is to fix CudaText issue #5139
-              );
+             ];
+
+        //ignore mouse-down on fold-mark, because we handle double-click on it (select entire range)
+        if not IsCoordInFoldMark(X, Y) then
+          DoShowPos(
+            FMouseDownPnt,
+            FOptScrollIndentCaretHorz,
+            FOptScrollIndentCaretVert,
+            bUnfoldClickedPos,
+            false,
+            false //False is to fix CudaText issue #5139
+            );
 
         DoSelect_None;
 
