@@ -1278,7 +1278,8 @@ type
       APosX, APosY, ACoordX, ACoordY: integer;
       const AMarkText: string);
     procedure DoPaintFoldingUnderline(C: TCanvas; const ARectLine: TRect;
-      const ACharSize: TATEditorCharSize; AOutputStringWidth: integer);
+      const ACharSize: TATEditorCharSize;
+      AOutputTextStart, AOutputTextWidth: integer);
     procedure DoPaintCaretShape(C: TCanvas; ARect: TRect; ACaret: TATCaretItem;
       ACaretShape: TATCaretShape);
     procedure DoPaintCarets(C: TCanvas; AWithInvalidate: boolean);
@@ -3801,9 +3802,11 @@ var
   NOutputCharsSkipped: Int64;
   NOutputStrWidth, NOutputMaximalChars: Int64;
   NOutputCellPercentsSkipped: Int64;
+  NOutputTextStart: integer;
   NCoordSep: Int64;
   WrapItem: TATWrapItem;
   StringItem: PATStringItem;
+  LineIndentKind: TATLineIndentKind;
   NColorEntire, NColorAfter: TColor;
   NDimValue: integer;
   StrOutput: atString;
@@ -4185,18 +4188,31 @@ begin
   end;
 
   //draw folding line '- - - -'
-  if IsFoldingUnderlineNeededForWrapitem(AWrapIndex) then
+  if (WrapItem.NFinal=cWrapItemFinal) and IsFoldingUnderlineNeededForWrapitem(AWrapIndex) then
+  begin
+    StringItem:= St.GetItemPtr(WrapItem.NLineIndex);
+    StringItem^.GetIndentProp(NOutputCharsSkipped, LineIndentKind);
+
+    NOutputTextStart:= NOutputCharsSkipped*ACharSize.XScaled*ACharSize.XSpacePercents div ATEditorCharXScale div 100;
+    if LineIndentKind=TATLineIndentKind.Tabs then
+      NOutputTextStart *= FTabHelper.TabSize;
+
+    if WrapItem.NIndent>0 then
+      Inc(NOutputStrWidth, WrapItem.NIndent*ACharSize.XScaled*ACharSize.XSpacePercents div ATEditorCharXScale div 100);
+
     DoPaintFoldingUnderline(C,
       ARectLine,
       ACharSize,
+      NOutputTextStart,
       NOutputStrWidth
       );
+  end;
 end;
 
 procedure TATSynEdit.DoPaintFoldingUnderline(C: TCanvas;
   const ARectLine: TRect;
   const ACharSize: TATEditorCharSize;
-  AOutputStringWidth: integer);
+  AOutputTextStart, AOutputTextWidth: integer);
 var
   NCoordTop, NCoordLeft, NCoordRight: integer;
   NLineWidth, NDashLen, NEmptyLen, i: integer;
@@ -4204,8 +4220,12 @@ begin
   NCoordTop:= ARectLine.Top+ACharSize.Y-1;
   NCoordLeft:= ARectLine.Left+FFoldUnderlineOffset;
   NCoordRight:= ARectLine.Right-FFoldUnderlineOffset;
+
   if not FOptShowFoldUnderlineFully then
-    NCoordRight:= Min(NCoordRight, ARectLine.Left+AOutputStringWidth);
+  begin
+    NCoordLeft:= Max(NCoordLeft, ARectLine.Left+AOutputTextStart);
+    NCoordRight:= Min(NCoordRight, ARectLine.Left+AOutputTextWidth);
+  end;
 
   NLineWidth:= Max(1, DoScaleFont(1));
 
