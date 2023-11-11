@@ -1068,7 +1068,7 @@ type
     procedure CalcCaretDistanceFromEdges(ACommand: integer;
       out ALinesFromTop, ALinesFromBottom: integer);
     function IsNormalLexerActive: boolean;
-    function IsPosInFoldMark(APos: TPoint): boolean;
+    function IsCoordInFoldMark(AX, AY: integer): boolean;
     procedure MenuitemClipboardRecentsClick(Sender: TObject);
     procedure SetEditorIndex(AValue: integer);
     function GetUndoForMarkers: boolean;
@@ -6470,7 +6470,7 @@ begin
              TATEditorFoldStyle.HereWithTruncatedText,
              TATEditorFoldStyle.FromEndOfLine
              ])
-          and not IsPosInFoldMark(Point(X, Y)) then
+          and not IsCoordInFoldMark(X, Y) then
             DoShowPos(
               FMouseDownPnt,
               FOptScrollIndentCaretHorz,

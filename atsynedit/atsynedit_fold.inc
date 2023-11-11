@@ -566,9 +566,9 @@ begin
 end;
 
 
-function TATSynEdit.IsPosInFoldMark(APos: TPoint): boolean;
+function TATSynEdit.IsCoordInFoldMark(AX, AY: integer): boolean;
 begin
   Result:= Assigned(FFoldedMarkList) and
-    FFoldedMarkList.FindByCoord(APos).IsInited;
+    FFoldedMarkList.FindByCoord(Point(AX, AY)).IsInited;
 end;
 
