@@ -487,6 +487,7 @@ type
     cInitMicromapShowForMinCount = 2;
     cInitScrollbarHorzAddSpace = 2;
     cInitFoldUnderlineStyle = TATEditorFoldUnderlineStyle.Dashed;
+    cInitFoldUnderlineFully = false;
     cInitIdleInterval = 0; //1000; //0 dont fire OnIdle, faster
     cInitCaretsPrimitiveColumnSelection = true;
     cInitCaretsMultiToColumnSel = true;
@@ -1949,7 +1950,7 @@ type
 
     property OptShowFontLigatures: boolean read FOptShowFontLigatures write FOptShowFontLigatures default true;
     property OptShowFoldUnderlineStyle: TATEditorFoldUnderlineStyle read FOptShowFoldUnderlineStyle write FOptShowFoldUnderlineStyle default cInitFoldUnderlineStyle;
-    property OptShowFoldUnderlineFully: boolean read FOptShowFoldUnderlineFully write FOptShowFoldUnderlineFully default false;
+    property OptShowFoldUnderlineFully: boolean read FOptShowFoldUnderlineFully write FOptShowFoldUnderlineFully default cInitFoldUnderlineFully;
     property OptShowURLs: boolean read FOptShowURLs write FOptShowURLs default true;
     property OptShowURLsRegex: string read FOptShowURLsRegex write SetOptShowURLsRegex stored false;
     property OptShowDragDropMarker: boolean read FOptShowDragDropMarker write FOptShowDragDropMarker default true;
@@ -5124,7 +5125,7 @@ begin
 
   FOptShowFontLigatures:= true;
   FOptShowFoldUnderlineStyle:= cInitFoldUnderlineStyle;
-  FOptShowFoldUnderlineFully:= false;
+  FOptShowFoldUnderlineFully:= cInitFoldUnderlineFully;
   FOptShowURLs:= true;
   FOptShowURLsRegex:= cUrlRegexInitial;
   FOptShowDragDropMarker:= true;
