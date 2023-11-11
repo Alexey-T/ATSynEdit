@@ -4193,9 +4193,14 @@ begin
     StringItem:= St.GetItemPtr(WrapItem.NLineIndex);
     StringItem^.GetIndentProp(NOutputCharsSkipped, LineIndentKind);
 
-    NOutputTextStart:= NOutputCharsSkipped*ACharSize.XScaled*ACharSize.XSpacePercents div ATEditorCharXScale div 100;
-    if LineIndentKind=TATLineIndentKind.Tabs then
-      NOutputTextStart *= FTabHelper.TabSize;
+    NOutputTextStart:= 0;
+    if NOutputCharsSkipped>0 then
+    begin
+      NOutputTextStart:= NOutputCharsSkipped*ACharSize.XScaled*ACharSize.XSpacePercents div ATEditorCharXScale div 100;
+      if LineIndentKind=TATLineIndentKind.Tabs then
+        NOutputTextStart *= FTabHelper.TabSize;
+      //code handles OK only Spaces and Tabs indent, but not mixed indent (Other)
+    end;
 
     if WrapItem.NIndent>0 then
       Inc(NOutputStrWidth, WrapItem.NIndent*ACharSize.XScaled*ACharSize.XSpacePercents div ATEditorCharXScale div 100);
