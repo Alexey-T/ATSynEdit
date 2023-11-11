@@ -4199,6 +4199,7 @@ procedure TATSynEdit.DoPaintFoldingUnderline(C: TCanvas;
   AOutputStringWidth: integer);
 var
   NCoordTop, NCoordLeft, NCoordRight: integer;
+  NLineWidth, NDashLen, NEmptyLen, i: integer;
 begin
   NCoordTop:= ARectLine.Top+ACharSize.Y-1;
   NCoordLeft:= ARectLine.Left+FFoldUnderlineOffset;
@@ -4206,25 +4207,31 @@ begin
   if not FOptShowFoldUnderlineFully then
     NCoordRight:= Min(NCoordRight, ARectLine.Left+AOutputStringWidth);
 
+  NLineWidth:= Max(1, DoScaleFont(1));
+
   case FOptShowFoldUnderlineStyle of
     TATEditorFoldUnderlineStyle.Solid:
       begin
-        CanvasLine(C,
-          Point(NCoordLeft, NCoordTop),
-          Point(NCoordRight, NCoordTop),
-          Colors.CollapseLine
-          );
+        for i:= 0 to NLineWidth-1 do
+          CanvasLine(C,
+            Point(NCoordLeft, NCoordTop-i),
+            Point(NCoordRight, NCoordTop-i),
+            Colors.CollapseLine
+            );
       end;
     TATEditorFoldUnderlineStyle.Dashed:
       begin
-        CanvasLineHorz_Dashed(C,
-          Colors.CollapseLine,
-          NCoordLeft,
-          NCoordTop,
-          NCoordRight,
-          DoScaleFont(ATEditorOptions.DashedLine_DashLen),
-          DoScaleFont(ATEditorOptions.DashedLine_EmptyLen)
-          );
+        NDashLen:= DoScaleFont(ATEditorOptions.DashedLine_DashLen);
+        NEmptyLen:= DoScaleFont(ATEditorOptions.DashedLine_EmptyLen);
+        for i:= 0 to NLineWidth-1 do
+          CanvasLineHorz_Dashed(C,
+            Colors.CollapseLine,
+            NCoordLeft,
+            NCoordTop-i,
+            NCoordRight,
+            NDashLen,
+            NEmptyLen
+            );
       end;
     TATEditorFoldUnderlineStyle.Dotted:
       begin
