@@ -1277,6 +1277,8 @@ type
     procedure DoPaintFoldedMark(C: TCanvas;
       APosX, APosY, ACoordX, ACoordY: integer;
       const AMarkText: string);
+    procedure DoPaintFoldingUnderline(C: TCanvas; const ARectLine: TRect;
+      const ACharSize: TATEditorCharSize; AOutputStringWidth: integer);
     procedure DoPaintCaretShape(C: TCanvas; ARect: TRect; ACaret: TATCaretItem;
       ACaretShape: TATCaretShape);
     procedure DoPaintCarets(C: TCanvas; AWithInvalidate: boolean);
@@ -3800,7 +3802,6 @@ var
   NOutputStrWidth, NOutputMaximalChars: Int64;
   NOutputCellPercentsSkipped: Int64;
   NCoordSep: Int64;
-  NCoordTop, NCoordLeft, NCoordRight: integer;
   WrapItem: TATWrapItem;
   StringItem: PATStringItem;
   NColorEntire, NColorAfter: TColor;
@@ -4185,20 +4186,37 @@ begin
 
   //draw folding line '- - - -'
   if IsFoldingUnderlineNeededForWrapitem(AWrapIndex) then
-  begin
-    NCoordTop:= ARectLine.Top+ACharSize.Y-1;
-    NCoordLeft:= ARectLine.Left+FFoldUnderlineOffset;
-    NCoordRight:= ARectLine.Right-FFoldUnderlineOffset;
-    if not FOptShowFoldUnderlineFully then
-      NCoordRight:= Min(NCoordRight, ARectLine.Left+NOutputStrWidth);
+    DoPaintFoldingUnderline(C,
+      ARectLine,
+      ACharSize,
+      NOutputStrWidth
+      );
+end;
 
-    case FOptShowFoldUnderlineStyle of
-      TATEditorFoldUnderlineStyle.Solid:
+procedure TATSynEdit.DoPaintFoldingUnderline(C: TCanvas;
+  const ARectLine: TRect;
+  const ACharSize: TATEditorCharSize;
+  AOutputStringWidth: integer);
+var
+  NCoordTop, NCoordLeft, NCoordRight: integer;
+begin
+  NCoordTop:= ARectLine.Top+ACharSize.Y-1;
+  NCoordLeft:= ARectLine.Left+FFoldUnderlineOffset;
+  NCoordRight:= ARectLine.Right-FFoldUnderlineOffset;
+  if not FOptShowFoldUnderlineFully then
+    NCoordRight:= Min(NCoordRight, ARectLine.Left+AOutputStringWidth);
+
+  case FOptShowFoldUnderlineStyle of
+    TATEditorFoldUnderlineStyle.Solid:
+      begin
         CanvasLine(C,
           Point(NCoordLeft, NCoordTop),
           Point(NCoordRight, NCoordTop),
-          Colors.CollapseLine);
-      TATEditorFoldUnderlineStyle.Dashed:
+          Colors.CollapseLine
+          );
+      end;
+    TATEditorFoldUnderlineStyle.Dashed:
+      begin
         CanvasLineHorz_Dashed(C,
           Colors.CollapseLine,
           NCoordLeft,
@@ -4207,7 +4225,9 @@ begin
           DoScaleFont(ATEditorOptions.DashedLine_DashLen),
           DoScaleFont(ATEditorOptions.DashedLine_EmptyLen)
           );
-      TATEditorFoldUnderlineStyle.Dotted:
+      end;
+    TATEditorFoldUnderlineStyle.Dotted:
+      begin
         CanvasLine_Dotted(C,
           Colors.CollapseLine,
           NCoordLeft,
@@ -4215,7 +4235,7 @@ begin
           NCoordRight,
           NCoordTop
           );
-    end;
+      end;
   end;
 end;
 
