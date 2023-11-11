@@ -1525,17 +1525,17 @@ var
         2: begin
              ColorFont:= clgreen;
              ColorBorder:= clgreen;
-             BorderDown:= cLineStyleRounded;
-             BorderUp:= cLineStyleRounded;
-             BorderLeft:= cLineStyleRounded;
-             BorderRight:= cLineStyleRounded;
+             BorderDown:= TATLineStyle.Rounded;
+             BorderUp:= TATLineStyle.Rounded;
+             BorderLeft:= TATLineStyle.Rounded;
+             BorderRight:= TATLineStyle.Rounded;
              FontStyles:= afsFontBold+afsFontItalic;
            end;
         3: begin
              ColorFont:= clred;
              Colorbg:= clyellow;
              ColorBorder:= clred;
-             BorderDown:= cLineStyleWave;
+             BorderDown:= TATLineStyle.Wave;
              //BorderLeft:= cLineDotted;
              //BorderRight:= cLineRounded;
              //BorderUp:= cLineRounded;
