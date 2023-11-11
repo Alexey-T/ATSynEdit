@@ -1061,6 +1061,7 @@ type
     procedure DoStringsOnUnfoldLine(Sender: TObject; ALine: SizeInt);
     function FindLineNextNonspaceBegin(const ALine: UnicodeString; AFromOffset: integer): integer;
     function FindLineNextNonspaceEnd(const ALine: UnicodeString; AFromOffset: integer): integer;
+    function GetLineIndentationInSpaces(ALine: integer; const ACharSize: TATEditorCharSize): integer;
     procedure InitClipboardExData(out Data: TATEditorClipboardExData);
     procedure FlushEditingChangeEx(AChange: TATLineChangeKind; ALine, AItemCount: SizeInt);
     procedure FlushEditingChangeLog(ALine: SizeInt);
@@ -3802,12 +3803,9 @@ var
   NOutputCharsSkipped: Int64;
   NOutputStrWidth, NOutputMaximalChars: Int64;
   NOutputCellPercentsSkipped: Int64;
-  NOutputTextStart: integer;
   NCoordSep: Int64;
   WrapItem: TATWrapItem;
   StringItem: PATStringItem;
-  LineIndentKind: TATLineIndentKind;
-  NIndentChars: SizeInt;
   NColorEntire, NColorAfter: TColor;
   NDimValue: integer;
   StrOutput: atString;
@@ -4191,29 +4189,37 @@ begin
   //draw folding line '- - - -'
   if (WrapItem.NFinal=cWrapItemFinal) and IsFoldingUnderlineNeededForWrapitem(AWrapIndex) then
   begin
-    StringItem:= St.GetItemPtr(WrapItem.NLineIndex);
-    StringItem^.GetIndentProp(NIndentChars, LineIndentKind);
-
-    if NIndentChars>0 then
-    begin
-      NOutputTextStart:= NIndentChars*ACharSize.XScaled*ACharSize.XSpacePercents div ATEditorCharXScale div 100;
-      if LineIndentKind=TATLineIndentKind.Tabs then
-        NOutputTextStart *= FTabHelper.TabSize;
-      //code handles Spaces and Tabs indent, but not mixed indent (Other). todo?
-    end
-    else
-      NOutputTextStart:= 0;
-
     if WrapItem.NIndent>0 then
       Inc(NOutputStrWidth, WrapItem.NIndent*ACharSize.XScaled*ACharSize.XSpacePercents div ATEditorCharXScale div 100);
 
     DoPaintFoldingUnderline(C,
       ARectLine,
       ACharSize,
-      NOutputTextStart,
+      GetLineIndentationInSpaces(WrapItem.NLineIndex, ACharSize),
       NOutputStrWidth
       );
   end;
+end;
+
+
+function TATSynEdit.GetLineIndentationInSpaces(ALine: integer; const ACharSize: TATEditorCharSize): integer;
+var
+  StringItem: PATStringItem;
+  LineIndentKind: TATLineIndentKind;
+  NChars: SizeInt;
+begin
+  StringItem:= Strings.GetItemPtr(ALine);
+  StringItem^.GetIndentProp(NChars, LineIndentKind);
+
+  if NChars>0 then
+  begin
+    Result:= NChars*ACharSize.XScaled*ACharSize.XSpacePercents div ATEditorCharXScale div 100;
+    if LineIndentKind=TATLineIndentKind.Tabs then
+      Result *= FTabHelper.TabSize;
+    //code handles Spaces and Tabs indent, but not mixed indent (Other). todo?
+  end
+  else
+    Result:= 0;
 end;
 
 procedure TATSynEdit.DoPaintFoldingUnderline(C: TCanvas;
