@@ -4206,17 +4206,16 @@ function TATSynEdit.GetLineIndentationInSpaces(ALine: integer; const ACharSize: 
 var
   StringItem: PATStringItem;
   LineIndentKind: TATLineIndentKind;
-  NChars: SizeInt;
+  NChars, NSpaceChars: SizeInt;
+  Str: atString;
 begin
   StringItem:= Strings.GetItemPtr(ALine);
   StringItem^.GetIndentProp(NChars, LineIndentKind);
-
   if NChars>0 then
   begin
-    Result:= NChars*ACharSize.XScaled*ACharSize.XSpacePercents div ATEditorCharXScale div 100;
-    if LineIndentKind=TATLineIndentKind.Tabs then
-      Result *= FTabHelper.TabSize;
-    //code handles Spaces and Tabs indent, but not mixed indent (Other). todo?
+    Str:= StringItem^.LineSub(1, NChars);
+    NSpaceChars:= FTabHelper.GetIndentExpanded(ALine, Str);
+    Result:= NSpaceChars*ACharSize.XScaled*ACharSize.XSpacePercents div ATEditorCharXScale div 100;
   end
   else
     Result:= 0;
