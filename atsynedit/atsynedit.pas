@@ -1061,8 +1061,8 @@ type
     procedure DoStringsOnUnfoldLine(Sender: TObject; ALine: SizeInt);
     function FindLineNextNonspaceBegin(const ALine: UnicodeString; AFromOffset: integer): integer;
     function FindLineNextNonspaceEnd(const ALine: UnicodeString; AFromOffset: integer): integer;
-    function GetLineIndentationInSpaces(ALine: integer): integer;
-    function GetLineIndentationInPixels(ALine: integer; const ACharSize: TATEditorCharSize): integer;
+    function GetLineIndentInSpaces(ALine: integer): integer;
+    function GetLineIndentInPixels(ALine: integer; const ACharSize: TATEditorCharSize): integer;
     procedure InitClipboardExData(out Data: TATEditorClipboardExData);
     procedure FlushEditingChangeEx(AChange: TATLineChangeKind; ALine, AItemCount: SizeInt);
     procedure FlushEditingChangeLog(ALine: SizeInt);
@@ -4196,14 +4196,14 @@ begin
     DoPaintFoldingUnderline(C,
       ARectLine,
       ACharSize,
-      GetLineIndentationInPixels(WrapItem.NLineIndex, ACharSize),
+      GetLineIndentInPixels(WrapItem.NLineIndex, ACharSize),
       NOutputStrWidth
       );
   end;
 end;
 
 
-function TATSynEdit.GetLineIndentationInSpaces(ALine: integer): integer;
+function TATSynEdit.GetLineIndentInSpaces(ALine: integer): integer;
 var
   StringItem: PATStringItem;
   LineIndentKind: TATLineIndentKind;
@@ -4221,9 +4221,9 @@ begin
     Result:= 0;
 end;
 
-function TATSynEdit.GetLineIndentationInPixels(ALine: integer; const ACharSize: TATEditorCharSize): integer;
+function TATSynEdit.GetLineIndentInPixels(ALine: integer; const ACharSize: TATEditorCharSize): integer;
 begin
-  Result:= GetLineIndentationInSpaces(ALine)
+  Result:= GetLineIndentInSpaces(ALine)
     * ACharSize.XScaled*ACharSize.XSpacePercents div ATEditorCharXScale div 100;
 end;
 
