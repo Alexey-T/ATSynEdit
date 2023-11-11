@@ -280,7 +280,7 @@ type
     HereWithTruncatedText, //show truncated line instead of "..."
     FromEndOfLine, //looks like Lazarus: show "..." after line, bad with 2 blocks starting at the same line
     FromEndOfLineAlways, //always [...] after line
-    FromNextLine //looks like SynWrite: don't show "...", show separator line
+    Underline //looks like SynWrite: don't show "...", show separator line
     );
 
   TATEditorFoldRangeCommand = (
