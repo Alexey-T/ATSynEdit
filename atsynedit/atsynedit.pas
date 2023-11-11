@@ -6469,7 +6469,8 @@ begin
              TATEditorFoldStyle.HereWithTruncatedText,
              TATEditorFoldStyle.FromEndOfLine
              ] then
-          if FFoldedMarkList.FindByCoord(Point(X, Y)).LineFrom<0 then //ignore click on [...] fold-mark
+          //ignore click on [...] fold-mark
+          if not FFoldedMarkList.FindByCoord(Point(X, Y)).IsInited then
             DoShowPos(
               FMouseDownPnt,
               FOptScrollIndentCaretHorz,
