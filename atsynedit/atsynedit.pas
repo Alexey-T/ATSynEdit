@@ -889,6 +889,7 @@ type
     FOptScrollbarHorizontalAddSpace: integer;
     FOptScrollLineCommandsKeepCaretOnScreen: boolean;
     FOptShowFontLigatures: boolean;
+    FOptShowFoldUnderlineFully: boolean;
     FOptShowURLs: boolean;
     FOptShowURLsRegex: string;
     FOptShowDragDropMarker: boolean;
@@ -1938,6 +1939,7 @@ type
     property OptScrollLineCommandsKeepCaretOnScreen: boolean read FOptScrollLineCommandsKeepCaretOnScreen write FOptScrollLineCommandsKeepCaretOnScreen default true;
 
     property OptShowFontLigatures: boolean read FOptShowFontLigatures write FOptShowFontLigatures default true;
+    property OptShowFoldUnderlineFully: boolean read FOptShowFoldUnderlineFully write FOptShowFoldUnderlineFully default false;
     property OptShowURLs: boolean read FOptShowURLs write FOptShowURLs default true;
     property OptShowURLsRegex: string read FOptShowURLsRegex write SetOptShowURLsRegex stored false;
     property OptShowDragDropMarker: boolean read FOptShowDragDropMarker write FOptShowDragDropMarker default true;
@@ -3787,6 +3789,7 @@ var
   NOutputStrWidth, NOutputMaximalChars: Int64;
   NOutputCellPercentsSkipped: Int64;
   NCoordSep: Int64;
+  NCoordTop, NCoordLeft, NCoordRight: integer;
   WrapItem: TATWrapItem;
   StringItem: PATStringItem;
   NColorEntire, NColorAfter: TColor;
@@ -4172,15 +4175,17 @@ begin
   //draw folding line '- - - -'
   if IsFoldingUnderlineNeededForWrapitem(AWrapIndex) then
   begin
-    NCoordSep:= ARectLine.Top+ACharSize.Y-1;
+    NCoordTop:= ARectLine.Top+ACharSize.Y-1;
+    NCoordLeft:= ARectLine.Left+FFoldUnderlineOffset;
+    NCoordRight:= ARectLine.Right-FFoldUnderlineOffset;
+    if not FOptShowFoldUnderlineFully then
+      NCoordRight:= Min(NCoordRight, ARectLine.Left+NOutputStrWidth);
+
     CanvasLineHorz_Dashed(C,
       Colors.CollapseLine,
-      ARectLine.Left+FFoldUnderlineOffset,
-      NCoordSep,
-      Min(
-        ARectLine.Right-FFoldUnderlineOffset,
-        ARectLine.Left+NOutputStrWidth
-        ),
+      NCoordLeft,
+      NCoordTop,
+      NCoordRight,
       DoScaleFont(ATEditorOptions.DashedLine_DashLen),
       DoScaleFont(ATEditorOptions.DashedLine_EmptyLen)
       );
@@ -5092,6 +5097,7 @@ begin
   FOptScrollLineCommandsKeepCaretOnScreen:= true;
 
   FOptShowFontLigatures:= true;
+  FOptShowFoldUnderlineFully:= false;
   FOptShowURLs:= true;
   FOptShowURLsRegex:= cUrlRegexInitial;
   FOptShowDragDropMarker:= true;
