@@ -556,3 +556,12 @@ begin
   end;
 end;
 
+
+procedure TATSynEdit.DoUnfoldLinesWithCarets;
+var
+  iCaret: integer;
+begin
+  for iCaret:= Carets.Count-1 downto 0 do
+    DoUnfoldLine(Carets[iCaret].PosY);
+end;
+

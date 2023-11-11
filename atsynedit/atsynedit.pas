@@ -1678,6 +1678,7 @@ type
     procedure DoFoldForLevel(ALevel: integer);
     procedure DoFoldForLevelEx(ALevel: integer; AOuterRange: integer);
     function DoFoldUnfoldRangeAtCurLine(AOp: TATEditorFoldRangeCommand): boolean;
+    procedure DoUnfoldLinesWithCarets;
     property FoldingAsString: string read GetFoldingAsString write SetFoldingAsString;
     property FoldingAsStringTodo: string read FFoldingAsStringTodo write FFoldingAsStringTodo;
     //markers
