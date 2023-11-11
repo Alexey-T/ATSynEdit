@@ -1061,7 +1061,8 @@ type
     procedure DoStringsOnUnfoldLine(Sender: TObject; ALine: SizeInt);
     function FindLineNextNonspaceBegin(const ALine: UnicodeString; AFromOffset: integer): integer;
     function FindLineNextNonspaceEnd(const ALine: UnicodeString; AFromOffset: integer): integer;
-    function GetLineIndentationInSpaces(ALine: integer; const ACharSize: TATEditorCharSize): integer;
+    function GetLineIndentationInSpaces(ALine: integer): integer;
+    function GetLineIndentationInPixels(ALine: integer; const ACharSize: TATEditorCharSize): integer;
     procedure InitClipboardExData(out Data: TATEditorClipboardExData);
     procedure FlushEditingChangeEx(AChange: TATLineChangeKind; ALine, AItemCount: SizeInt);
     procedure FlushEditingChangeLog(ALine: SizeInt);
@@ -4195,18 +4196,18 @@ begin
     DoPaintFoldingUnderline(C,
       ARectLine,
       ACharSize,
-      GetLineIndentationInSpaces(WrapItem.NLineIndex, ACharSize),
+      GetLineIndentationInPixels(WrapItem.NLineIndex, ACharSize),
       NOutputStrWidth
       );
   end;
 end;
 
 
-function TATSynEdit.GetLineIndentationInSpaces(ALine: integer; const ACharSize: TATEditorCharSize): integer;
+function TATSynEdit.GetLineIndentationInSpaces(ALine: integer): integer;
 var
   StringItem: PATStringItem;
   LineIndentKind: TATLineIndentKind;
-  NChars, NSpaceChars: SizeInt;
+  NChars: SizeInt;
   Str: atString;
 begin
   StringItem:= Strings.GetItemPtr(ALine);
@@ -4214,11 +4215,16 @@ begin
   if NChars>0 then
   begin
     Str:= StringItem^.LineSub(1, NChars);
-    NSpaceChars:= FTabHelper.GetIndentExpanded(ALine, Str);
-    Result:= NSpaceChars*ACharSize.XScaled*ACharSize.XSpacePercents div ATEditorCharXScale div 100;
+    Result:= FTabHelper.GetIndentExpanded(ALine, Str);
   end
   else
     Result:= 0;
+end;
+
+function TATSynEdit.GetLineIndentationInPixels(ALine: integer; const ACharSize: TATEditorCharSize): integer;
+begin
+  Result:= GetLineIndentationInSpaces(ALine)
+    * ACharSize.XScaled*ACharSize.XSpacePercents div ATEditorCharXScale div 100;
 end;
 
 procedure TATSynEdit.DoPaintFoldingUnderline(C: TCanvas;
