@@ -201,6 +201,7 @@ var
   bCaretMoved: boolean;
   NLineChanged: integer;
   NProximityVert: integer;
+  iCaret: integer;
 begin
   bNeedRepaint:= false;
   bAllowRepaint:= true;
@@ -220,6 +221,9 @@ begin
   if bTextChanged or
      (TATCommandResult.FoldChange in Res) then
   begin
+    //prevent bad effects when user edits a line with "fold_style":4, unfold the edited line
+    for iCaret:= Carets.Count-1 downto 0 do
+      DoUnfoldLine(Carets[iCaret].PosY);
     bNeedRepaint:= true;
     FWrapUpdateNeeded:= true;
     UpdateWrapInfo;
