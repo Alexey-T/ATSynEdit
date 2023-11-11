@@ -279,7 +279,7 @@ type
     HereWithDots, //show "..." from fold-pos
     HereWithTruncatedText, //show truncated line instead of "..."
     FromEndOfLine, //looks like Lazarus: show "..." after line, bad with 2 blocks starting at the same line
-    FromEndOfLineAlways, //same, even if HintText not empty
+    FromEndOfLineAlways, //always [...] after line
     FromNextLine //looks like SynWrite: don't show "...", show separator line
     );
 
@@ -6458,10 +6458,13 @@ begin
       end
       else
       begin
-        if Assigned(FOnClickMoveCaret) then
-          FOnClickMoveCaret(Self, Point(Carets[0].PosX, Carets[0].PosY), FMouseDownPnt);
-
         DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
+
+        if FFoldStyle in [
+             TATEditorFoldStyle.HereWithDots,
+             TATEditorFoldStyle.HereWithTruncatedText,
+             TATEditorFoldStyle.FromEndOfLine
+             ] then
         DoShowPos(
           FMouseDownPnt,
           FOptScrollIndentCaretHorz,
@@ -6471,6 +6474,9 @@ begin
           false //False is to fix CudaText issue #5139
           );
         DoSelect_None;
+
+        if Assigned(FOnClickMoveCaret) then
+          FOnClickMoveCaret(Self, Point(Carets[0].PosX, Carets[0].PosY), FMouseDownPnt);
       end;
     end;
 
