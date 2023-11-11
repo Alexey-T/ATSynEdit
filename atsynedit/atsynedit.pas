@@ -6465,13 +6465,12 @@ begin
       begin
         DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
 
-        if FFoldStyle in [
+        if (FFoldStyle in [
              TATEditorFoldStyle.HereWithDots,
              TATEditorFoldStyle.HereWithTruncatedText,
              TATEditorFoldStyle.FromEndOfLine
-             ] then
-          //ignore click on [...] fold-mark, because we must react to double-click on it
-          if not IsPosInFoldMark(Point(X, Y)) then
+             ])
+          and not IsPosInFoldMark(Point(X, Y)) then
             DoShowPos(
               FMouseDownPnt,
               FOptScrollIndentCaretHorz,
