@@ -157,7 +157,7 @@ begin
         St.LinesFoldFrom[Range^.Y, FEditorIndex]:= St.LinesLen[Range^.Y]+1;
         Range^.Hint:= '...';
       end;
-    TATEditorFoldStyle.Underline:
+    TATEditorFoldStyle.FromNextLine:
       begin
         //don't fold line
       end;
@@ -294,7 +294,7 @@ begin
           NPosAfterEnd:= St.LinesLen[R^.Y]+1;
           bFold:= NFoldFrom=NPosAfterEnd;
         end;
-      TATEditorFoldStyle.Underline:
+      TATEditorFoldStyle.FromNextLine:
         begin
           bFold:= (R^.Y+1<=NMaxLine) and St.LinesHidden[R^.Y+1, FEditorIndex];
         end

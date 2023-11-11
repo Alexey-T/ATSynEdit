@@ -275,12 +275,12 @@ type
     ColumnRight
     );
 
-  TATEditorFoldStyle = ( //affects folding of blocks without "text hint" passed from adapter
-    HereWithDots, //show "..." from fold-pos
-    HereWithTruncatedText, //show truncated line instead of "..."
-    FromEndOfLine, //looks like Lazarus: show "..." after line, bad with 2 blocks starting at the same line
-    FromEndOfLineAlways, //always [...] after line
-    Underline //looks like SynWrite: don't show "...", show separator line
+  TATEditorFoldStyle = (
+    HereWithDots, //show [...] from fold-pos
+    HereWithTruncatedText, //show truncated line instead of [...]
+    FromEndOfLine, //looks like Lazarus: show [...] after line, but it's bad when 2 blocks start at the same line
+    FromEndOfLineAlways, //always show [...] after line end
+    FromNextLine //don't show [...], show dashed underline "- - - -"
     );
 
   TATEditorFoldRangeCommand = (
