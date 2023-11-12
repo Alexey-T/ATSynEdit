@@ -152,13 +152,6 @@ type
     GotoDefinition
     );
 
-  TATEditorFoldUnderlineStyle = (
-    None,
-    Dashed,
-    Solid,
-    Dotted
-    );
-
   TATEditorPosDetails = record
     EndOfWrappedLine: boolean;
     OnGapItem: TATGapItem;
@@ -486,8 +479,6 @@ type
     cInitUndoForCaretJump = true;
     cInitMicromapShowForMinCount = 2;
     cInitScrollbarHorzAddSpace = 2;
-    cInitFoldUnderlineStyle = TATEditorFoldUnderlineStyle.Dashed;
-    cInitFoldUnderlineFully = false;
     cInitIdleInterval = 0; //1000; //0 dont fire OnIdle, faster
     cInitCaretsPrimitiveColumnSelection = true;
     cInitCaretsMultiToColumnSel = true;
@@ -898,8 +889,6 @@ type
     FOptScrollbarHorizontalAddSpace: integer;
     FOptScrollLineCommandsKeepCaretOnScreen: boolean;
     FOptShowFontLigatures: boolean;
-    FOptShowFoldUnderlineStyle: TATEditorFoldUnderlineStyle;
-    FOptShowFoldUnderlineFully: boolean;
     FOptShowURLs: boolean;
     FOptShowURLsRegex: string;
     FOptShowDragDropMarker: boolean;
@@ -1954,8 +1943,6 @@ type
     property OptScrollLineCommandsKeepCaretOnScreen: boolean read FOptScrollLineCommandsKeepCaretOnScreen write FOptScrollLineCommandsKeepCaretOnScreen default true;
 
     property OptShowFontLigatures: boolean read FOptShowFontLigatures write FOptShowFontLigatures default true;
-    property OptShowFoldUnderlineStyle: TATEditorFoldUnderlineStyle read FOptShowFoldUnderlineStyle write FOptShowFoldUnderlineStyle default cInitFoldUnderlineStyle;
-    property OptShowFoldUnderlineFully: boolean read FOptShowFoldUnderlineFully write FOptShowFoldUnderlineFully default cInitFoldUnderlineFully;
     property OptShowURLs: boolean read FOptShowURLs write FOptShowURLs default true;
     property OptShowURLsRegex: string read FOptShowURLsRegex write SetOptShowURLsRegex stored false;
     property OptShowDragDropMarker: boolean read FOptShowDragDropMarker write FOptShowDragDropMarker default true;
@@ -4239,7 +4226,7 @@ begin
   NCoordLeft:= ARectLine.Left+FFoldUnderlineOffset;
   NCoordRight:= ARectLine.Right-FFoldUnderlineOffset;
 
-  if not FOptShowFoldUnderlineFully then
+  if not ATEditorOptions.FoldUnderlineFull then
   begin
     NCoordLeft:= Max(NCoordLeft, ARectLine.Left+AOutputTextStart);
     NCoordRight:= Min(NCoordRight, ARectLine.Left+AOutputTextWidth);
@@ -4247,7 +4234,7 @@ begin
 
   NLineWidth:= Max(1, DoScaleFont(1));
 
-  case FOptShowFoldUnderlineStyle of
+  case ATEditorOptions.FoldUnderlineStyle of
     TATEditorFoldUnderlineStyle.Dashed:
       begin
         NDashLen:= DoScaleFont(ATEditorOptions.DashedLine_DashLen);
@@ -5189,8 +5176,6 @@ begin
   FOptScrollLineCommandsKeepCaretOnScreen:= true;
 
   FOptShowFontLigatures:= true;
-  FOptShowFoldUnderlineStyle:= cInitFoldUnderlineStyle;
-  FOptShowFoldUnderlineFully:= cInitFoldUnderlineFully;
   FOptShowURLs:= true;
   FOptShowURLsRegex:= cUrlRegexInitial;
   FOptShowDragDropMarker:= true;

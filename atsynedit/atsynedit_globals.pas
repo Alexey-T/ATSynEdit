@@ -24,6 +24,13 @@ type
     Pilcrow
     );
 
+  TATEditorFoldUnderlineStyle = (
+    None,
+    Dashed,
+    Solid,
+    Dotted
+    );
+
 type
 
   { TATEditorOptions }
@@ -145,6 +152,9 @@ type
     HintBookmarkDy: integer;
     HintBookmarkMaxWidth: integer;
     UrlMarkerTag: integer;
+
+    FoldUnderlineStyle: TATEditorFoldUnderlineStyle;
+    FoldUnderlineFull: boolean;
 
     //UI strings
     TextHintScrollPrefix: string;
@@ -457,6 +467,9 @@ initialization
     HintBookmarkDy:= 16;
     HintBookmarkMaxWidth:= 700;
     UrlMarkerTag:= -100;
+
+    FoldUnderlineStyle:= TATEditorFoldUnderlineStyle.Dashed;
+    FoldUnderlineFull:= false;
 
     //UI strings
     TextHintScrollPrefix:= 'Line';
