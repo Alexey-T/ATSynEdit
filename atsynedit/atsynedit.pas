@@ -154,8 +154,8 @@ type
 
   TATEditorFoldUnderlineStyle = (
     None,
-    Solid,
     Dashed,
+    Solid,
     Dotted
     );
 
@@ -4248,15 +4248,6 @@ begin
   NLineWidth:= Max(1, DoScaleFont(1));
 
   case FOptShowFoldUnderlineStyle of
-    TATEditorFoldUnderlineStyle.Solid:
-      begin
-        for i:= 0 to NLineWidth-1 do
-          CanvasLine(C,
-            Point(NCoordLeft, NCoordTop-i),
-            Point(NCoordRight, NCoordTop-i),
-            Colors.CollapseLine
-            );
-      end;
     TATEditorFoldUnderlineStyle.Dashed:
       begin
         NDashLen:= DoScaleFont(ATEditorOptions.DashedLine_DashLen);
@@ -4269,6 +4260,15 @@ begin
             NCoordRight,
             NDashLen,
             NEmptyLen
+            );
+      end;
+    TATEditorFoldUnderlineStyle.Solid:
+      begin
+        for i:= 0 to NLineWidth-1 do
+          CanvasLine(C,
+            Point(NCoordLeft, NCoordTop-i),
+            Point(NCoordRight, NCoordTop-i),
+            Colors.CollapseLine
             );
       end;
     TATEditorFoldUnderlineStyle.Dotted:
