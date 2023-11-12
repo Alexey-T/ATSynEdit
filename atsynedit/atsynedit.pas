@@ -1268,9 +1268,12 @@ type
     procedure DoPaintFoldedMark(C: TCanvas;
       APosX, APosY, ACoordX, ACoordY: integer;
       const AMarkText: string);
-    procedure DoPaintFoldingUnderline(C: TCanvas; const ARectLine: TRect;
+    procedure DoPaintFoldingUnderline(C: TCanvas;
+      ALine: integer;
+      const ARectLine: TRect;
       const ACharSize: TATEditorCharSize;
-      AOutputTextStart, AOutputTextWidth: integer);
+      const AScrollHorz: TATEditorScrollInfo;
+      AOutputTextWidth: integer);
     procedure DoPaintCaretShape(C: TCanvas; ARect: TRect; ACaret: TATCaretItem;
       ACaretShape: TATCaretShape);
     procedure DoPaintCarets(C: TCanvas; AWithInvalidate: boolean);
@@ -4181,15 +4184,11 @@ begin
     if WrapItem.NIndent>0 then
       Inc(NOutputStrWidth, WrapItem.NIndent*ACharSize.XScaled*ACharSize.XSpacePercents div ATEditorCharXScale div 100);
 
-    if ATEditorOptions.FoldedUnderlineSize=TATEditorFoldedUnderlineSize.IndentToLineEnd then
-      NOutputTextStart:= GetLineIndentInPixels(WrapItem.NLineIndex, ACharSize)-AScrollHorz.SmoothPos
-    else
-      NOutputTextStart:= 0;
-
     DoPaintFoldingUnderline(C,
+      WrapItem.NLineIndex,
       ARectLine,
       ACharSize,
-      NOutputTextStart,
+      AScrollHorz,
       NOutputStrWidth
       );
   end;
@@ -4221,12 +4220,14 @@ begin
 end;
 
 procedure TATSynEdit.DoPaintFoldingUnderline(C: TCanvas;
+  ALine: integer;
   const ARectLine: TRect;
   const ACharSize: TATEditorCharSize;
-  AOutputTextStart, AOutputTextWidth: integer);
+  const AScrollHorz: TATEditorScrollInfo;
+  AOutputTextWidth: integer);
 var
   NCoordTop, NCoordLeft, NCoordRight: integer;
-  NLineWidth, NDashLen, NEmptyLen, i: integer;
+  NOutputTextStart, NLineWidth, NDashLen, NEmptyLen, i: integer;
 begin
   NCoordTop:= ARectLine.Top+ACharSize.Y-1;
 
@@ -4243,7 +4244,8 @@ begin
       end;
     TATEditorFoldedUnderlineSize.IndentToLineEnd:
       begin
-        NCoordLeft:= Max(ARectLine.Left+FFoldUnderlineOffset, ARectLine.Left+AOutputTextStart);
+        NOutputTextStart:= GetLineIndentInPixels(ALine, ACharSize)-AScrollHorz.SmoothPos;
+        NCoordLeft:= Max(ARectLine.Left+FFoldUnderlineOffset, ARectLine.Left+NOutputTextStart);
         NCoordRight:= Min(ARectLine.Right-FFoldUnderlineOffset, ARectLine.Left+AOutputTextWidth);
       end;
   end;
