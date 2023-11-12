@@ -4248,6 +4248,11 @@ begin
         NCoordLeft:= Max(ARectLine.Left+FFoldUnderlineOffset, ARectLine.Left+NOutputTextStart);
         NCoordRight:= Min(ARectLine.Right-FFoldUnderlineOffset, ARectLine.Left+AOutputTextWidth);
       end;
+    TATEditorFoldedUnderlineSize.BeginToMargin:
+      begin
+        NCoordLeft:= ARectLine.Left+FFoldUnderlineOffset;
+        NCoordRight:= Min(ARectLine.Right-FFoldUnderlineOffset, ARectLine.Left+FMarginRight*ACharSize.XScaled div ATEditorCharXScale-AScrollHorz.SmoothPos);
+      end;
   end;
 
   NLineWidth:= Max(1, DoScaleFont(1));

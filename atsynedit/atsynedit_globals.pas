@@ -27,7 +27,8 @@ type
   TATEditorFoldedUnderlineSize = (
     BeginToWindowEnd,
     BeginToLineEnd,
-    IndentToLineEnd
+    IndentToLineEnd,
+    BeginToMargin
     );
 
   TATEditorFoldedUnderlineStyle = (
