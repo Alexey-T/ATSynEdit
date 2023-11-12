@@ -1,6 +1,6 @@
 2023.11.12
 + add: ATEditorOptions.FoldedUnderlineStyle
-+ add: ATEditorOptions.FoldedUnderlineFull
++ add: ATEditorOptions.FoldedUnderlineSize
 
 2023.10.01
 * change: removed methods DoConvertIndentation, DoConvertTabsToSpaces (moved to CudaText project)

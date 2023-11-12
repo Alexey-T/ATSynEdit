@@ -24,6 +24,12 @@ type
     Pilcrow
     );
 
+  TATEditorFoldedUnderlineSize = (
+    BeginToWindowEnd,
+    BeginToLineEnd,
+    IndentToLineEnd
+    );
+
   TATEditorFoldedUnderlineStyle = (
     None,
     Dashed,
@@ -129,7 +135,7 @@ type
     FoldedMarkIndentInner: integer;
     FoldedMarkIndentOuter: integer;
     FoldedUnderlineStyle: TATEditorFoldedUnderlineStyle;
-    FoldedUnderlineFull: boolean;
+    FoldedUnderlineSize: TATEditorFoldedUnderlineSize;
 
     UsePaintStatic: boolean;
     SpeedScrollNice: integer;
@@ -444,7 +450,7 @@ initialization
     FoldedMarkIndentInner:= 1; //indent inside [...] folded-mark
     FoldedMarkIndentOuter:= 2; //indent before [...] folded-mark
     FoldedUnderlineStyle:= TATEditorFoldedUnderlineStyle.Dashed;
-    FoldedUnderlineFull:= true;
+    FoldedUnderlineSize:= TATEditorFoldedUnderlineSize.BeginToWindowEnd;
 
     UsePaintStatic:= true;
     SpeedScrollNice:= 3;

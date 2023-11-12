@@ -4223,13 +4223,23 @@ var
   NLineWidth, NDashLen, NEmptyLen, i: integer;
 begin
   NCoordTop:= ARectLine.Top+ACharSize.Y-1;
-  NCoordLeft:= ARectLine.Left+FFoldUnderlineOffset;
-  NCoordRight:= ARectLine.Right-FFoldUnderlineOffset;
 
-  if not ATEditorOptions.FoldedUnderlineFull then
-  begin
-    NCoordLeft:= Max(NCoordLeft, ARectLine.Left+AOutputTextStart);
-    NCoordRight:= Min(NCoordRight, ARectLine.Left+AOutputTextWidth);
+  case ATEditorOptions.FoldedUnderlineSize of
+    TATEditorFoldedUnderlineSize.BeginToWindowEnd:
+      begin
+        NCoordLeft:= ARectLine.Left+FFoldUnderlineOffset;
+        NCoordRight:= ARectLine.Right-FFoldUnderlineOffset;
+      end;
+    TATEditorFoldedUnderlineSize.BeginToLineEnd:
+      begin
+        NCoordLeft:= ARectLine.Left+FFoldUnderlineOffset;
+        NCoordRight:= Min(ARectLine.Right-FFoldUnderlineOffset, ARectLine.Left+AOutputTextWidth);
+      end;
+    TATEditorFoldedUnderlineSize.IndentToLineEnd:
+      begin
+        NCoordLeft:= Max(ARectLine.Left+FFoldUnderlineOffset, ARectLine.Left+AOutputTextStart);
+        NCoordRight:= Min(ARectLine.Right-FFoldUnderlineOffset, ARectLine.Left+AOutputTextWidth);
+      end;
   end;
 
   NLineWidth:= Max(1, DoScaleFont(1));
