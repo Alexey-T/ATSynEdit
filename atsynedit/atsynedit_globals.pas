@@ -444,7 +444,7 @@ initialization
     FoldedMarkIndentInner:= 1; //indent inside [...] folded-mark
     FoldedMarkIndentOuter:= 2; //indent before [...] folded-mark
     FoldedUnderlineStyle:= TATEditorFoldedUnderlineStyle.Dashed;
-    FoldedUnderlineFull:= false;
+    FoldedUnderlineFull:= true;
 
     UsePaintStatic:= true;
     SpeedScrollNice:= 3;
