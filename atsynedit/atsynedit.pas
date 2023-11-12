@@ -4226,7 +4226,7 @@ begin
   NCoordLeft:= ARectLine.Left+FFoldUnderlineOffset;
   NCoordRight:= ARectLine.Right-FFoldUnderlineOffset;
 
-  if not ATEditorOptions.FoldUnderlineFull then
+  if not ATEditorOptions.FoldedUnderlineFull then
   begin
     NCoordLeft:= Max(NCoordLeft, ARectLine.Left+AOutputTextStart);
     NCoordRight:= Min(NCoordRight, ARectLine.Left+AOutputTextWidth);
@@ -4234,8 +4234,8 @@ begin
 
   NLineWidth:= Max(1, DoScaleFont(1));
 
-  case ATEditorOptions.FoldUnderlineStyle of
-    TATEditorFoldUnderlineStyle.Dashed:
+  case ATEditorOptions.FoldedUnderlineStyle of
+    TATEditorFoldedUnderlineStyle.Dashed:
       begin
         NDashLen:= DoScaleFont(ATEditorOptions.DashedLine_DashLen);
         NEmptyLen:= DoScaleFont(ATEditorOptions.DashedLine_EmptyLen);
@@ -4249,7 +4249,7 @@ begin
             NEmptyLen
             );
       end;
-    TATEditorFoldUnderlineStyle.Solid:
+    TATEditorFoldedUnderlineStyle.Solid:
       begin
         for i:= 0 to NLineWidth-1 do
           CanvasLine(C,
@@ -4258,7 +4258,7 @@ begin
             Colors.CollapseLine
             );
       end;
-    TATEditorFoldUnderlineStyle.Dotted:
+    TATEditorFoldedUnderlineStyle.Dotted:
       begin
         CanvasLine_Dotted(C,
           Colors.CollapseLine,

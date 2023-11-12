@@ -24,7 +24,7 @@ type
     Pilcrow
     );
 
-  TATEditorFoldUnderlineStyle = (
+  TATEditorFoldedUnderlineStyle = (
     None,
     Dashed,
     Solid,
@@ -125,10 +125,13 @@ type
     GutterSizeSeparator: integer;
     GutterSizeEmpty: integer;
 
-    UsePaintStatic: boolean;
     FoldedLenOfEmptyHint: integer;
     FoldedMarkIndentInner: integer;
     FoldedMarkIndentOuter: integer;
+    FoldedUnderlineStyle: TATEditorFoldedUnderlineStyle;
+    FoldedUnderlineFull: boolean;
+
+    UsePaintStatic: boolean;
     SpeedScrollNice: integer;
     SizeGutterFoldLineDx: integer;
     SizeIndentTooltipX: integer;
@@ -152,9 +155,6 @@ type
     HintBookmarkDy: integer;
     HintBookmarkMaxWidth: integer;
     UrlMarkerTag: integer;
-
-    FoldUnderlineStyle: TATEditorFoldUnderlineStyle;
-    FoldUnderlineFull: boolean;
 
     //UI strings
     TextHintScrollPrefix: string;
@@ -440,10 +440,13 @@ initialization
     GutterSizeSeparator:= 1;
     GutterSizeEmpty:= 2;
 
-    UsePaintStatic:= true;
     FoldedLenOfEmptyHint:= 50;
     FoldedMarkIndentInner:= 1; //indent inside [...] folded-mark
     FoldedMarkIndentOuter:= 2; //indent before [...] folded-mark
+    FoldedUnderlineStyle:= TATEditorFoldedUnderlineStyle.Dashed;
+    FoldedUnderlineFull:= false;
+
+    UsePaintStatic:= true;
     SpeedScrollNice:= 3;
     SizeGutterFoldLineDx:= 3;
     SizeIndentTooltipX:= 5;
@@ -467,9 +470,6 @@ initialization
     HintBookmarkDy:= 16;
     HintBookmarkMaxWidth:= 700;
     UrlMarkerTag:= -100;
-
-    FoldUnderlineStyle:= TATEditorFoldUnderlineStyle.Dashed;
-    FoldUnderlineFull:= false;
 
     //UI strings
     TextHintScrollPrefix:= 'Line';
