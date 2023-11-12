@@ -3791,6 +3791,7 @@ var
   NOutputCharsSkipped: Int64;
   NOutputStrWidth, NOutputMaximalChars: Int64;
   NOutputCellPercentsSkipped: Int64;
+  NOutputTextStart: integer;
   NCoordSep: Int64;
   WrapItem: TATWrapItem;
   StringItem: PATStringItem;
@@ -4180,10 +4181,15 @@ begin
     if WrapItem.NIndent>0 then
       Inc(NOutputStrWidth, WrapItem.NIndent*ACharSize.XScaled*ACharSize.XSpacePercents div ATEditorCharXScale div 100);
 
+    if ATEditorOptions.FoldedUnderlineSize=TATEditorFoldedUnderlineSize.IndentToLineEnd then
+      NOutputTextStart:= GetLineIndentInPixels(WrapItem.NLineIndex, ACharSize)-AScrollHorz.SmoothPos
+    else
+      NOutputTextStart:= 0;
+
     DoPaintFoldingUnderline(C,
       ARectLine,
       ACharSize,
-      GetLineIndentInPixels(WrapItem.NLineIndex, ACharSize)-AScrollHorz.SmoothPos,
+      NOutputTextStart,
       NOutputStrWidth
       );
   end;
