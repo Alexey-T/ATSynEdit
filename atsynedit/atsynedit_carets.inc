@@ -326,7 +326,7 @@ begin
     if (P.X<Item.NCharIndex-1) then Continue;
 
     NLastCharIndex:= Item.NCharIndex-1+Item.NLength;
-    if (Item.NFinal=cWrapItemMiddle) then
+    if (Item.NFinal=TATWrapItemFinal.Middle) then
       if (P.X>NLastCharIndex) or
         ((P.X=NLastCharIndex) and APreferLeftSide) then
         Continue;
@@ -439,7 +439,7 @@ begin
 
     //consider gap
     Item:= AWrapInfo[NIndex];
-    if (Item.NFinal=cWrapItemFinal) and (AGaps.Count>0) then
+    if (Item.NFinal=TATWrapItemFinal.Final) and (AGaps.Count>0) then
     begin
       ItemGap:= AGaps.Find(Item.NLineIndex);
       if Assigned(ItemGap) then
@@ -530,7 +530,7 @@ begin
     Result.X:= StrLen + Item.NCharIndex-1
   else
   begin
-    AllowVirtual:= AVirtualPos and (Item.NFinal=cWrapItemFinal);
+    AllowVirtual:= AVirtualPos and (Item.NFinal=TATWrapItemFinal.Final);
     NPixels:= Int64(P.X)-ARect.Left + AScrollHorz.SmoothPos - ATabHelper.CharSize.XScaled*ATabHelper.CharSize.XSpacePercents*Item.NIndent div ATEditorCharXScale div 100;
     Result.X:= ATabHelper.FindClickedPosition(
       Result.Y,
@@ -551,7 +551,7 @@ begin
     end;
   end;
 
-  if Item.NFinal=cWrapItemFinal then //don't set AWrappedEnd for real eol
+  if Item.NFinal=TATWrapItemFinal.Final then //don't set AWrappedEnd for real eol
     ADetails.EndOfWrappedLine:= false;
 end;
 
@@ -686,7 +686,7 @@ begin
     Dec(NPixels, NCell);
 
     //consider gap
-    if FWrapInfo[NIndex].NFinal=cWrapItemFinal then
+    if FWrapInfo[NIndex].NFinal=TATWrapItemFinal.Final then
     begin
       ItemGap:= Gaps.Find(FWrapInfo[NIndex].NLineIndex);
       if Assigned(ItemGap) then

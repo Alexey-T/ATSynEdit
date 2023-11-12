@@ -2591,7 +2591,7 @@ begin
 
   if NLineLen=0 then
   begin
-    WrapItem.Init(ALineIndex, 1, 0, 0, cWrapItemFinal, true);
+    WrapItem.Init(ALineIndex, 1, 0, 0, TATWrapItemFinal.Final, true);
     AItems.Add(WrapItem);
     Exit;
   end;
@@ -2603,7 +2603,7 @@ begin
     NFoldFrom:= AStrings.LinesFoldFrom[ALineIndex, AEditorIndex];
     if NFoldFrom>0 then
     begin
-      WrapItem.Init(ALineIndex, 1, Min(NLineLen, NFoldFrom-1), 0, cWrapItemCollapsed, true);
+      WrapItem.Init(ALineIndex, 1, Min(NLineLen, NFoldFrom-1), 0, TATWrapItemFinal.Collapsed, true);
       AItems.Add(WrapItem);
       Exit;
     end;
@@ -2612,7 +2612,7 @@ begin
   //line not wrapped?
   if (AWrapColumn<ATEditorOptions.MinWrapColumnAbs) then
   begin
-    WrapItem.Init(ALineIndex, 1, NLineLen, 0, cWrapItemFinal, true);
+    WrapItem.Init(ALineIndex, 1, NLineLen, 0, TATWrapItemFinal.Final, true);
     AItems.Add(WrapItem);
     Exit;
   end;
@@ -2633,7 +2633,7 @@ begin
       if not bInitialItem then
       begin
         WrapItemPtr:= AItems._GetItemPtr(AItems.Count-1);
-        WrapItemPtr^.NFinal:= cWrapItemFinal;
+        WrapItemPtr^.NFinal:= TATWrapItemFinal.Final;
       end;
       Break;
     end;
@@ -2648,7 +2648,7 @@ begin
       AWrapIndented
       );
 
-    WrapItem.Init(ALineIndex, NPartOffset, NPartLen, NIndent, cWrapItemMiddle, bInitialItem);
+    WrapItem.Init(ALineIndex, NPartOffset, NPartLen, NIndent, TATWrapItemFinal.Middle, bInitialItem);
     AItems.Add(WrapItem);
     bInitialItem:= false;
 
@@ -3682,7 +3682,7 @@ begin
     end;
 
     //consider gap for this line
-    if WrapItem.NFinal=cWrapItemFinal then
+    if WrapItem.NFinal=TATWrapItemFinal.Final then
     begin
       GapItemCur:= Gaps.Find(WrapItem.NLineIndex);
       if Assigned(GapItemCur) then
@@ -4098,7 +4098,7 @@ begin
   CoordAfterText.X:= CurrPointText.X+NOutputStrWidth;
   CoordAfterText.Y:= CurrPointText.Y;
 
-  if WrapItem.NFinal=cWrapItemFinal then
+  if WrapItem.NFinal=TATWrapItemFinal.Final then
   begin
     //for OptShowFullWidthForSelection=false paint eol bg
     if bLineEolSelected then
@@ -4159,7 +4159,7 @@ begin
   end;
 
   //draw collapsed-mark
-  if WrapItem.NFinal=cWrapItemCollapsed then
+  if WrapItem.NFinal=TATWrapItemFinal.Collapsed then
     DoPaintFoldedMark(C,
       St.LinesFoldFrom[NLinesIndex, FEditorIndex]-1,
       NLinesIndex,
@@ -4179,7 +4179,7 @@ begin
   end;
 
   //draw folding line '- - - -'
-  if (WrapItem.NFinal=cWrapItemFinal) and IsFoldingUnderlineNeededForWrapitem(AWrapIndex) then
+  if (WrapItem.NFinal=TATWrapItemFinal.Final) and IsFoldingUnderlineNeededForWrapitem(AWrapIndex) then
   begin
     if WrapItem.NIndent>0 then
       Inc(NOutputStrWidth, WrapItem.NIndent*ACharSize.XScaled*ACharSize.XSpacePercents div ATEditorCharXScale div 100);
@@ -8001,7 +8001,7 @@ begin
       //1) OptShowFullSel=false
       //2) middle WrapItem
       if RangeFrom>NPartXAfter then
-        if (AWrapItem.NFinal=cWrapItemMiddle) then
+        if (AWrapItem.NFinal=TATWrapItemFinal.Middle) then
           Continue;
 
       NLeft:= APointText.X + ALineWidth + (RangeFrom-NPartXAfter)*ACharSize.XScaled div ATEditorCharXScale;
@@ -8966,7 +8966,7 @@ begin
 
   //correct state for wrapped line
   if AProps.State=TATFoldBarState.SEnd then
-    if WrapItem.NFinal=cWrapItemMiddle then
+    if WrapItem.NFinal=TATWrapItemFinal.Middle then
       AProps.State:= TATFoldBarState.SMiddle;
 
   Result:= true;

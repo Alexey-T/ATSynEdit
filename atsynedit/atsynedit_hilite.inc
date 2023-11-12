@@ -16,7 +16,7 @@ begin
   Data.NCharIndex:= 1;
   Data.NLength:= Strings.LinesLen[ALineIndex];
   Data.NIndent:= 0;
-  Data.NFinal:= cWrapItemFinal;
+  Data.NFinal:= TATWrapItemFinal.Final;
   if Data.NLength=0 then exit;
 
   AColorAfter:= AColorBG;

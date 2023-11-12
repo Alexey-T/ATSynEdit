@@ -6,6 +6,7 @@ unit ATSynEdit_WrapInfo;
 
 {$mode objfpc}{$H+}
 {$ModeSwitch advancedrecords}
+{$ScopedEnums on}
 {$Z1}
 
 interface
@@ -17,9 +18,9 @@ uses
 
 type
   TATWrapItemFinal = (
-    cWrapItemFinal,
-    cWrapItemCollapsed,
-    cWrapItemMiddle
+    Final,
+    Collapsed,
+    Middle
     );
 
 type
@@ -98,7 +99,7 @@ begin
   Result:= false;
   if AY<>NLineIndex then exit;
   if AX<NCharIndex-1 then exit;
-  if NFinal<>cWrapItemFinal then
+  if NFinal<>TATWrapItemFinal.Final then
     if AX>=NCharIndex-1+NLength then exit;
   Result:= true;
 end;
@@ -115,7 +116,7 @@ begin
   if FVirtualMode then
   begin
     if FStrings.IsIndexValid(AIndex) then
-      Result.Init(AIndex, 1, FStrings.LinesLen[AIndex], 0, cWrapItemFinal, true)
+      Result.Init(AIndex, 1, FStrings.LinesLen[AIndex], 0, TATWrapItemFinal.Final, true)
     else
       Result:= Default(TATWrapItem);
   end
