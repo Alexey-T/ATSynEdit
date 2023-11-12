@@ -4196,7 +4196,7 @@ begin
     DoPaintFoldingUnderline(C,
       ARectLine,
       ACharSize,
-      GetLineIndentInPixels(WrapItem.NLineIndex, ACharSize),
+      GetLineIndentInPixels(WrapItem.NLineIndex, ACharSize)-AScrollHorz.SmoothPos,
       NOutputStrWidth
       );
   end;
