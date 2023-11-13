@@ -21,6 +21,8 @@ http://www.die-partei.de/?start=0
 https://vnotex.github.io/vnote/zh_cn/#!docs/%E5%BC%80%E5%8F%91%E8%80%85/%E6%9E%84%E5%BB%BAVNote.md
 www.com#AA_DD_%20_%30
 
+https://en.wikipedia.org/wiki/Flip-flop_(electronics)#Master%E2%80%93slave_edge-triggered_D_flip-flop
+
 ---
 tests which must not catch too many chars into URL
 Here is a [](https://example.com){_attr="value"}.
