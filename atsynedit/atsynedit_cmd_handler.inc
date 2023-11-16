@@ -217,12 +217,13 @@ begin
       Include(Res, TATCommandResult.CaretTop);
     end;
 
+  //prevent bad effects when user edits a line with "fold_style":4, unfold the edited line
+  if bTextChanged then
+    DoUnfoldLinesWithCarets;
+
   if bTextChanged or
      (TATCommandResult.FoldChange in Res) then
   begin
-    //prevent bad effects when user edits a line with "fold_style":4, unfold the edited line
-    DoUnfoldLinesWithCarets;
-
     bNeedRepaint:= true;
     FWrapUpdateNeeded:= true;
     UpdateWrapInfo;
