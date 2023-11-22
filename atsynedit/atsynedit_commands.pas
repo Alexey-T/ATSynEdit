@@ -149,7 +149,6 @@ const
   cCommand_MoveSelectionDown = 269; // or cCmdFlag_Caret;
   cCommand_TextInsertEmptyAbove = 270 or cCmdFlag_ResetSel or cCmdFlag_Caret;
   cCommand_TextInsertEmptyBelow = 271 or cCmdFlag_ResetSel or cCmdFlag_Caret;
-  cCommand_SelectFoldingRangeAtCaret = 280;
 
   cCommand_ToggleOverwrite = 300;
   cCommand_ToggleReadOnly = 301;
@@ -234,6 +233,7 @@ const
   cCommand_FoldingUnfoldAtCurLine = 1041;
   cCommand_FoldingToggleAtCurLine = 1042;
   cCommand_FoldingFoldSelection = 1043;
+  cCommand_FoldingSelectRangeAtCaret = 1045;
 
   cCommand_CancelKeepSel = 1998;
   cCommand_CancelKeepLast = 1999;

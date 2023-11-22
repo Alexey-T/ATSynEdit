@@ -647,7 +647,6 @@ begin
     cCommand_MoveSelectiondown:        Result:= DoCommand_MoveSelectionUpDown(true);
     cCommand_TextInsertEmptyAbove:     Result:= DoCommand_TextInsertEmptyAboveBelow(false);
     cCommand_TextInsertEmptyBelow:     Result:= DoCommand_TextInsertEmptyAboveBelow(true);
-    cCommand_SelectFoldingRangeAtCaret: Result:= DoCommand_SelectFoldingRangeAtCaret;
 
     cCommand_TextCaseLower:            Result:= DoCommand_TextChangeCase(TATEditorCaseConvert.Lower);
     cCommand_TextCaseUpper:            Result:= DoCommand_TextChangeCase(TATEditorCaseConvert.Upper);
@@ -668,6 +667,7 @@ begin
     cCommand_FoldingUnfoldAtCurLine:   Result:= DoCommand_FoldRangeAtCurLine(TATEditorFoldRangeCommand.Unfold);
     cCommand_FoldingToggleAtCurLine:   Result:= DoCommand_FoldRangeAtCurLine(TATEditorFoldRangeCommand.Toggle);
     cCommand_FoldingFoldSelection:     Result:= DoCommand_FoldSelection;
+    cCommand_FoldingSelectRangeAtCaret: Result:= DoCommand_SelectFoldingRangeAtCaret;
 
     cCommand_Cancel:                   Result:= DoCommand_Cancel(false, false);
     cCommand_CancelKeepSel:            Result:= DoCommand_Cancel(false, true);

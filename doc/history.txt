@@ -1,5 +1,5 @@
 2023.11.22
-+ add: command "select folding range(s) at caret(s)"
++ add: command "folding: select block(s) at caret(s)"
 
 2023.11.12
 + add: ATEditorOptions.FoldedUnderlineStyle
