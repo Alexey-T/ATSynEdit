@@ -706,6 +706,20 @@ begin
 end;
 
 
+procedure TATSynEdit.DoSelect_LinesByFoldMark(const FoldMark: TATFoldedMark);
+var
+  TextPnt: TPoint;
+begin
+  if FoldMark.IsInited then
+  begin
+    if Strings.IsIndexValid(FoldMark.LineTo+1) then
+      TextPnt:= Point(0, FoldMark.LineTo+1)
+    else
+      TextPnt:= Point(Strings.LinesLen[FoldMark.LineTo], FoldMark.LineTo);
+    DoSelect_LineRange(FoldMark.LineFrom, TextPnt);
+  end;
+end;
+
 procedure TATSynEdit.DebugSelRect;
 begin
   Application.MainForm.Caption:= Format('SelRect %d:%d-%d:%d, SelRectBegin %d:%d, SelRectEnd %d:%d', [

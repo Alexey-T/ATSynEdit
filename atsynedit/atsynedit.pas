@@ -1731,6 +1731,7 @@ type
     procedure DoSelect_Line(APos: TPoint);
     procedure DoSelect_CharGroupAtPos(P: TPoint; AddCaret, AllowOnlyWordChars: boolean);
     procedure DoSelect_LineRange(ALineFrom: integer; APosTo: TPoint);
+    procedure DoSelect_LinesByFoldMark(const FoldMark: TATFoldedMark);
     procedure DoSelect_ClearColumnBlock;
     procedure DoSelect_ColumnBlock_FromPoints(P1Char, P2Char: TPoint;
       AUpdateSelRectPoints: boolean=true);
@@ -7395,7 +7396,7 @@ var
   Caret: TATCaretItem;
   SLink: atString;
   FoldMark: TATFoldedMark;
-  MousePnt, TextPnt: TPoint;
+  MousePnt: TPoint;
 begin
   if not OptMouseEnableAll then exit;
   inherited;
@@ -7409,11 +7410,7 @@ begin
       FoldMark:= FFoldedMarkList.FindByCoord(MousePnt);
       if FoldMark.IsInited then
       begin
-        if Strings.IsIndexValid(FoldMark.LineTo+1) then
-          TextPnt:= Point(0, FoldMark.LineTo+1)
-        else
-          TextPnt:= Point(Strings.LinesLen[FoldMark.LineTo], FoldMark.LineTo);
-        DoSelect_LineRange(FoldMark.LineFrom, TextPnt);
+        DoSelect_LinesByFoldMark(FoldMark);
         exit;
       end;
     end;
