@@ -100,10 +100,10 @@ begin
   M.Add(cCommand_GotoWordEnd,        'go to word end',            [scXControl+VK_RIGHT], []);
   M.Add(cCommand_GotoWordEnd_Sel,    'go to word end + select',   [scXControl+scShift+VK_RIGHT], []);
 
-  M.Add(cCommand_GotoLineAbsBegin,     'go to line abs. begin',          [], []);
-  M.Add(cCommand_GotoLineAbsBegin_Sel, 'go to line abs. begin + select', [], []);
-  M.Add(cCommand_GotoLineAbsEnd,       'go to line abs. end',          [], []);
-  M.Add(cCommand_GotoLineAbsEnd_Sel,   'go to line abs. end + select', [], []);
+  M.Add(cCommand_GotoLineAbsBegin,     'go to line absolute begin',          [], []);
+  M.Add(cCommand_GotoLineAbsBegin_Sel, 'go to line absolute begin + select', [], []);
+  M.Add(cCommand_GotoLineAbsEnd,       'go to line absolute end',          [], []);
+  M.Add(cCommand_GotoLineAbsEnd_Sel,   'go to line absolute end + select', [], []);
 
   M.Add(cCommand_GotoScreenTop,      'go to screen top', [], []);
   M.Add(cCommand_GotoScreenBottom,   'go to screen bottom', [], []);
