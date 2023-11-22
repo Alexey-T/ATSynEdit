@@ -720,7 +720,8 @@ begin
   end;
 end;
 
-function TATSynEdit.DoSelect_FoldingRangeStartingAtLine(ALine: integer): boolean;
+function TATSynEdit.DoSelect_FoldingRangeStartingAtLine(
+  ACaret: TATCaretItem; ALine: integer; ACaretToEndOfSel: boolean): boolean;
 var
   NRange: integer;
   RangePtr: PATSynRange;
@@ -734,9 +735,21 @@ begin
   NLineBegin:= RangePtr^.Y;
   NLineEnd:= RangePtr^.Y2;
   if Strings.IsIndexValid(NLineEnd+1) then
-    DoSelect_LineRange(NLineBegin, Point(0, NLineEnd+1))
+    ACaret.Change(
+      0,
+      NLineBegin,
+      0,
+      NLineEnd+1
+      )
   else
-    DoSelect_LineRange(NLineBegin, Point(Strings.LinesLen[NLineEnd], NLineEnd));
+    ACaret.Change(
+      0,
+      NLineBegin,
+      Strings.LinesLen[NLineEnd],
+      NLineEnd
+      );
+  if ACaretToEndOfSel then
+    ACaret.SwapSelection;
   Result:= true;
 end;
 
@@ -753,7 +766,7 @@ begin
     Caret:= Carets[iCaret];
     Caret.GetRange(NX1, NY1, NX2, NY2, bSel);
     if bSel then Continue;
-    if DoSelect_FoldingRangeStartingAtLine(NY1) then
+    if DoSelect_FoldingRangeStartingAtLine(Caret, NY1, false) then
       Result:= true;
   end;
 end;

@@ -1733,7 +1733,8 @@ type
     procedure DoSelect_CharGroupAtPos(P: TPoint; AddCaret, AllowOnlyWordChars: boolean);
     procedure DoSelect_LineRange(ALineFrom: integer; APosTo: TPoint);
     procedure DoSelect_LinesByFoldMark(const FoldMark: TATFoldedMark);
-    function DoSelect_FoldingRangeStartingAtLine(ALine: integer): boolean;
+    function DoSelect_FoldingRangeStartingAtLine(ACaret: TATCaretItem;
+      ALine: integer; ACaretToEndOfSel: boolean): boolean;
     function DoSelect_FoldingRangeAtCaret: boolean;
     procedure DoSelect_ClearColumnBlock;
     procedure DoSelect_ColumnBlock_FromPoints(P1Char, P2Char: TPoint;
