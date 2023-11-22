@@ -723,18 +723,24 @@ end;
 function TATSynEdit.DoSelect_FoldingRangeStartingAtLine(
   ACaret: TATCaretItem; ALine: integer; ACaretToEndOfSel: boolean): boolean;
 var
-  NRange: integer;
+  St: TATStrings;
   RangePtr: PATSynRange;
+  NRange: integer;
   NLineBegin, NLineEnd: integer;
 begin
   Result:= false;
+  St:= Strings;
   NRange:= FFold.FindRangeWithPlusAtLine(ALine);
   if NRange<0 then exit;
   if not FFold.IsIndexValid(NRange) then exit;
   RangePtr:= FFold.ItemPtr(NRange);
+
   NLineBegin:= RangePtr^.Y;
   NLineEnd:= RangePtr^.Y2;
-  if Strings.IsIndexValid(NLineEnd+1) then
+  if not St.IsIndexValid(NLineBegin) then exit;
+  if not St.IsIndexValid(NLineEnd) then exit;
+
+  if St.IsIndexValid(NLineEnd+1) then
     ACaret.Change(
       0,
       NLineBegin,
@@ -745,7 +751,7 @@ begin
     ACaret.Change(
       0,
       NLineBegin,
-      Strings.LinesLen[NLineEnd],
+      St.LinesLen[NLineEnd],
       NLineEnd
       );
   if ACaretToEndOfSel then
