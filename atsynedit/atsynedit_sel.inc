@@ -766,7 +766,11 @@ begin
     Caret:= Carets[iCaret];
     Caret.GetRange(NX1, NY1, NX2, NY2, bSel);
     if bSel then Continue;
-    if DoSelect_FoldingRangeStartingAtLine(Caret, NY1, false) then
+    if DoSelect_FoldingRangeStartingAtLine(
+      Caret,
+      NY1,
+      false //false: better keep carets at original lines to avoid scrolling
+      ) then
       Result:= true;
   end;
 end;
