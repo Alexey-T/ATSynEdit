@@ -566,7 +566,7 @@ begin
 end;
 
 
-function TATSynEdit.IsCoordInFoldMark(AX, AY: integer): boolean;
+function TATSynEdit.IsCoordInFoldedMark(AX, AY: integer): boolean;
 begin
   Result:= Assigned(FFoldedMarkList) and
     FFoldedMarkList.FindByCoord(Point(AX, AY)).IsInited;

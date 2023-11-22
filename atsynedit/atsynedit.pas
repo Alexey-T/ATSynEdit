@@ -1070,7 +1070,7 @@ type
     procedure CalcCaretDistanceFromEdges(ACommand: integer;
       out ALinesFromTop, ALinesFromBottom: integer);
     function IsNormalLexerActive: boolean;
-    function IsCoordInFoldMark(AX, AY: integer): boolean;
+    function IsCoordInFoldedMark(AX, AY: integer): boolean;
     procedure MenuitemClipboardRecentsClick(Sender: TObject);
     procedure SetEditorIndex(AValue: integer);
     function GetUndoForMarkers: boolean;
@@ -1732,7 +1732,7 @@ type
     procedure DoSelect_Line(APos: TPoint);
     procedure DoSelect_CharGroupAtPos(P: TPoint; AddCaret, AllowOnlyWordChars: boolean);
     procedure DoSelect_LineRange(ALineFrom: integer; APosTo: TPoint);
-    procedure DoSelect_LinesByFoldMark(const FoldMark: TATFoldedMark);
+    procedure DoSelect_LinesByFoldedMark(const AMark: TATFoldedMark);
     function DoSelect_FoldingRangeStartingAtLine(ACaret: TATCaretItem;
       ALine: integer; ACaretToEndOfSel: boolean): boolean;
     function DoSelect_FoldingRangeAtCaret: boolean;
@@ -6583,7 +6583,7 @@ begin
           TATEditorFoldStyle.FromEndOfLine
           ])
           //ignore click on fold-mark, because we handle double-click on it (select entire range)
-          and not IsCoordInFoldMark(X, Y);
+          and not IsCoordInFoldedMark(X, Y);
 
         DoShowPos(
           FMouseDownPnt,
@@ -7414,7 +7414,7 @@ begin
       FoldMark:= FFoldedMarkList.FindByCoord(MousePnt);
       if FoldMark.IsInited then
       begin
-        DoSelect_LinesByFoldMark(FoldMark);
+        DoSelect_LinesByFoldedMark(FoldMark);
         exit;
       end;
     end;

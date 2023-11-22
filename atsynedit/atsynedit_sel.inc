@@ -706,17 +706,17 @@ begin
 end;
 
 
-procedure TATSynEdit.DoSelect_LinesByFoldMark(const FoldMark: TATFoldedMark);
+procedure TATSynEdit.DoSelect_LinesByFoldedMark(const AMark: TATFoldedMark);
 var
   TextPnt: TPoint;
 begin
-  if FoldMark.IsInited then
+  if AMark.IsInited then
   begin
-    if Strings.IsIndexValid(FoldMark.LineTo+1) then
-      TextPnt:= Point(0, FoldMark.LineTo+1)
+    if Strings.IsIndexValid(AMark.LineTo+1) then
+      TextPnt:= Point(0, AMark.LineTo+1)
     else
-      TextPnt:= Point(Strings.LinesLen[FoldMark.LineTo], FoldMark.LineTo);
-    DoSelect_LineRange(FoldMark.LineFrom, TextPnt);
+      TextPnt:= Point(Strings.LinesLen[AMark.LineTo], AMark.LineTo);
+    DoSelect_LineRange(AMark.LineFrom, TextPnt);
   end;
 end;
 
