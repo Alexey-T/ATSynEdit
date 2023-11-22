@@ -720,6 +720,44 @@ begin
   end;
 end;
 
+function TATSynEdit.DoSelect_FoldingRangeStartingAtLine(ALine: integer): boolean;
+var
+  NRange: integer;
+  RangePtr: PATSynRange;
+  NLineBegin, NLineEnd: integer;
+begin
+  Result:= false;
+  NRange:= FFold.FindRangeWithPlusAtLine(ALine);
+  if NRange<0 then exit;
+  if not FFold.IsIndexValid(NRange) then exit;
+  RangePtr:= FFold.ItemPtr(NRange);
+  NLineBegin:= RangePtr^.Y;
+  NLineEnd:= RangePtr^.Y2;
+  if Strings.IsIndexValid(NLineEnd+1) then
+    DoSelect_LineRange(NLineBegin, Point(0, NLineEnd+1))
+  else
+    DoSelect_LineRange(NLineBegin, Point(Strings.LinesLen[NLineEnd], NLineEnd));
+  Result:= true;
+end;
+
+function TATSynEdit.DoSelect_FoldingRangeAtCaret: boolean;
+var
+  Caret: TATCaretItem;
+  NX1, NY1, NX2, NY2: integer;
+  iCaret: integer;
+  bSel: boolean;
+begin
+  Result:= false;
+  for iCaret:= Carets.Count-1 downto 0 do
+  begin
+    Caret:= Carets[iCaret];
+    Caret.GetRange(NX1, NY1, NX2, NY2, bSel);
+    if bSel then Continue;
+    if DoSelect_FoldingRangeStartingAtLine(NY1) then
+      Result:= true;
+  end;
+end;
+
 procedure TATSynEdit.DebugSelRect;
 begin
   Application.MainForm.Caption:= Format('SelRect %d:%d-%d:%d, SelRectBegin %d:%d, SelRectEnd %d:%d', [

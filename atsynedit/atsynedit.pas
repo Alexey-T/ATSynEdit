@@ -1419,6 +1419,7 @@ type
     function DoCommand_TextInsertEmptyAboveBelow(ADown: boolean): TATCommandResults;
     function DoCommand_SelectColumnToDirection(ADir: TATEditorSelectColumnDirection): TATCommandResults;
     function DoCommand_SelectColumnToLineEdge(AToEnd: boolean): TATCommandResults;
+    function DoCommand_SelectFoldingRangeAtCaret: TATCommandResults;
     function DoCommand_RemoveOneCaret(AFirstCaret: boolean): TATCommandResults;
     function DoCommand_TextInsertColumnBlockOnce(const AText: string; AKeepCaret: boolean): TATCommandResults;
     function DoCommand_CaretsExtend(ADown: boolean; ALines: integer): TATCommandResults;
@@ -1732,6 +1733,8 @@ type
     procedure DoSelect_CharGroupAtPos(P: TPoint; AddCaret, AllowOnlyWordChars: boolean);
     procedure DoSelect_LineRange(ALineFrom: integer; APosTo: TPoint);
     procedure DoSelect_LinesByFoldMark(const FoldMark: TATFoldedMark);
+    function DoSelect_FoldingRangeStartingAtLine(ALine: integer): boolean;
+    function DoSelect_FoldingRangeAtCaret: boolean;
     procedure DoSelect_ClearColumnBlock;
     procedure DoSelect_ColumnBlock_FromPoints(P1Char, P2Char: TPoint;
       AUpdateSelRectPoints: boolean=true);

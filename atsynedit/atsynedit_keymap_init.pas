@@ -206,6 +206,7 @@ begin
   M.Add(cCommand_MoveSelectionDown, 'move selected lines down', [scAlt+VK_DOWN], []);
   M.Add(cCommand_TextInsertEmptyAbove, 'insert empty line above', [], []);
   M.Add(cCommand_TextInsertEmptyBelow, 'insert empty line below', [], []);
+  M.Add(cCommand_SelectFoldingRangeAtCaret, 'select folding range(s) at caret(s)', [], []);
 
   M.Add(cCommand_CaretsExtendUpLine, 'carets extend: up a line', [], []);
   M.Add(cCommand_CaretsExtendUpPage, 'carets extend: up a page', [], []);

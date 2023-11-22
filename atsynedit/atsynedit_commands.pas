@@ -149,6 +149,7 @@ const
   cCommand_MoveSelectionDown = 269; // or cCmdFlag_Caret;
   cCommand_TextInsertEmptyAbove = 270 or cCmdFlag_ResetSel or cCmdFlag_Caret;
   cCommand_TextInsertEmptyBelow = 271 or cCmdFlag_ResetSel or cCmdFlag_Caret;
+  cCommand_SelectFoldingRangeAtCaret = 280;
 
   cCommand_ToggleOverwrite = 300;
   cCommand_ToggleReadOnly = 301;

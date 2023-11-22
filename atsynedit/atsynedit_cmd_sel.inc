@@ -197,6 +197,13 @@ begin
   Result:= [TATCommandResult.KeepColumnSel, TATCommandResult.CaretBottom];
 end;
 
+function TATSynEdit.DoCommand_SelectFoldingRangeAtCaret: TATCommandResults;
+begin
+  Result:= [];
+  if DoSelect_FoldingRangeAtCaret then
+    Result:= [TATCommandResult.CaretAny];
+end;
+
 function TATSynEdit.DoCommand_RemoveOneCaret(AFirstCaret: boolean): TATCommandResults;
 begin
   if Carets.Count>1 then
