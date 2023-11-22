@@ -1732,7 +1732,7 @@ type
     procedure DoSelect_Line(APos: TPoint);
     procedure DoSelect_CharGroupAtPos(P: TPoint; AddCaret, AllowOnlyWordChars: boolean);
     procedure DoSelect_LineRange(ALineFrom: integer; APosTo: TPoint);
-    procedure DoSelect_LinesByFoldedMark(const AMark: TATFoldedMark);
+    procedure DoSelect_LinesByFoldedMark(ALineFrom, ALineTo: integer);
     function DoSelect_FoldingRangeStartingAtLine(ACaret: TATCaretItem;
       ALine: integer; ACaretToEndOfSel: boolean): boolean;
     function DoSelect_FoldingRangeAtCaret: boolean;
@@ -7414,7 +7414,7 @@ begin
       FoldMark:= FFoldedMarkList.FindByCoord(MousePnt);
       if FoldMark.IsInited then
       begin
-        DoSelect_LinesByFoldedMark(FoldMark);
+        DoSelect_LinesByFoldedMark(FoldMark.LineFrom, FoldMark.LineTo);
         exit;
       end;
     end;
