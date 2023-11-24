@@ -5968,11 +5968,7 @@ begin
   if FAdapterHilite=nil then
     exit(false);
   S:= FAdapterHilite.GetLexerName;
-  if (S='') or (S='-') then //none lexer
-    exit(false);
-  if S[Length(S)]='^' then //lite lexer
-    exit(false);
-  Result:= true;
+  Result:= (S<>'') and (S<>'-') {none lexer} and (S[Length(S)]<>'^') {lite lexer};
 end;
 
 procedure TATSynEdit.SetEditorIndex(AValue: integer);
