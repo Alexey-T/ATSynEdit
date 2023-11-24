@@ -5968,9 +5968,9 @@ begin
   if FAdapterHilite=nil then
     exit(false);
   S:= FAdapterHilite.GetLexerName;
-  if S='-' then //none lexer
+  if (S='') or (S='-') then //none lexer
     exit(false);
-  if SEndsWith(S, ' ^') then //lite lexer
+  if S[Length(S)]='^' then //lite lexer
     exit(false);
   Result:= true;
 end;
