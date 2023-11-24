@@ -1069,7 +1069,6 @@ type
     procedure InitLengthArray(out Lens: TATIntArray);
     procedure CalcCaretDistanceFromEdges(ACommand: integer;
       out ALinesFromTop, ALinesFromBottom: integer);
-    function IsNormalLexerActive: boolean;
     function IsCoordInFoldedMark(AX, AY: integer): boolean;
     procedure MenuitemClipboardRecentsClick(Sender: TObject);
     procedure SetEditorIndex(AValue: integer);
@@ -1602,6 +1601,7 @@ type
     function IsPosInVisibleArea(AX, AY: integer): boolean;
     function IsLineFolded(ALine: integer; ADetectPartialFold: boolean = false): boolean;
     function IsCharWord(ch: Widechar): boolean;
+    function IsNormalLexerActive: boolean;
     property TextCharSize: TATEditorCharSize read FCharSize;
     property RectMain: TRect read FRectMain;
     property RectGutter: TRect read FRectGutter;
