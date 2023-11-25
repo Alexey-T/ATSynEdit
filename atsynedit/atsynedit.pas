@@ -130,8 +130,6 @@ type
     Delta: integer;
   end;
 
-  //TATEditorWheelQueue = specialize TQueue<TATEditorWheelRecord>;
-
 type
   TATTokenKind = (
     Other,
@@ -729,7 +727,6 @@ type
     FWrapIndented: boolean;
     FWrapAddSpace: integer;
     FWrapEnabledForMaxLines: integer;
-    //FWheelQueue: TATEditorWheelQueue;
     FUnprintedVisible,
     FUnprintedSpaces,
     FUnprintedSpacesTrailing,
@@ -4951,8 +4948,6 @@ begin
   FCharSize.Y:= 4;
   FEditorIndex:= 0;
 
-  //FWheelQueue:= TATEditorWheelQueue.Create;
-
   FCommandLog:= TATCommandLog.Create;
 
   FCarets:= TATCarets.Create;
@@ -5438,7 +5433,6 @@ begin
   FreeAndNil(FCaretShapeNormal);
   FreeAndNil(FCaretShapeOverwrite);
   FreeAndNil(FCaretShapeReadonly);
-  //FreeAndNil(FWheelQueue);
   inherited;
 end;
 
@@ -7343,7 +7337,6 @@ begin
         begin
           WheelRecord.Kind:= TATEditorWheelRecordKind.Vert;
           WheelRecord.Delta:= AWheelDelta;
-          //FWheelQueue.Push(WheelRecord);
           DoHandleWheelRecord(WheelRecord);
           Update;
         end;
@@ -7356,7 +7349,6 @@ begin
         begin
           WheelRecord.Kind:= TATEditorWheelRecordKind.Horz;
           WheelRecord.Delta:= AWheelDelta;
-          //FWheelQueue.Push(WheelRecord);
           DoHandleWheelRecord(WheelRecord);
           Update;
         end;
@@ -7369,7 +7361,6 @@ begin
         begin
           WheelRecord.Kind:= TATEditorWheelRecordKind.Zoom;
           WheelRecord.Delta:= AWheelDelta;
-          //FWheelQueue.Push(WheelRecord);
           DoHandleWheelRecord(WheelRecord);
           Update;
         end;
