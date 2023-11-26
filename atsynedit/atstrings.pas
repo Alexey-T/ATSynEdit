@@ -819,7 +819,7 @@ begin
   if NLen=0 then exit(#0);
   if AIndex>NLen then exit(#0);
   if Ex.Wide then
-    Move(Buf[AIndex*2-1], Result, 2)
+    Result:= PWideChar(@Buf[AIndex*2-1])^
   else
     Result:= WideChar(Ord(Buf[AIndex]));
 end;
