@@ -1644,6 +1644,7 @@ type
     //goto
     function DoShowPos(const APos: TPoint; AIndentHorz, AIndentVert: integer;
       AUnfold, AllowUpdate, AllowProximity: boolean): boolean;
+    procedure DoShowCaret(AUnfold, AllowUpdate, AllowProximity: boolean);
     procedure DoGotoPos(const APos, APosEnd: TPoint;
       AIndentHorz, AIndentVert: integer;
       APlaceCaret, ADoUnfold: boolean;

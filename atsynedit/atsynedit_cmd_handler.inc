@@ -373,14 +373,7 @@ begin
     if bFoldChanged then
     begin
       Paint;
-      DoShowPos(
-        Point(Caret.PosX, Caret.PosY),
-        FOptScrollIndentCaretHorz,
-        FOptScrollIndentCaretVert,
-        false,
-        false,
-        true
-        );
+      DoShowCaret(false, false, true);
     end;
     if bAllowRepaint then
       Invalidate;
