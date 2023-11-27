@@ -373,6 +373,7 @@ begin
     if bFoldChanged then
     begin
       Paint;
+      //lines before caret can be folded, so caret can go out of screen
       DoGotoCaret(TATCaretEdge.Top, bUndoRedo, false, false, true);
     end;
     if bAllowRepaint then
