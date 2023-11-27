@@ -217,6 +217,7 @@ begin
   else
     DoRangeFold(ARangeIndex);
 
+  UpdateWrapInfo;
   Update;
 
   //force repaint, if after 'fold' editor has empty space below the last line,
@@ -458,10 +459,7 @@ begin
     begin
       Caret:= Carets[0];
       if Fold.ItemPtr(NRange)^.Y<=Caret.PosY then
-      begin
-        UpdateWrapInfo;
         DoGotoCaret(TATCaretEdge.Top);
-      end;
     end;
   end;
 end;
