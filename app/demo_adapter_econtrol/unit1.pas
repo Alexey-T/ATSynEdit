@@ -207,7 +207,7 @@ begin
     5,
     5,
     true,
-    true
+    TATEditorActionIfFolded.Unfold
     );
   ed.SetFocus;
 end;

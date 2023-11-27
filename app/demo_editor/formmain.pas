@@ -701,7 +701,7 @@ begin
       NIndentHorz,
       NIndentVert,
       true,
-      true)
+      TATEditorActionIfFolded.Unfold)
   else
     ShowMessage('Incorrect line index: '+s);
 end;
@@ -1655,7 +1655,7 @@ end;
 procedure TfmMain.FinderUpdateEditor(AUpdateText: boolean);
 begin
   FFinder.Editor.Update(AUpdateText);
-  FFinder.Editor.DoGotoCaret(cEdgeTop);
+  FFinder.Editor.DoGotoCaret(TATCaretEdge.Top);
   UpdateStatus;
 end;
 

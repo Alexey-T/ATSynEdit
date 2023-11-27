@@ -79,7 +79,8 @@ begin
       Point(Finder.MatchEdEnd.X, Finder.MatchEdEnd.Y),
       5, 2,
       true,
-      true);
+      TATEditorActionIfFolded.Unfold
+      );
   end
   else
     MemoRes.Text:= '(not found)';
