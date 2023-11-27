@@ -207,7 +207,7 @@ procedure TATSynEdit.DoFoldbarClick_RangeIndex(ARangeIndex: integer);
 var
   FoldItemPtr: PATSynRange;
   bUnfold: boolean;
-  bScrolledToLastPage: boolean;
+  //bScrolledToLastPage: boolean;
 begin
   if not FFold.IsIndexValid(ARangeIndex) then exit;
   FoldItemPtr:= FFold.ItemPtr(ARangeIndex);
