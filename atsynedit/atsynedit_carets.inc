@@ -815,24 +815,6 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoShowPosOfCaret(AUnfold, AllowUpdate, AllowProximity: boolean);
-var
-  Caret: TATCaretItem;
-begin
-  if Carets.Count>0 then
-  begin
-    Caret:= Carets[0];
-    DoShowPos(
-      Point(Caret.PosX, Caret.PosY),
-      FOptScrollIndentCaretHorz,
-      FOptScrollIndentCaretVert,
-      AUnfold,
-      AllowUpdate,
-      AllowProximity
-      );
-  end;
-end;
-
 procedure TATSynEdit.DoGotoPos(const APos, APosEnd: TPoint;
   AIndentHorz, AIndentVert: integer;
   APlaceCaret: boolean;

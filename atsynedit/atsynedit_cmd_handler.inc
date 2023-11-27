@@ -373,7 +373,7 @@ begin
     if bFoldChanged then
     begin
       Paint;
-      DoShowPosOfCaret(false, false, true);
+      DoGotoCaret(TATCaretEdge.Top, bUndoRedo, false, false, true);
     end;
     if bAllowRepaint then
       Invalidate;
