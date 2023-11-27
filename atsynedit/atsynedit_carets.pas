@@ -170,7 +170,7 @@ type
     property AsString: string read GetAsString write SetAsString;
     property OnCaretChanged: TNotifyEvent read FOnCaretChanged write FOnCaretChanged;
     procedure UpdateMemory(AMode: TATCaretMemoryAction; AArrowUpDown: boolean);
-    procedure UpdateAfterRangeFolded(ARangeX, ARangeY, ARangeY2: integer);
+    function UpdateAfterRangeFolded(ARangeX, ARangeY, ARangeY2: integer): boolean;
     procedure DoChanged;
     class function IsTouchingSelections(Item1, Item2: TATCaretItem): boolean;
   end;
@@ -1244,7 +1244,7 @@ begin
     Items[i].UpdateMemory(AMode, AArrowUpDown);
 end;
 
-procedure TATCarets.UpdateAfterRangeFolded(ARangeX, ARangeY, ARangeY2: integer);
+function TATCarets.UpdateAfterRangeFolded(ARangeX, ARangeY, ARangeY2: integer): boolean;
 var
   Caret: TATCaretItem;
   bChange: boolean;
@@ -1264,6 +1264,7 @@ begin
   end;
   if bChange then
     Sort;
+  Result:= bChange;
 end;
 
 procedure TATCarets.GetSelections(out D: TATCaretSelections);

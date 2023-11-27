@@ -167,7 +167,10 @@ begin
   DoRangeHideLines(Range^.Y+1, Range^.Y2);
 
   if FOptCaretFixAfterRangeFolded then
-    Carets.UpdateAfterRangeFolded(Range^.X, Range^.Y, Range^.Y2);
+  begin
+    if Carets.UpdateAfterRangeFolded(Range^.X, Range^.Y, Range^.Y2) then
+      DoEventCarets;
+  end;
 end;
 
 
