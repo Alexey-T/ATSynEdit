@@ -199,13 +199,13 @@ var
   NLineChanged: integer;
   NProximityVert: integer;
 begin
+  St:= Strings;
   bNeedRepaint:= false;
   bAllowRepaint:= true;
   bTextChanged:= TATCommandResult.Text in Res;
   bUndoRedo:= TATCommandResult.UndoRedo in Res;
   bFoldChanged:= TATCommandResult.FoldChange in Res;
-  bCaretMoved:= false;
-  St:= Strings;
+  bCaretMoved:= IsCommandResults_CaretMove(Res);
 
   //if one-line, try to make right edge of text near the edge of control, like Win inputs
   if ModeOneLine then
@@ -250,8 +250,6 @@ begin
   DoCaretsFixIfInsideFolded;
   Carets.Sort;
 
-
-  bCaretMoved:= IsCommandResults_CaretMove(Res);
   if bCaretMoved then
   begin
     if Carets.Count=1 then
