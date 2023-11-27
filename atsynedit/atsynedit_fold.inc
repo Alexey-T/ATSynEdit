@@ -218,6 +218,7 @@ begin
     DoRangeFold(ARangeIndex);
 
   UpdateWrapInfo;
+  UpdateScrollbars(true);
   Update;
 
   //force repaint, if after 'fold' editor has empty space below the last line,
