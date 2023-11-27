@@ -458,7 +458,10 @@ begin
     begin
       Caret:= Carets[0];
       if Fold.ItemPtr(NRange)^.Y<=Caret.PosY then
+      begin
+        UpdateWrapInfo;
         DoGotoCaret(TATCaretEdge.Top);
+      end;
     end;
   end;
 end;
