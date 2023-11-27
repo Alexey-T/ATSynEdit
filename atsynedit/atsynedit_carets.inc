@@ -835,7 +835,8 @@ end;
 
 procedure TATSynEdit.DoGotoPos(const APos, APosEnd: TPoint;
   AIndentHorz, AIndentVert: integer;
-  APlaceCaret, ADoUnfold: boolean;
+  APlaceCaret: boolean;
+  ADoUnfold: TATEditorActionIfFolded;
   AAllowProcessMsg: boolean=true;
   AAllowUpdate: boolean=true;
   AAllowProximity: boolean=true);
@@ -856,18 +857,18 @@ begin
 
   //if IsPosFolded(APos.X, APos.Y) - better?
   if IsLineFolded(APos.Y, true) then
-  begin
-    if ADoUnfold then
-    begin
-      DoUnfoldLine(APos.Y);
-      if AAllowUpdate then
-        Update;
-      if AAllowProcessMsg then
-        Application.ProcessMessages;
-    end
-    else
-      exit;
-  end;
+    case ADoUnfold of
+      TATEditorActionIfFolded.Unfold:
+        begin
+          DoUnfoldLine(APos.Y);
+          if AAllowUpdate then
+            Update;
+          if AAllowProcessMsg then
+            Application.ProcessMessages;
+        end;
+      TATEditorActionIfFolded.DoExit:
+        exit;
+    end;
 
   if APlaceCaret then
   begin
@@ -877,10 +878,10 @@ begin
   end;
 
   if APosEnd.Y>=0 then
-    changed1:= DoShowPos(APosEnd, AIndentHorz, AIndentVert, ADoUnfold, false, AAllowProximity)
+    changed1:= DoShowPos(APosEnd, AIndentHorz, AIndentVert, ADoUnfold=TATEditorActionIfFolded.Unfold, false, AAllowProximity)
   else
     changed1:= false;
-  changed2:= DoShowPos(APos, AIndentHorz, AIndentVert, ADoUnfold, false, AAllowProximity);
+  changed2:= DoShowPos(APos, AIndentHorz, AIndentVert, ADoUnfold=TATEditorActionIfFolded.Unfold, false, AAllowProximity);
 
   ////always update scrollbar after all keyboard cmds (PageUp, PageDown, Ctrl+Home)
   if not changed1 and not changed2 then
@@ -890,8 +891,10 @@ begin
     Update(false, true{AForceRepaint});
 end;
 
-procedure TATSynEdit.DoGotoCaret(AEdge: TATCaretEdge; AUndoRedo: boolean=false;
-  AAllowProcessMsg: boolean=true; AAllowUpdate: boolean=true;
+procedure TATSynEdit.DoGotoCaret(AEdge: TATCaretEdge;
+  AUndoRedo: boolean=false;
+  AAllowProcessMsg: boolean=true;
+  AAllowUpdate: boolean=true;
   AAllowProximity: boolean=true);
 var
   NIndentVert, NIndentHorz: integer;
@@ -913,7 +916,7 @@ begin
     NIndentHorz,
     NIndentVert,
     false,
-    false, //dont unfold
+    TATEditorActionIfFolded.Ignore,
     AAllowProcessMsg,
     AAllowUpdate,
     AAllowProximity

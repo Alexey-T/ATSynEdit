@@ -245,7 +245,7 @@ begin
         AIndentHorz,
         AIndentVert,
         true,
-        true
+        TATEditorActionIfFolded.Unfold
         );
       exit;
     end;

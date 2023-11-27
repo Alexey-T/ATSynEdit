@@ -44,7 +44,7 @@ begin
     AIndentHorz,
     AIndentVert,
     true,
-    true
+    TATEditorActionIfFolded.Unfold
     );
 
   if AndDelete then

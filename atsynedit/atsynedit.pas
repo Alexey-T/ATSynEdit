@@ -237,6 +237,12 @@ type
     Sentence
     );
 
+  TATEditorActionIfFolded = (
+    Ignore,
+    Unfold,
+    DoExit
+    );
+
   TATCommandResult = (
     Text,             //Text was changed.
     FoldChange,       //Folding range(s) were changed or folded/unfolded.
@@ -1647,7 +1653,8 @@ type
     procedure DoShowPosOfCaret(AUnfold, AllowUpdate, AllowProximity: boolean);
     procedure DoGotoPos(const APos, APosEnd: TPoint;
       AIndentHorz, AIndentVert: integer;
-      APlaceCaret, ADoUnfold: boolean;
+      APlaceCaret: boolean;
+      ADoUnfold: TATEditorActionIfFolded;
       AAllowProcessMsg: boolean=true;
       AAllowUpdate: boolean=true;
       AAllowProximity: boolean=true);
@@ -10603,7 +10610,7 @@ begin
     FOptUndoIndentHorz,
     FOptUndoIndentVert,
     true,
-    true,
+    TATEditorActionIfFolded.Unfold,
     false,
     false);
   { //not good
