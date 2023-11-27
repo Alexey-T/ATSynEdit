@@ -6,6 +6,7 @@ unit ATSynEdit_Carets;
 
 {$mode objfpc}{$H+}
 {$ModeSwitch advancedrecords}
+{$ScopedEnums on}
 
 interface
 
@@ -17,21 +18,21 @@ uses
 
 type
   TATPosRelation = (
-    cRelateBefore,
-    cRelateInside,
-    cRelateAfter
+    Before,
+    Inside,
+    After
     );
 
   TATRangeSelection = (
-    cRangeAllSelected,
-    cRangeAllUnselected,
-    cRangePartlySelected
+    AllSelected,
+    AllUnselected,
+    PartlySelected
     );
 
   TATCaretMemoryAction = (
-    cCaretMem_PrepareX,
-    cCaretMem_SaveX,
-    cCaretMem_ClearX
+    PrepareX,
+    SaveX,
+    ClearX
     );
 
 procedure SwapInt(var n1, n2: integer); inline;
@@ -81,16 +82,16 @@ type
 
 type
   TATCaretEdge = (
-    cEdgeTop,
-    cEdgeBottom,
-    cEdgeLeft,
-    cEdgeRight
+    Top,
+    Bottom,
+    Left,
+    Right
     );
 
   TATCaretScreenSide = (
-    cScreenSideTop,
-    cScreenSideMiddle,
-    cScreenSideBottom
+    Top,
+    Middle,
+    Bottom
     );
 
 type
@@ -207,12 +208,12 @@ function IsPosInRange(X, Y, X1, Y1, X2, Y2: integer;
     AllowOnRightEdge: boolean=false): TATPosRelation;
 begin
   if IsPosSorted(X, Y, X1, Y1, false) then
-    Result:= cRelateBefore
+    Result:= TATPosRelation.Before
   else
   if IsPosSorted(X, Y, X2, Y2, AllowOnRightEdge) then
-    Result:= cRelateInside
+    Result:= TATPosRelation.Inside
   else
-    Result:= cRelateAfter;
+    Result:= TATPosRelation.After;
 end;
 
 procedure SwapInt(var n1, n2: integer); inline;
@@ -333,11 +334,11 @@ begin
     Y2:= Data[m].EndY;
 
     case IsPosInRange(AX, AY, X1, Y1, X2, Y2) of
-      cRelateInside:
+      TATPosRelation.Inside:
         exit(true);
-      cRelateBefore:
+      TATPosRelation.Before:
         b:= m-1;
-      cRelateAfter:
+      TATPosRelation.After:
         a:= m+1;
     end;
   until false;
@@ -349,7 +350,7 @@ var
   a, b, m: integer;
   bLeft, bRight: TATPosRelation;
 begin
-  Result:= cRangeAllUnselected;
+  Result:= TATRangeSelection.AllUnselected;
   a:= 0;
   b:= High(Data);
 
@@ -363,23 +364,23 @@ begin
     Y2:= Data[m].EndY;
 
     bLeft:= IsPosInRange(AX1, AY1, X1, Y1, X2, Y2);
-    if (bLeft=cRelateAfter) then
+    if (bLeft=TATPosRelation.After) then
     begin
       a:= m+1;
       Continue;
     end;
 
     bRight:= IsPosInRange(AX2, AY2, X1, Y1, X2, Y2, true);
-    if (bRight=cRelateBefore) then
+    if (bRight=TATPosRelation.Before) then
     begin
       b:= m-1;
       Continue;
     end;
 
-    if (bLeft=cRelateInside) and (bRight=cRelateInside) then
-      exit(cRangeAllSelected)
+    if (bLeft=TATPosRelation.Inside) and (bRight=TATPosRelation.Inside) then
+      exit(TATRangeSelection.AllSelected)
     else
-      exit(cRangePartlySelected);
+      exit(TATRangeSelection.PartlySelected);
   until false;
 end;
 
@@ -560,16 +561,16 @@ end;
 procedure TATCaretItem.UpdateMemory(AMode: TATCaretMemoryAction; AArrowUpDown: boolean);
 begin
   case AMode of
-    cCaretMem_PrepareX:
+    TATCaretMemoryAction.PrepareX:
       begin
         SavedX_Pre:= CoordX;
       end;
-    cCaretMem_SaveX:
+    TATCaretMemoryAction.SaveX:
       begin
         if (not AArrowUpDown) or (SavedX<SavedX_Pre) then
           SavedX:= SavedX_Pre;
       end;
-    cCaretMem_ClearX:
+    TATCaretMemoryAction.ClearX:
       begin
         SavedX:= 0;
       end;
@@ -878,7 +879,7 @@ begin
     Item:= Items[i];
     Item.GetRange(X1, Y1, X2, Y2, bSel);
     if bSel then
-      if IsPosInRange(APosX, APosY, X1, Y1, X2, Y2)=cRelateInside then
+      if IsPosInRange(APosX, APosY, X1, Y1, X2, Y2)=TATPosRelation.Inside then
         Exit(i);
   end;
 end;
@@ -1070,10 +1071,14 @@ var
 begin
   Result:= Point(0, 0);
   case AEdge of
-    cEdgeTop: N:= 0;
-    cEdgeBottom: N:= Count-1;
-    cEdgeLeft: N:= IndexOfLeftRight(true);
-    cEdgeRight: N:= IndexOfLeftRight(false);
+    TATCaretEdge.Top:
+      N:= 0;
+    TATCaretEdge.Bottom:
+      N:= Count-1;
+    TATCaretEdge.Left:
+      N:= IndexOfLeftRight(true);
+    TATCaretEdge.Right:
+      N:= IndexOfLeftRight(false);
   end;
   if IsIndexValid(N) then
     with Items[N] do
@@ -1100,14 +1105,14 @@ begin
   if not Sel1 and not Sel2 then Exit;
   if not Sel1 then
   begin
-    Result:= IsPosInRange(Item1.PosX, Item1.PosY, XMin2, YMin2, XMax2, YMax2)=cRelateInside;
+    Result:= IsPosInRange(Item1.PosX, Item1.PosY, XMin2, YMin2, XMax2, YMax2)=TATPosRelation.Inside;
     if Result then
       begin OutPosX:= Item2.PosX; OutPosY:= Item2.PosY; OutEndX:= Item2.EndX; OutEndY:= Item2.EndY; end;
     Exit
   end;
   if not Sel2 then
   begin
-    Result:= IsPosInRange(Item2.PosX, Item2.PosY, XMin1, YMin1, XMax1, YMax1)=cRelateInside;
+    Result:= IsPosInRange(Item2.PosX, Item2.PosY, XMin1, YMin1, XMax1, YMax1)=TATPosRelation.Inside;
     if Result then
       begin OutPosX:= Item1.PosX; OutPosY:= Item1.PosY; OutEndX:= Item1.EndX; OutEndY:= Item1.EndY; end;
     Exit
@@ -1312,7 +1317,7 @@ begin
     Caret:= Items[i];
     Caret.GetRange(X1, Y1, X2, Y2, bSel);
     if bSel then
-      if IsPosInRange(AX, AY, X1, Y1, X2, Y2, AllowAtEdge)=cRelateInside then
+      if IsPosInRange(AX, AY, X1, Y1, X2, Y2, AllowAtEdge)=TATPosRelation.Inside then
         exit(true);
   end;
 end;

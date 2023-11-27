@@ -160,7 +160,7 @@ begin
   else
   begin
     P:= SelEnd;
-    Result:= IsPosInRange(AX, AY, PosX, PosY, P.X, P.Y)=cRelateInside;
+    Result:= IsPosInRange(AX, AY, PosX, PosY, P.X, P.Y)=TATPosRelation.Inside;
   end;
 end;
 
@@ -441,7 +441,7 @@ function TATMarkers.DeleteInRange(AX1, AY1, AX2, AY2: integer): boolean;
   //
   function IsMarkerOk(Item: PATMarkerItem): boolean; inline;
   begin
-    Result:= IsPosInRange(Item^.PosX, Item^.PosY, AX1, AY1, AX2, AY2)=cRelateInside;
+    Result:= IsPosInRange(Item^.PosX, Item^.PosY, AX1, AY1, AX2, AY2)=TATPosRelation.Inside;
   end;
   //
 var

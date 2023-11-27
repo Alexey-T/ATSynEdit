@@ -154,7 +154,7 @@ begin
   for i:= 0 to Count-1 do
   begin
     Item:= FList.ItemPtr(i);
-    if IsPosInRange(AX, AY, Item^.PosX, Item^.PosY, Item^.EndX, Item^.EndY, false) = cRelateInside then
+    if IsPosInRange(AX, AY, Item^.PosX, Item^.PosY, Item^.EndX, Item^.EndY, false) = TATPosRelation.Inside then
       exit(i);
   end;
 end;

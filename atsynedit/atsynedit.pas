@@ -1644,7 +1644,7 @@ type
     //goto
     function DoShowPos(const APos: TPoint; AIndentHorz, AIndentVert: integer;
       AUnfold, AllowUpdate, AllowProximity: boolean): boolean;
-    procedure DoShowCaret(AUnfold, AllowUpdate, AllowProximity: boolean);
+    procedure DoShowPosOfCaret(AUnfold, AllowUpdate, AllowProximity: boolean);
     procedure DoGotoPos(const APos, APosEnd: TPoint;
       AIndentHorz, AIndentVert: integer;
       APlaceCaret, ADoUnfold: boolean;
@@ -8195,7 +8195,7 @@ begin
     if TATEditorInternalFlag.ScrolledHorz in FPaintFlags then
     begin
       Exclude(FPaintFlags, TATEditorInternalFlag.ScrolledHorz);
-      Carets.UpdateMemory(cCaretMem_ClearX, false);
+      Carets.UpdateMemory(TATCaretMemoryAction.ClearX, false);
     end;
 
   if Assigned(FAdapterHilite) then
@@ -8482,14 +8482,14 @@ begin
 
   //can't drop into selection
   Relation:= IsPosInRange(P.X, P.Y, X1, Y1, X2, Y2);
-  if Relation=cRelateInside then exit;
+  if Relation=TATPosRelation.Inside then exit;
 
   Str:= St.TextSubstring(X1, Y1, X2, Y2);
   if Str='' then exit;
   BeginEditing;
 
   //insert before selection?
-  if Relation=cRelateBefore then
+  if Relation=TATPosRelation.Before then
   begin
     if AndDeleteSelection then
       St.TextDeleteRange(X1, Y1, X2, Y2, Shift, PosAfter);
@@ -10521,7 +10521,7 @@ begin
       FScrollHorz.SetZero;
 
       //SetZero may scroll view out of caret
-      DoGotoCaret(cEdgeTop);
+      DoGotoCaret(TATCaretEdge.Top);
     end;
 
     //keep LineTop! CudaText issue #3055

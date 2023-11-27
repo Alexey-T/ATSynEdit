@@ -126,7 +126,7 @@ const
 begin
   St:= Strings;
   if not AWithSelection or
-    (TempSel_IsRangeSelected(ACharIndex, ALineIndex, ACharIndex+AOffsetMax, ALineIndex)=cRangeAllUnselected) then
+    (TempSel_IsRangeSelected(ACharIndex, ALineIndex, ACharIndex+AOffsetMax, ALineIndex)=TATRangeSelection.AllUnselected) then
   begin
     nPartOffset:= 0;
     nPartLen:= Min(St.LinesLen[ALineIndex], AOffsetMax);
@@ -265,13 +265,13 @@ begin
     nRangeX1:= ACharIndex + AParts[i].Offset;
     nRangeX2:= nRangeX1 + AParts[i].Len;
     case IsRangeSelected(nRangeX1, ALineIndex, nRangeX2, ALineIndex) of
-      cRangeAllSelected:
+      TATRangeSelection.AllSelected:
         begin
           if Part.ColorFont<>clNone then
             AParts[i].ColorFont:= Part.ColorFont;
           AParts[i].ColorBG:= Part.ColorBG; //clGreen
         end;
-      cRangePartlySelected:
+      TATRangeSelection.PartlySelected:
         begin
           FPartsSel[iPart].Offset:= AParts[i].Offset;
           FPartsSel[iPart].Len:= AParts[i].Len;

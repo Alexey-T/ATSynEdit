@@ -27,21 +27,21 @@ begin
   begin
     //check for y
     if AY1<>AY2 then
-      exit(cRangeAllUnselected); //dont allow multi-line range
+      exit(TATRangeSelection.AllUnselected); //dont allow multi-line range
     if (AY1<FSelRect.Top) or (AY1>FSelRect.Bottom) then
-      exit(cRangeAllUnselected);
+      exit(TATRangeSelection.AllUnselected);
 
     //check for x
     NPosLeft:= Strings.ColumnPosToCharPos(AY1, FSelRect.Left, FTabHelper);
     NPosRight:= Strings.ColumnPosToCharPos(AY1, FSelRect.Right, FTabHelper);
 
     if (AX1>=NPosLeft) and (AX2<=NPosRight) then
-      Result:= cRangeAllSelected
+      Result:= TATRangeSelection.AllSelected
     else
     if (AX1>=NPosRight) or (AX2<=NPosLeft) then
-      Result:= cRangeAllUnselected
+      Result:= TATRangeSelection.AllUnselected
     else
-      Result:= cRangePartlySelected;
+      Result:= TATRangeSelection.PartlySelected;
   end
   else
     Result:= TempSel_IsRangeSelected(AX1, AY1, AX2, AY2);

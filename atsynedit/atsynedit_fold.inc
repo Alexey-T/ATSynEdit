@@ -448,7 +448,7 @@ begin
     DoFoldbarClick_RangeIndex(NRange);
 
   //fixing CudaText #5291
-  DoShowCaret(false, true, true);
+  DoShowPosOfCaret(false, true, true);
 end;
 
 procedure TATSynEdit.MenuFoldFoldAllClick(Sender: TObject);

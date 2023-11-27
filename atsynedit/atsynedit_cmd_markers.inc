@@ -113,7 +113,7 @@ begin
   Mark.PosY:= PY;
   FMarkers[FMarkers.Count-1] := Mark;
 
-  DoGotoCaret(cEdgeTop);
+  DoGotoCaret(TATCaretEdge.Top);
   Update;
 end;
 

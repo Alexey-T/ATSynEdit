@@ -263,16 +263,16 @@ begin
     if bAllowCaretScroll then
     begin
       if TATCommandResult.CaretTop in Res then
-        DoGotoCaret(cEdgeTop, bUndoRedo, false, false, false)
+        DoGotoCaret(TATCaretEdge.Top, bUndoRedo, false, false, false)
       else
       if TATCommandResult.CaretBottom in Res then
-        DoGotoCaret(cEdgeBottom, bUndoRedo, false, false, false)
+        DoGotoCaret(TATCaretEdge.Bottom, bUndoRedo, false, false, false)
       else
       if TATCommandResult.CaretLeft in Res then
-        DoGotoCaret(cEdgeLeft, bUndoRedo, false, false, false)
+        DoGotoCaret(TATCaretEdge.Left, bUndoRedo, false, false, false)
       else
       if TATCommandResult.CaretRight in Res then
-        DoGotoCaret(cEdgeRight, bUndoRedo, false, false, false);
+        DoGotoCaret(TATCaretEdge.Right, bUndoRedo, false, false, false);
     end;
 
     if not (TATCommandResult.KeepColumnSel in Res) then
@@ -373,7 +373,7 @@ begin
     if bFoldChanged then
     begin
       Paint;
-      DoShowCaret(false, false, true);
+      DoShowPosOfCaret(false, false, true);
     end;
     if bAllowRepaint then
       Invalidate;
@@ -532,9 +532,9 @@ begin
     cCommand_GotoTextEnd,
     cCommand_GotoTextEnd_Sel:          Result:= DoCommand_GotoTextEnd;
 
-    cCommand_GotoScreenTop:            Result:= DoCommand_GotoScreenSide(cScreenSideTop);
-    cCommand_GotoScreenBottom:         Result:= DoCommand_GotoScreenSide(cScreenSideBottom);
-    cCommand_GotoScreenCenter:         Result:= DoCommand_GotoScreenSide(cScreenSideMiddle);
+    cCommand_GotoScreenTop:            Result:= DoCommand_GotoScreenSide(TATCaretScreenSide.Top);
+    cCommand_GotoScreenBottom:         Result:= DoCommand_GotoScreenSide(TATCaretScreenSide.Bottom);
+    cCommand_GotoScreenCenter:         Result:= DoCommand_GotoScreenSide(TATCaretScreenSide.Middle);
 
     cCommand_GotoWordNext,
     cCommand_GotoWordNext_Sel:         Result:= DoCommand_GotoWord(cWordjumpToNext);
@@ -747,7 +747,7 @@ begin
   St.SetNewCommandMark;
 
   if not FCaretVirtual then
-    Carets.UpdateMemory(cCaretMem_PrepareX, false);
+    Carets.UpdateMemory(TATCaretMemoryAction.PrepareX, false);
   FIsRunningCommand:= true;
 
   bTooManyCarets:= Carets.Count>FOptUndoMaxCarets;
@@ -795,7 +795,7 @@ begin
     cCommand_KeyTab:
       begin
         if not FLastCommandChangedText2 then
-          Carets.UpdateMemory(cCaretMem_SaveX, false);
+          Carets.UpdateMemory(TATCaretMemoryAction.SaveX, false);
       end;
     {
     // CudaText issue #1326
@@ -805,7 +805,7 @@ begin
     cCommand_ClipboardAltAltPaste,
     cCommand_ClipboardAltPaste_Select:
       begin
-        Carets.UpdateMemory(cCaretMem_SaveX, false);
+        Carets.UpdateMemory(TATCaretMemoryAction.SaveX, false);
       end;
     }
     cCommand_KeyUp,
@@ -816,9 +816,9 @@ begin
     cCommand_KeyPageUp_Sel,
     cCommand_KeyPageDown,
     cCommand_KeyPageDown_Sel:
-      Carets.UpdateMemory(cCaretMem_SaveX, true);
+      Carets.UpdateMemory(TATCaretMemoryAction.SaveX, true);
     else
-      Carets.UpdateMemory(cCaretMem_ClearX, false);
+      Carets.UpdateMemory(TATCaretMemoryAction.ClearX, false);
   end;
 
   if NCommandCode<>0 then

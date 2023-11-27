@@ -560,11 +560,11 @@ begin
   //NCaretX:= R.Left; //also useful, maybe make an option?
 
   case ASide of
-    cScreenSideTop:
+    TATCaretScreenSide.Top:
       PntCoord:= ATPoint(NCaretX, R.Top);
-    cScreenSideBottom:
+    TATCaretScreenSide.Bottom:
       PntCoord:= ATPoint(NCaretX, R.Bottom);
-    cScreenSideMiddle:
+    TATCaretScreenSide.Middle:
       PntCoord:= ATPoint(NCaretX, (R.Top+R.Bottom) div 2);
   end;
 
@@ -572,13 +572,13 @@ begin
   if PntText.Y<0 then exit;
 
   case ASide of
-    cScreenSideTop:
+    TATCaretScreenSide.Top:
       begin
         if FOptScrollSmooth then
           if PntText.Y>0 then
             Inc(PntText.Y); //smooth scrolling gives partially visible 1st line
       end;
-    cScreenSideBottom:
+    TATCaretScreenSide.Bottom:
       begin
         if PntText.Y<Strings.Count-1 then
           Dec(PntText.Y);

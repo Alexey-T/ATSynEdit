@@ -815,7 +815,7 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoShowCaret(AUnfold, AllowUpdate, AllowProximity: boolean);
+procedure TATSynEdit.DoShowPosOfCaret(AUnfold, AllowUpdate, AllowProximity: boolean);
 var
   Caret: TATCaretItem;
 begin
