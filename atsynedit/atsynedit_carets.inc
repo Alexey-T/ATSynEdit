@@ -1117,10 +1117,12 @@ procedure TATSynEdit.DoCaretsFixIfInsideFolded;
 var
   St: TATStrings;
   Caret: TATCaretItem;
-  NFoldFrom, i: integer;
-  bHidden: boolean;
+  bHidden, bChanged: boolean;
+  NFoldFrom, NewX, i: integer;
 begin
   St:= Strings;
+  bChanged:= false;
+
   for i:= Carets.Count-1 downto 0 do
   begin
     Caret:= Carets[i];
@@ -1130,7 +1132,12 @@ begin
     bHidden:= St.LinesHidden[Caret.PosY, FEditorIndex];
     if bHidden then
     begin
-      Caret.PosX:= 0;
+      NewX:= 0;
+      if Caret.PosX<>NewX then
+      begin
+        Caret.PosX:= NewX;
+        bChanged:= true;
+      end;
       Continue;
     end;
 
@@ -1138,8 +1145,21 @@ begin
     if NFoldFrom=0 then
       Continue
     else
-      Caret.PosX:= Min(Caret.PosX, NFoldFrom-1);
+    begin
+      NewX:= Min(Caret.PosX, NFoldFrom-1);
+      if Caret.PosX<>NewX then
+      begin
+        Caret.PosX:= NewX;
+        bChanged:= true;
+      end;
+    end;
   end;
+
+  //not needed yet
+  {
+  if bChanged then
+    DoEventCarets;
+    }
 end;
 
 
