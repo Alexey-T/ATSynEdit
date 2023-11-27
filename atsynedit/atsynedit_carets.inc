@@ -770,19 +770,22 @@ begin
   end;
 end;
 
-function TATSynEdit.DoShowPos(const APos: TPoint; AIndentHorz, AIndentVert: integer;
-  AUnfold, AllowUpdate, AllowProximity: boolean): boolean;
+function TATSynEdit.DoShowPos(const APos: TPoint;
+  AIndentHorz, AIndentVert: integer;
+  AllowUnfold,
+  AllowUpdate,
+  AllowProximity: boolean): boolean;
 var
   Coord: TATPoint;
   NProximityVert, NProximityHorz: integer;
 begin
   Result:= false;
 
-  //allow big values - make centering vertically
+  //big values >=100 - make centering vertically
   if Abs(AIndentVert)>=100 then
     AIndentVert:= GetVisibleLines div 2;
 
-  if AUnfold then
+  if AllowUnfold then
     if IsLineFolded(APos.Y, true) then
       DoUnfoldLine(APos.Y);
 

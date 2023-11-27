@@ -1648,8 +1648,11 @@ type
     function OffsetToCaretPos(const APos: integer): TPoint;
     function CaretPosToOffset(const ACaret: TPoint): integer;
     //goto
-    function DoShowPos(const APos: TPoint; AIndentHorz, AIndentVert: integer;
-      AUnfold, AllowUpdate, AllowProximity: boolean): boolean;
+    function DoShowPos(const APos: TPoint;
+      AIndentHorz, AIndentVert: integer;
+      AllowUnfold,
+      AllowUpdate,
+      AllowProximity: boolean): boolean;
     procedure DoGotoPos(const APos, APosEnd: TPoint;
       AIndentHorz, AIndentVert: integer;
       APlaceCaret: boolean;
@@ -1657,8 +1660,10 @@ type
       AAllowProcessMsg: boolean=true;
       AAllowUpdate: boolean=true;
       AAllowProximity: boolean=true);
-    procedure DoGotoCaret(AEdge: TATCaretEdge; AUndoRedo: boolean=false;
-      AAllowProcessMsg: boolean=true; AAllowUpdate: boolean=true;
+    procedure DoGotoCaret(AEdge: TATCaretEdge;
+      AUndoRedo: boolean=false;
+      AAllowProcessMsg: boolean=true;
+      AAllowUpdate: boolean=true;
       AAllowProximity: boolean=true);
     //bookmarks
     procedure BookmarkSetForLineEx(ALine, ABmKind: integer;
