@@ -1,3 +1,6 @@
+2023.11.27
+* change: changed type of DoGotoPos param ADoUnfold from Boolean to enum
+
 2023.11.22
 + add: command "folding: select block(s) at caret(s)"
 
