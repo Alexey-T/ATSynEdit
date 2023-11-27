@@ -20,10 +20,10 @@ var
 begin
   if FLockInput then exit;
   inherited;
-  if Key=0 then Exit;
 
-  //special handle for spec keys
   case Key of
+    0:
+      exit;
     VK_CONTROL,
     VK_LWIN,
     VK_RWIN:
@@ -66,9 +66,6 @@ end;
 procedure TATSynEdit.KeyUp(var Key: Word; Shift: TShiftState);
 begin
   inherited;
-  if Key=0 then Exit;
-
-  //special handle for spec keys
   case Key of
     VK_CONTROL,
     VK_LWIN,
