@@ -194,11 +194,8 @@ procedure TATSynEdit.DoCommandResults(ACmd: integer; Res: TATCommandResults);
 var
   Caret: TATCaretItem;
   St: TATStrings;
-  bTextChanged: boolean;
-  bNeedRepaint, bAllowRepaint: boolean;
-  bUndoRedo: boolean;
-  bAllowCaretScroll: boolean;
-  bCaretMoved: boolean;
+  bTextChanged, bCaretMoved, bUndoRedo, bFoldChanged: boolean;
+  bNeedRepaint, bAllowRepaint, bAllowCaretScroll: boolean;
   NLineChanged: integer;
   NProximityVert: integer;
 begin
@@ -206,6 +203,7 @@ begin
   bAllowRepaint:= true;
   bTextChanged:= TATCommandResult.Text in Res;
   bUndoRedo:= TATCommandResult.UndoRedo in Res;
+  bFoldChanged:= TATCommandResult.FoldChange in Res;
   bCaretMoved:= false;
   St:= Strings;
 
@@ -221,8 +219,7 @@ begin
   if bTextChanged then
     DoUnfoldLinesWithCarets;
 
-  if bTextChanged or
-     (TATCommandResult.FoldChange in Res) then
+  if bTextChanged or bFoldChanged then
   begin
     bNeedRepaint:= true;
     FWrapUpdateNeeded:= true;
@@ -375,7 +372,7 @@ begin
     //- Paint call needed, to repaint after "Fold all" (Linux gtk2)
     //and it helps to not skip repaints in big files with EControl lexer
     UpdateCursor;
-    if TATCommandResult.FoldChange in Res then
+    if bFoldChanged then
       Paint;
     if bAllowRepaint then
       Invalidate;
