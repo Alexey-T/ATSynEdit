@@ -442,10 +442,25 @@ end;
 procedure TATSynEdit.MenuFoldPlusMinusClick(Sender: TObject);
 var
   NRange: integer;
+  Caret: TATCaretItem;
 begin
   NRange:= (Sender as TComponent).Tag;
   if Fold.IsIndexValid(NRange) then
     DoFoldbarClick_RangeIndex(NRange);
+
+  //fixing CudaText #5291
+  if Carets.Count>0 then
+  begin
+    Caret:= Carets[0];
+    DoShowPos(
+      Point(Caret.PosX, Caret.PosY),
+      FOptScrollIndentCaretHorz,
+      FOptScrollIndentCaretVert,
+      false,
+      true,
+      true
+      );
+  end;
 end;
 
 procedure TATSynEdit.MenuFoldFoldAllClick(Sender: TObject);
