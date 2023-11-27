@@ -371,7 +371,17 @@ begin
     //and it helps to not skip repaints in big files with EControl lexer
     UpdateCursor;
     if bFoldChanged then
+    begin
       Paint;
+      DoShowPos(
+        Point(Caret.PosX, Caret.PosY),
+        FOptScrollIndentCaretHorz,
+        FOptScrollIndentCaretVert,
+        false,
+        false,
+        true
+        );
+    end;
     if bAllowRepaint then
       Invalidate;
   end
