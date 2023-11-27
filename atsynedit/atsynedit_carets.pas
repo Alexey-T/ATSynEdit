@@ -78,6 +78,7 @@ type
     procedure ClearDoubleClickRange;
     procedure UpdateMemory(AMode: TATCaretMemoryAction; AArrowUpDown: boolean);
     procedure UpdateOnEditing(APos, APosEnd, AShift: TPoint);
+    function UpdateAfterRangeFolded(ARangeX, ARangeY, ARangeY2: integer): boolean;
   end;
 
 type
@@ -622,6 +623,19 @@ begin
 
   if PosX<0 then PosX:= 0;
   if PosY<0 then PosY:= 0;
+end;
+
+function TATCaretItem.UpdateAfterRangeFolded(ARangeX, ARangeY, ARangeY2: integer): boolean;
+begin
+  if (PosY>=ARangeY) and (PosY<=ARangeY2) and
+    ((PosY>ARangeY) or (PosX>ARangeX)) then
+  begin
+    Result:= true;
+    PosX:= Max(0, ARangeX-1);
+    PosY:= ARangeY;
+  end
+  else
+    Result:= false;
 end;
 
 procedure TATCaretItem.SelectNone;
@@ -1255,13 +1269,8 @@ begin
   for i:= 0 to Count-1 do
   begin
     Caret:= GetItem(i);
-    if (Caret.PosY>=ARangeY) and (Caret.PosY<=ARangeY2) and
-      ((Caret.PosY>ARangeY) or (Caret.PosX>ARangeX)) then
-    begin
+    if Caret.UpdateAfterRangeFolded(ARangeX, ARangeY, ARangeY2) then
       bChange:= true;
-      Caret.PosX:= Max(0, ARangeX-1);
-      Caret.PosY:= ARangeY;
-    end;
   end;
   if bChange then
     Sort;
