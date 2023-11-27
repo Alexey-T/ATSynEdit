@@ -445,13 +445,22 @@ end;
 procedure TATSynEdit.MenuFoldPlusMinusClick(Sender: TObject);
 var
   NRange: integer;
+  Caret: TATCaretItem;
 begin
   NRange:= (Sender as TComponent).Tag;
   if Fold.IsIndexValid(NRange) then
+  begin
     DoFoldbarClick_RangeIndex(NRange);
 
-  //fixing CudaText #5291
-  DoGotoCaret(TATCaretEdge.Top);
+    //if fold-range is above the caret, scroll to caret
+    //fixing CudaText #5291
+    if Carets.Count>0 then
+    begin
+      Caret:= Carets[0];
+      if Fold.ItemPtr(NRange)^.Y<=Caret.PosY then
+        DoGotoCaret(TATCaretEdge.Top);
+    end;
+  end;
 end;
 
 procedure TATSynEdit.MenuFoldFoldAllClick(Sender: TObject);
