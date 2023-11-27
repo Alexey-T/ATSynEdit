@@ -221,8 +221,12 @@ begin
   UpdateScrollbars(true);
   Update;
 
+  (*
   //force repaint, if after 'fold' editor has empty space below the last line,
   //because next click on gutter-fold-mark will be ignored. CudaText issue #4850
+  //
+  //2023.11: seems this block isn't needed, CudaText #4850 is still solved
+
   if not FOptLastLineOnTop and not bUnfold then
   begin
     bScrolledToLastPage:= FScrollVert.NPos>=FScrollVert.NPosLast;
@@ -240,6 +244,7 @@ begin
       Update;
     end;
   end;
+  *)
 end;
 
 
