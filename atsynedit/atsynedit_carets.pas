@@ -1245,6 +1245,7 @@ begin
 end;
 
 function TATCarets.UpdateAfterRangeFolded(ARangeX, ARangeY, ARangeY2: integer): boolean;
+//put carets into begin of newly folded range, if carets are inside that range
 var
   Caret: TATCaretItem;
   bChange: boolean;
