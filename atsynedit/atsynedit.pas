@@ -290,6 +290,14 @@ type
     FromNextLine //don't show [...], show dashed underline "- - - -"
     );
 
+const
+  cEditorFoldStylesUnfoldOnClick = [
+    TATEditorFoldStyle.HereWithDots,
+    TATEditorFoldStyle.HereWithTruncatedText,
+    TATEditorFoldStyle.FromEndOfLine
+    ];
+
+type
   TATEditorFoldRangeCommand = (
     Fold,
     Unfold,
@@ -6583,11 +6591,7 @@ begin
       begin
         DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
 
-        bUnfoldClickedPos:= (FFoldStyle in [
-          TATEditorFoldStyle.HereWithDots,
-          TATEditorFoldStyle.HereWithTruncatedText,
-          TATEditorFoldStyle.FromEndOfLine
-          ])
+        bUnfoldClickedPos:= (FFoldStyle in cEditorFoldStylesUnfoldOnClick)
           //ignore click on fold-mark, because we handle double-click on it (select entire range)
           and not IsCoordInFoldedMark(X, Y);
 
