@@ -9,7 +9,7 @@ unit ATSynEdit_Adapters;
 interface
 
 uses
-  Classes, SysUtils, Graphics, Messages,
+  Classes, SysUtils, Graphics, Messages, LMessages,
   ATStringProc,
   ATSynEdit_LineParts;
 
@@ -112,6 +112,9 @@ type
     procedure ImeStartComposition(Sender: TObject; var Msg: TMessage); virtual;
     procedure ImeComposition(Sender: TObject; var Msg: TMessage); virtual;
     procedure ImeEndComposition(Sender: TObject; var Msg: TMessage); virtual;
+    {$ifdef LCLGTK2}
+    procedure GTK2IMComposition(Sender: TObject; var Message: TLMessage); virtual;
+    {$endif}
   end;
 
 
@@ -148,6 +151,14 @@ procedure TATAdapterIME.ImeEndComposition(Sender: TObject; var Msg: TMessage);
 begin
   //
 end;
+
+{$ifdef LCLGTK2}
+procedure TATAdapterIME.GTK2IMComposition(Sender: TObject;
+  var Message: TLMessage);
+begin
+  //
+end;
+{$endif}
 
 { TATAdapterHilite }
 

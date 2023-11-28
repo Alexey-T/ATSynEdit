@@ -18,6 +18,9 @@ uses
   Windows,
   ATSynEdit_Adapter_WindowsIME,
   {$endif}
+  {$ifdef LCLGTK2}
+  ATSynEdit_Adapter_gtk2IME,
+  {$endif}
   Messages, //for Win32 and macOS
   InterfaceBase,
   Classes, SysUtils, Graphics,
@@ -1034,9 +1037,6 @@ type
     FOptZebraStep: integer;
     FOptZebraAlphaBlend: byte;
     FOptDimUnfocusedBack: integer;
-    {$ifdef LCLGTK2}
-    FIMSelText: string;
-    {$endif}
 
     //
     function DoCalcForegroundFromAttribs(AX, AY: integer; var AColor: TColor;
@@ -1800,9 +1800,9 @@ type
     {$endif}
 
     {$ifdef LCLGTK2}
-    {$ifdef GTK2_IME_CODE}
-    procedure WM_GTK_IM_COMPOSITION(var Message: TLMessage); message LM_IM_COMPOSITION;
-    {$endif}
+    //{$ifdef GTK2_IME_CODE}
+    procedure WM_GTK_IM_COMPOSITION(var Msg: TLMessage); message LM_IM_COMPOSITION;
+    //{$endif}
     {$endif}
 
     {$ifdef LCLCOCOA}
@@ -4989,6 +4989,10 @@ begin
 
   {$ifdef LCLCOCOA}
   FAdapterIME:= TATAdapterCocoaIME.Create(self);
+  {$endif}
+
+  {$ifdef LCLGTK2}
+  FAdapterIME:= TATAdapterGTK2IME.Create;
   {$endif}
 
   FPaintLocked:= 0;
@@ -9242,63 +9246,13 @@ begin
 end;
 
 {$ifdef LCLGTK2}
-{$ifdef GTK2_IME_CODE}
-// fcitx IM
-procedure TATSynEdit.WM_GTK_IM_COMPOSITION(var Message: TLMessage);
-var
-  buffer: atString;
-  len: Integer;
-  bOverwrite, bSelect: Boolean;
-  Caret: TATCaretItem;
+//{$ifdef GTK2_IME_CODE}
+procedure TATSynEdit.WM_GTK_IM_COMPOSITION(var Msg: TLMessage);
 begin
-  //exit;-
-  //exiting, currently it breaks CudaText issue #3442
-
-  if (not ModeReadOnly) then
-  begin
-    // set candidate position
-    if (Message.WParam and (GTK_IM_FLAG_START or GTK_IM_FLAG_PREEDIT))<>0 then
-    begin
-      if Carets.Count>0 then
-      begin
-        Caret:= Carets[0];
-        IM_Context_Set_Cursor_Pos(Caret.CoordX,Caret.CoordY+TextCharSize.Y);
-        // if symbol IM_Context_Set_Cursor_Pos cannot be compiled, you need to open IDE dialog
-        // "Tools / Configure 'Build Lazarus'", and there enable the define: WITH_GTK2_IM;
-        // then recompile the IDE.
-      end;
-    end;
-    // valid string at composition & commit
-    if Message.WParam and (GTK_IM_FLAG_COMMIT or GTK_IM_FLAG_PREEDIT)<>0 then
-    begin
-	  if Message.WParam and GTK_IM_FLAG_REPLACE=0 then
-        FIMSelText:=TextSelected;
-      // insert preedit or commit string
-      buffer:=UTF8Decode(pchar(Message.LParam));
-      len:=Length(buffer);
-      bOverwrite:=ModeOverwrite and (Length(FIMSelText)=0);
-      bSelect:=len>0;
-      // commit
-      if len>0 then
-      begin
-        if Message.WParam and GTK_IM_FLAG_COMMIT<>0 then
-        begin
-          TextInsertAtCarets(buffer, False, bOverwrite, False);
-          FIMSelText:='';
-        end else
-          TextInsertAtCarets(buffer, False, False, bSelect);
-      end else
-        // fix for IBUS IM.
-        if Message.WParam and GTK_IM_FLAG_REPLACE<>0 then
-          TextInsertAtCarets('',False, bOverwrite, False);
-    end;
-    // end composition
-    // To Do : skip insert saved selection after commit with ibus.
-    if (Message.WParam and GTK_IM_FLAG_END<>0) and (FIMSelText<>'') then
-      TextInsertAtCarets(FIMSelText, False, False, False);
-  end;
+  if Assigned(FAdapterIME) then
+    FAdapterIME.GTK2IMComposition(Self, Msg);
 end;
-{$endif}
+//{$endif}
 {$endif}
 
 procedure TATSynEdit.DoPaintStaple(C: TCanvas; const R: TRect; AColor: TColor);
