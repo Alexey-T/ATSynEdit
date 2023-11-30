@@ -12,7 +12,7 @@ type
 
   TATAdapterGTK2IME = class(TATAdapterIME)
   private
-    FIMSelText: string;
+    FIMSelText: UnicodeString;
     buffer: array[0..256] of WideChar;
     position: Integer;
     CompForm: TForm;
@@ -21,6 +21,8 @@ type
     procedure HideCompForm;
   public
     procedure Stop(Sender: TObject; Success: boolean); override;
+    procedure ImeEnter(Sender: TObject); override;
+    procedure ImeExit(Sender: TObject); override;
     procedure GTK2IMComposition(Sender: TObject; var Message: TLMessage); override;
   end;
 
@@ -108,14 +110,33 @@ end;
 procedure TATAdapterGTK2IME.Stop(Sender: TObject; Success: boolean);
 begin
   ResetDefaultIMContext;
+  HideCompForm;
   inherited Stop(Sender, Success);
+end;
+
+procedure TATAdapterGTK2IME.ImeEnter(Sender: TObject);
+var
+  Ed: TATSynEdit;
+  Caret: TATCaretItem;
+begin
+  Ed:=TATSynEdit(Sender);
+  if Ed.Carets.Count>0 then
+  begin
+    Caret:= Ed.Carets[0];
+    IM_Context_Set_Cursor_Pos(Caret.CoordX,Caret.CoordY+Ed.TextCharSize.Y);
+  end;
+end;
+
+procedure TATAdapterGTK2IME.ImeExit(Sender: TObject);
+begin
+  HideCompForm;
 end;
 
 procedure TATAdapterGTK2IME.GTK2IMComposition(Sender: TObject;
   var Message: TLMessage);
 var
   len: Integer;
-  bOverwrite, bSelect: Boolean;
+  bOverwrite: Boolean;
   Ed: TATSynEdit;
   Caret: TATCaretItem;
 begin
@@ -123,11 +144,13 @@ begin
 
   if (not Ed.ModeReadOnly) then
   begin
-    if (Message.WParam and (GTK_IM_FLAG_START or GTK_IM_FLAG_PREEDIT))<>0 then
+    if Message.WParam and GTK_IM_FLAG_START <> 0 then
     begin
       position:=0;
-      UpdateCompForm(Sender); // initialize composition form
-
+      UpdateCompForm(Ed);  // initialize composition form
+    end;
+    if (Message.WParam and (GTK_IM_FLAG_START or GTK_IM_FLAG_PREEDIT))<>0 then
+    begin
       if Ed.Carets.Count>0 then
       begin
         Caret:= Ed.Carets[0];
@@ -146,7 +169,6 @@ begin
       buffer:=UTF8Decode(pchar(Message.LParam));
       len:=StrLen(buffer);
       bOverwrite:=Ed.ModeOverwrite and (Length(FIMSelText)=0);
-      bSelect:=len>0;
       UpdateCompForm(Ed);
       // commit
       if len>0 then
