@@ -200,10 +200,6 @@ end;
 procedure TATSynRanges.ClearLineIndexer(ALineCount: integer; ASetLenOnly: boolean=false);
 begin
   if not ASetLenOnly then
-    {
-    for i:= High(FLineIndexer) downto 0 do
-      FLineIndexer[i]:= nil;
-    }
     FLineIndexer:= nil;
 
   SetLength(FLineIndexer, ALineCount);
