@@ -56,9 +56,11 @@ begin
   CompForm.Canvas.TextOut(1,0,buffer);
   // draw IME Caret
   s:='';
+  // caret position in composition don't work under gtk2, position always 0
   if position>0 then
-    for i:=0 to position-1 do
-      s:=s+FIMSelText[i];
+    for i:=1 to position do
+      s:=s+buffer[i];
+  // draw caret
   cm:=CompForm.Canvas.TextExtent(s);
   cm.cy:=tm.cy+2;
   CompForm.Canvas.Pen.Color:=clHighlightText;
