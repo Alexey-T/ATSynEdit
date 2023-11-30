@@ -13,7 +13,7 @@ type
   TATAdapterGTK2IME = class(TATAdapterIME)
   private
     FIMSelText: UnicodeString;
-    buffer: array[0..256] of WideChar;
+    buffer: UnicodeString;
     position: Integer;
     CompForm: TForm;
     procedure CompFormPaint(Sender: TObject);
@@ -167,7 +167,7 @@ begin
         FIMSelText:=Ed.TextSelected;
       // insert preedit or commit string
       buffer:=UTF8Decode(pchar(Message.LParam));
-      len:=StrLen(buffer);
+      len:=Length(buffer);
       bOverwrite:=Ed.ModeOverwrite and (Length(FIMSelText)=0);
       UpdateCompForm(Ed);
       // commit
