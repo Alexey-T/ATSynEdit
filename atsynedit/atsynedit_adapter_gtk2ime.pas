@@ -180,9 +180,7 @@ begin
           HideCompForm;
         end;
       end else
-        // fix for IBUS IM.
-        if Message.WParam and GTK_IM_FLAG_REPLACE<>0 then
-          HideCompForm;
+        HideCompForm;
     end;
     // end composition
     // To Do : skip insert saved selection after commit with ibus.
