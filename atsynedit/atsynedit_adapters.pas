@@ -112,6 +112,8 @@ type
     procedure ImeStartComposition(Sender: TObject; var Msg: TMessage); virtual;
     procedure ImeComposition(Sender: TObject; var Msg: TMessage); virtual;
     procedure ImeEndComposition(Sender: TObject; var Msg: TMessage); virtual;
+    procedure ImeEnter(Sender: TObject); virtual;
+    procedure ImeExit(Sender: TObject); virtual;
     {$ifdef LCLGTK2}
     procedure GTK2IMComposition(Sender: TObject; var Message: TLMessage); virtual;
     {$endif}
@@ -148,6 +150,16 @@ begin
 end;
 
 procedure TATAdapterIME.ImeEndComposition(Sender: TObject; var Msg: TMessage);
+begin
+  //
+end;
+
+procedure TATAdapterIME.ImeEnter(Sender: TObject);
+begin
+  //
+end;
+
+procedure TATAdapterIME.ImeExit(Sender: TObject);
 begin
   //
 end;

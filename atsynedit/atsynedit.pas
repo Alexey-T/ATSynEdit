@@ -8678,6 +8678,8 @@ begin
   if IsRepaintNeededOnEnterOrExit then
     Invalidate;
   TimersStart;
+  if Assigned(FAdapterIME) then
+    FAdapterIME.ImeEnter(Self);
 end;
 
 procedure TATSynEdit.DoExit;
@@ -8689,6 +8691,8 @@ begin
   if IsRepaintNeededOnEnterOrExit then
     Invalidate;
   TimersStop;
+  if Assigned(FAdapterIME) then
+    FAdapterIME.ImeExit(Self);
 end;
 
 procedure TATSynEdit.TimersStart;
