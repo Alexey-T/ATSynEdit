@@ -863,6 +863,7 @@ type
     FOptAutocompleteAutoshowCharCount: integer;
     FOptAutocompleteTriggerChars: string;
     FOptAutocompleteCommitChars: string;
+    FOptAutocompleteCommitOnEnter: boolean;
     FOptAutocompleteCloseChars: string;
     FOptAutocompleteAddOpeningBracket: boolean;
     FOptAutocompleteUpDownAtEdge: integer;
@@ -1915,6 +1916,7 @@ type
     property OptAutocompleteAutoshowCharCount: integer read FOptAutocompleteAutoshowCharCount write FOptAutocompleteAutoshowCharCount default 0;
     property OptAutocompleteTriggerChars: string read FOptAutocompleteTriggerChars write FOptAutocompleteTriggerChars stored false;
     property OptAutocompleteCommitChars: string read FOptAutocompleteCommitChars write FOptAutocompleteCommitChars stored false;
+    property OptAutocompleteCommitOnEnter: boolean read FOptAutocompleteCommitOnEnter write FOptAutocompleteCommitOnEnter stored false;
     property OptAutocompleteCloseChars: string read FOptAutocompleteCloseChars write FOptAutocompleteCloseChars stored false;
     property OptAutocompleteAddOpeningBracket: boolean read FOptAutocompleteAddOpeningBracket write FOptAutocompleteAddOpeningBracket default true;
     property OptAutocompleteUpDownAtEdge: integer read FOptAutocompleteUpDownAtEdge write FOptAutocompleteUpDownAtEdge default 1;
@@ -5117,6 +5119,7 @@ begin
   FOptAutocompleteAutoshowCharCount:= 0;
   FOptAutocompleteTriggerChars:= '';
   FOptAutocompleteCommitChars:= ' ,;/\''"';
+  FOptAutocompleteCommitOnEnter:= true;
   FOptAutocompleteCloseChars:= '<>()[]{}=';
   FOptAutocompleteAddOpeningBracket:= true;
   FOptAutocompleteUpDownAtEdge:= 1; //cudWrap
