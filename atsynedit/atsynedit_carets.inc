@@ -1234,6 +1234,9 @@ begin
   if APos.X<0 then Exit;
   if APos.Y<0 then Exit;
 
+  if Assigned(FOnChangeDetailed) then
+    FOnChangeDetailed(Self, APos, APosEnd, AShift, APosAfter);
+
   //if AFromCaret<0 then
   //  AFromCaret:= Carets.IndexOfPosYAvg(APosY);
 

@@ -439,6 +439,7 @@ type
   TATSynEditClickGutterEvent = procedure(Sender: TObject; ABand: integer; ALineNum: integer; var AHandled: boolean) of object;
   TATSynEditClickMicromapEvent = procedure(Sender: TObject; AX, AY: integer) of object;
   TATSynEditClickLinkEvent = procedure(Sender: TObject; const ALink: string) of object;
+  TATSynEditChangeDetailedEvent = procedure(Sender: TObject; APos, APosEnd, AShift, APosAfter: TPoint) of object;
   TATSynEditDrawBookmarkEvent = procedure(Sender: TObject; C: TCanvas; ALineNum: integer; const ARect: TRect) of object;
   TATSynEditDrawRectEvent = procedure(Sender: TObject; C: TCanvas; const ARect: TRect) of object;
   TATSynEditDrawRulerEvent = procedure(Sender: TObject; C: TCanvas; const ARect: TRect; var AHandled: boolean) of object;
@@ -711,6 +712,7 @@ type
     FOnClickLink: TATSynEditClickLinkEvent;
     FOnIdle: TNotifyEvent;
     FOnChange: TNotifyEvent;
+    FOnChangeDetailed: TATSynEditChangeDetailedEvent;
     FOnChangeLog: TATStringsChangeLogEvent;
     FOnChangeCaretPos: TNotifyEvent;
     FOnChangeState: TNotifyEvent;
@@ -1870,6 +1872,7 @@ type
     property OnCheckInput: TATSynEditCheckInputEvent read FOnCheckInput write FOnCheckInput;
     property OnIdle: TNotifyEvent read FOnIdle write FOnIdle;
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
+    property OnChangeDetailed: TATSynEditChangeDetailedEvent read FOnChangeDetailed write FOnChangeDetailed;
     property OnChangeLog: TATStringsChangeLogEvent read FOnChangeLog write FOnChangeLog;
     property OnChangeModified: TNotifyEvent read FOnChangeModified write FOnChangeModified;
     property OnChangeCaretPos: TNotifyEvent read FOnChangeCaretPos write FOnChangeCaretPos;
