@@ -1801,6 +1801,7 @@ type
     procedure WMHScroll(var Msg: TLMHScroll); message LM_HSCROLL;
     procedure WMVScroll(var Msg: TLMVScroll); message LM_VSCROLL;
     procedure CMWantSpecialKey(var Message: TCMWantSpecialKey); message CM_WANTSPECIALKEY;
+    procedure WMKillFocus(var Message: TLMKillFocus); message LM_KILLFOCUS;
 
     {$ifdef windows}
     procedure WMIME_Request(var Msg: TMessage); message WM_IME_REQUEST;
@@ -9257,6 +9258,13 @@ begin
     else
       inherited;
   end;
+end;
+
+procedure TATSynEdit.WMKillFocus(var Message: TLMKillFocus);
+begin
+  inherited;
+  if Assigned(FAdapterIME) then
+    FAdapterIME.ImeKillFocus(Self);
 end;
 
 {$ifdef LCLGTK2}

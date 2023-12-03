@@ -23,6 +23,7 @@ type
     procedure Stop(Sender: TObject; Success: boolean); override;
     procedure ImeEnter(Sender: TObject); override;
     procedure ImeExit(Sender: TObject); override;
+    procedure ImeKillFocus(Sender: TObject); override;
     procedure GTK2IMComposition(Sender: TObject; var Message: TLMessage); override;
   end;
 
@@ -131,6 +132,13 @@ end;
 
 procedure TATAdapterGTK2IME.ImeExit(Sender: TObject);
 begin
+  HideCompForm;
+end;
+
+procedure TATAdapterGTK2IME.ImeKillFocus(Sender: TObject);
+begin
+  inherited ImeKillFocus(Sender);
+  ResetDefaultIMContext;
   HideCompForm;
 end;
 
