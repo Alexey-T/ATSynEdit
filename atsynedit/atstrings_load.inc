@@ -700,6 +700,7 @@ begin
           //failed to load text as UTF8, so load again as ANSI
           AForcedToANSI:= true;
           FEncoding:= TATFileEncoding.ANSI;
+          FEncodingCodepage:= eidCP1252;
           CharSize:= 1;
           _LoadItems;
         end
