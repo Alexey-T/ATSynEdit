@@ -87,7 +87,7 @@ type
     function FindRangesWithStaples(ALineFrom, ALineTo: integer): TATIntArray;
     function FindDeepestRangeContainingLine_Old(ALine: integer; const AIndexes: TATIntArray): integer;
     function FindDeepestRangeContainingLine(ALine: integer; AWithStaple: boolean; AMinimalRangeHeight: integer): integer;
-    function FindRangeWithPlusAtLine(ALine: integer): integer;
+    function FindRangeWithPlusAtLine(ALine: integer; AReturnInsertPos: boolean=false): integer;
     function FindRangeWithPlusAtLine_ViaIndexer(ALine: integer): integer;
     function FindRangeLevel(AIndex: integer): integer;
     function MessageText(AMaxCount: integer): string;
@@ -677,7 +677,7 @@ begin
   end;
 end;
 
-function TATSynRanges.FindRangeWithPlusAtLine(ALine: integer): integer;
+function TATSynRanges.FindRangeWithPlusAtLine(ALine: integer; AReturnInsertPos: boolean=false): integer;
 // CudaText issue #2566
 // because of this, we must skip all one-line ranges
 var
@@ -690,7 +690,12 @@ begin
   b:= NCount-1;
 
   repeat
-    if a>b then exit; //not Break
+    if a>b then
+    begin
+      if AReturnInsertPos and IsIndexValid(a) then
+        Result:= a;
+      exit;
+    end;
     m:= (a+b+1) div 2;
 
     R:= FList.ItemPtr(m);
@@ -717,6 +722,7 @@ begin
   if (m<NCount) and (FList.ItemPtr(m)^.Y=ALine) then
     Result:= m;
 end;
+
 
 function TATSynRanges.MessageText(AMaxCount: integer): string;
 var
