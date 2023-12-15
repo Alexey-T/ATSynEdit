@@ -827,8 +827,8 @@ begin
 end;
 
 procedure TATSynRanges.Merge(AX, AY, AX2, AY2: integer; const AHint: string; const ATag: Int64);
-//try to find old Ed.Fold item for the AY pos;
-//if found, update found range and doesn't change it's Folded state
+//try to find old fold-range for the AY line;
+//if found, update the range (don't change it's Folded state) without inserting new one
 var
   Item: PATSynRange;
   NIndex: integer;
