@@ -70,6 +70,7 @@ type
       out AItemIndex: integer): TATSynRange;
     function Insert(AIndex: integer; AX, AY, AX2, AY2: integer; AWithStaple: boolean;
       const AHint: string; const ATag: Int64=0): TATSynRange;
+    procedure Merge(AX, AY, AX2, AY2: integer; const AHint: string; const ATag: Int64);
     procedure Clear;
     procedure ClearLineIndexer(ALineCount: integer; ASetLenOnly: boolean=false);
     procedure Delete(AIndex: integer);
@@ -823,6 +824,29 @@ begin
       S+= IntToStr(FLineIndexer[iLine][i])+' ';
     Result+= S+#10;
   end;
+end;
+
+procedure TATSynRanges.Merge(AX, AY, AX2, AY2: integer; const AHint: string; const ATag: Int64);
+//try to find old Ed.Fold item for the AY pos;
+//if found, update found range and doesn't change it's Folded state
+var
+  Item: PATSynRange;
+  NIndex: integer;
+begin
+  NIndex:= FindRangeWithPlusAtLine(AY, true);
+  if NIndex>=0 then
+  begin
+    Item:= ItemPtr(NIndex);
+    if (Item^.Y=AY) and (Item^.Hint=AHint) and (Item^.Tag=ATag) then
+    begin
+      Item^.X2:= AX2;
+      Item^.Y2:= AY2;
+    end
+    else
+      Insert(NIndex, AX, AY, AX2, AY2, false, AHint, ATag);
+  end
+  else
+    Add(AX, AY, AX2, AY2, false, AHint, ATag);
 end;
 
 
