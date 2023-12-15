@@ -837,10 +837,11 @@ begin
   if NIndex>=0 then
   begin
     Item:= ItemPtr(NIndex);
-    if (Item^.Y=AY) and (Item^.Hint=AHint) and (Item^.Tag=ATag) then
+    if (Item^.Y=AY) and (Item^.Hint=AHint) then
     begin
       Item^.X2:= AX2;
       Item^.Y2:= AY2;
+      Item^.Tag:= ATag;
     end
     else
       Insert(NIndex, AX, AY, AX2, AY2, false, AHint, ATag);
