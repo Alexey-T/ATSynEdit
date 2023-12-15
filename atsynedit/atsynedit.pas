@@ -10177,7 +10177,7 @@ begin
   S:= Format('#%03d, %d ms', [FPaintCounter, FTickAll]);
   if FMinimapVisible then
     S+= Format(', mmap %d ms', [FTickMinimap]);
-  CanvasTextOutSimplest(C, 1, Height - cFontSize * 18 div 10, S);
+  CanvasTextOutSimplest(C, 1, ClientHeight - cFontSize * 18 div 10, S);
 end;
 
 
