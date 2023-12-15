@@ -1128,7 +1128,6 @@ type
     procedure DoMenuText;
     procedure DoMinimapClick(APosY: integer);
     procedure DoMinimapDrag(APosY: integer);
-    procedure DoStringsOnChangeEx(Sender: TObject; AChange: TATLineChangeKind; ALine, AItemCount: SizeInt);
     procedure DoStringsOnChangeLog(Sender: TObject; ALine: SizeInt);
     procedure DoStringsOnProgress(Sender: TObject; var ACancel: boolean);
     procedure DoStringsOnUndoAfter(Sender: TObject; AX, AY: SizeInt);
@@ -1604,6 +1603,7 @@ type
     property RedoCount: integer read GetRedoCount;
     property UndoAsString: string read GetUndoAsString write SetUndoAsString;
     property RedoAsString: string read GetRedoAsString write SetRedoAsString;
+    procedure DoStringsOnChangeEx(Sender: TObject; AChange: TATLineChangeKind; ALine, AItemCount: SizeInt);
     procedure ActionAddJumpToUndo;
     property Text: UnicodeString read GetText write SetText;
     property SelRect: TRect read FSelRect;

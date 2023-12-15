@@ -220,6 +220,7 @@ type
     FOnProgress: TATStringsProgressEvent;
     FOnChangeLog: TATStringsChangeLogEvent;
     FOnChangeEx: TATStringsChangeExEvent;
+    FOnChangeEx2: TATStringsChangeExEvent;
     FOnUndoBefore: TATStringsUndoEvent;
     FOnUndoAfter: TATStringsUndoEvent;
     FOnChangeBlock: TATStringsChangeBlockEvent;
@@ -450,6 +451,7 @@ type
     property OnProgress: TATStringsProgressEvent read FOnProgress write FOnProgress;
     property OnChangeLog: TATStringsChangeLogEvent read FOnChangeLog write FOnChangeLog;
     property OnChangeEx: TATStringsChangeExEvent read FOnChangeEx write FOnChangeEx;
+    property OnChangeEx2: TATStringsChangeExEvent read FOnChangeEx2 write FOnChangeEx2;
     property OnChangeBlock: TATStringsChangeBlockEvent read FOnChangeBlock write FOnChangeBlock;
     property OnUndoBefore: TATStringsUndoEvent read FOnUndoBefore write FOnUndoBefore;
     property OnUndoAfter: TATStringsUndoEvent read FOnUndoAfter write FOnUndoAfter;
@@ -1307,6 +1309,7 @@ destructor TATStrings.Destroy;
 begin
   //disable events: so Clear won't call them
   FOnChangeEx:= nil;
+  FOnChangeEx2:= nil;
   FOnChangeLog:= nil;
   FOnChangeBlock:= nil;
   FOnGetCaretsArray:= nil;
@@ -2669,6 +2672,8 @@ begin
 
   if Assigned(FOnChangeEx) then
     FOnChangeEx(Self, AChange, ALineIndex, AItemCount);
+  if Assigned(FOnChangeEx2) then
+    FOnChangeEx2(Self, AChange, ALineIndex, AItemCount);
 end;
 
 procedure TATStrings.ClearSeparators;
