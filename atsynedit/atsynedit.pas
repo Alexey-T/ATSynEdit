@@ -10185,7 +10185,7 @@ begin
 
   while FFpsQueue.Size()>cPlotWidth do
     FFpsQueue.PopBack();
-  FFpsQueue.PushFront(FTickAll);
+  FFpsQueue.PushFront(integer(FTickAll));
 
   C.Font.Name:= Font.Name;
   C.Font.Color:= cFontColor;
