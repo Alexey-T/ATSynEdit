@@ -372,7 +372,7 @@ begin
   ed.Gaps.OnDelete:=@EditorGapDelete;
   ed_gap.Hide;
 
-  ATEditorOptions.DebugTiming:= true;
+  //ATEditorOptions.DebugTiming:= true;
 end;
 
 procedure TfmMain.FormShow(Sender: TObject);
