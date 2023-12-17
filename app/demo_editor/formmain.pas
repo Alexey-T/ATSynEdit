@@ -371,6 +371,8 @@ begin
   ed_gap.OnChange:= @EditorGapChange;
   ed.Gaps.OnDelete:=@EditorGapDelete;
   ed_gap.Hide;
+
+  ATEditorOptions.DebugTiming:= true;
 end;
 
 procedure TfmMain.FormShow(Sender: TObject);

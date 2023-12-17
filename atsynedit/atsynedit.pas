@@ -474,6 +474,9 @@ type
   end;
 
 type
+  TATFpsQueue = specialize TDeque<integer>;
+
+type
   { TATSynEdit }
 
   TATSynEdit = class(TCustomControl)
@@ -701,6 +704,7 @@ type
     FFoldbarCache: TATFoldBarPropsArray;
     FFoldbarCacheStart: integer;
     FAdapterIsDataReady: boolean;
+    FFpsQueue: TATFpsQueue;
     FOnCheckInput: TATSynEditCheckInputEvent;
     FOnBeforeCalcHilite: TNotifyEvent;
     FOnClickDbl,
@@ -5396,6 +5400,8 @@ end;
 
 destructor TATSynEdit.Destroy;
 begin
+  if Assigned(FFpsQueue) then
+    FreeAndNil(FFpsQueue);
   if Assigned(FMinimapThread) then
   begin
     FMinimapThread.Terminate;
@@ -10162,22 +10168,54 @@ const
   cFontSize = 8;
   cFontColor = clRed;
   cBackColor = clCream;
+  cLinesColor = clBlue;
   cMinEditorLines = 15;
+  cPlotWidth = 80;
+  cPlotHeight = 40;
 var
+  RPlot: TRect;
+  NRectBottom, i: integer;
   S: string;
 begin
   if ModeOneLine then exit;
   if GetVisibleLines<cMinEditorLines then exit;
+
+  if not Assigned(FFpsQueue) then
+    FFpsQueue:= TATFpsQueue.Create;
+
+  while FFpsQueue.Size()>cPlotWidth do
+    FFpsQueue.PopBack();
+  FFpsQueue.PushFront(FTickAll);
 
   C.Font.Name:= Font.Name;
   C.Font.Color:= cFontColor;
   C.Font.Size:= cFontSize;
   C.Brush.Color:= cBackColor;
 
+  NRectBottom:= ClientHeight-1;
+
+  RPlot.Left:= 0;
+  RPlot.Right:= RPlot.Left+cPlotWidth;
+  RPlot.Bottom:= NRectBottom;
+  RPlot.Top:= RPlot.Bottom-cPlotHeight;
+
+  C.Pen.Color:= cLinesColor;
+  for i:= 0 to cPlotHeight div 10 do
+    C.Line(RPlot.Left, RPlot.Bottom-i*10, RPlot.Right, RPlot.Bottom-i*10);
+
+  C.Pen.Color:= cFontColor;
+  for i:= 1 to FFpsQueue.Size-1 do
+    C.Line(
+      RPlot.Left+i-1,
+      RPlot.Bottom-FFpsQueue.Items[i],
+      RPlot.Left+i,
+      RPlot.Bottom-FFpsQueue.Items[i-1]
+      );
+
   S:= Format('#%03d, %d ms', [FPaintCounter, FTickAll]);
   if FMinimapVisible then
     S+= Format(', mmap %d ms', [FTickMinimap]);
-  CanvasTextOutSimplest(C, 1, ClientHeight - cFontSize * 18 div 10, S);
+  CanvasTextOutSimplest(C, RPlot.Right+3, ClientHeight - cFontSize * 18 div 10, S);
 end;
 
 
