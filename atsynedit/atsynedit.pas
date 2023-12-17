@@ -704,7 +704,7 @@ type
     FFoldbarCache: TATFoldBarPropsArray;
     FFoldbarCacheStart: integer;
     FAdapterIsDataReady: boolean;
-    FFpsQueue: TATFpsQueue;
+    FTimingQueue: TATFpsQueue;
     FOnCheckInput: TATSynEditCheckInputEvent;
     FOnBeforeCalcHilite: TNotifyEvent;
     FOnClickDbl,
@@ -5400,8 +5400,8 @@ end;
 
 destructor TATSynEdit.Destroy;
 begin
-  if Assigned(FFpsQueue) then
-    FreeAndNil(FFpsQueue);
+  if Assigned(FTimingQueue) then
+    FreeAndNil(FTimingQueue);
   if Assigned(FMinimapThread) then
   begin
     FMinimapThread.Terminate;
@@ -10172,12 +10172,12 @@ begin
   if ModeOneLine then exit;
   if GetVisibleLines<ATEditorTimingIndicator.MinEditorLines then exit;
 
-  if not Assigned(FFpsQueue) then
-    FFpsQueue:= TATFpsQueue.Create;
+  if not Assigned(FTimingQueue) then
+    FTimingQueue:= TATFpsQueue.Create;
 
-  while FFpsQueue.Size()>ATEditorTimingIndicator.PlotWidth do
-    FFpsQueue.PopBack();
-  FFpsQueue.PushFront(integer(FTickAll));
+  while FTimingQueue.Size()>ATEditorTimingIndicator.PlotWidth do
+    FTimingQueue.PopBack();
+  FTimingQueue.PushFront(integer(FTickAll));
 
   C.Font.Name:= Font.Name;
   C.Font.Color:= ATEditorTimingIndicator.FontColor;
@@ -10196,12 +10196,12 @@ begin
     C.Line(RPlot.Left, RPlot.Bottom-i*10, RPlot.Right, RPlot.Bottom-i*10);
 
   C.Pen.Color:= ATEditorTimingIndicator.LinesPlotColor;
-  for i:= 1 to FFpsQueue.Size-1 do
+  for i:= 1 to FTimingQueue.Size-1 do
     C.Line(
       RPlot.Left+i-1,
-      RPlot.Bottom-FFpsQueue.Items[i],
+      RPlot.Bottom-FTimingQueue.Items[i],
       RPlot.Left+i,
-      RPlot.Bottom-FFpsQueue.Items[i-1]
+      RPlot.Bottom-FTimingQueue.Items[i-1]
       );
 
   S:= Format('#%03d, %d ms', [FPaintCounter, FTickAll]);
