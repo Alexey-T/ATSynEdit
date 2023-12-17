@@ -232,6 +232,20 @@ const
 
 function ATEditorGetClipboardExData(out AInfo: TATEditorClipboardExData): boolean;
 
+type
+  TATEditorTimingIndicator = record
+    FontSize: integer;
+    FontColor: TColor;
+    FontBackColor: TColor;
+    LinesHorizColor: TColor;
+    LinesPlotColor: TColor;
+    MinEditorLines: integer;
+    PlotWidth: integer;
+    PlotHeight: integer;
+  end;
+
+var
+  ATEditorTimingIndicator: TATEditorTimingIndicator;
 
 implementation
 
@@ -500,6 +514,18 @@ initialization
     WarningPasteMaxLinesDiff:= 5;
 
     ClipboardColumnSignature:= $1000;
+  end;
+
+  with ATEditorTimingIndicator do
+  begin
+    FontSize:= 8;
+    FontColor:= clRed;
+    FontBackColor:= clCream;
+    LinesHorizColor:= clBlue;
+    LinesPlotColor:= clRed;
+    MinEditorLines:= 15;
+    PlotWidth:= 80;
+    PlotHeight:= 40;
   end;
 
   FillChar(ATEditorBitmaps, SizeOf(ATEditorBitmaps), 0);

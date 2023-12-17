@@ -10164,46 +10164,38 @@ begin
 end;
 
 procedure TATSynEdit.DoPaintTiming(C: TCanvas);
-const
-  cFontSize = 8;
-  cFontColor = clRed;
-  cBackColor = clCream;
-  cLinesColor = clBlue;
-  cMinEditorLines = 15;
-  cPlotWidth = 80;
-  cPlotHeight = 40;
 var
   RPlot: TRect;
   NRectBottom, i: integer;
   S: string;
 begin
   if ModeOneLine then exit;
-  if GetVisibleLines<cMinEditorLines then exit;
+  if GetVisibleLines<ATEditorTimingIndicator.MinEditorLines then exit;
 
   if not Assigned(FFpsQueue) then
     FFpsQueue:= TATFpsQueue.Create;
 
-  while FFpsQueue.Size()>cPlotWidth do
+  while FFpsQueue.Size()>ATEditorTimingIndicator.PlotWidth do
     FFpsQueue.PopBack();
   FFpsQueue.PushFront(integer(FTickAll));
 
   C.Font.Name:= Font.Name;
-  C.Font.Color:= cFontColor;
-  C.Font.Size:= cFontSize;
-  C.Brush.Color:= cBackColor;
+  C.Font.Color:= ATEditorTimingIndicator.FontColor;
+  C.Font.Size:= ATEditorTimingIndicator.FontSize;
+  C.Brush.Color:= ATEditorTimingIndicator.FontBackColor;
 
   NRectBottom:= ClientHeight-1;
 
   RPlot.Left:= 0;
-  RPlot.Right:= RPlot.Left+cPlotWidth;
+  RPlot.Right:= RPlot.Left+ATEditorTimingIndicator.PlotWidth;
   RPlot.Bottom:= NRectBottom;
-  RPlot.Top:= RPlot.Bottom-cPlotHeight;
+  RPlot.Top:= RPlot.Bottom-ATEditorTimingIndicator.PlotHeight;
 
-  C.Pen.Color:= cLinesColor;
-  for i:= 0 to cPlotHeight div 10 do
+  C.Pen.Color:= ATEditorTimingIndicator.LinesHorizColor;
+  for i:= 0 to ATEditorTimingIndicator.PlotHeight div 10 do
     C.Line(RPlot.Left, RPlot.Bottom-i*10, RPlot.Right, RPlot.Bottom-i*10);
 
-  C.Pen.Color:= cFontColor;
+  C.Pen.Color:= ATEditorTimingIndicator.LinesPlotColor;
   for i:= 1 to FFpsQueue.Size-1 do
     C.Line(
       RPlot.Left+i-1,
@@ -10215,7 +10207,7 @@ begin
   S:= Format('#%03d, %d ms', [FPaintCounter, FTickAll]);
   if FMinimapVisible then
     S+= Format(', mmap %d ms', [FTickMinimap]);
-  CanvasTextOutSimplest(C, RPlot.Right+3, ClientHeight - cFontSize * 18 div 10, S);
+  CanvasTextOutSimplest(C, RPlot.Right+3, ClientHeight - ATEditorTimingIndicator.FontSize * 18 div 10, S);
 end;
 
 
