@@ -474,7 +474,7 @@ type
   end;
 
 type
-  TATFpsQueue = specialize TDeque<integer>;
+  TATTimingQueue = specialize TDeque<integer>;
 
 type
   { TATSynEdit }
@@ -704,7 +704,7 @@ type
     FFoldbarCache: TATFoldBarPropsArray;
     FFoldbarCacheStart: integer;
     FAdapterIsDataReady: boolean;
-    FTimingQueue: TATFpsQueue;
+    FTimingQueue: TATTimingQueue;
     FOnCheckInput: TATSynEditCheckInputEvent;
     FOnBeforeCalcHilite: TNotifyEvent;
     FOnClickDbl,
@@ -10170,32 +10170,32 @@ var
   S: string;
 begin
   if ModeOneLine then exit;
-  if GetVisibleLines<ATEditorTimingIndicator.MinEditorLines then exit;
+  if GetVisibleLines<ATTimingIndicator.MinEditorLines then exit;
 
   if not Assigned(FTimingQueue) then
-    FTimingQueue:= TATFpsQueue.Create;
+    FTimingQueue:= TATTimingQueue.Create;
 
-  while FTimingQueue.Size()>ATEditorTimingIndicator.PlotWidth do
+  while FTimingQueue.Size()>ATTimingIndicator.PlotWidth do
     FTimingQueue.PopBack();
   FTimingQueue.PushFront(integer(FTickAll));
 
   C.Font.Name:= Font.Name;
-  C.Font.Color:= ATEditorTimingIndicator.FontColor;
-  C.Font.Size:= ATEditorTimingIndicator.FontSize;
-  C.Brush.Color:= ATEditorTimingIndicator.FontBackColor;
+  C.Font.Color:= ATTimingIndicator.FontColor;
+  C.Font.Size:= ATTimingIndicator.FontSize;
+  C.Brush.Color:= ATTimingIndicator.FontBackColor;
 
   NRectBottom:= ClientHeight-1;
 
   RPlot.Left:= 0;
-  RPlot.Right:= RPlot.Left+ATEditorTimingIndicator.PlotWidth;
+  RPlot.Right:= RPlot.Left+ATTimingIndicator.PlotWidth;
   RPlot.Bottom:= NRectBottom;
-  RPlot.Top:= RPlot.Bottom-ATEditorTimingIndicator.PlotHeight;
+  RPlot.Top:= RPlot.Bottom-ATTimingIndicator.PlotHeight;
 
-  C.Pen.Color:= ATEditorTimingIndicator.LinesHorizColor;
-  for i:= 0 to ATEditorTimingIndicator.PlotHeight div 10 do
+  C.Pen.Color:= ATTimingIndicator.LinesHorizColor;
+  for i:= 0 to ATTimingIndicator.PlotHeight div 10 do
     C.Line(RPlot.Left, RPlot.Bottom-i*10, RPlot.Right, RPlot.Bottom-i*10);
 
-  C.Pen.Color:= ATEditorTimingIndicator.LinesPlotColor;
+  C.Pen.Color:= ATTimingIndicator.LinesPlotColor;
   for i:= 1 to FTimingQueue.Size-1 do
     C.Line(
       RPlot.Left+i-1,
@@ -10207,7 +10207,7 @@ begin
   S:= Format('#%03d, %d ms', [FPaintCounter, FTickAll]);
   if FMinimapVisible then
     S+= Format(', mmap %d ms', [FTickMinimap]);
-  CanvasTextOutSimplest(C, RPlot.Right+3, ClientHeight - ATEditorTimingIndicator.FontSize * 18 div 10, S);
+  CanvasTextOutSimplest(C, RPlot.Right+3, ClientHeight - ATTimingIndicator.FontSize * 18 div 10, S);
 end;
 
 

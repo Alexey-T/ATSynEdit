@@ -245,7 +245,7 @@ type
   end;
 
 var
-  ATEditorTimingIndicator: TATEditorTimingIndicator;
+  ATTimingIndicator: TATEditorTimingIndicator;
 
 implementation
 
@@ -516,7 +516,7 @@ initialization
     ClipboardColumnSignature:= $1000;
   end;
 
-  with ATEditorTimingIndicator do
+  with ATTimingIndicator do
   begin
     FontSize:= 8;
     FontColor:= clRed;
