@@ -492,8 +492,9 @@ begin
         Result.Y:= Item.NLineIndex;
         Result.X:= Item.NCharIndex+Item.NLength-1;
         if not AStrings.IsIndexValid(Result.Y) then
-          exit(Point(-1, -1));
+          Exit(Point(-1, -1));
       end;
+      ADetails.BelowAllText:= true;
       Exit
     end;
   end;

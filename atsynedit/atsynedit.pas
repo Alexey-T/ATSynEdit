@@ -155,6 +155,7 @@ type
 
   TATEditorPosDetails = record
     EndOfWrappedLine: boolean;
+    BelowAllText: boolean;
     OnGapItem: TATGapItem;
     OnGapPos: TPoint;
   end;
