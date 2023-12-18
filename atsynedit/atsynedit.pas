@@ -6554,7 +6554,8 @@ begin
       if bClickOnSelection then
         ActionId:= TATEditorMouseAction.ClickSimple;
 
-    if ActionId=TATEditorMouseAction.ClickMiddle then
+    case ActionId of
+    TATEditorMouseAction.ClickMiddle:
     begin
       case FOptMouseMiddleClickAction of
         TATEditorMiddleClickAction.Scrolling:
@@ -6583,7 +6584,7 @@ begin
       Exit
     end;
 
-    if ActionId=TATEditorMouseAction.ClickSimple then
+    TATEditorMouseAction.ClickSimple:
     begin
       ActionAddJumpToUndo;
       Strings.SetGroupMark;
@@ -6635,7 +6636,7 @@ begin
       end;
     end;
 
-    if ActionId=TATEditorMouseAction.ClickAndSelNormalBlock then
+    TATEditorMouseAction.ClickAndSelNormalBlock:
     begin
       FSelRect:= cRectEmpty;
       DoCaretSingleAsIs;
@@ -6643,7 +6644,7 @@ begin
       Carets[0].SelectToPoint_ByShiftClick(FMouseDownPnt.X, FMouseDownPnt.Y);
     end;
 
-    if ActionId=TATEditorMouseAction.ClickAndSelVerticalBlock then
+    TATEditorMouseAction.ClickAndSelVerticalBlock:
     begin
       FSelRect:= cRectEmpty;
       DoCaretSingleAsIs;
@@ -6654,17 +6655,18 @@ begin
           );
     end;
 
-    if ActionId=TATEditorMouseAction.MakeCaret then
+    TATEditorMouseAction.MakeCaret:
     begin
       FSelRect:= cRectEmpty;
       DoCaretAddToPoint(FMouseDownPnt.X, FMouseDownPnt.Y);
     end;
 
-    if ActionId=TATEditorMouseAction.MakeCaretsColumn then
+    TATEditorMouseAction.MakeCaretsColumn:
     begin
       FSelRect:= cRectEmpty;
       DoCaretsColumnToPoint(FMouseDownPnt.X, FMouseDownPnt.Y);
     end;
+    end; //case ActionId of
   end;
 
   if FOptGutterVisible and ATPointInRect(FRectGutter, PosCoord) then
