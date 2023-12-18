@@ -552,7 +552,7 @@ begin
     end;
   end;
 
-  if Item.NFinal=TATWrapItemFinal.Final then //don't set AWrappedEnd for real eol
+  if Item.NFinal=TATWrapItemFinal.Final then //don't set EndOfWrappedLine for real EOL
     ADetails.EndOfWrappedLine:= false;
 end;
 
