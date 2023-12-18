@@ -548,7 +548,10 @@ begin
     begin
       NIndex:= AStrings.LinesFoldFrom[Result.Y, AEditorIndex];
       if NIndex>0 then
+      begin
+        ADetails.EndOfPartiallyFoldedLine:= true;
         Result.X:= NIndex-1;
+      end;
     end;
   end;
 

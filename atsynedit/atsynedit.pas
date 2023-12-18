@@ -155,6 +155,7 @@ type
 
   TATEditorPosDetails = record
     EndOfWrappedLine: boolean; //coordinate was after the end of wrapped line-part (but not after the final line-part)
+    EndOfPartiallyFoldedLine: boolean; //coordinate was after beginning of folded-block, for partially folded line
     BelowAllText: boolean; //coordinate was below all existing lines (so the ending text pos was returned)
     OnGapItem: TATGapItem; //if coordinate is on a gap, here it TATGapItem object
     OnGapPos: TPoint; //if coordinate is on a gap, here are gap-related coordinates
