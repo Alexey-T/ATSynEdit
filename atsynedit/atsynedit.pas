@@ -6608,7 +6608,9 @@ begin
         if Carets.Count=1 then
         begin
           Caret:= Carets[0];
-          if (Caret.PosX=FMouseDownPnt.X) and (Caret.PosY=FMouseDownPnt.Y) then
+          if (not Caret.IsSelection) and
+            (Caret.PosX=FMouseDownPnt.X) and
+            (Caret.PosY=FMouseDownPnt.Y) then
             exit;
         end;
 
