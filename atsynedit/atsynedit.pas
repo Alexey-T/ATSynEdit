@@ -6604,6 +6604,14 @@ begin
       end
       else
       begin
+        //avoid OnChangeCaretPos if click does nothing
+        if Carets.Count=1 then
+        begin
+          Caret:= Carets[0];
+          if (Caret.PosX=FMouseDownPnt.X) and (Caret.PosY=FMouseDownPnt.Y) then
+            exit;
+        end;
+
         DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
 
         bUnfoldClickedPos:= (FFoldStyle in cEditorFoldStylesUnfoldOnClick)

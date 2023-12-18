@@ -543,7 +543,7 @@ end;
 
 procedure TfmMain.EditScroll(Sender: TObject);
 begin
-  EditCaretMoved(Sender);
+  UpdateStatus;
   UpdateGapPanel;
 end;
 
