@@ -6555,117 +6555,117 @@ begin
         ActionId:= TATEditorMouseAction.ClickSimple;
 
     case ActionId of
-    TATEditorMouseAction.ClickMiddle:
-    begin
-      case FOptMouseMiddleClickAction of
-        TATEditorMiddleClickAction.Scrolling:
-          begin
-            if not ModeOneLine then
-            begin
-              FMouseNiceScrollPos:= PosCoord;
-              MouseNiceScroll:= true;
-            end;
-          end;
-        TATEditorMiddleClickAction.Paste:
-          begin
-            //set caret to the clicked position, like Kate and VSCode do:
-            DoCaretSingle(PosTextClicked.X, PosTextClicked.Y);
-            DoCommand(cCommand_ClipboardAltPaste, TATCommandInvoke.Internal); //uses PrimarySelection:TClipboard
-          end;
-        TATEditorMiddleClickAction.GotoDefinition:
-          begin
-            if (not ModeOneLine) and (cCommand_GotoDefinition>0) then
-            begin
-              DoCaretSingle(PosTextClicked.X, PosTextClicked.Y);
-              DoCommand(cCommand_GotoDefinition, TATCommandInvoke.Internal);
-            end;
-          end;
-      end;
-      Exit
-    end;
-
-    TATEditorMouseAction.ClickSimple:
-    begin
-      ActionAddJumpToUndo;
-      Strings.SetGroupMark;
-
-      FSelRect:= cRectEmpty;
-      DoCaretSingleAsIs;
-
-      if Assigned(PosDetails.OnGapItem) then
-      begin
-        if Assigned(FOnClickGap) then
-          FOnClickGap(Self, PosDetails.OnGapItem, PosDetails.OnGapPos);
-      end;
-
-      if FOptMouseDragDrop and bClickOnSelection then
-      begin
-        //DragMode must be dmManual, drag started by code
-        FMouseDragDropping:= true;
-      end
-      else
-      begin
-        //avoid OnChangeCaretPos if click does nothing
-        if Carets.Count=1 then
+      TATEditorMouseAction.ClickMiddle:
         begin
-          Caret:= Carets[0];
-          if (not Caret.IsSelection) and
-            (Caret.PosX=FMouseDownPnt.X) and
-            (Caret.PosY=FMouseDownPnt.Y) then
-            exit;
+          case FOptMouseMiddleClickAction of
+            TATEditorMiddleClickAction.Scrolling:
+              begin
+                if not ModeOneLine then
+                begin
+                  FMouseNiceScrollPos:= PosCoord;
+                  MouseNiceScroll:= true;
+                end;
+              end;
+            TATEditorMiddleClickAction.Paste:
+              begin
+                //set caret to the clicked position, like Kate and VSCode do:
+                DoCaretSingle(PosTextClicked.X, PosTextClicked.Y);
+                DoCommand(cCommand_ClipboardAltPaste, TATCommandInvoke.Internal); //uses PrimarySelection:TClipboard
+              end;
+            TATEditorMiddleClickAction.GotoDefinition:
+              begin
+                if (not ModeOneLine) and (cCommand_GotoDefinition>0) then
+                begin
+                  DoCaretSingle(PosTextClicked.X, PosTextClicked.Y);
+                  DoCommand(cCommand_GotoDefinition, TATCommandInvoke.Internal);
+                end;
+              end;
+          end;
+          Exit
         end;
 
-        DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
+      TATEditorMouseAction.ClickSimple:
+        begin
+          ActionAddJumpToUndo;
+          Strings.SetGroupMark;
 
-        bUnfoldClickedPos:= (FFoldStyle in cEditorFoldStylesUnfoldOnClick)
-          //ignore click on fold-mark, because we handle double-click on it (select entire range)
-          and not IsCoordInFoldedMark(X, Y);
+          FSelRect:= cRectEmpty;
+          DoCaretSingleAsIs;
 
-        DoShowPos(
-          FMouseDownPnt,
-          FOptScrollIndentCaretHorz,
-          FOptScrollIndentCaretVert,
-          bUnfoldClickedPos,
-          false,
-          false //False is to fix CudaText issue #5139
-          );
-        DoSelect_None;
+          if Assigned(PosDetails.OnGapItem) then
+          begin
+            if Assigned(FOnClickGap) then
+              FOnClickGap(Self, PosDetails.OnGapItem, PosDetails.OnGapPos);
+          end;
 
-        if Assigned(FOnClickMoveCaret) then
-          FOnClickMoveCaret(Self, Point(Carets[0].PosX, Carets[0].PosY), FMouseDownPnt);
-      end;
-    end;
+          if FOptMouseDragDrop and bClickOnSelection then
+          begin
+            //DragMode must be dmManual, drag started by code
+            FMouseDragDropping:= true;
+          end
+          else
+          begin
+            //avoid OnChangeCaretPos if click does nothing
+            if Carets.Count=1 then
+            begin
+              Caret:= Carets[0];
+              if (not Caret.IsSelection) and
+                (Caret.PosX=FMouseDownPnt.X) and
+                (Caret.PosY=FMouseDownPnt.Y) then
+                exit;
+            end;
 
-    TATEditorMouseAction.ClickAndSelNormalBlock:
-    begin
-      FSelRect:= cRectEmpty;
-      DoCaretSingleAsIs;
-      //see CudaText issue #5221
-      Carets[0].SelectToPoint_ByShiftClick(FMouseDownPnt.X, FMouseDownPnt.Y);
-    end;
+            DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
 
-    TATEditorMouseAction.ClickAndSelVerticalBlock:
-    begin
-      FSelRect:= cRectEmpty;
-      DoCaretSingleAsIs;
-      with Carets[0] do
-        DoSelect_ColumnBlock_FromPoints(
-          Point(PosX, PosY),
-          FMouseDownPnt
-          );
-    end;
+            bUnfoldClickedPos:= (FFoldStyle in cEditorFoldStylesUnfoldOnClick)
+              //ignore click on fold-mark, because we handle double-click on it (select entire range)
+              and not IsCoordInFoldedMark(X, Y);
 
-    TATEditorMouseAction.MakeCaret:
-    begin
-      FSelRect:= cRectEmpty;
-      DoCaretAddToPoint(FMouseDownPnt.X, FMouseDownPnt.Y);
-    end;
+            DoShowPos(
+              FMouseDownPnt,
+              FOptScrollIndentCaretHorz,
+              FOptScrollIndentCaretVert,
+              bUnfoldClickedPos,
+              false,
+              false //False is to fix CudaText issue #5139
+              );
+            DoSelect_None;
 
-    TATEditorMouseAction.MakeCaretsColumn:
-    begin
-      FSelRect:= cRectEmpty;
-      DoCaretsColumnToPoint(FMouseDownPnt.X, FMouseDownPnt.Y);
-    end;
+            if Assigned(FOnClickMoveCaret) then
+              FOnClickMoveCaret(Self, Point(Carets[0].PosX, Carets[0].PosY), FMouseDownPnt);
+          end;
+        end;
+
+      TATEditorMouseAction.ClickAndSelNormalBlock:
+        begin
+          FSelRect:= cRectEmpty;
+          DoCaretSingleAsIs;
+          //see CudaText issue #5221
+          Carets[0].SelectToPoint_ByShiftClick(FMouseDownPnt.X, FMouseDownPnt.Y);
+        end;
+
+      TATEditorMouseAction.ClickAndSelVerticalBlock:
+        begin
+          FSelRect:= cRectEmpty;
+          DoCaretSingleAsIs;
+          with Carets[0] do
+            DoSelect_ColumnBlock_FromPoints(
+              Point(PosX, PosY),
+              FMouseDownPnt
+              );
+        end;
+
+      TATEditorMouseAction.MakeCaret:
+        begin
+          FSelRect:= cRectEmpty;
+          DoCaretAddToPoint(FMouseDownPnt.X, FMouseDownPnt.Y);
+        end;
+
+      TATEditorMouseAction.MakeCaretsColumn:
+        begin
+          FSelRect:= cRectEmpty;
+          DoCaretsColumnToPoint(FMouseDownPnt.X, FMouseDownPnt.Y);
+        end;
     end; //case ActionId of
   end;
 
