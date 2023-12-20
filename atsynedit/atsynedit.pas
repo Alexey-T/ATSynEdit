@@ -6063,8 +6063,13 @@ begin
   if DoubleBuffered then
   begin
     //single place where we flush bitmap to canvas
+    {
+    //method 1
     R:= Canvas.ClipRect;
     Canvas.CopyRect(R, FBitmap.Canvas, R);
+    }
+    //method 2, seems little faster that method 1 on Windows
+    Canvas.Draw(0, 0, FBitmap);
   end;
 
   DoPaintMarkerOfDragDrop(Canvas);
