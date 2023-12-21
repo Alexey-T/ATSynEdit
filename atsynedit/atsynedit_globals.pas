@@ -452,7 +452,7 @@ initialization
     DefaultNonWordChars:= '-+*=/\()[]{}<>"''.,:;~?!@#$%^&|`…';
 
     TimerIntervalAutoScroll:= 100;
-    TimerIntervalNiceScroll:= 100;
+    TimerIntervalNiceScroll:= 40;
 
     GutterSizeBookmarks:= 16;
     GutterSizeNumbers:= 10;
@@ -468,7 +468,7 @@ initialization
     FoldedUnderlineSize:= TATEditorFoldedUnderlineSize.BeginToWindowEnd;
 
     UsePaintStatic:= true;
-    SpeedScrollNice:= 3;
+    SpeedScrollNice:= 5;
     SizeGutterFoldLineDx:= 3;
     SizeIndentTooltipX:= 5;
     SizeIndentTooltipY:= 1;
