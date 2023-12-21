@@ -347,7 +347,7 @@ begin
     begin
       if Result<>'' then
         Result+= cNiceSeparator;
-      Result+= ShortcutToText(Data[i]);
+      Result+= ShortcutToTextRaw(Data[i]);
     end;
 end;
 
@@ -398,7 +398,7 @@ begin
     if not Sep.GetItemStr(S) then Break;
     S:= Trim(S); //Trim to allow near spaces
     if S='' then Break;
-    Data[i]:= TextToShortCut(S);
+    Data[i]:= TextToShortCutRaw(S);
   end;
 end;
 
