@@ -6046,6 +6046,7 @@ begin
   begin
     if not Assigned(FBitmap) then exit;
     DoPaintCarets(FBitmap.Canvas, true);
+    Canvas.Draw(0, 0, FBitmap);
   end
   else
   //non-buf mode: timer tick clears whole canvas first.
@@ -6054,12 +6055,6 @@ begin
   begin
     if not FCaretBlinkEnabled or FCaretAllowNextBlink then
       DoPaintCarets(Canvas, true);
-  end;
-
-  if DoubleBuffered then
-  begin
-    //single place where we flush bitmap to canvas
-    Canvas.Draw(0, 0, FBitmap);
   end;
 
   DoPaintMarkerOfDragDrop(Canvas);
