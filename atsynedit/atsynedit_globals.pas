@@ -468,7 +468,7 @@ initialization
     FoldedUnderlineSize:= TATEditorFoldedUnderlineSize.BeginToWindowEnd;
 
     UsePaintStatic:= true;
-    SpeedScrollNice:= 7;
+    SpeedScrollNice:= 8;
     SizeGutterFoldLineDx:= 3;
     SizeIndentTooltipX:= 5;
     SizeIndentTooltipY:= 1;
