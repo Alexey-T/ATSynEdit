@@ -76,6 +76,8 @@ type
     //smart update used only if lines changed, not deleted/inserted
     MaxUpdatesCountEasy: integer;
 
+    MaxMinimapThreadWaiting: integer;
+
     MaxClipboardRecentsMenuitemLen: integer;
     MaxPrecedingLinesForSmartTab: integer;
 
@@ -392,6 +394,7 @@ initialization
   begin
     MaxFileSizeMbToDetectEncoding:= 50;
     MaxUpdatesCountEasy:= 200;
+    MaxMinimapThreadWaiting:= 200;
 
     MaxClipboardRecentsMenuitemLen:= 60;
     MaxPrecedingLinesForSmartTab:= 300;

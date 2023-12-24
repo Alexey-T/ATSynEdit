@@ -2222,7 +2222,7 @@ begin
   Ed:= TATSynEdit(Editor);
   repeat
     if Terminated then exit;
-    if Ed.FEventMapStart.WaitFor(1000)=wrSignaled then
+    if Ed.FEventMapStart.WaitFor(ATEditorOptions.MaxMinimapThreadWaiting)=wrSignaled then
     begin
       Ed.FEventMapStart.ResetEvent;
       Ed.DoPaintMinimapAllToBGRABitmap;
