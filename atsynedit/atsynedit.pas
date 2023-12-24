@@ -3426,7 +3426,7 @@ begin
       DoPaintMinimapTooltip(C);
 
     {$ifdef map_th}
-    if FEventMapDone.WaitFor(1000)=wrSignaled then
+    if FEventMapDone.WaitFor(ATEditorOptions.MaxMinimapThreadWaiting)=wrSignaled then
     begin
       FEventMapDone.ResetEvent;
       FMinimapBmp.Draw(C, FRectMinimap.Left, FRectMinimap.Top);
