@@ -534,17 +534,17 @@ begin
     cCommand_GotoScreenCenter:         Result:= DoCommand_GotoScreenSide(TATCaretScreenSide.Middle);
 
     cCommand_GotoWordNext,
-    cCommand_GotoWordNext_Sel:         Result:= DoCommand_GotoWord(cWordjumpToNext);
+    cCommand_GotoWordNext_Sel:         Result:= DoCommand_GotoWord(TATWordJump.Next);
     cCommand_GotoWordPrev,
-    cCommand_GotoWordPrev_Sel:         Result:= DoCommand_GotoWord(cWordjumpToPrev);
+    cCommand_GotoWordPrev_Sel:         Result:= DoCommand_GotoWord(TATWordJump.Prev);
 
     cCommand_GotoWordNext_Simple,
-    cCommand_GotoWordNext_Simple_Sel:  Result:= DoCommand_GotoWord(cWordjumpToNext, true);
+    cCommand_GotoWordNext_Simple_Sel:  Result:= DoCommand_GotoWord(TATWordJump.Next, true);
     cCommand_GotoWordPrev_Simple,
-    cCommand_GotoWordPrev_Simple_Sel:  Result:= DoCommand_GotoWord(cWordjumpToPrev, true);
+    cCommand_GotoWordPrev_Simple_Sel:  Result:= DoCommand_GotoWord(TATWordJump.Prev, true);
 
     cCommand_GotoWordEnd,
-    cCommand_GotoWordEnd_Sel:          Result:= DoCommand_GotoWord(cWordjumpToEndOrNext);
+    cCommand_GotoWordEnd_Sel:          Result:= DoCommand_GotoWord(TATWordJump.EndOrNext);
 
     cCommand_GotoLineAbsBegin,
     cCommand_GotoLineAbsBegin_Sel:     Result:= DoCommand_GotoLineEdge(true);

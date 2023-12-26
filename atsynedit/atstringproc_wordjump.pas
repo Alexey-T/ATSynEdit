@@ -5,6 +5,7 @@ License: MPL 2.0 or LGPL
 unit ATStringProc_WordJump;
 
 {$mode objfpc}{$H+}
+{$ScopedEnums on}
 
 interface
 
@@ -14,11 +15,11 @@ uses
 
 type
   TATWordJump = (
-    cWordjumpToNext,
-    cWordjumpToEndOrNext,
-    cWordjumpToPrev,
-    cWordjumpToNextByMouse,
-    cWordjumpToPrevByMouse
+    Next,
+    EndOrNext,
+    Prev,
+    NextByMouse,
+    PrevByMouse
     );
 
 function SFindWordOffset(const S: atString; AOffset: integer; AJump: TATWordJump; ABigJump: boolean;
@@ -43,7 +44,11 @@ const
 *)
 
 type
-  TCharGroup = (cgSpaces, cgSymbols, cgWord);
+  TCharGroup = (
+    Spaces,
+    Symbols,
+    Word
+    );
 
 type
   TCharGroupFunction = function(ch: atChar; const ANonWordChars: atString): TCharGroup;
@@ -51,20 +56,20 @@ type
 function GroupOfChar_Usual(ch: atChar; const ANonWordChars: atString): TCharGroup;
 begin
   if (ch=#9) or IsCharSpace(ch) then
-    Result:= cgSpaces
+    Result:= TCharGroup.Spaces
   else
   if IsCharWord(ch, ANonWordChars) then
-    Result:= cgWord
+    Result:= TCharGroup.Word
   else
-    Result:= cgSymbols;
+    Result:= TCharGroup.Symbols;
 end;
 
 function GroupOfChar_Simple(ch: atChar; const ANonWordChars: atString): TCharGroup;
 begin
   if (ch=#9) or IsCharSpace(ch) then
-    Result:= cgSpaces
+    Result:= TCharGroup.Spaces
   else
-    Result:= cgWord;
+    Result:= TCharGroup.Word;
 end;
 
 
@@ -98,13 +103,13 @@ var
   begin
     Next(n);
     if ABigJump then
-      if (n<Length(s)) and (GroupOfChar(s[n+1], ANonWordChars)=cgSpaces) then
+      if (n<Length(s)) and (GroupOfChar(s[n+1], ANonWordChars)=TCharGroup.Spaces) then
         Next(n);
   end;
   //------------
   procedure JumpToEnd(var n: integer);
   begin
-    while (n<Length(S)) and (GroupOfChar(S[n+1], ANonWordChars)=cgWord) do
+    while (n<Length(S)) and (GroupOfChar(S[n+1], ANonWordChars)=TCharGroup.Word) do
       Inc(n);
   end;
   //------------
@@ -121,7 +126,7 @@ begin
     GroupOfChar:= @GroupOfChar_Usual;
 
   case AJump of
-    cWordjumpToNextByMouse:
+    TATWordJump.NextByMouse:
       begin
         while (n<NLen) and
           ((n=0) or IsCharWord(S[n], ANonWordChars)) and
@@ -129,7 +134,7 @@ begin
           Inc(n);
       end;
 
-    cWordjumpToPrevByMouse:
+    TATWordJump.PrevByMouse:
       begin
         while (n>0) and (n<=NLen) and
           IsCharWord(S[n], ANonWordChars) and
@@ -137,10 +142,10 @@ begin
           Dec(n);
       end;
 
-    cWordjumpToNext:
+    TATWordJump.Next:
       JumpToNext(n);
 
-    cWordjumpToPrev:
+    TATWordJump.Prev:
       begin
         //if we at word middle, jump to word start
         if (n>0) and (n<Length(s)) and (GroupOfChar(s[n], ANonWordChars)=GroupOfChar(s[n+1], ANonWordChars)) then
@@ -151,12 +156,12 @@ begin
           if (n>0) then
             begin Dec(n); Home(n); end;
           if ABigJump then
-            if (n>0) and (GroupOfChar(s[n+1], ANonWordChars)<>cgWord) then
+            if (n>0) and (GroupOfChar(s[n+1], ANonWordChars)<>TCharGroup.Word) then
               begin Dec(n); Home(n); end;
         end
       end;
 
-    cWordjumpToEndOrNext:
+    TATWordJump.EndOrNext:
       begin
         JumpToEnd(n);
         //not moved? jump again
@@ -197,10 +202,10 @@ begin
 
     //jump left only if at middle of word
     if (AOffset>0) and IsCharWord(S[AOffset], ANonWordChars) then
-      AOffset1:= SFindWordOffset(S, AOffset, cWordjumpToPrev, false, ANonWordChars);
+      AOffset1:= SFindWordOffset(S, AOffset, TATWordJump.Prev, false, ANonWordChars);
 
     //jump right always
-    AOffset2:= SFindWordOffset(S, AOffset, cWordjumpToNext, false, ANonWordChars);
+    AOffset2:= SFindWordOffset(S, AOffset, TATWordJump.Next, false, ANonWordChars);
   end;
 end;
 

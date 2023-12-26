@@ -468,7 +468,7 @@ begin
     Str:= Strs.Lines[Caret.PosY];
 
     //jump to prev line?
-    if (Caret.PosX=0) and (AJump=cWordjumpToPrev) then
+    if (Caret.PosX=0) and (AJump=TATWordJump.Prev) then
     begin
       if not bMultiCaret or FOptKeyLeftRightGoToNextLineWithCarets then
       if Caret.PosY>0 then
@@ -479,7 +479,7 @@ begin
     end
     else
     //jump to next line?
-    if (Caret.PosX>=Length(Str)) and (AJump in [cWordjumpToNext, cWordjumpToEndOrNext]) then
+    if (Caret.PosX>=Length(Str)) and (AJump in [TATWordJump.Next, TATWordJump.EndOrNext]) then
     begin
       if not bMultiCaret or FOptKeyLeftRightGoToNextLineWithCarets then
       if Caret.PosY<Strs.Count-1 then
@@ -489,7 +489,7 @@ begin
         Caret.PosX:= SGetIndentChars(Str);
 
         //additional jump to word end
-        if AJump=cWordjumpToEndOrNext then
+        if AJump=TATWordJump.EndOrNext then
         begin
           Caret.PosX:= SFindWordOffset(Str, Caret.PosX, AJump, true, FOptNonWordChars, AJumpSimple);
         end;
@@ -497,7 +497,7 @@ begin
     end
     else
     //jump from beyond eol to eol?
-    if (Caret.PosX>Length(Str)) and (AJump=cWordjumpToPrev) then
+    if (Caret.PosX>Length(Str)) and (AJump=TATWordJump.Prev) then
     begin
       Caret.PosX:= Length(Str);
     end
@@ -510,7 +510,7 @@ begin
   end;
 
   //TATCommandResult.CaretLazy is to fix CudaText #3065
-  if AJump=cWordjumpToPrev then
+  if AJump=TATWordJump.Prev then
     Result:= [TATCommandResult.CaretTop, TATCommandResult.CaretLazy]
   else
     Result:= [TATCommandResult.CaretBottom, TATCommandResult.CaretLazy];
