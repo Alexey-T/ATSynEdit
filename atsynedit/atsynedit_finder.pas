@@ -6,6 +6,7 @@ unit ATSynEdit_Finder;
 
 {$mode objfpc}{$H+}
 {$ModeSwitch advancedrecords}
+{$ScopedEnums on}
 
 interface
 
@@ -57,13 +58,13 @@ type
   TATFinderResults2 = specialize TFPGList<TATFinderResult2>;
 
   TATFinderTokensAllowed = (
-    cTokensAll,
-    cTokensOnlyComments,
-    cTokensOnlyStrings,
-    cTokensOnlyCommentsAndStrings,
-    cTokensNoComments,
-    cTokensNoStrings,
-    cTokensNoCommentsAndStrings
+    All,
+    OnlyComments,
+    OnlyStrings,
+    OnlyCommentsAndStrings,
+    NoComments,
+    NoStrings,
+    NoCommentsAndStrings
     );
 
 type
@@ -590,7 +591,7 @@ The VS Code's logic is:
 }
 function TATTextFinder.GetPreserveCaseReplacement(const AFromText: UnicodeString): UnicodeString;
 type
-  TLetterCase = (lcUnknown, lcLower, lcUpper, lcAsIs);
+  TLetterCase = (Unknown, Lower, Upper, AsIs);
 var
   inputLen: Integer;
   numLetters: Integer;
@@ -601,7 +602,7 @@ begin
   if StrReplace = '' then
     exit('');
 
-  firstLetterCase := lcUnknown;
+  firstLetterCase := TLetterCase.Unknown;
   numLetters := 0;
   numUpperCaseLetters := 0;
   inputLen := Length(AFromText);
@@ -621,16 +622,16 @@ begin
       if TCharacter.IsUpper(AFromText[i]) then // upper-case letter
       begin
         Inc(numUpperCaseLetters);
-        if firstLetterCase = lcUnknown then firstLetterCase := lcUpper;
+        if firstLetterCase = TLetterCase.Unknown then firstLetterCase := TLetterCase.Upper;
       end
       else // lower-case letter
       begin
-        if firstLetterCase = lcUnknown then firstLetterCase := lcLower;
+        if firstLetterCase = TLetterCase.Unknown then firstLetterCase := TLetterCase.Lower;
       end
     end
     else // not a letter
     begin
-      if firstLetterCase = lcUnknown then firstLetterCase := lcAsIs;
+      if firstLetterCase = TLetterCase.Unknown then firstLetterCase := TLetterCase.AsIs;
     end;
     Inc(i);
   end;
@@ -644,9 +645,9 @@ begin
   else
   begin
     Result := StrReplace;
-    if firstLetterCase = lcUpper then
+    if firstLetterCase = TLetterCase.Upper then
       Result[1] := TCharacter.ToUpper(Result[1])
-    else if firstLetterCase = lcLower then
+    else if firstLetterCase = TLetterCase.Lower then
       Result[1] := TCharacter.ToLower(Result[1])
   end
 end;
@@ -1353,7 +1354,7 @@ begin
       exit(false);
   end;
 
-  if OptTokens=cTokensAll then
+  if OptTokens=TATFinderTokensAllowed.All then
     exit(true);
 
   if not Assigned(FOnGetToken) then
@@ -1361,17 +1362,17 @@ begin
 
   FOnGetToken(Editor, AX, AY, Kind);
   case OptTokens of
-    cTokensOnlyComments:
+    TATFinderTokensAllowed.OnlyComments:
       Result:= Kind=TATTokenKind.Comment;
-    cTokensOnlyStrings:
+    TATFinderTokensAllowed.OnlyStrings:
       Result:= Kind=TATTokenKind.Str;
-    cTokensOnlyCommentsAndStrings:
+    TATFinderTokensAllowed.OnlyCommentsAndStrings:
       Result:= Kind<>TATTokenKind.Other; //Kind in [TATTokenKind.Comment, atkString];
-    cTokensNoComments:
+    TATFinderTokensAllowed.NoComments:
       Result:= Kind<>TATTokenKind.Comment;
-    cTokensNoStrings:
+    TATFinderTokensAllowed.NoStrings:
       Result:= Kind<>TATTokenKind.Str;
-    cTokensNoCommentsAndStrings:
+    TATFinderTokensAllowed.NoCommentsAndStrings:
       Result:= Kind=TATTokenKind.Other; //not (Kind in [TATTokenKind.Comment, atkString]);
   end;
 end;
@@ -1917,7 +1918,7 @@ begin
   OptRegexSubst:= true;
   OptWrapped:= false;
   OptWrappedConfirm:= true;
-  OptTokens:= cTokensAll;
+  OptTokens:= TATFinderTokensAllowed.All;
   ClearMatchPos;
 
   FRegex:= nil;
@@ -2428,7 +2429,7 @@ begin
   OptRegex:= false;
   OptWrapped:= false;
   OptWrappedConfirm:= true;
-  OptTokens:= cTokensAll;
+  OptTokens:= TATFinderTokensAllowed.All;
 
   OptFromCaret:= false;
   OptConfirmReplace:= false;
