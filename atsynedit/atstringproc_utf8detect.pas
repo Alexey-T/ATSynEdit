@@ -6,14 +6,15 @@ Changed for ATSynEdit by Alexey Torgashin (UVviewsoft.com)
 unit ATStringProc_UTF8Detect;
 
 {$mode objfpc}{$H+}
+{$ScopedEnums on}
 
 interface
 
 type
-  TBufferUTF8State = (u8sUnknown, u8sYes, u8sNo);
+  TATBufferUTF8State = (Unknown, Yes, No);
 
 //PartialAllowed must be set to true if the buffer is smaller than the file.
-function IsBufferUtf8(buf:PAnsiChar; bufSize:SizeInt; PartialAllowed:boolean): TBufferUTF8State;
+function IsBufferUtf8(buf:PAnsiChar; bufSize:SizeInt; PartialAllowed:boolean): TATBufferUTF8State;
 
 implementation
 
@@ -46,7 +47,7 @@ begin
   result:=(byte(thechar) and (128+64))=128;
 end;
 
-function IsBufferUtf8(buf:PAnsiChar; bufSize:SizeInt; PartialAllowed:boolean):TBufferUTF8State;
+function IsBufferUtf8(buf:PAnsiChar; bufSize:SizeInt; PartialAllowed:boolean):TATBufferUTF8State;
 {Buffer contains only valid UTF-8 characters, no secondary alone,
 no primary without the correct nr of secondary}
 var
@@ -57,7 +58,7 @@ var
 begin
   p:=buf;
   hadutf8bytes:=false;
-  result:=u8sUnknown;
+  result:=TATBufferUTF8State.Unknown;
   utf8bytes:=0;
   for i:= 1 to bufSize do
   begin
@@ -65,7 +66,7 @@ begin
     begin  {Expecting secondary AnsiChar}
       hadutf8bytes:=true;
       if not IsSecondaryUTF8Char(p^) then
-        exit(u8sNo);  {Fail!}
+        exit(TATBufferUTF8State.No);  {Fail!}
       dec(utf8bytes);
     end
     else
@@ -73,11 +74,11 @@ begin
       utf8bytes:=bytesFromUTF8[p^]
     else
     if IsSecondaryUTF8Char(p^) then
-      exit(u8sNo);  {Fail!}
+      exit(TATBufferUTF8State.No);  {Fail!}
     inc(p);
   end;
   if hadutf8bytes and (PartialAllowed or (utf8bytes=0)) then
-    result:=u8sYes;
+    result:=TATBufferUTF8State.Yes;
 end;
 
 end.

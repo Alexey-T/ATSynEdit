@@ -459,10 +459,10 @@ type
   end;
 
 type
-  TBufferUTF8State = ATStringProc_Utf8Detect.TBufferUTF8State;
+  TATBufferUTF8State = ATStringProc_Utf8Detect.TATBufferUTF8State;
 
 function ATStrings_To_StringList(AStr: TATStrings): TStringList;
-function DetectStreamUtf8NoBom(Stream: TStream; BufSizeKb: word): TBufferUTF8State;
+function DetectStreamUtf8NoBom(Stream: TStream; BufSizeKb: word): TATBufferUTF8State;
 function DetectStreamUtf16NoBom(Stream: TStream; BufSizeWords: integer; out IsLE: boolean): boolean;
 
 implementation

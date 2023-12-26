@@ -73,14 +73,14 @@ begin
 end;
 
 
-function DetectStreamUtf8NoBom(Stream: TStream; BufSizeKb: word): TBufferUTF8State;
+function DetectStreamUtf8NoBom(Stream: TStream; BufSizeKb: word): TATBufferUTF8State;
 const
   cMinLen = 10;
 var
   Buf: PChar;
   Size: integer;
 begin
-  Result:= u8sUnknown;
+  Result:= TATBufferUTF8State.Unknown;
   if Stream.Size<cMinLen then Exit;
 
   if BufSizeKb=0 then
@@ -310,13 +310,13 @@ begin
 
   if BufSizeUTF8>0 then
     case DetectStreamUtf8NoBom(Stream, BufSizeUTF8) of
-      u8sYes:
+      TATBufferUTF8State.Yes:
         begin
           Enc:= TATFileEncoding.UTF8;
           EncWithBom:= false;
           Exit
         end;
-      u8sNo:
+      TATBufferUTF8State.No:
         begin
           // https://github.com/Alexey-T/CudaText/issues/2928
           Enc:= TATFileEncoding.ANSI;
