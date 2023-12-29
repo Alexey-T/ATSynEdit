@@ -240,7 +240,9 @@ type
     FontColor: TColor;
     FontBackColor: TColor;
     LinesHorizColor: TColor;
-    LinesPlotColor: TColor;
+    LinesPlotColorAll: TColor;
+    LinesPlotColorMinimap: TColor;
+    LinesPlotColorTextout: TColor;
     MinEditorLines: integer;
     PlotWidth: integer;
     PlotHeight: integer;
@@ -524,8 +526,10 @@ initialization
     FontSize:= 8;
     FontColor:= clRed;
     FontBackColor:= clCream;
-    LinesHorizColor:= clBlue;
-    LinesPlotColor:= clRed;
+    LinesHorizColor:= clGray;
+    LinesPlotColorAll:= clRed;
+    LinesPlotColorMinimap:= clGreen;
+    LinesPlotColorTextout:= clBlue;
     MinEditorLines:= 15;
     PlotWidth:= 80;
     PlotHeight:= 40;

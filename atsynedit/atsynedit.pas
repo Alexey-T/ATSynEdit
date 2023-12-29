@@ -476,7 +476,12 @@ type
   end;
 
 type
-  TATTimingQueue = specialize TDeque<integer>;
+  TATTimingRec = record
+    TimeAll,
+    TimeMinimap,
+    TimeTextout: integer;
+  end;
+  TATTimingQueue = specialize TDeque<TATTimingRec>;
 
 type
   { TATSynEdit }
@@ -853,6 +858,7 @@ type
     FPaintCounter: integer;
     FPaintStarted: boolean;
     FPaintWorking: boolean;
+    FTickTextout: QWord;
     FTickMinimap: QWord;
     FTickAll: QWord;
     FShowOsBarVert: boolean;
@@ -4089,6 +4095,9 @@ begin
       TextOutProps.FontBoldItalic_Name:= FontBoldItalic.Name;
       TextOutProps.FontBoldItalic_Size:= DoScaleFont(FontBoldItalic.Size);
 
+      if ATEditorOptions.DebugTiming then
+        FTickTextout:= GetTickCount64;
+
       CanvasTextOut(C,
         CurrPointText.X,
         CurrPointText.Y,
@@ -4097,6 +4106,9 @@ begin
         NOutputStrWidth,
         TextOutProps
         );
+
+      if ATEditorOptions.DebugTiming then
+        FTickTextout:= GetTickCount64-FTickTextout;
 
       //paint selection bg, after applying ColorAfterEol
       DoPaintSelectedLineBG(C, ACharSize, ARectLine,
@@ -6026,6 +6038,7 @@ begin
   begin
     FTickAll:= GetTickCount64;
     FTickMinimap:= 0;
+    FTickTextout:= 0;
   end;
 
   DoPaint(ALineNumber);
@@ -10170,6 +10183,7 @@ end;
 procedure TATSynEdit.DoPaintTiming(C: TCanvas);
 var
   RPlot: TRect;
+  Rec, RecPrev: TATTimingRec;
   NRectBottom, i: integer;
   S: string;
 begin
@@ -10181,7 +10195,11 @@ begin
 
   while FTimingQueue.Size()>ATTimingIndicator.PlotWidth do
     FTimingQueue.PopBack();
-  FTimingQueue.PushFront(integer(FTickAll));
+
+  Rec.TimeAll:= FTickAll;
+  Rec.TimeMinimap:= FTickMinimap;
+  Rec.TimeTextout:= FTickTextout;
+  FTimingQueue.PushFront(Rec);
 
   C.Font.Name:= Font.Name;
   C.Font.Color:= ATTimingIndicator.FontColor;
@@ -10199,14 +10217,32 @@ begin
   for i:= 0 to ATTimingIndicator.PlotHeight div 10 do
     C.Line(RPlot.Left, RPlot.Bottom-i*10, RPlot.Right, RPlot.Bottom-i*10);
 
-  C.Pen.Color:= ATTimingIndicator.LinesPlotColor;
   for i:= 1 to FTimingQueue.Size-1 do
+  begin
+    Rec:= FTimingQueue.Items[i];
+    RecPrev:= FTimingQueue.Items[i-1];
+    C.Pen.Color:= ATTimingIndicator.LinesPlotColorTextout;
     C.Line(
       RPlot.Left+i-1,
-      RPlot.Bottom-FTimingQueue.Items[i],
+      RPlot.Bottom-Rec.TimeTextout,
       RPlot.Left+i,
-      RPlot.Bottom-FTimingQueue.Items[i-1]
+      RPlot.Bottom-RecPrev.TimeTextout
       );
+    C.Pen.Color:= ATTimingIndicator.LinesPlotColorMinimap;
+    C.Line(
+      RPlot.Left+i-1,
+      RPlot.Bottom-Rec.TimeMinimap,
+      RPlot.Left+i,
+      RPlot.Bottom-RecPrev.TimeMinimap
+      );
+    C.Pen.Color:= ATTimingIndicator.LinesPlotColorAll;
+    C.Line(
+      RPlot.Left+i-1,
+      RPlot.Bottom-Rec.TimeAll,
+      RPlot.Left+i,
+      RPlot.Bottom-RecPrev.TimeAll
+      );
+  end;
 
   S:= Format('#%03d, %d ms', [FPaintCounter, FTickAll]);
   if FMinimapVisible then
