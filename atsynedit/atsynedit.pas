@@ -858,7 +858,6 @@ type
     FPaintCounter: integer;
     FPaintStarted: boolean;
     FPaintWorking: boolean;
-    FTickTextout: QWord;
     FTickMinimap: QWord;
     FTickAll: QWord;
     FShowOsBarVert: boolean;
@@ -4095,9 +4094,6 @@ begin
       TextOutProps.FontBoldItalic_Name:= FontBoldItalic.Name;
       TextOutProps.FontBoldItalic_Size:= DoScaleFont(FontBoldItalic.Size);
 
-      if ATEditorOptions.DebugTiming then
-        FTickTextout:= GetTickCount64;
-
       CanvasTextOut(C,
         CurrPointText.X,
         CurrPointText.Y,
@@ -4106,9 +4102,6 @@ begin
         NOutputStrWidth,
         TextOutProps
         );
-
-      if ATEditorOptions.DebugTiming then
-        FTickTextout:= GetTickCount64-FTickTextout;
 
       //paint selection bg, after applying ColorAfterEol
       DoPaintSelectedLineBG(C, ACharSize, ARectLine,

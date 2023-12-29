@@ -150,6 +150,9 @@ function CanvasTextWidth(const S: atString; ALineIndex: integer;
 
 procedure UpdateWiderFlags(C: TCanvas; out Flags: TATWiderFlags);
 
+var
+  FTickTextout: QWord;
+
 implementation
 
 uses
@@ -761,6 +764,7 @@ var
   bBold, bItalic, bSpaceChars: boolean;
   bShowUnprintedPartially: boolean;
   ch: WideChar;
+  tick: QWord;
 begin
   NLen:= Min(Length(AText), cMaxFixedArray);
   if NLen=0 then Exit;
@@ -813,6 +817,7 @@ begin
     end;
 
     C.Brush.Style:= cTextoutBrushStyle;
+
     {$IF Defined(LCLWin32)}
     _TextOut_Windows(C.Handle, APosX, APosY, nil, BufW, DxPointer, false{no ligatures});
     {$else}
@@ -975,6 +980,8 @@ begin
           DxPointer:= nil;
       end;
 
+      if ATEditorOptions.DebugTiming then
+        tick:= GetTickCount64;
       _TextOut_Unix(C.Handle,
         APosX+PixOffset1,
         APosY+AProps.TextOffsetFromLine,
@@ -982,6 +989,8 @@ begin
         Buf,
         DxPointer
         );
+      if ATEditorOptions.DebugTiming then
+        FTickTextout+= GetTickCount64-tick;
       {$endif}
 
       if not AProps.HasAsciiNoTabs then
