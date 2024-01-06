@@ -582,6 +582,7 @@ type
     FBitmap: TBitmap;
     FKeymap: TATKeymap;
     FKeymapHistory: TATKeyArray;
+    FActivationTime: QWord;
     FParentFrameObject: TCustomFrame;
     FWantTabs: boolean;
     FWantReturns: boolean;
@@ -1603,6 +1604,7 @@ type
     property AdapterForHilite: TATAdapterHilite read FAdapterHilite write FAdapterHilite;
     property AdapterIME: TATAdapterIME read FAdapterIME write FAdapterIME;
     property EditorIndex: integer read FEditorIndex write SetEditorIndex;
+    property ActivationTime: QWord read FActivationTime write FActivationTime;
     property LineTop: integer read GetLineTop write SetLineTop;
     property LineBottom: integer read FLineBottom;
     property LinesFromTop: integer read GetLinesFromTop write SetLinesFromTop;
@@ -8696,6 +8698,7 @@ procedure TATSynEdit.DoEnter;
 begin
   inherited;
   FIsEntered:= true;
+  FActivationTime:= GetTickCount64;
   if FCaretHideUnfocused then
     FCaretShowEnabled:= true;
   if IsRepaintNeededOnEnterOrExit then

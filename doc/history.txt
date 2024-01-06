@@ -1,3 +1,6 @@
+2024.01.07
++ add: public prop ActivationTime
+
 2023.12.24
 + add: ATEditorOptions.MaxMinimapThreadWaiting
 
