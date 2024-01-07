@@ -1731,6 +1731,7 @@ type
     procedure MarkerSwap;
     procedure MarkerSelectToCaret;
     procedure MarkerDeleteToCaret;
+    procedure AttribClearAll;
     //menu
     property PopupTextDefault: TPopupMenu read FMenuStd;
     property PopupText: TPopupMenu read FMenuText write FMenuText;

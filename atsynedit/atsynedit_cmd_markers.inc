@@ -93,6 +93,15 @@ begin
   end;
 end;
 
+procedure TATSynEdit.AttribClearAll;
+begin
+  if Assigned(FAttribs) then
+  begin
+    FAttribs.Clear;
+    Update;
+  end;
+end;
+
 procedure TATSynEdit.MarkerSwap;
 var
   Caret: TATCaretItem;
