@@ -606,6 +606,8 @@ end;
 function TATStringItem.GetLine: UnicodeString;
 var
   NLen, i: SizeInt;
+  BytePtr: PByte;
+  WordPtr: PWord;
 begin
   NLen:= Length(Buf);
   if NLen=0 then exit('');
@@ -617,8 +619,16 @@ begin
   else
   begin
     SetLength(Result, NLen);
-    for i:= 1 to NLen do
-      Result[i]:= WideChar(Ord(Buf[i]));
+    //avoid assign Result[i] coz it implicitely calls UniqueString
+    BytePtr:= @Buf[1];
+    WordPtr:= @Result[1];
+    i:= NLen;
+    repeat
+      WordPtr^:= Word(BytePtr^);
+      Inc(BytePtr);
+      Inc(WordPtr);
+      Dec(i);
+    until i=0;
   end;
 end;
 
