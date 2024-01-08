@@ -667,7 +667,9 @@ end;
 
 procedure TATStringItem.SetLineW(const S: UnicodeString);
 var
-  NLen, i: SizeInt;
+  NLen: SizeInt;
+  BytePtr, BytePtrLast: PByte;
+  WordPtr: PWord;
 begin
   NLen:= Length(S);
   if NLen>=MaxInt-1 then
@@ -682,8 +684,14 @@ begin
   begin
     Ex.Wide:= false;
     SetLength(Buf, NLen);
-    for i:= 1 to NLen do
-      Buf[i]:= Chr(Ord(S[i]));
+    BytePtr:= @Buf[1];
+    BytePtrLast:= @Buf[NLen];
+    WordPtr:= @S[1];
+    repeat
+      BytePtr^:= Byte(WordPtr^);
+      Inc(BytePtr);
+      Inc(WordPtr);
+    until BytePtr>BytePtrLast;
   end
   else
   begin
