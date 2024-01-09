@@ -262,6 +262,7 @@ function SFindRegexMatch(const Subject, Regex: UnicodeString; GroupIndex: intege
 function SCountTextOccurrences(const SubStr, Str: UnicodeString): integer;
 function SCountTextLines(const Str, StrBreak: UnicodeString): integer;
 procedure SSplitByChar(const S: string; Sep: char; out S1, S2: string);
+procedure SDeleteAndInsert(var AStr: UnicodeString; APos, ACount: integer; const AReplace: UnicodeString);
 
 
 implementation
@@ -1487,5 +1488,35 @@ begin
   end;
 end;
 
+
+procedure SDeleteAndInsert(var AStr: UnicodeString; APos, ACount: integer; const AReplace: UnicodeString);
+var
+  NLenOld, NLenRepl: integer;
+begin
+  if AReplace='' then
+  begin
+    Delete(AStr, APos, ACount);
+    exit;
+  end;
+
+  NLenOld:= Length(AStr);
+  NLenRepl:= Length(AReplace);
+  ACount:= Min(ACount, NLenOld-APos+1);
+
+  if NLenRepl>ACount then
+  begin
+    Insert(StringOfChar(#$2020, NLenRepl-ACount), AStr, APos+ACount);
+  end
+  else
+  if NLenRepl<ACount then
+  begin
+    Delete(AStr, APos, ACount-NLenRepl);
+  end
+  else
+  begin
+  end;
+
+  Move(AReplace[1], AStr[APos], NLenRepl*SizeOf(WideChar));
+end;
 
 end.
