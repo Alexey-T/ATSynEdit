@@ -1252,6 +1252,12 @@ begin
       else
         Str:= StrReplace;
 
+      //TODO
+      //for single-line matches:
+      //don't replace _in editor_, replace only inside one string,
+      //and when we go to another string, put old string to editor.
+      //huge speedup for huge one-liners of length 400k.
+
       DoReplaceTextInEditor(P1, P2, Str, false, false, PosAfter);
       Inc(Result);
 
