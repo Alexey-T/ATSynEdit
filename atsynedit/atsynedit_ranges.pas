@@ -480,6 +480,7 @@ var
   R, RngOuter, RngLastAdded: PATSynRange;
   nStartIndex, nEndLine, i: integer;
 begin
+  Result:= nil;
   RngOuter:= nil;
   RngLastAdded:= nil;
   nStartIndex:= 0;
@@ -492,7 +493,6 @@ begin
     nEndLine:= RngOuter^.Y2;
   end;
 
-  SetLength(Result{%H-}, 0);
   L:= TATIntegerList.Create;
   L.Capacity:= 128;
 
