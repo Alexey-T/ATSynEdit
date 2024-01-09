@@ -1503,17 +1503,10 @@ begin
   ACount:= Min(ACount, Length(AStr)-APos+1);
 
   if NLenRepl>ACount then
-  begin
-    Insert(StringOfChar(#$2020, NLenRepl-ACount), AStr, APos+ACount);
-  end
+    Insert(StringOfChar(#$2020, NLenRepl-ACount), AStr, APos+ACount)
   else
   if NLenRepl<ACount then
-  begin
     Delete(AStr, APos, ACount-NLenRepl);
-  end
-  else
-  begin
-  end;
 
   Move(AReplace[1], AStr[APos], NLenRepl*SizeOf(WideChar));
 end;
