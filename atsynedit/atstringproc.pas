@@ -1493,6 +1493,7 @@ end;
 procedure SDeleteAndInsert(var AStr: UnicodeString; APos, ACount: SizeInt; const AReplace: UnicodeString);
 var
   NLenRepl: SizeInt;
+  SDummy: UnicodeString;
 begin
   if AReplace='' then
   begin
@@ -1501,15 +1502,20 @@ begin
   end;
 
   NLenRepl:= Length(AReplace);
+  APos:= Min(APos, Length(AStr)+1);
   ACount:= Min(ACount, Length(AStr)-APos+1);
 
   if NLenRepl>ACount then
-    Insert(StringOfChar(#$2020, NLenRepl-ACount), AStr, APos+ACount)
+  begin
+    SetLength(SDummy, NLenRepl-ACount); //content is ignored
+    Insert(SDummy, AStr, APos+ACount)
+  end
   else
   if NLenRepl<ACount then
     Delete(AStr, APos, ACount-NLenRepl);
 
   Move(AReplace[1], AStr[APos], NLenRepl*SizeOf(WideChar));
 end;
+
 
 end.
