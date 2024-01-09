@@ -1491,7 +1491,7 @@ end;
 
 procedure SDeleteAndInsert(var AStr: UnicodeString; APos, ACount: integer; const AReplace: UnicodeString);
 var
-  NLenOld, NLenRepl: integer;
+  NLenRepl: integer;
 begin
   if AReplace='' then
   begin
@@ -1499,9 +1499,8 @@ begin
     exit;
   end;
 
-  NLenOld:= Length(AStr);
   NLenRepl:= Length(AReplace);
-  ACount:= Min(ACount, NLenOld-APos+1);
+  ACount:= Min(ACount, Length(AStr)-APos+1);
 
   if NLenRepl>ACount then
   begin
