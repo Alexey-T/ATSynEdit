@@ -532,7 +532,7 @@ var
   R: PATSynRange;
   NLen, NRange, i: integer;
 begin
-  SetLength(Result{%H-}, 0);
+  Result:= nil;
   if ALine>High(FLineIndexer) then exit;
 
   if not AOnlyFolded then
@@ -568,7 +568,7 @@ function TATSynRanges.FindRangesWithAnyOfLines(ALineFrom, ALineTo: integer): TAT
 var
   NMax, NRange, iLine, iItem: integer;
 begin
-  SetLength(Result{%H-}, 0);
+  Result:= nil;
   NMax:= High(FLineIndexer);
   if ALineFrom>NMax then exit;
   if ALineTo>NMax then ALineTo:= NMax;
@@ -590,7 +590,7 @@ var
   NMax, NRange, iLine, iItem: integer;
   Rng: PATSynRange;
 begin
-  SetLength(Result{%H-}, 0);
+  Result:= nil;
   NMax:= High(FLineIndexer);
   if ALineFrom>NMax then exit;
   if ALineTo>NMax then ALineTo:= NMax;
