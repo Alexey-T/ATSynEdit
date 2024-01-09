@@ -40,8 +40,9 @@ type
 type
   TATFinderResult = record
   public
-    FPos, FEnd: TPoint;
-    procedure Init(APos, AEnd: TPoint);
+    PosBegin,
+    PosEnd: TPoint;
+    procedure Init(APosBegin, APosEnd: TPoint);
     class operator =(const a, b: TATFinderResult): boolean;
   end;
 
@@ -434,10 +435,10 @@ end;
 
 { TATFinderResult }
 
-procedure TATFinderResult.Init(APos, AEnd: TPoint);
+procedure TATFinderResult.Init(APosBegin, APosEnd: TPoint);
 begin
-  FPos:= APos;
-  FEnd:= AEnd;
+  PosBegin:= APosBegin;
+  PosEnd:= APosEnd;
 end;
 
 class operator TATFinderResult.=(const a, b: TATFinderResult): boolean;
@@ -820,11 +821,11 @@ begin
     FMatchLen:= FRegex.MatchLen[0];
     DoOnFound(AWithEvent);
 
-    if IsProgressNeeded(Res.FPos.Y) then
+    if IsProgressNeeded(Res.PosBegin.Y) then
       if Assigned(FOnProgress) then
       begin
         bOk:= true;
-        FOnProgress(Self, Res.FPos.Y, Editor.Strings.Count-1, bOk);
+        FOnProgress(Self, Res.PosBegin.Y, Editor.Strings.Count-1, bOk);
         if not bOk then exit;
       end;
   end;
@@ -1150,10 +1151,10 @@ begin
     begin
       Res:= ListRes[i];
       Str:= St.TextSubstring(
-        Res.FPos.X,
-        Res.FPos.Y,
-        Res.FEnd.X,
-        Res.FEnd.Y);
+        Res.PosBegin.X,
+        Res.PosBegin.Y,
+        Res.PosEnd.X,
+        Res.PosEnd.Y);
       if Str<>'' then
         AMatches.Add(UTF8Encode(Str));
     end;
@@ -1236,12 +1237,12 @@ begin
       if Application.Terminated then exit;
       Res:= L[i];
 
-      P1:= Res.FPos;
-      P2:= Res.FEnd;
+      P1:= Res.PosBegin;
+      P2:= Res.PosEnd;
       if not IsPosSorted(P1.X, P1.Y, P2.X, P2.Y, true) then
       begin
-        P1:= Res.FEnd;
-        P2:= Res.FPos;
+        P1:= Res.PosEnd;
+        P2:= Res.PosBegin;
       end;
 
       if OptRegex then
@@ -2607,16 +2608,16 @@ begin
       Res:= Results[iRes];
 
       if not bMatchVisible then
-        if Editor.IsPosInVisibleArea(Res.FPos.X, Res.FPos.Y) then
+        if Editor.IsPosInVisibleArea(Res.PosBegin.X, Res.PosBegin.Y) then
           bMatchVisible:= true;
 
       //single line attr
-      if Res.FPos.Y=Res.FEnd.Y then
+      if Res.PosBegin.Y=Res.PosEnd.Y then
       begin
-        PosX:= Res.FPos.X;
-        PosY:= Res.FPos.Y;
+        PosX:= Res.PosBegin.X;
+        PosY:= Res.PosBegin.Y;
         SelY:= 0;
-        SelX:= Abs(Res.FEnd.X-Res.FPos.X);
+        SelX:= Abs(Res.PosEnd.X-Res.PosBegin.X);
         Editor.Attribs.Add(
           Point(PosX, PosY),
           Point(SelX, SelY),
@@ -2627,23 +2628,23 @@ begin
       end
       else
       //add N attrs per each line of a match
-      for iLine:= Res.FPos.Y to Res.FEnd.Y do
+      for iLine:= Res.PosBegin.Y to Res.PosEnd.Y do
         if St.IsIndexValid(iLine) then
         begin
           PosY:= iLine;
           SelY:= 0;
           //attr on first line
-          if iLine=Res.FPos.Y then
+          if iLine=Res.PosBegin.Y then
           begin
-            PosX:= Res.FPos.X;
+            PosX:= Res.PosBegin.X;
             SelX:= St.LinesLen[iLine];
           end
           else
           //attr in final line
-          if iLine=Res.FEnd.Y then
+          if iLine=Res.PosEnd.Y then
           begin
             PosX:= 0;
-            SelX:= Res.FEnd.X;
+            SelX:= Res.PosEnd.X;
           end
           else
           //attr on middle line
