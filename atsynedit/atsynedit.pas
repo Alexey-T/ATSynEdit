@@ -8587,7 +8587,7 @@ function TATSynEdit.GetAutoIndentString(APosX, APosY: integer; AUseIndentRegexRu
 var
   StrPrev, StrIndent: atString;
   NChars, NSpaces: integer;
-  MatchPos, MatchLen: integer;
+  MatchPos, MatchLen: SizeInt;
   bAddIndent: boolean;
 begin
   Result:= '';

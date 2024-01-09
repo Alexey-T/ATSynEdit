@@ -125,7 +125,7 @@ function SCaseTitle(const S, SNonWordChars: atString): atString;
 function SCaseInvert(const S: atString): atString;
 function SCaseSentence(const S, SNonWordChars: atString): atString;
 
-function StringOfCharW(ch: WideChar; Len: integer): UnicodeString;
+function StringOfCharW(ch: WideChar; Len: SizeInt): UnicodeString;
 
 {$Z1}
 type
@@ -164,16 +164,17 @@ type
     OnCalcTabSize: TATStringTabCalcEvent;
     OnCalcLineLen: TATStringGetLenEvent;
     constructor Create(ACharSizer: TATCharSizer);
-    function CalcTabulationSize(ALineIndex, APos: integer): integer;
+    function CalcTabulationSize(ALineIndex, APos: SizeInt): integer;
     function TabsToSpaces(ALineIndex: integer; const S: atString): atString;
-    function TabsToSpaces_Length(ALineIndex: integer; const S: atString; AMaxLen: integer): integer;
+    function TabsToSpaces_Length(ALineIndex: integer; const S: atString; AMaxLen: SizeInt): SizeInt;
     function SpacesToTabs(ALineIndex: integer; const S: atString): atString;
     function GetIndentExpanded(ALineIndex: integer; const S: atString): integer;
-    function CharPosToColumnPos(ALineIndex: integer; const S: atString; APos: integer): integer;
-    function ColumnPosToCharPos(ALineIndex: integer; const S: atString; AColumn: integer): integer;
+    function CharPosToColumnPos(ALineIndex: integer; const S: atString; APos: SizeInt): integer;
+    function ColumnPosToCharPos(ALineIndex: integer; const S: atString; AColumn: SizeInt): integer;
     function IndentUnindent(ALineIndex: integer; const Str: atString; ARight: boolean): atString;
-    procedure CalcCharOffsets(ALineIndex: integer; const S: atString; out AInfo: TATIntFixedArray; ACharsSkipped: integer = 0);
-    function CalcCharOffsetLast(ALineIndex: integer; const S: atString; ACharsSkipped: integer = 0): Int64;
+    procedure CalcCharOffsets(ALineIndex: integer; const S: atString;
+      out AInfo: TATIntFixedArray; ACharsSkipped: SizeInt=0);
+    function CalcCharOffsetLast(ALineIndex: integer; const S: atString; ACharsSkipped: SizeInt=0): Int64;
     function FindWordWrapOffset(ALineIndex: integer; const S: atString; AColumns: Int64;
       const ANonWordChars: atString; AWrapIndented: boolean): integer;
     function FindClickedPosition(ALineIndex: integer;
@@ -209,7 +210,7 @@ function IsCharSurrogateHigh(ch: widechar): boolean; inline;
 function IsCharSurrogateLow(ch: widechar): boolean; inline;
 
 function IsStringSpaces(const S: atString): boolean; inline;
-function IsStringSpaces(const S: atString; AFrom, ALen: integer): boolean;
+function IsStringSpaces(const S: atString; AFrom, ALen: SizeInt): boolean;
 
 function SBeginsWith(const S, SubStr: UnicodeString): boolean;
 function SBeginsWith(const S, SubStr: string): boolean;
@@ -226,11 +227,11 @@ function STrimAll(const S: UnicodeString): UnicodeString;
 function STrimLeft(const S: UnicodeString): UnicodeString;
 function STrimRight(const S: UnicodeString): UnicodeString;
 
-function SGetIndentChars(const S: string): integer;
-function SGetIndentChars(const S: atString): integer;
-function SGetIndentCharsToOpeningBracket(const S: atString): integer;
-function SGetTrailingSpaceChars(const S: atString): integer;
-function SGetNonSpaceLength(const S: atString): integer;
+function SGetIndentChars(const S: string): SizeInt;
+function SGetIndentChars(const S: atString): SizeInt;
+function SGetIndentCharsToOpeningBracket(const S: atString): SizeInt;
+function SGetTrailingSpaceChars(const S: atString): SizeInt;
+function SGetNonSpaceLength(const S: atString): SizeInt;
 
 function SStringHasEol(const S: atString): boolean; inline;
 function SStringHasEol(const S: string): boolean; inline;
@@ -255,14 +256,14 @@ procedure SDeleteFromEol(var S: string);
 procedure SDeleteFromEol(var S: UnicodeString);
 
 procedure SClipboardCopy(AText: string; AClipboardObj: TClipboard=nil);
-function SFindCharCount(const S: string; ch: char): integer;
-function SFindCharCount(const S: UnicodeString; ch: WideChar): integer;
-function SFindRegexMatch(const Subject, Regex: UnicodeString; out MatchPos, MatchLen: integer): boolean;
+function SFindCharCount(const S: string; ch: char): SizeInt;
+function SFindCharCount(const S: UnicodeString; ch: WideChar): SizeInt;
+function SFindRegexMatch(const Subject, Regex: UnicodeString; out MatchPos, MatchLen: SizeInt): boolean;
 function SFindRegexMatch(const Subject, Regex: UnicodeString; GroupIndex: integer; ModS, ModI, ModM: boolean): UnicodeString;
-function SCountTextOccurrences(const SubStr, Str: UnicodeString): integer;
-function SCountTextLines(const Str, StrBreak: UnicodeString): integer;
+function SCountTextOccurrences(const SubStr, Str: UnicodeString): SizeInt;
+function SCountTextLines(const Str, StrBreak: UnicodeString): SizeInt;
 procedure SSplitByChar(const S: string; Sep: char; out S1, S2: string);
-procedure SDeleteAndInsert(var AStr: UnicodeString; APos, ACount: integer; const AReplace: UnicodeString);
+procedure SDeleteAndInsert(var AStr: UnicodeString; APos, ACount: SizeInt; const AReplace: UnicodeString);
 
 
 implementation
@@ -413,7 +414,7 @@ end;
 
 function IsStringSpaces(const S: atString): boolean;
 var
-  i: integer;
+  i: SizeInt;
 begin
   for i:= 1 to Length(S) do
     if not IsCharSpace(S[i]) then
@@ -421,9 +422,9 @@ begin
   Result:= true;
 end;
 
-function IsStringSpaces(const S: atString; AFrom, ALen: integer): boolean;
+function IsStringSpaces(const S: atString; AFrom, ALen: SizeInt): boolean;
 var
-  i: integer;
+  i: SizeInt;
 begin
   for i:= AFrom to Min(AFrom+ALen-1, Length(S)) do
     if not IsCharSpace(S[i]) then
@@ -434,7 +435,7 @@ end;
 {
 function SStringHasUnicodeChars(const S: atString): boolean;
 var
-  i, N: integer;
+  i, N: SizeInt;
 begin
   for i:= 1 to Length(S) do
   begin
@@ -515,7 +516,7 @@ function TATStringTabHelper.FindWordWrapOffset(ALineIndex: integer; const S: atS
   end;
   //
 var
-  N, NMin, NAvg: integer;
+  N, NMin, NAvg: SizeInt;
   Offsets: TATIntFixedArray;
   ch, ch_next: widechar;
 begin
@@ -559,23 +560,23 @@ begin
     Result:= NAvg;
 end;
 
-function SGetIndentChars(const S: string): integer;
+function SGetIndentChars(const S: string): SizeInt;
 begin
   Result:= 0;
   while (Result<Length(S)) and IsCharSpace(S[Result+1]) do
     Inc(Result);
 end;
 
-function SGetIndentChars(const S: atString): integer;
+function SGetIndentChars(const S: atString): SizeInt;
 begin
   Result:= 0;
   while (Result<Length(S)) and IsCharSpace(S[Result+1]) do
     Inc(Result);
 end;
 
-function SGetTrailingSpaceChars(const S: atString): integer;
+function SGetTrailingSpaceChars(const S: atString): SizeInt;
 var
-  N: integer;
+  N: SizeInt;
 begin
   Result:= 0;
   N:= Length(S);
@@ -587,9 +588,9 @@ begin
 end;
 
 
-function SGetIndentCharsToOpeningBracket(const S: atString): integer;
+function SGetIndentCharsToOpeningBracket(const S: atString): SizeInt;
 var
-  n: integer;
+  n: SizeInt;
 begin
   Result:= 0;
   n:= Length(S);
@@ -601,7 +602,7 @@ begin
       Result:= n;
 end;
 
-function SGetNonSpaceLength(const S: atString): integer;
+function SGetNonSpaceLength(const S: atString): SizeInt;
 begin
   Result:= Length(S);
   while (Result>0) and IsCharSpace(S[Result]) do Dec(Result);
@@ -611,7 +612,7 @@ end;
 
 procedure SSwapEndianWide(var S: UnicodeString);
 var
-  i: integer;
+  i: SizeInt;
   P: PWord;
 begin
   if S='' then exit;
@@ -625,7 +626,7 @@ end;
 
 procedure SSwapEndianUCS4(var S: UCS4String);
 var
-  i: integer;
+  i: SizeInt;
 begin
   for i:= 0 to Length(S)-1 do
     S[i]:= SwapEndian(S[i]);
@@ -637,7 +638,7 @@ begin
   CharSizer:= ACharSizer;
 end;
 
-function TATStringTabHelper.CalcTabulationSize(ALineIndex, APos: integer): integer;
+function TATStringTabHelper.CalcTabulationSize(ALineIndex, APos: SizeInt): integer;
 begin
   if Assigned(OnCalcTabSize) then
     Result:= OnCalcTabSize(SenderObj, ALineIndex, APos)
@@ -655,7 +656,7 @@ end;
 function TATStringTabHelper.GetIndentExpanded(ALineIndex: integer; const S: atString): integer;
 var
   ch: widechar;
-  i: integer;
+  i: SizeInt;
 begin
   Result:= 0;
   for i:= 1 to Length(S) do
@@ -672,7 +673,7 @@ end;
 
 function TATStringTabHelper.TabsToSpaces(ALineIndex: integer; const S: atString): atString;
 var
-  N, NSize: integer;
+  N, NSize: SizeInt;
 begin
   Result:= S;
   N:= 0;
@@ -691,9 +692,9 @@ begin
 end;
 
 function TATStringTabHelper.TabsToSpaces_Length(ALineIndex: integer; const S: atString;
-  AMaxLen: integer): integer;
+  AMaxLen: SizeInt): SizeInt;
 var
-  i: integer;
+  i: SizeInt;
 begin
   Result:= 0;
   if AMaxLen<0 then
@@ -707,12 +708,12 @@ end;
 
 
 procedure TATStringTabHelper.CalcCharOffsets(ALineIndex: integer; const S: atString;
-  out AInfo: TATIntFixedArray; ACharsSkipped: integer=0);
+  out AInfo: TATIntFixedArray; ACharsSkipped: SizeInt=0);
 var
-  NLen, NSize, NTabSize, NCharsSkipped: integer;
-  NScalePercents: integer;
+  NLen, NSize, NTabSize, NCharsSkipped: SizeInt;
+  NScalePercents: SizeInt;
   ch: widechar;
-  i: integer;
+  i: SizeInt;
 begin
   AInfo:= Default(TATIntFixedArray);
   NLen:= Min(Length(S), cMaxFixedArray);
@@ -758,12 +759,12 @@ begin
 end;
 
 function TATStringTabHelper.CalcCharOffsetLast(ALineIndex: integer; const S: atString;
-  ACharsSkipped: integer=0): Int64;
+  ACharsSkipped: SizeInt=0): Int64;
 var
-  NLen, NSize, NTabSize, NCharsSkipped: integer;
-  NScalePercents: integer;
+  NLen, NSize, NTabSize, NCharsSkipped: SizeInt;
+  NScalePercents: SizeInt;
   ch: WideChar;
-  i: integer;
+  i: SizeInt;
 begin
   Result:= 0;
   NLen:= Length(S);
@@ -813,7 +814,7 @@ function TATStringTabHelper.FindClickedPosition(ALineIndex: integer;
   AAllowVirtualPos: boolean;
   out AEndOfLinePos: boolean): Int64;
 var
-  i: integer;
+  i: SizeInt;
 begin
   AEndOfLinePos:= false;
 
@@ -893,7 +894,7 @@ end;
 
 function SGetItem(var S: string; const ch: Char = ','): string;
 var
-  i: integer;
+  i: SizeInt;
 begin
   i:= Pos(ch, S);
   if i=0 then
@@ -936,7 +937,7 @@ begin
 end;
 
 function TATStringTabHelper.CharPosToColumnPos(ALineIndex: integer; const S: atString;
-  APos: integer): integer;
+  APos: SizeInt): integer;
 begin
   if APos>Length(S) then
     Result:= TabsToSpaces_Length(ALineIndex, S, -1) + APos-Length(S)
@@ -945,9 +946,9 @@ begin
 end;
 
 function TATStringTabHelper.ColumnPosToCharPos(ALineIndex: integer; const S: atString;
-  AColumn: integer): integer;
+  AColumn: SizeInt): integer;
 var
-  size, i: integer;
+  size, i: SizeInt;
 begin
   if AColumn=0 then exit(AColumn);
   if not SStringHasTab(S) then exit(AColumn);
@@ -981,7 +982,7 @@ end;
 (*
 function SStringHasAsciiAndNoTabs(const S: atString): boolean;
 var
-  code, i: integer;
+  code, i: SizeInt;
 begin
   for i:= 1 to Length(S) do
   begin
@@ -994,7 +995,7 @@ end;
 
 function SStringHasAsciiAndNoTabs(const S: string): boolean;
 var
-  code, i: integer;
+  code, i: SizeInt;
 begin
   for i:= 1 to Length(S) do
   begin
@@ -1010,7 +1011,7 @@ function TATStringTabHelper.IndentUnindent(ALineIndex: integer; const Str: atStr
   ARight: boolean): atString;
 var
   StrIndent, StrText: atString;
-  DecSpaces, N: integer;
+  DecSpaces, N: SizeInt;
   DoTabs: boolean;
 begin
   Result:= Str;
@@ -1060,7 +1061,7 @@ end;
 
 function SRemoveNewlineChars(const S: atString): atString;
 var
-  i: integer;
+  i: SizeInt;
 begin
   Result:= S;
   for i:= 1 to Length(Result) do
@@ -1104,7 +1105,7 @@ end;
 
 function SBeginsWith(const S, SubStr: UnicodeString): boolean;
 var
-  i: integer;
+  i: SizeInt;
 begin
   Result:= false;
   if S='' then exit;
@@ -1117,7 +1118,7 @@ end;
 
 function SBeginsWith(const S, SubStr: string): boolean;
 var
-  i: integer;
+  i: SizeInt;
 begin
   Result:= false;
   if S='' then exit;
@@ -1130,7 +1131,7 @@ end;
 
 function SEndsWith(const S, SubStr: UnicodeString): boolean;
 var
-  i, Offset: integer;
+  i, Offset: SizeInt;
 begin
   Result:= false;
   if S='' then exit;
@@ -1144,7 +1145,7 @@ end;
 
 function SEndsWith(const S, SubStr: string): boolean;
 var
-  i, Offset: integer;
+  i, Offset: SizeInt;
 begin
   Result:= false;
   if S='' then exit;
@@ -1199,7 +1200,7 @@ end;
 
 function SCaseTitle(const S, SNonWordChars: atString): atString;
 var
-  i: integer;
+  i: SizeInt;
 begin
   Result:= S;
   for i:= 1 to Length(Result) do
@@ -1212,7 +1213,7 @@ end;
 function SCaseInvert(const S: atString): atString;
 var
   ch, ch_up: WideChar;
-  i: integer;
+  i: SizeInt;
 begin
   Result:= S;
   for i:= 1 to Length(Result) do
@@ -1230,7 +1231,7 @@ function SCaseSentence(const S, SNonWordChars: atString): atString;
 var
   dot: boolean;
   ch: WideChar;
-  i: Integer;
+  i: SizeInt;
 begin
   Result:= S;
   dot:= True;
@@ -1251,9 +1252,9 @@ begin
   end;
 end;
 
-function StringOfCharW(ch: WideChar; Len: integer): UnicodeString;
+function StringOfCharW(ch: WideChar; Len: SizeInt): UnicodeString;
 var
-  i: integer;
+  i: SizeInt;
 begin
   SetLength(Result{%H-}, Len);
   for i:= 1 to Len do
@@ -1268,7 +1269,7 @@ end;
 
 procedure SDeleteFrom(var s: string; const SFrom: string);
 var
-  n: integer;
+  n: SizeInt;
 begin
   n:= Pos(SFrom, S);
   if n>0 then
@@ -1277,7 +1278,7 @@ end;
 
 procedure SDeleteFrom(var s: UnicodeString; const SFrom: UnicodeString);
 var
-  n: integer;
+  n: SizeInt;
 begin
   n:= Pos(SFrom, S);
   if n>0 then
@@ -1286,7 +1287,7 @@ end;
 
 procedure SDeleteFromEol(var S: string);
 var
-  i: integer;
+  i: SizeInt;
   ch: char;
 begin
   for i:= 1 to Length(S) do
@@ -1302,7 +1303,7 @@ end;
 
 procedure SDeleteFromEol(var S: UnicodeString);
 var
-  i: integer;
+  i: SizeInt;
   ch: WideChar;
 begin
   for i:= 1 to Length(S) do
@@ -1348,9 +1349,9 @@ begin
 end;
 
 
-function SFindCharCount(const S: string; ch: char): integer;
+function SFindCharCount(const S: string; ch: char): SizeInt;
 var
-  i: integer;
+  i: SizeInt;
 begin
   Result:= 0;
   for i:= 1 to Length(S) do
@@ -1358,9 +1359,9 @@ begin
       Inc(Result);
 end;
 
-function SFindCharCount(const S: UnicodeString; ch: WideChar): integer;
+function SFindCharCount(const S: UnicodeString; ch: WideChar): SizeInt;
 var
-  i: integer;
+  i: SizeInt;
 begin
   Result:= 0;
   for i:= 1 to Length(S) do
@@ -1369,7 +1370,7 @@ begin
 end;
 
 
-function SFindRegexMatch(const Subject, Regex: UnicodeString; out MatchPos, MatchLen: integer): boolean;
+function SFindRegexMatch(const Subject, Regex: UnicodeString; out MatchPos, MatchLen: SizeInt): boolean;
 var
   Obj: TRegExpr;
 begin
@@ -1414,9 +1415,9 @@ begin
 end;
 
 
-function SCountTextOccurrences(const SubStr, Str: UnicodeString): integer;
+function SCountTextOccurrences(const SubStr, Str: UnicodeString): SizeInt;
 var
-  Offset: integer;
+  Offset: SizeInt;
 begin
   Result:= 0;
   if (Str='') or (SubStr='') then exit;
@@ -1428,7 +1429,7 @@ begin
   end;
 end;
 
-function SCountTextLines(const Str, StrBreak: UnicodeString): integer;
+function SCountTextLines(const Str, StrBreak: UnicodeString): SizeInt;
 begin
   Result:= SCountTextOccurrences(StrBreak, Str)+1;
   // ignore trailing EOL
@@ -1439,7 +1440,7 @@ end;
 
 procedure SSplitByChar(const S: string; Sep: char; out S1, S2: string);
 var
-  N: integer;
+  N: SizeInt;
 begin
   N:= Pos(Sep, S);
   if N=0 then
@@ -1456,7 +1457,7 @@ end;
 
 function IsStringWithUnicode(const S: string): boolean;
 var
-  i: integer;
+  i: SizeInt;
 begin
   for i:= 1 to Length(S) do
     if Ord(S[i])>=128 then
@@ -1466,7 +1467,7 @@ end;
 
 function IsStringWithUnicode(const S: UnicodeString): boolean;
 var
-  i: integer;
+  i: SizeInt;
 begin
   for i:= 1 to Length(S) do
     if Ord(S[i])>=128 then
@@ -1489,9 +1490,9 @@ begin
 end;
 
 
-procedure SDeleteAndInsert(var AStr: UnicodeString; APos, ACount: integer; const AReplace: UnicodeString);
+procedure SDeleteAndInsert(var AStr: UnicodeString; APos, ACount: SizeInt; const AReplace: UnicodeString);
 var
-  NLenRepl: integer;
+  NLenRepl: SizeInt;
 begin
   if AReplace='' then
   begin
