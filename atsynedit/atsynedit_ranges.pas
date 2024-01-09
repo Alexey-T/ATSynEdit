@@ -829,15 +829,24 @@ end;
 procedure TATSynRanges.Merge(AX, AY, AX2, AY2: integer; const AHint: string; const ATag: Int64);
 //try to find old fold-range for the AY line;
 //if found, update the range (don't change it's Folded state) without inserting new one
+const
+  //how many chars to compare in old_hint and new_hint
+  cMaxLenCompare = 20;
 var
   Item: PATSynRange;
-  NIndex: integer;
+  NIndex, NLenOld, NLenNew: integer;
+  bSameHint: boolean;
 begin
   NIndex:= FindRangeWithPlusAtLine(AY, true);
   if NIndex>=0 then
   begin
     Item:= ItemPtr(NIndex);
-    if (Item^.Y=AY) and (Item^.Hint=AHint) then
+
+    NLenOld:= Min(cMaxLenCompare, Length(Item^.Hint));
+    NLenNew:= Min(cMaxLenCompare, Length(AHint));
+    bSameHint:= (NLenOld=NLenNew) and (StrLComp(@Item^.Hint[1], PChar(AHint), NLenOld)=0);
+
+    if (Item^.Y=AY) and bSameHint then
     begin
       Item^.X2:= AX2;
       Item^.Y2:= AY2;
