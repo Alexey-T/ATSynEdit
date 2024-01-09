@@ -1219,6 +1219,10 @@ begin
   Result:= 0;
   St:= Editor.Strings;
 
+  //first, we collect positions of all matches to L,
+  //then we do the loop over L and replace all matches there;
+  //it allows to correctly consider 'in selection' option
+
   L:= TATFinderResults.Create;
   try
     if OptRegex then
