@@ -20,13 +20,13 @@ type
   PATSynRange = ^TATSynRange;
   TATSynRange = packed record
     Tag: Int64;
-    Hint: string[95];
     X: integer; //start column
     Y: integer; //start line
     X2: integer; //ending column
     Y2: integer; //ending line, which is fully folded (can't partially fold)
     Folded: boolean;
     Staple: boolean;
+    Hint: string[95];
     procedure Init(AX, AY, AX2, AY2: integer; AStaple: boolean; const AHint: string; const ATag: Int64);
     function IsSimple: boolean;
     function IsLineInside(ALine: integer): boolean;
