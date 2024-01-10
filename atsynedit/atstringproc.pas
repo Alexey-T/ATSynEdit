@@ -1490,33 +1490,6 @@ begin
 end;
 
 
-procedure SDeleteAndInsert_Old(var AStr: UnicodeString; AFromPos, ACount: SizeInt; const AReplace: UnicodeString);
-var
-  NLenRepl: SizeInt;
-  SDummy: UnicodeString;
-begin
-  if AReplace='' then
-  begin
-    Delete(AStr, AFromPos, ACount);
-    exit;
-  end;
-
-  NLenRepl:= Length(AReplace);
-  AFromPos:= Min(AFromPos, Length(AStr)+1);
-  ACount:= Min(ACount, Length(AStr)+1-AFromPos);
-
-  if NLenRepl>ACount then
-  begin
-    SetLength(SDummy, NLenRepl-ACount); //content is ignored
-    Insert(SDummy, AStr, AFromPos+ACount)
-  end
-  else
-  if NLenRepl<ACount then
-    Delete(AStr, AFromPos, ACount-NLenRepl);
-
-  Move(AReplace[1], AStr[AFromPos], NLenRepl*SizeOf(WideChar));
-end;
-
 //from https://forum.lazarus.freepascal.org/index.php?topic=65813.0
 procedure SDeleteAndInsert(var AStr: UnicodeString; AFromPos, ACount: SizeInt;
   const AReplace: UnicodeString);
