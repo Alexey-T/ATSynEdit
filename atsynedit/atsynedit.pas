@@ -1070,7 +1070,7 @@ type
     procedure ClearSelRectPoints;
     procedure ClearMouseDownVariables;
     procedure DebugSelRect;
-    function DoCalcLineLen(ALineIndex: integer): integer;
+    function DoCalcLineLen(ALineIndex: SizeInt): SizeInt;
     procedure DoChangeBookmarks;
     procedure DoHandleWheelRecord(const ARec: TATEditorWheelRecord);
     procedure DoStringsOnUnfoldLine(Sender: TObject; ALine: SizeInt);
@@ -10444,7 +10444,7 @@ begin
   Result:= FAttribs;
 end;
 
-function TATSynEdit.DoCalcLineLen(ALineIndex: integer): integer;
+function TATSynEdit.DoCalcLineLen(ALineIndex: SizeInt): SizeInt;
 begin
   Result:= Strings.LinesLen[ALineIndex];
 end;

@@ -99,13 +99,13 @@ type
   //must be with Int64 items, 32-bit is not enough for single line with len>40M
   TATIntFixedArray = record
     Data: packed array[0..cMaxFixedArray-1] of Int64;
-    Len: integer;
+    Len: SizeInt;
   end;
 
-  //must be with 'longint' items, it's for Dx offsets for rendering
+  //must be with Longint items, it's for Dx offsets for rendering
   TATInt32FixedArray = record
     Data: packed array[0..cMaxFixedArray-1] of Longint;
-    Len: integer;
+    Len: SizeInt;
   end;
 
 type
@@ -141,8 +141,8 @@ const
   BoolToPlusMinusOne: array[boolean] of integer = (-1, 1);
 
 type
-  TATStringTabCalcEvent = function(Sender: TObject; ALineIndex, ACharIndex: integer): integer of object;
-  TATStringGetLenEvent = function(ALineIndex: integer): integer of object;
+  TATStringTabCalcEvent = function(Sender: TObject; ALineIndex, ACharIndex: SizeInt): SizeInt of object;
+  TATStringGetLenEvent = function(ALineIndex: SizeInt): SizeInt of object;
 
 type
 
