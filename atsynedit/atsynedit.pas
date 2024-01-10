@@ -1460,6 +1460,7 @@ type
     function DoCommand_SelectSplitToLines: TATCommandResults;
     function DoCommand_SelectExtendByLine(AUp: boolean): TATCommandResults;
     function DoCommand_Cancel(AKeepLastCaret, AKeepSelection: boolean): TATCommandResults;
+    function DoCommand_CancelKeepFirstVisible: TATCommandResults;
     function DoCommand_ToggleReadOnly: TATCommandResults;
     function DoCommand_ToggleOverwrite: TATCommandResults;
     function DoCommand_ToggleWordWrap(AltOrder: boolean): TATCommandResults;

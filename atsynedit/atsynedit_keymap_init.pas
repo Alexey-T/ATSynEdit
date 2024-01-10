@@ -123,6 +123,8 @@ begin
   M.Add(cCommand_CancelKeepSel, 'selection: cancel carets, but keep first caret/selection', [], []);
   M.Add(cCommand_CancelKeepLast, 'selection: cancel carets, but keep last caret', [], []);
   M.Add(cCommand_CancelKeepLastAndSel, 'selection: cancel carets, but keep last caret/selection', [], []);
+  M.Add(cCommand_CancelKeepFirstVisible, 'selection: cancel carets, but keep first visible caret', [], []);
+
   M.Add(cCommand_RemoveFirstCaret, 'selection: remove first caret', [], []);
   M.Add(cCommand_RemoveLastCaret, 'selection: remove last caret', [], []);
 

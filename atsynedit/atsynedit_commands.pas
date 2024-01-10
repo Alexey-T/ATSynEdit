@@ -235,6 +235,7 @@ const
   cCommand_FoldingFoldSelection = 1043;
   cCommand_FoldingSelectRangeAtCaret = 1045;
 
+  cCommand_CancelKeepFirstVisible = 1997;
   cCommand_CancelKeepSel = 1998;
   cCommand_CancelKeepLast = 1999;
   cCommand_CancelKeepLastAndSel = 2000;

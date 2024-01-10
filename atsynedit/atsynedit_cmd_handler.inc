@@ -668,6 +668,7 @@ begin
     cCommand_CancelKeepSel:            Result:= DoCommand_Cancel(false, true);
     cCommand_CancelKeepLast:           Result:= DoCommand_Cancel(true, false);
     cCommand_CancelKeepLastAndSel:     Result:= DoCommand_Cancel(true, true);
+    cCommand_CancelKeepFirstVisible:   Result:= DoCommand_CancelKeepFirstVisible;
 
     cCommand_CaretsExtendUpLine:       Result:= DoCommand_CaretsExtend(false, 1);
     cCommand_CaretsExtendUpPage:       Result:= DoCommand_CaretsExtend(false, GetPageLines);

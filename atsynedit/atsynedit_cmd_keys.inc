@@ -619,3 +619,26 @@ begin
 end;
 
 
+function TATSynEdit.DoCommand_CancelKeepFirstVisible: TATCommandResults;
+var
+  Caret: TATCaretItem;
+  i: integer;
+begin
+  Result:= [];
+  if Carets.Count<=1 then exit;
+
+  for i:= 0 to Carets.Count-1 do
+  begin
+    Caret:= Carets[i];
+    if IsPosInVisibleArea(Caret.PosX, Caret.PosY) then
+    begin
+      DoCaretSingle(Caret.PosX, Caret.PosY);
+      Result:= [TATCommandResult.CaretTop];
+      exit;
+    end;
+  end;
+
+  //no caret visible on screen? do usual 'Cancel'
+  Result:= DoCommand_Cancel(false, false);
+end;
+
