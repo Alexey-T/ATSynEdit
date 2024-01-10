@@ -263,7 +263,7 @@ function SFindRegexMatch(const Subject, Regex: UnicodeString; GroupIndex: intege
 function SCountTextOccurrences(const SubStr, Str: UnicodeString): SizeInt;
 function SCountTextLines(const Str, StrBreak: UnicodeString): SizeInt;
 procedure SSplitByChar(const S: string; Sep: char; out S1, S2: string);
-procedure SDeleteAndInsert(var AStr: UnicodeString; APos, ACount: SizeInt; const AReplace: UnicodeString);
+procedure SDeleteAndInsert(var AStr: UnicodeString; AFromPos, ACount: SizeInt; const AReplace: UnicodeString);
 
 
 implementation
@@ -1490,31 +1490,70 @@ begin
 end;
 
 
-procedure SDeleteAndInsert(var AStr: UnicodeString; APos, ACount: SizeInt; const AReplace: UnicodeString);
+procedure SDeleteAndInsert_Old(var AStr: UnicodeString; AFromPos, ACount: SizeInt; const AReplace: UnicodeString);
 var
   NLenRepl: SizeInt;
   SDummy: UnicodeString;
 begin
   if AReplace='' then
   begin
-    Delete(AStr, APos, ACount);
+    Delete(AStr, AFromPos, ACount);
     exit;
   end;
 
   NLenRepl:= Length(AReplace);
-  APos:= Min(APos, Length(AStr)+1);
-  ACount:= Min(ACount, Length(AStr)-APos+1);
+  AFromPos:= Min(AFromPos, Length(AStr)+1);
+  ACount:= Min(ACount, Length(AStr)+1-AFromPos);
 
   if NLenRepl>ACount then
   begin
     SetLength(SDummy, NLenRepl-ACount); //content is ignored
-    Insert(SDummy, AStr, APos+ACount)
+    Insert(SDummy, AStr, AFromPos+ACount)
   end
   else
   if NLenRepl<ACount then
-    Delete(AStr, APos, ACount-NLenRepl);
+    Delete(AStr, AFromPos, ACount-NLenRepl);
 
-  Move(AReplace[1], AStr[APos], NLenRepl*SizeOf(WideChar));
+  Move(AReplace[1], AStr[AFromPos], NLenRepl*SizeOf(WideChar));
+end;
+
+//from https://forum.lazarus.freepascal.org/index.php?topic=65813.0
+procedure SDeleteAndInsert(var AStr: UnicodeString; AFromPos, ACount: SizeInt;
+  const AReplace: UnicodeString);
+var
+  NStrLen: SizeInt;
+  NReplaceLen: SizeInt;
+  GrowCount: SizeInt;
+  MoveSize: SizeInt;
+  AfterPos: SizeInt;
+begin
+  NStrLen := Length(AStr);
+  if NStrLen = 0 then
+  begin
+    AStr := AReplace;
+    UniqueString(AStr);
+    Exit;
+  end;
+  NReplaceLen := Length(AReplace);
+  if NReplaceLen = 0 then
+  begin
+    Delete(AStr, AFromPos, ACount);
+    Exit;
+  end;
+  AFromPos := Min(AFromPos, NStrLen + 1);
+  ACount := Min(ACount, NStrLen + 1 - AFromPos);
+  AfterPos := AFromPos + ACount;
+  // Was: AStr[1]..AStr[AFromPos]..AStr[AfterPos]..AStr[NStrLen]
+  // New: AStr[1]..AReplace..AStr[NStrLen]
+  MoveSize := (NStrLen + 1 - AfterPos) * SizeOf(UnicodeChar);
+  GrowCount := NReplaceLen - ACount;
+  if GrowCount > 0 then  // Need grow
+    SetLength(AStr, NStrLen + GrowCount);
+  if MoveSize > 0 then
+    Move(AStr[AfterPos], AStr[AFromPos + NReplaceLen], MoveSize);
+  Move(AReplace[1], AStr[AFromPos], NReplaceLen * SizeOf(UnicodeChar));
+  if GrowCount < 0 then  // Need shrink
+    SetLength(AStr, NStrLen + GrowCount);
 end;
 
 
