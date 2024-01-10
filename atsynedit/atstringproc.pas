@@ -1521,39 +1521,39 @@ end;
 procedure SDeleteAndInsert(var AStr: UnicodeString; AFromPos, ACount: SizeInt;
   const AReplace: UnicodeString);
 var
-  NStrLen: SizeInt;
-  NReplaceLen: SizeInt;
+  LenStr: SizeInt;
+  LenReplace: SizeInt;
   GrowCount: SizeInt;
   MoveSize: SizeInt;
   AfterPos: SizeInt;
 begin
-  NStrLen := Length(AStr);
-  if NStrLen = 0 then
+  LenStr := Length(AStr);
+  if LenStr = 0 then
   begin
     AStr := AReplace;
     UniqueString(AStr);
     Exit;
   end;
-  NReplaceLen := Length(AReplace);
-  if NReplaceLen = 0 then
+  LenReplace := Length(AReplace);
+  if LenReplace = 0 then
   begin
     Delete(AStr, AFromPos, ACount);
     Exit;
   end;
-  AFromPos := Min(AFromPos, NStrLen + 1);
-  ACount := Min(ACount, NStrLen + 1 - AFromPos);
+  AFromPos := Min(AFromPos, LenStr + 1);
+  ACount := Min(ACount, LenStr + 1 - AFromPos);
   AfterPos := AFromPos + ACount;
-  // Was: AStr[1]..AStr[AFromPos]..AStr[AfterPos]..AStr[NStrLen]
-  // New: AStr[1]..AReplace..AStr[NStrLen]
-  MoveSize := (NStrLen + 1 - AfterPos) * SizeOf(UnicodeChar);
-  GrowCount := NReplaceLen - ACount;
+  // Was: AStr[1]..AStr[AFromPos]..AStr[AfterPos]..AStr[LenStr]
+  // New: AStr[1]..AReplace..AStr[LenStr]
+  MoveSize := (LenStr + 1 - AfterPos) * SizeOf(UnicodeChar);
+  GrowCount := LenReplace - ACount;
   if GrowCount > 0 then  // Need grow
-    SetLength(AStr, NStrLen + GrowCount);
+    SetLength(AStr, LenStr + GrowCount);
   if MoveSize > 0 then
-    Move(AStr[AfterPos], AStr[AFromPos + NReplaceLen], MoveSize);
-  Move(AReplace[1], AStr[AFromPos], NReplaceLen * SizeOf(UnicodeChar));
+    Move(AStr[AfterPos], AStr[AFromPos + LenReplace], MoveSize);
+  Move(AReplace[1], AStr[AFromPos], LenReplace * SizeOf(UnicodeChar));
   if GrowCount < 0 then  // Need shrink
-    SetLength(AStr, NStrLen + GrowCount);
+    SetLength(AStr, LenStr + GrowCount);
 end;
 
 
