@@ -45,6 +45,8 @@ type
   { TATFoldRanges }
 
   TATFoldRanges = class
+  private const
+    MaxCount = $FFFF-4;
   private
     FList: TATFoldRangeList;
     FListPersist: TATFoldRangeList; //for BackupPersistentRanges/RestorePersistentRanges
@@ -238,6 +240,8 @@ function TATFoldRanges.Add(AX, AY, AX2, AY2: integer; AWithStaple: boolean;
 var
   NIndex: integer;
 begin
+  if Count>=MaxCount then exit;
+
   Result.Init(AX, AY, AX2, AY2, AWithStaple, AHint, ATag);
   NIndex:= FList.Add(Result);
 
@@ -257,6 +261,8 @@ var
   Item: PATFoldRange;
   i: integer;
 begin
+  if Count>=MaxCount then exit;
+
   AItemIndex:= -1;
   Result.Init(AX, AY, AX2, AY2, AWithStaple, AHint, ATag);
 
@@ -315,6 +321,8 @@ function TATFoldRanges.Insert(AIndex: integer; AX, AY, AX2, AY2: integer;
   const AHint: string;
   const ATag: Int64=0): TATFoldRange;
 begin
+  if Count>=MaxCount then exit;
+
   Result.Init(AX, AY, AX2, AY2, AWithStaple, AHint, ATag);
   FList.Insert(AIndex, Result);
 
@@ -844,6 +852,8 @@ var
   Item: PATFoldRange;
   NIndex: integer;
 begin
+  if Count>=MaxCount then exit;
+
   NIndex:= FindRangeWithPlusAtLine(AY, true);
   if NIndex>=0 then
   begin
