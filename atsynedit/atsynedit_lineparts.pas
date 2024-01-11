@@ -49,7 +49,7 @@ type
   PATLineParts = ^TATLineParts;
 
 procedure DoPartFind(var P: TATLineParts; APos: integer; out AIndex, AOffsetLeft: integer);
-function DoPartInsert(var AParts: TATLineParts; var APart: TATLinePart; AKeepFontStyles: boolean): boolean;
+function DoPartInsert(var AParts: TATLineParts; var APart: TATLinePart; AKeepFontStyles, AMainText: boolean): boolean;
 procedure DoPartSetColorBG(var P: TATLineParts; AColor: TColor; AForceColor: boolean);
 
 function DoPartsGetCount(var P: TATLineParts): integer;
@@ -180,19 +180,22 @@ end;
 
 
 var
-  ResultParts: TATLineParts; //size is huge, so not local var
+  //size is huge, so it's global var
+  //local var decreases paint speed by ~5 msec per paint
+  //boolean index is to avoid conflict between main thread / minimap thread; use AMainText here
+  ResultParts: array[boolean] of TATLineParts;
 
 function DoPartInsert(var AParts: TATLineParts; var APart: TATLinePart;
-  AKeepFontStyles: boolean): boolean;
+  AKeepFontStyles, AMainText: boolean): boolean;
 var
   ResultPartIndex: integer;
   //
   procedure AddPart(constref P: TATLinePart); inline;
   begin
     if P.Len>0 then
-      if ResultPartIndex<High(ResultParts) then
+      if ResultPartIndex<High(TATLineParts) then
       begin
-        Move(P, ResultParts[ResultPartIndex], SizeOf(P));
+        Move(P, ResultParts[AMainText][ResultPartIndex], SizeOf(P));
         Inc(ResultPartIndex);
       end;
   end;
@@ -276,7 +279,7 @@ begin
     newOffset2:= Offset+nOffset2;
   end;
 
-  FillChar(ResultParts, SizeOf(ResultParts), 0);
+  FillChar(ResultParts[AMainText], SizeOf(TATLineParts), 0);
   ResultPartIndex:= 0;
 
   //add parts before selection
@@ -329,7 +332,7 @@ begin
     AddPart(AParts[i]);
   end;
 
-  Move(ResultParts, AParts, SizeOf(AParts));
+  Move(ResultParts[AMainText], AParts, SizeOf(TATLineParts));
   Result:= true;
 end;
 

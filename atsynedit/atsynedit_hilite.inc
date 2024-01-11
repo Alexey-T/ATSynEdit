@@ -92,7 +92,7 @@ begin
   //first add Attribs,
   //selection must be over attribs
   if AMainText then
-    DoPartCalc_ApplyAttribsOver(AParts, nMaxOffset, nLineIndex, nCharIndex-1, AColorBG);
+    DoPartCalc_ApplyAttribsOver(AParts, nMaxOffset, nLineIndex, nCharIndex-1, AColorBG, AMainText);
 
   //_CreateNew makes parts for selection and fills empty AParts with these parts.
   //_ApplySelectionOver makes parts for selection and inserts these one-by-one over ready AParts
@@ -102,7 +102,7 @@ begin
   if (AParts[0].Len>0) then
   begin
     if AWithSelection and TempSel_IsLineWithSelection(nLineIndex) then
-      DoPartCalc_ApplySelectionOver(AParts, nMaxOffset, nLineIndex, nCharIndex-1);
+      DoPartCalc_ApplySelectionOver(AParts, nMaxOffset, nLineIndex, nCharIndex-1, AMainText);
   end
   else
   begin
@@ -222,7 +222,7 @@ end;
 
 
 procedure TATSynEdit.DoPartCalc_ApplySelectionOver(var AParts: TATLineParts; AOffsetMax,
-  ALineIndex, ACharIndex: integer);
+  ALineIndex, ACharIndex: integer; AMainText: boolean);
 var
   bSel, bSelPrev: boolean;
   Part: TATLinePart;
@@ -256,7 +256,7 @@ begin
   //- partly selected parts, save them to FPartsSel,
   //  and do slow loop (by offsets) over them.
 
-  FillChar(FPartsSel, SizeOf(TATLineParts), 0);
+  FillChar(FPartsSel[AMainText], SizeOf(TATLineParts), 0);
   iPart:= 0;
 
   for i:= Low(AParts) to High(AParts) do
@@ -273,8 +273,8 @@ begin
         end;
       TATRangeSelection.PartlySelected:
         begin
-          FPartsSel[iPart].Offset:= AParts[i].Offset;
-          FPartsSel[iPart].Len:= AParts[i].Len;
+          FPartsSel[AMainText][iPart].Offset:= AParts[i].Offset;
+          FPartsSel[AMainText][iPart].Len:= AParts[i].Len;
           Inc(iPart);
         end;
     end;
@@ -282,7 +282,7 @@ begin
 
   for iPart:= Low(AParts) to High(AParts) do
   begin
-    PartOther:= @FPartsSel[iPart];
+    PartOther:= @FPartsSel[AMainText][iPart];
     if PartOther^.Len=0 then Break;
 
     bSel:= false;
@@ -295,7 +295,7 @@ begin
 
       if bSel and (i=AOffsetMax) then
       begin
-        DoPartInsert(AParts, Part, true);
+        DoPartInsert(AParts, Part, true, AMainText);
         Break
       end;
 
@@ -310,13 +310,13 @@ begin
       else
       if bSelPrev and not bSel then
       begin
-        DoPartInsert(AParts, Part, true);
+        DoPartInsert(AParts, Part, true, AMainText);
       end;
       bSelPrev:= bSel;
     end;
 
     if bSelPrev then
-      DoPartInsert(AParts, Part, true);
+      DoPartInsert(AParts, Part, true, AMainText);
   end;
 
   //DoPartsShow(AParts); ////debug
@@ -380,7 +380,7 @@ end;
 
 
 procedure TATSynEdit.DoPartCalc_ApplyAttribsOver(var AParts: TATLineParts;
-  AOffsetMax, ALineIndex, ACharIndex: integer; AColorBG: TColor);
+  AOffsetMax, ALineIndex, ACharIndex: integer; AColorBG: TColor; AMainText: boolean);
 var
   Attr: TATMarkerItem;
   Part: TATLinePart;
@@ -427,7 +427,7 @@ begin
     Part.Len:= Attr.SelX;
     Part.Offset:= nOffset;
     //note: don't change Part.ColorBG here
-    DoPartInsert(AParts, Part, false);
+    DoPartInsert(AParts, Part, false, AMainText);
   end;
 end;
 

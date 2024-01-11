@@ -820,7 +820,7 @@ type
     FLineBottom: integer;
     FParts: TATLineParts; //this is used in DoPaintLine
     FPartsMinimap: TATLineParts; //this is used by DoPaintMinimapLine, in thread
-    FPartsSel: TATLineParts; //this is used in DoPartCalc_ApplySelectionOver
+    FPartsSel: array[boolean] of TATLineParts; //this is used in DoPartCalc_ApplySelectionOver
     FScrollVert,
     FScrollHorz,
     FScrollVertMinimap,
@@ -1176,9 +1176,9 @@ type
     procedure DoPartCalc_CreateNew(var AParts: TATLineParts; AOffsetMax,
       ALineIndex, ACharIndex: integer; AColorBG: TColor; AWithSelection: boolean);
     procedure DoPartCalc_ApplySelectionOver(var AParts: TATLineParts; AOffsetMax,
-      ALineIndex, ACharIndex: integer);
+      ALineIndex, ACharIndex: integer; AMainText: boolean);
     procedure DoPartCalc_ApplyAttribsOver(var AParts: TATLineParts; AOffsetMax,
-      ALineIndex, ACharIndex: integer; AColorBG: TColor);
+      ALineIndex, ACharIndex: integer; AColorBG: TColor; AMainText: boolean);
     function GetAutoIndentString(APosX, APosY: integer; AUseIndentRegexRule: boolean): atString;
     function GetFoldedMarkText(ALine: integer): string;
     function GetModified: boolean;
