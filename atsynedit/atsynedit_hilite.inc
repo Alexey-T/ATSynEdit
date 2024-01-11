@@ -38,7 +38,7 @@ procedure TATSynEdit.DoCalcLineHilite(const AData: TATWrapItem;
   ACharsSkipped, ACharsMax: integer;
   AColorBG: TColor; AColorForced: boolean;
   var AColorAfter: TColor;
-  AMainText: boolean; AWithSelection: boolean=true);
+  AMainText, AWithSelection: boolean);
 var
   nMaxOffset, nCharIndex, nLineIndex, nLineLen: integer;
   bEnableHilite: boolean;

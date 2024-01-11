@@ -1214,7 +1214,7 @@ type
     procedure DoCalcLineHilite(const AData: TATWrapItem;
       var AParts: TATLineParts; ACharsSkipped, ACharsMax: integer;
       AColorBG: TColor; AColorForced: boolean; var AColorAfter: TColor;
-      AMainText: boolean; AWithSelection: boolean=true);
+      AMainText, AWithSelection: boolean);
     function DoScaleFont(AValue: integer): integer;
     //select
     procedure DoSelectionDeleteOrReset;
@@ -4018,9 +4018,14 @@ begin
     DoCalcLineHilite(
       WrapItem,
       ATempParts{%H-},
-      NOutputCharsSkipped, ATEditorOptions.MaxCharsForOutput,
-      NColorEntire, bLineColorForced,
-      NColorAfter, true);
+      NOutputCharsSkipped,
+      ATEditorOptions.MaxCharsForOutput,
+      NColorEntire,
+      bLineColorForced,
+      NColorAfter,
+      true,
+      true
+      );
 
     if ATempParts[0].Offset<0 then
     begin
@@ -4415,9 +4420,14 @@ begin
     DoCalcLineHilite(
       WrapItem,
       ATempParts{%H-},
-      NOutputCharsSkipped, ATEditorOptions.MaxCharsForOutput,
-      NColorEntire, bLineColorForced,
-      NColorAfter, false);
+      NOutputCharsSkipped,
+      ATEditorOptions.MaxCharsForOutput,
+      NColorEntire,
+      bLineColorForced,
+      NColorAfter,
+      false,
+      true
+      );
 
     //adapter may return ColorAfterEol, paint it
     if FOptShowFullHilite then
@@ -9980,11 +9990,14 @@ begin
     DoCalcLineHilite(
       WrapItem,
       FParts{%H-},
-      0, ATEditorOptions.MaxCharsForOutput,
+      0,
+      ATEditorOptions.MaxCharsForOutput,
       AColorBG,
       false,
       NColorAfter,
-      true);
+      true,
+      true
+      );
 
     SText:= St.LineSub(
         WrapItem.NLineIndex,
