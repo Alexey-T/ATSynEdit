@@ -15,6 +15,20 @@ uses
   ATSynEdit_FGL;
 
 type
+  { TATFoldIndexItem }
+
+  PATFoldIndexItem = ^TATFoldIndexItem;
+  TATFoldIndexItem = packed record
+    Len: SmallInt; //must be signed; if Word, then need typecast to Integer when we use 'Len-1'
+    Data: array[0..Pred(19)] of Word;
+    procedure Clear;
+    function Add(AValue: Word): boolean;
+    function Delete(AValue: Word): boolean;
+    function Find(AValue: Word): integer;
+    function DebugText: string;
+  end;
+
+type
   { TATFoldRange }
 
   PATFoldRange = ^TATFoldRange;
@@ -41,6 +55,10 @@ type
     function ItemPtr(AIndex: integer): PATFoldRange; inline;
   end;
 
+  { TATFoldIndexer }
+
+  TATFoldIndexer = packed array of TATFoldIndexItem;
+
 type
   { TATFoldRanges }
 
@@ -50,7 +68,7 @@ type
   private
     FList: TATFoldRangeList;
     FListPersist: TATFoldRangeList; //for BackupPersistentRanges/RestorePersistentRanges
-    FLineIndexer: array of array of integer;
+    FLineIndexer: TATFoldIndexer;
     FHasTagPersist: boolean;
     FHasStaples: boolean;
     procedure AddToLineIndexer(ALine1, ALine2, AIndex: integer);
@@ -115,6 +133,59 @@ uses
 //(don't know why it gives such blocks)
 const
   cAllowHangoutLines = 1; //0 or 1, do not bigger
+
+{ TATFoldIndexItem }
+
+procedure TATFoldIndexItem.Clear;
+begin
+  Len:= 0;
+end;
+
+function TATFoldIndexItem.Add(AValue: Word): boolean;
+begin
+  Result:= Len<Length(Data);
+  if Result then
+  begin
+    Data[Len]:= AValue;
+    Inc(Len);
+  end;
+end;
+
+function TATFoldIndexItem.Delete(AValue: Word): boolean;
+var
+  i, j: integer;
+begin
+  Result:= false;
+  for i:= 0 to Len-1 do
+    if Data[i]=AValue then
+    begin
+      for j:= i to Len-2 do
+        Data[j]:= Data[j+1];
+      Dec(Len);
+      Result:= true;
+      Break;
+    end;
+end;
+
+function TATFoldIndexItem.Find(AValue: Word): integer;
+var
+  i: integer;
+begin
+  for i:= 0 to Len-1 do
+    if Data[i]=AValue then
+      exit(i);
+  Result:= -1;
+end;
+
+function TATFoldIndexItem.DebugText: string;
+var
+  i: integer;
+begin
+  Result:= '';
+  for i:= 0 to Len-1 do
+    Result+= IntToStr(Data[i])+' ';
+end;
+
 
 { TATFoldRangeList }
 
@@ -213,6 +284,7 @@ begin
   FList:= TATFoldRangeList.Create;
   FList.Capacity:= 2*1024;
   FListPersist:= TATFoldRangeList.Create;
+  FLineIndexer:= nil;
   FHasTagPersist:= false;
   FHasStaples:= false;
 end;
@@ -221,6 +293,7 @@ destructor TATFoldRanges.Destroy;
 begin
   FListPersist.Clear;
   Clear;
+  FLineIndexer:= nil;
   FreeAndNil(FListPersist);
   FreeAndNil(FList);
   inherited;
@@ -294,15 +367,13 @@ end;
 
 procedure TATFoldRanges.AddToLineIndexer(ALine1, ALine2, AIndex: integer);
 var
-  NItemLen, i: integer;
+  i: integer;
 begin
   if ALine1<>ALine2 then //skip one-line ranges
     if ALine2<=High(FLineIndexer) then
       for i:= ALine1 to ALine2 do
       begin
-        NItemLen:= Length(FLineIndexer[i]);
-        SetLength(FLineIndexer[i], NItemLen+1);
-        FLineIndexer[i][NItemLen]:= AIndex;
+        FLineIndexer[i].Add(AIndex);
       end;
 end;
 
@@ -311,9 +382,9 @@ var
   i, j: integer;
 begin
   for i:= 0 to High(FLineIndexer) do
-    for j:= 0 to High(FLineIndexer[i]) do
-      if FLineIndexer[i][j]>=ARangeIndex then
-        Inc(FLineIndexer[i][j]);
+    for j:= 0 to FLineIndexer[i].Len-1 do
+      if FLineIndexer[i].Data[j]>=ARangeIndex then
+        Inc(FLineIndexer[i].Data[j]);
 end;
 
 function TATFoldRanges.Insert(AIndex: integer; AX, AY, AX2, AY2: integer;
@@ -450,12 +521,9 @@ begin
   NLine:= ItemPtr(AIndex)^.Y;
   if NLine>High(FLineIndexer) then exit;
 
-  for iItem:= 0 to High(FLineIndexer[NLine]) do
-    if FLineIndexer[NLine][iItem] = AIndex then
-    begin
-      Result:= iItem;
-      Break;
-    end;
+  iItem:= FLineIndexer[NLine].Find(AIndex);
+  if iItem>=0 then
+    Result:= iItem;
 
   //first in LineIndexer item? then level 0
   if Result=0 then
@@ -465,7 +533,7 @@ begin
   //if they only touch our range
   while Result>0 do
   begin
-    iItem:= FLineIndexer[NLine][Result-1];
+    iItem:= FLineIndexer[NLine].Data[Result-1];
     if IsRangesTouch(iItem, AIndex) then
       Dec(Result);
   end;
@@ -544,13 +612,17 @@ begin
   if ALine>High(FLineIndexer) then exit;
 
   if not AOnlyFolded then
-    Result:= FLineIndexer[ALine]
+  begin
+    SetLength(Result, FLineIndexer[ALine].Len);
+    for i:= 0 to Length(Result)-1 do
+      Result[i]:= FLineIndexer[ALine].Data[i];
+  end
   else
   begin
     NLen:= 0;
-    for i:= 0 to High(FLineIndexer[ALine]) do
+    for i:= 0 to FLineIndexer[ALine].Len-1 do
     begin
-      NRange:= FLineIndexer[ALine][i];
+      NRange:= FLineIndexer[ALine].Data[i];
       R:= ItemPtr(NRange);
       if R^.Folded then
       begin
@@ -582,9 +654,9 @@ begin
   if ALineTo>NMax then ALineTo:= NMax;
 
   for iLine:= ALineFrom to ALineTo do
-    for iItem:= 0 to High(FLineIndexer[iLine]) do
+    for iItem:= 0 to FLineIndexer[iLine].Len-1 do
     begin
-      NRange:= FLineIndexer[iLine][iItem];
+      NRange:= FLineIndexer[iLine].Data[iItem];
       if not _IsArrayItemPresent(Result, NRange) then
       begin
         SetLength(Result, Length(Result)+1);
@@ -604,9 +676,9 @@ begin
   if ALineTo>NMax then ALineTo:= NMax;
 
   for iLine:= ALineFrom to ALineTo do
-    for iItem:= 0 to High(FLineIndexer[iLine]) do
+    for iItem:= 0 to FLineIndexer[iLine].Len-1 do
     begin
-      NRange:= FLineIndexer[iLine][iItem];
+      NRange:= FLineIndexer[iLine].Data[iItem];
       Rng:= ItemPtr(NRange);
       if not Rng^.Staple then Continue;
       if Rng^.Folded then Continue;
@@ -644,10 +716,10 @@ begin
   if ALine<0 then exit;
   if ALine>High(FLineIndexer) then exit;
 
-  NItemLen:= Length(FLineIndexer[ALine]);
+  NItemLen:= FLineIndexer[ALine].Len;
   for iItem:= NItemLen-1 downto 0 do
   begin
-    NRange:= FLineIndexer[ALine][iItem];
+    NRange:= FLineIndexer[ALine].Data[iItem];
     if not IsIndexValid(NRange) then Continue;
     Ptr:= ItemPtr(NRange);
 
@@ -675,10 +747,10 @@ begin
   Result:= -1;
   if ALine>High(FLineIndexer) then exit;
 
-  NItemLen:= Length(FLineIndexer[ALine]);
+  NItemLen:= FLineIndexer[ALine].Len;
   for iItem:= 0 to NItemLen-1 do
   begin
-    NRange:= FLineIndexer[ALine][iItem];
+    NRange:= FLineIndexer[ALine].Data[iItem];
     Ptr:= ItemPtr(NRange);
     if Ptr^.Y=ALine then
       if not Ptr^.IsSimple then
@@ -822,15 +894,13 @@ end;
 function TATFoldRanges.MessageLineIndexer(AMaxCount: integer): string;
 var
   S: string;
-  i, iLine: integer;
+  iLine: integer;
 begin
   Result:= '';
   for iLine:= 0 to Min(High(FLineIndexer), AMaxCount) do
   begin
-    S:= IntToStr(iLine)+': ';
-    for i:= 0 to High(FLineIndexer[iLine]) do
-      S+= IntToStr(FLineIndexer[iLine][i])+' ';
-    Result+= S+#10;
+    S:= IntToStr(iLine)+': '+FLineIndexer[iLine].DebugText+#10;
+    Result+= S;
   end;
 end;
 
