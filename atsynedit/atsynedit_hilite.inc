@@ -8,7 +8,7 @@ const
 var
   Data: TATWrapItem;
 begin
-  FillChar(AParts, SizeOf(AParts), 0);
+  AParts:= Default(TATLineParts);
   Result:= Strings.IsIndexValid(ALineIndex);
   if not Result then exit;
 
@@ -52,7 +52,7 @@ begin
   //bEnableHilite:= St.LinesLen[nLineIndex]<=FOptMaxLineLenToTokenize;
   bEnableHilite:= true;
 
-  FillChar(AParts, SizeOf(AParts), 0);
+  AParts:= Default(TATLineParts);
   if nLineLen=0 then exit;
 
   (*
@@ -246,7 +246,7 @@ begin
     exit;
   end;
 
-  FillChar(Part{%H-}, SizeOf(Part), 0);
+  Part:= Default(TATLinePart);
   Part.ColorFont:= Colors.TextSelFont;
   Part.ColorBG:= Colors.TextSelBG;
 
@@ -256,7 +256,7 @@ begin
   //- partly selected parts, save them to FPartsSel,
   //  and do slow loop (by offsets) over them.
 
-  FillChar(FPartsSel[AMainText], SizeOf(TATLineParts), 0);
+  FPartsSel[AMainText]:= Default(TATLineParts);
   iPart:= 0;
 
   for i:= Low(AParts) to High(AParts) do
