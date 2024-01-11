@@ -246,8 +246,8 @@ begin
   end;
 
   //these 2 parts are for edges of selection
-  FillChar(PartSelBegin{%H-}, SizeOf(TATLinePart), 0);
-  FillChar(PartSelEnd{%H-}, SizeOf(TATLinePart), 0);
+  PartSelBegin:= Default(TATLinePart);
+  PartSelEnd:= Default(TATLinePart);
 
   PartSelBegin.ColorFont:= ColorFontLeft;
   PartSelBegin.ColorBG:= APart.ColorBG;
@@ -279,7 +279,7 @@ begin
     newOffset2:= Offset+nOffset2;
   end;
 
-  FillChar(ResultParts[AMainText], SizeOf(TATLineParts), 0);
+  ResultParts[AMainText]:= Default(TATLineParts);
   ResultPartIndex:= 0;
 
   //add parts before selection
@@ -404,7 +404,7 @@ begin
 
   //fill tail with zeros
   for i:= NCount-N to NCount-1 do
-    FillChar(P[i], SizeOf(TATLinePart), 0);
+    P[i]:= Default(TATLinePart);
 
   for i:= 0 to NCount-1-N do
     with P[i] do
