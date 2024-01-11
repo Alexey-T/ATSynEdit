@@ -78,7 +78,7 @@ b) show first lines of found folded sub-ranges
 procedure TATSynEdit.DoRangeUnfold(ARangeIndex: integer);
 var
   RangeIndexes: TATIntArray;
-  RngOuter, Rng: PATSynRange;
+  RngOuter, Rng: PATFoldRange;
   Strs: TATStrings;
   Checks: array of boolean; //take less memory
   Line1, Line2: integer;
@@ -126,7 +126,7 @@ end;
 procedure TATSynEdit.DoRangeFold(ARangeIndex: integer);
 var
   St: TATStrings;
-  Range: PATSynRange;
+  Range: PATFoldRange;
 begin
   St:= Strings;
   Range:= Fold.ItemPtr(ARangeIndex);
@@ -205,7 +205,7 @@ end;
 
 procedure TATSynEdit.DoFoldbarClick_RangeIndex(ARangeIndex: integer);
 var
-  FoldItemPtr: PATSynRange;
+  FoldItemPtr: PATFoldRange;
   bUnfold: boolean;
   //bScrolledToLastPage: boolean;
 begin
@@ -271,7 +271,7 @@ var
   St: TATStrings;
   NFoldFrom, NPosAfterEnd: integer;
   NMaxLine, iRange: integer;
-  R: PATSynRange;
+  R: PATFoldRange;
   bFold: boolean;
 begin
   St:= Strings;
@@ -395,7 +395,7 @@ var
   NLine: integer;
   IntList: TATIntArray;
   Details: TATEditorPosDetails;
-  Rng: PATSynRange;
+  Rng: PATFoldRange;
   mi: TMenuItem;
   i: integer;
 begin
@@ -491,7 +491,7 @@ procedure TATSynEdit.DoFoldForLevelEx(ALevel: integer; AOuterRange: integer);
 //it folds ranges if ALevel=0, otherwise it goes to subranges until it finds ALevel=0.
 var
   List: TATIntArray;
-  R: PATSynRange;
+  R: PATFoldRange;
   i: integer;
 begin
   if ALevel<0 then exit;

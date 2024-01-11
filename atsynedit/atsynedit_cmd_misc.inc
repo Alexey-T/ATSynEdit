@@ -129,7 +129,7 @@ end;
 
 function TATSynEdit.DoCommand_FoldAll: TATCommandResults;
 var
-  R: PATSynRange;
+  R: PATFoldRange;
   NeedFixCaret: boolean;
   i: integer;
 begin
@@ -155,7 +155,7 @@ end;
 
 procedure TATSynEdit.DoMarkAllRangesUnfolded;
 var
-  R: PATSynRange;
+  R: PATFoldRange;
   i: integer;
 begin
   for i:= 0 to Fold.Count-1 do

@@ -15,10 +15,10 @@ uses
   ATSynEdit_FGL;
 
 type
-  { TATSynRange }
+  { TATFoldRange }
 
-  PATSynRange = ^TATSynRange;
-  TATSynRange = packed record
+  PATFoldRange = ^TATFoldRange;
+  TATFoldRange = packed record
     Tag: Int64;
     X: integer; //start column
     Y: integer; //start line
@@ -31,30 +31,30 @@ type
     function IsSimple: boolean;
     function IsLineInside(ALine: integer): boolean;
     function MessageText: string;
-    class operator =(const a, b: TATSynRange): boolean;
+    class operator =(const a, b: TATFoldRange): boolean;
   end;
 
-  { TATSynRangeList }
+  { TATFoldRangeList }
 
-  TATSynRangeList = class(specialize TFPGList<TATSynRange>)
+  TATFoldRangeList = class(specialize TFPGList<TATFoldRange>)
   public
-    function ItemPtr(AIndex: integer): PATSynRange; inline;
+    function ItemPtr(AIndex: integer): PATFoldRange; inline;
   end;
 
 type
-  { TATSynRanges }
+  { TATFoldRanges }
 
-  TATSynRanges = class
+  TATFoldRanges = class
   private
-    FList: TATSynRangeList;
-    FListPersist: TATSynRangeList; //for BackupPersistentRanges/RestorePersistentRanges
+    FList: TATFoldRangeList;
+    FListPersist: TATFoldRangeList; //for BackupPersistentRanges/RestorePersistentRanges
     FLineIndexer: array of array of integer;
     FHasTagPersist: boolean;
     FHasStaples: boolean;
     procedure AddToLineIndexer(ALine1, ALine2, AIndex: integer);
     procedure AdjustLineIndexerForInsertion(ARangeIndex: integer);
-    function GetItems(Index: integer): TATSynRange;
-    procedure SetItems(Index: integer; const AValue: TATSynRange);
+    function GetItems(Index: integer): TATFoldRange;
+    procedure SetItems(Index: integer; const AValue: TATFoldRange);
     //function MessageTextForIndexList(const L: TATIntArray): string;
   public
     constructor Create; virtual;
@@ -64,12 +64,12 @@ type
     function IsIndexValid(N: integer): boolean; inline;
     function IsRangesTouch(N1, N2: integer): boolean;
     function Add(AX, AY, AX2, AY2: integer; AWithStaple: boolean; const AHint: string;
-      const ATag: Int64=0): TATSynRange;
+      const ATag: Int64=0): TATFoldRange;
     function AddSorted(AX, AY, AX2, AY2: integer; AWithStaple: boolean;
       const AHint: string; const ATag: Int64;
-      out AItemIndex: integer): TATSynRange;
+      out AItemIndex: integer): TATFoldRange;
     function Insert(AIndex: integer; AX, AY, AX2, AY2: integer; AWithStaple: boolean;
-      const AHint: string; const ATag: Int64=0): TATSynRange;
+      const AHint: string; const ATag: Int64=0): TATFoldRange;
     procedure Merge(AX, AY, AX2, AY2: integer; const AHint: string; const ATag: Int64);
     procedure Clear;
     procedure ClearLineIndexer(ALineCount: integer; ASetLenOnly: boolean=false);
@@ -78,10 +78,10 @@ type
     procedure DeleteAllExceptTag(const ATag: Int64);
     procedure BackupPersistentRanges;
     procedure RestorePersistentRanges;
-    property Items[Index: integer]: TATSynRange read GetItems write SetItems; default;
-    function ItemPtr(AIndex: integer): PATSynRange;
-    function IsRangeInsideOther(R1, R2: PATSynRange): boolean;
-    function IsRangesSame(R1, R2: PATSynRange): boolean;
+    property Items[Index: integer]: TATFoldRange read GetItems write SetItems; default;
+    function ItemPtr(AIndex: integer): PATFoldRange;
+    function IsRangeInsideOther(R1, R2: PATFoldRange): boolean;
+    function IsRangesSame(R1, R2: PATFoldRange): boolean;
     function FindRanges(AOuterRange: integer; AOnlyFolded, ATopLevelOnly: boolean): TATIntArray;
     function FindRangesWithLine(ALine: integer; AOnlyFolded: boolean): TATIntArray;
     function FindRangesWithAnyOfLines(ALineFrom, ALineTo: integer): TATIntArray;
@@ -114,17 +114,17 @@ uses
 const
   cAllowHangoutLines = 1; //0 or 1, do not bigger
 
-{ TATSynRangeList }
+{ TATFoldRangeList }
 
-function TATSynRangeList.ItemPtr(AIndex: integer): PATSynRange;
+function TATFoldRangeList.ItemPtr(AIndex: integer): PATFoldRange;
 begin
-  Result:= PATSynRange(InternalGet(AIndex));
+  Result:= PATFoldRange(InternalGet(AIndex));
 end;
 
 
-{ TATSynRange }
+{ TATFoldRange }
 
-procedure TATSynRange.Init(AX, AY, AX2, AY2: integer; AStaple: boolean;
+procedure TATFoldRange.Init(AX, AY, AX2, AY2: integer; AStaple: boolean;
   const AHint: string; const ATag: Int64);
 begin
   if (AX<=0) then
@@ -146,50 +146,50 @@ begin
   Tag:= ATag;
 end;
 
-function TATSynRange.IsSimple: boolean; inline;
+function TATFoldRange.IsSimple: boolean; inline;
 //ranges of only 2 lines are needed sometimes, e.g. in FindInFiles lexer
 begin
   Result:= Y2-Y < 1;
 end;
 
-function TATSynRange.IsLineInside(ALine: integer): boolean; inline;
+function TATFoldRange.IsLineInside(ALine: integer): boolean; inline;
 begin
   Result:= (ALine>=Y) and (ALine<=Y2);
 end;
 
-function TATSynRange.MessageText: string;
+function TATFoldRange.MessageText: string;
 begin
   Result:= Format('%d..%d', [Y+1, Y2+1]);
 end;
 
-class operator TATSynRange.=(const a, b: TATSynRange): boolean;
+class operator TATFoldRange.=(const a, b: TATFoldRange): boolean;
 begin
   Result:= false;
 end;
 
-{ TATSynRanges }
+{ TATFoldRanges }
 
-function TATSynRanges.IsIndexValid(N: integer): boolean; inline;
+function TATFoldRanges.IsIndexValid(N: integer): boolean; inline;
 begin
   Result:= (N>=0) and (N<FList.Count);
 end;
 
-function TATSynRanges.Count: integer; inline;
+function TATFoldRanges.Count: integer; inline;
 begin
   Result:= FList.Count;
 end;
 
-function TATSynRanges.CountOfLineIndexer: integer;
+function TATFoldRanges.CountOfLineIndexer: integer;
 begin
   Result:= Length(FLineIndexer);
 end;
 
-function TATSynRanges.GetItems(Index: integer): TATSynRange;
+function TATFoldRanges.GetItems(Index: integer): TATFoldRange;
 begin
   Result:= FList[Index];
 end;
 
-procedure TATSynRanges.SetItems(Index: integer; const AValue: TATSynRange);
+procedure TATFoldRanges.SetItems(Index: integer; const AValue: TATFoldRange);
 begin
   FList[Index]:= AValue;
   if AValue.Tag=cTagPersistentFoldRange then
@@ -198,7 +198,7 @@ begin
     FHasStaples:= true;
 end;
 
-procedure TATSynRanges.ClearLineIndexer(ALineCount: integer; ASetLenOnly: boolean=false);
+procedure TATFoldRanges.ClearLineIndexer(ALineCount: integer; ASetLenOnly: boolean=false);
 begin
   if not ASetLenOnly then
     FLineIndexer:= nil;
@@ -206,16 +206,16 @@ begin
   SetLength(FLineIndexer, ALineCount);
 end;
 
-constructor TATSynRanges.Create;
+constructor TATFoldRanges.Create;
 begin
-  FList:= TATSynRangeList.Create;
+  FList:= TATFoldRangeList.Create;
   FList.Capacity:= 2*1024;
-  FListPersist:= TATSynRangeList.Create;
+  FListPersist:= TATFoldRangeList.Create;
   FHasTagPersist:= false;
   FHasStaples:= false;
 end;
 
-destructor TATSynRanges.Destroy;
+destructor TATFoldRanges.Destroy;
 begin
   FListPersist.Clear;
   Clear;
@@ -224,7 +224,7 @@ begin
   inherited;
 end;
 
-procedure TATSynRanges.Clear;
+procedure TATFoldRanges.Clear;
 begin
   ClearLineIndexer(0);
   FList.Clear;
@@ -232,9 +232,9 @@ begin
   FHasStaples:= false;
 end;
 
-function TATSynRanges.Add(AX, AY, AX2, AY2: integer; AWithStaple: boolean;
+function TATFoldRanges.Add(AX, AY, AX2, AY2: integer; AWithStaple: boolean;
   const AHint: string;
-  const ATag: Int64=0): TATSynRange;
+  const ATag: Int64=0): TATFoldRange;
 var
   NIndex: integer;
 begin
@@ -249,12 +249,12 @@ begin
   AddToLineIndexer(AY, AY2, NIndex);
 end;
 
-function TATSynRanges.AddSorted(AX, AY, AX2, AY2: integer; AWithStaple: boolean;
+function TATFoldRanges.AddSorted(AX, AY, AX2, AY2: integer; AWithStaple: boolean;
   const AHint: string;
   const ATag: Int64;
-  out AItemIndex: integer): TATSynRange;
+  out AItemIndex: integer): TATFoldRange;
 var
-  Item: PATSynRange;
+  Item: PATFoldRange;
   i: integer;
 begin
   AItemIndex:= -1;
@@ -286,7 +286,7 @@ begin
   AddToLineIndexer(AY, AY2, AItemIndex);
 end;
 
-procedure TATSynRanges.AddToLineIndexer(ALine1, ALine2, AIndex: integer);
+procedure TATFoldRanges.AddToLineIndexer(ALine1, ALine2, AIndex: integer);
 var
   NItemLen, i: integer;
 begin
@@ -300,7 +300,7 @@ begin
       end;
 end;
 
-procedure TATSynRanges.AdjustLineIndexerForInsertion(ARangeIndex: integer);
+procedure TATFoldRanges.AdjustLineIndexerForInsertion(ARangeIndex: integer);
 var
   i, j: integer;
 begin
@@ -310,10 +310,10 @@ begin
         Inc(FLineIndexer[i][j]);
 end;
 
-function TATSynRanges.Insert(AIndex: integer; AX, AY, AX2, AY2: integer;
+function TATFoldRanges.Insert(AIndex: integer; AX, AY, AX2, AY2: integer;
   AWithStaple: boolean;
   const AHint: string;
-  const ATag: Int64=0): TATSynRange;
+  const ATag: Int64=0): TATFoldRange;
 begin
   Result.Init(AX, AY, AX2, AY2, AWithStaple, AHint, ATag);
   FList.Insert(AIndex, Result);
@@ -326,13 +326,13 @@ begin
   UpdateLineIndexer;
 end;
 
-procedure TATSynRanges.Delete(AIndex: integer); inline;
+procedure TATFoldRanges.Delete(AIndex: integer); inline;
 begin
   FList.Delete(AIndex);
   UpdateLineIndexer;
 end;
 
-procedure TATSynRanges.DeleteAllByTag(const ATag: Int64);
+procedure TATFoldRanges.DeleteAllByTag(const ATag: Int64);
 var
   i: integer;
 begin
@@ -346,12 +346,12 @@ begin
   UpdateLineIndexer;
 end;
 
-procedure TATSynRanges.DeleteAllExceptTag(const ATag: Int64);
+procedure TATFoldRanges.DeleteAllExceptTag(const ATag: Int64);
 var
-  TempList: TATSynRangeList;
+  TempList: TATFoldRangeList;
   i: integer;
 begin
-  TempList:= TATSynRangeList.Create;
+  TempList:= TATFoldRangeList.Create;
   try
     for i:= 0 to FList.Count-1 do
       if ItemPtr(i)^.Tag=ATag then
@@ -369,9 +369,9 @@ begin
   UpdateLineIndexer;
 end;
 
-procedure TATSynRanges.BackupPersistentRanges;
+procedure TATFoldRanges.BackupPersistentRanges;
 var
-  Item: PATSynRange;
+  Item: PATFoldRange;
   i: integer;
 begin
   FListPersist.Clear;
@@ -384,9 +384,9 @@ begin
   end;
 end;
 
-procedure TATSynRanges.RestorePersistentRanges;
+procedure TATFoldRanges.RestorePersistentRanges;
 var
-  ItemFrom: PATSynRange;
+  ItemFrom: PATFoldRange;
   NItemIndex, i: integer;
 begin
   for i:= 0 to FListPersist.Count-1 do
@@ -412,19 +412,19 @@ begin
   FListPersist.Clear;
 end;
 
-function TATSynRanges.ItemPtr(AIndex: integer): PATSynRange;
+function TATFoldRanges.ItemPtr(AIndex: integer): PATFoldRange;
 begin
   Result:= FList.ItemPtr(AIndex);
 end;
 
-function TATSynRanges.IsRangeInsideOther(R1, R2: PATSynRange): boolean;
+function TATFoldRanges.IsRangeInsideOther(R1, R2: PATFoldRange): boolean;
 begin
   Result:=
     IsPosSorted(R2^.X, R2^.Y, R1^.X, R1^.Y, true)
     and (R1^.Y2-cAllowHangoutLines<=R2^.Y2);
 end;
 
-function TATSynRanges.IsRangesSame(R1, R2: PATSynRange): boolean;
+function TATFoldRanges.IsRangesSame(R1, R2: PATFoldRange): boolean;
 begin
   if R1=R2 then
     exit(true);
@@ -434,7 +434,7 @@ begin
   Result:= false;
 end;
 
-function TATSynRanges.FindRangeLevel(AIndex: integer): integer;
+function TATFoldRanges.FindRangeLevel(AIndex: integer): integer;
 var
   NLine, iItem: integer;
 begin
@@ -463,7 +463,7 @@ begin
   end;
 end;
 
-function TATSynRanges.IsRangesTouch(N1, N2: integer): boolean;
+function TATFoldRanges.IsRangesTouch(N1, N2: integer): boolean;
 begin
   Result:= ItemPtr(N1)^.Y2 = ItemPtr(N2)^.Y;
 end;
@@ -471,13 +471,13 @@ end;
 type
   TATIntegerList = specialize TFPGList<integer>;
 
-function TATSynRanges.FindRanges(AOuterRange: integer; AOnlyFolded,
+function TATFoldRanges.FindRanges(AOuterRange: integer; AOnlyFolded,
   ATopLevelOnly: boolean): TATIntArray;
 //ATopLevel: keep from collected list only top-level ranges
 //(not globally top-level, but top-level inside found list)
 var
   L: TATIntegerList;
-  R, RngOuter, RngLastAdded: PATSynRange;
+  R, RngOuter, RngLastAdded: PATFoldRange;
   nStartIndex, nEndLine, i: integer;
 begin
   Result:= nil;
@@ -527,9 +527,9 @@ begin
   end;
 end;
 
-function TATSynRanges.FindRangesWithLine(ALine: integer; AOnlyFolded: boolean): TATIntArray;
+function TATFoldRanges.FindRangesWithLine(ALine: integer; AOnlyFolded: boolean): TATIntArray;
 var
-  R: PATSynRange;
+  R: PATFoldRange;
   NLen, NRange, i: integer;
 begin
   Result:= nil;
@@ -564,7 +564,7 @@ begin
   Result:= false;
 end;
 
-function TATSynRanges.FindRangesWithAnyOfLines(ALineFrom, ALineTo: integer): TATIntArray;
+function TATFoldRanges.FindRangesWithAnyOfLines(ALineFrom, ALineTo: integer): TATIntArray;
 var
   NMax, NRange, iLine, iItem: integer;
 begin
@@ -585,10 +585,10 @@ begin
     end;
 end;
 
-function TATSynRanges.FindRangesWithStaples(ALineFrom, ALineTo: integer): TATIntArray;
+function TATFoldRanges.FindRangesWithStaples(ALineFrom, ALineTo: integer): TATIntArray;
 var
   NMax, NRange, iLine, iItem: integer;
-  Rng: PATSynRange;
+  Rng: PATFoldRange;
 begin
   Result:= nil;
   NMax:= High(FLineIndexer);
@@ -609,10 +609,10 @@ begin
 end;
 
 
-function TATSynRanges.FindDeepestRangeContainingLine_Old(ALine: integer;
+function TATFoldRanges.FindDeepestRangeContainingLine_Old(ALine: integer;
   const AIndexes: TATIntArray): integer;
 var
-  R: PATSynRange;
+  R: PATFoldRange;
   i: integer;
 begin
   Result:= -1;
@@ -627,10 +627,10 @@ begin
   end;
 end;
 
-function TATSynRanges.FindDeepestRangeContainingLine(ALine: integer; AWithStaple: boolean; AMinimalRangeHeight: integer): integer;
+function TATFoldRanges.FindDeepestRangeContainingLine(ALine: integer; AWithStaple: boolean; AMinimalRangeHeight: integer): integer;
 var
   NItemLen, NRange, iItem: integer;
-  Ptr: PATSynRange;
+  Ptr: PATFoldRange;
 begin
   Result:= -1;
   if ALine<0 then exit;
@@ -659,10 +659,10 @@ begin
 end;
 
 
-function TATSynRanges.FindRangeWithPlusAtLine_ViaIndexer(ALine: integer): integer;
+function TATFoldRanges.FindRangeWithPlusAtLine_ViaIndexer(ALine: integer): integer;
 var
   NItemLen, NRange, iItem: integer;
-  Ptr: PATSynRange;
+  Ptr: PATFoldRange;
 begin
   Result:= -1;
   if ALine>High(FLineIndexer) then exit;
@@ -678,12 +678,12 @@ begin
   end;
 end;
 
-function TATSynRanges.FindRangeWithPlusAtLine(ALine: integer; AReturnInsertPos: boolean=false): integer;
+function TATFoldRanges.FindRangeWithPlusAtLine(ALine: integer; AReturnInsertPos: boolean=false): integer;
 // CudaText issue #2566
 // because of this, we must skip all one-line ranges
 var
   a, b, m, dif, NCount: integer;
-  R: PATSynRange;
+  R: PATFoldRange;
 begin
   Result:= -1;
   NCount:= Count;
@@ -725,9 +725,9 @@ begin
 end;
 
 
-function TATSynRanges.MessageText(AMaxCount: integer): string;
+function TATFoldRanges.MessageText(AMaxCount: integer): string;
 var
-  Ptr: PATSynRange;
+  Ptr: PATFoldRange;
   i: integer;
 begin
   Result:= '';
@@ -738,9 +738,9 @@ begin
   end;
 end;
 
-procedure TATSynRanges.Update(AChange: TATLineChangeKind; ALineIndex, AItemCount: integer);
+procedure TATFoldRanges.Update(AChange: TATLineChangeKind; ALineIndex, AItemCount: integer);
 var
-  Rng: PATSynRange;
+  Rng: PATFoldRange;
   i: integer;
 begin
   case AChange of
@@ -798,9 +798,9 @@ begin
   UpdateLineIndexer;
 end;
 
-procedure TATSynRanges.UpdateLineIndexer;
+procedure TATFoldRanges.UpdateLineIndexer;
 var
-  Ptr: PATSynRange;
+  Ptr: PATFoldRange;
   i: integer;
 begin
   ClearLineIndexer(Length(FLineIndexer));
@@ -811,7 +811,7 @@ begin
   end;
 end;
 
-function TATSynRanges.MessageLineIndexer(AMaxCount: integer): string;
+function TATFoldRanges.MessageLineIndexer(AMaxCount: integer): string;
 var
   S: string;
   i, iLine: integer;
@@ -826,10 +826,10 @@ begin
   end;
 end;
 
-procedure TATSynRanges.Merge(AX, AY, AX2, AY2: integer; const AHint: string; const ATag: Int64);
+procedure TATFoldRanges.Merge(AX, AY, AX2, AY2: integer; const AHint: string; const ATag: Int64);
 //try to find old fold-range for the AY line;
 //if found, update the range (don't change it's Folded state) without inserting new one
-  function IsHintSame(Item: PATSynRange): boolean;
+  function IsHintSame(Item: PATFoldRange): boolean;
   const
     cMaxLenCompare = 20;
   var
@@ -841,7 +841,7 @@ procedure TATSynRanges.Merge(AX, AY, AX2, AY2: integer; const AHint: string; con
   end;
   //
 var
-  Item: PATSynRange;
+  Item: PATFoldRange;
   NIndex: integer;
 begin
   NIndex:= FindRangeWithPlusAtLine(AY, true);

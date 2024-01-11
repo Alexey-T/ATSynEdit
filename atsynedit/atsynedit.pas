@@ -595,7 +595,7 @@ type
     FAdapterHilite: TATAdapterHilite;
     FAdapterIME: TATAdapterIME;
     FCharSizer: TATCharSizer;
-    FFold: TATSynRanges;
+    FFold: TATFoldRanges;
     FFoldImageList: TImageList;
     FFoldStyle: TATEditorFoldStyle;
     FFoldUnderlineOffset: integer;
@@ -1574,7 +1574,7 @@ type
     procedure TimersStop;
     //complex objects
     property Strings: TATStrings read GetStrings write SetStrings;
-    property Fold: TATSynRanges read FFold;
+    property Fold: TATFoldRanges read FFold;
     property Carets: TATCarets read FCarets;
     property CaretsSel: TATCaretSelections read FSel;
     property CaretShowEnabled: boolean read FCaretShowEnabled write FCaretShowEnabled;
@@ -5096,7 +5096,7 @@ begin
   FStringsInt.OnUndoAfter:= @DoStringsOnUndoAfter;
   FStringsInt.OnUnfoldLine:= @DoStringsOnUnfoldLine;
 
-  FFold:= TATSynRanges.Create;
+  FFold:= TATFoldRanges.Create;
   FFoldStyle:= cInitFoldStyle;
   FFoldEnabled:= true;
   FFoldCacheEnabled:= true;
@@ -8970,7 +8970,7 @@ end;
 function TATSynEdit.DoCalcFoldProps(AWrapItemIndex: integer; out AProps: TATFoldBarProps): boolean;
 var
   WrapItem: TATWrapItem;
-  Rng: PATSynRange;
+  Rng: PATFoldRange;
   Caret: TATCaretItem;
   NLineIndex: integer;
   NIndexOfCurrentRng, NIndexOfCaretRng: integer;
@@ -9343,7 +9343,7 @@ var
   nIndent, nIndentBegin, nIndentEnd: integer;
   nSpaceShift: integer;
   Indexes: TATIntArray;
-  Range: PATSynRange;
+  Range: PATFoldRange;
   P1, P2: TATPoint;
   RSt: TRect;
   NColor, NColorNormal, NColorActive: TColor;
@@ -10538,7 +10538,7 @@ function TATSynEdit.GetFoldingAsString: string;
 var
   L: TStringList;
   i: integer;
-  R: PATSynRange;
+  R: PATFoldRange;
 begin
   Result:= '';
   L:= TStringList.Create;

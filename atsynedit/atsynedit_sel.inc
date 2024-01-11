@@ -723,7 +723,7 @@ function TATSynEdit.DoSelect_FoldingRangeStartingAtLine(
   ACaret: TATCaretItem; ALine: integer; ACaretToEndOfSel: boolean): boolean;
 var
   St: TATStrings;
-  RangePtr: PATSynRange;
+  RangePtr: PATFoldRange;
   NRange: integer;
   NLineBegin, NLineEnd: integer;
 begin
