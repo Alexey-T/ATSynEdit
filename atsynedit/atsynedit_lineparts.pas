@@ -195,7 +195,7 @@ var
     if P.Len>0 then
       if ResultPartIndex<High(TATLineParts) then
       begin
-        Move(P, ResultParts[AMainText][ResultPartIndex], SizeOf(P));
+        Move(P, ResultParts[AMainText][ResultPartIndex], SizeOf(TATLinePart));
         Inc(ResultPartIndex);
       end;
   end;
