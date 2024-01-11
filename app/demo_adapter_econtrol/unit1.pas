@@ -353,7 +353,7 @@ begin
       ed.Strings.Bookmarks.Delete(NIndex)
     else
     begin
-      FillChar(Data, SizeOf(Data), 0);
+      Data:= Default(TATBookmarkData);
       Data.Kind:= 1;
       Data.ShowInBookmarkList:= true;
       Data.LineNum:= ALine;

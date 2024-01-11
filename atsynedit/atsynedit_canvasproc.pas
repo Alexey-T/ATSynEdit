@@ -771,9 +771,9 @@ begin
   NCharWidthScaled:= AProps.CharSize.XScaled;
   NDeltaForItalic:= C.Font.Size * ATEditorOptions.ItalicFontLongerInPercents div 100;
 
-  FillChar(ListInt, SizeOf(ListInt), 0);
-  FillChar(Dx, SizeOf(Dx), 0);
-  //no need to do FillChar(DxUTF8...)
+  ListInt:= Default(TATIntFixedArray);
+  Dx:= Default(TATInt32FixedArray);
+  //no need to clear DxUTF8
 
   if AProps.SuperFast or AProps.HasAsciiNoTabs then
   begin

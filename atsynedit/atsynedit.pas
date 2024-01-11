@@ -2451,7 +2451,7 @@ const
 var
   si: TScrollInfo;
 begin
-  FillChar(si{%H-}, SizeOf(si), 0);
+  si:= Default(TScrollInfo);
   si.cbSize:= SizeOf(si);
   si.fMask:= SIF_ALL;
   GetScrollInfo(Handle, cKind[bVertical], si);
@@ -3014,7 +3014,7 @@ begin
 
   if ShowOsBarVert then
   begin
-    FillChar(si{%H-}, SizeOf(si), 0);
+    si:= Default(TScrollInfo);
     si.cbSize:= SizeOf(si);
     si.fMask:= SIF_ALL; //or SIF_DISABLENOSCROLL; //todo -- DisableNoScroll doesnt work(Win)
     si.nMin:= 0;
@@ -3067,7 +3067,7 @@ begin
 
   if ShowOsBarHorz then
   begin
-    FillChar(si{%H-}, SizeOf(si), 0);
+    si:= Default(TScrollInfo);
     si.cbSize:= SizeOf(si);
     si.fMask:= SIF_ALL; //or SIF_DISABLENOSCROLL; don't work
     si.nMin:= 0;
@@ -4405,7 +4405,7 @@ begin
 
     if GetTickCount64-FTickMinimap>=ATEditorOptions.MinimapColoringTime then
     begin
-      FillChar(ATempParts, SizeOf(ATempParts), 0);
+      ATempParts:= Default(TATLineParts);
       ATempParts[0].Offset:= 0;
       ATempParts[0].Len:= WrapItem.NLength;
       ATempParts[0].ColorBG:= NColorEntire;
@@ -9610,7 +9610,7 @@ begin
       FRegexLinks.InputString:= St.Lines[iLine];
 
       LinkIndex:= 0;
-      FillChar(LinkArray{%H-}, SizeOf(LinkArray), 0);
+      LinkArray:= Default(TATLinkArray);
       MatchPos:= 0;
       MatchLen:= 0;
       Inc(NRegexRuns);
@@ -9888,7 +9888,7 @@ begin
   C.Brush.Color:= AColorBG;
   C.FillRect(ARect);
 
-  FillChar(TextOutProps{%H-}, SizeOf(TextOutProps), 0);
+  TextOutProps:= Default(TATCanvasTextOutProps);
 
   TextOutProps.Editor:= Self;
   TextOutProps.TabHelper:= FTabHelper;
@@ -9971,7 +9971,7 @@ begin
     end
     else
     begin
-      FillChar(WrapItem, SizeOf(WrapItem), 0);
+      WrapItem:= Default(TATWrapItem);
       WrapItem.NLineIndex:= NLine;
       WrapItem.NCharIndex:= 1;
       WrapItem.NLength:= St.LinesLen[NLine];

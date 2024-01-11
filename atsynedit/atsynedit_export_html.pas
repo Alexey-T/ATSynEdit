@@ -120,7 +120,7 @@ begin
   St:= Ed.Strings;
   if EditorIsEmpty(Ed) then exit;
 
-  FillChar(Parts{%H-}, Sizeof(Parts), 0);
+  Parts:= Default(TATLineParts);
 
   ListLines:= TStringList.Create;
   if AWithNumbers then

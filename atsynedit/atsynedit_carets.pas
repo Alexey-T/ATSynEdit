@@ -42,6 +42,11 @@ function IsPosInRange(X, Y, X1, Y1, X2, Y2: integer; AllowOnRightEdge: boolean=f
 
 
 type
+  TATCaretItem_DblClickRange = record
+    XFrom, XTo, Y: integer;
+  end;
+
+type
   { TATCaretItem }
 
   TATCaretItem = class
@@ -55,9 +60,7 @@ type
     CharAtCaret: WideChar; //char which is rendered above the inverted-rect, if ATEditorOptions.CaretTextOverInvertedRect
     CharColor: TColor;
     CharStyles: TFontStyles;
-    DoubleClickRange: record //must be filled only when selection is made by double-click (and like it)
-      XFrom, XTo, Y: integer;
-    end;
+    DoubleClickRange: TATCaretItem_DblClickRange; //must be filled only when selection is made by double-click (and like it)
     procedure SelectNone;
     procedure SelectToPoint(AX, AY: integer);
     procedure SelectToPoint_ByShiftClick(AX, AY: integer);
@@ -647,7 +650,7 @@ end;
 
 procedure TATCaretItem.ClearDoubleClickRange;
 begin
-  FillChar(DoubleClickRange, SizeOf(DoubleClickRange), 0);
+  DoubleClickRange:= Default(TATCaretItem_DblClickRange);
 end;
 
 procedure TATCaretItem.SelectToPoint(AX, AY: integer);

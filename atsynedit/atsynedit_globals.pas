@@ -391,7 +391,6 @@ end;
 
 initialization
 
-  FillChar(ATEditorOptions, SizeOf(ATEditorOptions), 0);
   with ATEditorOptions do
   begin
     MaxFileSizeMbToDetectEncoding:= 50;
@@ -535,7 +534,6 @@ initialization
     PlotHeight:= 40;
   end;
 
-  FillChar(ATEditorBitmaps, SizeOf(ATEditorBitmaps), 0);
   with ATEditorBitmaps do
   begin
     ScaleSuffix:= GetScaleSuffix;

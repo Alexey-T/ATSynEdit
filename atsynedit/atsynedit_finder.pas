@@ -2600,7 +2600,7 @@ begin
     end;
     if Results.Count=0 then exit;
 
-    FillChar(AttrRec{%H-}, SizeOf(AttrRec), 0);
+    AttrRec:= Default(TATLinePart);
     AttrRec.ColorBG:= clNone;
     AttrRec.ColorFont:= clNone;
     AttrRec.ColorBorder:= AColorBorder;
