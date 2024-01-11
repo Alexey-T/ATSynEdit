@@ -1270,7 +1270,8 @@ type
       ALineFrom: integer;
       AConsiderWrapInfo: boolean;
       AColorBG, AColorBorder: TColor;
-      AFontSize: integer);
+      AFontSize: integer;
+      AWithSelection: boolean);
     procedure DoPaintLineIndent(C: TCanvas;
       const ARect: TRect;
       const ACharSize: TATEditorCharSize;
@@ -9881,7 +9882,8 @@ procedure TATSynEdit.DoPaintTextFragment(C: TCanvas;
   ALineFrom: integer;
   AConsiderWrapInfo: boolean;
   AColorBG, AColorBorder: TColor;
-  AFontSize: integer);
+  AFontSize: integer;
+  AWithSelection: boolean);
 var
   St: TATStrings;
   NOutputStrWidth: Int64;
@@ -9996,7 +9998,7 @@ begin
       false,
       NColorAfter,
       true,
-      true
+      AWithSelection
       );
 
     SText:= St.LineSub(
@@ -10076,7 +10078,8 @@ begin
     true,
     Colors.MinimapTooltipBG,
     Colors.MinimapTooltipBorder,
-    FMinimapTooltipFontSize
+    FMinimapTooltipFontSize,
+    true
     );
 
   C.Draw(NPanelLeft, NPanelTop, FMinimapTooltipBitmap);
@@ -10125,11 +10128,11 @@ begin
       FFoldedMarkTooltip.Canvas,
       Rect(0, 0, FFoldedMarkTooltip.Width, FFoldedMarkTooltip.Height),
       FFoldedMarkCurrent.LineFrom,
-      //FFoldedMarkCurrent.LineTo,
       false, //to paint fully folded lines, must be False
       Colors.MinimapTooltipBG,
       Colors.MinimapTooltipBorder,
-      0
+      0,
+      true
       );
 end;
 
