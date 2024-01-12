@@ -25,6 +25,7 @@ type
     function Add(AValue: Word): boolean;
     function Delete(AValue: Word): boolean;
     function Find(AValue: Word): integer;
+    procedure Adjust(AValue: Word); inline;
     function DebugText: string;
   end;
 
@@ -175,6 +176,15 @@ begin
     if Data[i]=AValue then
       exit(i);
   Result:= -1;
+end;
+
+procedure TATFoldIndexItem.Adjust(AValue: Word);
+var
+  i: integer;
+begin
+  for i:= 0 to Len-1 do
+    if Data[i]>=AValue then
+      Inc(Data[i]);
 end;
 
 function TATFoldIndexItem.DebugText: string;
@@ -372,19 +382,15 @@ begin
   if ALine1<>ALine2 then //skip one-line ranges
     if ALine2<=High(FLineIndexer) then
       for i:= ALine1 to ALine2 do
-      begin
         FLineIndexer[i].Add(AIndex);
-      end;
 end;
 
 procedure TATFoldRanges.AdjustLineIndexerForInsertion(ARangeIndex: integer);
 var
-  i, j: integer;
+  i: integer;
 begin
   for i:= 0 to High(FLineIndexer) do
-    for j:= 0 to FLineIndexer[i].Len-1 do
-      if FLineIndexer[i].Data[j]>=ARangeIndex then
-        Inc(FLineIndexer[i].Data[j]);
+    FLineIndexer[i].Adjust(ARangeIndex);
 end;
 
 function TATFoldRanges.Insert(AIndex: integer; AX, AY, AX2, AY2: integer;
