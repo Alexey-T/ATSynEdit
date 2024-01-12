@@ -308,7 +308,7 @@ end;
 
 procedure TATFoldRanges.Clear;
 begin
-  ClearLineIndexer(0);
+  FLineIndexer:= nil;
   FList.Clear;
   FHasTagPersist:= false;
   FHasStaples:= false;
