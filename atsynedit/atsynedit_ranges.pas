@@ -417,15 +417,23 @@ end;
 procedure TATFoldRanges.DeleteAllByTag(const ATag: Int64);
 var
   i: integer;
+  bChanged: boolean;
 begin
+  bChanged:= false;
   for i:= FList.Count-1 downto 0 do
     if ItemPtr(i)^.Tag=ATag then
+    begin
       FList.Delete(i);
+      bChanged:= true;
+    end;
 
-  if ATag=cTagPersistentFoldRange then
-    FHasTagPersist:= false;
+  if bChanged then
+  begin
+    if ATag=cTagPersistentFoldRange then
+      FHasTagPersist:= false;
 
-  UpdateLineIndexer;
+    UpdateLineIndexer;
+  end;
 end;
 
 procedure TATFoldRanges.DeleteAllExceptTag(const ATag: Int64);
