@@ -223,7 +223,7 @@ end;
 function TATFoldRange.IsSimple: boolean; inline;
 //ranges of only 2 lines are needed sometimes, e.g. in FindInFiles lexer
 begin
-  Result:= Y2-Y < 1;
+  Result:= Y=Y2;
 end;
 
 function TATFoldRange.IsLineInside(ALine: integer): boolean; inline;
