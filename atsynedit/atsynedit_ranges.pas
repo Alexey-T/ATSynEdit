@@ -74,9 +74,6 @@ type
     FHasStaples: boolean;
     procedure AddToLineIndexer(ALine1, ALine2, AIndex: integer);
     procedure AdjustLineIndexerForInsertion(ARangeIndex: integer);
-    function GetItems(Index: integer): TATFoldRange;
-    procedure SetItems(Index: integer; const AValue: TATFoldRange);
-    //function MessageTextForIndexList(const L: TATIntArray): string;
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -99,7 +96,6 @@ type
     //procedure DeleteAllExceptTag(const ATag: Int64);
     procedure BackupPersistentRanges;
     procedure RestorePersistentRanges;
-    //property Items[Index: integer]: TATFoldRange read GetItems write SetItems; default;
     function ItemPtr(AIndex: integer): PATFoldRange;
     function IsRangeInsideOther(R1, R2: PATFoldRange): boolean;
     function IsRangesSame(R1, R2: PATFoldRange): boolean;
@@ -271,20 +267,6 @@ end;
 function TATFoldRanges.CountOfLineIndexer: integer;
 begin
   Result:= Length(FLineIndexer);
-end;
-
-function TATFoldRanges.GetItems(Index: integer): TATFoldRange;
-begin
-  Result:= FList[Index];
-end;
-
-procedure TATFoldRanges.SetItems(Index: integer; const AValue: TATFoldRange);
-begin
-  FList[Index]:= AValue;
-  if AValue.Tag=cTagPersistentFoldRange then
-    FHasTagPersist:= true;
-  if AValue.Staple then
-    FHasStaples:= true;
 end;
 
 procedure TATFoldRanges.ClearLineIndexer(ALineCount: integer; ASetLenOnly: boolean=false);
