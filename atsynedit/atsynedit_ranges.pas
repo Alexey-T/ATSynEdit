@@ -99,7 +99,7 @@ type
     //procedure DeleteAllExceptTag(const ATag: Int64);
     procedure BackupPersistentRanges;
     procedure RestorePersistentRanges;
-    property Items[Index: integer]: TATFoldRange read GetItems write SetItems; default;
+    //property Items[Index: integer]: TATFoldRange read GetItems write SetItems; default;
     function ItemPtr(AIndex: integer): PATFoldRange;
     function IsRangeInsideOther(R1, R2: PATFoldRange): boolean;
     function IsRangesSame(R1, R2: PATFoldRange): boolean;
