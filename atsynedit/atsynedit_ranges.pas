@@ -95,7 +95,7 @@ type
     procedure ClearLineIndexer(ALineCount: integer; ASetLenOnly: boolean=false);
     procedure Delete(AIndex: integer);
     procedure DeleteAllByTag(const ATag: Int64);
-    procedure DeleteAllExceptTag(const ATag: Int64);
+    //procedure DeleteAllExceptTag(const ATag: Int64);
     procedure BackupPersistentRanges;
     procedure RestorePersistentRanges;
     property Items[Index: integer]: TATFoldRange read GetItems write SetItems; default;
@@ -436,6 +436,7 @@ begin
   end;
 end;
 
+{
 procedure TATFoldRanges.DeleteAllExceptTag(const ATag: Int64);
 var
   TempList: TATFoldRangeList;
@@ -458,6 +459,7 @@ begin
 
   UpdateLineIndexer;
 end;
+}
 
 procedure TATFoldRanges.BackupPersistentRanges;
 var
