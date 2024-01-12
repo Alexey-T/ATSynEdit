@@ -15,12 +15,16 @@ uses
   ATSynEdit_FGL;
 
 type
+  TATFoldHintLong = string[95];
+  TATFoldHintTrimmed = string[21];
+
+type
   { TATFoldIndexItem }
 
   PATFoldIndexItem = ^TATFoldIndexItem;
   TATFoldIndexItem = packed record
     Len: SmallInt; //must be signed; if Word, then need typecast to Integer when we use 'Len-1'
-    Data: array[0..Pred(19)] of Word;
+    Data: array[0..Pred(19)] of Word; //about 20 levels: enough for most real cases
     function Add(AValue: Word): boolean;
     function Delete(AValue: Word): boolean;
     function Find(AValue: Word): integer;
@@ -40,11 +44,11 @@ type
     Y2: integer; //ending line, which is fully folded (can't partially fold)
     Folded: boolean;
     Staple: boolean;
-    Hint: string[95];
+    Hint: TATFoldHintLong;
     procedure Init(AX, AY, AX2, AY2: integer; AStaple: boolean; const AHint: string; const ATag: Int64);
     function IsSimple: boolean;
     function IsLineInside(ALine: integer): boolean;
-    function IsHintSame(const AOtherHint: string): boolean;
+    function IsHintSame(const AOtherHint: TATFoldHintTrimmed): boolean;
     function MessageText: string;
     class operator =(const a, b: TATFoldRange): boolean;
   end;
@@ -65,7 +69,7 @@ type
   PATFoldedSave = ^TATFoldedSave;
   TATFoldedSave = record
     LineIndex: integer;
-    HintTrimmed: string[21];
+    HintTrimmed: TATFoldHintTrimmed;
     class operator=(constref a, b: TATFoldedSave): boolean;
   end;
 
@@ -252,7 +256,7 @@ begin
   Result:= (ALine>=Y) and (ALine<=Y2);
 end;
 
-function TATFoldRange.IsHintSame(const AOtherHint: string): boolean;
+function TATFoldRange.IsHintSame(const AOtherHint: TATFoldHintTrimmed): boolean;
 const
   cMaxLenCompare = 20;
 var
@@ -260,7 +264,7 @@ var
 begin
   NLenOld:= Min(cMaxLenCompare, Length(Hint));
   NLenNew:= Min(cMaxLenCompare, Length(AOtherHint));
-  Result:= (NLenOld=NLenNew) and (StrLComp(@Hint[1], PChar(AOtherHint), NLenOld)=0);
+  Result:= (NLenOld=NLenNew) and (StrLComp(@Hint[1], @AOtherHint[1], NLenOld)=0);
 end;
 
 function TATFoldRange.MessageText: string;
