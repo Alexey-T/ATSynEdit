@@ -21,12 +21,11 @@ type
   TATFoldIndexItem = packed record
     Len: SmallInt; //must be signed; if Word, then need typecast to Integer when we use 'Len-1'
     Data: array[0..Pred(19)] of Word;
-    procedure Clear;
     function Add(AValue: Word): boolean;
     function Delete(AValue: Word): boolean;
     function Find(AValue: Word): integer;
     procedure Adjust(AValue: Word); inline;
-    function DebugText: string;
+    function MessageText: string;
   end;
 
 type
@@ -137,11 +136,6 @@ const
 
 { TATFoldIndexItem }
 
-procedure TATFoldIndexItem.Clear;
-begin
-  Len:= 0;
-end;
-
 function TATFoldIndexItem.Add(AValue: Word): boolean;
 begin
   Result:= Len<Length(Data);
@@ -187,7 +181,7 @@ begin
       Inc(Data[i]);
 end;
 
-function TATFoldIndexItem.DebugText: string;
+function TATFoldIndexItem.MessageText: string;
 var
   i: integer;
 begin
@@ -905,7 +899,7 @@ begin
   Result:= '';
   for iLine:= 0 to Min(High(FLineIndexer), AMaxCount) do
   begin
-    S:= IntToStr(iLine)+': '+FLineIndexer[iLine].DebugText+#10;
+    S:= IntToStr(iLine)+': '+FLineIndexer[iLine].MessageText+#10;
     Result+= S;
   end;
 end;
