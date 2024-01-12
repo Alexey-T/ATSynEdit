@@ -276,9 +276,12 @@ begin
 end;
 
 procedure TATFoldRanges.ClearLineIndexer(ALineCount: integer; ASetLenOnly: boolean=false);
+var
+  i: integer;
 begin
   if not ASetLenOnly then
-    FLineIndexer:= nil;
+    for i:= 0 to High(FLineIndexer) do
+      FLineIndexer[i].Len:= 0;
 
   SetLength(FLineIndexer, ALineCount);
 end;
