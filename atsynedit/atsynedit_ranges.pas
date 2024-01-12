@@ -295,7 +295,8 @@ begin
     for i:= 0 to High(FLineIndexer) do
       FLineIndexer[i].Len:= 0;
 
-  SetLength(FLineIndexer, ALineCount);
+  if Length(FLineIndexer)<>ALineCount then
+    SetLength(FLineIndexer, ALineCount);
 end;
 
 constructor TATFoldRanges.Create;
