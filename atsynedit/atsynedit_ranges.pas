@@ -44,6 +44,7 @@ type
     procedure Init(AX, AY, AX2, AY2: integer; AStaple: boolean; const AHint: string; const ATag: Int64);
     function IsSimple: boolean;
     function IsLineInside(ALine: integer): boolean;
+    function IsHintSame(const AOtherHint: string): boolean;
     function MessageText: string;
     class operator =(const a, b: TATFoldRange): boolean;
   end;
@@ -232,6 +233,17 @@ end;
 function TATFoldRange.IsLineInside(ALine: integer): boolean; inline;
 begin
   Result:= (ALine>=Y) and (ALine<=Y2);
+end;
+
+function TATFoldRange.IsHintSame(const AOtherHint: string): boolean;
+const
+  cMaxLenCompare = 20;
+var
+  NLenOld, NLenNew: integer;
+begin
+  NLenOld:= Min(cMaxLenCompare, Length(Hint));
+  NLenNew:= Min(cMaxLenCompare, Length(AOtherHint));
+  Result:= (NLenOld=NLenNew) and (StrLComp(@Hint[1], PChar(AOtherHint), NLenOld)=0);
 end;
 
 function TATFoldRange.MessageText: string;
@@ -920,17 +932,6 @@ end;
 procedure TATFoldRanges.Merge(AX, AY, AX2, AY2: integer; const AHint: string; const ATag: Int64);
 //try to find old fold-range for the AY line;
 //if found, update the range (don't change it's Folded state) without inserting new one
-  function IsHintSame(Item: PATFoldRange): boolean;
-  const
-    cMaxLenCompare = 20;
-  var
-    NLenOld, NLenNew: integer;
-  begin
-    NLenOld:= Min(cMaxLenCompare, Length(Item^.Hint));
-    NLenNew:= Min(cMaxLenCompare, Length(AHint));
-    Result:= (NLenOld=NLenNew) and (StrLComp(@Item^.Hint[1], PChar(AHint), NLenOld)=0);
-  end;
-  //
 var
   Item: PATFoldRange;
   NIndex: integer;
@@ -941,7 +942,7 @@ begin
   if NIndex>=0 then
   begin
     Item:= ItemPtr(NIndex);
-    if (Item^.Y=AY) and IsHintSame(Item) then
+    if (Item^.Y=AY) and Item^.IsHintSame(AHint) then
     begin
       Item^.X2:= AX2;
       Item^.Y2:= AY2;
