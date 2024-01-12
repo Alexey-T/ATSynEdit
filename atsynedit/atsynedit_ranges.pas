@@ -107,6 +107,7 @@ type
     //procedure Merge(AX, AY, AX2, AY2: integer; const AHint: string; const ATag: Int64);
     procedure Clear;
     procedure ClearLineIndexer(ALineCount: integer; ASetLenOnly: boolean=false);
+    procedure AssignList(AList: TATFoldRangeList);
     procedure Delete(AIndex: integer);
     procedure DeleteAllByTag(const ATag: Int64);
     //procedure DeleteAllExceptTag(const ATag: Int64);
@@ -304,6 +305,11 @@ begin
 
   if Length(FLineIndexer)<>ALineCount then
     SetLength(FLineIndexer, ALineCount);
+end;
+
+procedure TATFoldRanges.AssignList(AList: TATFoldRangeList);
+begin
+  FList.Assign(AList);
 end;
 
 constructor TATFoldRanges.Create;
