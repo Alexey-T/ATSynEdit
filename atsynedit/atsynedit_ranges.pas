@@ -60,6 +60,17 @@ type
 
   TATFoldIndexer = packed array of TATFoldIndexItem;
 
+  { TATFoldedSaves }
+
+  PATFoldedSave = ^TATFoldedSave;
+  TATFoldedSave = record
+    LineIndex: integer;
+    HintTrimmed: string[21];
+    class operator=(constref a, b: TATFoldedSave): boolean;
+  end;
+
+  TATFoldedSaves = specialize TFPGList<TATFoldedSave>;
+
 type
   { TATFoldRanges }
 
@@ -69,6 +80,7 @@ type
   private
     FList: TATFoldRangeList;
     FListPersist: TATFoldRangeList; //for BackupPersistentRanges/RestorePersistentRanges
+    FListFoldedSaves: TATFoldedSaves;
     FLineIndexer: TATFoldIndexer;
     FHasTagPersist: boolean;
     FHasStaples: boolean;
@@ -88,14 +100,12 @@ type
       out AItemIndex: integer): TATFoldRange;
     function Insert(AIndex: integer; AX, AY, AX2, AY2: integer; AWithStaple: boolean;
       const AHint: string; const ATag: Int64=0): TATFoldRange;
-    procedure Merge(AX, AY, AX2, AY2: integer; const AHint: string; const ATag: Int64);
+    //procedure Merge(AX, AY, AX2, AY2: integer; const AHint: string; const ATag: Int64);
     procedure Clear;
     procedure ClearLineIndexer(ALineCount: integer; ASetLenOnly: boolean=false);
     procedure Delete(AIndex: integer);
     procedure DeleteAllByTag(const ATag: Int64);
     //procedure DeleteAllExceptTag(const ATag: Int64);
-    procedure BackupPersistentRanges;
-    procedure RestorePersistentRanges;
     function ItemPtr(AIndex: integer): PATFoldRange;
     function IsRangeInsideOther(R1, R2: PATFoldRange): boolean;
     function IsRangesSame(R1, R2: PATFoldRange): boolean;
@@ -114,6 +124,10 @@ type
     procedure Update(AChange: TATLineChangeKind; ALineIndex, AItemCount: integer);
     property HasTagPersist: boolean read FHasTagPersist;
     property HasStaples: boolean read FHasStaples;
+    procedure BackupPersistentRanges;
+    procedure RestorePersistentRanges;
+    procedure BackupFoldedStates;
+    procedure RestoreFoldedStates;
   end;
 
 const
@@ -193,6 +207,13 @@ end;
 function TATFoldRangeList.ItemPtr(AIndex: integer): PATFoldRange;
 begin
   Result:= PATFoldRange(InternalGet(AIndex));
+end;
+
+{ TATFoldedSave }
+
+class operator TATFoldedSave.=(constref a, b: TATFoldedSave): boolean;
+begin
+  Result:= false;
 end;
 
 
@@ -296,6 +317,8 @@ begin
   FListPersist.Clear;
   Clear;
   FLineIndexer:= nil;
+  if Assigned(FListFoldedSaves) then
+    FreeAndNil(FListFoldedSaves);
   FreeAndNil(FListPersist);
   FreeAndNil(FList);
   inherited;
@@ -305,6 +328,7 @@ procedure TATFoldRanges.Clear;
 begin
   FLineIndexer:= nil;
   FList.Clear;
+  //don't clear FListFoldedSaves
   FHasTagPersist:= false;
   FHasStaples:= false;
 end;
@@ -912,6 +936,7 @@ begin
   end;
 end;
 
+(*
 procedure TATFoldRanges.Merge(AX, AY, AX2, AY2: integer; const AHint: string; const ATag: Int64);
 //try to find old fold-range for the AY line;
 //if found, update the range (don't change it's Folded state) without inserting new one
@@ -936,6 +961,49 @@ begin
   end
   else
     Add(AX, AY, AX2, AY2, false, AHint, ATag);
+end;
+*)
+
+procedure TATFoldRanges.BackupFoldedStates;
+var
+  Item: PATFoldRange;
+  SaveState: TATFoldedSave;
+  i: integer;
+begin
+  if FListFoldedSaves=nil then
+    FListFoldedSaves:= TATFoldedSaves.Create;
+  FListFoldedSaves.Clear;
+
+  for i:= 0 to Count-1 do
+  begin
+    Item:= ItemPtr(i);
+    if Item^.Folded then
+    begin
+      SaveState.LineIndex:= Item^.Y;
+      SaveState.HintTrimmed:= Item^.Hint;
+      FListFoldedSaves.Add(SaveState);
+    end;
+  end;
+end;
+
+procedure TATFoldRanges.RestoreFoldedStates;
+var
+  SavedItem: PATFoldedSave;
+  Item: PATFoldRange;
+  NIndex, i: integer;
+begin
+  if FListFoldedSaves=nil then exit;
+  for i:= 0 to FListFoldedSaves.Count-1 do
+  begin
+    SavedItem:= FListFoldedSaves._GetItemPtr(i);
+    NIndex:= FindRangeWithPlusAtLine(SavedItem^.LineIndex, true);
+    if NIndex>=0 then
+    begin
+      Item:= ItemPtr(NIndex);
+      if Item^.IsHintSame(SavedItem^.HintTrimmed) then
+        Item^.Folded:= true;
+    end;
+  end;
 end;
 
 
