@@ -1666,8 +1666,8 @@ type
     function DoCaretsFixIncorrectPos(AndLimitByLineEnds: boolean): boolean;
     procedure DoCaretsFixIfInsideFolded;
     procedure DoCaretForceShow;
-    function CaretPosToClientPos(const P: TPoint): TATPoint;
-    function ClientPosToCaretPos(P: TATPoint;
+    function CaretPosToClientPos(const APos: TPoint): TATPoint;
+    function ClientPosToCaretPos(APos: TATPoint;
       out ADetails: TATEditorPosDetails;
       AGapCoordAction: TATEditorGapCoordAction=TATEditorGapCoordAction.ToLineEnd): TPoint;
     function IsLineWithCaret(ALine: integer; ADisableSelected: boolean=false): boolean;

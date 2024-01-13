@@ -559,10 +559,10 @@ begin
     ADetails.EndOfWrappedLine:= false;
 end;
 
-function TATSynEdit.CaretPosToClientPos(const P: TPoint): TATPoint;
+function TATSynEdit.CaretPosToClientPos(const APos: TPoint): TATPoint;
 begin
-  Result:= _DoCaretPosToClientPos(P,
-    FWrapInfo,
+  Result:= _DoCaretPosToClientPos(APos,
+    WrapInfo,
     Strings,
     Gaps,
     FTabHelper,
@@ -582,16 +582,17 @@ begin
   }
 end;
 
-function TATSynEdit.ClientPosToCaretPos(P: TATPoint;
+function TATSynEdit.ClientPosToCaretPos(
+  APos: TATPoint;
   out ADetails: TATEditorPosDetails;
   AGapCoordAction: TATEditorGapCoordAction = TATEditorGapCoordAction.ToLineEnd): TPoint;
 begin
   if FOptScrollSmooth then
-    Dec(P.X, FScrollHorz.NPixelOffset); //fix for text partially scrolled, #5349
-  Dec(P.Y, FTextOffsetFromTop1);
+    Dec(APos.X, FScrollHorz.NPixelOffset); //fix for text partially scrolled, #5349
+  Dec(APos.Y, FTextOffsetFromTop1);
 
-  Result:= _DoClientPosToCaretPos(P,
-    FWrapInfo,
+  Result:= _DoClientPosToCaretPos(APos,
+    WrapInfo,
     Strings,
     Gaps,
     FTabHelper,
