@@ -2789,8 +2789,6 @@ end;
 
 procedure TATSynEdit.SetText(const AValue: UnicodeString);
 begin
-  Strings.LoadFromString(UTF8Encode(AValue));
-
   DoCaretSingle(0, 0);
   if Assigned(FMarkers) then
     FMarkers.Clear;
@@ -2799,7 +2797,9 @@ begin
   if Assigned(FLinkCache) then
     FLinkCache.Clear;
 
-  Update(true);
+  Strings.LoadFromString(UTF8Encode(AValue));
+  UpdateWrapInfo(true, false{important});
+  Update;
 end;
 
 procedure TATSynEdit.SetWrapMode(AValue: TATEditorWrapMode);
