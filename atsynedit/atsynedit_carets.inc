@@ -586,6 +586,8 @@ function TATSynEdit.ClientPosToCaretPos(P: TATPoint;
   out ADetails: TATEditorPosDetails;
   AGapCoordAction: TATEditorGapCoordAction = TATEditorGapCoordAction.ToLineEnd): TPoint;
 begin
+  if FOptScrollSmooth then
+    Dec(P.X, FScrollHorz.NPixelOffset); //fix for text partially scrolled, #5349
   Dec(P.Y, FTextOffsetFromTop1);
 
   Result:= _DoClientPosToCaretPos(P,
