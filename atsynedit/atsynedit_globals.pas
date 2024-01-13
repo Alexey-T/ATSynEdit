@@ -465,7 +465,7 @@ initialization
     GutterSizeSeparator:= 1;
     GutterSizeEmpty:= 2;
 
-    FoldedLenOfEmptyHint:= 50;
+    FoldedLenOfEmptyHint:= 60;
     FoldedMarkIndentInner:= 1; //indent inside [...] folded-mark
     FoldedMarkIndentOuter:= 2; //indent before [...] folded-mark
     FoldedUnderlineStyle:= TATEditorFoldedUnderlineStyle.Dashed;
