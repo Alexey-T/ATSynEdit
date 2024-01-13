@@ -2790,6 +2790,7 @@ end;
 procedure TATSynEdit.SetText(const AValue: UnicodeString);
 begin
   DoCaretSingle(0, 0);
+  BookmarkDeleteAll;
   if Assigned(FMarkers) then
     FMarkers.Clear;
   if Assigned(FAttribs) then
