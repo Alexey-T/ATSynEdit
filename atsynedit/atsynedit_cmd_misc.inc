@@ -169,13 +169,15 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoMarkAllLinesVisible;
+procedure TATSynEdit.DoMarkLinesVisible(ALineFrom, ALineTo: integer);
 var
   St: TATStrings;
   i: integer;
 begin
   St:= Strings;
-  for i:= 0 to St.Count-1 do
+  ALineTo:= Min(ALineTo, St.Count-1);
+
+  for i:= ALineFrom to ALineTo do
   begin
     St.LinesHidden[i, EditorIndex]:= false;
     St.LinesFoldFrom[i, EditorIndex]:= 0;
@@ -185,7 +187,7 @@ end;
 function TATSynEdit.DoCommand_FoldUnAll: TATCommandResults;
 begin
   DoMarkAllRangesUnfolded;
-  DoMarkAllLinesVisible;
+  DoMarkLinesVisible(0, MaxInt);
 
   Result:= [TATCommandResult.CaretTop, TATCommandResult.Scroll, TATCommandResult.FoldChange];
 end;

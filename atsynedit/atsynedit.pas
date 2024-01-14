@@ -1724,7 +1724,7 @@ type
     property FoldingAsStringTodo: string read FFoldingAsStringTodo write FFoldingAsStringTodo;
     procedure DoUnfoldLine(ALine: integer);
     procedure DoUnfoldLinesWithCarets;
-    procedure DoMarkAllLinesVisible;
+    procedure DoMarkLinesVisible(ALineFrom, ALineTo: integer);
     //markers
     procedure MarkerClearAll;
     procedure MarkerDrop;
