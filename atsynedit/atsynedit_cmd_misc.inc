@@ -206,7 +206,7 @@ begin
     Result:= [TATCommandResult.CaretAny, TATCommandResult.Scroll, TATCommandResult.FoldChange];
 end;
 
-procedure TATSynEdit.UpdateFoldLineIndexer;
+procedure TATSynEdit.UpdateFoldLineIndexerLen;
 var
   NCount: integer;
 begin
@@ -229,7 +229,7 @@ begin
   //better clear the selection
   Caret.SelectNone;
 
-  UpdateFoldLineIndexer;
+  UpdateFoldLineIndexerLen;
 
   //don't use FindRangeWithPlusAtLine because it uses binary search, while
   //range 'for selection' is added unsorted
