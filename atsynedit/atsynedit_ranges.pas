@@ -916,8 +916,6 @@ begin
           end;
         end;
   end;
-
-  UpdateLineIndexer;
 end;
 
 procedure TATFoldRanges.UpdateLineIndexer;

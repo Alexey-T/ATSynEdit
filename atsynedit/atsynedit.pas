@@ -9797,9 +9797,15 @@ procedure TATSynEdit.DoStringsOnChangeEx(Sender: TObject; AChange: TATLineChange
 var
   St: TATStrings;
 begin
-  Fold.Update(AChange, ALine, AItemCount);
-
   St:= Strings;
+
+  if Fold.Count>0 then
+  begin
+    Fold.Update(AChange, ALine, AItemCount);
+    Fold.ClearLineIndexer(St.Count, true);
+    Fold.UpdateLineIndexer;
+  end;
+
   if not St.EditingActive then
     FlushEditingChangeEx(AChange, ALine, AItemCount);
 end;
