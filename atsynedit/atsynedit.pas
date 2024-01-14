@@ -1559,7 +1559,6 @@ type
     procedure UpdateWrapInfo(AForceUpdate: boolean=false; AAllowCachedUpdate: boolean=true);
     procedure UpdateFoldedFromLinesHidden;
     procedure UpdateScrollInfoFromSmoothPos(var AInfo: TATEditorScrollInfo; const APos: Int64);
-    procedure UpdateFoldLineIndexerLen;
     function UpdateScrollbars(AdjustSmoothPos: boolean): boolean;
     procedure UpdateCaretsAndMarkersOnEditing(AFromCaret: integer; APos, APosEnd, AShift, APosAfter: TPoint);
     procedure UpdateMarkersOnDeleting(AX1, AY1, AX2, AY2: integer);

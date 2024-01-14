@@ -206,14 +206,6 @@ begin
     Result:= [TATCommandResult.CaretAny, TATCommandResult.Scroll, TATCommandResult.FoldChange];
 end;
 
-procedure TATSynEdit.UpdateFoldLineIndexerLen;
-var
-  NCount: integer;
-begin
-  NCount:= Strings.Count;
-  if Fold.CountOfLineIndexer<NCount then
-    Fold.ClearLineIndexer(NCount, true);
-end;
 
 function TATSynEdit.DoCommand_FoldSelection: TATCommandResults;
 var
@@ -229,14 +221,15 @@ begin
   //better clear the selection
   Caret.SelectNone;
 
-  UpdateFoldLineIndexerLen;
-
   //don't use FindRangeWithPlusAtLine because it uses binary search, while
   //range 'for selection' is added unsorted
   if Fold.FindRangeWithPlusAtLine_ViaIndexer(Y1)>=0 then exit;
 
   Fold.AddSorted(1, Y1, 1, Y2, false, '', cTagPersistentFoldRange, NRangeIndex);
   DoRangeFold(NRangeIndex);
+
+  Fold.ClearLineIndexer(Strings.Count, true);
+  Fold.UpdateLineIndexer;
 
   Result:= [TATCommandResult.CaretAny, TATCommandResult.FoldChange];
 end;
