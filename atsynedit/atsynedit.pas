@@ -1126,7 +1126,6 @@ type
     procedure DoCaretsAssign(NewCarets: TATCarets);
     procedure DoDropText(AndDeleteSelection: boolean);
     procedure DoMarkAllRangesUnfolded;
-    procedure DoMarkAllLinesVisible;
     procedure DoFoldbarClick_LineIndex(ALine: integer);
     procedure DoFoldbarClick_RangeIndex(ARangeIndex: integer);
     procedure DoHandleRightClick(X, Y: integer);
@@ -1725,6 +1724,7 @@ type
     property FoldingAsStringTodo: string read FFoldingAsStringTodo write FFoldingAsStringTodo;
     procedure DoUnfoldLine(ALine: integer);
     procedure DoUnfoldLinesWithCarets;
+    procedure DoMarkAllLinesVisible;
     //markers
     procedure MarkerClearAll;
     procedure MarkerDrop;
