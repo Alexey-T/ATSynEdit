@@ -600,7 +600,6 @@ type
     FFoldStyle: TATEditorFoldStyle;
     FFoldUnderlineOffset: integer;
     FFoldEnabled: boolean;
-    FFoldCacheEnabled: boolean;
     FFoldTooltipVisible: boolean;
     FFoldTooltipWidthPercents: integer;
     FFoldTooltipLineCount: integer;
@@ -709,7 +708,6 @@ type
     FIsRunningCommand: boolean;
     FCursorOnMinimap: boolean;
     FCursorOnGutter: boolean;
-    FFoldbarCache: TATFoldBarPropsArray;
     FFoldbarCacheStart: integer;
     FAdapterIsDataReady: boolean;
     FTimingQueue: TATTimingQueue;
@@ -1091,7 +1089,6 @@ type
     function GetDimRanges: TATDimRanges;
     function GetHotspots: TATHotspots;
     function GetGutterDecor: TATGutterDecor;
-    procedure InitFoldbarCache(ACacheStartIndex: integer);
     procedure InitLengthArray(out Lens: TATIntArray);
     procedure CalcCaretDistanceFromEdges(ACommand: integer;
       out ALinesFromTop, ALinesFromBottom: integer);
@@ -1957,7 +1954,6 @@ type
     property OptNonWordChars: atString read FOptNonWordChars write FOptNonWordChars stored false;
     property OptFoldStyle: TATEditorFoldStyle read FFoldStyle write FFoldStyle default cInitFoldStyle;
     property OptFoldEnabled: boolean read FFoldEnabled write SetFoldEnabled default true;
-    property OptFoldCacheEnabled: boolean read FFoldCacheEnabled write FFoldCacheEnabled default true;
     property OptFoldUnderlineOffset: integer read FFoldUnderlineOffset write FFoldUnderlineOffset default cInitFoldUnderlineOffset;
     property OptFoldTooltipVisible: boolean read FFoldTooltipVisible write FFoldTooltipVisible default cInitFoldTooltipVisible;
     property OldFoldTooltipWidthPercents: integer read FFoldTooltipWidthPercents write FFoldTooltipWidthPercents default cInitFoldTooltipWidthPercents;
@@ -3675,9 +3671,6 @@ begin
   AScrollHorz.NMax:= 1;
   {$endif}
 
-  if FFoldCacheEnabled then
-    InitFoldbarCache(NWrapIndex);
-
   DoEventBeforeCalcHilite;
 
   RectLine.Left:= ARect.Left;
@@ -5099,7 +5092,6 @@ begin
   FFold:= TATFoldRanges.Create;
   FFoldStyle:= cInitFoldStyle;
   FFoldEnabled:= true;
-  FFoldCacheEnabled:= true;
   FFoldUnderlineOffset:= cInitFoldUnderlineOffset;
   FFoldTooltipVisible:= cInitFoldTooltipVisible;
   FFoldTooltipWidthPercents:= cInitFoldTooltipWidthPercents;
@@ -9056,7 +9048,6 @@ var
   //
 var
   NColorLine, NColorPlus: TColor;
-  NCacheIndex: integer;
   bOk: boolean;
   OldPenWidth: integer;
 begin
@@ -9066,26 +9057,8 @@ begin
   //fixing CudaText issue #4285, needed only for macOS
   C.AntialiasingMode:= amOff;
 
-  //FFoldbarCache removes flickering of the folding-bar on fast editing
-  if FFoldCacheEnabled then
-  begin
-    NCacheIndex:= AWrapItemIndex-FFoldbarCacheStart;
-    if not ((NCacheIndex>=0) and (NCacheIndex<=High(FFoldbarCache))) then exit;
-
-    if not FAdapterIsDataReady then
-      Props:= FFoldbarCache[NCacheIndex]
-    else
-    begin
-      bOk:= DoCalcFoldProps(AWrapItemIndex, Props);
-      FFoldbarCache[NCacheIndex]:= Props;
-      if not bOk then exit;
-    end;
-  end
-  else
-  begin
-    bOk:= DoCalcFoldProps(AWrapItemIndex, Props);
-    if not bOk then exit;
-  end;
+  bOk:= DoCalcFoldProps(AWrapItemIndex, Props);
+  if not bOk then exit;
 
   if Props.HiliteLines then
     NColorPlus:= Colors.GutterFoldLine2
@@ -10806,28 +10779,6 @@ begin
   UpdateInitialVars(Canvas);
 end;
 
-procedure TATSynEdit.InitFoldbarCache(ACacheStartIndex: integer);
-var
-  NCount: integer;
-  bLenValid, bClear: boolean;
-begin
-  NCount:= GetVisibleLines+1;
-
-  bClear:= false;
-  if FFoldbarCacheStart<>ACacheStartIndex then
-    bClear:= true;
-  bLenValid:= Length(FFoldbarCache)=NCount;
-  if not bLenValid then
-    bClear:= true;
-
-  FFoldbarCacheStart:= ACacheStartIndex;
-
-  if not bLenValid then
-    SetLength(FFoldbarCache, NCount);
-
-  if bClear then
-    FillChar(FFoldbarCache[0], SizeOf(TATFoldBarProps)*NCount, 0);
-end;
 
 procedure TATSynEdit.DoHandleWheelRecord(const ARec: TATEditorWheelRecord);
 begin
