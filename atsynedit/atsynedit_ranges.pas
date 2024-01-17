@@ -873,7 +873,6 @@ begin
       for i:= FList.Count-1 downto 0 do
         begin
           Rng:= FList.ItemPtr(i);
-          //if Rng^.Tag<>cTagPersistentFoldRange then Continue;
 
           if Rng^.Y>=ALineIndex+AItemCount then
           begin
@@ -902,7 +901,6 @@ begin
       for i:= FList.Count-1 downto 0 do
         begin
           Rng:= FList.ItemPtr(i);
-          //if Rng^.Tag<>cTagPersistentFoldRange then Continue;
 
           if Rng^.Y>=ALineIndex then
           begin
