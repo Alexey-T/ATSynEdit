@@ -873,7 +873,7 @@ begin
       for i:= FList.Count-1 downto 0 do
         begin
           Rng:= FList.ItemPtr(i);
-          if Rng^.Tag<>cTagPersistentFoldRange then Continue;
+          //if Rng^.Tag<>cTagPersistentFoldRange then Continue;
 
           if Rng^.Y>=ALineIndex+AItemCount then
           begin
@@ -902,7 +902,7 @@ begin
       for i:= FList.Count-1 downto 0 do
         begin
           Rng:= FList.ItemPtr(i);
-          if Rng^.Tag<>cTagPersistentFoldRange then Continue;
+          //if Rng^.Tag<>cTagPersistentFoldRange then Continue;
 
           if Rng^.Y>=ALineIndex then
           begin
@@ -939,7 +939,7 @@ begin
   Result:= '';
   for iLine:= 0 to Min(High(FLineIndexer), AMaxCount) do
   begin
-    S:= IntToStr(iLine)+': '+FLineIndexer[iLine].MessageText+#10;
+    S:= IntToStr(iLine+1)+': '+FLineIndexer[iLine].MessageText+#10;
     Result+= S;
   end;
 end;
