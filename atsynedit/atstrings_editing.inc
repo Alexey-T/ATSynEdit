@@ -9,10 +9,7 @@ var
   Str: atString;
 begin
   Str:= Lines[AY];
-  Str:=
-    Copy(Str, 1, AX1) +
-    AText +
-    Copy(Str, AX2+1, MaxInt);
+  SDeleteAndInsert(Str, AX1, AX2-AX1, AText);
   Lines[AY]:= Str;
 end;
 
