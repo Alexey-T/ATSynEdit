@@ -866,9 +866,6 @@ var
   i: integer;
 begin
   case AChange of
-    TATLineChangeKind.DeletedAll:
-      Clear;
-
     TATLineChangeKind.Deleted:
       for i:= FList.Count-1 downto 0 do
         begin
@@ -913,6 +910,9 @@ begin
             Rng^.Y2+= AItemCount;
           end;
         end;
+
+    TATLineChangeKind.DeletedAll:
+      Clear;
   end;
 end;
 
