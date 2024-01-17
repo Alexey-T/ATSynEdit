@@ -2807,7 +2807,7 @@ begin
 
   //disable setting wrap=on for too big files
   if FWrapMode=TATEditorWrapMode.ModeOff then
-    if Strings.Count>=FWrapEnabledForMaxLines then exit;
+    if Strings.Count>FWrapEnabledForMaxLines then exit;
 
   NLine:= LineTop;
   FWrapMode:= AValue;
