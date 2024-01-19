@@ -27,7 +27,7 @@ type
     );
 
 const
-  StrEditActionDescriptions: array[TATEditAction] of string = (
+  cEditAction_Description: array[TATEditAction] of string = (
     'change',
     'change-eol',
     'insert',
@@ -37,7 +37,8 @@ const
     'jump'
     );
 
-  cEditActionSetsModified: array[TATEditAction] of boolean = (
+  {
+  cEditAction_SetsModified: array[TATEditAction] of boolean = (
     true,
     true,
     true,
@@ -46,6 +47,7 @@ const
     false,
     false
     );
+    }
 
   cEditAction_CachedWrapinfoUpdate: array[TATEditAction] of boolean = (
     true,
@@ -501,7 +503,7 @@ begin
   for i:= 0 to Min(MaxItems, Count)-1 do
   begin
     Item:= Items[i];
-    s_action:= StrEditActionDescriptions[Item.ItemAction];
+    s_action:= cEditAction_Description[Item.ItemAction];
     s_text:= UTF8Encode(Item.ItemText);
     if Length(s_text)>MaxLen then
       s_text:= Copy(s_text, 1, MaxLen)+'...';
