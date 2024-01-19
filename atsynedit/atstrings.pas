@@ -1896,7 +1896,7 @@ var
   CurMarkersArray: TATMarkerMarkerArray;
   CurAttribsArray: TATMarkerAttribArray;
   OtherList: TATUndoList;
-  NCount: integer;
+  NCount, NTemp: integer;
   NEventX, NEventY: SizeInt;
   bWithoutPause: boolean;
   bEnableEventBefore,
@@ -2033,8 +2033,9 @@ begin
 
       TATEditAction.Add:
         begin
-          if Count>0 then
-            LineDelete(Count-1, true, false);
+          NTemp:= Count;
+          if NTemp>0 then
+            LineDelete(NTemp-1, true, false);
         end;
 
       TATEditAction.ClearModified:
