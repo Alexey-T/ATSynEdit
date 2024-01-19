@@ -106,7 +106,7 @@ var
   LastItem: PATStringItem;
   Block: TATStrings;
   BlockUTF8: TStringList;
-  bTrimRedundantEol,
+  bTrimRedundantEol, bInsertSingleLine,
   bAtLineEnd, bAtFileEnd, bAtEmptyLine,
   bBlockWithEol, bUseBlockFinalEol: boolean;
   BlockOriginalLineCount: integer;
@@ -127,7 +127,7 @@ begin
   bAtLineEnd:= AX>=Length(Str);
   bAtFileEnd:= bAtLineEnd and (AY>=Count-1);
   bAtEmptyLine:= Str='';
-  //note: bools used for pasting block of n lines, yes/no final eol, at end of line
+  bInsertSingleLine:= not SStringHasEol(AText);
 
   if bBlockWithEol and bAtFileEnd then
   begin
@@ -144,8 +144,31 @@ begin
 
   if not bAtLineEnd then
   begin
-    StrLead:= Copy(Str, 1, AX);
-    StrTail:= Copy(Str, AX+1, MaxInt);
+    if bInsertSingleLine then
+    begin
+      //simplest case: typing a char in a middle of line
+      //optimize it specially via SDeleteAndInsert
+      if not AOverwrite then
+        NDeleteLen:= 0
+      else
+      begin
+        NDeleteLen:= Length(AText);
+        //if we type over emoji - delete 2 surrogate chars
+        if IsCharSurrogateHigh(Str[AX+1]) then
+          Inc(NDeleteLen);
+      end;
+      SDeleteAndInsert(Str, AX+1, NDeleteLen, AText);
+      Lines[AY]:= Str;
+      if not AOverwrite then
+        AShift.X:= Length(AText);
+      APosAfter.X:= AX+Length(AText);
+      Exit
+    end
+    else
+    begin
+      StrLead:= Copy(Str, 1, AX);
+      StrTail:= Copy(Str, AX+1, MaxInt);
+    end;
   end
   else
   begin
@@ -165,7 +188,7 @@ begin
   //------------------
   //Insert single line
 
-  if not SStringHasEol(AText) then
+  if bInsertSingleLine then
   begin
     Lines[AY]:= StrLead+AText+StrTail;
     if not AOverwrite then
