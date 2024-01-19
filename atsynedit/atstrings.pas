@@ -297,7 +297,7 @@ type
       AHardMarkedNext, AUnmodifiedNext: boolean;
       out ACommandCode: integer;
       out ATickCount: QWord);
-    procedure AddUpdatesAction(N: integer; AAction: TATEditAction);
+    procedure AddUpdatesAction(ALineIndex: integer; AAction: TATEditAction);
     procedure UpdateModified;
   public
     CaretsAfterLastEdition: TATPointArray;
@@ -2524,7 +2524,7 @@ begin
 end;
 
 
-procedure TATStrings.AddUpdatesAction(N: integer; AAction: TATEditAction);
+procedure TATStrings.AddUpdatesAction(ALineIndex: integer; AAction: TATEditAction);
 begin
   if not Assigned(FIndexesOfEditedLines) then Exit;
 
@@ -2540,9 +2540,8 @@ begin
     Exit
   end;
 
-  with FIndexesOfEditedLines do
-    if IndexOf(N)<0 then
-      Add(N);
+  if FIndexesOfEditedLines.IndexOf(ALineIndex)<0 then
+    FIndexesOfEditedLines.Add(ALineIndex);
 end;
 
 procedure TATStrings.DoOnChangeBlock(AX1, AY1, AX2, AY2: SizeInt;
