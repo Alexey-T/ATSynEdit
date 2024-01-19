@@ -1896,7 +1896,7 @@ var
   CurMarkersArray: TATMarkerMarkerArray;
   CurAttribsArray: TATMarkerAttribArray;
   OtherList: TATUndoList;
-  NCount, NTemp: integer;
+  NCount, NTemp: SizeInt;
   NEventX, NEventY: SizeInt;
   bWithoutPause: boolean;
   bEnableEventBefore,
