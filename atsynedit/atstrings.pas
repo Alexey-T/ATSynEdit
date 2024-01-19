@@ -1412,7 +1412,7 @@ begin
   if IsFilled then Exit;
 
   UpdateModified;
-  AddUndoItem(TATEditAction.Insert, Count, '', TATLineEnds.None, TATLineState.None, FCommandCode);
+  AddUndoItem(TATEditAction.Add, Count, '', TATLineEnds.None, TATLineState.None, FCommandCode);
   if AWithEvent then
   begin
     DoEventLog(Count);
@@ -2034,8 +2034,10 @@ begin
       TATEditAction.Add:
         begin
           NTemp:= Count;
-          if NTemp>0 then
-            LineDelete(NTemp-1, true, false);
+          if NTemp>1 then
+            LineDelete(NTemp-1, false)
+          else
+            Lines[0]:= '';
         end;
 
       TATEditAction.ClearModified:
