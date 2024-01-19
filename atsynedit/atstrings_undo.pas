@@ -27,16 +27,6 @@ type
     );
 
 const
-  cEditAction_Description: array[TATEditAction] of string = (
-    'change',
-    'change-eol',
-    'insert',
-    'delete',
-    'clear-mod',
-    'jump',
-    'add'
-    );
-
   cEditAction_CachedWrapinfoUpdate: array[TATEditAction] of boolean = (
     true,
     true,
@@ -480,9 +470,9 @@ end;
 
 function TATUndoList.DebugText: string;
 var
+  Item: TATUndoItem;
   s_action, s_text: string;
   i, n_carets: integer;
-  Item: TATUndoItem;
 const
   MaxItems=40;
   MaxLen=30;
@@ -491,7 +481,7 @@ begin
   for i:= 0 to Min(MaxItems, Count)-1 do
   begin
     Item:= Items[i];
-    s_action:= cEditAction_Description[Item.ItemAction];
+    System.Str(Item.ItemAction, s_action);
     s_text:= UTF8Encode(Item.ItemText);
     if Length(s_text)>MaxLen then
       s_text:= Copy(s_text, 1, MaxLen)+'...';
