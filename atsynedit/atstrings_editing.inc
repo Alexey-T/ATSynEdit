@@ -9,7 +9,7 @@ var
   Str: atString;
 begin
   Str:= Lines[AY];
-  SDeleteAndInsert(Str, AX1, AX2-AX1, AText);
+  SDeleteAndInsert(Str, AX1+1, AX2-AX1, AText);
   Lines[AY]:= Str;
 end;
 
