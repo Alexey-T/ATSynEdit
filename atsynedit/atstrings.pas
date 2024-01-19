@@ -2544,7 +2544,7 @@ procedure TATStrings.AddUpdatesAction(ALineIndex: integer; AAction: TATEditActio
 begin
   if not Assigned(FIndexesOfEditedLines) then Exit;
 
-  if AAction in [TATEditAction.Delete, TATEditAction.Insert] then
+  if FOneLine or (AAction in [TATEditAction.Delete, TATEditAction.Insert]) then
   begin
     FEnableCachedWrapinfoUpdate:= false;
     Exit
