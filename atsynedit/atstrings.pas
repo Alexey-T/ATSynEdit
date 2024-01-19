@@ -2002,7 +2002,7 @@ begin
           //big index =Count? it is _adding_ of new line: LineInsertRaw had change in 2024.01
           if CurIndex=Count then
           begin
-            LineInsert(CurIndex, CurText, false);
+            LineAddEx(CurText, CurLineEnd);
           end
           else
           if CurIndex>=0 then
