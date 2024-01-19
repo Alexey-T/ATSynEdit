@@ -1478,9 +1478,10 @@ begin
 
   UpdateModified;
 
+  //2024.01:
   //bAddToEnd should be True for _adding_ lines;
   //it makes EditAction=Change, so allows cached WrapInfo update
-  //(EnabledCachedWrapUpdate is set to False on EditAction=Insert);
+  //(EditAction=Insert makes EnabledCachedWrapUpdate:=False);
   //it solves https://github.com/Alexey-T/CudaText/issues/5360
   NOldCount:= Count;
   bAddToEnd:=
@@ -2002,7 +2003,13 @@ begin
     case CurAction of
       TATEditAction.Change:
         begin
-          if IsIndexValid(CurIndex) then
+          //big index =Count? it is _adding_ of new line: LineInsertRaw had change in 2024.01
+          if CurIndex=Count then
+          begin
+            LineInsert(CurIndex, CurText, false);
+          end
+          else
+          if CurIndex>=0 then
           begin
             Lines[CurIndex]:= CurText;
             LinesState[CurIndex]:= CurLineState;
