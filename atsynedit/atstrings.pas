@@ -1896,7 +1896,7 @@ var
   CurMarkersArray: TATMarkerMarkerArray;
   CurAttribsArray: TATMarkerAttribArray;
   OtherList: TATUndoList;
-  NCount, NTemp: SizeInt;
+  NCurCount, NStringsCount: SizeInt;
   NEventX, NEventY: SizeInt;
   bWithoutPause: boolean;
   bEnableEventBefore,
@@ -1927,13 +1927,13 @@ begin
   ASoftMarked:= CurItem.ItemSoftMark;
   AHardMarked:= CurItem.ItemHardMark;
   ATickCount:= CurItem.ItemTickCount;
-  NCount:= ACurList.Count;
+  NCurCount:= ACurList.Count;
   bWithoutPause:= IsCommandToUndoInOneStep(ACommandCode);
 
   //note: do not break this issue https://github.com/Alexey-T/CudaText/issues/2677
-  if NCount>=2 then
+  if NCurCount>=2 then
   begin
-    PrevItem:= ACurList[NCount-2];
+    PrevItem:= ACurList[NCurCount-2];
     AHardMarkedNext:= PrevItem.ItemHardMark;
     AUnmodifiedNext:= PrevItem.ItemAction=TATEditAction.ClearModified;
   end;
@@ -2033,9 +2033,9 @@ begin
 
       TATEditAction.Add:
         begin
-          NTemp:= Count;
-          if NTemp>1 then
-            LineDelete(NTemp-1, false)
+          NStringsCount:= Count;
+          if NStringsCount>1 then
+            LineDelete(NStringsCount-1, false)
           else
             Lines[0]:= '';
         end;
