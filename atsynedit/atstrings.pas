@@ -1465,14 +1465,30 @@ end;
 
 procedure TATStrings.LineInsertRaw(ALineIndex: SizeInt; const AString: atString;
   AEnd: TATLineEnds; AWithEvent: boolean=true);
+const
+  cActions: array[boolean] of TATEditAction = (TATEditAction.Insert, TATEditAction.Change);
 var
+  NOldCount: SizeInt;
+  bAddToEnd: boolean;
+  EditAction: TATEditAction;
   Item: TATStringItem;
 begin
   if FReadOnly then Exit;
   if IsFilled then Exit;
 
   UpdateModified;
-  AddUndoItem(TATEditAction.Insert, ALineIndex, '', TATLineEnds.None, TATLineState.None, FCommandCode);
+
+  //bAddToEnd should be True for _adding_ lines;
+  //it makes EditAction=Change, so allows cached WrapInfo update
+  //(EnabledCachedWrapUpdate is set to False on EditAction=Insert);
+  //it solves https://github.com/Alexey-T/CudaText/issues/5360
+  NOldCount:= Count;
+  bAddToEnd:=
+    (ALineIndex=NOldCount) or
+    ((ALineIndex=NOldCount-1) and (NOldCount>0) and (LinesLen[NOldCount-1]=0));
+  EditAction:= cActions[bAddToEnd];
+
+  AddUndoItem(EditAction, ALineIndex, '', TATLineEnds.None, TATLineState.None, FCommandCode);
 
   if AWithEvent then
   begin
