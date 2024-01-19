@@ -1483,7 +1483,7 @@ begin
   NOldCount:= Count;
   if (ALineIndex=NOldCount) or
     ((ALineIndex=NOldCount-1) and IsLastLineFake) then
-    EditAction:= TATEditAction.Change;
+    EditAction:= TATEditAction.Add;
 
   AddUndoItem(EditAction, ALineIndex, '', TATLineEnds.None, TATLineState.None, FCommandCode);
 
@@ -1999,13 +1999,7 @@ begin
     case CurAction of
       TATEditAction.Change:
         begin
-          //big index =Count? it is _adding_ of new line: LineInsertRaw had change in 2024.01
-          if CurIndex=Count then
-          begin
-            LineAddEx(CurText, CurLineEnd);
-          end
-          else
-          if CurIndex>=0 then
+          if IsIndexValid(CurIndex) then
           begin
             Lines[CurIndex]:= CurText;
             LinesState[CurIndex]:= CurLineState;
@@ -2035,6 +2029,12 @@ begin
             LineInsertRaw(CurIndex, CurText, CurLineEnd);
           if IsIndexValid(CurIndex) then
             LinesState[CurIndex]:= CurLineState;
+        end;
+
+      TATEditAction.Add:
+        begin
+          if Count>0 then
+            LineDelete(Count-1, true, false);
         end;
 
       TATEditAction.ClearModified:
@@ -2547,7 +2547,7 @@ procedure TATStrings.AddUpdatesAction(ALineIndex: integer; AAction: TATEditActio
 begin
   if not Assigned(FIndexesOfEditedLines) then Exit;
 
-  if AAction in [TATEditAction.Delete, TATEditAction.Insert] then
+  if not cEditAction_CachedWrapinfoUpdate[AAction] then
   begin
     FEnableCachedWrapinfoUpdate:= false;
     Exit

@@ -21,6 +21,7 @@ type
     ChangeEol,
     Insert,
     Delete,
+    Add,
     ClearModified,
     CaretJump
     );
@@ -31,6 +32,7 @@ const
     'change-eol',
     'insert',
     'delete',
+    'add',
     'clear-mod',
     'jump'
     );
@@ -40,8 +42,19 @@ const
     true,
     true,
     true,
+    true,
     false,
     false
+    );
+
+  cEditAction_CachedWrapinfoUpdate: array[TATEditAction] of boolean = (
+    true,
+    true,
+    false,
+    false,
+    true,
+    true,
+    true
     );
 
 type
