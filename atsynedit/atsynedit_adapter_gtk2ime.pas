@@ -181,7 +181,9 @@ begin
       buffer:=UTF8Decode(pchar(Message.LParam));
       len:=Length(buffer);
       bOverwrite:=Ed.ModeOverwrite and (Length(FIMSelText)=0);
-      UpdateCompForm(Ed);
+      // preedit
+      if Message.WParam and GTK_IM_FLAG_PREEDIT<>0 then
+        UpdateCompForm(Ed);
       // commit
       if len>0 then
       begin
