@@ -32,6 +32,7 @@ implementation
 uses
   Types,
   SysUtils,
+  Math,
   Classes,
   Controls,
   Graphics,
@@ -93,8 +94,8 @@ begin
   if ed.Carets.Count>0 then begin
     Caret:=ed.Carets[0];
     CompPos:=ed.CaretPosToClientPos(Point(Caret.PosX,Caret.PosY));
-    CompForm.Left:=CompPos.X;
-    CompForm.Top:=CompPos.Y;
+    CompForm.Left:=Max(Screen.DesktopLeft, CompPos.X);
+    CompForm.Top:=Max(Screen.DesktopTop, CompPos.Y);
   end else begin
     CompForm.Left:=0;
     CompForm.Top:=0;
