@@ -76,6 +76,7 @@ var
   ed: TATSynEdit;
   CompPos: TATPoint;
   Caret: TATCaretItem;
+  DeskRect: TRect;
 begin
   ed:=TATSynEdit(Sender);
   if not Assigned(CompForm) then begin
@@ -94,8 +95,9 @@ begin
   if ed.Carets.Count>0 then begin
     Caret:=ed.Carets[0];
     CompPos:=ed.CaretPosToClientPos(Point(Caret.PosX,Caret.PosY));
-    CompForm.Left:=Max(Screen.DesktopLeft, CompPos.X);
-    CompForm.Top:=Max(Screen.DesktopTop, CompPos.Y);
+    DeskRect:=Screen.DesktopRect;
+    CompForm.Left:=Min(DeskRect.Right, Max(DeskRect.Left, CompPos.X));
+    CompForm.Top:=Min(DeskRect.Bottom, Max(DeskRect.Top, CompPos.Y));
   end else begin
     CompForm.Left:=0;
     CompForm.Top:=0;
