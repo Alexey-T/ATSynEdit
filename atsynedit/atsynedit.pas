@@ -2590,15 +2590,16 @@ begin
         if FWrapTemps.Count=0 then Continue;
 
         FWrapInfo.FindIndexesOfLineNumber(NLine, NIndexFrom, NIndexTo);
-        if NIndexFrom<0 then
+        if NIndexFrom>=0 then
+        begin
+          //slow for 100 carets, 1M lines, so made method in which
+          //we can optimize it (instead of Delete/Insert do Assign)
+          FWrapInfo.ReplaceItems(NIndexFrom, NIndexTo, FWrapTemps);
+        end
+        else
         begin
           //ShowMessage('Cant find wrap-index for line '+IntToStr(NLine));
-          Continue;
         end;
-
-        //slow for 100 carets, 1M lines, so made method in which
-        //we can optimize it (instead of Delete/Insert do Assign)
-        FWrapInfo.ReplaceItems(NIndexFrom, NIndexTo, FWrapTemps);
       end;
 
       FWrapTemps.Clear;
