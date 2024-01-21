@@ -6015,6 +6015,7 @@ begin
     exit(false);
   S:= FAdapterHilite.GetLexerName;
   Result:= (S<>'') and (S[Length(S)]<>'^');
+  //suffix of lite lexers in CudaText = ' ^'
 end;
 
 function TATSynEdit.IsLexerNone: boolean;
