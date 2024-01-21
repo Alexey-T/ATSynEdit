@@ -2467,6 +2467,7 @@ procedure TATSynEdit.UpdateWrapInfo(AForceUpdate: boolean; AAllowCachedUpdate: b
 var
   CurStrings: TATStrings;
   ListNums: TATIntegerList;
+  TempWrapItem: TATWrapItem;
   bUseCachedUpdate: boolean;
   bConsiderFolding: boolean;
   NNewVisibleColumns: integer;
@@ -2565,6 +2566,20 @@ begin
     try
       ListNums.Assign(CurStrings.IndexesOfEditedLines);
 
+      //after changes in 2024.01 (action=Add: don't reset EnableCachedWrapinfoUpdate),
+      //we can have trailing empty line(s) not indexed in WrapInfo,
+      //so add empty wrap-items for them
+      j:= FWrapInfo.Count;
+      if j>0 then
+      begin
+        NLine:= FWrapInfo.Data[j-1].NLineIndex;
+        for i:= NLine+1 to CurStrings.Count-1 do
+        begin
+          TempWrapItem.Init(i, 1, CurStrings.LinesLen[i], 1, TATWrapItemFinal.Final, true);
+          FWrapInfo.Add(TempWrapItem);
+        end;
+      end;
+
       for i:= 0 to ListNums.Count-1 do
       begin
         NLine:= ListNums[i];
@@ -2585,6 +2600,7 @@ begin
         //we can optimize it (instead of Delete/Insert do Assign)
         FWrapInfo.ReplaceItems(NIndexFrom, NIndexTo, FWrapTemps);
       end;
+
       FWrapTemps.Clear;
     finally
       FreeAndNil(ListNums);
