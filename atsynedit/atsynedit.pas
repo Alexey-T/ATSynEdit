@@ -1625,7 +1625,8 @@ type
     function IsPosInVisibleArea(AX, AY: integer): boolean;
     function IsLineFolded(ALine: integer; ADetectPartialFold: boolean = false): boolean;
     function IsCharWord(ch: Widechar): boolean;
-    function IsNormalLexerActive: boolean;
+    function IsLexerNormal: boolean;
+    function IsLexerNone: boolean;
     property TextCharSize: TATEditorCharSize read FCharSize;
     property RectMain: TRect read FRectMain;
     property RectGutter: TRect read FRectGutter;
@@ -6006,15 +6007,26 @@ begin
   end;
 end;
 
-function TATSynEdit.IsNormalLexerActive: boolean;
+function TATSynEdit.IsLexerNormal: boolean;
 var
   S: string;
 begin
   if FAdapterHilite=nil then
     exit(false);
   S:= FAdapterHilite.GetLexerName;
-  Result:= (S<>'') and (S[Length(S)]<>'^') {lite lexer};
+  Result:= (S<>'') and (S[Length(S)]<>'^');
 end;
+
+function TATSynEdit.IsLexerNone: boolean;
+var
+  S: string;
+begin
+  if FAdapterHilite=nil then
+    exit(true);
+  S:= FAdapterHilite.GetLexerName;
+  Result:= S='';
+end;
+
 
 procedure TATSynEdit.SetEditorIndex(AValue: integer);
 begin
@@ -6026,7 +6038,7 @@ end;
 procedure TATSynEdit.PaintEx(ALineNumber: integer);
 begin
   //experimental, reduce flickering on typing in Markdown
-  FOptAllowRepaintOnTextChange:= not IsNormalLexerActive;
+  FOptAllowRepaintOnTextChange:= not IsLexerNormal;
 
   if IsLocked then
   begin
