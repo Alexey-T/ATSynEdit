@@ -2568,7 +2568,7 @@ begin
 
       //after changes in 2024.01 (action=Add: don't reset EnableCachedWrapinfoUpdate),
       //we can have trailing empty line(s) not indexed in WrapInfo,
-      //so add empty wrap-items for them
+      //so add wrap-items for them
       j:= FWrapInfo.Count;
       if j>0 then
       begin
