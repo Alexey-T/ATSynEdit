@@ -67,7 +67,7 @@ type
 
     function GetLexerName: string; virtual;
     //return lexer name
-    //get '-' for none lexer; get name with suffix 'Name ^' for lite lexers of CudaText
+    //get '' for none lexer; get name with suffix 'Name ^' for lite lexers of CudaText
 
     property ImplementsDataReady: boolean read FImplementsDataReady write FImplementsDataReady;
     function IsDataReady: boolean; virtual;
@@ -247,7 +247,7 @@ end;
 
 function TATAdapterHilite.GetLexerName: string;
 begin
-  Result:= '-';
+  Result:= '';
 end;
 
 function TATAdapterHilite.IsDataReady: boolean;

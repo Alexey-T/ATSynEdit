@@ -6013,7 +6013,7 @@ begin
   if FAdapterHilite=nil then
     exit(false);
   S:= FAdapterHilite.GetLexerName;
-  Result:= (S<>'') and (S<>'-') {none lexer} and (S[Length(S)]<>'^') {lite lexer};
+  Result:= (S<>'') and (S[Length(S)]<>'^') {lite lexer};
 end;
 
 procedure TATSynEdit.SetEditorIndex(AValue: integer);
