@@ -2575,7 +2575,7 @@ begin
         NLine:= FWrapInfo.Data[j-1].NLineIndex;
         for i:= NLine+1 to CurStrings.Count-1 do
         begin
-          TempWrapItem.Init(i, 1, CurStrings.LinesLen[i], 1, TATWrapItemFinal.Final, true);
+          TempWrapItem.Init(i, 1, CurStrings.LinesLen[i], 0, TATWrapItemFinal.Final, true);
           FWrapInfo.Add(TempWrapItem);
         end;
       end;
