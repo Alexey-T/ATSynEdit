@@ -2539,10 +2539,11 @@ begin
   bUseCachedUpdate:=
     AAllowCachedUpdate and
     (FWrapInfo.Count>0) and
+    (FWrapInfo.StringsPrevCount>=0) and
     (NLinesCount>ATEditorOptions.MaxLinesForOldWrapUpdate) and
     CurStrings.EnableCachedWrapinfoUpdate and
     (CurStrings.IndexesOfEditedLines.Count>0);
-  //bUseCachedUpdate:= false;////to disable
+  //bUseCachedUpdate:= false; ////debug
 
   FWrapTemps.Clear;
 
@@ -2569,15 +2570,10 @@ begin
       //after changes in 2024.01 (action=Add: don't reset EnableCachedWrapinfoUpdate),
       //we can have trailing empty line(s) not indexed in WrapInfo,
       //so add wrap-items for them
-      j:= FWrapInfo.Count;
-      if j>0 then
+      for i:= FWrapInfo.StringsPrevCount to CurStrings.Count-1 do
       begin
-        NLine:= FWrapInfo.Data[j-1].NLineIndex;
-        for i:= NLine+1 to CurStrings.Count-1 do
-        begin
-          TempWrapItem.Init(i, 1, CurStrings.LinesLen[i], 0, TATWrapItemFinal.Final, true);
-          FWrapInfo.Add(TempWrapItem);
-        end;
+        TempWrapItem.Init(i, 1, CurStrings.LinesLen[i], 0, TATWrapItemFinal.Final, true);
+        FWrapInfo.Add(TempWrapItem);
       end;
 
       for i:= 0 to ListNums.Count-1 do
@@ -2608,6 +2604,7 @@ begin
     end;
   end;
 
+  FWrapInfo.StringsPrevCount:= CurStrings.Count;
   CurStrings.IndexesOfEditedLines.Clear;
   CurStrings.EnableCachedWrapinfoUpdate:= true;
 

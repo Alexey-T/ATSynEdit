@@ -57,6 +57,7 @@ type
     VisibleColumns: integer;
     WrapColumn: integer;
     EditorIndex: integer;
+    StringsPrevCount: SizeInt;
     constructor Create; virtual;
     destructor Destroy; override;
     procedure Clear;
@@ -154,6 +155,7 @@ constructor TATWrapInfo.Create;
 begin
   FList:= TATWrapItems.Create;
   FVirtualMode:= false;
+  StringsPrevCount:= -1;
 end;
 
 destructor TATWrapInfo.Destroy;
