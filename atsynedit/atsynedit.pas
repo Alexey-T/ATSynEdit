@@ -2563,19 +2563,20 @@ begin
   begin
     //cached WrapInfo update - calculate info only for changed lines (Strings.IndexesOfEditedLines)
     //and insert results into WrapInfo
-    ListNums:= TATIntegerList.Create;
-    try
-      ListNums.Assign(CurStrings.IndexesOfEditedLines);
 
-      //after changes in 2024.01 (action=Add: don't reset EnableCachedWrapinfoUpdate),
-      //we can have trailing empty line(s) not indexed in WrapInfo,
-      //so add wrap-items for them
+    //after changes in 2024.01 (action=Add: don't reset EnableCachedWrapinfoUpdate),
+    //we can have trailing empty line(s) not indexed in WrapInfo,
+    //so add wrap-items for them
+    if FWrapInfo.StringsPrevCount>=0 then
       for i:= FWrapInfo.StringsPrevCount to CurStrings.Count-1 do
       begin
         TempWrapItem.Init(i, 1, CurStrings.LinesLen[i], 0, TATWrapItemFinal.Final, true);
         FWrapInfo.Add(TempWrapItem);
       end;
 
+    ListNums:= TATIntegerList.Create;
+    try
+      ListNums.Assign(CurStrings.IndexesOfEditedLines);
       for i:= 0 to ListNums.Count-1 do
       begin
         NLine:= ListNums[i];
