@@ -143,7 +143,7 @@ begin
   end;
 end;
 
-procedure TATStrings.SaveToFile(const AFilename: string);
+procedure TATStrings.SaveToFile(const AFilename: string; AsCopy: boolean=false);
 var
   fs: TFileStream;
   ms: TMemoryStream;
@@ -180,7 +180,8 @@ begin
     end;
   end;
 
-  DoFinalizeSaving;
+  if not AsCopy then
+    DoFinalizeSaving;
 end;
 
 procedure TATStrings.DoFinalizeSaving;

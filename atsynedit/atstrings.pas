@@ -391,7 +391,7 @@ type
     procedure LoadFromString(const AText: string);
     procedure LoadFromStrings(AList: TStrings; AEnds: TATLineEnds; AllowBadCharsOfLen1: boolean);
     procedure SaveToStream(AStream: TStream; AEncoding: TATFileEncoding; AWithSignature: boolean);
-    procedure SaveToFile(const AFilename: string);
+    procedure SaveToFile(const AFilename: string; AsCopy: boolean=false);
     property SaveSignUtf8: boolean read FSaveSignUtf8 write FSaveSignUtf8;
     property SaveSignWide: boolean read FSaveSignWide write FSaveSignWide;
     //text
