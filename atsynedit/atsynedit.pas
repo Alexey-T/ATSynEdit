@@ -4149,7 +4149,8 @@ begin
   else
   //paint empty line bg
   begin
-    if FOptShowFullHilite then
+    if FOptShowFullHilite and
+      (ChosenBackColorEnum<>TATEditorChosenBackColor.MarkedRangeBG) then
     begin
       NColorAfter:= clNone;
       //visible StrOutput is empty, but the line itself may be not empty (because of horz scroll)
