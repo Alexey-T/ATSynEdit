@@ -84,7 +84,6 @@ type
     ColorNormalFont: TColor;
     ColorUnprintedFont: TColor;
     ColorUnprintedHexFont: TColor;
-    ColorAfterEnd: TColor;
     FontProportional: boolean;
     FontNormal_Name: string;
     FontNormal_Size: integer;
