@@ -84,6 +84,7 @@ type
     ColorNormalFont: TColor;
     ColorUnprintedFont: TColor;
     ColorUnprintedHexFont: TColor;
+    ColorAfterEnd: TColor;
     FontProportional: boolean;
     FontNormal_Name: string;
     FontNormal_Size: integer;
@@ -926,6 +927,8 @@ begin
         //avoid clipping previous 'italic' part
         if (iPart>0) and ((AParts^[iPart-1].FontStyles and afsFontItalic)<>0) then
           Inc(PartRect.Left, NDeltaForItalic);
+        if AProps.ColorAfterEnd<>clNone then
+          C.Brush.Color:= AProps.ColorAfterEnd; //for space-only part inside Markdown fenced block
         C.FillRect(PartRect);
         Continue;
       end;

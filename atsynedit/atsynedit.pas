@@ -4113,6 +4113,7 @@ begin
       TextOutProps.ColorNormalFont:= Colors.TextFont;
       TextOutProps.ColorUnprintedFont:= Colors.UnprintedFont;
       TextOutProps.ColorUnprintedHexFont:= Colors.UnprintedHexFont;
+      TextOutProps.ColorAfterEnd:= NColorAfter;
 
       TextOutProps.FontProportional:= FFontProportional;
 
@@ -9946,6 +9947,7 @@ begin
   TextOutProps.ColorNormalFont:= Colors.TextFont;
   TextOutProps.ColorUnprintedFont:= Colors.UnprintedFont;
   TextOutProps.ColorUnprintedHexFont:= Colors.UnprintedHexFont;
+  TextOutProps.ColorAfterEnd:= clNone;
 
   TextOutProps.FontProportional:= FFontProportional;
 
