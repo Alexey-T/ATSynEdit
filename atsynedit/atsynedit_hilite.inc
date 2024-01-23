@@ -196,7 +196,7 @@ begin
         Len:= 1;
         if bSel then
         begin
-          if FColors.TextSelFont<>clNone then
+          if not FOptKeepSelFontColor then
             ColorFont:= FColors.TextSelFont
           else
             ColorFont:= FColors.TextFont;
@@ -239,7 +239,7 @@ begin
         Break
       else
       begin
-        if Colors.TextSelFont<>clNone then
+        if not FOptKeepSelFontColor then
           AParts[i].ColorFont:= Colors.TextSelFont;
         AParts[i].ColorBG:= Colors.TextSelBG;
       end;

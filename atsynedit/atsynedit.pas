@@ -1027,6 +1027,7 @@ type
     FOptShowCurLineOnlyFocused: boolean;
     FOptShowCurLineIfWithoutSel: boolean;
     FOptShowCurColumn: boolean;
+    FOptKeepSelFontColor: boolean;
     FOptShowMouseSelFrame: boolean;
     FOptMouseHideCursor: boolean;
     FOptMouseClickOpensURL: boolean;
@@ -2019,6 +2020,7 @@ type
     property OptShowCurLineOnlyFocused: boolean read FOptShowCurLineOnlyFocused write FOptShowCurLineOnlyFocused default false;
     property OptShowCurLineIfWithoutSel: boolean read FOptShowCurLineIfWithoutSel write FOptShowCurLineIfWithoutSel default true;
     property OptShowCurColumn: boolean read FOptShowCurColumn write FOptShowCurColumn default false;
+    property OptKeepSelFontColor: boolean read FOptKeepSelFontColor write FOptKeepSelFontColor default false;
     property OptShowScrollHint: boolean read FOptShowScrollHint write FOptShowScrollHint default false;
     property OptShowMouseSelFrame: boolean read FOptShowMouseSelFrame write FOptShowMouseSelFrame default cInitShowMouseSelFrame;
     property OptCaretManyAllowed: boolean read GetCaretManyAllowed write SetCaretManyAllowed default true;
@@ -4881,7 +4883,7 @@ begin
   //if 1st chars selected, then use selection-color
   if IsPosSelected(APosX, APosY) and FOptShowFoldedMarkWithSelectionBG then
   begin
-    if Colors.TextSelFont<>clNone then
+    if not FOptKeepSelFontColor then
       C.Font.Color:= Colors.TextSelFont
     else
       C.Font.Color:= Colors.TextFont;

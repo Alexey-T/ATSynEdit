@@ -1,3 +1,6 @@
+2024.01.23
++ add: prop OptKeepSelFontColor
+
 2024.01.17
 * change: deleted OptFoldCacheEnabled
 
