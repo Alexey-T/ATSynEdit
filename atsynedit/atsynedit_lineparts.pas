@@ -35,7 +35,7 @@ type
     Len: Longint; //Word is enough, but Longint makes SizeOf=24 bytes, better
     ColorFont, ColorBG, ColorBorder: TColor;
     FontStyles: byte;
-    Dummy: byte;
+    Dummy: byte; //to align SizeOf to 24 bytes
     BorderUp, BorderDown, BorderLeft, BorderRight: TATLineStyle;
   end;
   PATLinePart = ^TATLinePart;
