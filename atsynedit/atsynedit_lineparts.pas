@@ -29,13 +29,13 @@ const
   afsFontCrossed = 4;
 
 type
-  //packed record: sizeof=35 bytes
-  //bitpacked: sizeof=21 bytes
+  //bitpacked: SizeOf=24 bytes
   TATLinePart = bitpacked record
     Offset: Longint; //4 bytes, 2 bytes are not enough (app will crash on line length 120K, with wrap=off)
+    Len: Longint; //Word is enough, but Longint makes SizeOf=24 bytes, better
     ColorFont, ColorBG, ColorBorder: TColor;
-    Len: word; //2 bytes
     FontStyles: byte;
+    Dummy: byte;
     BorderUp, BorderDown, BorderLeft, BorderRight: TATLineStyle;
   end;
   PATLinePart = ^TATLinePart;
@@ -442,5 +442,11 @@ begin
     Include(Result, fsStrikeOut);
 end;
 
+
+{
+initialization
+  WriteLn('SizeOf(TATLinePart): '+IntToStr(SizeOf(TATLinePart)));
+  WriteLn('SizeOf(TATLineParts): '+IntToStr(SizeOf(TATLineParts)));
+}
 
 end.
