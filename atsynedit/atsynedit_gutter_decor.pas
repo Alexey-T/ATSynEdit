@@ -273,7 +273,8 @@ begin
     begin
       bBackfillerOld:= ItemPtr(i)^.IsBackgroundFill;
       bBackfillerNew:= NewItem.IsBackgroundFill;
-      if bBackfillerOld<>bBackfillerNew then
+      if (bBackfillerOld<>bBackfillerNew) or
+        (ItemPtr(i)^.Data.Tag<>NewItem.Data.Tag) then
       begin
         if bBackfillerNew then
           FList.Insert(i, NewItem)
