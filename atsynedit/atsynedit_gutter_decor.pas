@@ -267,8 +267,7 @@ begin
   end
   else
   begin
-    //2 items can exist for the same line-number.
-    //make sure we put background-filler item to lower index.
+    //N items can exist for the same line
     if ItemPtr(i)^.Data.LineNum=AData.LineNum then
     begin
       bBackfillerOld:= ItemPtr(i)^.IsBackgroundFill;
