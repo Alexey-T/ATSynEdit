@@ -442,11 +442,10 @@ begin
     Include(Result, fsStrikeOut);
 end;
 
-
 {
 initialization
   WriteLn('SizeOf(TATLinePart): '+IntToStr(SizeOf(TATLinePart)));
-  WriteLn('SizeOf(TATLineParts): '+IntToStr(SizeOf(TATLineParts)));
+  WriteLn('SizeOf(TATLineParts): '+IntToStr(SizeOf(TATLineParts)), ', ', IntToStr(SizeOf(TATLineParts) div cMaxLineParts), ' bytes per part');
 }
 
 end.
