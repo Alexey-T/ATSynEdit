@@ -280,9 +280,12 @@ begin
           FList.Insert(i, NewItem)
         else
         begin
+          {
+          //this code avoided >2 decors for the same line:
           if IsIndexValid(i+1) and (ItemPtr(i+1)^.Data.LineNum=AData.LineNum) then
             FList[i+1]:= NewItem
           else
+          }
             FList.Insert(i+1, NewItem);
         end;
       end
