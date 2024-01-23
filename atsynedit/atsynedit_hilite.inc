@@ -332,6 +332,7 @@ end;
 procedure TATSynEdit.DoCalcLineEntireColor(ALine: integer;
   AUseColorOfCurrentLine: boolean;
   out AColor: TColor; out AColorForced: boolean;
+  out AChosenEnum: TATEditorChosenBackColor;
   AHiliteLineWithSelection: boolean);
 var
   St: TATStrings;
@@ -339,13 +340,20 @@ var
   NMarkedLine1, NMarkedLine2: integer;
 begin
   AColor:= clNone;
+  AChosenEnum:= TATEditorChosenBackColor.None;
   St:= Strings;
 
   if AUseColorOfCurrentLine then
-    AColor:= Colors.CurrentLineBG
+  begin
+    AColor:= Colors.CurrentLineBG;
+    AChosenEnum:= TATEditorChosenBackColor.CurrentLineBG;
+  end
   else
   if AHiliteLineWithSelection and TempSel_IsLineWithSelection(ALine) then
-    AColor:= Colors.CurrentLineBG
+  begin
+    AColor:= Colors.CurrentLineBG;
+    AChosenEnum:= TATEditorChosenBackColor.CurrentLineBG;
+  end
   else
   begin
     NIndex:= St.Bookmarks.Find(ALine);
@@ -353,6 +361,7 @@ begin
     begin
       BmKind:= St.Bookmarks[NIndex]^.Data.Kind;
       AColor:= Colors.BookmarkBG;
+      AChosenEnum:= TATEditorChosenBackColor.BookmarkBG;
       if Assigned(FOnCalcBookmarkColor) then
         FOnCalcBookmarkColor(Self, BmKind, AColor);
     end
@@ -363,6 +372,7 @@ begin
       begin
         BmKind:= St.Bookmarks2[NIndex]^.Data.Kind;
         AColor:= Colors.BookmarkBG;
+        AChosenEnum:= TATEditorChosenBackColor.BookmarkBG;
         if Assigned(FOnCalcBookmarkColor) then
           FOnCalcBookmarkColor(Self, BmKind, AColor);
       end;
@@ -371,11 +381,17 @@ begin
 
   if DoGetMarkedLines(NMarkedLine1, NMarkedLine2) then
     if (ALine>=NMarkedLine1) and (ALine<=NMarkedLine2) then
+    begin
       AColor:= Colors.MarkedLinesBG;
+      AChosenEnum:= TATEditorChosenBackColor.MarkedRangeBG;
+    end;
 
   AColorForced:= AColor<>clNone;
   if not AColorForced then
+  begin
     AColor:= FColorBG;
+    AChosenEnum:= TATEditorChosenBackColor.DefaultBG;
+  end;
 end;
 
 

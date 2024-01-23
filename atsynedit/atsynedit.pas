@@ -483,6 +483,14 @@ type
   end;
   TATTimingQueue = specialize TDeque<TATTimingRec>;
 
+  TATEditorChosenBackColor = (
+    None,
+    CurrentLineBG,
+    BookmarkBG,
+    MarkedRangeBG,
+    DefaultBG
+    );
+
 type
   { TATSynEdit }
 
@@ -1110,8 +1118,10 @@ type
     procedure DebugFindWrapIndex;
     function DoCalcIndentCharsFromPrevLines(AX, AY: integer): integer;
     procedure DoCalcPosColor(AX, AY: integer; var AColor: TColor);
-    procedure DoCalcLineEntireColor(ALine: integer; AUseColorOfCurrentLine: boolean; out AColor: TColor; out
-      AColorForced: boolean; AHiliteLineWithSelection: boolean);
+    procedure DoCalcLineEntireColor(ALine: integer; AUseColorOfCurrentLine: boolean;
+      out AColor: TColor; out AColorForced: boolean;
+      out AChosenEnum: TATEditorChosenBackColor;
+      AHiliteLineWithSelection: boolean);
     procedure DoCaretsApplyShape(var R: TRect; Props: TATCaretShape; W, H: integer);
     function DoCaretApplyProximityToVertEdge(ACaretPos: TPoint; ACaretCoordY: Int64;
       AProximity, AIndentVert: integer): boolean;
@@ -3853,6 +3863,7 @@ var
   StringItem: PATStringItem;
   NColorEntire, NColorAfter: TColor;
   NDimValue: integer;
+  ChosenBackColorEnum: TATEditorChosenBackColor;
   StrOutput: atString;
   CurrPoint, CurrPointText, CoordAfterText: TPoint;
   LineSeparator: TATLineSeparator;
@@ -4002,7 +4013,9 @@ begin
     bUseColorOfCurrentLine,
     NColorEntire,
     bLineColorForced,
-    bHiliteLinesWithSelection);
+    ChosenBackColorEnum,
+    bHiliteLinesWithSelection
+    );
 
   if FOptZebraActive then
     if (NLinesIndex+1) mod FOptZebraStep = 0 then
@@ -4376,6 +4389,7 @@ var
   WrapItem: TATWrapItem;
   NColorEntire, NColorAfter: TColor;
   CurrPoint, CurrPointText: TPoint;
+  ChosenBackColorEnum: TATEditorChosenBackColor;
   bLineColorForced: boolean;
   bUseSetPixel: boolean;
   bUseColorOfCurrentLine: boolean;
@@ -4408,6 +4422,7 @@ begin
     bUseColorOfCurrentLine,
     NColorEntire,
     bLineColorForced,
+    ChosenBackColorEnum,
     FMinimapHiliteLinesWithSelection
     );
 
