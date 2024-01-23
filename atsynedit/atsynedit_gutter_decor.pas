@@ -276,6 +276,7 @@ begin
       if (bBackfillerOld<>bBackfillerNew) or
         (ItemPtr(i)^.Data.Tag<>NewItem.Data.Tag) then
       begin
+        //if we insert Backfiller item, put it first (before all items for the same line)
         if bBackfillerNew then
           FList.Insert(i, NewItem)
         else
@@ -285,8 +286,12 @@ begin
           if IsIndexValid(i+1) and (ItemPtr(i+1)^.Data.LineNum=AData.LineNum) then
             FList[i+1]:= NewItem
           else
-          }
             FList.Insert(i+1, NewItem);
+          }
+          //make sure we insert new item after all items for the same line
+          while IsIndexValid(i+1) and (ItemPtr(i+1)^.Data.LineNum=AData.LineNum) do
+            Inc(i);
+          FList.Insert(i+1, NewItem);
         end;
       end
       else
