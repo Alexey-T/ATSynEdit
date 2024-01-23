@@ -927,8 +927,16 @@ begin
         //avoid clipping previous 'italic' part
         if (iPart>0) and ((AParts^[iPart-1].FontStyles and afsFontItalic)<>0) then
           Inc(PartRect.Left, NDeltaForItalic);
-        if AProps.ColorAfterEnd<>clNone then
-          C.Brush.Color:= AProps.ColorAfterEnd; //for space-only part inside Markdown fenced block
+
+        //for space-only part inside Markdown fenced block;
+        //when this part is single in the line
+        {
+        if (iPart=0) and (AParts^[iPart+1].Len=0) and
+          (AProps.ColorAfterEnd<>clNone) and
+          (not AProps.DetectIsPosSelected(0, AProps.LineIndex)) then
+          C.Brush.Color:= AProps.ColorAfterEnd;
+          }
+
         C.FillRect(PartRect);
         Continue;
       end;
