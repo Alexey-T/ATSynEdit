@@ -2035,7 +2035,10 @@ begin
         begin
           NStringsCount:= Count;
           if NStringsCount>1 then
-            LineDelete(NStringsCount-1, false)
+          begin
+            LineDelete(NStringsCount-1, false);
+            ActionDeleteFakeLineAndFinalEol; //fixes CudaText #5379
+          end
           else
             Lines[0]:= '';
         end;
