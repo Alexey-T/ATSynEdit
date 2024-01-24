@@ -3317,7 +3317,10 @@ end;
 
 procedure TATSynEdit.DoPaintBorders(C: TCanvas);
 var
+  Sep: TATStringSeparator;
   TextSize: Types.TSize;
+  SItem: string;
+  NLines, iLine: integer;
 const
   cBrushStyles: array[boolean] of TBrushStyle = (bsClear, bsSolid);
 begin
@@ -3339,11 +3342,18 @@ begin
     C.Font.Color:= FOptCornerColorFont;
     C.Brush.Color:= FOptCornerColorBack;
     C.Brush.Style:= cBrushStyles[FOptCornerColorBack<>clNone];
-    TextSize:= C.TextExtent(FOptCornerText);
-    C.TextOut(
-      ClientWidth-TextSize.cx,
-      ClientHeight-TextSize.cy,
-      FOptCornerText);
+    NLines:= SFindCharCount(FOptCornerText, #10)+1;
+    iLine:= 0;
+    Sep.Init(FOptCornerText, #10);
+    while Sep.GetItemStr(SItem) do
+    begin
+      TextSize:= C.TextExtent(SItem);
+      C.TextOut(
+        ClientWidth-TextSize.cx,
+        ClientHeight-(NLines-iLine)*TextSize.cy,
+        SItem);
+      Inc(iLine);
+    end;
     C.Brush.Style:= bsSolid;
     if FOptCornerColorBorder<>clNone then
     begin
@@ -3367,11 +3377,18 @@ begin
     C.Font.Color:= FOptCorner2ColorFont;
     C.Brush.Color:= FOptCorner2ColorBack;
     C.Brush.Style:= cBrushStyles[FOptCorner2ColorBack<>clNone];
-    TextSize:= C.TextExtent(FOptCorner2Text);
-    C.TextOut(
-      ClientWidth-TextSize.cx,
-      0,
-      FOptCorner2Text);
+    NLines:= SFindCharCount(FOptCornerText, #10)+1;
+    iLine:= 0;
+    Sep.Init(FOptCorner2Text, #10);
+    while Sep.GetItemStr(SItem) do
+    begin
+      TextSize:= C.TextExtent(SItem);
+      C.TextOut(
+        ClientWidth-TextSize.cx,
+        iLine*TextSize.cy,
+        SItem);
+      Inc(iLine);
+    end;
     C.Brush.Style:= bsSolid;
     if FOptCorner2ColorBorder<>clNone then
     begin
