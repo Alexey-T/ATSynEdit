@@ -3340,24 +3340,6 @@ begin
   //normal border
   if FOptBorderVisible and (FOptBorderWidth>0) then
     DoPaintBorder(C, Colors.BorderLine, FOptBorderWidth, FOptBorderRounded);
-
-  DoPaintCornerText_RightBottom(C,
-    FOptCornerText,
-    FOptCornerFontName,
-    FOptCornerFontSize,
-    FOptCornerColorFont,
-    FOptCornerColorBack,
-    FOptCornerColorBorder
-    );
-
-  DoPaintCornerText_RightTop(C,
-    FOptCorner2Text,
-    FOptCorner2FontName,
-    FOptCorner2FontSize,
-    FOptCorner2ColorFont,
-    FOptCorner2ColorBack,
-    FOptCorner2ColorBorder
-    );
 end;
 
 procedure TATSynEdit.DoPaintCornerText_RightBottom(C: TCanvas;
@@ -3555,6 +3537,24 @@ begin
   end;
 
   DoPaintBorders(C);
+
+  DoPaintCornerText_RightBottom(C,
+    FOptCornerText,
+    FOptCornerFontName,
+    FOptCornerFontSize,
+    FOptCornerColorFont,
+    FOptCornerColorBack,
+    FOptCornerColorBorder
+    );
+
+  DoPaintCornerText_RightTop(C,
+    FOptCorner2Text,
+    FOptCorner2FontName,
+    FOptCorner2FontSize,
+    FOptCorner2ColorFont,
+    FOptCorner2ColorBack,
+    FOptCorner2ColorBorder
+    );
 end;
 
 procedure TATSynEdit.DoPaintMouseSelFrame(C: TCanvas);
