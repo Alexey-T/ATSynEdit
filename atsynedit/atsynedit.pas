@@ -1313,9 +1313,9 @@ type
     procedure DoPaintCaretShape(C: TCanvas; ARect: TRect; ACaret: TATCaretItem;
       ACaretShape: TATCaretShape);
     procedure DoPaintCarets(C: TCanvas; AWithInvalidate: boolean);
-    procedure DoPaintCornerText1(C: TCanvas; const AText, AFontName: string;
+    procedure DoPaintCornerText_RightBottom(C: TCanvas; const AText, AFontName: string;
       AFontSize: integer; AColorFont, AColorBack, AColorBorder: TColor);
-    procedure DoPaintCornerText2(C: TCanvas; const AText, AFontName: string;
+    procedure DoPaintCornerText_RightTop(C: TCanvas; const AText, AFontName: string;
       AFontSize: integer; AColorFont, AColorBack, AColorBorder: TColor);
     procedure TimerBlinkDisable;
     procedure TimerBlinkEnable;
@@ -3341,7 +3341,7 @@ begin
   if FOptBorderVisible and (FOptBorderWidth>0) then
     DoPaintBorder(C, Colors.BorderLine, FOptBorderWidth, FOptBorderRounded);
 
-  DoPaintCornerText1(C,
+  DoPaintCornerText_RightBottom(C,
     FOptCornerText,
     FOptCornerFontName,
     FOptCornerFontSize,
@@ -3350,7 +3350,7 @@ begin
     FOptCornerColorBorder
     );
 
-  DoPaintCornerText2(C,
+  DoPaintCornerText_RightTop(C,
     FOptCorner2Text,
     FOptCorner2FontName,
     FOptCorner2FontSize,
@@ -3360,7 +3360,7 @@ begin
     );
 end;
 
-procedure TATSynEdit.DoPaintCornerText1(C: TCanvas;
+procedure TATSynEdit.DoPaintCornerText_RightBottom(C: TCanvas;
   const AText, AFontName: string;
   AFontSize: integer;
   AColorFont, AColorBack, AColorBorder: TColor);
@@ -3416,7 +3416,7 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoPaintCornerText2(C: TCanvas;
+procedure TATSynEdit.DoPaintCornerText_RightTop(C: TCanvas;
   const AText, AFontName: string;
   AFontSize: integer;
   AColorFont, AColorBack, AColorBorder: TColor);
