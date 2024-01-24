@@ -3369,6 +3369,7 @@ var
   TextSize: Types.TSize;
   SItem: string;
   NTop: integer;
+  bOneLine: boolean;
 const
   cBrushStyles: array[boolean] of TBrushStyle = (bsClear, bsSolid);
 begin
@@ -3382,19 +3383,26 @@ begin
     C.Font.Size:= AFontSize
   else
     C.Font.Size:= Self.Font.Size;
+
   C.Font.Color:= AColorFont;
   C.Brush.Color:= AColorBack;
   C.Brush.Style:= cBrushStyles[AColorBack<>clNone];
 
+  bOneLine:= Pos(#10, AText)=0;
+
   Sep.Init(AText, #10);
   NTop:= ClientHeight;
   while Sep.GetItemStr(SItem) do
-    Dec(NTop, C.TextHeight(SItem));
+  begin
+    TextSize:= C.TextExtent(SItem);
+    Dec(NTop, TextSize.cy);
+  end;
 
   Sep.Init(AText, #10);
   while Sep.GetItemStr(SItem) do
   begin
-    TextSize:= C.TextExtent(SItem);
+    if not bOneLine then
+      TextSize:= C.TextExtent(SItem);
     C.TextOut(
       ClientWidth-TextSize.cx,
       NTop,
