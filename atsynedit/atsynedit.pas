@@ -3328,7 +3328,7 @@ var
   Sep: TATStringSeparator;
   TextSize: Types.TSize;
   SItem: string;
-  NLines, iLine: integer;
+  NTop: integer;
 const
   cBrushStyles: array[boolean] of TBrushStyle = (bsClear, bsSolid);
 begin
@@ -3348,33 +3348,42 @@ begin
   if (FOptCornerText<>'') and (FOptCornerColorFont<>clNone) then
   begin
     if FOptCornerFontName<>'' then
-      C.Font.Name:= FOptCornerFontName;
+      C.Font.Name:= FOptCornerFontName
+    else
+      C.Font.Name:= Self.Font.Name;
     if FOptCornerFontSize>0 then
-      C.Font.Size:= FOptCornerFontSize;
+      C.Font.Size:= FOptCornerFontSize
+    else
+      C.Font.Size:= Self.Font.Size;
     C.Font.Color:= FOptCornerColorFont;
     C.Brush.Color:= FOptCornerColorBack;
     C.Brush.Style:= cBrushStyles[FOptCornerColorBack<>clNone];
-    NLines:= SFindCharCount(FOptCornerText, #10)+1;
-    iLine:= 0;
+
+    Sep.Init(FOptCornerText, #10);
+    NTop:= ClientHeight;
+    while Sep.GetItemStr(SItem) do
+      Dec(NTop, C.TextHeight(SItem));
+
     Sep.Init(FOptCornerText, #10);
     while Sep.GetItemStr(SItem) do
     begin
       TextSize:= C.TextExtent(SItem);
       C.TextOut(
         ClientWidth-TextSize.cx,
-        ClientHeight-(NLines-iLine)*TextSize.cy,
-        SItem);
+        NTop,
+        SItem
+        );
+      Inc(NTop, TextSize.cy);
       if FOptCornerColorBorder<>clNone then
       begin
         C.Pen.Color:= FOptCornerColorBorder;
         C.Frame(
           ClientWidth-TextSize.cx,
-          ClientHeight-(NLines-iLine)*TextSize.cy,
+          NTop,
           ClientWidth,
-          ClientHeight-(NLines-iLine-1)*TextSize.cy
+          NTop+TextSize.cy
           );
       end;
-      Inc(iLine);
     end;
     C.Brush.Style:= bsSolid;
   end;
@@ -3383,33 +3392,37 @@ begin
   if (FOptCorner2Text<>'') and (FOptCorner2ColorFont<>clNone) then
   begin
     if FOptCorner2FontName<>'' then
-      C.Font.Name:= FOptCorner2FontName;
+      C.Font.Name:= FOptCorner2FontName
+    else
+      C.Font.Name:= Self.Font.Name;
     if FOptCorner2FontSize>0 then
-      C.Font.Size:= FOptCorner2FontSize;
+      C.Font.Size:= FOptCorner2FontSize
+    else
+      C.Font.Size:= Self.Font.Size;
     C.Font.Color:= FOptCorner2ColorFont;
     C.Brush.Color:= FOptCorner2ColorBack;
     C.Brush.Style:= cBrushStyles[FOptCorner2ColorBack<>clNone];
-    NLines:= SFindCharCount(FOptCornerText, #10)+1;
-    iLine:= 0;
     Sep.Init(FOptCorner2Text, #10);
+    NTop:= 0;
     while Sep.GetItemStr(SItem) do
     begin
       TextSize:= C.TextExtent(SItem);
       C.TextOut(
         ClientWidth-TextSize.cx,
-        iLine*TextSize.cy,
-        SItem);
+        NTop,
+        SItem
+        );
+      Inc(NTop, TextSize.cy);
       if FOptCorner2ColorBorder<>clNone then
       begin
         C.Pen.Color:= FOptCorner2ColorBorder;
         C.Frame(
           ClientWidth-TextSize.cx,
-          iLine*TextSize.cy,
+          NTop,
           ClientWidth,
-          (iLine+1)*TextSize.cy
+          NTop+TextSize.cy
           );
       end;
-      Inc(iLine);
     end;
     C.Brush.Style:= bsSolid;
   end;
