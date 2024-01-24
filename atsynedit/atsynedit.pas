@@ -3364,23 +3364,19 @@ begin
         ClientWidth-TextSize.cx,
         ClientHeight-(NLines-iLine)*TextSize.cy,
         SItem);
+      if FOptCornerColorBorder<>clNone then
+      begin
+        C.Pen.Color:= FOptCornerColorBorder;
+        C.Frame(
+          ClientWidth-TextSize.cx,
+          ClientHeight-(NLines-iLine)*TextSize.cy,
+          ClientWidth,
+          ClientHeight-(NLines-iLine-1)*TextSize.cy
+          );
+      end;
       Inc(iLine);
     end;
     C.Brush.Style:= bsSolid;
-    if FOptCornerColorBorder<>clNone then
-    begin
-      C.Pen.Color:= FOptCornerColorBorder;
-      C.Line(
-        ClientWidth-TextSize.cx,
-        ClientHeight-TextSize.cy,
-        ClientWidth,
-        ClientHeight-TextSize.cy);
-      C.Line(
-        ClientWidth-TextSize.cx-1,
-        ClientHeight-TextSize.cy,
-        ClientWidth-TextSize.cx-1,
-        ClientHeight);
-    end;
   end;
 
   //corner text 2nd
@@ -3403,23 +3399,19 @@ begin
         ClientWidth-TextSize.cx,
         iLine*TextSize.cy,
         SItem);
+      if FOptCorner2ColorBorder<>clNone then
+      begin
+        C.Pen.Color:= FOptCorner2ColorBorder;
+        C.Frame(
+          ClientWidth-TextSize.cx,
+          iLine*TextSize.cy,
+          ClientWidth,
+          (iLine+1)*TextSize.cy
+          );
+      end;
       Inc(iLine);
     end;
     C.Brush.Style:= bsSolid;
-    if FOptCorner2ColorBorder<>clNone then
-    begin
-      C.Pen.Color:= FOptCorner2ColorBorder;
-      C.Line(
-        ClientWidth-TextSize.cx-1,
-        0,
-        ClientWidth-TextSize.cx-1,
-        TextSize.cy+1);
-      C.Line(
-        ClientWidth-TextSize.cx,
-        TextSize.cy,
-        ClientWidth,
-        TextSize.cy);
-    end;
   end;
 end;
 
