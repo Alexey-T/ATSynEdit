@@ -3372,48 +3372,47 @@ var
 const
   cBrushStyles: array[boolean] of TBrushStyle = (bsClear, bsSolid);
 begin
-  if (AText<>'') and (AColorFont<>clNone) then
+  if (AText='') or (AColorFont=clNone) then exit;
+
+  if AFontName<>'' then
+    C.Font.Name:= AFontName
+  else
+    C.Font.Name:= Self.Font.Name;
+  if AFontSize>0 then
+    C.Font.Size:= AFontSize
+  else
+    C.Font.Size:= Self.Font.Size;
+  C.Font.Color:= AColorFont;
+  C.Brush.Color:= AColorBack;
+  C.Brush.Style:= cBrushStyles[AColorBack<>clNone];
+
+  Sep.Init(AText, #10);
+  NTop:= ClientHeight;
+  while Sep.GetItemStr(SItem) do
+    Dec(NTop, C.TextHeight(SItem));
+
+  Sep.Init(AText, #10);
+  while Sep.GetItemStr(SItem) do
   begin
-    if AFontName<>'' then
-      C.Font.Name:= AFontName
-    else
-      C.Font.Name:= Self.Font.Name;
-    if AFontSize>0 then
-      C.Font.Size:= AFontSize
-    else
-      C.Font.Size:= Self.Font.Size;
-    C.Font.Color:= AColorFont;
-    C.Brush.Color:= AColorBack;
-    C.Brush.Style:= cBrushStyles[AColorBack<>clNone];
-
-    Sep.Init(AText, #10);
-    NTop:= ClientHeight;
-    while Sep.GetItemStr(SItem) do
-      Dec(NTop, C.TextHeight(SItem));
-
-    Sep.Init(AText, #10);
-    while Sep.GetItemStr(SItem) do
+    TextSize:= C.TextExtent(SItem);
+    C.TextOut(
+      ClientWidth-TextSize.cx,
+      NTop,
+      SItem
+      );
+    if AColorBorder<>clNone then
     begin
-      TextSize:= C.TextExtent(SItem);
-      C.TextOut(
+      C.Pen.Color:= AColorBorder;
+      C.Frame(
         ClientWidth-TextSize.cx,
         NTop,
-        SItem
+        ClientWidth,
+        NTop+TextSize.cy
         );
-      if AColorBorder<>clNone then
-      begin
-        C.Pen.Color:= AColorBorder;
-        C.Frame(
-          ClientWidth-TextSize.cx,
-          NTop,
-          ClientWidth,
-          NTop+TextSize.cy
-          );
-      end;
-      Inc(NTop, TextSize.cy);
     end;
-    C.Brush.Style:= bsSolid;
+    Inc(NTop, TextSize.cy);
   end;
+  C.Brush.Style:= bsSolid;
 end;
 
 procedure TATSynEdit.DoPaintCornerText_RightTop(C: TCanvas;
@@ -3428,44 +3427,43 @@ var
 const
   cBrushStyles: array[boolean] of TBrushStyle = (bsClear, bsSolid);
 begin
-  if (AText<>'') and (AColorFont<>clNone) then
-  begin
-    if AFontName<>'' then
-      C.Font.Name:= AFontName
-    else
-      C.Font.Name:= Self.Font.Name;
-    if AFontSize>0 then
-      C.Font.Size:= AFontSize
-    else
-      C.Font.Size:= Self.Font.Size;
-    C.Font.Color:= AColorFont;
-    C.Brush.Color:= AColorBack;
-    C.Brush.Style:= cBrushStyles[AColorBack<>clNone];
+  if (AText='') or (AColorFont=clNone) then exit;
 
-    Sep.Init(AText, #10);
-    NTop:= 0;
-    while Sep.GetItemStr(SItem) do
+  if AFontName<>'' then
+    C.Font.Name:= AFontName
+  else
+    C.Font.Name:= Self.Font.Name;
+  if AFontSize>0 then
+    C.Font.Size:= AFontSize
+  else
+    C.Font.Size:= Self.Font.Size;
+  C.Font.Color:= AColorFont;
+  C.Brush.Color:= AColorBack;
+  C.Brush.Style:= cBrushStyles[AColorBack<>clNone];
+
+  Sep.Init(AText, #10);
+  NTop:= 0;
+  while Sep.GetItemStr(SItem) do
+  begin
+    TextSize:= C.TextExtent(SItem);
+    C.TextOut(
+      ClientWidth-TextSize.cx,
+      NTop,
+      SItem
+      );
+    if AColorBorder<>clNone then
     begin
-      TextSize:= C.TextExtent(SItem);
-      C.TextOut(
+      C.Pen.Color:= AColorBorder;
+      C.Frame(
         ClientWidth-TextSize.cx,
         NTop,
-        SItem
+        ClientWidth,
+        NTop+TextSize.cy
         );
-      if AColorBorder<>clNone then
-      begin
-        C.Pen.Color:= AColorBorder;
-        C.Frame(
-          ClientWidth-TextSize.cx,
-          NTop,
-          ClientWidth,
-          NTop+TextSize.cy
-          );
-      end;
-      Inc(NTop, TextSize.cy);
     end;
-    C.Brush.Style:= bsSolid;
+    Inc(NTop, TextSize.cy);
   end;
+  C.Brush.Style:= bsSolid;
 end;
 
 procedure TATSynEdit.DoPaintMain(C: TCanvas; ALineFrom: integer);
