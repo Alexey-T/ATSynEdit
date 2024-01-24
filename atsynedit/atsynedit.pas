@@ -972,6 +972,8 @@ type
     FOptCornerColorFont: TColor;
     FOptCornerColorBack: TColor;
     FOptCornerColorBorder: TColor;
+    FOptCorner2FontName: string;
+    FOptCorner2FontSize: integer;
     FOptCorner2Text: string;
     FOptCorner2ColorFont: TColor;
     FOptCorner2ColorBack: TColor;
@@ -2059,6 +2061,8 @@ type
     property OptCornerColorFont: TColor read FOptCornerColorFont write FOptCornerColorFont default clBlack;
     property OptCornerColorBack: TColor read FOptCornerColorBack write FOptCornerColorBack default clWhite;
     property OptCornerColorBorder: TColor read FOptCornerColorBorder write FOptCornerColorBorder default clNone;
+    property OptCorner2FontName: string read FOptCorner2FontName write FOptCorner2FontName;
+    property OptCorner2FontSize: integer read FOptCorner2FontSize write FOptCorner2FontSize default 0;
     property OptCorner2Text: string read FOptCorner2Text write FOptCorner2Text;
     property OptCorner2ColorFont: TColor read FOptCorner2ColorFont write FOptCorner2ColorFont default clBlack;
     property OptCorner2ColorBack: TColor read FOptCorner2ColorBack write FOptCorner2ColorBack default clWhite;
@@ -3382,10 +3386,10 @@ begin
   //corner text 2nd
   if (FOptCorner2Text<>'') and (FOptCorner2ColorFont<>clNone) then
   begin
-    if FOptCornerFontName<>'' then
-      C.Font.Name:= FOptCornerFontName;
-    if FOptCornerFontSize>0 then
-      C.Font.Size:= FOptCornerFontSize;
+    if FOptCorner2FontName<>'' then
+      C.Font.Name:= FOptCorner2FontName;
+    if FOptCorner2FontSize>0 then
+      C.Font.Size:= FOptCorner2FontSize;
     C.Font.Color:= FOptCorner2ColorFont;
     C.Brush.Color:= FOptCorner2ColorBack;
     C.Brush.Style:= cBrushStyles[FOptCorner2ColorBack<>clNone];

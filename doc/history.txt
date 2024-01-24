@@ -1,6 +1,8 @@
 2024.01.24
 + add: prop OptCornerFontName (if empty: use editor font)
 + add: prop OptCornerFontSize (if 0: use editor font)
++ add: prop OptCorner2FontName
++ add: prop OptCorner2FontSize
 + add: prop OptKeepSelFontColor
 
 2024.01.17
