@@ -3344,7 +3344,7 @@ begin
   if FOptBorderVisible and (FOptBorderWidth>0) then
     DoPaintBorder(C, Colors.BorderLine, FOptBorderWidth, FOptBorderRounded);
 
-  //corner text 1st
+  //corner right/bottom
   if (FOptCornerText<>'') and (FOptCornerColorFont<>clNone) then
   begin
     if FOptCornerFontName<>'' then
@@ -3379,7 +3379,7 @@ begin
     C.Brush.Style:= bsSolid;
   end;
 
-  //corner text 2nd
+  //corner right/top
   if (FOptCorner2Text<>'') and (FOptCorner2ColorFont<>clNone) then
   begin
     if FOptCorner2FontName<>'' then
