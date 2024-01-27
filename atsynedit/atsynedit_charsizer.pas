@@ -42,7 +42,7 @@ type
     procedure Init(const AFontName: string; AFontSize: integer; ATabSize: integer; AFontProportional: boolean);
     function GetCharWidth(ch: WideChar): integer;
     function GetSpaceWidth: integer;
-    //function GetStrWidth(const S: WideString): integer;
+    //function GetStrWidth(const S: UnicodeString): integer;
   end;
 
 var
@@ -118,7 +118,7 @@ end;
 {$else}
 function _WidestrWidth(C: TCanvas; S: WideChar): integer; inline;
 begin
-  Result:= C.TextWidth(WideString(S));
+  Result:= C.TextWidth(UnicodeString(S));
   //debug
   //Write('#'+IntToHex(Ord(S),2)+'"'+S+'" ');
 end;
@@ -274,7 +274,7 @@ begin
 end;
 
 {
-function TATCharSizer.GetStrWidth(const S: WideString): integer;
+function TATCharSizer.GetStrWidth(const S: UnicodeString): integer;
 begin
   Result:= _WidestrWidth(FPanel.Canvas, S) * 100 div SizeAvg;
 end;
