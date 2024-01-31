@@ -15,6 +15,7 @@ type
 
   TfmCombo = class(TForm)
     ButtonPanel1: TButtonPanel;
+    chkDefaultFont: TCheckBox;
     chkRounded: TCheckBox;
     chkRO: TCheckBox;
     chkNumAllowNeg: TCheckBox;
@@ -27,6 +28,7 @@ type
     PanelCombo: TPanel;
     PanelEdit: TPanel;
     edMaxLen: TSpinEdit;
+    procedure chkDefaultFontChange(Sender: TObject);
     procedure chkEnabledChange(Sender: TObject);
     procedure chkEnMouseChange(Sender: TObject);
     procedure chkNumAllowNegChange(Sender: TObject);
@@ -83,6 +85,18 @@ procedure TfmCombo.chkEnabledChange(Sender: TObject);
 begin
   ed.Enabled:= chkEnabled.Checked;
   ed0.Enabled:= chkEnabled.Checked;
+end;
+
+procedure TfmCombo.chkDefaultFontChange(Sender: TObject);
+var
+  s: string;
+begin
+  if chkDefaultFont.Checked then
+    s:= 'default'
+  else
+    s:= 'Courier New';
+  ed.Font.Name:= s;
+  ed0.Font.Name:= s;
 end;
 
 procedure TfmCombo.chkEnMouseChange(Sender: TObject);

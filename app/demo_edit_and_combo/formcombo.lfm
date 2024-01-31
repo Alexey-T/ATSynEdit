@@ -8,9 +8,9 @@ object fmCombo: TfmCombo
   ClientHeight = 348
   ClientWidth = 404
   Constraints.MinHeight = 200
-  OnCreate = FormCreate
   Position = poScreenCenter
-  LCLVersion = '2.3.0.0'
+  LCLVersion = '3.99.0.0'
+  OnCreate = FormCreate
   object PanelCombo: TPanel
     Left = 6
     Height = 58
@@ -32,8 +32,8 @@ object fmCombo: TfmCombo
   end
   object ButtonPanel1: TButtonPanel
     Left = 6
-    Height = 29
-    Top = 313
+    Height = 33
+    Top = 309
     Width = 392
     OKButton.Name = 'OKButton'
     OKButton.DefaultCaption = True
@@ -43,20 +43,20 @@ object fmCombo: TfmCombo
     CloseButton.DefaultCaption = True
     CancelButton.Name = 'CancelButton'
     CancelButton.DefaultCaption = True
-    TabOrder = 5
+    TabOrder = 10
     ShowButtons = [pbClose]
     ShowBevel = False
   end
   object chkEnabled: TCheckBox
     Left = 8
-    Height = 24
+    Height = 23
     Top = 136
     Width = 80
     Caption = 'Enabled'
     Checked = True
-    OnChange = chkEnabledChange
     State = cbChecked
     TabOrder = 2
+    OnChange = chkEnabledChange
   end
   object PanelEdit: TPanel
     Left = 6
@@ -79,12 +79,12 @@ object fmCombo: TfmCombo
   end
   object edMaxLen: TSpinEdit
     Left = 8
-    Height = 26
+    Height = 33
     Top = 216
     Width = 80
     MaxValue = 1000
+    TabOrder = 5
     OnChange = edMaxLenChange
-    TabOrder = 4
   end
   object LabelMaxLen: TLabel
     AnchorSideLeft.Control = edMaxLen
@@ -93,58 +93,67 @@ object fmCombo: TfmCombo
     AnchorSideTop.Side = asrCenter
     Left = 94
     Height = 17
-    Top = 221
+    Top = 224
     Width = 115
     BorderSpacing.Left = 6
     Caption = 'Max length (if >0)'
   end
   object chkEnMouse: TCheckBox
     Left = 8
-    Height = 24
+    Height = 23
     Top = 160
     Width = 128
     Caption = 'Enabled mouse'
     Checked = True
-    OnChange = chkEnMouseChange
     State = cbChecked
     TabOrder = 3
+    OnChange = chkEnMouseChange
   end
   object chkNumOnly: TCheckBox
     Left = 192
-    Height = 24
+    Height = 23
     Top = 136
     Width = 112
     Caption = 'Number only'
+    TabOrder = 8
     OnChange = chkNumOnlyChange
-    TabOrder = 6
   end
   object chkNumAllowNeg: TCheckBox
     Left = 216
-    Height = 24
+    Height = 23
     Top = 160
     Width = 134
     Caption = 'Allow number<0'
     Checked = True
-    OnChange = chkNumAllowNegChange
     State = cbChecked
-    TabOrder = 7
+    TabOrder = 9
+    OnChange = chkNumAllowNegChange
   end
   object chkRO: TCheckBox
     Left = 8
-    Height = 24
+    Height = 23
     Top = 184
     Width = 92
     Caption = 'Read-only'
+    TabOrder = 4
     OnChange = chkROChange
-    TabOrder = 8
   end
   object chkRounded: TCheckBox
     Left = 8
-    Height = 24
+    Height = 23
     Top = 249
     Width = 136
     Caption = 'Rounded border'
+    TabOrder = 6
     OnChange = chkRoundedChange
-    TabOrder = 9
+  end
+  object chkDefaultFont: TCheckBox
+    Left = 8
+    Height = 23
+    Top = 272
+    Width = 143
+    Caption = 'Use ''default'' font'
+    TabOrder = 7
+    OnChange = chkDefaultFontChange
   end
 end
