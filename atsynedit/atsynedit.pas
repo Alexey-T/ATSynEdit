@@ -6009,6 +6009,9 @@ begin
 
   if Carets.Count>0 then
   begin
+    //we paint line only for 1st caret
+    //no need to paint for all carets,
+    //it will be bad for e.g. 100 carets
     if FOptShowCurColumn then
       DoPaintMarginLineTo(C, Carets[0].CoordX, ATEditorScale(1), Colors.MarginCaret);
 
