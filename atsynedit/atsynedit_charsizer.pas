@@ -33,7 +33,7 @@ type
     SizeAvg: integer;
     FPanel: TPanel;
     FOwner: TComponent;
-    Sizes: packed array[word] of byte; //width of WideChars, divided by SizeAvg, divided by SaveScale
+    Sizes: packed array[word] of byte; //width of WideChars, in % of SizeAvg, divided by SaveScale
     procedure InitPanel;
     function GetCharWidth_FromCache(ch: WideChar): integer;
   public
