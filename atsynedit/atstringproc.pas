@@ -150,11 +150,11 @@ type
 
   TATStringTabHelper = class
   private
-    CharSizer: TATCharSizer;
     //these arrays are local vars, placed here to alloc 2*4Kb not in stack
     ListEnds: TATIntFixedArray;
     ListMid: TATIntFixedArray;
   public
+    CharSizer: TATCharSizer;
     TabSpaces: boolean;
     TabSize: integer;
     IndentSize: integer;

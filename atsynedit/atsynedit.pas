@@ -890,6 +890,7 @@ type
     FOptAutocompleteCommitIfSingleItem: boolean;
 
     //options
+    FOptForceSeparateCharSizer: boolean;
     FOptGapBitmapAlignment: TAlignment;
     FOptFlickerReducingPause: integer;
     FOptInputNumberOnly: boolean;
@@ -1958,6 +1959,7 @@ type
     property OptAutocompleteUpDownAtEdge: integer read FOptAutocompleteUpDownAtEdge write FOptAutocompleteUpDownAtEdge default 1;
     property OptAutocompleteCommitIfSingleItem: boolean read FOptAutocompleteCommitIfSingleItem write FOptAutocompleteCommitIfSingleItem default false;
 
+    property OptForceSeparateCharSizer: boolean read FOptForceSeparateCharSizer write FOptForceSeparateCharSizer default false;
     property OptGapBitmapAlignment: TAlignment read FOptGapBitmapAlignment write FOptGapBitmapAlignment default taCenter;
     property OptFlickerReducingPause: integer read FOptFlickerReducingPause write FOptFlickerReducingPause default 0;
     property OptInputNumberOnly: boolean read FOptInputNumberOnly write FOptInputNumberOnly default false;
@@ -3276,6 +3278,11 @@ begin
   C.Font.Name:= Font.Name;
   C.Font.Size:= DoScaleFont(Font.Size);
 
+  if FOptForceSeparateCharSizer and (FCharSizer=GlobalCharSizer) then
+  begin
+    FCharSizer:= TATCharSizer.Create(Self);
+    FTabHelper.CharSizer:= FCharSizer;
+  end;
   UpdateCharSize(FCharSize, C, FSpacingY);
 
   if FSpacingY<0 then
