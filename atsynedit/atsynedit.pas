@@ -5592,6 +5592,8 @@ begin
   if Assigned(FMarkers) then
     FreeAndNil(FMarkers);
   FreeAndNil(FTabHelper);
+  if Assigned(FCharSizer) and (FCharSizer<>GlobalCharSizer) then
+    FreeAndNil(FCharSizer);
   if Assigned(FAttribs) then
     FreeAndNil(FAttribs);
   FreeAndNil(FGutter);
