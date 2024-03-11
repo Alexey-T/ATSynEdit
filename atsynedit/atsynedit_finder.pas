@@ -179,7 +179,8 @@ type
     procedure UpdateCarets(ASimpleAction: boolean);
     procedure SetVirtualCaretsAsString(const AValue: string);
     procedure ClearMatchPos; override;
-    function FindMatch_InEditor(APosStart, APosEnd: TPoint; AWithEvent: boolean): boolean;
+    function FindMatch_InEditor(APosStart, APosEnd: TPoint; AWithEvent: boolean;
+      const AFirstLoopedLine: UnicodeString): boolean;
     procedure InitProgress;
     procedure UpdateBuffer;
     procedure UpdateBuffer_FromText(const AText: UnicodeString);
@@ -669,11 +670,12 @@ var
   bOk, bContinue: boolean;
   Res: TATFinderResult;
   Fr: TATEditorFragment;
-  SNew: UnicodeString;
+  SNew: UnicodeString = '';
+  SFirstLoopedLine: UnicodeString = '';
+  SFirstLoopedLineIndex: integer = -1;
 begin
   AList.Clear;
   if StrFind='' then exit;
-  SNew:= '';
 
   St:= Editor.Strings;
   IndexLineMax:= St.Count-1;
@@ -698,7 +700,13 @@ begin
   repeat
     if Application.Terminated then Break;
     if not St.IsIndexValid(PosStart.Y) then Break;
-    if not FindMatch_InEditor(PosStart, PosEnd, AWithEvent) then Break;
+
+    if PosStart.Y<>SFirstLoopedLineIndex then
+    begin
+      SFirstLoopedLineIndex:= PosStart.Y;
+      SFirstLoopedLine:= St.Lines[SFirstLoopedLineIndex];
+    end;
+    if not FindMatch_InEditor(PosStart, PosEnd, AWithEvent, SFirstLoopedLine) then Break;
 
     if FMatchEdPos.X < St.LinesLen[FMatchEdPos.Y] then
     begin
@@ -967,6 +975,7 @@ end;
 
 function TATEditorFinder.DoAction_FindSimple(const APosStart: TPoint): boolean;
 var
+  St: TATStrings;
   Cnt: integer;
   PosEnd: TPoint;
   bStartAtEdge: boolean;
@@ -975,17 +984,20 @@ begin
   if OptRegex then
     raise Exception.Create('Finder FindSimple called in regex mode');
 
-  Cnt:= Editor.Strings.Count;
-  PosEnd.X:= Editor.Strings.LinesLen[Cnt-1];
+  St:= Editor.Strings;
+  Cnt:= St.Count;
+  PosEnd.X:= St.LinesLen[Cnt-1];
   PosEnd.Y:= Cnt-1;
   bStartAtEdge:= (APosStart.X=0) and (APosStart.Y=0);
   FIsSearchWrapped:= false;
+  if not St.IsIndexValid(APosStart.Y) then
+    Exit(false);
 
   BeginTiming;
-  Result:= FindMatch_InEditor(APosStart, PosEnd, false);
+  Result:= FindMatch_InEditor(APosStart, PosEnd, false, St.Lines[APosStart.Y]);
   if not Result and OptWrapped and not bStartAtEdge then
   begin
-    Result:= FindMatch_InEditor(Point(0, 0), APosStart, false);
+    Result:= FindMatch_InEditor(Point(0, 0), APosStart, false, St.Lines[0]);
     FIsSearchWrapped:= true;
   end;
   EndTiming;
@@ -1628,6 +1640,7 @@ end;
 function TATEditorFinder.DoFindOrReplace_InEditor_Internal(AReplace, AForMany: boolean;
   out AChanged: boolean; APosStart, APosEnd: TPoint; AUpdateCaret: boolean): boolean;
 var
+  St: TATStrings;
   ConfirmThis, ConfirmContinue: boolean;
   SNew: UnicodeString;
   P1, P2: TPoint;
@@ -1635,8 +1648,10 @@ begin
   Result:= false;
   AChanged:= false;
   ClearMatchPos;
+  St:= Editor.Strings;
+  if not St.IsIndexValid(APosStart.Y) then Exit;
 
-  Result:= FindMatch_InEditor(APosStart, APosEnd, true);
+  Result:= FindMatch_InEditor(APosStart, APosEnd, true, St.Lines[APosStart.Y]);
   if Result then
   begin
     if AUpdateCaret then
@@ -1656,10 +1671,10 @@ begin
           P1:= FMatchEdEnd;
           P2:= FMatchEdPos;
         end;
-        SNew:= GetRegexReplacement(Editor.Strings.TextSubstring(P1.X, P1.Y, P2.X, P2.Y));
+        SNew:= GetRegexReplacement(St.TextSubstring(P1.X, P1.Y, P2.X, P2.Y));
       end
       else if OptPreserveCase then
-        SNew:= GetPreserveCaseReplacement(Editor.Strings.TextSubstring(P1.X, P1.Y, P2.X, P2.Y))
+        SNew:= GetPreserveCaseReplacement(St.TextSubstring(P1.X, P1.Y, P2.X, P2.Y))
       else
         SNew:= StrReplace;
 
@@ -2115,7 +2130,8 @@ begin
 end;
 
 function TATEditorFinder.FindMatch_InEditor(APosStart, APosEnd: TPoint;
-  AWithEvent: boolean): boolean;
+  AWithEvent: boolean;
+  const AFirstLoopedLine: UnicodeString): boolean;
 var
   PartCount: integer;
   ListParts, ListLooped: TATFinderStringArray;
@@ -2268,7 +2284,10 @@ begin
             if not bOk then Break;
           end;
 
-        SLineLoopedW:= Strs.Lines[IndexLine];
+        if IndexLine=APosStart.Y then //this helps much for 'find all' in huge line len=400K
+          SLineLoopedW:= AFirstLoopedLine
+        else
+          SLineLoopedW:= Strs.Lines[IndexLine];
         SLineLooped_Len:= Length(SLineLoopedW);
 
         if PartCount>1 then
@@ -2350,7 +2369,10 @@ begin
             if not bOk then Break;
           end;
 
-        SLineLoopedW:= Strs.Lines[IndexLine];
+        if IndexLine=APosStart.Y then //this helps much for 'find all' in huge line len=400K
+          SLineLoopedW:= AFirstLoopedLine
+        else
+          SLineLoopedW:= Strs.Lines[IndexLine];
         SLineLooped_Len:= Length(SLineLoopedW);
 
         if PartCount>1 then
