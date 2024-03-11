@@ -679,6 +679,7 @@ begin
 
   St:= Editor.Strings;
   IndexLineMax:= St.Count-1;
+  if IndexLineMax<0 then exit;
   InitProgress;
 
   if FFragments.Count=0 then
@@ -744,16 +745,18 @@ end;
 
 procedure TATEditorFinder.DoCollect_Regex(AList: TATFinderResults; AFromPos: integer; AWithEvent, AWithConfirm: boolean);
 var
+  NMaxPos: integer;
   bOk, bContinue: boolean;
   Res: TATFinderResult;
   P1, P2: TPoint;
-  SNew: UnicodeString;
+  SReplacement: UnicodeString = '';
 begin
   AList.Clear;
   if StrFind='' then exit;
   if StrText='' then exit;
   InitRegex;
-  SNew:= '';
+  NMaxPos:= Editor.Strings.Count-1;
+  if NMaxPos<0 then exit;
 
   try
     if (FCachedText<>StrFind) or
@@ -792,7 +795,7 @@ begin
 
   if bOk and AWithConfirm then
   begin
-    DoConfirmReplace(P1, P2, bOk, bContinue, SNew);
+    DoConfirmReplace(P1, P2, bOk, bContinue, SReplacement);
     if not bContinue then exit;
   end;
 
@@ -817,7 +820,7 @@ begin
 
     if AWithConfirm then
     begin
-      DoConfirmReplace(P1, P2, bOk, bContinue, SNew);
+      DoConfirmReplace(P1, P2, bOk, bContinue, SReplacement);
       if not bContinue then exit;
       if not bOk then Continue;
     end;
@@ -833,7 +836,7 @@ begin
       if Assigned(FOnProgress) then
       begin
         bOk:= true;
-        FOnProgress(Self, Res.PosBegin.Y, Editor.Strings.Count-1, bOk);
+        FOnProgress(Self, Res.PosBegin.Y, NMaxPos, bOk);
         if not bOk then exit;
       end;
   end;
@@ -986,6 +989,8 @@ begin
 
   St:= Editor.Strings;
   Cnt:= St.Count;
+  if Cnt=0 then
+    Exit(false);
   PosEnd.X:= St.LinesLen[Cnt-1];
   PosEnd.Y:= Cnt-1;
   bStartAtEdge:= (APosStart.X=0) and (APosStart.Y=0);
@@ -2631,6 +2636,7 @@ begin
   bMatchVisible:= false;
   if StrFind='' then exit;
   St:= Editor.Strings;
+  if St.Count=0 then exit;
   if St.Count>=AMaxLines then exit;
 
   Results:= TATFinderResults.Create;
