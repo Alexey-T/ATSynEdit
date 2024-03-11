@@ -1797,9 +1797,9 @@ function TATEditorFinder.DoFindOrReplace_Buffered_Internal(AReplace, AForMany: b
   //function usually called 1 time in outer func,
   //or 1-2 times if OptWrap=true
 var
-  P1, P2: TPoint;
+  PosBegin, PosEnd: TPoint;
   ConfirmThis, ConfirmContinue: boolean;
-  SNew: UnicodeString;
+  SReplacement: UnicodeString;
 begin
   AChanged:= false;
   Result:= FindMatch_Regex(AStartPos);
@@ -1808,10 +1808,10 @@ begin
 
   if Result then
   begin
-    P1:= ConvertBufferPosToCaretPos(FMatchPos);
-    P2:= ConvertBufferPosToCaretPos(FMatchPos+FMatchLen);
+    PosBegin:= ConvertBufferPosToCaretPos(FMatchPos);
+    PosEnd:= ConvertBufferPosToCaretPos(FMatchPos+FMatchLen);
     if AUpdateCaret then
-      PlaceCaret(P1.X, P1.Y);
+      PlaceCaret(PosBegin.X, PosBegin.Y);
 
     if AReplace then
     begin
@@ -1819,23 +1819,23 @@ begin
       ConfirmContinue:= true;
 
       if OptRegex then
-        SNew:= GetRegexReplacement(FBuffer.SubString(FMatchPos, FMatchLen))
+        SReplacement:= GetRegexReplacement(FBuffer.SubString(FMatchPos, FMatchLen))
       else if OptPreserveCase then
-        SNew:= GetPreserveCaseReplacement(FBuffer.SubString(FMatchPos, FMatchLen))
+        SReplacement:= GetPreserveCaseReplacement(FBuffer.SubString(FMatchPos, FMatchLen))
       else
-        SNew:= StrReplace;
+        SReplacement:= StrReplace;
 
       if OptConfirmReplace then
         if Assigned(FOnConfirmReplace) then
-          FOnConfirmReplace(Self, P1, P2, AForMany, ConfirmThis, ConfirmContinue, SNew);
+          FOnConfirmReplace(Self, PosBegin, PosEnd, AForMany, ConfirmThis, ConfirmContinue, SReplacement);
 
       if not ConfirmContinue then
         Exit(false);
 
       if ConfirmThis then
       begin
-        DoReplaceTextInEditor(P1, P2, SNew, true, true, FMatchEdPosAfterRep);
-        FSkipLen:= Length(SNew)+GetRegexSkipIncrement;
+        DoReplaceTextInEditor(PosBegin, PosEnd, SReplacement, true, true, FMatchEdPosAfterRep);
+        FSkipLen:= Length(SReplacement)+GetRegexSkipIncrement;
         AChanged:= true;
       end;
     end;
@@ -1844,12 +1844,12 @@ begin
     begin
       if AReplace then
         //don't select
-        PlaceCaret(P1.X, P1.Y)
+        PlaceCaret(PosBegin.X, PosBegin.Y)
       else
       if OptBack and OptPutBackwardSelection then
-        PlaceCaret(P1.X, P1.Y, P2.X, P2.Y)
+        PlaceCaret(PosBegin.X, PosBegin.Y, PosEnd.X, PosEnd.Y)
       else
-        PlaceCaret(P2.X, P2.Y, P1.X, P1.Y);
+        PlaceCaret(PosEnd.X, PosEnd.Y, PosBegin.X, PosBegin.Y);
     end;
   end;
 end;
