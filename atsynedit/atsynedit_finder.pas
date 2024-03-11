@@ -1234,6 +1234,8 @@ var
   begin
     if St.IsIndexValid(BufferLineIndex) then
       St.Lines[BufferLineIndex]:= BufferLine;
+    BufferLineIndex:= -1;
+    BufferLine:= '';
   end;
   //
 var
@@ -1297,8 +1299,6 @@ begin
       else
       begin
         FlushBufferLine;
-        BufferLineIndex:= -1;
-        BufferLine:= '';
         DoReplaceTextInEditor(P1, P2, SReplacement, false, false, PosAfter);
       end;
 
