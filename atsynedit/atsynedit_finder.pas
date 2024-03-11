@@ -2284,7 +2284,7 @@ begin
             if not bOk then Break;
           end;
 
-        if IndexLine=APosStart.Y then //this helps much for 'find all' in huge line len=400K
+        if IndexLine=APosStart.Y then //helps much for 'find all' in huge line len=400K with 20K matches
           SLineLoopedW:= AFirstLoopedLine
         else
           SLineLoopedW:= Strs.Lines[IndexLine];
@@ -2369,7 +2369,7 @@ begin
             if not bOk then Break;
           end;
 
-        if IndexLine=APosStart.Y then //this helps much for 'find all' in huge line len=400K
+        if IndexLine=APosStart.Y then //helps much for 'find all' in huge line len=400K with 20K matches
           SLineLoopedW:= AFirstLoopedLine
         else
           SLineLoopedW:= Strs.Lines[IndexLine];
