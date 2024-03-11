@@ -1226,6 +1226,8 @@ var
   Res: TATFinderResult;
   Str: UnicodeString;
   P1, P2, PosAfter: TPoint;
+  BufferLine: UnicodeString = '';
+  BufferLineIndex: integer = -1;
   NLast, i: integer;
   Ok: boolean;
 begin
@@ -1264,13 +1266,29 @@ begin
       else
         Str:= StrReplace;
 
-      //TODO
       //for single-line matches:
       //don't replace _in editor_, replace only inside one string,
       //and when we go to another string, put old string to editor.
-      //huge speedup for huge one-liners of length 400k.
+      //huge speedup for huge one-liners of length 400k, with 20k matches.
 
-      DoReplaceTextInEditor(P1, P2, Str, false, false, PosAfter);
+      if (P1.Y=P2.Y) and (Pos(#10, Str)=0) then
+      begin
+        if BufferLineIndex<>P1.Y then
+        begin
+          if BufferLineIndex>=0 then
+            St.Lines[BufferLineIndex]:= BufferLine;
+          BufferLineIndex:= P1.Y;
+          BufferLine:= St.Lines[BufferLineIndex];
+        end;
+        SDeleteAndInsert(BufferLine, P1.X+1, P2.X-P1.X, Str);
+      end
+      else
+      begin
+        BufferLineIndex:= -1;
+        BufferLine:= '';
+        DoReplaceTextInEditor(P1, P2, Str, false, false, PosAfter);
+      end;
+
       Inc(Result);
 
       if i mod cStepForProgress = 0 then
@@ -1281,6 +1299,9 @@ begin
           if not Ok then Break;
         end;
     end;
+
+    if BufferLineIndex>=0 then
+      St.Lines[BufferLineIndex]:= BufferLine;
   finally
     FreeAndNil(L);
   end;
