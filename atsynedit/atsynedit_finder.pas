@@ -670,9 +670,9 @@ var
   bOk, bContinue: boolean;
   Res: TATFinderResult;
   Fr: TATEditorFragment;
-  SNew: UnicodeString = '';
   SFirstLoopedLine: UnicodeString = '';
   SFirstLoopedLineIndex: integer = -1;
+  SReplacement: UnicodeString = '';
 begin
   AList.Clear;
   if StrFind='' then exit;
@@ -723,7 +723,7 @@ begin
     begin
       bOk:= true;
       bContinue:= true;
-      DoConfirmReplace(FMatchEdPos, FMatchEdEnd, bOk, bContinue, SNew);
+      DoConfirmReplace(FMatchEdPos, FMatchEdEnd, bOk, bContinue, SReplacement);
       if not bContinue then exit;
       if not bOk then Continue;
     end;
