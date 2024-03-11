@@ -1280,7 +1280,7 @@ begin
       begin
         if BufferLineIndex<>P1.Y then
         begin
-          if BufferLineIndex>=0 then
+          if St.IsIndexValid(BufferLineIndex) then
             St.Lines[BufferLineIndex]:= BufferLine;
           BufferLineIndex:= P1.Y;
           BufferLine:= St.Lines[BufferLineIndex];
@@ -1306,7 +1306,7 @@ begin
     end;
 
     //flush the last remaining buffered line
-    if BufferLineIndex>=0 then
+    if St.IsIndexValid(BufferLineIndex) then
       St.Lines[BufferLineIndex]:= BufferLine;
 
   finally
