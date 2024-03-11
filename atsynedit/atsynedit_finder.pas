@@ -81,6 +81,7 @@ type
     FMatchPos: integer;
     FMatchLen: integer;
     FStrFind: UnicodeString;
+    FStrFind_Upper: UnicodeString;
     FStrReplace: UnicodeString;
     FStrFindUnicode: boolean;
     FCachedText: UnicodeString;
@@ -457,10 +458,18 @@ begin
 end;
 
 procedure TATTextFinder.SetStrFind(const AValue: UnicodeString);
+var
+  i: integer;
 begin
   if FStrFind=AValue then Exit;
   FStrFind:= AValue;
   FStrFindUnicode:= IsStringWithUnicode(AValue);
+
+  FStrFind_Upper:= '';
+  SetLength(FStrFind_Upper, Length(AValue));
+  for i:= 1 to Length(AValue) do
+    FStrFind_Upper[i]:= SCharUpper(AValue[i]);
+
   ClearMatchPos;
 end;
 
@@ -2277,10 +2286,10 @@ begin
   if APosEnd.Y>=NLineCount then
     APosEnd.Y:= NLineCount-1;
 
-  SFind:= StrFind;
-  if not OptCase then
-    for i:= 1 to Length(SFind) do
-      SFind[i]:= SCharUpper(SFind[i]);
+  if OptCase then
+    SFind:= FStrFind
+  else
+    SFind:= FStrFind_Upper;
 
   StringArray_SetFromString(ListParts, SFind, OptBack);
   PartCount:= Length(ListParts);
