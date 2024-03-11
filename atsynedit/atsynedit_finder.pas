@@ -1676,8 +1676,8 @@ function TATEditorFinder.DoFindOrReplace_InEditor_Internal(AReplace, AForMany: b
 var
   St: TATStrings;
   ConfirmThis, ConfirmContinue: boolean;
-  SNew: UnicodeString;
-  P1, P2: TPoint;
+  SReplacement: UnicodeString;
+  PosBegin, PosEnd: TPoint;
 begin
   Result:= false;
   AChanged:= false;
@@ -1698,31 +1698,31 @@ begin
 
       if OptRegex then
       begin
-        P1:= FMatchEdPos;
-        P2:= FMatchEdEnd;
-        if not IsPosSorted(P1.X, P1.Y, P2.X, P2.Y, true) then
+        PosBegin:= FMatchEdPos;
+        PosEnd:= FMatchEdEnd;
+        if not IsPosSorted(PosBegin.X, PosBegin.Y, PosEnd.X, PosEnd.Y, true) then
         begin
-          P1:= FMatchEdEnd;
-          P2:= FMatchEdPos;
+          PosBegin:= FMatchEdEnd;
+          PosEnd:= FMatchEdPos;
         end;
-        SNew:= GetRegexReplacement(St.TextSubstring(P1.X, P1.Y, P2.X, P2.Y));
+        SReplacement:= GetRegexReplacement(St.TextSubstring(PosBegin.X, PosBegin.Y, PosEnd.X, PosEnd.Y));
       end
       else if OptPreserveCase then
-        SNew:= GetPreserveCaseReplacement(St.TextSubstring(P1.X, P1.Y, P2.X, P2.Y))
+        SReplacement:= GetPreserveCaseReplacement(St.TextSubstring(PosBegin.X, PosBegin.Y, PosEnd.X, PosEnd.Y))
       else
-        SNew:= StrReplace;
+        SReplacement:= StrReplace;
 
       if OptConfirmReplace then
         if Assigned(FOnConfirmReplace) then
-          FOnConfirmReplace(Self, FMatchEdPos, FMatchEdEnd, AForMany, ConfirmThis, ConfirmContinue, SNew);
+          FOnConfirmReplace(Self, FMatchEdPos, FMatchEdEnd, AForMany, ConfirmThis, ConfirmContinue, SReplacement);
 
       if not ConfirmContinue then
         Exit(false);
 
       if ConfirmThis then
       begin
-        DoReplaceTextInEditor(FMatchEdPos, FMatchEdEnd, SNew, true, true, FMatchEdPosAfterRep);
-        FSkipLen:= Length(SNew)+GetRegexSkipIncrement;
+        DoReplaceTextInEditor(FMatchEdPos, FMatchEdEnd, SReplacement, true, true, FMatchEdPosAfterRep);
+        FSkipLen:= Length(SReplacement)+GetRegexSkipIncrement;
         AChanged:= true;
       end;
     end;
