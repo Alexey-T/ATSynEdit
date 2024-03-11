@@ -396,6 +396,18 @@ begin
   Result:= true;
 end;
 
+
+function SCustomUpperCase(const S: UnicodeString): UnicodeString;
+var
+  i: integer;
+begin
+  Result:= '';
+  SetLength(Result, Length(S));
+  for i:= 1 to Length(S) do
+    Result[i]:= SCharUpper(S[i]);
+end;
+
+
 { TATFinderResult2 }
 
 class operator TATFinderResult2.=(const a, b: TATFinderResult2): boolean;
@@ -458,18 +470,11 @@ begin
 end;
 
 procedure TATTextFinder.SetStrFind(const AValue: UnicodeString);
-var
-  i: integer;
 begin
   if FStrFind=AValue then Exit;
   FStrFind:= AValue;
   FStrFindUnicode:= IsStringWithUnicode(AValue);
-
-  FStrFind_Upper:= '';
-  SetLength(FStrFind_Upper, Length(AValue));
-  for i:= 1 to Length(AValue) do
-    FStrFind_Upper[i]:= SCharUpper(AValue[i]);
-
+  FStrFind_Upper:= SCustomUpperCase(AValue);
   ClearMatchPos;
 end;
 
