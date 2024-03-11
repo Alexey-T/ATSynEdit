@@ -1229,8 +1229,8 @@ var
   St: TATStrings;
   L: TATFinderResults;
   Res: TATFinderResult;
-  Str: UnicodeString;
   P1, P2, PosAfter: TPoint;
+  SReplacement: UnicodeString;
   BufferLine: UnicodeString = '';
   BufferLineIndex: integer = -1;
   NLastResult, iResult: integer;
@@ -1265,18 +1265,18 @@ begin
       end;
 
       if OptRegex then
-        Str:= GetRegexReplacement(St.TextSubstring(P1.X, P1.Y, P2.X, P2.Y))
+        SReplacement:= GetRegexReplacement(St.TextSubstring(P1.X, P1.Y, P2.X, P2.Y))
       else if OptPreserveCase then
-        Str:= GetPreserveCaseReplacement(St.TextSubstring(P1.X, P1.Y, P2.X, P2.Y))
+        SReplacement:= GetPreserveCaseReplacement(St.TextSubstring(P1.X, P1.Y, P2.X, P2.Y))
       else
-        Str:= StrReplace;
+        SReplacement:= StrReplace;
 
       //for single-line matches:
       //don't replace _in editor_, replace only inside one string,
       //and when we go to another string, put old string to editor.
       //huge speedup for huge one-liners of length 400k, with 20k matches.
 
-      if (P1.Y=P2.Y) and (Pos(#10, Str)=0) then
+      if (P1.Y=P2.Y) and (Pos(#10, SReplacement)=0) then
       begin
         if BufferLineIndex<>P1.Y then
         begin
@@ -1285,13 +1285,13 @@ begin
           BufferLineIndex:= P1.Y;
           BufferLine:= St.Lines[BufferLineIndex];
         end;
-        SDeleteAndInsert(BufferLine, P1.X+1, P2.X-P1.X, Str);
+        SDeleteAndInsert(BufferLine, P1.X+1, P2.X-P1.X, SReplacement);
       end
       else
       begin
         BufferLineIndex:= -1;
         BufferLine:= '';
-        DoReplaceTextInEditor(P1, P2, Str, false, false, PosAfter);
+        DoReplaceTextInEditor(P1, P2, SReplacement, false, false, PosAfter);
       end;
 
       Inc(Result);
