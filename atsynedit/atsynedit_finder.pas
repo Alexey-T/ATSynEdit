@@ -1227,12 +1227,20 @@ end;
 function TATEditorFinder.DoReplace_InFragment: integer;
 var
   St: TATStrings;
+  BufferLine: UnicodeString = '';
+  BufferLineIndex: integer = -1;
+  //
+  procedure FlushBufferLine;
+  begin
+    if St.IsIndexValid(BufferLineIndex) then
+      St.Lines[BufferLineIndex]:= BufferLine;
+  end;
+  //
+var
   L: TATFinderResults;
   Res: TATFinderResult;
   P1, P2, PosAfter: TPoint;
   SReplacement: UnicodeString;
-  BufferLine: UnicodeString = '';
-  BufferLineIndex: integer = -1;
   NLastResult, iResult: integer;
   Ok: boolean;
 begin
@@ -1280,8 +1288,7 @@ begin
       begin
         if BufferLineIndex<>P1.Y then
         begin
-          if St.IsIndexValid(BufferLineIndex) then
-            St.Lines[BufferLineIndex]:= BufferLine;
+          FlushBufferLine;
           BufferLineIndex:= P1.Y;
           BufferLine:= St.Lines[BufferLineIndex];
         end;
@@ -1289,6 +1296,7 @@ begin
       end
       else
       begin
+        FlushBufferLine;
         BufferLineIndex:= -1;
         BufferLine:= '';
         DoReplaceTextInEditor(P1, P2, SReplacement, false, false, PosAfter);
@@ -1305,9 +1313,7 @@ begin
         end;
     end;
 
-    //flush the last remaining buffered line
-    if St.IsIndexValid(BufferLineIndex) then
-      St.Lines[BufferLineIndex]:= BufferLine;
+    FlushBufferLine;
 
   finally
     FreeAndNil(L);
