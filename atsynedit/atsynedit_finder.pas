@@ -1305,8 +1305,10 @@ begin
         end;
     end;
 
+    //flush the last remaining buffered line
     if BufferLineIndex>=0 then
       St.Lines[BufferLineIndex]:= BufferLine;
+
   finally
     FreeAndNil(L);
   end;
