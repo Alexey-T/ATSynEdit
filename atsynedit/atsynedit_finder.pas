@@ -1233,7 +1233,7 @@ var
   P1, P2, PosAfter: TPoint;
   BufferLine: UnicodeString = '';
   BufferLineIndex: integer = -1;
-  NLast, i: integer;
+  NLastResult, iResult: integer;
   Ok: boolean;
 begin
   Result:= 0;
@@ -1250,11 +1250,11 @@ begin
     else
       DoCollect_Usual(L, false, OptConfirmReplace);
 
-    NLast:= L.Count-1;
-    for i:= NLast downto 0 do
+    NLastResult:= L.Count-1;
+    for iResult:= NLastResult downto 0 do
     begin
       if Application.Terminated then exit;
-      Res:= L[i];
+      Res:= L[iResult];
 
       P1:= Res.PosBegin;
       P2:= Res.PosEnd;
@@ -1296,11 +1296,11 @@ begin
 
       Inc(Result);
 
-      if i mod cStepForProgress = 0 then
+      if iResult mod cStepForProgress = 0 then
         if Assigned(FOnProgress) then
         begin
           Ok:= true;
-          FOnProgress(Self, NLast-i, NLast, Ok);
+          FOnProgress(Self, NLastResult-iResult, NLastResult, Ok);
           if not Ok then Break;
         end;
     end;
