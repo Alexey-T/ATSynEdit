@@ -1241,10 +1241,10 @@ var
 var
   L: TATFinderResults;
   Res: TATFinderResult;
-  P1, P2, PosAfter: TPoint;
+  PosBegin, PosEnd, PosAfter: TPoint;
   SReplacement: UnicodeString;
   NLastResult, iResult: integer;
-  Ok: boolean;
+  bOk: boolean;
 begin
   Result:= 0;
   St:= Editor.Strings;
@@ -1266,18 +1266,18 @@ begin
       if Application.Terminated then exit;
       Res:= L[iResult];
 
-      P1:= Res.PosBegin;
-      P2:= Res.PosEnd;
-      if not IsPosSorted(P1.X, P1.Y, P2.X, P2.Y, true) then
+      PosBegin:= Res.PosBegin;
+      PosEnd:= Res.PosEnd;
+      if not IsPosSorted(PosBegin.X, PosBegin.Y, PosEnd.X, PosEnd.Y, true) then
       begin
-        P1:= Res.PosEnd;
-        P2:= Res.PosBegin;
+        PosBegin:= Res.PosEnd;
+        PosEnd:= Res.PosBegin;
       end;
 
       if OptRegex then
-        SReplacement:= GetRegexReplacement(St.TextSubstring(P1.X, P1.Y, P2.X, P2.Y))
+        SReplacement:= GetRegexReplacement(St.TextSubstring(PosBegin.X, PosBegin.Y, PosEnd.X, PosEnd.Y))
       else if OptPreserveCase then
-        SReplacement:= GetPreserveCaseReplacement(St.TextSubstring(P1.X, P1.Y, P2.X, P2.Y))
+        SReplacement:= GetPreserveCaseReplacement(St.TextSubstring(PosBegin.X, PosBegin.Y, PosEnd.X, PosEnd.Y))
       else
         SReplacement:= StrReplace;
 
@@ -1286,20 +1286,20 @@ begin
       //and when we go to another string, put old string to editor.
       //huge speedup for huge one-liners of length 400k, with 20k matches.
 
-      if (P1.Y=P2.Y) and (Pos(#10, SReplacement)=0) then
+      if (PosBegin.Y=PosEnd.Y) and (Pos(#10, SReplacement)=0) then
       begin
-        if BufferLineIndex<>P1.Y then
+        if BufferLineIndex<>PosBegin.Y then
         begin
           FlushBufferLine;
-          BufferLineIndex:= P1.Y;
+          BufferLineIndex:= PosBegin.Y;
           BufferLine:= St.Lines[BufferLineIndex];
         end;
-        SDeleteAndInsert(BufferLine, P1.X+1, P2.X-P1.X, SReplacement);
+        SDeleteAndInsert(BufferLine, PosBegin.X+1, PosEnd.X-PosBegin.X, SReplacement);
       end
       else
       begin
         FlushBufferLine;
-        DoReplaceTextInEditor(P1, P2, SReplacement, false, false, PosAfter);
+        DoReplaceTextInEditor(PosBegin, PosEnd, SReplacement, false, false, PosAfter);
       end;
 
       Inc(Result);
@@ -1307,9 +1307,9 @@ begin
       if iResult mod cStepForProgress = 0 then
         if Assigned(FOnProgress) then
         begin
-          Ok:= true;
-          FOnProgress(Self, NLastResult-iResult, NLastResult, Ok);
-          if not Ok then Break;
+          bOk:= true;
+          FOnProgress(Self, NLastResult-iResult, NLastResult, bOk);
+          if not bOk then Break;
         end;
     end;
 
