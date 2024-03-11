@@ -795,6 +795,7 @@ type
     FGutter: TATGutter;
     FGutterDecor: TATGutterDecor;
     FGutterDecorImages: TImageList;
+    FGutterDecorImagesOwned: boolean;
     FGutterDecorAlignment: TAlignment;
     FGutterBandBookmarks: integer;
     FGutterBandNumbers: integer;
@@ -1804,6 +1805,7 @@ type
     function DoGetMarkedLines(out ALine1, ALine2: integer): boolean;
     function DoGetLinkAtPos(AX, AY: integer): atString;
     function DoGetGapRect(AIndex: integer; out ARect: TRect): boolean;
+    property ImagesGutterDecorOwned: boolean read FGutterDecorImagesOwned write FGutterDecorImagesOwned;
 
   protected
     IsRepaintEnabled: boolean;
@@ -5566,6 +5568,10 @@ begin
   if Assigned(FMenuStd) then
     FreeAndNil(FMenuStd);
   TimerBlinkDisable;
+  if Assigned(FFoldImageList) then
+    FreeAndNil(FFoldImageList);
+  if Assigned(FGutterDecorImages) and FGutterDecorImagesOwned then
+    FreeAndNil(FGutterDecorImages);
   if Assigned(FFoldedMarkList) then
   begin
     FFoldedMarkList.Clear;

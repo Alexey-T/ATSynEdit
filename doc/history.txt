@@ -1,3 +1,6 @@
+2024.03.11
++ add: prop ImagesGutterDecorOwned
+
 2024.03.04
 + add: prop OptForceSeparateCharSizer
 
