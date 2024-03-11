@@ -748,7 +748,7 @@ var
   NMaxPos: integer;
   bOk, bContinue: boolean;
   Res: TATFinderResult;
-  P1, P2: TPoint;
+  PosBegin, PosEnd: TPoint;
   SReplacement: UnicodeString = '';
 begin
   AList.Clear;
@@ -783,25 +783,25 @@ begin
 
   FRegex.InputString:= StrText;
   if not FRegex.ExecPos(AFromPos) then exit;
-  P1:= ConvertBufferPosToCaretPos(FRegex.MatchPos[0]);
-  P2:= ConvertBufferPosToCaretPos(FRegex.MatchPos[0]+FRegex.MatchLen[0]);
+  PosBegin:= ConvertBufferPosToCaretPos(FRegex.MatchPos[0]);
+  PosEnd:= ConvertBufferPosToCaretPos(FRegex.MatchPos[0]+FRegex.MatchLen[0]);
 
   bOk:= true;
   bContinue:= true;
 
   if bOk then
-    if not CheckTokensEd(P1.X, P1.Y, P2.X, P2.Y) then
+    if not CheckTokensEd(PosBegin.X, PosBegin.Y, PosEnd.X, PosEnd.Y) then
       bOk:= false;
 
   if bOk and AWithConfirm then
   begin
-    DoConfirmReplace(P1, P2, bOk, bContinue, SReplacement);
+    DoConfirmReplace(PosBegin, PosEnd, bOk, bContinue, SReplacement);
     if not bContinue then exit;
   end;
 
   if bOk then
   begin
-    Res.Init(P1, P2);
+    Res.Init(PosBegin, PosEnd);
     AList.Add(Res);
 
     FMatchPos:= FRegex.MatchPos[0];
@@ -811,21 +811,21 @@ begin
 
   while FRegex.ExecNext do
   begin
-    P1:= ConvertBufferPosToCaretPos(FRegex.MatchPos[0]);
-    P2:= ConvertBufferPosToCaretPos(FRegex.MatchPos[0]+FRegex.MatchLen[0]);
+    PosBegin:= ConvertBufferPosToCaretPos(FRegex.MatchPos[0]);
+    PosEnd:= ConvertBufferPosToCaretPos(FRegex.MatchPos[0]+FRegex.MatchLen[0]);
 
     if Application.Terminated then exit;
 
-    if not CheckTokensEd(P1.X, P1.Y, P2.X, P2.Y) then Continue;
+    if not CheckTokensEd(PosBegin.X, PosBegin.Y, PosEnd.X, PosEnd.Y) then Continue;
 
     if AWithConfirm then
     begin
-      DoConfirmReplace(P1, P2, bOk, bContinue, SReplacement);
+      DoConfirmReplace(PosBegin, PosEnd, bOk, bContinue, SReplacement);
       if not bContinue then exit;
       if not bOk then Continue;
     end;
 
-    Res.Init(P1, P2);
+    Res.Init(PosBegin, PosEnd);
     AList.Add(Res);
 
     FMatchPos:= FRegex.MatchPos[0];
