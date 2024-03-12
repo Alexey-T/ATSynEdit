@@ -195,8 +195,8 @@ type
     procedure GetEditorSelRange(out AX1, AY1, AX2, AY2: integer; out ASelText: UnicodeString);
     procedure DoFixCaretSelectionDirection;
     //
-    procedure DoCollect_Usual(AList: TATFinderResults; AWithEvent, AWithConfirm: boolean);
-    procedure DoCollect_Regex(AList: TATFinderResults; AFromPos: integer; AWithEvent, AWithConfirm: boolean);
+    procedure DoCollect_Usual(AList: TATFinderResults; out AListCount: integer; AWithEvent, AWithConfirm: boolean);
+    procedure DoCollect_Regex(AList: TATFinderResults; out AListCount: integer; AFromPos: integer; AWithEvent, AWithConfirm: boolean);
     function DoCount_InFragment(AWithEvent: boolean): integer;
     function DoReplace_InFragment: integer;
     //
@@ -676,7 +676,8 @@ begin
 end;
 
 
-procedure TATEditorFinder.DoCollect_Usual(AList: TATFinderResults; AWithEvent, AWithConfirm: boolean);
+procedure TATEditorFinder.DoCollect_Usual(AList: TATFinderResults; out AListCount: integer;
+  AWithEvent, AWithConfirm: boolean);
 var
   St: TATStrings;
   IndexLineMax: integer;
@@ -688,7 +689,10 @@ var
   SFirstLoopedLineIndex: integer = -1;
   SReplacement: UnicodeString = '';
 begin
-  AList.Clear;
+  if Assigned(AList) then
+    AList.Clear;
+  AListCount:= 0;
+
   if StrFind='' then exit;
 
   St:= Editor.Strings;
@@ -744,7 +748,10 @@ begin
     end;
 
     Res.Init(FMatchEdPos, FMatchEdEnd);
-    AList.Add(Res);
+
+    if Assigned(AList) then
+      AList.Add(Res);
+    Inc(AListCount);
 
     if IsProgressNeeded(FMatchEdPos.Y) then
       if Assigned(FOnProgress) then
@@ -757,7 +764,8 @@ begin
 end;
 
 
-procedure TATEditorFinder.DoCollect_Regex(AList: TATFinderResults; AFromPos: integer; AWithEvent, AWithConfirm: boolean);
+procedure TATEditorFinder.DoCollect_Regex(AList: TATFinderResults; out AListCount: integer;
+  AFromPos: integer; AWithEvent, AWithConfirm: boolean);
 var
   NMaxPos: integer;
   bOk, bContinue: boolean;
@@ -765,7 +773,10 @@ var
   PosBegin, PosEnd: TPoint;
   SReplacement: UnicodeString = '';
 begin
-  AList.Clear;
+  if Assigned(AList) then
+    AList.Clear;
+  AListCount:= 0;
+
   if StrFind='' then exit;
   if StrText='' then exit;
   InitRegex;
@@ -816,7 +827,10 @@ begin
   if bOk then
   begin
     Res.Init(PosBegin, PosEnd);
-    AList.Add(Res);
+
+    if Assigned(AList) then
+      AList.Add(Res);
+    Inc(AListCount);
 
     FMatchPos:= FRegex.MatchPos[0];
     FMatchLen:= FRegex.MatchLen[0];
@@ -840,7 +854,10 @@ begin
     end;
 
     Res.Init(PosBegin, PosEnd);
-    AList.Add(Res);
+
+    if Assigned(AList) then
+      AList.Add(Res);
+    Inc(AListCount);
 
     FMatchPos:= FRegex.MatchPos[0];
     FMatchLen:= FRegex.MatchLen[0];
@@ -857,19 +874,11 @@ begin
 end;
 
 function TATEditorFinder.DoCount_InFragment(AWithEvent: boolean): integer;
-var
-  L: TATFinderResults;
 begin
-  L:= TATFinderResults.Create;
-  try
-    if OptRegex then
-      DoCollect_Regex(L, 1, AWithEvent, false)
-    else
-      DoCollect_Usual(L, AWithEvent, false);
-    Result:= L.Count;
-  finally
-    FreeAndNil(L);
-  end;
+  if OptRegex then
+    DoCollect_Regex(nil, Result, 1, AWithEvent, false)
+  else
+    DoCollect_Usual(nil, Result, AWithEvent, false);
 end;
 
 { TATEditorFinder }
@@ -1135,6 +1144,8 @@ begin
 end;
 
 procedure TATEditorFinder.DoAction_FindAll(AResults: TATFinderResults; AWithEvent: boolean);
+var
+  NListCount: integer;
 begin
   UpdateCarets(false);
   UpdateFragments;
@@ -1144,10 +1155,10 @@ begin
   if OptRegex then
   begin
     UpdateBuffer;
-    DoCollect_Regex(AResults, 1, AWithEvent, false)
+    DoCollect_Regex(AResults, NListCount, 1, AWithEvent, false)
   end
   else
-    DoCollect_Usual(AResults, AWithEvent, false);
+    DoCollect_Usual(AResults, NListCount, AWithEvent, false);
 
   EndTiming;
 end;
@@ -1160,7 +1171,7 @@ var
   ListRes: TATFinderResults;
   Res: TATFinderResult;
   Str: UnicodeString;
-  i: integer;
+  NListCount, i: integer;
 begin
   if not OptRegex then
     raise Exception.Create('Finder Extract action called for non-regex mode');
@@ -1177,7 +1188,7 @@ begin
     AMatches.Duplicates:= ADuplicates;
     AMatches.CaseSensitive:= ACaseSens;
 
-    DoCollect_Regex(ListRes, 1, AWithEvent, false);
+    DoCollect_Regex(ListRes, NListCount, 1, AWithEvent, false);
     for i:= 0 to ListRes.Count-1 do
     begin
       Res:= ListRes[i];
@@ -1257,7 +1268,7 @@ var
   Res: TATFinderResult;
   PosBegin, PosEnd, PosAfter: TPoint;
   SReplacement: UnicodeString;
-  NLastResult, iResult: integer;
+  NListCount, NLastResult, iResult: integer;
   bOk: boolean;
 begin
   Result:= 0;
@@ -1270,9 +1281,9 @@ begin
   L:= TATFinderResults.Create;
   try
     if OptRegex then
-      DoCollect_Regex(L, 1, false, OptConfirmReplace)
+      DoCollect_Regex(L, NListCount, 1, false, OptConfirmReplace)
     else
-      DoCollect_Usual(L, false, OptConfirmReplace);
+      DoCollect_Usual(L, NListCount, false, OptConfirmReplace);
 
     NLastResult:= L.Count-1;
     for iResult:= NLastResult downto 0 do
