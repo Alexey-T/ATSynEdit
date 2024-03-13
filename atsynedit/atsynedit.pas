@@ -345,6 +345,7 @@ type
     Bitmap, //flag "bitmap should be repainted"
     ScrolledHorz, //flag "horizontal scroll _position_ is changed"
     RepaintNeeded, //last paint changes some state, so repainting is needed
+    ScrollEventNeeded, //last paint detected that OnScroll event must be fired
     Resize
     );
   TATEditorInternalFlags = set of TATEditorInternalFlag;
@@ -3010,13 +3011,13 @@ begin
 
     bScrolled:=
       (FPrevHorz.SmoothPos<>FScrollHorz.SmoothPos) or
-      (FPrevVert.SmoothPos<>FScrollVert.SmoothPos);
+      (FPrevVert.SmoothPos<>FScrollVert.SmoothPos) or
+      (FPrevVert.SmoothPage<>FScrollVert.SmoothPage); //this must react to window maximize/restore
+    if bScrolled then
+      Include(FPaintFlags, TATEditorInternalFlag.ScrollEventNeeded);
 
     FPrevHorz:= FScrollHorz;
     FPrevVert:= FScrollVert;
-
-    if bScrolled then
-      DoEventScroll;
   end;
 end;
 
@@ -6133,6 +6134,12 @@ begin
     PaintEx(NLine);
   finally
     FPaintWorking:= false;
+  end;
+
+  if TATEditorInternalFlag.ScrollEventNeeded in FPaintFlags then
+  begin
+    Exclude(FPaintFlags, TATEditorInternalFlag.ScrollEventNeeded);
+    DoEventScroll;
   end;
 end;
 
