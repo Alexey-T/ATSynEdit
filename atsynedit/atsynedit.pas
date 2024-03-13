@@ -7756,7 +7756,7 @@ begin
   inherited Invalidate;
 
   if AForceOnScroll then
-    DoEventScroll;
+    Include(FPaintFlags, TATEditorInternalFlag.ScrollEventNeeded);
 end;
 
 function TATSynEdit._IsFocused: boolean;
