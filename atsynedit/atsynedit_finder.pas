@@ -1487,7 +1487,7 @@ begin
   if not Assigned(Editor) then
     raise Exception.Create('Finder.Editor not set');
   if StrFind='' then
-    raise Exception.Create('Finder.StrFind is empty');
+    exit; //raise Exception.Create('Finder.StrFind is empty'); //this occurs in real work
   if FinderCarets.Count=0 then
     raise Exception.Create('Finder.FinderCarets is empty');
   if AReplace and Editor.ModeReadOnly then exit;
