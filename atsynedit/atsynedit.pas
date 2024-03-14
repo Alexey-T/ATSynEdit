@@ -514,7 +514,7 @@ type
     cInitUndoForCaretJump = true;
     cInitMicromapShowForMinCount = 2;
     cInitScrollbarHorzAddSpace = 2;
-    cInitIdleInterval = 0; //1000; //0 dont fire OnIdle, faster
+    cInitIdleInterval = 0; //0: don't fire OnIdle, faster
     cInitCaretsPrimitiveColumnSelection = true;
     cInitCaretsMultiToColumnSel = true;
     cInitBorderVisible = true;
