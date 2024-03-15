@@ -5173,10 +5173,6 @@ begin
   FTimerDelayedParsing.Interval:= 300;
   FTimerDelayedParsing.OnTimer:= @TimerDelayedParsingTick;
 
-  FTimerIdle:= TTimer.Create(Self);
-  FTimerIdle.Enabled:= false;
-  FTimerIdle.OnTimer:=@TimerIdleTick;
-
   FTimerBlink:= TTimer.Create(Self);
   FTimerBlink.Enabled:= false;
   SetCaretBlinkTime(cInitCaretBlinkTime);
@@ -8440,6 +8436,12 @@ begin
   //fire OnIdle after pause after change
   if FOptIdleInterval>0 then
   begin
+    if FTimerIdle=nil then
+    begin
+      FTimerIdle:= TTimer.Create(Self);
+      FTimerIdle.Enabled:= false;
+      FTimerIdle.OnTimer:= @TimerIdleTick;
+    end;
     FTimerIdle.Enabled:= false;
     FTimerIdle.Interval:= FOptIdleInterval;
     FTimerIdle.Enabled:= true;
