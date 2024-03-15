@@ -1,5 +1,5 @@
 2024.03.15
-+ add: prop OptSpaceOnlyLineMakeEmptyByEnter
++ add: prop OptTrimLineOnPressingEnter
 
 2024.03.04
 + add: prop OptForceSeparateCharSizer

@@ -639,10 +639,9 @@ begin
     Str:= GetAutoIndentString(Caret.PosX, Caret.PosY, not bBetterBrackets);
     St.TextInsertEol(Caret.PosX, Caret.PosY, AKeepCaret, Str, Shift, PosAfter);
 
-    //after inserting EOL line became space-only? then make it empty
-    if FOptSpaceOnlyLineMakeEmptyByEnter then
-      if IsStringSpaces(St.Lines[Caret.PosY]) then
-        St.Lines[Caret.PosY]:= '';
+    //after inserting EOL, trim previous line (make it empty if only spaces)
+    if FOptTrimLineOnPressingEnter then
+      St.Lines[Caret.PosY]:= STrimRight(St.Lines[Caret.PosY]);
 
     //work to move } to next line, leave caret at current line
     if bBetterBrackets then
