@@ -640,8 +640,9 @@ begin
     St.TextInsertEol(Caret.PosX, Caret.PosY, AKeepCaret, Str, Shift, PosAfter);
 
     //after inserting EOL line became space-only? then make it empty
-    if IsStringSpaces(St.Lines[Caret.PosY]) then
-      St.Lines[Caret.PosY]:= '';
+    if FOptSpaceOnlyLineMakeEmptyByEnter then
+      if IsStringSpaces(St.Lines[Caret.PosY]) then
+        St.Lines[Caret.PosY]:= '';
 
     //work to move } to next line, leave caret at current line
     if bBetterBrackets then

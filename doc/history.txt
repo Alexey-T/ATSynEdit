@@ -1,3 +1,6 @@
+2024.03.15
++ add: prop OptSpaceOnlyLineMakeEmptyByEnter
+
 2024.03.04
 + add: prop OptForceSeparateCharSizer
 

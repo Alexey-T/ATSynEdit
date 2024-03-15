@@ -961,6 +961,7 @@ type
     FOptIndentSize: integer;
     FOptIndentKeepsAlign: boolean;
     FOptIndentMakesWholeLinesSelection: boolean;
+    FOptSpaceOnlyLineMakeEmptyByEnter: boolean;
     FOptBorderVisible: boolean;
     FOptBorderWidth: integer;
     FOptBorderWidthFocused: integer;
@@ -2173,6 +2174,7 @@ type
              // N=0: calc indent from OptTabSize/OptTabSpaces
     property OptIndentKeepsAlign: boolean read FOptIndentKeepsAlign write FOptIndentKeepsAlign default true;
     property OptIndentMakesWholeLinesSelection: boolean read FOptIndentMakesWholeLinesSelection write FOptIndentMakesWholeLinesSelection default false;
+    property OptSpaceOnlyLineMakeEmptyByEnter: boolean read FOptSpaceOnlyLineMakeEmptyByEnter write FOptSpaceOnlyLineMakeEmptyByEnter default true;
     property OptShowIndentLines: boolean read FOptShowIndentLines write FOptShowIndentLines default true;
     property OptShowGutterCaretBG: boolean read FOptShowGutterCaretBG write FOptShowGutterCaretBG default true;
     property OptAllowRepaintOnTextChange: boolean read FOptAllowRepaintOnTextChange write FOptAllowRepaintOnTextChange default true;
@@ -5469,6 +5471,7 @@ begin
   FOptIndentSize:= 2;
   FOptIndentKeepsAlign:= true;
   FOptIndentMakesWholeLinesSelection:= false;
+  FOptSpaceOnlyLineMakeEmptyByEnter:= true;
   FOptSavingForceFinalEol:= false;
   FOptSavingTrimSpaces:= false;
   FOptShowScrollHint:= false;
