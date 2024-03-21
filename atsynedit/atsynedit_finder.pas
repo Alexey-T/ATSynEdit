@@ -1127,18 +1127,13 @@ begin
     UpdateBuffer;
   BeginTiming;
 
-  if FFragments.Count=0 then
-    Result:= DoCount_InFragment(AWithEvent)
-  else
+  Result:= 0;
+  for i:= 0 to Max(0, FFragments.Count-1) do
   begin
-    Result:= 0;
-    for i:= 0 to FFragments.Count-1 do
-    begin
-      CurrentFragmentIndex:= i;
-      Inc(Result, DoCount_InFragment(AWithEvent));
-    end;
-    CurrentFragmentIndex:= 0;
+    CurrentFragmentIndex:= i;
+    Inc(Result, DoCount_InFragment(AWithEvent));
   end;
+  CurrentFragmentIndex:= 0;
 
   EndTiming;
 end;
