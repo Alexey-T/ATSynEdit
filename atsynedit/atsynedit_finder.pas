@@ -1145,21 +1145,30 @@ end;
 
 procedure TATEditorFinder.DoAction_FindAll(AResults: TATFinderResults; AWithEvent: boolean);
 var
-  NListCount: integer;
+  TempResults: TATFinderResults;
+  NListCount, iFragment: integer;
 begin
+  BeginTiming;
   UpdateCarets(false);
   UpdateFragments;
-  CurrentFragmentIndex:= 0;
-  BeginTiming;
-
   if OptRegex then
-  begin
     UpdateBuffer;
-    DoCollect_Regex(AResults, NListCount, 1, AWithEvent, false)
-  end
-  else
-    DoCollect_Usual(AResults, NListCount, AWithEvent, false);
+  TempResults:= TATFinderResults.Create;
 
+  for iFragment:= 0 to Max(0, FFragments.Count-1) do
+  begin
+    CurrentFragmentIndex:= iFragment;
+
+    if OptRegex then
+      DoCollect_Regex(TempResults, NListCount, 1, AWithEvent, false)
+    else
+      DoCollect_Usual(TempResults, NListCount, AWithEvent, false);
+
+    AResults.AddList(TempResults);
+  end;
+
+  CurrentFragmentIndex:= 0;
+  FreeAndNil(TempResults);
   EndTiming;
 end;
 
