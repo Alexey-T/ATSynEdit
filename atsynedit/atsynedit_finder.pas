@@ -1154,6 +1154,7 @@ begin
   if OptRegex then
     UpdateBuffer;
   TempResults:= TATFinderResults.Create;
+  AResults.Clear;
 
   for iFragment:= 0 to Max(0, FFragments.Count-1) do
   begin
