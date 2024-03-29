@@ -597,7 +597,9 @@ begin
     there. Otherwise, we could accidentally have there a copy of some item
     on the list, and accidentally Deref it too soon.
     See http://bugs.freepascal.org/view.php?id=20005. }
-  FillChar(InternalItems[FCount]^, (FCapacity+1-FCount) * FItemSize, #0);
+  FillChar(InternalItems[FCount]^, 1{(FCapacity+1-FCount)} * FItemSize, #0);
+    //Alexey: changed 2nd param to 1 to avoud BIG slowdown when deleting in 600k items list
+    //repro in CudaText: open file with 600k lines, 'select all', Delete -> 30 sec pause
 end;
 
 procedure TFPSList.DeleteRange(IndexFrom, IndexTo : Integer);
