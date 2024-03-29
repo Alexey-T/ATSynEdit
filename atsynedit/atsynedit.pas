@@ -8237,8 +8237,8 @@ begin
 end;
 
 procedure TATSynEdit.DoPaintGutterNumber(C: TCanvas; ALineIndex, ACoordTop: integer; ABand: TATGutterItem);
-//painting of text is slower, paint a special mark if possible
   //
+  //painting of text mark '-' or '.' is slower, so paint mark by FillRect()
   procedure PaintDash(W, H: integer);
   var
     P: TPoint;
@@ -8267,7 +8267,7 @@ procedure TATSynEdit.DoPaintGutterNumber(C: TCanvas; ALineIndex, ACoordTop: inte
 var
   SText: string;
   P: TPoint;
-  NW: integer;
+  NNumberWidth: integer;
 begin
   SText:= DoFormatLineNumber(ALineIndex+1);
 
@@ -8287,7 +8287,7 @@ begin
 
     else
       begin
-        NW:= FCharSize.XScaled * Length(SText) div ATEditorCharXScale;
+        NNumberWidth:= FCharSize.XScaled * Length(SText) div ATEditorCharXScale;
 
         P.Y:= ACoordTop;
 
@@ -8295,9 +8295,9 @@ begin
           taLeftJustify:
             P.X:= ABand.Left + FNumbersIndent;
           taRightJustify:
-            P.X:= ABand.Right - NW - FNumbersIndent;
+            P.X:= ABand.Right - NNumberWidth - FNumbersIndent;
           taCenter:
-            P.X:= (ABand.Left + ABand.Right - NW) div 2;
+            P.X:= (ABand.Left + ABand.Right - NNumberWidth) div 2;
         end;
 
         Inc(P.Y, FTextOffsetFromTop);
