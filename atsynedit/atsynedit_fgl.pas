@@ -598,7 +598,6 @@ begin
     on the list, and accidentally Deref it too soon.
     See http://bugs.freepascal.org/view.php?id=20005. }
   FillChar(InternalItems[FCount]^, FItemSize, #0);
-  //Alexey: changed 2nd param to FItemSize to avoud big slowdown when deleting 600k items
 end;
 
 procedure TFPSList.DeleteRange(IndexFrom, IndexTo : Integer);
@@ -669,23 +668,18 @@ end;
 function TFPSList.Expand: TFPSList;
 var
   IncSize : Longint;
-  NewVal: Int64;
 begin
   if FCount < FCapacity then exit;
   IncSize := 4;
   if FCapacity > 3 then IncSize := IncSize + 4;
   if FCapacity > 8 then IncSize := IncSize + 8;
   if FCapacity > 127 then Inc(IncSize, FCapacity shr 2);
-
-  //AT changed to allow more items up to MaxListSize
-  if FCapacity >= MaxListSize then
-    Error(SListCapacityError, FCapacity);
-
-  NewVal := Int64(FCapacity) + IncSize;
-  if NewVal > MaxListSize then
-    NewVal := MaxListSize;
-
-  SetCapacity(NewVal);
+  if FCapacity+IncSize>MaxListSize then
+    IncSize:=MaxListSize-FCapacity;
+  // If we were at max capacity already, force error.
+  If IncSize<=0 then
+    IncSize:=1; // Will trigger error 
+  SetCapacity(FCapacity + IncSize);
   Result := Self;
 end;
 
