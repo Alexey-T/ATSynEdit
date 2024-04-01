@@ -264,6 +264,7 @@ function SCountTextOccurrences(const SubStr, Str: UnicodeString): SizeInt;
 function SCountTextLines(const Str, StrBreak: UnicodeString): SizeInt;
 procedure SSplitByChar(const S: string; Sep: char; out S1, S2: string);
 procedure SDeleteAndInsert(var AStr: UnicodeString; AFromPos, ACount: SizeInt; const AReplace: UnicodeString);
+procedure SDeleteHtmlTags(var S: string);
 
 
 implementation
@@ -1527,6 +1528,20 @@ begin
   Move(AReplace[1], AStr[AFromPos], LenReplace * SizeOf(UnicodeChar));
   if GrowCount < 0 then  // Need shrink
     SetLength(AStr, LenStr + GrowCount);
+end;
+
+
+procedure SDeleteHtmlTags(var S: string);
+var
+  n1, n2: integer;
+begin
+  repeat
+    n1:= Pos('<', S);
+    if n1=0 then Break;
+    n2:= Pos('>', S, n1+1);
+    if n2=0 then Break;
+    Delete(S, n1, n2-n1+1);
+  until false;
 end;
 
 
