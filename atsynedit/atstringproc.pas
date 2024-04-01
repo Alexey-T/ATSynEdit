@@ -7,6 +7,7 @@ unit ATStringProc;
 {$mode objfpc}{$H+}
 {$codepage utf8}
 {$ScopedEnums on}
+{$ModeSwitch advancedrecords}
 
 interface
 
@@ -27,8 +28,12 @@ const
   ATEditorCharXScale = 1024;
 
 type
+
+  { TATPoint }
+
   TATPoint = record
     X, Y: Int64;
+    class operator =(const A, B: TATPoint): boolean;
   end;
 
 type
@@ -498,6 +503,13 @@ begin
     else
       Result:= false;
   end;
+end;
+
+{ TATPoint }
+
+class operator TATPoint.=(const A, B: TATPoint): boolean;
+begin
+  Result:= (A.X=B.X) and (A.Y=B.Y);
 end;
 
 function TATStringTabHelper.FindWordWrapOffset(ALineIndex: integer; const S: atString; AColumns: Int64;

@@ -717,7 +717,8 @@ type
     FIsRunningCommand: boolean;
     FCursorOnMinimap: boolean;
     FCursorOnGutter: boolean;
-    FFoldbarCacheStart: integer;
+    FCoordOfDropMarker: TATPoint;
+    FCoordOfDropMarker_Prev: TATPoint;
     FAdapterIsDataReady: boolean;
     FTimingQueue: TATTimingQueue;
     FOnCheckInput: TATSynEditCheckInputEvent;
@@ -7313,7 +7314,12 @@ begin
     end
     else
     begin
-      Invalidate; //Invalidate is needed even if nothing changed, just to paint drop-marker
+      DoCalcCoordOfDropMarker(FCoordOfDropMarker);
+      if FCoordOfDropMarker<>FCoordOfDropMarker_Prev then
+      begin
+        FCoordOfDropMarker_Prev:= FCoordOfDropMarker;
+        Invalidate; //Invalidate is needed even if nothing changed, just to paint drop-marker
+      end;
     end;
     exit;
   end;
@@ -8089,7 +8095,7 @@ begin
   ////drag-drop from another control may be active
   if not DragManager.IsDragging then exit;
 
-  DoCalcCoordOfDropMarker(PntCoord);
+  PntCoord:= FCoordOfDropMarker;
   if PntCoord.Y<0 then exit;
   if not ATPointInRect(FRectMain, PntCoord) then exit;
 
