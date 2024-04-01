@@ -1089,6 +1089,7 @@ var
   NDecSpaces, NMinSpaces, i: integer;
   NShift1, NShift2, NShiftChars, NIndentChars1, NIndentChars2: integer;
   NBlockBeginY, NBlockEndY: integer;
+  bNoSel: boolean;
 begin
   ATextChanged:= false;
   St:= Strings;
@@ -1097,7 +1098,9 @@ begin
 
   Caret.GetSelLines(NBlockBeginY, NBlockEndY, true{Allow no sel});
   if NBlockBeginY<0 then exit;
-  if Caret.EndY<0 then
+
+  bNoSel:= Caret.EndY<0;
+  if bNoSel then
   begin
     Caret.EndX:= Caret.PosX;
     Caret.EndY:= Caret.PosY;
@@ -1189,6 +1192,8 @@ begin
       Caret.PosX:= Max(0, Caret.PosX+NShift1);
     if Caret.EndX>0 then
       Caret.EndX:= Max(0, Caret.EndX+NShift2);
+    if bNoSel then
+      Caret.SelectNone;
   end;
 end;
 
