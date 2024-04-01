@@ -635,7 +635,8 @@ begin
          (FOptAutoIndentBetterBracketsRound and (Str='()')) or
          (FOptAutoIndentBetterBracketsSquare and (Str='[]')) then
         bBetterBrackets:= true;
-      if FOptAutoIndentBetterBracketsCurly and (Str='{') then
+      if (FOptAutoIndentBetterBracketsCurly and (Str='{')) or
+         (FOptAutoIndentBetterBracketsSquare and (Str='[')) then
         bForceIndent:= true;
     end;
 

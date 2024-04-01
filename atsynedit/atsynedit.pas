@@ -1991,7 +1991,7 @@ type
     property OptAutoIndentKind: TATEditorAutoIndentKind read FOptAutoIndentKind write FOptAutoIndentKind default TATEditorAutoIndentKind.AsPrevLine;
     property OptAutoIndentBetterBracketsCurly: boolean read FOptAutoIndentBetterBracketsCurly write FOptAutoIndentBetterBracketsCurly default true;
     property OptAutoIndentBetterBracketsRound: boolean read FOptAutoIndentBetterBracketsRound write FOptAutoIndentBetterBracketsRound default false;
-    property OptAutoIndentBetterBracketsSquare: boolean read FOptAutoIndentBetterBracketsSquare write FOptAutoIndentBetterBracketsSquare default false;
+    property OptAutoIndentBetterBracketsSquare: boolean read FOptAutoIndentBetterBracketsSquare write FOptAutoIndentBetterBracketsSquare default true;
     property OptAutoIndentRegexRule: string read FOptAutoIndentRegexRule write FOptAutoIndentRegexRule;
     property OptCopyLinesIfNoSel: boolean read FOptCopyLinesIfNoSel write FOptCopyLinesIfNoSel default true;
     property OptCutLinesIfNoSel: boolean read FOptCutLinesIfNoSel write FOptCutLinesIfNoSel default false;
@@ -5411,7 +5411,7 @@ begin
   FOptAutoIndentKind:= TATEditorAutoIndentKind.AsPrevLine;
   FOptAutoIndentBetterBracketsCurly:= true;
   FOptAutoIndentBetterBracketsRound:= false;
-  FOptAutoIndentBetterBracketsSquare:= false;
+  FOptAutoIndentBetterBracketsSquare:= true;
   FOptAutoIndentRegexRule:= '';
 
   FOptTabSize:= cInitTabSize;
