@@ -1085,7 +1085,7 @@ procedure TATSynEdit.DoCommand_TextIndentUnindent_StreamBlock_OneCaret(ARight: b
   Caret: TATCaretItem; out ATextChanged: boolean);
 var
   St: TATStrings;
-  Str: atString;
+  Str, StrOld: atString;
   NDecSpaces, NMinSpaces, i: integer;
   NShift1, NShift2, NShiftChars, NIndentChars1, NIndentChars2: integer;
   NBlockBeginY, NBlockEndY: integer;
@@ -1158,9 +1158,9 @@ begin
   try
     for i:= NBlockBeginY to NBlockEndY do
     begin
-      Str:= St.Lines[i];
-      Str:= FTabHelper.IndentUnindent(i, Str, ARight);
-      if St.Lines[i]<>Str then
+      StrOld:= St.Lines[i];
+      Str:= FTabHelper.IndentUnindent(i, StrOld, ARight);
+      if Str<>StrOld then
       begin
         St.Lines[i]:= Str;
         ATextChanged:= true;
