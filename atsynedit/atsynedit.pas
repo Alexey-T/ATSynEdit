@@ -1193,7 +1193,7 @@ type
       ALineIndex, ACharIndex: integer; AMainText: boolean);
     procedure DoPartCalc_ApplyAttribsOver(var AParts: TATLineParts; AOffsetMax,
       ALineIndex, ACharIndex: integer; AColorBG: TColor; AMainText: boolean);
-    function GetAutoIndentString(APosX, APosY: integer; AUseIndentRegexRule: boolean): atString;
+    function GetAutoIndentString(APosX, APosY: integer; AUseIndentRegexRule, AForceIndent: boolean): atString;
     function GetFoldedMarkText(ALine: integer): string;
     function GetModified: boolean;
     function GetModifiedBookmarks: boolean;
@@ -8741,7 +8741,8 @@ begin
     Result:= #9;
 end;
 
-function TATSynEdit.GetAutoIndentString(APosX, APosY: integer; AUseIndentRegexRule: boolean): atString;
+function TATSynEdit.GetAutoIndentString(APosX, APosY: integer;
+  AUseIndentRegexRule, AForceIndent: boolean): atString;
 var
   StrPrev, StrIndent: atString;
   NChars, NSpaces: integer;
@@ -8756,7 +8757,10 @@ begin
   if StrPrev='' then exit;
   NChars:= SGetIndentChars(StrPrev); //count of chars in indent
 
-  bAddIndent:=
+  if AForceIndent then
+    bAddIndent:= true
+  else
+    bAddIndent:=
     AUseIndentRegexRule and
     (FOptAutoIndentRegexRule<>'') and
     SFindRegexMatch(StrPrev, FOptAutoIndentRegexRule{%H-}, MatchPos, MatchLen);

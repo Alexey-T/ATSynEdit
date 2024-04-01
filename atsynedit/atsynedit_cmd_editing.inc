@@ -598,7 +598,7 @@ var
   St: TATStrings;
   Shift, PosAfter: TPoint;
   Str: atString;
-  bNeedGroup, bBetterBrackets: boolean;
+  bNeedGroup, bBetterBrackets, bForceIndent: boolean;
   NShiftX, NShiftY, iCaret: integer;
 begin
   Result:= [];
@@ -625,18 +625,21 @@ begin
     NShiftX:= 0;
     NShiftY:= 0;
     bBetterBrackets:= false;
+    bForceIndent:= false;
 
     Str:= St.Lines[Caret.PosY];
-    if (Caret.PosX>0) and (Caret.PosX<Length(Str)) then
+    if (Caret.PosX>0) and (Caret.PosX<=Length(Str)) then
     begin
       Str:= Copy(Str, Caret.PosX, 2);
       if (FOptAutoIndentBetterBracketsCurly and (Str='{}')) or
          (FOptAutoIndentBetterBracketsRound and (Str='()')) or
          (FOptAutoIndentBetterBracketsSquare and (Str='[]')) then
         bBetterBrackets:= true;
+      if FOptAutoIndentBetterBracketsCurly and (Str='{') then
+        bForceIndent:= true;
     end;
 
-    Str:= GetAutoIndentString(Caret.PosX, Caret.PosY, not bBetterBrackets);
+    Str:= GetAutoIndentString(Caret.PosX, Caret.PosY, not bBetterBrackets, bForceIndent);
     St.TextInsertEol(Caret.PosX, Caret.PosY, AKeepCaret, Str, Shift, PosAfter);
 
     //after inserting EOL, trim previous line (make it empty if only spaces)
