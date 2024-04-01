@@ -5963,6 +5963,7 @@ begin
   end;
 end;
 
+
 procedure TATSynEdit.DoPaintAll(C: TCanvas; ALineFrom: integer);
 var
   NColorOther: TColor;
@@ -6029,7 +6030,9 @@ begin
 
   UpdateMarkersCoords;
   DoPaintMarkersTo(C);
+  DoPaintMarkerOfDragDrop(C);
 end;
+
 
 procedure TATSynEdit.DoPaint(ALineFrom: integer);
 begin
@@ -6217,8 +6220,6 @@ begin
     if not FCaretBlinkEnabled or FCaretAllowNextBlink then
       DoPaintCarets(Canvas, true);
   end;
-
-  DoPaintMarkerOfDragDrop(Canvas);
 
   if ATEditorOptions.DebugTiming then
   begin
@@ -7133,6 +7134,7 @@ begin
   if P.Y>R.Bottom then P.Y:= R.Bottom;
 end;
 
+
 procedure TATSynEdit.MouseMove(Shift: TShiftState; X, Y: Integer);
 var
   PntCoord: TATPoint;
@@ -7309,7 +7311,9 @@ begin
       BeginDrag(true);
     end
     else
+    begin
       Invalidate; //Invalidate is needed even if nothing changed, just to paint drop-marker
+    end;
     exit;
   end;
 
@@ -8089,8 +8093,10 @@ begin
   C.Brush.Color:= Colors.DragDropMarker;
   C.FillRect(R);
 
+  {
   //InvalidateRect(Handle, @R, false); //doens't work for CudaText issue #3784
   Invalidate; //fix CudaText issue #3784
+  }
 end;
 
 procedure TATSynEdit.TimerBlinkDisable;
