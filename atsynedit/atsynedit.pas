@@ -1775,6 +1775,7 @@ type
     procedure EndEditing(ATextChanged: boolean);
     procedure DoHideAllTooltips;
     function IsLocked: boolean;
+    function IsIndentBasedFolding: boolean;
     function TextSelected: atString;
     function TextSelectedEx(ACaret: TATCaretItem): atString;
     function TextCurrentWord: atString;
@@ -9039,6 +9040,11 @@ begin
   Result:= FPaintLocked>0;
 end;
 
+function TATSynEdit.IsIndentBasedFolding: boolean;
+begin
+  Result:= Assigned(AdapterForHilite) and AdapterForHilite.IsIndentBasedFolding;
+end;
+
 function TATSynEdit.TextSelectedEx(ACaret: TATCaretItem): atString;
 var
   X1, Y1, X2, Y2: integer;
@@ -9510,7 +9516,7 @@ begin
   if NColorActive=clNone then
     NColorActive:= ColorBlend(NColorNormal, FColorFont, FOptStapleHiliteActiveAlpha);
 
-  bIndentBasedFolding:= Assigned(AdapterForHilite) and AdapterForHilite.IsIndentBasedFolding;
+  bIndentBasedFolding:= IsIndentBasedFolding;
 
   for i:= 0 to High(Indexes) do
   begin
