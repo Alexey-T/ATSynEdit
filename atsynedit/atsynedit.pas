@@ -9548,12 +9548,13 @@ begin
 
     RSt.Left:= P1.X + FOptStapleIndent;
     RSt.Top:= P1.Y;
-    RSt.Right:= RSt.Left+ (ACharSize.XScaled * FOptStapleWidthPercent div ATEditorCharXScale div 100);
-    RSt.Bottom:= P2.Y + ACharSize.Y-1;
 
     if (RSt.Left>=ARect.Left) and
       (RSt.Left<ARect.Right) then
     begin
+      RSt.Right:= RSt.Left+ (ACharSize.XScaled * FOptStapleWidthPercent div ATEditorCharXScale div 100);
+      RSt.Bottom:= P2.Y + ACharSize.Y-1;
+
       if FOptStapleEdge1=TATEditorStapleEdge.None then
         Inc(RSt.Top, FCharSize.Y);
 
