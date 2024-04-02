@@ -9463,8 +9463,6 @@ end;
 
 procedure TATSynEdit.DoPaintStaple(C: TCanvas; const R: TRect; AColor: TColor);
 begin
-  if FOptStapleStyle=TATLineStyle.None then Exit;
-
   if FOptStapleEdge1=TATEditorStapleEdge.Angle then
     CanvasLineEx(C, AColor, FOptStapleStyle, R.Left, R.Top, R.Right, R.Top, false);
 
