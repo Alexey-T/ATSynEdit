@@ -74,6 +74,8 @@ type
     function IsDataReadyPartially: boolean; virtual;
     //return False to prevent Minimap repainting (avoid Minimap flicker during typing)
 
+    function IsIndentBasedFolding: boolean; virtual;
+
     //
     //dynamic-highlighting = some elements colors depend on caret position.
     //e.g. in EControl HTML lexer: highlight of < > is changed, when caret is near < >.
@@ -266,6 +268,11 @@ begin
     DynamicHiliteEnabled and
     DynamicHiliteSupportedInCurrentSyntax and
     (ALinesCount<=DynamicHiliteMaxLines);
+end;
+
+function TATAdapterHilite.IsIndentBasedFolding: boolean;
+begin
+  Result:= false;
 end;
 
 

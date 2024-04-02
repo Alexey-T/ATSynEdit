@@ -9474,10 +9474,13 @@ begin
   Y1:= R.Top;
   X2:= R.Left;
   Y2:= R.Bottom;
+
   if FOptStapleEdge1=TATEditorStapleEdge.None then
     Inc(Y1, FCharSize.Y);
+
   if FOptStapleEdge2=TATEditorStapleEdge.None then
-    Dec(Y2, FCharSize.Y);
+    if not (Assigned(AdapterForHilite) and AdapterForHilite.IsIndentBasedFolding) then
+      Dec(Y2, FCharSize.Y);
 
   CanvasLineEx(C, AColor, FOptStapleStyle, X1, Y1, X2, Y2, false);
 
