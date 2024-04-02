@@ -1341,7 +1341,8 @@ type
     procedure DoPaintGutterBandBG(C: TCanvas; AColor: TColor; AX1, AY1, AX2,
       AY2: integer; AEntireHeight: boolean);
     procedure DoPaintLockedWarning(C: TCanvas);
-    procedure DoPaintStaple(C: TCanvas; const R: TRect; AColor: TColor);
+    procedure DoPaintStaple(C: TCanvas; const R: TRect; AColor: TColor;
+      AIndentBasedFolding: boolean);
     procedure DoPaintStaples(C: TCanvas;
       const ARect: TRect;
       const ACharSize: TATEditorCharSize;
@@ -9461,7 +9462,7 @@ end;
 //{$endif}
 {$endif}
 
-procedure TATSynEdit.DoPaintStaple(C: TCanvas; const R: TRect; AColor: TColor);
+procedure TATSynEdit.DoPaintStaple(C: TCanvas; const R: TRect; AColor: TColor; AIndentBasedFolding: boolean);
 var
   X1, Y1, X2, Y2: integer;
 begin
@@ -9479,7 +9480,7 @@ begin
     Inc(Y1, FCharSize.Y);
 
   if FOptStapleEdge2=TATEditorStapleEdge.None then
-    if not (Assigned(AdapterForHilite) and AdapterForHilite.IsIndentBasedFolding) then
+    if not AIndentBasedFolding then
       Dec(Y2, FCharSize.Y);
 
   CanvasLineEx(C, AColor, FOptStapleStyle, X1, Y1, X2, Y2, false);
@@ -9502,6 +9503,7 @@ var
   P1, P2: TATPoint;
   RSt: TRect;
   NColor, NColorNormal, NColorActive: TColor;
+  bIndentBasedFolding: boolean;
   i: integer;
 begin
   if FOptStapleStyle=TATLineStyle.None then Exit;
@@ -9524,6 +9526,8 @@ begin
   NColorActive:= Colors.BlockStapleForCaret;
   if NColorActive=clNone then
     NColorActive:= ColorBlend(NColorNormal, FColorFont, FOptStapleHiliteActiveAlpha);
+
+  bIndentBasedFolding:= Assigned(AdapterForHilite) and AdapterForHilite.IsIndentBasedFolding;
 
   for i:= 0 to High(Indexes) do
   begin
@@ -9579,7 +9583,7 @@ begin
       if Assigned(FOnCalcStaple) then
         FOnCalcStaple(Self, Range^.Y, NIndent, NColor);
 
-      DoPaintStaple(C, RSt, NColor);
+      DoPaintStaple(C, RSt, NColor, bIndentBasedFolding);
     end;
   end;
 end;
