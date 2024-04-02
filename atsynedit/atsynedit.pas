@@ -1341,8 +1341,7 @@ type
     procedure DoPaintGutterBandBG(C: TCanvas; AColor: TColor; AX1, AY1, AX2,
       AY2: integer; AEntireHeight: boolean);
     procedure DoPaintLockedWarning(C: TCanvas);
-    procedure DoPaintStaple(C: TCanvas; const R: TRect; AColor: TColor;
-      AIndentBasedFolding: boolean);
+    procedure DoPaintStaple(C: TCanvas; const R: TRect; AColor: TColor);
     procedure DoPaintStaples(C: TCanvas;
       const ARect: TRect;
       const ACharSize: TATEditorCharSize;
@@ -9462,7 +9461,7 @@ end;
 //{$endif}
 {$endif}
 
-procedure TATSynEdit.DoPaintStaple(C: TCanvas; const R: TRect; AColor: TColor; AIndentBasedFolding: boolean);
+procedure TATSynEdit.DoPaintStaple(C: TCanvas; const R: TRect; AColor: TColor);
 var
   X1, Y1, X2, Y2: integer;
 begin
@@ -9475,13 +9474,6 @@ begin
   Y1:= R.Top;
   X2:= R.Left;
   Y2:= R.Bottom;
-
-  if FOptStapleEdge1=TATEditorStapleEdge.None then
-    Inc(Y1, FCharSize.Y);
-
-  if FOptStapleEdge2=TATEditorStapleEdge.None then
-    if not AIndentBasedFolding then
-      Dec(Y2, FCharSize.Y);
 
   CanvasLineEx(C, AColor, FOptStapleStyle, X1, Y1, X2, Y2, false);
 
@@ -9571,6 +9563,13 @@ begin
     if (RSt.Left>=ARect.Left) and
       (RSt.Left<ARect.Right) then
     begin
+      if FOptStapleEdge1=TATEditorStapleEdge.None then
+        Inc(RSt.Top, FCharSize.Y);
+
+      if FOptStapleEdge2=TATEditorStapleEdge.None then
+        if not bIndentBasedFolding then
+          Dec(RSt.Bottom, FCharSize.Y);
+
       //don't use too big coords, some OS'es truncate lines painted with big coords
       RSt.Top:= Max(RSt.Top, -2);
       RSt.Bottom:= Min(RSt.Bottom, nMaxHeight);
@@ -9583,7 +9582,7 @@ begin
       if Assigned(FOnCalcStaple) then
         FOnCalcStaple(Self, Range^.Y, NIndent, NColor);
 
-      DoPaintStaple(C, RSt, NColor, bIndentBasedFolding);
+      DoPaintStaple(C, RSt, NColor);
     end;
   end;
 end;
