@@ -9490,7 +9490,7 @@ var
   Indexes: TATIntArray;
   Range: PATFoldRange;
   P1, P2: TATPoint;
-  RSt: TRect;
+  RectStaple: TRect;
   NColor, NColorNormal, NColorActive: TColor;
   bIndentBasedFolding: boolean;
   i: integer;
@@ -9552,25 +9552,25 @@ begin
     Inc(P1.X, nSpaceShift);
     Inc(P2.X, nSpaceShift);
 
-    RSt.Left:= P1.X + FOptStapleIndent;
-    RSt.Top:= P1.Y;
+    RectStaple.Left:= P1.X + FOptStapleIndent;
+    RectStaple.Top:= P1.Y;
 
-    if (RSt.Left>=ARect.Left) and
-      (RSt.Left<ARect.Right) then
+    if (RectStaple.Left>=ARect.Left) and
+      (RectStaple.Left<ARect.Right) then
     begin
-      RSt.Right:= RSt.Left+ (ACharSize.XScaled * FOptStapleWidthPercent div ATEditorCharXScale div 100);
-      RSt.Bottom:= P2.Y + ACharSize.Y-1;
+      RectStaple.Right:= RectStaple.Left+ (ACharSize.XScaled * FOptStapleWidthPercent div ATEditorCharXScale div 100);
+      RectStaple.Bottom:= P2.Y + ACharSize.Y-1;
 
       if FOptStapleEdge1=TATEditorStapleEdge.None then
-        Inc(RSt.Top, FCharSize.Y);
+        Inc(RectStaple.Top, FCharSize.Y);
 
       if FOptStapleEdge2=TATEditorStapleEdge.None then
         if not bIndentBasedFolding then
-          Dec(RSt.Bottom, FCharSize.Y);
+          Dec(RectStaple.Bottom, FCharSize.Y);
 
       //don't use too big coords, some OS'es truncate lines painted with big coords
-      RSt.Top:= Max(RSt.Top, -2);
-      RSt.Bottom:= Min(RSt.Bottom, nMaxHeight);
+      RectStaple.Top:= Max(RectStaple.Top, -2);
+      RectStaple.Bottom:= Min(RectStaple.Bottom, nMaxHeight);
 
       if Indexes[i]=nRangeDeepest then
         NColor:= NColorActive
@@ -9580,7 +9580,7 @@ begin
       if Assigned(FOnCalcStaple) then
         FOnCalcStaple(Self, Range^.Y, NIndent, NColor);
 
-      DoPaintStaple(C, RSt, NColor);
+      DoPaintStaple(C, RectStaple, NColor);
     end;
   end;
 end;
