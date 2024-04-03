@@ -7151,13 +7151,25 @@ var
   bMovedMinimal: boolean;
   bUpdateForMinimap: boolean;
   bStartTimerScroll: boolean;
-  Details: TATEditorPosDetails;
+  bPntTextInited: boolean = false;
   nIndexHotspot, nIndexCaret: integer;
   {$ifdef windows}
   PntScreen: TPoint;
   nScreenDelta: integer;
   {$endif}
   Caret: TATCaretItem;
+  //
+  procedure UpdatePntText;
+  var
+    Details: TATEditorPosDetails;
+  begin
+    if not bPntTextInited then
+    begin
+      bPntTextInited:= true;
+      PntText:= ClientPosToCaretPos(ATPoint(X, Y), Details);
+    end;
+  end;
+  //
 begin
   if not OptMouseEnableAll then exit;
   inherited;
@@ -7255,7 +7267,7 @@ begin
   //show/hide bookmark hint
   if bOnGutterBookmk and not bSelecting then
   begin
-    PntText:= ClientPosToCaretPos(PntCoord, Details);
+    UpdatePntText;
     DoHintShowForBookmark(PntText.Y);
   end
   else
@@ -7277,13 +7289,13 @@ begin
     FTimerScroll.Enabled:= bStartTimerScroll;
 
   FMouseAutoScrollDirection:= TATEditorDirection.None;
-  if (PntCoord.Y<RectMainCopy.Top) and (not ModeOneLine) then
+  if (Y<RectMainCopy.Top) and (not ModeOneLine) then
     FMouseAutoScrollDirection:= TATEditorDirection.Up else
-  if (PntCoord.Y>=RectMainCopy.Bottom) and (not ModeOneLine) then
+  if (Y>=RectMainCopy.Bottom) and (not ModeOneLine) then
     FMouseAutoScrollDirection:= TATEditorDirection.Down else
-  if (PntCoord.X<RectMainCopy.Left) then
+  if (X<RectMainCopy.Left) then
     FMouseAutoScrollDirection:= TATEditorDirection.Left else
-  if (PntCoord.X>=RectMainCopy.Right) then
+  if (X>=RectMainCopy.Right) then
     FMouseAutoScrollDirection:= TATEditorDirection.Right;
 
   //mouse dragged on gutter numbers (only if drag started on gutter numbers)
@@ -7292,7 +7304,7 @@ begin
     begin
       if Shift=[ssLeft] then
       begin
-        PntText:= ClientPosToCaretPos(PntCoord, Details);
+        UpdatePntText;
         if (PntText.Y>=0) and (PntText.X>=0) then
         begin
           DoSelect_LineRange(FMouseDownGutterLineNumber, PntText);
@@ -7331,7 +7343,7 @@ begin
       if Shift*[ssLeft, ssRight]=[] then
         if Assigned(FHotspots) and (FHotspots.Count>0) then
         begin
-          PntText:= ClientPosToCaretPos(PntCoord, Details);
+          UpdatePntText;
           if PntText.Y>=0 then
           begin
             nIndexHotspot:= FHotspots.FindByPos(PntText.X, PntText.Y);
@@ -7359,7 +7371,7 @@ begin
       if (ssLeft in Shift) or bSelectColumnMiddle then
         if Carets.Count>0 then
         begin
-          PntText:= ClientPosToCaretPos(PntCoord, Details);
+          UpdatePntText;
           //Application.MainForm.Caption:= Format('MouseDownPnt %d:%d, CurPnt %d:%d',
             //[FMouseDownPnt.Y, FMouseDownPnt.X, PntText.Y, PntText.X]);
           if (PntText.Y<0) then Exit;
