@@ -717,8 +717,8 @@ type
     FIsRunningCommand: boolean;
     FCursorOnMinimap: boolean;
     FCursorOnGutter: boolean;
+    FPosOfDropMarker: TPoint;
     FCoordOfDropMarker: TATPoint;
-    FCoordOfDropMarker_Prev: TATPoint;
     FAdapterIsDataReady: boolean;
     FTimingQueue: TATTimingQueue;
     FOnCheckInput: TATSynEditCheckInputEvent;
@@ -7329,15 +7329,13 @@ begin
       UpdatePntText;
       if PntText.Y>=0 then
       begin
-        FCoordOfDropMarker:= CaretPosToClientPos(PntText);
-        if FCoordOfDropMarker<>FCoordOfDropMarker_Prev then
+        if PntText<>FPosOfDropMarker then
         begin
-          FCoordOfDropMarker_Prev:= FCoordOfDropMarker;
+          FPosOfDropMarker:= PntText;
+          FCoordOfDropMarker:= CaretPosToClientPos(FPosOfDropMarker);
           Invalidate; //Invalidate is needed even if nothing changed, just to paint drop-marker
         end;
-      end
-      else
-        FCoordOfDropMarker:= ATPoint(-1, -1);
+      end;
     end;
     exit;
   end;
