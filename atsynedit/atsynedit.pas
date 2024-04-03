@@ -717,8 +717,8 @@ type
     FIsRunningCommand: boolean;
     FCursorOnMinimap: boolean;
     FCursorOnGutter: boolean;
-    FPosOfDropMarker: TPoint;
-    FCoordOfDropMarker: TATPoint;
+    FDropMarker_TextPos: TPoint;
+    FDropMarker_Coord: TATPoint;
     FAdapterIsDataReady: boolean;
     FTimingQueue: TATTimingQueue;
     FOnCheckInput: TATSynEditCheckInputEvent;
@@ -7329,10 +7329,10 @@ begin
       UpdatePntText;
       if PntText.Y>=0 then
       begin
-        if PntText<>FPosOfDropMarker then
+        if PntText<>FDropMarker_TextPos then
         begin
-          FPosOfDropMarker:= PntText;
-          FCoordOfDropMarker:= CaretPosToClientPos(FPosOfDropMarker);
+          FDropMarker_TextPos:= PntText;
+          FDropMarker_Coord:= CaretPosToClientPos(FDropMarker_TextPos);
           Invalidate; //Invalidate is needed even if nothing changed, just to paint drop-marker
         end;
       end;
@@ -8096,7 +8096,7 @@ begin
   ////drag-drop from another control may be active
   if not DragManager.IsDragging then exit;
 
-  PntCoord:= FCoordOfDropMarker;
+  PntCoord:= FDropMarker_Coord;
   if PntCoord.Y<0 then exit;
   if not ATPointInRect(FRectMain, PntCoord) then exit;
 
