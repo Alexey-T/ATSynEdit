@@ -7335,7 +7335,9 @@ begin
           FCoordOfDropMarker_Prev:= FCoordOfDropMarker;
           Invalidate; //Invalidate is needed even if nothing changed, just to paint drop-marker
         end;
-      end;
+      end
+      else
+        FCoordOfDropMarker:= ATPoint(-1, -1);
     end;
     exit;
   end;
