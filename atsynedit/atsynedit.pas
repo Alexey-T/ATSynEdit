@@ -1077,7 +1077,6 @@ type
     FOptDimUnfocusedBack: integer;
 
     //
-    procedure DoCalcCoordOfDropMarker(out ACoord: TATPoint);
     function DoCalcForegroundFromAttribs(AX, AY: integer; var AColor: TColor;
       var AFontStyles: TFontStyles): boolean;
     function DoCalcFoldProps(AWrapItemIndex: integer; out AProps: TATFoldBarProps): boolean;
@@ -7327,11 +7326,15 @@ begin
     end
     else
     begin
-      DoCalcCoordOfDropMarker(FCoordOfDropMarker);
-      if FCoordOfDropMarker<>FCoordOfDropMarker_Prev then
+      UpdatePntText;
+      if PntText.Y>=0 then
       begin
-        FCoordOfDropMarker_Prev:= FCoordOfDropMarker;
-        Invalidate; //Invalidate is needed even if nothing changed, just to paint drop-marker
+        FCoordOfDropMarker:= CaretPosToClientPos(PntText);
+        if FCoordOfDropMarker<>FCoordOfDropMarker_Prev then
+        begin
+          FCoordOfDropMarker_Prev:= FCoordOfDropMarker;
+          Invalidate; //Invalidate is needed even if nothing changed, just to paint drop-marker
+        end;
       end;
     end;
     exit;
@@ -8080,21 +8083,6 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoCalcCoordOfDropMarker(out ACoord: TATPoint);
-var
-  PntMouse: TPoint;
-  PntText: TPoint;
-  PntCoord: TATPoint;
-  Details: TATEditorPosDetails;
-begin
-  ACoord:= ATPoint(0, -1);
-  PntMouse:= ScreenToClient(Mouse.CursorPos);
-  if not PtInRect(ClientRect, PntMouse) then exit;
-  PntCoord:= ATPoint(PntMouse.X, PntMouse.Y);
-  PntText:= ClientPosToCaretPos(PntCoord, Details);
-  if PntText.Y<0 then exit;
-  ACoord:= CaretPosToClientPos(PntText);
-end;
 
 procedure TATSynEdit.DoPaintMarkerOfDragDrop(C: TCanvas);
 var
