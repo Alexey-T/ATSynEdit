@@ -537,6 +537,7 @@ type
     cInitMinimapTooltipHeight = 6;
     cInitMinimapTooltipWidthPercents = 60;
     cInitMicromapVisible = false;
+    cInitMicromapScalePerColumn = 50;
     cInitMicromapOnScrollbar = false;
     cInitMicromapBookmarks = false;
     cInitShowMouseSelFrame = true;
@@ -2102,7 +2103,7 @@ type
     property OptMinimapHiliteLinesWithSelection: boolean read FMinimapHiliteLinesWithSelection write FMinimapHiliteLinesWithSelection default true;
     property OptMinimapDragImmediately: boolean read FMinimapDragImmediately write FMinimapDragImmediately default false;
     property OptMicromapVisible: boolean read FMicromapVisible write SetMicromapVisible default cInitMicromapVisible;
-    property OptMicromapScalePerColumn: integer read FMicromapScalePerColumn write FMicromapScalePerColumn nodefault;
+    property OptMicromapScalePerColumn: integer read FMicromapScalePerColumn write FMicromapScalePerColumn default cInitMicromapScalePerColumn;
     property OptMicromapOnScrollbar: boolean read FMicromapOnScrollbar write FMicromapOnScrollbar default cInitMicromapOnScrollbar;
     property OptMicromapLineStates: boolean read FMicromapLineStates write FMicromapLineStates default true;
     property OptMicromapSelections: boolean read FMicromapSelections write FMicromapSelections default true;
@@ -5241,7 +5242,7 @@ begin
 
   FMicromap:= TATMicromap.Create;
   FMicromapVisible:= cInitMicromapVisible;
-  FMicromapScalePerColumn:= 50;
+  FMicromapScalePerColumn:= cInitMicromapScalePerColumn;
   FMicromapOnScrollbar:= cInitMicromapOnScrollbar;
   FMicromapLineStates:= true;
   FMicromapSelections:= true;
