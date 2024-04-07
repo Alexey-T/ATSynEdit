@@ -76,6 +76,8 @@ begin
       NTag:= ATag;
       NWidthUnits:= AWidthUnits;
       NColor:= AColor;
+      NLeft:= 0;
+      NRight:= 0;
     end;
   end;
 end;
