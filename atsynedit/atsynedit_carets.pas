@@ -852,14 +852,18 @@ end;
 
 procedure TATCarets.Assign(Obj: TATCarets);
 var
-  Caret: TATCaretItem;
+  CaretFrom, CaretTo: TATCaretItem;
   i: integer;
 begin
   Clear;
   for i:= 0 to Obj.Count-1 do
   begin
-    Caret:= Obj[i];
-    Add(Caret.PosX, Caret.PosY, Caret.EndX, Caret.EndY, false{AWithEvent});
+    CaretFrom:= Obj[i];
+    Add(CaretFrom.PosX, CaretFrom.PosY, CaretFrom.EndX, CaretFrom.EndY, false{AWithEvent});
+    CaretTo:= Items[Count-1];
+    //important to copy Coord*, to avoid caret jumping to the top
+    CaretTo.CoordX:= CaretFrom.CoordX;
+    CaretTo.CoordY:= CaretFrom.CoordY;
   end;
   DoChanged;
 end;
