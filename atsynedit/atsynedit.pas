@@ -3191,8 +3191,8 @@ var
   NWidth: integer;
 begin
   //don't use ATEditorScale() here, will be too wide
-  if FMicromapOnScrollbar then
-    NWidth:= ATScrollbarTheme.InitialSize * ATScrollbarTheme.ScalePercents div 100 - 2*ATScrollbarTheme.BorderSize
+  if FMicromapOnScrollbar and Assigned(FScrollbarVert) then
+    NWidth:= FScrollbarVert.Width - 2*ATScrollbarTheme.BorderSize
   else
     NWidth:= Length(FMicromap.Columns) * FCharSize.XScaled div ATEditorCharXScale * FMicromapScalePerColumn div 100;
 
