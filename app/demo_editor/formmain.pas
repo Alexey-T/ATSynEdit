@@ -311,7 +311,7 @@ begin
     ed.Font.Name:= cGoodFont;
   {$endif}
 
-  SetLength(ed.Micromap.Columns, 0);
+  ed.Micromap.Columns:= nil;
   ed.Micromap.ColumnAdd(1, 100, clRed);
   ed.Micromap.ColumnAdd(2, 100, clBlue);
   ed.Micromap.ColumnAdd(3, 100, clGreen);

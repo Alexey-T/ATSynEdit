@@ -856,6 +856,7 @@ type
     FMinimapDragImmediately: boolean;
     FMicromap: TATMicromap;
     FMicromapVisible: boolean;
+    FMicromapScalePerColumn: integer;
     FMicromapOnScrollbar: boolean;
     FMicromapLineStates: boolean;
     FMicromapSelections: boolean;
@@ -2101,6 +2102,7 @@ type
     property OptMinimapHiliteLinesWithSelection: boolean read FMinimapHiliteLinesWithSelection write FMinimapHiliteLinesWithSelection default true;
     property OptMinimapDragImmediately: boolean read FMinimapDragImmediately write FMinimapDragImmediately default false;
     property OptMicromapVisible: boolean read FMicromapVisible write SetMicromapVisible default cInitMicromapVisible;
+    property OptMicromapScalePerColumn: integer read FMicromapScalePerColumn write FMicromapScalePerColumn nodefault;
     property OptMicromapOnScrollbar: boolean read FMicromapOnScrollbar write FMicromapOnScrollbar default cInitMicromapOnScrollbar;
     property OptMicromapLineStates: boolean read FMicromapLineStates write FMicromapLineStates default true;
     property OptMicromapSelections: boolean read FMicromapSelections write FMicromapSelections default true;
@@ -3185,10 +3187,15 @@ end;
 
 procedure TATSynEdit.GetRectMicromap(out R: TRect);
 var
-  NSize: integer;
+  NWidth: integer;
 begin
   //don't use ATEditorScale() here, will be too wide
-  NSize:= FMicromap.UpdateSizes(FCharSize.XScaled div ATEditorCharXScale);
+  if FMicromapOnScrollbar then
+    NWidth:= ATScrollbarTheme.InitialSize * ATScrollbarTheme.ScalePercents div 100
+  else
+    NWidth:= Length(FMicromap.Columns) * FCharSize.XScaled div ATEditorCharXScale * FMicromapScalePerColumn div 100;
+
+  FMicromap.UpdateWidth(NWidth);
 
   if not FMicromapVisible or FMicromapOnScrollbar then
   begin
@@ -3199,10 +3206,8 @@ begin
     R.Top:= 0;
     R.Bottom:= ClientHeight;
     R.Right:= ClientWidth;
-    R.Left:= R.Right-NSize;
+    R.Left:= R.Right-NWidth;
   end;
-
-  FMicromap.UpdateCoords;
 end;
 
 procedure TATSynEdit.GetRectGutter(out R: TRect);
@@ -5236,6 +5241,7 @@ begin
 
   FMicromap:= TATMicromap.Create;
   FMicromapVisible:= cInitMicromapVisible;
+  FMicromapScalePerColumn:= 50;
   FMicromapOnScrollbar:= cInitMicromapOnScrollbar;
   FMicromapLineStates:= true;
   FMicromapSelections:= true;

@@ -13,7 +13,8 @@ uses
 
 type
   TATMicromapColumn = record
-    NWidthPercents, NWidthPixels: integer;
+    NWidthUnits,
+    NWidthPixels: integer;
     NLeft, NRight: integer;
     NTag: Int64;
     NColor: TColor;
@@ -23,16 +24,17 @@ type
   { TATMicromap }
 
   TATMicromap = class
-  private
+  strict private
+    TotalWidth: integer;
+    procedure UpdateCoords;
   public
     Columns: array of TATMicromapColumn;
     constructor Create;
     function IsIndexValid(AIndex: integer): boolean;
     function ColumnFromTag(const ATag: Int64): integer;
-    function ColumnAdd(const ATag: Int64; AWidthPercents: integer; AColor: TColor): boolean;
+    function ColumnAdd(const ATag: Int64; AWidthUnits: integer; AColor: TColor): boolean;
     function ColumnDelete(const ATag: Int64): boolean;
-    function UpdateSizes(ACharSize: integer): integer;
-    procedure UpdateCoords;
+    procedure UpdateWidth(ATotalWidth: integer);
   end;
 
 implementation
@@ -43,25 +45,10 @@ implementation
 constructor TATMicromap.Create;
 begin
   inherited Create;
-  SetLength(Columns, 3);
-  with Columns[0] do
-  begin
-    NWidthPercents:= 50;
-    NTag:= 0;
-    NColor:= clNone;
-  end;
-  with Columns[1] do
-  begin
-    NWidthPercents:= 50;
-    NTag:= 1;
-    NColor:= clNone;
-  end;
-  with Columns[2] do
-  begin
-    NWidthPercents:= 50;
-    NTag:= 2;
-    NColor:= clNone;
-  end;
+  Columns:= nil;
+  ColumnAdd(0, 100, clNone);
+  ColumnAdd(1, 100, clNone);
+  ColumnAdd(2, 100, clNone);
 end;
 
 function TATMicromap.IsIndexValid(AIndex: integer): boolean;
@@ -80,16 +67,16 @@ begin
   Result:= -1;
 end;
 
-function TATMicromap.ColumnAdd(const ATag: Int64; AWidthPercents: integer; AColor: TColor): boolean;
+function TATMicromap.ColumnAdd(const ATag: Int64; AWidthUnits: integer; AColor: TColor): boolean;
 begin
-  Result:= (ColumnFromTag(ATag)<0) and (AWidthPercents>0);
+  Result:= (ColumnFromTag(ATag)<0) and (AWidthUnits>0);
   if Result then
   begin
     SetLength(Columns, Length(Columns)+1);
     with Columns[Length(Columns)-1] do
     begin
       NTag:= ATag;
-      NWidthPercents:= AWidthPercents;
+      NWidthUnits:= AWidthUnits;
       NColor:= AColor;
     end;
   end;
@@ -110,17 +97,27 @@ begin
   end;
 end;
 
-function TATMicromap.UpdateSizes(ACharSize: integer): integer;
+procedure TATMicromap.UpdateWidth(ATotalWidth: integer);
 var
+  NTotalUnits: integer;
   i: integer;
 begin
-  Result:= 0;
+  TotalWidth:= ATotalWidth;
+
+  NTotalUnits:= 0;
   for i:= 0 to Length(Columns)-1 do
     with Columns[i] do
     begin
-      NWidthPixels:= ACharSize * NWidthPercents div 100;
-      Inc(Result, NWidthPixels);
+      NTotalUnits+= NWidthUnits;
     end;
+
+  for i:= 0 to Length(Columns)-1 do
+    with Columns[i] do
+    begin
+      NWidthPixels:= TotalWidth * NWidthUnits div NTotalUnits;
+    end;
+
+  UpdateCoords;
 end;
 
 procedure TATMicromap.UpdateCoords;

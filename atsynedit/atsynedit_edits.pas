@@ -172,7 +172,9 @@ begin
 
   OptMicromapVisible:= true;
   OptComboboxShowX:= true;
-  Micromap.Columns[0].NWidthPercents:= 300;
+  OptMicromapScalePerColumn:= 300;
+  Micromap.Columns:= nil;
+  Micromap.ColumnAdd(0, 100, clNone);
 
   OnClickMicromap:= @MicromapClick;
   OnDrawMicromap:= @MicromapDraw;
