@@ -13,8 +13,7 @@ uses
 
 type
   TATMicromapColumn = record
-    NWidthUnits,
-    NWidthPixels: integer;
+    NWidthUnits: integer;
     NLeft, NRight: integer;
     NTag: Int64;
     NColor: TColor;
@@ -98,7 +97,7 @@ end;
 
 procedure TATMicromap.UpdateWidth(ATotalWidthPixels: integer);
 var
-  NTotalUnits: integer;
+  NTotalUnits, NWidthPixels: integer;
   i: integer;
 begin
   TotalWidthPixels:= ATotalWidthPixels;
