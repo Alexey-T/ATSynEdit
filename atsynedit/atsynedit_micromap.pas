@@ -25,7 +25,7 @@ type
 
   TATMicromap = class
   strict private
-    WidthPixels: integer;
+    TotalWidthPixels: integer;
   public
     Columns: array of TATMicromapColumn;
     constructor Create;
@@ -33,7 +33,7 @@ type
     function ColumnFromTag(const ATag: Int64): integer;
     function ColumnAdd(const ATag: Int64; AWidthUnits: integer; AColor: TColor): boolean;
     function ColumnDelete(const ATag: Int64): boolean;
-    procedure UpdateWidth(AWidthPixels: integer);
+    procedure UpdateWidth(ATotalWidthPixels: integer);
   end;
 
 implementation
@@ -96,12 +96,12 @@ begin
   end;
 end;
 
-procedure TATMicromap.UpdateWidth(AWidthPixels: integer);
+procedure TATMicromap.UpdateWidth(ATotalWidthPixels: integer);
 var
   NTotalUnits: integer;
   i: integer;
 begin
-  WidthPixels:= AWidthPixels;
+  TotalWidthPixels:= ATotalWidthPixels;
 
   NTotalUnits:= 0;
   for i:= 0 to Length(Columns)-1 do
@@ -113,7 +113,7 @@ begin
   for i:= 0 to Length(Columns)-1 do
     with Columns[i] do
     begin
-      NWidthPixels:= WidthPixels * NWidthUnits div NTotalUnits;
+      NWidthPixels:= TotalWidthPixels * NWidthUnits div NTotalUnits;
       if i=0 then
         NLeft:= 0
       else
