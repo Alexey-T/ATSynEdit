@@ -955,6 +955,7 @@ type
     FOptCaretProximityVert: integer;
     FOptMarkersSize: integer;
     FOptShowScrollHint: boolean;
+    FOptTextDuplicationMovesCaretDown: boolean;
     FOptTextCenteringCharWidth: integer;
     FOptTextOffsetLeft: integer;
     FOptTextOffsetTop: integer;
@@ -1990,6 +1991,7 @@ type
     property OptTextHint: string read FTextHint write FTextHint;
     property OptTextHintFontStyle: TFontStyles read FTextHintFontStyle write FTextHintFontStyle default [fsItalic];
     property OptTextHintCenter: boolean read FTextHintCenter write FTextHintCenter default false;
+    property OptTextDuplicationMovesCaretDown: boolean read FOptTextDuplicationMovesCaretDown write FOptTextDuplicationMovesCaretDown default true;
     property OptTextCenteringCharWidth: integer read FOptTextCenteringCharWidth write FOptTextCenteringCharWidth default 0;
     property OptAutoIndent: boolean read FOptAutoIndent write FOptAutoIndent default true;
     property OptAutoIndentKind: TATEditorAutoIndentKind read FOptAutoIndentKind write FOptAutoIndentKind default TATEditorAutoIndentKind.AsPrevLine;
@@ -5399,6 +5401,7 @@ begin
   FOptStapleEdge2:= TATEditorStapleEdge.Angle;
   FOptStapleIndentConsidersEnd:= false;
 
+  FOptTextDuplicationMovesCaretDown:= true;
   FOptTextCenteringCharWidth:= 0;
   FOptTextOffsetLeft:= cInitTextOffsetLeft;
   FOptTextOffsetTop:= cInitTextOffsetTop;

@@ -749,6 +749,8 @@ begin
 
       //universal code, for selection or not
       Caret.GetSelLines(Line1, Line2, true);
+      if Line2>=MaxInt-1-(Line2-Line1) then Continue;
+
       if St.LinesEnds[Line2]=TATLineEnds.None then
         St.LinesEnds[Line2]:= St.Endings;
       for iLine:= Line2 downto Line1 do
@@ -756,6 +758,13 @@ begin
         St.LineInsert(Line2+1, St.Lines[iLine]);
         if St.IsIndexValid(Line2+1) then
           St.LinesEnds[Line2+1]:= St.Endings;
+      end;
+
+      if FOptTextDuplicationMovesCaretDown then
+      begin
+        Inc(Caret.PosY, Line2-Line1+1);
+        if Caret.EndY>=0 then
+          Inc(Caret.EndY, Line2-Line1+1);
       end;
 
       UpdateCaretsAndMarkersOnEditing(iCaret+1,
