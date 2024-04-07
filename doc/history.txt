@@ -1,5 +1,5 @@
 2024.04.07
-+ add: OptMicromapScalePerColumn (percents of char-width for each micromap column, if micromap is not on the scrollbar)
++ add: prop OptMicromapScalePerColumn (percents of char-width for each micromap column, if micromap is not on the scrollbar)
 
 2024.03.15
 + add: prop OptTrimLineOnPressingEnter
