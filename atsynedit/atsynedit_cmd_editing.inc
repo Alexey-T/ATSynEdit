@@ -760,18 +760,18 @@ begin
           St.LinesEnds[Line2+1]:= St.Endings;
       end;
 
+      UpdateCaretsAndMarkersOnEditing(iCaret+1,
+        Point(Caret.PosX, Caret.PosY),
+        Point(Caret.PosX, Caret.PosY),
+        Point(0, Line2-Line1+1),
+        Point(0, 0));
+
       if FOptTextDuplicationMovesCaretDown then
       begin
         Inc(Caret.PosY, Line2-Line1+1);
         if Caret.EndY>=0 then
           Inc(Caret.EndY, Line2-Line1+1);
       end;
-
-      UpdateCaretsAndMarkersOnEditing(iCaret+1,
-        Point(Caret.PosX, Caret.PosY),
-        Point(Caret.PosX, Caret.PosY),
-        Point(0, Line2-Line1+1),
-        Point(0, 0));
     end;
   finally
     St.EndUndoGroup;
