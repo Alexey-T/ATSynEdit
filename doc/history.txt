@@ -1,3 +1,6 @@
+2024.04.15
++ add: method IsEmpty
+
 2024.04.07
 + add: prop OptMicromapScalePerColumn (percents of char-width for each micromap column, if micromap is not on the scrollbar)
 + add: prop OptTextDuplicationMovesCaretDown

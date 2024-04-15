@@ -1643,6 +1643,7 @@ type
     procedure ActionAddJumpToUndo;
     property Text: UnicodeString read GetText write SetText;
     property SelRect: TRect read FSelRect;
+    function IsEmpty: boolean;
     function IsSelRectEmpty: boolean;
     function IsSelColumn: boolean;
     function IsPosSelected(AX, AY: integer): boolean;
@@ -10910,6 +10911,15 @@ begin
   end;
 end;
 
+function TATSynEdit.IsEmpty: boolean;
+var
+  St: TATStrings;
+  NCount: integer;
+begin
+  St:= Strings;
+  NCount:= St.Count;
+  Result:= (NCount=0) or ((NCount=1) and (St.LinesLen[0]=0));
+end;
 
 procedure TATSynEdit.BeginEditing;
 var
