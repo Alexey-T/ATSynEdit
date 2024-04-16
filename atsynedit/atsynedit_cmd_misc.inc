@@ -23,7 +23,7 @@ begin
   end;
 
   Include(ModifiedOptions, TATEditorModifiedOption.WordWrap);
-  Result:= [TATCommandResult.State];
+  Result:= [TATCommandResult.State, TATCommandResult.CaretTop]; //CaretTop: to make caret visible
 end;
 
 function TATSynEdit.DoCommand_ToggleUnprinted: TATCommandResults;
