@@ -7,7 +7,11 @@ begin
 end;
 
 function TATSynEdit.DoCommand_ToggleWordWrap(AltOrder: boolean): TATCommandResults;
+var
+  bCaretVisible: boolean;
 begin
+  bCaretVisible:= IsCaretOnVisibleRect;
+
   case FWrapMode of
     TATEditorWrapMode.ModeOff:
       OptWrapMode:= TATEditorWrapMode.ModeOn;
@@ -23,7 +27,9 @@ begin
   end;
 
   Include(ModifiedOptions, TATEditorModifiedOption.WordWrap);
-  Result:= [TATCommandResult.State, TATCommandResult.CaretTop]; //CaretTop: to make caret visible
+  Result:= [TATCommandResult.State];
+  if bCaretVisible then
+    Include(Result, TATCommandResult.CaretTop);
 end;
 
 function TATSynEdit.DoCommand_ToggleUnprinted: TATCommandResults;
