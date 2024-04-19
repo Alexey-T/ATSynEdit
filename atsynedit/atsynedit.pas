@@ -699,7 +699,6 @@ type
     FMouseRightClickOnGutterIsHandled: boolean;
     FMouseAutoScrollDirection: TATEditorDirection;
     FMouseActions: TATEditorMouseActions;
-    FLockInput: boolean;
     FLastControlWidth: integer;
     FLastControlHeight: integer;
     FLastHotspot: integer;
