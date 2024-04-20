@@ -368,7 +368,7 @@ type
     property Bookmarks2: TATBookmarks read FBookmarks2;
     property GutterDecor1: TATGutterDecor read FGutterDecor1 write FGutterDecor1;
     property GutterDecor2: TATGutterDecor read FGutterDecor2 write FGutterDecor2;
-    property CommandCode: integer read FCommandCode write FCommandCode;
+    property CommandCode: integer read FCommandCode write FCommandCode; //Affects UndoList/RedoList's items ACommandCode field
     //actions
     procedure ActionDeleteFakeLine;
     procedure ActionDeleteFakeLineAndFinalEol;
