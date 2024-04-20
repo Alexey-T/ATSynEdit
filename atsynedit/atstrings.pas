@@ -1940,6 +1940,8 @@ begin
 
   //don't undo if one item left: unmodified-mark
   if ACurList.IsEmpty then exit;
+  //affect Redo list's items ACommandCode
+  CommandCode:= ACommandCode;
 
   CurItem:= nil;
   ACurList.DeleteLast;
@@ -2077,6 +2079,7 @@ begin
     ActionDeleteDupFakeLines;
   finally
     ACurList.Locked:= false;
+    CommandCode:= 0;
   end;
 end;
 
