@@ -4826,6 +4826,7 @@ begin
   begin
     GetRectMinimapSel(R);
     OffsetRect(R, -FRectMinimap.Left, -FRectMinimap.Top);
+    Inc(R.Left); //left border must be more visible, not overlap vertical line
 
     // https://forum.lazarus.freepascal.org/index.php/topic,51383.msg377195.html#msg377195
     nAlphaValue:= FMinimapSelColorChange*255 div 100;
