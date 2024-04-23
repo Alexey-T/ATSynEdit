@@ -8303,12 +8303,18 @@ begin
 
     '.':
       begin
-        PaintDash(ATEditorScale(2), ATEditorScale(2));
+        PaintDash(
+          DoScaleFont(2),
+          DoScaleFont(2)
+          );
       end;
 
     '-':
       begin
-        PaintDash(FCharSize.XScaled div ATEditorCharXScale, ATEditorScale(2));
+        PaintDash(
+          FCharSize.XScaled div ATEditorCharXScale,
+          DoScaleFont(2)
+          );
       end;
 
     else
