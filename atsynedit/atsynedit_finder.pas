@@ -108,6 +108,7 @@ type
     procedure DoOnFound(AWithEvent: boolean); virtual;
     function CheckTokensBuffer(APos1, APos2: integer): boolean; virtual;
   public
+    OptDisableOnProgress: boolean;
     OptBack: boolean;
     OptWords: boolean; //for non-regex
     OptCase: boolean; //for regex and usual
@@ -670,6 +671,8 @@ end;
 
 function TATTextFinder.IsProgressNeeded(ANewPos: integer): boolean;
 begin
+  if OptDisableOnProgress then
+    Exit(false);
   Result:= Abs(FProgressPrev-ANewPos) >= FProgressDelta;
   if Result then
     FProgressPrev:= ANewPos;
