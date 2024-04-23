@@ -1541,10 +1541,12 @@ begin
   begin
     for i:= 0 to NCount-1 do
     begin
-      //special case: 1st line, in empty document;
-      //this if-block is to fix bug with Undo/Redo after Paste in empty document: CudaText issue #5472;
-      //this if-block is not needed if we don't want to fix CudaText #5472;
-      //that issue is hard to fix in another way
+      {
+      special case: 1st line, in empty document.
+      if/then-block is to fix bug with Undo/Redo after Paste in empty document: CudaText issue #5472.
+      that issue is hard to fix in another way.
+      before, we had only else-block.
+      }
       if (ALineIndex+i=0) and (FList.Count=1) and (LinesLen[0]=0) and (LinesEnds[0]=TATLineEnds.None) then
       begin
         Lines[0]:= ABlock.GetLine(i);
