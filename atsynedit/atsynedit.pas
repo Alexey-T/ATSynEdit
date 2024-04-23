@@ -4820,13 +4820,19 @@ var
   R: TRect;
   rColor: TBGRAPixel;
   nAlphaValue: integer;
+  NPos: integer;
 begin
   C:= FMinimapBmp;
   if FMinimapShowSelAlways or FCursorOnMinimap then
   begin
     GetRectMinimapSel(R);
     OffsetRect(R, -FRectMinimap.Left, -FRectMinimap.Top);
-    Inc(R.Left); //left border must be more visible, not overlap vertical line
+
+    //border must be more visible, not overlap vertical line
+    if FMinimapAtLeft then
+      Dec(R.Right)
+    else
+      Inc(R.Left);
 
     // https://forum.lazarus.freepascal.org/index.php/topic,51383.msg377195.html#msg377195
     nAlphaValue:= FMinimapSelColorChange*255 div 100;
@@ -4847,7 +4853,11 @@ begin
   if Colors.MinimapBorder<>clNone then
   begin
     rColor.FromColor(Colors.MinimapBorder);
-    C.DrawVertLine(0, 0, FRectMinimap.Height, rColor);
+    if FMinimapAtLeft then
+      NPos:= FRectMinimap.Right-1
+    else
+      NPos:= 0;
+    C.DrawVertLine(NPos, 0, FRectMinimap.Height, rColor);
   end;
 end;
 
