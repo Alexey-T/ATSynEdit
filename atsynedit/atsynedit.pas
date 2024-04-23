@@ -9277,17 +9277,15 @@ begin
     TATFoldBarState.SBegin:
       begin
         if FOptGutterShowFoldLinesAll then
-        begin
           DrawUp;
-          DrawDown;
-        end;
 
-        if not Props.IsPlus then
+        if FOptGutterShowFoldLinesAll or not Props.IsPlus then
           DrawDown;
 
         DoPaintGutterPlusMinus(C,
           CoordXCenter, CoordYCenter, Props.IsPlus, NColorPlus);
       end;
+
     TATFoldBarState.SEnd:
       begin
         if FOptGutterShowFoldLinesAll then
@@ -9308,6 +9306,7 @@ begin
           CoordXCenter + DoScaleFont(FOptGutterPlusSize)
           );
       end;
+
     TATFoldBarState.SMiddle:
       begin
         CanvasLineVert(C,
@@ -9316,6 +9315,7 @@ begin
           ACoordY2
           );
       end;
+
     else
       begin
         DrawUp;
