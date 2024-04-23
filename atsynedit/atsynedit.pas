@@ -8293,7 +8293,7 @@ procedure TATSynEdit.DoPaintGutterNumber(C: TCanvas; ALineIndex, ACoordTop: inte
 var
   SText: string;
   P: TPoint;
-  NNumberWidth: integer;
+  NNumberWidth, NLineWidthPx: integer;
 begin
   SText:= DoFormatLineNumber(ALineIndex+1);
 
@@ -8303,17 +8303,19 @@ begin
 
     '.':
       begin
+        NLineWidthPx:= DoScaleFont(2);
         PaintDash(
-          DoScaleFont(2),
-          DoScaleFont(2)
+          NLineWidthPx,
+          NLineWidthPx
           );
       end;
 
     '-':
       begin
+        NLineWidthPx:= DoScaleFont(2);
         PaintDash(
           FCharSize.XScaled div ATEditorCharXScale,
-          DoScaleFont(2)
+          NLineWidthPx
           );
       end;
 
