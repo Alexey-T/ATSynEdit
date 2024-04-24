@@ -1223,6 +1223,7 @@ begin
   FReplacedAtLine:= MaxInt;
   BeginTiming;
   if Editor.ModeReadOnly then exit;
+  Editor.Strings.EnabledChangeEvents:= false; //avoid big slowdown if lexer is set
   Editor.Strings.SetNewCommandMark;
   FEnableCaretEvent:= false;
 
@@ -1246,6 +1247,7 @@ begin
   end;
 
   FEnableCaretEvent:= true;
+  Editor.Strings.EnabledChangeEvents:= true;
 
   if FReplacedAtLine<>MaxInt then
   begin
