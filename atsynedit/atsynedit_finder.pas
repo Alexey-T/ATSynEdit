@@ -152,9 +152,6 @@ type
   private
     FBuffer: TATStringBuffer;
     FSkipLen: integer;
-    FOnFound: TATFinderFound;
-    FOnWrapAtEdge: TNotifyEvent;
-    FOnConfirmReplace: TATFinderConfirmReplace;
     FFragments: TATEditorFragments;
     FFragmentIndex: integer;
     FMatchEdPos: TPoint;
@@ -175,6 +172,10 @@ type
     FEnableCaretEvent: boolean;
     //FReplacedAtEndOfText: boolean;
     FIsSearchWrapped: boolean;
+    //
+    FOnFound: TATFinderFound;
+    FOnWrapAtEdge: TNotifyEvent;
+    FOnConfirmReplace: TATFinderConfirmReplace;
     //
     function GetEnableChangeEvent: boolean;
     procedure SetEnableChangeEvent(AValue: boolean);
@@ -243,6 +244,10 @@ type
     OptPutBackwardSelection: boolean; //on backward search, place backward selection, ie caret on left of selection
     OptPreserveCase: boolean;
     //
+    constructor Create;
+    destructor Destroy; override;
+    procedure Clear;
+    //
     property MatchEdPos: TPoint read FMatchEdPos;
     property MatchEdEnd: TPoint read FMatchEdEnd;
     property MatchEdPosAfterRep: TPoint read FMatchEdPosAfterRep;
@@ -256,10 +261,6 @@ type
     property IsSearchWrapped: boolean read FIsSearchWrapped;
     property EnableCaretEvent: boolean read FEnableCaretEvent write FEnableCaretEvent;
     property EnableChangeEvent: boolean read GetEnableChangeEvent write SetEnableChangeEvent;
-    //
-    constructor Create;
-    destructor Destroy; override;
-    procedure Clear;
     //
     function DoAction_FindSimple(const APosStart: TPoint): boolean;
     function DoAction_FindOrReplace(AReplace, AForMany: boolean; out AChanged: boolean;
