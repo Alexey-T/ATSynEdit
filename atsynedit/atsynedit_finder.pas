@@ -1505,11 +1505,13 @@ begin
     Editor.Strings.SetNewCommandMark;
 
   UpdateFragments;
+  FEnableCaretEvent:= false;
   DoFixCaretSelectionDirection;
 
   if not OptInSelection or (FFragments.Count=0) then
   begin
     Result:= DoFindOrReplace_InFragment(AReplace, AForMany, AChanged, AUpdateCaret);
+    FEnableCaretEvent:= true;
     exit
   end;
 
@@ -1574,6 +1576,7 @@ begin
   if FReplacedAtLine<>MaxInt then
     Editor.DoEventChange(FReplacedAtLine);
 
+  FEnableCaretEvent:= true;
   EndTiming;
 end;
 
