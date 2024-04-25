@@ -1153,6 +1153,7 @@ begin
     UpdateBuffer;
   TempResults:= TATFinderResults.Create;
   AResults.Clear;
+  FEnableCaretEvent:= false;
 
   for iFragment:= 0 to Max(0, FFragments.Count-1) do
   begin
@@ -1166,6 +1167,7 @@ begin
     AResults.AddList(TempResults);
   end;
 
+  FEnableCaretEvent:= true;
   CurrentFragmentIndex:= 0;
   FreeAndNil(TempResults);
   EndTiming;
