@@ -176,6 +176,8 @@ type
     //FReplacedAtEndOfText: boolean;
     FIsSearchWrapped: boolean;
     //
+    function GetEnableChangeEvent: boolean;
+    procedure SetEnableChangeEvent(AValue: boolean);
     function ConfirmWrappedSearch: boolean;
     function IsSelStartsAtMatch: boolean;
     procedure UpdateCarets(ASimpleAction: boolean);
@@ -252,6 +254,8 @@ type
     property CallbackString: string read FCallbackString write FCallbackString;
     property LastActionTime: QWord read FLastActionTime;
     property IsSearchWrapped: boolean read FIsSearchWrapped;
+    property EnableCaretEvent: boolean read FEnableCaretEvent write FEnableCaretEvent;
+    property EnableChangeEvent: boolean read GetEnableChangeEvent write SetEnableChangeEvent;
     //
     constructor Create;
     destructor Destroy; override;
@@ -987,6 +991,16 @@ begin
   inherited;
 end;
 
+function TATEditorFinder.GetEnableChangeEvent: boolean;
+begin
+  Result:= Editor.Strings.EnabledChangeEvents;
+end;
+
+procedure TATEditorFinder.SetEnableChangeEvent(AValue: boolean);
+begin
+  Editor.Strings.EnabledChangeEvents:= AValue;
+end;
+
 function TATEditorFinder.ConfirmWrappedSearch: boolean;
 var
   Str: string;
@@ -1153,7 +1167,7 @@ begin
     UpdateBuffer;
   TempResults:= TATFinderResults.Create;
   AResults.Clear;
-  FEnableCaretEvent:= false;
+  EnableCaretEvent:= false;
 
   for iFragment:= 0 to Max(0, FFragments.Count-1) do
   begin
@@ -1167,7 +1181,7 @@ begin
     AResults.AddList(TempResults);
   end;
 
-  FEnableCaretEvent:= true;
+  EnableCaretEvent:= true;
   CurrentFragmentIndex:= 0;
   FreeAndNil(TempResults);
   EndTiming;
@@ -1225,9 +1239,9 @@ begin
   FReplacedAtLine:= MaxInt;
   BeginTiming;
   if Editor.ModeReadOnly then exit;
-  Editor.Strings.EnabledChangeEvents:= false; //avoid big slowdown if lexer is set
   Editor.Strings.SetNewCommandMark;
-  FEnableCaretEvent:= false;
+  EnableChangeEvent:= false; //avoid big slowdown if lexer is set
+  EnableCaretEvent:= false;
 
   UpdateCarets(false);
   UpdateFragments;
@@ -1248,8 +1262,8 @@ begin
     CurrentFragmentIndex:= 0;
   end;
 
-  FEnableCaretEvent:= true;
-  Editor.Strings.EnabledChangeEvents:= true;
+  EnableCaretEvent:= true;
+  EnableChangeEvent:= true;
 
   if FReplacedAtLine<>MaxInt then
   begin
@@ -1507,13 +1521,13 @@ begin
     Editor.Strings.SetNewCommandMark;
 
   UpdateFragments;
-  FEnableCaretEvent:= false;
+  EnableCaretEvent:= false;
   DoFixCaretSelectionDirection;
 
   if not OptInSelection or (FFragments.Count=0) then
   begin
     Result:= DoFindOrReplace_InFragment(AReplace, AForMany, AChanged, AUpdateCaret);
-    FEnableCaretEvent:= true;
+    EnableCaretEvent:= true;
     exit
   end;
 
@@ -1578,7 +1592,7 @@ begin
   if FReplacedAtLine<>MaxInt then
     Editor.DoEventChange(FReplacedAtLine);
 
-  FEnableCaretEvent:= true;
+  EnableCaretEvent:= true;
   EndTiming;
 end;
 
@@ -1942,7 +1956,7 @@ begin
   else
   begin
     Editor.DoCaretSingle(APosX, APosY, AEndX, AEndY);
-    if FEnableCaretEvent then
+    if EnableCaretEvent then
       Editor.DoEventCarets;
 
     //solve CudaText issue #3261:
