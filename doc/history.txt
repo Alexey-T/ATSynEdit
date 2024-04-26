@@ -1,3 +1,6 @@
+2024.04.25
++ add: finder: prop OptDisableOnProgress
+
 2024.04.15
 + add: method IsEmpty
 
