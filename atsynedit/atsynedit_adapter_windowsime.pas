@@ -24,7 +24,6 @@ type
     //attrsize: Integer;
     //attrbuf: array[0..255] of Byte;
     CompForm: TForm;
-    FQueryCharPos: Boolean;
     procedure CompFormPaint(Sender: TObject);
     procedure UpdateCandidatePos(Sender: TObject);
     procedure UpdateCompForm(Sender: TObject);
@@ -207,12 +206,13 @@ begin
   case Msg.wParam of
     IMR_QUERYCHARPOSITION:
       begin
-        FQueryCharPos:=True;
         cp := PIMECHARPOSITION(Msg.lParam);
-        cp^.dwSize:=sizeof(IMECHARPOSITION);
+        cp^.dwSize := SizeOf(IMECHARPOSITION);
         cp^.cLineHeight := Ed.TextCharSize.Y;
+
         cp^.pt.x := Pnt.X;
         cp^.pt.y := Pnt.Y;
+
         R := Ed.ClientRect;
         cp^.rcDocument.TopLeft := Ed.ClientToScreen(R.TopLeft);
         cp^.rcDocument.BottomRight := Ed.ClientToScreen(R.BottomRight);
@@ -341,15 +341,14 @@ begin
   Len:= Length(FSelText);
   Ed.TextInsertAtCarets(FSelText, False, False, Len>0);
   HideCompForm;
+  { tweak for emoji window, but don't work currently
+    it shows emoji window on previous position.
+    but not work good with chinese IME.
 
-  { Emoji tweak }
-  if FQueryCharPos then begin
-    FQueryCharPos:=False;
-    if Ed.Focused then begin
-      SetFocus(0);
-      SetFocus(Ed.Handle);
-    end;
-  end;
+    it is also bad as reported here: https://github.com/Alexey-T/CudaText/issues/5395
+  }
+  //SetFocus(0);
+  //SetFocus(Ed.Handle);
 
   //WriteLn(Format('WM_IME_ENDCOMPOSITION %x, %x',[Msg.wParam,Msg.lParam]));
   Msg.Result:= -1;
