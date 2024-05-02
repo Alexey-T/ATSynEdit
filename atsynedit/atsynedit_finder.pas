@@ -585,29 +585,7 @@ end;
 
 function TATTextFinder.GetRegexReplacement: UnicodeString;
 begin
-  if StrReplace='' then
-    exit('');
-
-  {
-  if FRegexReplacer=nil then
-  begin
-    FRegexReplacer:= TRegExpr.Create;
-    FRegexReplacer.ModifierS:= false;
-    FRegexReplacer.ModifierM:= true;
-  end;
-
-  try
-    FRegexReplacer.ModifierI:= not OptCase;
-    FRegexReplacer.Expression:= StrFind;
-    FRegexReplacer.InputString:= AFromText;
-    //don't call Compile, it will be compiled in Exec when Expression changes
-    FRegexReplacer.Exec;
-  except
-    exit(StrReplace);
-  end;
-  }
-
-  if OptRegexSubst then
+  if OptRegexSubst and (StrReplace<>'') then
     Result:= FRegex.Substitute(StrReplace)
   else
     Result:= StrReplace;
