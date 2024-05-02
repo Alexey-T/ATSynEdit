@@ -38,15 +38,25 @@ type
     var AReplacement: UnicodeString) of object;
 
 type
+
+  { TATFinderResult }
+
+  PATFinderResult = ^TATFinderResult;
   TATFinderResult = record
   public
     PosBegin,
     PosEnd: TPoint;
+    Replacement: UnicodeString;
     procedure Init(APosBegin, APosEnd: TPoint);
     class operator =(const a, b: TATFinderResult): boolean;
   end;
 
-  TATFinderResults = specialize TFPGList<TATFinderResult>;
+  { TATFinderResults }
+
+  TATFinderResults = class(specialize TFPGList<TATFinderResult>)
+  protected
+    procedure Deref(Item: Pointer); override;
+  end;
 
   { TATFinderResult2 }
 
@@ -100,7 +110,7 @@ type
     procedure InitRegex;
     procedure SetStrFind(const AValue: UnicodeString);
     procedure SetStrReplace(const AValue: UnicodeString);
-    function GetRegexReplacement(const AFromText: UnicodeString): UnicodeString;
+    function GetRegexReplacement: UnicodeString;
     function GetPreserveCaseReplacement(const AFromText: UnicodeString): UnicodeString;
     function IsProgressNeeded(ANewPos: integer): boolean; inline;
   protected
@@ -199,7 +209,7 @@ type
     procedure DoFixCaretSelectionDirection;
     //
     procedure DoCollect_Usual(AList: TATFinderResults; out AListCount: integer; AWithEvent, AWithConfirm: boolean);
-    procedure DoCollect_Regex(AList: TATFinderResults; out AListCount: integer; AFromPos: integer; AWithEvent, AWithConfirm: boolean);
+    procedure DoCollect_Regex(AList: TATFinderResults; out AListCount: integer; AFromPos: integer; AWithEvent, AWithConfirm, AReplace: boolean);
     function DoCount_InFragment(AWithEvent: boolean): integer;
     function DoReplace_InFragment: integer;
     //
@@ -458,11 +468,19 @@ procedure TATFinderResult.Init(APosBegin, APosEnd: TPoint);
 begin
   PosBegin:= APosBegin;
   PosEnd:= APosEnd;
+  Replacement:= '';
 end;
 
 class operator TATFinderResult.=(const a, b: TATFinderResult): boolean;
 begin
   Result:= false;
+end;
+
+{ TATFinderResults }
+
+procedure TATFinderResults.Deref(Item: Pointer);
+begin
+  PATFinderResult(Item)^.Replacement:= '';
 end;
 
 
@@ -565,7 +583,7 @@ begin
   end;
 end;
 
-function TATTextFinder.GetRegexReplacement(const AFromText: UnicodeString): UnicodeString;
+function TATTextFinder.GetRegexReplacement: UnicodeString;
 begin
   if StrReplace='' then
     exit('');
@@ -774,7 +792,7 @@ end;
 
 
 procedure TATEditorFinder.DoCollect_Regex(AList: TATFinderResults; out AListCount: integer;
-  AFromPos: integer; AWithEvent, AWithConfirm: boolean);
+  AFromPos: integer; AWithEvent, AWithConfirm, AReplace: boolean);
 var
   NMaxPos: integer;
   bOk, bContinue: boolean;
@@ -836,6 +854,8 @@ begin
   if bOk then
   begin
     Res.Init(PosBegin, PosEnd);
+    if AReplace then
+      Res.Replacement:= GetRegexReplacement();
 
     if Assigned(AList) then
       AList.Add(Res);
@@ -863,6 +883,8 @@ begin
     end;
 
     Res.Init(PosBegin, PosEnd);
+    if AReplace then
+      Res.Replacement:= GetRegexReplacement();
 
     if Assigned(AList) then
       AList.Add(Res);
@@ -885,7 +907,7 @@ end;
 function TATEditorFinder.DoCount_InFragment(AWithEvent: boolean): integer;
 begin
   if OptRegex then
-    DoCollect_Regex(nil, Result, 1, AWithEvent, false)
+    DoCollect_Regex(nil, Result, 1, AWithEvent, false, false)
   else
     DoCollect_Usual(nil, Result, AWithEvent, false);
 end;
@@ -1176,7 +1198,7 @@ begin
     CurrentFragmentIndex:= iFragment;
 
     if OptRegex then
-      DoCollect_Regex(TempResults, NListCount, 1, AWithEvent, false)
+      DoCollect_Regex(TempResults, NListCount, 1, AWithEvent, false, false)
     else
       DoCollect_Usual(TempResults, NListCount, AWithEvent, false);
 
@@ -1214,7 +1236,7 @@ begin
     AMatches.Duplicates:= ADuplicates;
     AMatches.CaseSensitive:= ACaseSens;
 
-    DoCollect_Regex(ListRes, NListCount, 1, AWithEvent, false);
+    DoCollect_Regex(ListRes, NListCount, 1, AWithEvent, false, false);
     for i:= 0 to ListRes.Count-1 do
     begin
       Res:= ListRes[i];
@@ -1309,7 +1331,7 @@ begin
   L:= TATFinderResults.Create;
   try
     if OptRegex then
-      DoCollect_Regex(L, NListCount, 1, false, OptConfirmReplace)
+      DoCollect_Regex(L, NListCount, 1, false, OptConfirmReplace, true)
     else
       DoCollect_Usual(L, NListCount, false, OptConfirmReplace);
 
@@ -1328,7 +1350,7 @@ begin
       end;
 
       if OptRegex then
-        SReplacement:= GetRegexReplacement(St.TextSubstring(PosBegin.X, PosBegin.Y, PosEnd.X, PosEnd.Y))
+        SReplacement:= Res.Replacement
       else if OptPreserveCase then
         SReplacement:= GetPreserveCaseReplacement(St.TextSubstring(PosBegin.X, PosBegin.Y, PosEnd.X, PosEnd.Y))
       else
@@ -1761,7 +1783,7 @@ begin
           PosBegin:= FMatchEdEnd;
           PosEnd:= FMatchEdPos;
         end;
-        SReplacement:= GetRegexReplacement(St.TextSubstring(PosBegin.X, PosBegin.Y, PosEnd.X, PosEnd.Y));
+        SReplacement:= GetRegexReplacement();
       end
       else if OptPreserveCase then
         SReplacement:= GetPreserveCaseReplacement(St.TextSubstring(PosBegin.X, PosBegin.Y, PosEnd.X, PosEnd.Y))
@@ -1875,7 +1897,7 @@ begin
       ConfirmContinue:= true;
 
       if OptRegex then
-        SReplacement:= GetRegexReplacement(FBuffer.SubString(FMatchPos, FMatchLen))
+        SReplacement:= GetRegexReplacement()
       else if OptPreserveCase then
         SReplacement:= GetPreserveCaseReplacement(FBuffer.SubString(FMatchPos, FMatchLen))
       else
@@ -2003,7 +2025,7 @@ begin
   end;
 
   if OptRegex then
-    SNew:= GetRegexReplacement(SSelText)
+    SNew:= GetRegexReplacement()
   else if OptPreserveCase then
     SNew:= GetPreserveCaseReplacement(SSelText)
   else
