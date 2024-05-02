@@ -87,7 +87,6 @@ type
     FCachedText: UnicodeString;
     FCachedOptCase: boolean;
     FRegex: TRegExpr;
-    FRegexReplacer: TRegExpr;
     FRegexBad: boolean;
     FRegexErrorMsg: string;
     FProgressPrev: integer;
@@ -571,6 +570,7 @@ begin
   if StrReplace='' then
     exit('');
 
+  {
   if FRegexReplacer=nil then
   begin
     FRegexReplacer:= TRegExpr.Create;
@@ -587,9 +587,10 @@ begin
   except
     exit(StrReplace);
   end;
+  }
 
   if OptRegexSubst then
-    Result:= FRegexReplacer.Substitute(StrReplace)
+    Result:= FRegex.Substitute(StrReplace)
   else
     Result:= StrReplace;
 end;
@@ -2037,14 +2038,10 @@ begin
   ClearMatchPos;
 
   FRegex:= nil;
-  FRegexReplacer:= nil;
 end;
 
 destructor TATTextFinder.Destroy;
 begin
-  if Assigned(FRegexReplacer) then
-    FreeAndNil(FRegexReplacer);
-
   if Assigned(FRegex) then
     FreeAndNil(FRegex);
 
@@ -2565,12 +2562,6 @@ begin
   begin
     FRegex.Expression:= '';
     FRegex.InputString:= '';
-  end;
-
-  if Assigned(FRegexReplacer) then
-  begin
-    FRegexReplacer.Expression:= '';
-    FRegexReplacer.InputString:= '';
   end;
 
   if Assigned(FBuffer) then
