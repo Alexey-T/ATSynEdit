@@ -832,7 +832,7 @@ begin
   if bOk then
   begin
     Res.Init(PosBegin, PosEnd);
-    if AReplace then
+    if AReplace and OptRegexSubst and (StrReplace<>'') then
       Res.Replacement:= GetRegexReplacement();
 
     if Assigned(AList) then
@@ -861,7 +861,7 @@ begin
     end;
 
     Res.Init(PosBegin, PosEnd);
-    if AReplace then
+    if AReplace and OptRegexSubst and (StrReplace<>'') then
       Res.Replacement:= GetRegexReplacement();
 
     if Assigned(AList) then
@@ -1327,7 +1327,7 @@ begin
         PosEnd:= Res.PosBegin;
       end;
 
-      if OptRegex then
+      if OptRegex and OptRegexSubst and (StrReplace<>'') then
         SReplacement:= Res.Replacement
       else if OptPreserveCase then
         SReplacement:= GetPreserveCaseReplacement(St.TextSubstring(PosBegin.X, PosBegin.Y, PosEnd.X, PosEnd.Y))
