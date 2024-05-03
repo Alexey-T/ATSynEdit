@@ -220,7 +220,7 @@ end;
 
 function TATSynEdit.DoCommand_MoveSelectionUpDown(ADown: boolean): TATCommandResults;
 var
-  NFrom, NTo, NLastLine: integer;
+  NFrom, NTo, NLastLine, iLine: integer;
   Caret: TATCaretItem;
   St: TATStrings;
   Pnt: TPoint;
@@ -296,6 +296,10 @@ begin
       if Caret.EndY>=0 then
         Dec(Caret.EndY);
     end;
+
+    //make it like in Sublime
+    for iLine:= IfThen(ADown, NFrom+1, NFrom) to IfThen(ADown, NTo, NTo-1) do
+      St.LinesState[iLine]:= TATLineState.Changed;
 
   finally
     St.EndUndoGroup;
