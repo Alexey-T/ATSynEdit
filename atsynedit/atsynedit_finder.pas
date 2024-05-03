@@ -1327,8 +1327,13 @@ begin
         PosEnd:= Res.PosBegin;
       end;
 
-      if OptRegex and OptRegexSubst and (StrReplace<>'') then
-        SReplacement:= Res.Replacement
+      if OptRegex then
+      begin
+        if OptRegexSubst and (StrReplace<>'') then
+          SReplacement:= Res.Replacement
+        else
+          SReplacement:= StrReplace;
+      end
       else if OptPreserveCase then
         SReplacement:= GetPreserveCaseReplacement(St.TextSubstring(PosBegin.X, PosBegin.Y, PosEnd.X, PosEnd.Y))
       else
