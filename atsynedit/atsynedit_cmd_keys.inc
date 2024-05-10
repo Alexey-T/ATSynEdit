@@ -3,10 +3,9 @@
 function TATSynEdit.DoCommand_KeyHome: TATCommandResults;
 var
   Caret: TATCaretItem;
-  PntText: TPoint;
-  PntCoord: TATPoint;
-  Details: TATEditorPosDetails;
+  WrapItem: TATWrapItem;
   NLine, NIndent, NWrapped, i: SizeInt;
+  NWrapIndex: integer;
   IndentKind: TATLineIndentKind;
 begin
   if FCarets.Count=0 then exit([]);
@@ -27,10 +26,12 @@ begin
 
     if FOptKeyHomeEndNavigateWrapped and (FWrapMode<>TATEditorWrapMode.ModeOff) then
     begin
-      PntCoord.X:= 0;
-      PntCoord.Y:= Caret.CoordY;
-      PntText:= ClientPosToCaretPos(PntCoord, Details);
-      NWrapped:= PntText.X;
+      NWrapIndex:= WrapInfo.FindIndexOfCaretPos(Point(Caret.PosX, Caret.PosY));
+      if NWrapIndex>=0 then
+      begin
+        WrapItem:= WrapInfo[NWrapIndex];
+        NWrapped:= WrapItem.NCharIndex-1;
+      end;
     end;
 
     if FOptKeyHomeToNonSpace then
@@ -61,10 +62,9 @@ function TATSynEdit.DoCommand_KeyEnd: TATCommandResults;
 var
   St: TATStrings;
   Caret: TATCaretItem;
-  PntText: TPoint;
-  PntCoord: TATPoint;
+  WrapItem: TATWrapItem;
   NLine, NLenTotal, NLen, NWrapped, i: integer;
-  Details: TATEditorPosDetails;
+  NWrapIndex: integer;
 begin
   if FCarets.Count=0 then exit([]);
   St:= Strings;
@@ -87,13 +87,14 @@ begin
 
     if FOptKeyHomeEndNavigateWrapped and (FWrapMode<>TATEditorWrapMode.ModeOff) then
     begin
-      PntCoord.X:= ClientWidth;
-      PntCoord.Y:= Caret.CoordY;
-      PntText:= ClientPosToCaretPos(PntCoord, Details);
-      if PntText.X<NLenTotal then
-        NWrapped:= PntText.X-1;
-        //-1 here: need to jump not to last chr but to last-1 chr
-        //(like Synwrite; to not blink caret at next part of wrapped line)
+      NWrapIndex:= WrapInfo.FindIndexOfCaretPos(Point(Caret.PosX, Caret.PosY));
+      if NWrapIndex>=0 then
+      begin
+        WrapItem:= WrapInfo[NWrapIndex];
+        NWrapped:= WrapItem.NCharIndex+WrapItem.NLength-1;
+        if (NWrapped>0) and (NWrapped<NLenTotal) then
+          Dec(NWrapped);
+      end;
     end;
 
     if FOptKeyEndToNonSpace then
