@@ -34,7 +34,7 @@ type
     NIndent: word;
     NFinal: TATWrapItemFinal;
     bInitial: boolean;
-    procedure Init(ALineIndex, ACharIndex, ALength, AIndent: SizeInt; AFinal: TATWrapItemFinal; AInitial: boolean); inline;
+    procedure Init(ALineIndex, ACharIndex, ALength, AIndent: SizeInt; AFinal: TATWrapItemFinal; AInitial: boolean);
     function ContainsPos(AX, AY: Int64): boolean;
     class operator=(const A, B: TATWrapItem): boolean;
   end;
@@ -63,16 +63,16 @@ type
     procedure Clear;
     property StringsObj: TATStrings read FStrings write FStrings;
     property VirtualMode: boolean read FVirtualMode write SetVirtualMode;
-    function Count: integer; inline;
+    function Count: integer;
     function IsIndexValid(AIndex: integer): boolean; inline;
     function IsIndexUniqueForLine(AIndex: integer): boolean;
-    property Data[N: integer]: TATWrapItem read GetData; default;
+    property Data[AIndex: integer]: TATWrapItem read GetData; default;
     procedure Add(const AData: TATWrapItem);
-    procedure Delete(N: integer);
-    procedure Insert(N: integer; const AItem: TATWrapItem);
+    procedure Delete(AIndex: integer);
+    procedure Insert(AIndex: integer; const AItem: TATWrapItem);
     procedure FindIndexesOfLineNumber(ALineNum: SizeInt; out AFrom, ATo: integer);
     function FindIndexOfCaretPos(APos: TPoint): integer;
-    procedure SetCapacity(N: integer);
+    procedure SetCapacity(AValue: integer);
     procedure ReplaceItems(AFrom, ATo: integer; AItems: TATWrapItems);
   end;
 
@@ -165,12 +165,12 @@ begin
   inherited;
 end;
 
-procedure TATWrapInfo.Clear; inline;
+procedure TATWrapInfo.Clear;
 begin
   FList.Clear;
 end;
 
-function TATWrapInfo.Count: integer; inline;
+function TATWrapInfo.Count: integer;
 begin
   if FVirtualMode then
     Result:= FStrings.Count
@@ -197,25 +197,25 @@ begin
   Result:= true;
 end;
 
-procedure TATWrapInfo.Add(const AData: TATWrapItem); inline;
+procedure TATWrapInfo.Add(const AData: TATWrapItem);
 begin
   if FVirtualMode then exit;
   FList.Add(AData);
 end;
 
-procedure TATWrapInfo.Delete(N: integer); inline;
+procedure TATWrapInfo.Delete(AIndex: integer);
 begin
   if FVirtualMode then exit;
-  FList.Delete(N);
+  FList.Delete(AIndex);
 end;
 
-procedure TATWrapInfo.Insert(N: integer; const AItem: TATWrapItem); inline;
+procedure TATWrapInfo.Insert(AIndex: integer; const AItem: TATWrapItem);
 begin
   if FVirtualMode then exit;
-  if N>=FList.Count then
+  if AIndex>=FList.Count then
     FList.Add(AItem)
   else
-    FList.Insert(N, AItem);
+    FList.Insert(AIndex, AItem);
 end;
 
 procedure TATWrapInfo.FindIndexesOfLineNumber(ALineNum: SizeInt; out AFrom, ATo: integer);
@@ -273,9 +273,9 @@ begin
   end;
 end;
 
-procedure TATWrapInfo.SetCapacity(N: integer); inline;
+procedure TATWrapInfo.SetCapacity(AValue: integer);
 begin
-  FList.Capacity:= Max(1024, N);
+  FList.Capacity:= Max(1024, AValue);
 end;
 
 //optimized; don't just del/ins
