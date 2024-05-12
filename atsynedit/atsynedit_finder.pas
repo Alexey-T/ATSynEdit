@@ -556,6 +556,7 @@ begin
 
   FRegex.InputString:= StrText;
 
+ try
   if FRegex.ExecPos(AFromPos, false, OptBack) then
   begin
     FoundPos:= FRegex.MatchPos[0];
@@ -581,6 +582,12 @@ begin
       end;
     until false;
   end;
+ except
+   on E: ERegExpr do
+   begin
+     //just supress exception, Result is False already
+   end;
+ end;
 end;
 
 function TATTextFinder.GetRegexReplacement: UnicodeString;
