@@ -34,6 +34,8 @@ rep(l, '{$I regexpr_compilers.inc}',
        '//{$I regexpr_compilers.inc}')
 rep(l, '{ off $DEFINE UnicodeEx} // Support Unicode >0xFFFF, e.g. emoji, e.g. "." must find 2 WideChars of 1 emoji',
        '{$DEFINE UnicodeEx}')
+rep(l, '{ off $DEFINE RegExpWithStackOverflowCheck} // Check the recursion depth and abort matching before stack overflows (available only for some OS/CPU)',
+       '{$DEFINE RegExpWithStackOverflowCheck}')
 
 with open(fn2, 'w') as f:
     f.write('\n'.join(l))
