@@ -55,6 +55,7 @@ type
 
     SampleChar = '0';
     MaxVisibleColumns = 500;
+    MaxLineLenToCalculateAutoIndent = 200;
 
     GutterTagBookmarks = 1;
     GutterTagNumbers = 2;

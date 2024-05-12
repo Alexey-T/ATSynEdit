@@ -8806,7 +8806,7 @@ begin
     bAddIndent:= true
   else
     bAddIndent:=
-    (Length(StrPrev)<200) and //avoid running regex on huge line, it gives AV in atsynedit_regexpr.pas:MatchPrim
+    (Length(StrPrev)<ATEditorOptions.MaxLineLenToCalculateAutoIndent) and //avoid running regex on huge line, it gives strange AV in atsynedit_regexpr.pas:MatchPrim
     AUseIndentRegexRule and
     (FOptAutoIndentRegexRule<>'') and
     SFindRegexMatch(StrPrev, FOptAutoIndentRegexRule{%H-}, MatchPos, MatchLen);
