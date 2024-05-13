@@ -556,21 +556,9 @@ begin
 
   FRegex.InputString:= StrText;
 
- try
-  if FRegex.ExecPos(AFromPos, false, OptBack) then
-  begin
-    FoundPos:= FRegex.MatchPos[0];
-    FoundLen:= FRegex.MatchLen[0];
-    if CheckTokensBuffer(FoundPos, FoundPos+FoundLen) then
+  try
+    if FRegex.ExecPos(AFromPos, false, OptBack) then
     begin
-      Result:= true;
-      FMatchPos:= FoundPos;
-      FMatchLen:= FoundLen;
-      exit
-    end;
-
-    repeat
-      if not FRegex.ExecNext(OptBack) then exit;
       FoundPos:= FRegex.MatchPos[0];
       FoundLen:= FRegex.MatchLen[0];
       if CheckTokensBuffer(FoundPos, FoundPos+FoundLen) then
@@ -580,14 +568,27 @@ begin
         FMatchLen:= FoundLen;
         exit
       end;
-    until false;
+
+      repeat
+        if not FRegex.ExecNext(OptBack) then exit;
+        FoundPos:= FRegex.MatchPos[0];
+        FoundLen:= FRegex.MatchLen[0];
+        if CheckTokensBuffer(FoundPos, FoundPos+FoundLen) then
+        begin
+          Result:= true;
+          FMatchPos:= FoundPos;
+          FMatchLen:= FoundLen;
+          exit
+        end;
+      until false;
+    end;
+  except
+    on E: ERegExpr do
+    begin
+      //just supress exception
+      //it may be 'stack overflow' if '.+:\s*$' is used on huge line
+    end;
   end;
- except
-   on E: ERegExpr do
-   begin
-     //just supress exception, Result is False already
-   end;
- end;
 end;
 
 function TATTextFinder.GetRegexReplacement: UnicodeString;
