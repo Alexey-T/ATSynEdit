@@ -820,7 +820,13 @@ begin
   end;
 
   FRegex.InputString:= StrText;
-  if not FRegex.ExecPos(AFromPos) then exit;
+  try
+    if not FRegex.ExecPos(AFromPos) then exit;
+  except
+    on E: ERegExpr do
+      exit;
+  end;
+
   PosBegin:= ConvertBufferPosToCaretPos(FRegex.MatchPos[0]);
   PosEnd:= ConvertBufferPosToCaretPos(FRegex.MatchPos[0]+FRegex.MatchLen[0]);
 
@@ -852,6 +858,7 @@ begin
     DoOnFound(AWithEvent);
   end;
 
+ try
   while FRegex.ExecNext do
   begin
     PosBegin:= ConvertBufferPosToCaretPos(FRegex.MatchPos[0]);
@@ -888,6 +895,10 @@ begin
         if not bOk then exit;
       end;
   end;
+ except
+   on E: ERegExpr do
+     exit;
+ end;
 end;
 
 function TATEditorFinder.DoCount_InFragment(AWithEvent: boolean): integer;
