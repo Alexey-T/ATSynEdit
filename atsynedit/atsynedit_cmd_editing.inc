@@ -54,6 +54,7 @@ var
   TextItem: atString;
   X1, Y1, X2, Y2, X_saved: integer;
   bSel, bNeedGroup, bInsertLinePerCaret: boolean;
+  bDelMultiline: boolean;
   iCaret: integer;
   NTextLines: integer;
 begin
@@ -102,6 +103,15 @@ begin
 
     if bNeedGroup then
       St.BeginUndoGroup;
+
+    bDelMultiline:= false;
+    for iCaret:= Carets.Count-1 downto 0 do
+    begin
+      Caret:= Carets[iCaret];
+      Caret.GetRange(X1, Y1, X2, Y2, bSel);
+      if bSel and (Y1<>Y2) then
+        bDelMultiline:= true;
+    end;
 
     {
     delete selections, but except the _touching_ selections.
@@ -159,6 +169,10 @@ begin
     if bNeedGroup then
       St.EndUndoGroup;
   end;
+
+  //disable cached WrapInfo update
+  if bDelMultiline then
+    St.IndexesOfEditedLines.Clear;
 
   //changed for issue CudaText#3065
   Result:= [TATCommandResult.Text, TATCommandResult.CaretBottom, TATCommandResult.CaretLazy];
