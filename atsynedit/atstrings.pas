@@ -2334,10 +2334,10 @@ begin
     FRedoList.Locked:= ALocked;
   end;
 
-  if Assigned(FIndexesOfEditedLines) then
+  if Assigned(IndexesOfEditedLines) then
   begin
-    FIndexesOfEditedLines.Clear;
-    FEnableCachedWrapinfoUpdate:= true;
+    IndexesOfEditedLines.Clear;
+    EnableCachedWrapinfoUpdate:= true;
   end;
 end;
 
@@ -2569,22 +2569,22 @@ end;
 
 procedure TATStrings.AddUpdatesAction(ALineIndex: integer; AAction: TATEditAction);
 begin
-  if not Assigned(FIndexesOfEditedLines) then Exit;
+  if not Assigned(IndexesOfEditedLines) then Exit;
 
   if not cEditAction_CachedWrapinfoUpdate[AAction] then
   begin
-    FEnableCachedWrapinfoUpdate:= false;
+    EnableCachedWrapinfoUpdate:= false;
     Exit
   end;
 
-  if FIndexesOfEditedLines.Count>ATEditorOptions.MaxUpdatesCountEasy then
+  if IndexesOfEditedLines.Count>ATEditorOptions.MaxUpdatesCountEasy then
   begin
-    FEnableCachedWrapinfoUpdate:= false;
+    EnableCachedWrapinfoUpdate:= false;
     Exit
   end;
 
-  if FIndexesOfEditedLines.IndexOf(ALineIndex)<0 then
-    FIndexesOfEditedLines.Add(ALineIndex);
+  if IndexesOfEditedLines.IndexOf(ALineIndex)<0 then
+    IndexesOfEditedLines.Add(ALineIndex);
 end;
 
 procedure TATStrings.DoOnChangeBlock(AX1, AY1, AX2, AY2: SizeInt;

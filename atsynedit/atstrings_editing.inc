@@ -639,7 +639,7 @@ begin
 
   //when deleting multiline block, _cached_ WrapInfo update works incorrect
   if AToY>AFromY then
-    FEnableCachedWrapinfoUpdate:= false;
+    EnableCachedWrapinfoUpdate:= false;
 
   Result:= true;
 end;
