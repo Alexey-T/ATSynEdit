@@ -54,7 +54,6 @@ var
   TextItem: atString;
   X1, Y1, X2, Y2, X_saved: integer;
   bSel, bNeedGroup, bInsertLinePerCaret: boolean;
-  bDelMultiline: boolean;
   iCaret: integer;
   NTextLines: integer;
 begin
@@ -104,13 +103,15 @@ begin
     if bNeedGroup then
       St.BeginUndoGroup;
 
-    bDelMultiline:= false;
     for iCaret:= Carets.Count-1 downto 0 do
     begin
       Caret:= Carets[iCaret];
       Caret.GetRange(X1, Y1, X2, Y2, bSel);
       if bSel and (Y1<>Y2) then
-        bDelMultiline:= true;
+      begin
+        St.EnableCachedWrapinfoUpdate:= false;
+        Break;
+      end;
     end;
 
     {
@@ -169,9 +170,6 @@ begin
     if bNeedGroup then
       St.EndUndoGroup;
   end;
-
-  if bDelMultiline then
-    St.EnableCachedWrapinfoUpdate:= false;
 
   //changed for issue CudaText#3065
   Result:= [TATCommandResult.Text, TATCommandResult.CaretBottom, TATCommandResult.CaretLazy];
@@ -468,7 +466,7 @@ var
   Shift, PosAfter: TPoint;
   NCaretCount: integer;
   X1, Y1, X2, Y2: integer;
-  bSel, bSelTouch, bDelMultiline: boolean;
+  bSel, bSelTouch: boolean;
   iCaret: integer;
 begin
   Result:= [];
@@ -483,7 +481,6 @@ begin
   end;
 
   if not Carets.IsSelection then Exit;
-  bDelMultiline:= false;
 
   St.BeginUndoGroup;
   try
@@ -503,8 +500,9 @@ begin
 
       Caret.GetRange(X1, Y1, X2, Y2, bSel);
       if not bSel then Continue;
+
       if Y1<>Y2 then
-        bDelMultiline:= true;
+        St.EnableCachedWrapinfoUpdate:= false;
 
       St.TextDeleteRange(X1, Y1, X2, Y2, Shift, PosAfter);
 
@@ -526,9 +524,6 @@ begin
   finally
     St.EndUndoGroup;
   end;
-
-  if bDelMultiline then
-    St.EnableCachedWrapinfoUpdate:= false;
 
   //CudaText issue #1615
   Carets.Sort;
