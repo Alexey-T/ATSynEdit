@@ -640,8 +640,7 @@ begin
   //disable cached WrapInfo update.
   //when e.g. Del is pressed to del multiline block, _cached_ WrapInfo update works incorrect.
   if AToY>AFromY then
-    if Assigned(FIndexesOfEditedLines) then
-      FIndexesOfEditedLines.Clear;
+    FEnableCachedWrapinfoUpdate:= false;
 
   Result:= true;
 end;

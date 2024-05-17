@@ -170,9 +170,8 @@ begin
       St.EndUndoGroup;
   end;
 
-  //disable cached WrapInfo update
   if bDelMultiline then
-    St.IndexesOfEditedLines.Clear;
+    St.EnableCachedWrapinfoUpdate:= false;
 
   //changed for issue CudaText#3065
   Result:= [TATCommandResult.Text, TATCommandResult.CaretBottom, TATCommandResult.CaretLazy];
@@ -528,9 +527,8 @@ begin
     St.EndUndoGroup;
   end;
 
-  //disable cached WrapInfo update
   if bDelMultiline then
-    St.IndexesOfEditedLines.Clear;
+    St.EnableCachedWrapinfoUpdate:= false;
 
   //CudaText issue #1615
   Carets.Sort;
