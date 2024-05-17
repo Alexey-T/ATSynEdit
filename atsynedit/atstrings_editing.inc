@@ -637,8 +637,7 @@ begin
   if Count=0 then
     ActionAddFakeLineIfNeeded;
 
-  //disable cached WrapInfo update.
-  //when e.g. Del is pressed to del multiline block, _cached_ WrapInfo update works incorrect.
+  //when deleting multiline block, _cached_ WrapInfo update works incorrect
   if AToY>AFromY then
     FEnableCachedWrapinfoUpdate:= false;
 

@@ -103,17 +103,6 @@ begin
     if bNeedGroup then
       St.BeginUndoGroup;
 
-    for iCaret:= Carets.Count-1 downto 0 do
-    begin
-      Caret:= Carets[iCaret];
-      Caret.GetRange(X1, Y1, X2, Y2, bSel);
-      if bSel and (Y1<>Y2) then
-      begin
-        St.EnableCachedWrapinfoUpdate:= false;
-        Break;
-      end;
-    end;
-
     {
     delete selections, but except the _touching_ selections.
     both cases must work OK:
@@ -500,9 +489,6 @@ begin
 
       Caret.GetRange(X1, Y1, X2, Y2, bSel);
       if not bSel then Continue;
-
-      if Y1<>Y2 then
-        St.EnableCachedWrapinfoUpdate:= false;
 
       St.TextDeleteRange(X1, Y1, X2, Y2, Shift, PosAfter);
 
