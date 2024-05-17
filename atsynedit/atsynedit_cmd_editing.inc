@@ -455,7 +455,7 @@ var
   Shift, PosAfter: TPoint;
   NCaretCount: integer;
   X1, Y1, X2, Y2: integer;
-  bSel, bSelTouch: boolean;
+  bSel, bSelTouch, bDelMultiline: boolean;
   iCaret: integer;
 begin
   Result:= [];
@@ -470,6 +470,7 @@ begin
   end;
 
   if not Carets.IsSelection then Exit;
+  bDelMultiline:= false;
 
   St.BeginUndoGroup;
   try
@@ -489,6 +490,8 @@ begin
 
       Caret.GetRange(X1, Y1, X2, Y2, bSel);
       if not bSel then Continue;
+      if Y1<>Y2 then
+        bDelMultiline:= true;
 
       St.TextDeleteRange(X1, Y1, X2, Y2, Shift, PosAfter);
 
@@ -510,6 +513,10 @@ begin
   finally
     St.EndUndoGroup;
   end;
+
+  //disable cached WrapInfo update
+  if bDelMultiline then
+    St.IndexesOfEditedLines.Clear;
 
   //CudaText issue #1615
   Carets.Sort;
