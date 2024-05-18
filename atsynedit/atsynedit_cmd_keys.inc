@@ -284,6 +284,15 @@ const
     (TATEditorGapCoordAction.Ignore, TATEditorGapCoordAction.MoveDown);
 begin
   St:= Strings;
+
+  //fix CudaText #5526; Caret.Coord* are zero, because plugin HiOccur changed the caret
+  if FCarets.Count=1 then
+  begin
+    Caret:= FCarets[0];
+    if (Caret.CoordX=0) and (Caret.CoordY=0) then
+      UpdateCaretsCoords;
+  end;
+
   for iCaret:= 0 to FCarets.Count-1 do
   begin
     Caret:= FCarets[iCaret];
