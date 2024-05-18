@@ -408,7 +408,7 @@ procedure TATSynEdit.DoPartCalc_ApplyAttribsOver(var AParts: TATLineParts;
 var
   Attr: TATMarkerItem;
   Part: TATLinePart;
-  nAttrIndex, nAttrIndexPrev, nOffset, i: integer;
+  nAttrIndex, nOffset, i: integer;
   bExact: boolean;
 begin
   if FAttribs=nil then exit;
@@ -422,16 +422,13 @@ begin
   //for long wrapped line with long URL-attrib, overlapped by short 'Hi' attribs:
   //if we found nAttrIndex of 'Hi' attrib, we must decrement index until we find long attrib;
   //CudaText issue #5525
-  if nAttrIndex>0 then
+  if (nAttrIndex>0) and not IsAttrLongEnough(FAttribs[nAttrIndex]) then
   begin
-    if not IsAttrLongEnough(FAttribs[nAttrIndex]) then
-    begin
-      nAttrIndexPrev:= nAttrIndex-1;
-      while (nAttrIndexPrev>0) and not IsAttrLongEnough(FAttribs[nAttrIndexPrev]) do
-        Dec(nAttrIndexPrev);
-      if IsAttrLongEnough(FAttribs[nAttrIndexPrev]) then
-        nAttrIndex:= nAttrIndexPrev;
-    end;
+    i:= nAttrIndex-1;
+    while (i>0) and not IsAttrLongEnough(FAttribs[i]) do
+      Dec(i);
+    if IsAttrLongEnough(FAttribs[i]) then
+      nAttrIndex:= i;
   end;
 
   for i:= nAttrIndex to FAttribs.Count-1 do
