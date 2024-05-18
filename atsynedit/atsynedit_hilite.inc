@@ -419,8 +419,8 @@ begin
   if nAttrIndex>0 then //fixes disappeared attrib on horz scrolling
     Dec(nAttrIndex);
 
-  //for long wrapped line with long URL-attrib, overlapped by short 'Hi' attribs:
-  //if we found nAttrIndex of 'Hi' attrib, we must decrement index until we find long attrib;
+  //for long wrapped line with long URL attrib, overlapped by short 'Highlight All' attrib(s):
+  //if nAttrIndex is of 'Highlight All' attrib, we must decrement index until we find long attrib;
   //CudaText issue #5525
   if (nAttrIndex>0) and not IsAttrLongEnough(FAttribs[nAttrIndex]) then
   begin
