@@ -397,10 +397,18 @@ end;
 
 procedure TATSynEdit.DoPartCalc_ApplyAttribsOver(var AParts: TATLineParts;
   AOffsetMax, ALineIndex, ACharIndex: integer; AColorBG: TColor; AMainText: boolean);
+  //
+  function IsAttrLongEnough(Attr: TATMarkerItem): boolean;
+  begin
+    Result:=
+      (Attr.PosY=ALineIndex) and
+      (Attr.PosX-ACharIndex+Attr.SelX>0);
+  end;
+  //
 var
   Attr: TATMarkerItem;
   Part: TATLinePart;
-  nAttrIndex, nOffset, i: integer;
+  nAttrIndex, nAttrIndexPrev, nOffset, i: integer;
   bExact: boolean;
 begin
   if FAttribs=nil then exit;
@@ -410,6 +418,20 @@ begin
   if nAttrIndex<0 then exit; //not IsIndexValid, because index=FAttribs.Count is ok
   if nAttrIndex>0 then //fixes disappeared attrib on horz scrolling
     Dec(nAttrIndex);
+
+  //for long wrapped line with long URL-attrib, overlapped by short HiOccur-attribs:
+  //if we found nAttrIndex of HiOccur-attrib, we must skip all HiOccur attribs and take index before them; CudaText issue #5525
+  if nAttrIndex>0 then
+  begin
+    if not IsAttrLongEnough(FAttribs[nAttrIndex]) then
+    begin
+      nAttrIndexPrev:= nAttrIndex-1;
+      while (nAttrIndexPrev>0) and not IsAttrLongEnough(FAttribs[nAttrIndexPrev]) do
+        Dec(nAttrIndexPrev);
+      if IsAttrLongEnough(FAttribs[nAttrIndexPrev]) then
+        nAttrIndex:= nAttrIndexPrev;
+    end;
+  end;
 
   for i:= nAttrIndex to FAttribs.Count-1 do
   begin
