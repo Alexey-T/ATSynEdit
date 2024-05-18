@@ -408,7 +408,7 @@ procedure TATSynEdit.DoPartCalc_ApplyAttribsOver(var AParts: TATLineParts;
 var
   Attr: TATMarkerItem;
   Part: TATLinePart;
-  nAttrIndex, nOffset, i: integer;
+  nAttrIndex, nOffset, iAttr, j: integer;
   bExact: boolean;
 begin
   if FAttribs=nil then exit;
@@ -424,16 +424,16 @@ begin
   //CudaText issue #5525
   if (nAttrIndex>0) and not IsAttrLongEnough(FAttribs[nAttrIndex]) then
   begin
-    i:= nAttrIndex-1;
-    while (i>0) and not IsAttrLongEnough(FAttribs[i]) do
-      Dec(i);
-    if IsAttrLongEnough(FAttribs[i]) then
-      nAttrIndex:= i;
+    j:= nAttrIndex-1;
+    while (j>0) and not IsAttrLongEnough(FAttribs[j]) do
+      Dec(j);
+    if IsAttrLongEnough(FAttribs[j]) then
+      nAttrIndex:= j;
   end;
 
-  for i:= nAttrIndex to FAttribs.Count-1 do
+  for iAttr:= nAttrIndex to FAttribs.Count-1 do
   begin
-    Attr:= FAttribs[i];
+    Attr:= FAttribs[iAttr];
     if Attr.MicromapMode=TATMarkerMicromapMode.MicromapOnly then Continue;
     if Attr.PosY<ALineIndex then Continue;
     if Attr.PosY>ALineIndex then Break;
