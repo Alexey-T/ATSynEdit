@@ -398,7 +398,7 @@ end;
 procedure TATSynEdit.DoPartCalc_ApplyAttribsOver(var AParts: TATLineParts;
   AOffsetMax, ALineIndex, ACharIndex: integer; AColorBG: TColor; AMainText: boolean);
   //
-  function IsAttrLongEnough(Attr: TATMarkerItem): boolean;
+  function IsAttrLongEnough(constref Attr: TATMarkerItem): boolean;
   begin
     Result:=
       (Attr.PosY=ALineIndex) and
