@@ -152,7 +152,7 @@ type
     class operator =(const a, b: TATEditorFragment): boolean;
   end;
 
-  TATEditorFragments = specialize TFPGList<TATEditorFragment>;
+  TATEditorFragments = array of TATEditorFragment;
 
 type
   { TATEditorFinder }
@@ -715,7 +715,7 @@ begin
   if IndexLineMax<0 then exit;
   InitProgress;
 
-  if FFragments.Count=0 then
+  if Length(FFragments)=0 then
   begin
     PosStart.X:= 0;
     PosStart.Y:= 0;
@@ -988,7 +988,7 @@ begin
   Editor:= nil;
   FBuffer:= TATStringBuffer.Create;
   FSkipLen:= 0;
-  FFragments:= TATEditorFragments.Create;
+  FFragments:= nil;
   FFragmentIndex:= 0;
   FinderCarets:= TATCarets.Create;
   //FReplacedAtEndOfText:= false;
@@ -1012,7 +1012,7 @@ begin
   DoFragmentsClear;
   FinderCaretsSel.Clear;
   FreeAndNil(FinderCarets);
-  FreeAndNil(FFragments);
+  FFragments:= nil;
   FreeAndNil(FBuffer);
   inherited;
 end;
@@ -1171,7 +1171,7 @@ begin
   BeginTiming;
 
   Result:= 0;
-  for i:= 0 to Max(0, FFragments.Count-1) do
+  for i:= 0 to Max(0, Length(FFragments)-1) do
   begin
     CurrentFragmentIndex:= i;
     Inc(Result, DoCount_InFragment(AWithEvent));
@@ -1195,7 +1195,7 @@ begin
   AResults.Clear;
   EnableCaretEvent:= false;
 
-  for iFragment:= 0 to Max(0, FFragments.Count-1) do
+  for iFragment:= 0 to Max(0, Length(FFragments)-1) do
   begin
     CurrentFragmentIndex:= iFragment;
 
@@ -1274,13 +1274,13 @@ begin
   if OptRegex then
     UpdateBuffer;
 
-  if FFragments.Count=0 then
+  if Length(FFragments)=0 then
     Result:= DoReplace_InFragment
   else
   begin
     Result:= 0;
     //always loop downto, coz multiline replacement deletes/adds lines
-    for i:= FFragments.Count-1 downto 0 do
+    for i:= Length(FFragments)-1 downto 0 do
     begin
       CurrentFragmentIndex:= i;
       Inc(Result, DoReplace_InFragment);
@@ -1552,14 +1552,14 @@ begin
   EnableCaretEvent:= false;
   DoFixCaretSelectionDirection;
 
-  if not OptInSelection or (FFragments.Count=0) then
+  if not OptInSelection or (Length(FFragments)=0) then
   begin
     Result:= DoFindOrReplace_InFragment(AReplace, AForMany, AChanged, AUpdateCaret);
     EnableCaretEvent:= true;
     exit
   end;
 
-  NMaxFragment:= FFragments.Count-1;
+  NMaxFragment:= Length(FFragments)-1;
 
   if not OptBack then
   begin
@@ -2128,18 +2128,17 @@ end;
 
 procedure TATEditorFinder.DoFragmentsInit;
 var
-  Fr: TATEditorFragment;
   Sel: TATCaretSelection;
   i: integer;
 begin
   DoFragmentsClear;
   if Editor=nil then exit;
 
+  SetLength(FFragments, Length(FinderCaretsSel.Data));
   for i:= 0 to High(FinderCaretsSel.Data) do
   begin
     Sel:= FinderCaretsSel.Data[i];
-    Fr.Init(Sel.PosX, Sel.PosY, Sel.EndX, Sel.EndY);
-    FFragments.Add(Fr);
+    FFragments[i].Init(Sel.PosX, Sel.PosY, Sel.EndX, Sel.EndY);
   end;
 
   //debug
@@ -2153,7 +2152,7 @@ var
   i: integer;
 begin
   S:= '';
-  for i:= 0 to FFragments.Count-1 do
+  for i:= 0 to Length(FFragments)-1 do
   begin
     Fr:= FFragments[i];
     S:= S +
@@ -2164,7 +2163,7 @@ end;
 
 procedure TATEditorFinder.DoFragmentsClear;
 begin
-  FFragments.Clear;
+  FFragments:= nil;
   FFragmentIndex:= -1;
 end;
 
@@ -2172,7 +2171,7 @@ function TATEditorFinder.CurrentFragment: TATEditorFragment;
 begin
   Result.Init(-1, -1, -1, -1);
   if OptInSelection then
-    if (FFragmentIndex>=0) and (FFragmentIndex<FFragments.Count) then
+    if (FFragmentIndex>=0) and (FFragmentIndex<Length(FFragments)) then
       Result:= FFragments[FFragmentIndex];
 end;
 
@@ -2181,7 +2180,7 @@ var
   Fr: TATEditorFragment;
 begin
   if FFragmentIndex=AValue then Exit;
-  if (AValue>=0) and (AValue<FFragments.Count) then
+  if (AValue>=0) and (AValue<Length(FFragments)) then
   begin
     FFragmentIndex:= AValue;
     Fr:= FFragments[FFragmentIndex];
@@ -2196,7 +2195,7 @@ var
   i: integer;
 begin
   Result:= false;
-  for i:= 0 to FFragments.Count-2 do
+  for i:= 0 to Length(FFragments)-2 do
   begin
     Fr1:= FFragments[i];
     Fr2:= FFragments[i+1];
