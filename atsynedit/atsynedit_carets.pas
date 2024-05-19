@@ -104,7 +104,6 @@ type
   why new record here? we could make methods in TATCarets, but during loops,
   we must always a) skip carets w/o selection,
   b) call CaretItem.GetRange to get _sorted_ range.
-  code for binary search (Is***Selected) would be ugly.
   }
 
   TATCaretSelections = record
@@ -150,7 +149,6 @@ type
     procedure Delete(N: integer; AWithEvent: boolean=true);
     function Count: integer; inline;
     function IsIndexValid(N: integer): boolean; inline;
-    function IsPosSelected(AX, AY: integer; AllowAtEdge: boolean=false): boolean;
     property Items[N: integer]: TATCaretItem read GetItem; default;
     procedure Add(APosX, APosY: integer; AEndX: integer=-1; AEndY: integer=-1; AWithEvent: boolean=true);
     procedure Sort(AJoinAdjacentCarets: boolean=true);
@@ -1319,25 +1317,6 @@ begin
   //don't realloc in a loop
   if NLen<>NCount then
     SetLength(D.Data, NLen);
-end;
-
-
-function TATCarets.IsPosSelected(AX, AY: integer; AllowAtEdge: boolean): boolean;
-var
-  Caret: TATCaretItem;
-  X1, Y1, X2, Y2: integer;
-  bSel: boolean;
-  i: integer;
-begin
-  Result:= false;
-  for i:= 0 to Count-1 do
-  begin
-    Caret:= Items[i];
-    Caret.GetRange(X1, Y1, X2, Y2, bSel);
-    if bSel then
-      if IsPosInRange(AX, AY, X1, Y1, X2, Y2, AllowAtEdge)=TATPosRelation.Inside then
-        exit(true);
-  end;
 end;
 
 end.

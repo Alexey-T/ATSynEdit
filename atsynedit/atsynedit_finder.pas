@@ -169,6 +169,7 @@ type
     FMaxLineLen: integer;
     //note: all code of finder must use FinderCarets, not Editor.Carets! except in: FinderCarets.Assign(Editor.Carets)
     FinderCarets: TATCarets;
+    FinderCaretsSel: TATCaretSelections;
     FVirtualCaretsAsString: string;
     FIndentHorz: integer;
     FIndentVert: integer;
@@ -371,6 +372,7 @@ begin
     Result+= S;
   end;
 end;
+
 
 function STestStringMatch(
   const SFind, SLine: UnicodeString;
@@ -918,6 +920,8 @@ begin
       FinderCarets.Assign(Editor.Carets);
 
   FPlaceMarker:= ASimpleAction and OptInSelection and FinderCarets.IsSelection;
+
+  FinderCarets.GetSelections(FinderCaretsSel);
 end;
 
 procedure TATEditorFinder.SetVirtualCaretsAsString(const AValue: string);
@@ -1006,6 +1010,7 @@ destructor TATEditorFinder.Destroy;
 begin
   Editor:= nil;
   DoFragmentsClear;
+  FinderCaretsSel.Clear;
   FreeAndNil(FinderCarets);
   FreeAndNil(FFragments);
   FreeAndNil(FBuffer);
@@ -1481,10 +1486,7 @@ var
 begin
   if OptInSelection then
   begin
-    //ignore positions found after the selection
-    if not FinderCarets.IsPosSelected(AX, AY) then
-      exit(false);
-    if not FinderCarets.IsPosSelected(AX2, AY2, true{AllowAtEdge}) then
+    if FinderCaretsSel.IsRangeSelected(AX, AY, AX2, AY2)<>TATRangeSelection.AllSelected then
       exit(false);
   end;
 
@@ -2595,6 +2597,8 @@ begin
   FSkipLen:= 0;
   FMaxLineLen:= MaxInt;
   DoFragmentsClear;
+  FinderCarets.Clear;
+  FinderCaretsSel.Clear;
 
   FIndentVert:= -5;
   FIndentHorz:= 10;
@@ -2633,7 +2637,7 @@ begin
   if OptBack then
     Inc(MarkX, Mark.LineLen);
 
-  if FinderCarets.IsPosSelected(MarkX, MarkY) then
+  if FinderCaretsSel.IsPosSelected(MarkX, MarkY) then
   begin
     AX:= MarkX;
     AY:= MarkY;
@@ -2813,6 +2817,5 @@ procedure TATEditorFinder.EndTiming;
 begin
   FLastActionTime:= GetTickCount64-FLastTick;
 end;
-
 
 end.
