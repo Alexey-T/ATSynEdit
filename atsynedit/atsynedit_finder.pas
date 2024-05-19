@@ -149,7 +149,6 @@ type
     procedure Init(AX1, AY1, AX2, AY2: integer);
     function Inited: boolean;
     function IsMarkerOnFragmentEnd(Ed: TATSynEdit): boolean;
-    class operator =(const a, b: TATEditorFragment): boolean;
   end;
 
   TATEditorFragments = array of TATEditorFragment;
@@ -456,11 +455,6 @@ begin
   Result:=
     (Mark.LineLen<>0) and (Mark.PosY=Y2) and
     ((Mark.PosX=X2) or (Mark.PosX+Mark.LineLen=X2));
-end;
-
-class operator TATEditorFragment.=(const a, b: TATEditorFragment): boolean;
-begin
-  Result:= false;
 end;
 
 
