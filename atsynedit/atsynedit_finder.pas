@@ -2128,22 +2128,17 @@ end;
 
 procedure TATEditorFinder.DoFragmentsInit;
 var
-  Caret: TATCaretItem;
-  X1, Y1, X2, Y2: integer;
   Fr: TATEditorFragment;
-  bSel: boolean;
+  Sel: TATCaretSelection;
   i: integer;
 begin
   DoFragmentsClear;
   if Editor=nil then exit;
 
-  for i:= 0 to FinderCarets.Count-1 do
+  for i:= 0 to High(FinderCaretsSel.Data) do
   begin
-    Caret:= FinderCarets[i];
-    Caret.GetRange(X1, Y1, X2, Y2, bSel);
-    if not bSel then Continue;
-
-    Fr.Init(X1, Y1, X2, Y2);
+    Sel:= FinderCaretsSel.Data[i];
+    Fr.Init(Sel.PosX, Sel.PosY, Sel.EndX, Sel.EndY);
     FFragments.Add(Fr);
   end;
 
