@@ -2611,6 +2611,7 @@ procedure TATEditorFinder.GetMarkerPos(out AX, AY: integer);
 var
   Mark: TATMarkerItem;
   Caret: TATCaretItem;
+  Sel: TATCaretSelection;
   MarkX, MarkY: integer;
   X1, Y1, X2, Y2: integer;
   bSel: boolean;
@@ -2618,6 +2619,7 @@ var
 begin
   AX:= -1;
   AY:= -1;
+
   if Editor.Markers.Count<>1 then
   begin
     if FinderCarets.Count=0 then exit;
@@ -2646,17 +2648,15 @@ begin
 
   //if marker is not in selection, find first selection _after_ the marker,
   //and return it's left side
-  for i:= 0 to FinderCarets.Count-1 do
+  for i:= 0 to High(FinderCaretsSel.Data) do
   begin
-    Caret:= FinderCarets[i];
-    Caret.GetRange(X1, Y1, X2, Y2, bSel);
-    if bSel then
-      if IsPosSorted(MarkX, MarkY, X1, Y1, false) then
-      begin
-        AX:= X1;
-        AY:= Y1;
-        exit;
-      end;
+    Sel:= FinderCaretsSel.Data[i];
+    if IsPosSorted(MarkX, MarkY, Sel.PosX, Sel.PosY, false) then
+    begin
+      AX:= Sel.PosX;
+      AY:= Sel.PosY;
+      exit;
+    end;
   end;
 end;
 
