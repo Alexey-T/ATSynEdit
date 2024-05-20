@@ -2832,6 +2832,7 @@ begin
   else
     FList.SortRange(AFrom, ATo, Func);
 
+  EnableCachedWrapinfoUpdate:= false;
   ChangeLineStates(AFrom, ATo);
 
   //this clears all bookmarks, ranges, decors - it's ok
