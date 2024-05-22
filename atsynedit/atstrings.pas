@@ -2795,9 +2795,9 @@ procedure TATStrings.ActionSort(AAction: TATStringsSortAction; AFrom, ATo: SizeI
   //
 var
   Func: TFPSListCompareFunc;
-  bAllText, bFakeLine: boolean;
+  bAllText, bWasFakeLine: boolean;
 begin
-  bFakeLine:= IsLastLineFake;
+  bWasFakeLine:= IsLastLineFake;
   bAllText:= AFrom<0;
   if bAllText then
   begin
@@ -2828,13 +2828,11 @@ begin
   begin
     RemoveEmptyLines;
     FList.Sort(Func);
-    ActionAddFakeLineIfNeeded;
+    if bWasFakeLine then
+      ActionAddFakeLineIfNeeded;
   end
   else
     FList.SortRange(AFrom, ATo, Func);
-
-  if not bFakeLine then
-    ActionDeleteFakeLineAndFinalEol;
 
   EnableCachedWrapinfoUpdate:= false;
   ChangeLineStates(AFrom, ATo);
