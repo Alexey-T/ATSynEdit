@@ -100,7 +100,7 @@ end;
 
 class function TATHtmlColorParser.ColorToHtmlString(Color: TColor): string;
 const
-  SHexDigits: PAnsiChar = '0123456789ABCDEF';
+  SHexDigits: PChar = '0123456789ABCDEF';
 var
   N: Longint;
   r, g, b: byte;
