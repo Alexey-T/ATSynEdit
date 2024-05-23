@@ -102,14 +102,19 @@ end;
 class function TATHtmlColorParser.ColorToHtmlString(Color: TColor): string;
 var
   N: Longint;
+  S_r, S_g, S_b: string[2];
 begin
   if Color=clNone then
     exit('');
   N:= ColorToRGB(Color);
-  Result:= '#'+
-    IntToHex(Red(N), 2)+
-    IntToHex(Green(N), 2)+
-    IntToHex(Blue(N), 2);
+  S_r:= IntToHex(Red(N));
+  S_g:= IntToHex(Green(N));
+  S_b:= IntToHex(Blue(N));
+  SetLength(Result, 7); // #rrggbb
+  Result[1]:= '#';
+  Move(S_r[1], Result[2], 2);
+  Move(S_g[1], Result[4], 2);
+  Move(S_b[1], Result[6], 2);
 end;
 
 class function TATHtmlColorParser.ParseTokenRGB(S: TPChar; out Len: integer; Default: TColor): TColor;
