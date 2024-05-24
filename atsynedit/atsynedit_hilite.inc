@@ -350,6 +350,7 @@ begin
       AChosenEnum:= TATEditorChosenBackColor.MarkedRangeBG;
     end;
 
+  //Colors.CurrentLineBG should be assigned _after_ Colors.MarkedLinesBG
   if AUseColorOfCurrentLine then
   begin
     AColor:= Colors.CurrentLineBG;
