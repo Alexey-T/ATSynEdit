@@ -343,6 +343,13 @@ begin
   AChosenEnum:= TATEditorChosenBackColor.None;
   St:= Strings;
 
+  if DoGetMarkedLines(NMarkedLine1, NMarkedLine2) then
+    if (ALine>=NMarkedLine1) and (ALine<=NMarkedLine2) then
+    begin
+      AColor:= Colors.MarkedLinesBG;
+      AChosenEnum:= TATEditorChosenBackColor.MarkedRangeBG;
+    end;
+
   if AUseColorOfCurrentLine then
   begin
     AColor:= Colors.CurrentLineBG;
@@ -378,13 +385,6 @@ begin
       end;
     end;
   end;
-
-  if DoGetMarkedLines(NMarkedLine1, NMarkedLine2) then
-    if (ALine>=NMarkedLine1) and (ALine<=NMarkedLine2) then
-    begin
-      AColor:= Colors.MarkedLinesBG;
-      AChosenEnum:= TATEditorChosenBackColor.MarkedRangeBG;
-    end;
 
   AColorForced:= AColor<>clNone;
   if not AColorForced then
