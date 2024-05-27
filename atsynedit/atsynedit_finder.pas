@@ -13,7 +13,7 @@ interface
 uses
   SysUtils, Classes, Graphics,
   LCLType,
-  Dialogs, Forms, Math, Character,
+  Forms, Math, Character,
   ATSynEdit,
   ATSynEdit_FGL,
   ATSynEdit_RegExpr, //must be with {$define Unicode}
@@ -230,7 +230,7 @@ type
     //fragments
     procedure DoFragmentsClear;
     procedure DoFragmentsInit;
-    procedure DoFragmentsShow;
+    function DoFragmentsShow: string;
     procedure SetFragmentIndex(AValue: integer);
     function GetFragmentsTouched: boolean;
     procedure UpdateFragments;
@@ -2094,7 +2094,7 @@ begin
       DoOnFound(true);
   end
   else
-    ShowMessage('Error: Finder.FindMatch called for non-regex');
+    raise Exception.Create('Finder.FindMatch_Regex called for non-regex');
 end;
 
 procedure TATEditorFinder.DoOnFound(AWithEvent: boolean);
@@ -2139,7 +2139,7 @@ begin
   //DoFragmentsShow;
 end;
 
-procedure TATEditorFinder.DoFragmentsShow;
+function TATEditorFinder.DoFragmentsShow: string;
 var
   Fr: TATEditorFragment;
   S: string;
@@ -2152,7 +2152,7 @@ begin
     S:= S +
       Format(#10'--[%d:%d .. %d:%d]-----'#10, [Fr.Y1, Fr.X1, Fr.Y2, Fr.X2]);
   end;
-  ShowMessage(S);
+  Result:= S;
 end;
 
 procedure TATEditorFinder.DoFragmentsClear;
