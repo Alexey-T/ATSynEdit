@@ -2088,7 +2088,7 @@ begin
 
   if OptRegex then
   begin
-    NPos:= Max(1, AStartPos);
+    NPos:= Max(0, AStartPos);
     Result:= DoFind_Regex(NPos);
     if Result then
       DoOnFound(true);

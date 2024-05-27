@@ -6866,10 +6866,10 @@ begin
         TempMatchPos := MatchPos[0];
         TempMatchLen := MatchLen[0];
         // don't accept match which equals to prev match
-        if (TempMatchPos = AOffset) and (Ptr > fInputStart) then
+        if (TempMatchPos - 1 = AOffset) {and (Ptr > fInputStart)} then
           Continue;
         // don't accept match which overlaps prev match
-        if (TempMatchPos + TempMatchLen -1 > AOffset) then
+        if (TempMatchPos + TempMatchLen - 1 > AOffset) then
           Continue;
         Result := True;
         Exit;
