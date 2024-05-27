@@ -6777,7 +6777,7 @@ begin
   // Check that the start position is not longer than the line
   if AOffset > Len - FMinMatchLen + 1 then
     if ABackward then
-      AOffset := Len - FMinMatchLen + 1
+      AOffset := Len - FMinMatchLen + 2
     else
       Exit;
 
