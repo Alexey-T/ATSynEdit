@@ -6775,9 +6775,11 @@ begin
       Exit;
 
   // Check that the start position is not longer than the line
-  if (AOffset - 1) > Len - FMinMatchLen then
-    Exit;
-
+  if AOffset > Len - FMinMatchLen + 1 then
+    if ABackward then
+      AOffset := Len - FMinMatchLen + 1
+    else
+      Exit;
 
   // If there is a "must appear" string, look for it.
   if ASlowChecks then
@@ -6819,6 +6821,7 @@ function TRegExpr.ExecPrimProtected(AOffset: Integer; ASlowChecks,
   ABackward: Boolean; ATryMatchOnlyStartingBefore: Integer): Boolean;
 var
   Ptr, SearchEnd: PRegExprChar;
+  TempMatchPos, TempMatchLen: Integer;
 begin
   Result := False;
   Ptr := fInputStart + AOffset - 1;
@@ -6845,7 +6848,7 @@ begin
 
   // Messy cases: unanchored match.
   if ABackward then begin
-    Inc(Ptr, 2);
+    Inc(Ptr);
     repeat
       Dec(Ptr);
       if Ptr < fInputStart then
@@ -6859,10 +6862,18 @@ begin
           Continue;
       {$ENDIF}
 
-      Result := MatchAtOnePos(Ptr);
-      // Exit on a match or after testing the end-of-string
-      if Result then
+      if MatchAtOnePos(Ptr) then begin
+        TempMatchPos := MatchPos[0];
+        TempMatchLen := MatchLen[0];
+        // don't accept match which equals to prev match
+        if (TempMatchPos = AOffset) and (Ptr > fInputStart) then
+          Continue;
+        // don't accept match which overlaps prev match
+        if (TempMatchPos + TempMatchLen -1 > AOffset) then
+          Continue;
+        Result := True;
         Exit;
+      end;
     until False;
   end
   else begin

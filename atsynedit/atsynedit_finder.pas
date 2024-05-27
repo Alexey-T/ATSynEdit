@@ -1143,7 +1143,7 @@ begin
   if OptBack then
   begin
     if OptRegex then
-      NDelta:= 2
+      NDelta:= 1
     else
       NDelta:= Length(StrFind);
     Dec(Result, NDelta);
@@ -1444,7 +1444,7 @@ begin
   if OptBack then
     Result:= Length(StrText)
   else
-    Result:= 1;
+    Result:= 0;
 end;
 
 procedure TATEditorFinder.DoFixCaretSelectionDirection;
