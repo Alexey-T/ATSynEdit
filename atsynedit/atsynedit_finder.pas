@@ -1832,13 +1832,13 @@ begin
   UpdateBuffer;
 
   NStartPos:= GetOffsetStartPos;
-  if (NStartPos<1) and OptBack then
+  if (NStartPos<0) and OptBack then
     Result:= false
   else
     Result:= DoFindOrReplace_Buffered_Internal(AReplace, AForMany, AChanged, NStartPos, AUpdateCaret);
 
   if not OptBack then
-    bStartAtEdge:= NStartPos<=1
+    bStartAtEdge:= NStartPos<=0
   else
     bStartAtEdge:= NStartPos>=Length(StrText);
 

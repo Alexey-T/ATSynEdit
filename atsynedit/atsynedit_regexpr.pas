@@ -6626,7 +6626,11 @@ begin
     Exit;
   end;
   if ATryOnce then
-    Result := ExecPrim(AOffset, False, ABackward, AOffset + 1)
+  begin
+    if not ABackward then
+      Inc(AOffset);
+    Result := ExecPrim(AOffset, False, ABackward, AOffset)
+  end
   else
     Result := ExecPrim(AOffset, False, ABackward, 0);
 end;
