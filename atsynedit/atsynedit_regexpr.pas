@@ -6820,7 +6820,7 @@ end;
 function TRegExpr.ExecPrimProtected(AOffset: Integer; ASlowChecks,
   ABackward: Boolean; ATryMatchOnlyStartingBefore: Integer): Boolean;
 var
-  Ptr, SearchEnd: PRegExprChar;
+  Ptr, PtrPrev, SearchEnd: PRegExprChar;
   TempMatchPos, TempMatchLen: Integer;
 begin
   Result := False;
@@ -6871,6 +6871,21 @@ begin
         // don't accept match which overlaps prev match
         if (TempMatchPos + TempMatchLen - 1 > AOffset) then
           Continue;
+
+        // do we have surrounding match at prev pos for regex 'w+'? take it.
+        PtrPrev := Ptr;
+        repeat
+          if (PtrPrev = fInputStart) then Break;
+          Dec(PtrPrev);
+          if MatchAtOnePos(PtrPrev) and (MatchPos[0] + MatchLen[0] = TempMatchPos + TempMatchLen) then
+            Ptr := PtrPrev
+          else
+          begin
+            MatchAtOnePos(Ptr); // to restore MatchPos[], MatchLen[]
+            Break;
+          end;
+        until False;
+
         Result := True;
         Exit;
       end;
