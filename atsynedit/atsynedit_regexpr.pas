@@ -6587,7 +6587,7 @@ end; { of function TRegExpr.Exec
 function TRegExpr.Exec(AOffset: Integer): Boolean;
 begin
   // Check that the start position is not negative
-  if AOffset < 1 then
+  if AOffset < 0 then
   begin
     ClearMatches;
     Error(reeOffsetMustBePositive);
@@ -6602,7 +6602,7 @@ end; { of function TRegExpr.Exec
 function TRegExpr.ExecPos(AOffset: Integer {$IFDEF DefParam} = 1{$ENDIF}): Boolean;
 begin
   // Check that the start position is not negative
-  if AOffset < 1 then
+  if AOffset < 0 then
   begin
     ClearMatches;
     Error(reeOffsetMustBePositive);
@@ -6617,7 +6617,7 @@ end; { of function TRegExpr.ExecPos
 function TRegExpr.ExecPos(AOffset: Integer; ATryOnce, ABackward: Boolean): Boolean;
 begin
   // Check that the start position is not negative
-  if AOffset < 1 then
+  if AOffset < 0 then
   begin
     ClearMatches;
     Error(reeOffsetMustBePositive);
@@ -6637,7 +6637,7 @@ end;
 function TRegExpr.ExecPos(AOffset, ATryMatchOnlyStartingBefore: Integer): Boolean;
 begin
   // Check that the start position is not negative
-  if AOffset < 1 then
+  if AOffset < 0 then
   begin
     ClearMatches;
     Error(reeOffsetMustBePositive);
@@ -8584,7 +8584,7 @@ end; { of procedure TRegExpr.Error
 function TRegExpr.ExecPos(AOffset: Integer; ATryOnce: Boolean): Boolean; overload;
 begin
   // Check that the start position is not negative
-  if AOffset < 1 then
+  if AOffset < 0 then
   begin
     ClearMatches;
     Error(reeOffsetMustBePositive);
