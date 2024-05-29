@@ -671,7 +671,7 @@ type
 
     // find match for InputString starting from AOffset position
     // (AOffset=1 - first char of InputString)
-    function ExecPos(AOffset: Integer {$IFDEF DefParam} = 1{$ENDIF}): Boolean;
+    function ExecPos(AOffset: Integer {$IFDEF DefParam} = 0{$ENDIF}): Boolean;
     {$IFDEF OverMeth}overload;{$endif} {$IFDEF InlineFuncs}inline;{$ENDIF}
 
     {$IFDEF OverMeth}
@@ -6599,7 +6599,7 @@ end; { of function TRegExpr.Exec
   -------------------------------------------------------------- }
 {$ENDIF}
 
-function TRegExpr.ExecPos(AOffset: Integer {$IFDEF DefParam} = 1{$ENDIF}): Boolean;
+function TRegExpr.ExecPos(AOffset: Integer {$IFDEF DefParam} = 0{$ENDIF}): Boolean;
 begin
   // Check that the start position is not negative
   if AOffset < 0 then
