@@ -1,5 +1,5 @@
 
-https://Alexey-T@github.com/Alexey-T/EControl.git
+https://test@github.com/Alexey-T/EControl.git
 http://test.my.domain.com:2100/integrator/services/WebService?WSDL
 https://custom.domain.com/docs/display/project/Main+Docs%20and%23%and#some-link
 http://dd.dd/~mmm20/test.c
@@ -19,13 +19,39 @@ http://userbase.kde.org/index.php?title=Special&www=wwww
 http://www.die-partei.de/?start=0
 
 https://vnotex.github.io/vnote/zh_cn/#!docs/%E5%BC%80%E5%8F%91%E8%80%85/%E6%9E%84%E5%BB%BAVNote.md
-www.com#AA_DD_%20_%30
-
 https://en.wikipedia.org/wiki/Flip-flop_(electronics)#Master%E2%80%93slave_edge-triggered_D_flip-flop
 
 https://wiki.freepascal.org/CudaText#Linux:_Qt5_and_Qt6_builds
 https://kx.studio/Applications:Catia
 
 ---
-tests which must not catch too many chars into URL
-Here is a [](https://example.com){_attr="value"}.
+tests which must not catch too many chars into URL:
+
+[](https://example.com){_attr="value"}
+[kdotool](https://github.com/jinliu/kdotool/releases/latest/).
+httpChannel.setRequestHeader('Referer', 'https://www.google.com.br/', false);
+
+---
+https://example.com/?ok
+https://example.com/?ok, <- shouldn't be included in URL
+https://example.com/?ok+
+https://example.com/?ok; <- shouldn't be included in URL
+https://example.com/?ok* (VSCode includes) (Sublime includes)
+https://example.com/?ok/
+https://example.com/?ok1
+https://example.com/?ok-
+https://example.com/?ok_ (Markdown doesn't include)
+https://example.com/?ok) <- shouldn't be included in URL
+https://example.com/?ok}
+https://example.com/?ok]
+https://example.com/?ok` <- shouldn't be included in URL (Markdown includes)
+https://example.com/?ok' <- shouldn't be included in URL
+https://example.com/?ok" <- shouldn't be included in URL
+https://example.com/?ok“ (VScode includes)
+https://example.com/?ok” (VScode includes)
+https://example.com/?ok’ (VScode includes)
+https://example.com/?ok‘ (VScode includes)
+https://example.com/?ok? (VSCode includes)
+https://example.com/?ok! (VSCode includes)
+https://example.com/?ok. <- shouldn't be included in URL
+https://example.com/?ok> <- shouldn't be included in URL

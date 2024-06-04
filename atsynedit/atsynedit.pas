@@ -566,11 +566,16 @@ type
     cUrlRegex_WebBegin = '\b(https?://|ftp://)';
     cUrlRegex_WebSite = '\w[\w\-\.@]*(:\d+)?'; // @ for password; :\d+ is port
     cUrlRegex_WebAnchor = '(\#[\w\-\./%:!]*)?';
-    cUrlRegex_WebParams = '(\?\S*[\w/\-\+])?';
+    cUrlRegex_WebParams = '(\?\S*[\w/\-\+\*])?';
+    cUrlRegex_WebFolder =
+      '[~\w\.\-\+/%@!%:&\*=\(\[\{\|,;\$]' + //always allowed chars
+      '|([\)\]\}''"`](?![\x20\x09\x0A\x0D.,;:]))' + //chars allowed only if not followed by a delimiter
+      '|\(.*?\)'; //brackets pair
+
     cUrlRegex_Web =
       cUrlRegex_WebBegin
       + cUrlRegex_WebSite
-      + '(/([~\w\.\-\+/%@!%:&\*=\(\)\[\]\{\}\|,;''"`\$]|\(.*?\))*)?' //folders
+      + '(/(' + cUrlRegex_WebFolder + ')*)?'
       + cUrlRegex_WebParams
       + cUrlRegex_WebAnchor;
     cUrlRegexInitial = cUrlRegex_Email + '|' + cUrlRegex_Web;
