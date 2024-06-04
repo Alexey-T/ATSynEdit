@@ -28,8 +28,8 @@ https://kx.studio/Applications:Catia
 tests which must not catch too many chars into URL:
 
 [](https://example.com){_attr="value"}
-[kdotool](https://github.com/jinliu/kdotool/releases/latest/).
-httpChannel.setRequestHeader('Referer', 'https://www.google.com.br/', false);
+[ttt](https://github.com/ttt/ttt/releases/latest/).
+setRequestHeader('Referer', 'https://www.com/', false);
 
 ---
 https://example.com/?ok
