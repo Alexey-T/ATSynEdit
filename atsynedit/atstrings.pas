@@ -193,7 +193,7 @@ type
     FGutterDecor2: TATGutterDecor;
     FUndoList,
     FRedoList: TATUndoList;
-    FUndoOrRedo: TATEditorRunningUndoOrRedo;
+    FRunningUndoOrRedo: TATEditorRunningUndoOrRedo;
     FCommandCode: integer;
     FUndoLimit: integer;
     FEndings: TATLineEnds;
@@ -1294,7 +1294,7 @@ begin
   FUndoLimit:= AUndoLimit;
   FUndoList:= TATUndoList.Create(FUndoLimit);
   FRedoList:= TATUndoList.Create(FUndoLimit);
-  FUndoOrRedo:= TATEditorRunningUndoOrRedo.NotUndoRedo;
+  FRunningUndoOrRedo:= TATEditorRunningUndoOrRedo.NotUndoRedo;
   FGaps:= TATGaps.Create;
   FBookmarks:= TATBookmarks.Create;
   FBookmarks2:= TATBookmarks.Create;
@@ -2080,7 +2080,7 @@ begin
             CurMarkersArray,
             CurAttribsArray,
             ACommandCode,
-            FUndoOrRedo
+            FRunningUndoOrRedo
             );
         end;
     end;
@@ -2216,7 +2216,7 @@ begin
     GetMarkersArray,
     GetAttribsArray,
     ACommandCode,
-    FUndoOrRedo
+    FRunningUndoOrRedo
     );
 end;
 
@@ -2235,11 +2235,11 @@ begin
   if not Assigned(FUndoList) then Exit;
   if not Assigned(FRedoList) then Exit;
 
-  PrevUndoOrRedo:= FUndoOrRedo;
+  PrevUndoOrRedo:= FRunningUndoOrRedo;
   if AUndo then
-    FUndoOrRedo:= TATEditorRunningUndoOrRedo.Undo
+    FRunningUndoOrRedo:= TATEditorRunningUndoOrRedo.Undo
   else
-    FUndoOrRedo:= TATEditorRunningUndoOrRedo.Redo;
+    FRunningUndoOrRedo:= TATEditorRunningUndoOrRedo.Redo;
 
   if AUndo then
   begin
@@ -2330,7 +2330,7 @@ begin
   if bSoftMarked then
     List.SoftMark:= true;
 
-  FUndoOrRedo:= PrevUndoOrRedo;
+  FRunningUndoOrRedo:= PrevUndoOrRedo;
 end;
 
 procedure TATStrings.ClearUndo(ALocked: boolean = false);
