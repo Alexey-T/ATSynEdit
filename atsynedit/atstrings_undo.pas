@@ -37,6 +37,10 @@ const
     true
     );
 
+var
+  ATStrings_PauseForUndoGroup: integer = 400;
+  //if pause (in msec) between 2 actions is smaller, actions will be undone as a group
+
 type
   { TATUndoItem }
 
@@ -90,7 +94,6 @@ type
     FSoftMark: boolean;
     FHardMark: boolean;
     FLastTick: QWord;
-    FPauseForMakingGroup: integer;
     FNewCommandMark: boolean;
     function GetAsString: string;
     function GetItem(N: integer): TATUndoItem;
@@ -107,7 +110,6 @@ type
     property SoftMark: boolean read FSoftMark write FSoftMark;
     property HardMark: boolean read FHardMark write FHardMark;
     property Locked: boolean read FLocked write FLocked;
-    property PauseForMakingGroup: integer read FPauseForMakingGroup write FPauseForMakingGroup;
     procedure Clear;
     procedure Delete(N: integer);
     procedure DeleteLast;
@@ -279,7 +281,6 @@ begin
   FSoftMark:= false;
   FHardMark:= false;
   FLocked:= false;
-  FPauseForMakingGroup:= 1500;
 end;
 
 destructor TATUndoList.Destroy;
@@ -386,7 +387,7 @@ begin
     if (Item.ItemAction=aeaInsert) and
       (Item.ItemIndex=AIndex) and
       (Item.ItemCommandCode=ACommandCode) and
-      (GetTickCount64-Item.ItemTickCount<FPauseForMakingGroup) then
+      (GetTickCount64-Item.ItemTickCount<ATStrings_PauseForUndoGroup) then
       begin
         DeleteLast;
         Exit
@@ -395,7 +396,7 @@ begin
   }
 
   NewTick:= GetTickCount64;
-  if (FLastTick>0) and (NewTick-FLastTick>=FPauseForMakingGroup) then
+  if (FLastTick>0) and (NewTick-FLastTick>=ATStrings_PauseForUndoGroup) then
     FSoftMark:= true;
   FLastTick:= NewTick;
 

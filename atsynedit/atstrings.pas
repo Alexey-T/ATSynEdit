@@ -2297,7 +2297,7 @@ begin
       begin
         LastItem:= List.Last;
         if LastItem.ItemCommandCode=NCommandCode then
-          if Abs(Int64(LastItem.ItemTickCount)-Int64(NTickCount))<List.PauseForMakingGroup then
+          if Abs(Int64(LastItem.ItemTickCount)-Int64(NTickCount))<ATStrings_PauseForUndoGroup then
             Continue;
       end;
 

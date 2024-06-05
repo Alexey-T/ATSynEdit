@@ -1,3 +1,6 @@
+2024.06.05
++ add: global var ATStrings_PauseForUndoGroup (400 msec)
+
 2024.04.25
 + add: finder: prop OptDisableOnProgress
 
