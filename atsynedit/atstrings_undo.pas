@@ -26,6 +26,12 @@ type
     Add
     );
 
+  TATEditorRunningUndoOrRedo = (
+    Normal,
+    Undo,
+    Redo
+    );
+
 const
   cEditAction_CachedWrapinfoUpdate: array[TATEditAction] of boolean = (
     true,
@@ -38,7 +44,7 @@ const
     );
 
 var
-  ATStrings_PauseForUndoGroup: integer = 300;
+  ATStrings_PauseForUndoGroup: integer = 700;
   //if pause (in msec) between 2 actions is smaller, actions will be undone as a group
 
 type
@@ -120,7 +126,8 @@ type
       const ACarets: TATPointArray;
       const AMarkers: TATMarkerMarkerArray;
       const AAttribs: TATMarkerAttribArray;
-      ACommandCode: integer);
+      ACommandCode: integer;
+      AUndoOrRedo: TATEditorRunningUndoOrRedo);
     procedure AddUnmodifiedMark;
     function DebugText: string;
     function IsEmpty: boolean;
@@ -343,7 +350,8 @@ procedure TATUndoList.Add(AAction: TATEditAction; AIndex: integer;
   const ACarets: TATPointArray;
   const AMarkers: TATMarkerMarkerArray;
   const AAttribs: TATMarkerAttribArray;
-  ACommandCode: integer);
+  ACommandCode: integer;
+  AUndoOrRedo: TATEditorRunningUndoOrRedo);
 var
   Item: TATUndoItem;
   NewTick: QWord;
@@ -395,9 +403,18 @@ begin
   end;
   }
 
-  NewTick:= GetTickCount64;
-  if (FLastTick>0) and (NewTick-FLastTick>=ATStrings_PauseForUndoGroup) then
-    FSoftMark:= true;
+  //don't save TickCount if we are running Undo/Redo
+  if AUndoOrRedo=TATEditorRunningUndoOrRedo.Normal then
+  begin
+    NewTick:= GetTickCount64;
+    if (FLastTick>0) and (NewTick-FLastTick>=ATStrings_PauseForUndoGroup) then
+      FSoftMark:= true;
+  end
+  else
+  begin
+    NewTick:= 0;
+  end;
+
   FLastTick:= NewTick;
 
   Item:= TATUndoItem.Create(AAction, AIndex, AText, AEnd, ALineState,

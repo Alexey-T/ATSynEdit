@@ -193,6 +193,7 @@ type
     FGutterDecor2: TATGutterDecor;
     FUndoList,
     FRedoList: TATUndoList;
+    FUndoOrRedo: TATEditorRunningUndoOrRedo;
     FCommandCode: integer;
     FUndoLimit: integer;
     FEndings: TATLineEnds;
@@ -1293,6 +1294,7 @@ begin
   FUndoLimit:= AUndoLimit;
   FUndoList:= TATUndoList.Create(FUndoLimit);
   FRedoList:= TATUndoList.Create(FUndoLimit);
+  FUndoOrRedo:= TATEditorRunningUndoOrRedo.Normal;
   FGaps:= TATGaps.Create;
   FBookmarks:= TATBookmarks.Create;
   FBookmarks2:= TATBookmarks.Create;
@@ -2077,7 +2079,8 @@ begin
             CurCaretsArray,
             CurMarkersArray,
             CurAttribsArray,
-            ACommandCode
+            ACommandCode,
+            FUndoOrRedo
             );
         end;
     end;
@@ -2212,7 +2215,8 @@ begin
     GetCaretsArray,
     GetMarkersArray,
     GetAttribsArray,
-    ACommandCode
+    ACommandCode,
+    FUndoOrRedo
     );
 end;
 
@@ -2226,9 +2230,16 @@ var
   bMarkedUnmodified: boolean;
   NCommandCode: integer;
   NTickCount: QWord;
+  PrevUndoOrRedo: TATEditorRunningUndoOrRedo;
 begin
   if not Assigned(FUndoList) then Exit;
   if not Assigned(FRedoList) then Exit;
+
+  PrevUndoOrRedo:= FUndoOrRedo;
+  if AUndo then
+    FUndoOrRedo:= TATEditorRunningUndoOrRedo.Undo
+  else
+    FUndoOrRedo:= TATEditorRunningUndoOrRedo.Redo;
 
   if AUndo then
   begin
@@ -2292,8 +2303,8 @@ begin
       Break;
 
     //make commands with non-zero ItemCommandCode grouped (ie 'move lines up/down')
-    if NCommandCode<>0 then
-      if List.Count>0 then
+    if (NCommandCode<>0) and
+      (NTickCount>0) and (List.Count>0) then
       begin
         LastItem:= List.Last;
         if LastItem.ItemCommandCode=NCommandCode then
@@ -2318,6 +2329,8 @@ begin
   // https://github.com/Alexey-T/CudaText/issues/3274#issuecomment-810522418
   if bSoftMarked then
     List.SoftMark:= true;
+
+  FUndoOrRedo:= PrevUndoOrRedo;
 end;
 
 procedure TATStrings.ClearUndo(ALocked: boolean = false);
