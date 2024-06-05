@@ -27,7 +27,7 @@ type
     );
 
   TATEditorRunningUndoOrRedo = (
-    Normal,
+    NoUndoNorRedo,
     Undo,
     Redo
     );
@@ -404,7 +404,7 @@ begin
   }
 
   //don't save TickCount if we are running Undo/Redo
-  if AUndoOrRedo=TATEditorRunningUndoOrRedo.Normal then
+  if AUndoOrRedo=TATEditorRunningUndoOrRedo.NoUndoNorRedo then
   begin
     NewTick:= GetTickCount64;
     if (FLastTick>0) and (NewTick-FLastTick>=ATStrings_PauseForUndoGroup) then

@@ -1294,7 +1294,7 @@ begin
   FUndoLimit:= AUndoLimit;
   FUndoList:= TATUndoList.Create(FUndoLimit);
   FRedoList:= TATUndoList.Create(FUndoLimit);
-  FUndoOrRedo:= TATEditorRunningUndoOrRedo.Normal;
+  FUndoOrRedo:= TATEditorRunningUndoOrRedo.NoUndoNorRedo;
   FGaps:= TATGaps.Create;
   FBookmarks:= TATBookmarks.Create;
   FBookmarks2:= TATBookmarks.Create;
