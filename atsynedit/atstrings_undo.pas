@@ -38,7 +38,7 @@ const
     );
 
 var
-  ATStrings_PauseForUndoGroup: integer = 400;
+  ATStrings_PauseForUndoGroup: integer = 300;
   //if pause (in msec) between 2 actions is smaller, actions will be undone as a group
 
 type
