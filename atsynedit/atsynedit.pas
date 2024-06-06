@@ -3520,7 +3520,9 @@ begin
     {$endif}
   end;
 
+  //UpdateLinksAttribs takes 0-1 ms on maximized window on notebook HP Pavilion g6, no need to optimize it more
   UpdateLinksAttribs(ALineFrom);
+
   DoPaintText(C, FRectMain, FCharSize, FOptGutterVisible, FScrollHorz, FScrollVert, NWrapIndex);
   DoPaintMargins(C);
   DoPaintNiceScroll(C);
