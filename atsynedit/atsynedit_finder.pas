@@ -1390,6 +1390,7 @@ begin
     end;
 
     FlushBufferLine;
+    FReplacedAtLine:= Min(FReplacedAtLine, PosBegin.Y);
 
   finally
     FreeAndNil(L);
