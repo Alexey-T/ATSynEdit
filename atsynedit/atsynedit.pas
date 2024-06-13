@@ -4009,8 +4009,7 @@ begin
   bTrimmedNonSpaces:= false;
 
   NLineLen:= St.LinesLen[NLinesIndex];
-  bLineHuge:= WrapItem.NLength>ATEditorOptions.MaxLineLenForAccurateCharWidths;
-          //not this: NLineLen>OptMaxLineLenForAccurateCharWidths;
+  bLineHuge:= WrapItem.NLength>cMaxFixedArray;
 
   if not bLineHuge then
   begin

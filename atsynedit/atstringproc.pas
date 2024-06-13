@@ -97,7 +97,8 @@ type
   TATMarkerAttribArray = array of TATMarkerAttribRecord;
 
 const
-  //must be >= ATEditorOptions.MaxLineLenForAccurateCharWidths
+  //if line is longer - all line chars will be rendered in normal-width (100%) cells
+  //so all CJK chars (width 190%) will overlap by design
   cMaxFixedArray = 1024;
 
 type
@@ -656,7 +657,7 @@ begin
   if Assigned(OnCalcTabSize) then
     Result:= OnCalcTabSize(SenderObj, ALineIndex, APos)
   else
-  if Assigned(OnCalcLineLen) and (ALineIndex>=0) and (OnCalcLineLen(ALineIndex)>ATEditorOptions.MaxLineLenForAccurateCharWidths) then
+  if Assigned(OnCalcLineLen) and (ALineIndex>=0) and (OnCalcLineLen(ALineIndex)>cMaxFixedArray) then
     Result:= 1
   else
   if APos>ATEditorOptions.MaxTabPositionToExpand then
@@ -733,14 +734,14 @@ begin
   AInfo.Len:= NLen;
   if NLen=0 then Exit;
 
-  NCharsSkipped:= ACharsSkipped;
-
-  if NLen>ATEditorOptions.MaxLineLenForAccurateCharWidths then
+  if Length(S)>cMaxFixedArray then
   begin
     for i:= 0 to NLen-1 do
       AInfo.Data[i]:= (Int64(i)+1)*100;
     exit;
   end;
+
+  NCharsSkipped:= ACharsSkipped;
 
   for i:= 1 to NLen do
   begin
@@ -783,7 +784,7 @@ begin
   NLen:= Length(S);
   if NLen=0 then Exit;
 
-  if NLen>ATEditorOptions.MaxLineLenForAccurateCharWidths then
+  if NLen>cMaxFixedArray then
     exit(NLen*100);
 
   NCharsSkipped:= ACharsSkipped;

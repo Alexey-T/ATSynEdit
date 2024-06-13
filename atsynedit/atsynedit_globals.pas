@@ -114,7 +114,6 @@ type
     MinWordWrapOffset: integer;
     PunctuationToWrapWithWords: UnicodeString;
     MaxLineLenForUndo: integer;
-    MaxLineLenForAccurateCharWidths: integer; //must be <= cMaxFixedArray
     TextoutNeedsOffsets: boolean;
     CaretTextOverInvertedRect: boolean;
     EnableLigaturesOnLineWithCaret: boolean;
@@ -433,7 +432,6 @@ initialization
     MinWordWrapOffset:= 3;
     PunctuationToWrapWithWords:= '.,;:''"`~?!&%$()[]';
     MaxLineLenForUndo:= 100*1024;
-    MaxLineLenForAccurateCharWidths:= 1024;
 
     //Win: seems no slowdown from offsets
     //macOS: better to use True, fonts have floating width value, e.g. 10.2 pixels
