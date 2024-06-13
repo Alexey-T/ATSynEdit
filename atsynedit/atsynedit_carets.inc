@@ -262,7 +262,7 @@ begin
 end;
 
 
-function _DoCaretPosToClientPos(
+function GenericCaretPosToClientPos(
   P: TPoint;
   AWrapInfo: TATWrapInfo;
   AStrings: TATStrings;
@@ -379,7 +379,7 @@ begin
 end;
 
 
-function _DoClientPosToCaretPos(
+function GenericClientPosToCaretPos(
   P: TATPoint;
   AWrapInfo: TATWrapInfo;
   AStrings: TATStrings;
@@ -561,7 +561,7 @@ end;
 
 function TATSynEdit.CaretPosToClientPos(const APos: TPoint): TATPoint;
 begin
-  Result:= _DoCaretPosToClientPos(APos,
+  Result:= GenericCaretPosToClientPos(APos,
     WrapInfo,
     Strings,
     Gaps,
@@ -591,7 +591,7 @@ begin
     Dec(APos.X, FScrollHorz.NPixelOffset); //fix for text partially scrolled, #5349
   Dec(APos.Y, FTextOffsetFromTop1);
 
-  Result:= _DoClientPosToCaretPos(APos,
+  Result:= GenericClientPosToCaretPos(APos,
     WrapInfo,
     Strings,
     Gaps,
