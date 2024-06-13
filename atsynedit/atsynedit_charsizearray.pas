@@ -46,14 +46,8 @@ begin
 
   //Cyrillic
   // https://www.compart.com/en/unicode/block/U+0400
-  for i:= $400 to $408 do
+  for i:= $400 to $45A do //Russian is here
     FixedSizes[i]:= uw_normal;
-  for i:= $409 to $40B do
-    FixedSizes[i]:= uw_fullwidth;
-  for i:= $40C to $458 do //Russian is here
-    FixedSizes[i]:= uw_normal;
-  for i:= $459 to $45A do
-    FixedSizes[i]:= uw_fullwidth;
   for i:= $45B to $45F do
     FixedSizes[i]:= uw_normal;
   for i:= $460 to $461 do
