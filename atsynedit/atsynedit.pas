@@ -1802,7 +1802,7 @@ type
       ALine: integer; ACaretToEndOfSel: boolean): boolean;
     function DoSelect_FoldingRangeAtCaret: boolean;
     procedure DoSelect_ClearColumnBlock;
-    procedure DoSelect_ColumnBlock_FromPoints(P1Char, P2Char: TPoint;
+    procedure DoSelect_ColumnBlock_FromPoints(APosChar1, APosChar2: TPoint;
       AUpdateSelRectPoints: boolean=true);
     procedure DoSelect_ColumnBlock_FromPointsColumns(P1, P2: TPoint);
     procedure DoSelect_ColumnBlock_Primitive(P1, P2: TPoint);

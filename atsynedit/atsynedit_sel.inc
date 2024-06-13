@@ -2,6 +2,7 @@
 
 function TATSynEdit.IsPosSelected(AX, AY: integer): boolean;
 var
+  St: TATStrings;
   NPosLeft,
   NPosRight: integer;
 begin
@@ -9,8 +10,9 @@ begin
   begin
     if not ((AY>=FSelRect.Top) and (AY<=FSelRect.Bottom)) then exit(False);
 
-    NPosLeft:= Strings.ColumnPosToCharPos(AY, FSelRect.Left, FTabHelper);
-    NPosRight:= Strings.ColumnPosToCharPos(AY, FSelRect.Right, FTabHelper);
+    St:= Strings;
+    NPosLeft:= St.ColumnPosToCharPos(AY, FSelRect.Left, FTabHelper);
+    NPosRight:= St.ColumnPosToCharPos(AY, FSelRect.Right, FTabHelper);
     Result:= (AX>=NPosLeft) and (AX<NPosRight);
   end
   else
@@ -142,14 +144,16 @@ end;
 
 procedure TATSynEdit.DoSelect_Line(APos: TPoint);
 var
+  St: TATStrings;
   PLast: TPoint;
   NPosX, NPosY, NEndX, NEndY: integer;
 begin
-  if not Strings.IsIndexValid(APos.Y) then Exit;
+  St:= Strings;
+  if not St.IsIndexValid(APos.Y) then Exit;
 
   if FOptMouseClickNumberSelectsLineWithEOL then
   begin
-    if APos.Y<Strings.Count-1 then
+    if APos.Y<St.Count-1 then
     begin
       NPosX:= 0;
       NPosY:= APos.Y+1;
@@ -163,7 +167,7 @@ begin
   end
   else
   begin
-    NPosX:= Strings.LinesLen[APos.Y];
+    NPosX:= St.LinesLen[APos.Y];
     NPosY:= APos.Y;
   end;
 
@@ -530,47 +534,49 @@ begin
     Carets.DoChanged;
 end;
 
-procedure TATSynEdit.DoSelect_ColumnBlock_FromPoints(P1Char, P2Char: TPoint;
+procedure TATSynEdit.DoSelect_ColumnBlock_FromPoints(APosChar1, APosChar2: TPoint;
   AUpdateSelRectPoints: boolean=true);
 var
-  //P1/P2 hold char-pos
-  //P1Col/P2Col hold column-pos
-  P1Col, P2Col: TPoint;
-  PTarget: TPoint;
+  St: TATStrings;
+  //APosChar1/APosChar2 hold char-pos
+  //Pos1Col/Pos2Col hold column-pos
+  Pos1Col, Pos2Col: TPoint;
+  PosTarget: TPoint;
 begin
-  P1Col:= P1Char;
-  P2Col:= P2Char;
-  P1Col.X:= Strings.CharPosToColumnPos(P1Col.Y, P1Col.X, FTabHelper);
-  P2Col.X:= Strings.CharPosToColumnPos(P2Col.Y, P2Col.X, FTabHelper);
+  St:= Strings;
+  Pos1Col:= APosChar1;
+  Pos2Col:= APosChar2;
+  Pos1Col.X:= St.CharPosToColumnPos(Pos1Col.Y, Pos1Col.X, FTabHelper);
+  Pos2Col.X:= St.CharPosToColumnPos(Pos2Col.Y, Pos2Col.X, FTabHelper);
 
   if AUpdateSelRectPoints then
   begin
     FLastCommandMakesColumnSel:= true;
-    FSelRectBegin:= P1Col;
-    FSelRectEnd:= P2Col;
+    FSelRectBegin:= Pos1Col;
+    FSelRectEnd:= Pos2Col;
   end;
 
   if FOptCaretsPrimitiveColumnSelection then
   begin
-    DoSelect_ColumnBlock_Primitive(P1Char, P2Char);
+    DoSelect_ColumnBlock_Primitive(APosChar1, APosChar2);
     exit;
   end;
 
   //setting SelRect must be first, it's used later
-  UpdateSelRectFromPoints(P1Col, P2Col);
+  UpdateSelRectFromPoints(Pos1Col, Pos2Col);
 
   //fix coords
-  PTarget:= P2Col;
-  if P1Col.Y>P2Col.Y then
-    SwapInt(P1Col.Y, P2Col.Y);
+  PosTarget:= Pos2Col;
+  if Pos1Col.Y>Pos2Col.Y then
+    SwapInt(Pos1Col.Y, Pos2Col.Y);
 
   if FOptCaretsAddedToColumnSelection then
-    DoCaretsAddOnColumnBlock(P1Col, P2Col, FSelRect)
+    DoCaretsAddOnColumnBlock(Pos1Col, Pos2Col, FSelRect)
   else
   begin
     //single caret at moving block edge
-    PTarget.X:= Strings.ColumnPosToCharPos(PTarget.Y, PTarget.X, FTabHelper);
-    DoCaretSingle(PTarget.X, PTarget.Y);
+    PosTarget.X:= St.ColumnPosToCharPos(PosTarget.Y, PosTarget.X, FTabHelper);
+    DoCaretSingle(PosTarget.X, PosTarget.Y);
   end;
 end;
 
@@ -597,20 +603,22 @@ end;
 
 procedure TATSynEdit.DoSelect_NormalSelToColumnSel(out ABegin, AEnd: TPoint);
 var
+  St: TATStrings;
   Caret: TATCaretItem;
 begin
+  St:= Strings;
   Caret:= Carets[0];
   if (Caret.EndY>=0) and (Caret.EndX>=0) then
   begin
-    ABegin.X:= Strings.CharPosToColumnPos(Caret.EndY, Caret.EndX, FTabHelper);
+    ABegin.X:= St.CharPosToColumnPos(Caret.EndY, Caret.EndX, FTabHelper);
     ABegin.Y:= Caret.EndY;
 
-    AEnd.X:= Strings.CharPosToColumnPos(Caret.PosY, Caret.PosX, FTabHelper);
+    AEnd.X:= St.CharPosToColumnPos(Caret.PosY, Caret.PosX, FTabHelper);
     AEnd.Y:= Caret.PosY;
   end
   else
   begin
-    ABegin.X:= Strings.CharPosToColumnPos(Caret.PosY, Caret.PosX, FTabHelper);
+    ABegin.X:= St.CharPosToColumnPos(Caret.PosY, Caret.PosX, FTabHelper);
     ABegin.Y:= Caret.PosY;
     AEnd:= ABegin;
   end;
@@ -661,6 +669,7 @@ function TATSynEdit.DoSelect_MultiCaretsLookLikeColumnSelection: boolean;
 //carets are placed vertically,
 //and all multi-selections are single line
 var
+  St: TATStrings;
   Caret0, Caret: TATCaretItem;
   Pnt, PntEnd: TPoint;
   bSel: boolean;
@@ -669,17 +678,18 @@ begin
   Result:= false;
   if not FOptCaretsMultiToColumnSel then exit;
   if Carets.Count<2 then exit;
+  St:= Strings;
 
   Caret0:= Carets[0];
   bSel:= Caret0.EndY>=0;
   //check for single line selection
   if bSel and (Caret0.PosY<>Caret0.EndY) then exit;
   //remember column x
-  Pnt.X:= Strings.CharPosToColumnPos(Caret0.PosY, Caret0.PosX, FTabHelper);
+  Pnt.X:= St.CharPosToColumnPos(Caret0.PosY, Caret0.PosX, FTabHelper);
   Pnt.Y:= Caret0.PosY;
 
   Caret:= Carets[Carets.Count-1];
-  PntEnd.X:= Strings.CharPosToColumnPos(Caret.PosY, Caret.EndX, FTabHelper);
+  PntEnd.X:= St.CharPosToColumnPos(Caret.PosY, Caret.EndX, FTabHelper);
   PntEnd.Y:= Caret.PosY;
   if PntEnd.X<0 then
     PntEnd.X:= Pnt.X;
@@ -692,7 +702,7 @@ begin
     //check for single line selections
     if bSel and (Caret.PosY<>Caret.EndY) then exit;
     //check for vertically (x)
-    if Pnt.X<>Strings.CharPosToColumnPos(Caret.PosY, Caret.PosX, FTabHelper) then exit;
+    if Pnt.X<>St.CharPosToColumnPos(Caret.PosY, Caret.PosX, FTabHelper) then exit;
   end;
 
   //multi-carets look like column sel,
