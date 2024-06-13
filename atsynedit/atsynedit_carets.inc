@@ -585,7 +585,8 @@ end;
 function TATSynEdit.ClientPosToCaretPos(
   APos: TATPoint;
   out ADetails: TATEditorPosDetails;
-  AGapCoordAction: TATEditorGapCoordAction = TATEditorGapCoordAction.ToLineEnd): TPoint;
+  AGapCoordAction: TATEditorGapCoordAction=TATEditorGapCoordAction.ToLineEnd;
+  AColumnSelectionAllowsVirtualPos: boolean=false): TPoint;
 begin
   if FOptScrollSmooth then
     Dec(APos.X, FScrollHorz.NPixelOffset); //fix for text partially scrolled, #5349
@@ -599,7 +600,7 @@ begin
     FRectMain,
     FScrollHorz,
     FScrollVert,
-    FCaretVirtual {or FMouseDownAndColumnSelection}, //don't allow it for column selection, CudaText issue #5551
+    FCaretVirtual or (AColumnSelectionAllowsVirtualPos and FMouseDownAndColumnSelection),
     ADetails,
     AGapCoordAction,
     IsSelRectEmpty,

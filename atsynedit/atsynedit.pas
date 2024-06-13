@@ -1696,7 +1696,8 @@ type
     function CaretPosToClientPos(const APos: TPoint): TATPoint;
     function ClientPosToCaretPos(APos: TATPoint;
       out ADetails: TATEditorPosDetails;
-      AGapCoordAction: TATEditorGapCoordAction=TATEditorGapCoordAction.ToLineEnd): TPoint;
+      AGapCoordAction: TATEditorGapCoordAction=TATEditorGapCoordAction.ToLineEnd;
+      AColumnSelectionAllowsVirtualPos: boolean=false): TPoint;
     function IsLineWithCaret(ALine: integer; ADisableSelected: boolean=false): boolean;
     function OffsetToCaretPos(const APos: integer): TPoint;
     function CaretPosToOffset(const ACaret: TPoint): integer;
@@ -7190,7 +7191,12 @@ var
     if not bPntTextInited then
     begin
       bPntTextInited:= true;
-      PntText:= ClientPosToCaretPos(ATPoint(X, Y), Details);
+      PntText:= ClientPosToCaretPos(
+        ATPoint(X, Y),
+        Details,
+        TATEditorGapCoordAction.ToLineEnd,
+        true
+        );
     end;
   end;
   //
