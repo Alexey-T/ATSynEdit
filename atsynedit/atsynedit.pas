@@ -3540,7 +3540,8 @@ begin
   if FMicromapVisible and not FMicromapOnScrollbar then
     DoPaintMicromap(C);
 
-  if FOptShowMouseSelFrame then
+  //force selection-frame during column selection
+  if FOptShowMouseSelFrame or FMouseDownAndColumnSelection then
     if FMouseDragCoord.X>=0 then
       DoPaintMouseSelFrame(C);
 
@@ -6950,7 +6951,7 @@ begin
   inherited;
   PosCoord:= ATPoint(X, Y);
 
-  if FOptShowMouseSelFrame then
+  if FOptShowMouseSelFrame or FMouseDownAndColumnSelection then
     if FMouseDragCoord.X>=0 then
     begin
       bMovedMinimal:= IsPointsDiffByDelta(PosCoord, FMouseDownCoordOriginal, ATEditorOptions.MouseMoveSmallDelta);
