@@ -7903,7 +7903,7 @@ begin
       DoSelect_LineRange(FMouseDownGutterLineNumber, PCaret);
     end
     else
-    if IsSelRectEmpty then
+    if IsSelRectEmpty and not FMouseDownAndColumnSelection then
     begin
       nIndexCaret:= Carets.IndexOfPosXY(FMouseDownPnt.X, FMouseDownPnt.Y, true);
       if nIndexCaret>=0 then
