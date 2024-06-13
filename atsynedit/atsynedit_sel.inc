@@ -513,14 +513,6 @@ begin
     LineCoord1:= ClientPosToCaretPos(ATPoint(Coord1.X, Y), Details);
     LineCoord2:= ClientPosToCaretPos(ATPoint(Coord2.X, Y), Details);
 
-    if not FCaretVirtual then
-    begin
-      if St.IsIndexValid(LineCoord1.Y) then
-        LineCoord1.X:= Min(LineCoord1.X, St.LinesLen[LineCoord1.Y]);
-      if St.IsIndexValid(LineCoord2.Y) then
-        LineCoord2.X:= Min(LineCoord2.X, St.LinesLen[LineCoord2.Y]);
-    end;
-
     NPosX:= LineCoord2.X;
     NPosY:= LineCoord2.Y;
     NEndX:= LineCoord1.X;
@@ -554,14 +546,6 @@ var
   PosTarget: TPoint;
 begin
   St:= Strings;
-
-  if not FCaretVirtual then
-  begin
-    if St.IsIndexValid(APosChar1.Y) then
-      APosChar1.X:= Min(APosChar1.X, St.LinesLen[APosChar1.Y]);
-    if St.IsIndexValid(APosChar2.Y) then
-      APosChar2.X:= Min(APosChar2.X, St.LinesLen[APosChar2.Y]);
-  end;
 
   Pos1Col:= APosChar1;
   Pos2Col:= APosChar2;

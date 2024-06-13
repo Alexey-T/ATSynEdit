@@ -599,7 +599,7 @@ begin
     FRectMain,
     FScrollHorz,
     FScrollVert,
-    FCaretVirtual or FMouseDownAndColumnSelection,
+    FCaretVirtual {or FMouseDownAndColumnSelection}, //don't allow it for column selection, CudaText issue #5551
     ADetails,
     AGapCoordAction,
     IsSelRectEmpty,
