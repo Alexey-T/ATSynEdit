@@ -7194,8 +7194,8 @@ var
       PntText:= ClientPosToCaretPos(
         ATPoint(X, Y),
         Details,
-        TATEditorGapCoordAction.ToLineEnd,
-        true
+        TATEditorGapCoordAction.ToLineEnd, //default value
+        true //true: for CudaText issue #5551
         );
     end;
   end;
