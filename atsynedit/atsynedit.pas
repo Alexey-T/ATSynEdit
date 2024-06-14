@@ -368,6 +368,7 @@ type
     UnprintedSpaces,
     UnprintedTrailingOnly,
     UnprintedEnds,
+    UnprintedEndsOnlyWraps,
     UnprintedEndDetails,
     SavingTrimSpaces,
     SavingTrimFinalEmptyLines,
@@ -780,6 +781,7 @@ type
     FUnprintedForceTabs,
     FUnprintedEof,
     FUnprintedEnds,
+    FUnprintedEndsOnlyWraps,
     FUnprintedEndsDetails: boolean;
     FPrevModified: boolean;
     FPrevFont: record
@@ -2138,6 +2140,7 @@ type
     property OptUnprintedSpacesAlsoInSelection: boolean read FUnprintedSpacesAlsoInSelection write FUnprintedSpacesAlsoInSelection default false;
     property OptUnprintedForceTabs: boolean read FUnprintedForceTabs write FUnprintedForceTabs default false;
     property OptUnprintedEnds: boolean read FUnprintedEnds write FUnprintedEnds default true;
+    property OptUnprintedEndsOnlyWraps: boolean read FUnprintedEndsOnlyWraps write FUnprintedEndsOnlyWraps default false;
     property OptUnprintedEndsDetails: boolean read FUnprintedEndsDetails write FUnprintedEndsDetails default true;
     property OptUnprintedEof: boolean read FUnprintedEof write FUnprintedEof default true;
     property OptMouseEnableAll: boolean read FOptMouseEnableAll write FOptMouseEnableAll default true;
@@ -4308,7 +4311,7 @@ begin
     end;
 
     //paint EOL mark
-    if FUnprintedVisible and FUnprintedEnds then
+    if FUnprintedVisible and FUnprintedEnds and not FUnprintedEndsOnlyWraps then
       //should UnprintedSpacesOnlyInSelection affect EOL marks? if yes, we need the following "if":
       if (not FUnprintedSpacesOnlyInSelection) or bLineEolSelected then
       begin
@@ -5306,6 +5309,7 @@ begin
   FUnprintedSpacesBothEnds:= false;
   FUnprintedSpacesOnlyInSelection:= false;
   FUnprintedEnds:= true;
+  FUnprintedEndsOnlyWraps:= false;
   FUnprintedEndsDetails:= true;
   FUnprintedEof:= true;
 
