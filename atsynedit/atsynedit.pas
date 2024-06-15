@@ -3972,7 +3972,7 @@ var
   NOutputCharsSkipped: Int64;
   NOutputStrWidth, NOutputMaximalChars: Int64;
   NOutputCellPercentsSkipped: Int64;
-  NOutputTextStart: integer;
+  NCoordTempX: integer;
   NCoordSep: Int64;
   WrapItem: TATWrapItem;
   StringItem: PATStringItem;
@@ -4339,11 +4339,11 @@ begin
       (not FUnprintedSpacesOnlyInSelection or bLineEolSelected) then
       begin
         if ATEditorOptions.UnprintedWrapArrowAtEdge then
-          NOutputTextStart:= ARectLine.Right - ACharSize.XScaled div ATEditorCharXScale - 1
+          NCoordTempX:= ARectLine.Right - ACharSize.XScaled div ATEditorCharXScale - 1
         else
-          NOutputTextStart:= CoordAfterText.X;
+          NCoordTempX:= CoordAfterText.X;
         DoPaintUnprintedWrapMark(C,
-          NOutputTextStart,
+          NCoordTempX,
           CoordAfterText.Y,
           ACharSize,
           Colors.UnprintedFont);
