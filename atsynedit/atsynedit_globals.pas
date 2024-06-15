@@ -96,6 +96,7 @@ type
     UnprintedPilcrowScale: integer;
     UnprintedWrapArrowLength: integer;
     UnprintedWrapArrowWidth: integer;
+    UnprintedWrapArrowAtEdge: boolean;
     UnprintedReplaceSpec: boolean;
     UnprintedReplaceSpecToCode: integer;
     CharSizeProportional: boolean;
@@ -414,6 +415,7 @@ initialization
     UnprintedPilcrowScale:= 80;
     UnprintedWrapArrowLength:= 40;
     UnprintedWrapArrowWidth:= 80;
+    UnprintedWrapArrowAtEdge:= false;
     UnprintedReplaceSpec:= false;
     UnprintedReplaceSpecToCode:= 164;
     CharSizeProportional:= true;

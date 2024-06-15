@@ -4337,11 +4337,17 @@ begin
     //paint wrapped-line-part mark
     if FUnprintedVisible and FUnprintedEnds and
       (not FUnprintedSpacesOnlyInSelection or bLineEolSelected) then
-      DoPaintUnprintedWrapMark(C,
-        CoordAfterText.X,
-        CoordAfterText.Y,
-        ACharSize,
-        Colors.UnprintedFont);
+      begin
+        if ATEditorOptions.UnprintedWrapArrowAtEdge then
+          NOutputTextStart:= ARectLine.Right - ACharSize.XScaled div ATEditorCharXScale - 1
+        else
+          NOutputTextStart:= CoordAfterText.X;
+        DoPaintUnprintedWrapMark(C,
+          NOutputTextStart,
+          CoordAfterText.Y,
+          ACharSize,
+          Colors.UnprintedFont);
+      end;
   end;
 
   //draw collapsed-mark

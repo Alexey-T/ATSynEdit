@@ -1,4 +1,5 @@
-2024.06.14
+2024.06.15
++ add: ATEditorOptions.UnprintedWrapArrowAtEdge (default False)
 + add: prop OptUnprintedEndsOnlyWraps
 
 2024.06.05
