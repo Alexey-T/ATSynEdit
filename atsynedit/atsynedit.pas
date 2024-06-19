@@ -9823,7 +9823,7 @@ begin
     if LinkArrayPtr=nil then
     begin
       Assert(Assigned(FRegexLinks), 'FRegexLinks not inited');
-      FRegexLinks.InputString:= St.Lines[iLine];
+      FRegexLinks.InputString:= St.Lines[iLine]+#10; //add #10 to handle it in regex
 
       LinkIndex:= 0;
       LinkArray:= Default(TATLinkArray);
