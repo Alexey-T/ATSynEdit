@@ -27,10 +27,10 @@ https://kx.studio/Applications:Catia
 ---
 must _not_ catch too many chars:
 
-[](https://example.com){_attr="value"}
-[ttt](https://github.com/ttt/ttt/releases/latest/).
-setRequestHeader('Referer', 'https://www.com/', false);
 <script src="https://a.com/a.js?f=g"></script>
+[](https://a.com){_attr="value"}
+[ttt](https://a.com/t/).
+setRequestHeader('Referer', 'https://www.com/', false);
 
 ---
 https://example.com/?ok
