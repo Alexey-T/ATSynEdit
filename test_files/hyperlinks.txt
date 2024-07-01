@@ -25,11 +25,12 @@ https://wiki.freepascal.org/CudaText#Linux:_Qt5_and_Qt6_builds
 https://kx.studio/Applications:Catia
 
 ---
-tests which must not catch too many chars into URL:
+must _not_ catch too many chars:
 
 [](https://example.com){_attr="value"}
 [ttt](https://github.com/ttt/ttt/releases/latest/).
 setRequestHeader('Referer', 'https://www.com/', false);
+<script src="https://a.com/a.js?f=g"></script>
 
 ---
 https://example.com/?ok
