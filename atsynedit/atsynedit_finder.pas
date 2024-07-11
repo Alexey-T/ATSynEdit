@@ -280,8 +280,11 @@ type
     procedure DoAction_ExtractAll(AWithEvent: boolean; AMatches: TStringList;
       ASorted, ACaseSens: boolean; ADuplicates: TDuplicates);
     function DoAction_ReplaceAll: integer;
-    function DoAction_HighlightAllEditorMatches(AColorBorder: TColor;
-      AStyleBorder: TATLineStyle; ATagValue, AMaxLines: integer): integer;
+    function DoAction_HighlightAllEditorMatches(
+      AColorBorder: TColor;
+      AStyleBorder: TATLineStyle;
+      ATagValue: Int64;
+      AMaxLines: integer): integer;
     //
     property OnFound: TATFinderFound read FOnFound write FOnFound;
     property OnWrapAtEdge: TNotifyEvent read FOnWrapAtEdge write FOnWrapAtEdge;
@@ -2687,7 +2690,9 @@ end;
 
 
 function TATEditorFinder.DoAction_HighlightAllEditorMatches(
-  AColorBorder: TColor; AStyleBorder: TATLineStyle; ATagValue,
+  AColorBorder: TColor;
+  AStyleBorder: TATLineStyle;
+  ATagValue: Int64;
   AMaxLines: integer): integer;
 var
   St: TATStrings;
