@@ -647,11 +647,13 @@ begin
   else
   begin
     SrcBuf:= PChar(Buf);
-    for i:= 1 to NLen do
+    i:= NLen;
+    while i>0 do
     begin
       OtherBuf^:= WideChar(Ord(SrcBuf^));
       Inc(SrcBuf);
       Inc(OtherBuf);
+      Dec(i);
     end;
   end;
 end;
