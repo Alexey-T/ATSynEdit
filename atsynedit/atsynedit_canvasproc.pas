@@ -69,8 +69,8 @@ type
     LineIndex: integer;
     CharIndexInLine: integer;
     CharSize: TATEditorCharSize;
-    CharsSkipped: integer;
-    TrimmedTrailingNonSpaces: boolean;
+    CharsSkipped: integer; //count of chars removed from the line' start, before passing line to renderer
+    TrimmedTrailingNonSpaces: boolean; //lines's trailing non-space chars were removed before passing line to renderer (for speedup for too long line)
     DrawEvent: TATSynEditDrawLineEvent;
     ControlWidth: integer;
     TextOffsetFromLine: integer;
