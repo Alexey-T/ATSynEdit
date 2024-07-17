@@ -63,17 +63,17 @@ const
 type
   TATCanvasTextOutProps = record
     Editor: TObject;
-    HasAsciiNoTabs: boolean;
-    SuperFast: boolean;
+    HasAsciiNoTabs: boolean; //line has only ASCII chars but w/o tab-char
+    SuperFast: boolean; //line is very long so output it in simpler way
     TabHelper: TATStringTabHelper;
     LineIndex: integer;
-    CharIndexInLine: integer;
+    CharIndexInLine: integer; //for part of long wrapped line, this is the char index of part's begin
     CharSize: TATEditorCharSize;
     CharsSkipped: integer; //count of chars removed from the line' start, before passing line to renderer
     TrimmedTrailingNonSpaces: boolean; //lines's trailing non-space chars were removed before passing line to renderer (for speedup for too long line)
     DrawEvent: TATSynEditDrawLineEvent;
-    ControlWidth: integer;
-    TextOffsetFromLine: integer;
+    ControlWidth: integer; //width of editor control, plus small delta to render 2 edge chars
+    TextOffsetFromLine: integer; //Y offset, additional to Y coord of line
     ShowUnprinted: boolean;
     ShowUnprintedSpacesTrailing: boolean;
     ShowUnprintedSpacesBothEnds: boolean;
