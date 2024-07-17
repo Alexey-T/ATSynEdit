@@ -1088,7 +1088,7 @@ begin
     if AProps.ShowUnprintedSpacesBothEnds then
     begin
       NPosFirstChar:= SGetIndentChars(AText);
-      NPosLastChar:= SGetNonSpaceLength(AText)+1;
+      NPosLastChar:= Max(NPosFirstChar, SGetNonSpaceLength(AText))+1;
       //paint leading
       for i:= 1 to NPosFirstChar do
       begin

@@ -620,8 +620,6 @@ function SGetNonSpaceLength(const S: atString): SizeInt;
 begin
   Result:= Length(S);
   while (Result>0) and IsCharSpace(S[Result]) do Dec(Result);
-  if Result=0 then
-    Result:= Length(S);
 end;
 
 procedure SSwapEndianWide(var S: UnicodeString);
