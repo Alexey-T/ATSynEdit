@@ -73,7 +73,7 @@ type
     TrimmedTrailingNonSpaces: boolean; //lines's trailing non-space chars were removed before passing line to renderer (for speedup for too long line)
     DrawEvent: TATSynEditDrawLineEvent;
     ControlWidth: integer; //width of editor control, plus small delta to render 2 edge chars
-    TextOffsetFromLine: integer; //Y offset, additional to Y coord of line
+    TextOffsetFromLine: integer; //Y offset, additional to Y coord of line (to emulate indent of 1st line from top edge)
     ShowUnprinted: boolean;
     ShowUnprintedSpacesTrailing: boolean;
     ShowUnprintedSpacesBothEnds: boolean;
