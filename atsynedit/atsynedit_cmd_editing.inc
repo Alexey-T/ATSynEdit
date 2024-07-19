@@ -1141,6 +1141,7 @@ begin
   begin
     //don't skip blank-only lines, like ST3
     Str:= St.Lines[i];
+    if Str='' then Continue;
     NMinSpaces:= Min(NMinSpaces, FTabHelper.GetIndentExpanded(i, Str));
   end;
   if NMinSpaces=MaxInt then Exit;
@@ -1168,6 +1169,7 @@ begin
     for i:= NBlockBeginY to NBlockEndY do
     begin
       StrOld:= St.Lines[i];
+      if StrOld='' then Continue;
       Str:= FTabHelper.IndentUnindent(i, StrOld, ARight);
       if Str<>StrOld then
       begin
