@@ -7482,7 +7482,7 @@ begin
                       DoSelect_WordRange(0, PntText, FMouseDownDouble_SelEnd);
                   end
                   else
-                    DoSelect_WordRange(0, FMouseDownPnt, PntText);
+                    DoSelect_WordRange(0, PntText, FMouseDownPnt);
                 end
                 else
                 begin
