@@ -118,13 +118,15 @@ end;
 procedure TATSynEdit.DoSelect_WordRange(ACaretIndex: integer; P1, P2: TPoint);
 var
   St: TATStrings;
+  bBackSelection: boolean;
 begin
   St:= Strings;
   if not Carets.IsIndexValid(ACaretIndex) then Exit;
   if not St.IsIndexValid(P1.Y) then Exit;
   if not St.IsIndexValid(P2.Y) then Exit;
 
-  if not IsPosSorted(P1.X, P1.Y, P2.X, P2.Y, true) then
+  bBackSelection:= IsPosSorted(P1.X, P1.Y, P2.X, P2.Y, true);
+  if not bBackSelection then
   begin
     SwapInt(P1.X, P2.X);
     SwapInt(P1.Y, P2.Y);
@@ -133,13 +135,10 @@ begin
   P1.X:= SFindWordOffset(St.Lines[P1.Y], P1.X, TATWordJump.PrevByMouse, false, FOptNonWordChars);
   P2.X:= SFindWordOffset(St.Lines[P2.Y], P2.X, TATWordJump.NextByMouse, false, FOptNonWordChars);
 
-  with Carets[ACaretIndex] do
-  begin
-    PosX:= P2.X;
-    PosY:= P2.Y;
-    EndX:= P1.X;
-    EndY:= P1.Y;
-  end;
+  if bBackSelection then
+    Carets[ACaretIndex].Change(P1.X, P1.Y, P2.X, P2.Y)
+  else
+    Carets[ACaretIndex].Change(P2.X, P2.Y, P1.X, P1.Y);
 end;
 
 procedure TATSynEdit.DoSelect_Line(APos: TPoint);

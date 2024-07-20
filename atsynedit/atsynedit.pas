@@ -7470,7 +7470,7 @@ begin
                       PntText.Y,
                       false
                       ) then
-                      DoSelect_WordRange(0, FMouseDownDouble_SelBegin, PntText)
+                      DoSelect_WordRange(0, PntText, FMouseDownDouble_SelBegin)
                     else
                     if IsPosSorted(
                       PntText.X,
