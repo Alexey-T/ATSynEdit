@@ -1635,7 +1635,7 @@ type
     property EditorIndex: integer read FEditorIndex write SetEditorIndex;
     property ActivationTime: QWord read FActivationTime write FActivationTime;
     property LineTop: integer read GetLineTop write SetLineTop;
-    property LineTopTodo: integer read FLineTopTodo write FLineTopTodo;
+    property LineTopTodo: integer read FLineTopTodo write FLineTopTodo; //e.g. needed for CudaText to override prev value of FLineTopTodo which was set by LineTop:=N
     property LineBottom: integer read FLineBottom;
     property LinesFromTop: integer read GetLinesFromTop write SetLinesFromTop;
     property ColumnLeft: integer read GetColumnLeft write SetColumnLeft;
