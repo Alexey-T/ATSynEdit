@@ -38,6 +38,7 @@ type
     FMarginUser,
     FIndentVertLines,
     FBookmarkBG,
+    FBookmarkIcon,
     FRulerFont,
     FRulerBG,
     FCollapseLine,
@@ -90,6 +91,7 @@ type
     property MarginUser: TColor read FMarginUser write FMarginUser;
     property IndentVertLines: TColor read FIndentVertLines write FIndentVertLines;
     property BookmarkBG: TColor read FBookmarkBG write FBookmarkBG;
+    property BookmarkIcon: TColor read FBookmarkIcon write FBookmarkIcon;
     property RulerFont: TColor read FRulerFont write FRulerFont;
     property RulerBG: TColor read FRulerBG write FRulerBG;
     property CollapseLine: TColor read FCollapseLine write FCollapseLine;
