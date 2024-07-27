@@ -148,6 +148,7 @@ begin
   C.GutterSeparatorBG:= clBlack;
   C.CurrentLineBG:= $d0f0d0;
   C.BookmarkBG:= clMoneyGreen;
+  C.BookmarkIcon:= clMedGray;
   C.RulerBG:= C.GutterBG;
   C.RulerFont:= clGray;
   C.CollapseLine:= $a06060;

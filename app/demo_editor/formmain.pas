@@ -243,7 +243,6 @@ type
     procedure EditCommand(Sender: TObject; ACmd{%H-}: integer; AInvoke: TATCommandInvoke; const AText: string; var AHandled: boolean);
     procedure EditClickGutter(Sender: TObject; ABand, ALine: integer; var AHandled: boolean);
     procedure EditClickMicromap(Sender: TObject; AX, AY: integer);
-    procedure EditDrawBm(Sender: TObject; C: TCanvas; ALineNum{%H-}: integer; const ARect: TRect);
     procedure EditDrawMicromap(Sender: TObject; C: TCanvas; const ARect: TRect);
     procedure EditDrawTest(Sender: TObject; C: TCanvas; const ARect: TRect);
     procedure EditDrawGap(Sender: TObject; C: TCanvas; const ARect: TRect; AGap: TATGapItem);
@@ -273,7 +272,6 @@ uses
 {$R *.lfm}
 
 const
-  cColorBmIco = clMedGray;
   cBookmarkBgKind = 10;
 
 
@@ -337,7 +335,6 @@ begin
   ed.OnClickMicromap:= @EditClickMicromap;
   ed.OnClickGap:= @EditClickGap;
   ed.OnClickLink:= @EditClickLink;
-  ed.OnDrawBookmarkIcon:= @EditDrawBm;
   ed.OnDrawLine:= @EditDrawLine;
   ed.OnDrawMicromap:= @EditDrawMicromap;
   ed.OnDrawGap:= @EditDrawGap;
@@ -589,21 +586,6 @@ begin
   Showmessage(Format('Micromap click: %d:%d', [AX, AY]));
 end;
 
-procedure TfmMain.EditDrawBm(Sender: TObject; C: TCanvas; ALineNum: integer;
-  const ARect: TRect);
-var
-  r: trect;
-  dx: integer;
-begin
-  r:= arect;
-  if IsRectEmpty(r) then exit;
-  c.brush.color:= cColorBmIco;
-  c.pen.color:= cColorBmIco;
-  inc(r.top, 1);
-  inc(r.left, 4);
-  dx:= r.Height div 2-1;
-  c.Polygon([Point(r.left, r.top), Point(r.left+dx, r.top+dx), Point(r.left, r.top+2*dx)]);
-end;
 
 procedure TfmMain.EditDrawMicromap(Sender: TObject; C: TCanvas; const ARect: TRect);
 var
