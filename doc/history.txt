@@ -1,3 +1,6 @@
+2024.07.27
+* change: signature of OnDrawBookmarkIcon event
+
 2024.06.15
 + add: ATEditorOptions.UnprintedWrapArrowAtEdge (default False)
 + add: prop OptUnprintedEndsOnlyWraps

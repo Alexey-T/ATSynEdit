@@ -444,7 +444,7 @@ type
   TATSynEditClickMicromapEvent = procedure(Sender: TObject; AX, AY: integer) of object;
   TATSynEditClickLinkEvent = procedure(Sender: TObject; const ALink: string) of object;
   TATSynEditChangeDetailedEvent = procedure(Sender: TObject; APos, APosEnd, AShift, APosAfter: TPoint) of object;
-  TATSynEditDrawBookmarkEvent = procedure(Sender: TObject; C: TCanvas; ALineNum: integer; const ARect: TRect) of object;
+  TATSynEditDrawBookmarkEvent = procedure(Sender: TObject; C: TCanvas; ALineIndex, ABookmarkIndex: integer; const ARect: TRect; var AHandled: boolean) of object;
   TATSynEditDrawRectEvent = procedure(Sender: TObject; C: TCanvas; const ARect: TRect) of object;
   TATSynEditDrawRulerEvent = procedure(Sender: TObject; C: TCanvas; const ARect: TRect; var AHandled: boolean) of object;
   TATSynEditDrawGapEvent = procedure(Sender: TObject; C: TCanvas; const ARect: TRect; AGap: TATGapItem) of object;
@@ -1276,6 +1276,7 @@ type
       ARect: TRect;
       const ACharSize: TATEditorCharSize;
       AWrapIndex: integer);
+    procedure DoPaintGutterBookmarkStdIcon(C: TCanvas; ARect: TRect);
     procedure DoPaintNiceScroll(C: TCanvas);
     procedure DoPaintGutterNumber(C: TCanvas; ALineIndex, ACoordTop: integer; ABand: TATGutterItem);
     procedure DoPaintMarginLineTo(C: TCanvas; AX: Int64; AWidth: integer; AColor: TColor);
@@ -1364,7 +1365,8 @@ type
     procedure DoEventClickMicromap(AX, AY: integer);
     procedure DoEventClickGutter(ABandIndex, ALineNumber: integer; var AHandled: boolean);
     function DoEventCommand(ACommand: integer; AInvoke: TATCommandInvoke; const AText: string): boolean;
-    procedure DoEventDrawBookmarkIcon(C: TCanvas; ALineNumber: integer; const ARect: TRect);
+    procedure DoEventDrawBookmarkIcon(C: TCanvas; ALineIndex, ABookmarkIndex: integer;
+      const ARect: TRect; var AHandled: boolean);
     procedure DoEventCommandAfter(ACommand: integer; const AText: string);
     //
     function GetEndOfFilePos: TPoint;
@@ -4628,6 +4630,24 @@ begin
   end;
 end;
 
+
+procedure TATSynEdit.DoPaintGutterBookmarkStdIcon(C: TCanvas; ARect: TRect);
+var
+  dx: integer;
+begin
+  C.Brush.Color:= Colors.BookmarkIcon;
+  C.Pen.Color:= Colors.BookmarkIcon;
+  inc(ARect.Top, 1);
+  inc(ARect.Left, 4);
+  dx:= ARect.Height div 2-1;
+  C.Polygon([
+    Point(ARect.Left, ARect.Top),
+    Point(ARect.Left+dx, ARect.Top+dx),
+    Point(ARect.Left, ARect.Top+2*dx)
+    ]);
+end;
+
+
 procedure TATSynEdit.DoPaintGutterOfLine(C: TCanvas;
   ARect: TRect;
   const ACharSize: TATEditorCharSize;
@@ -4637,8 +4657,9 @@ var
   WrapItem: TATWrapItem;
   LineState: TATLineState;
   GutterItem: TATGutterItem;
-  bLineWithCaret: boolean;
-  NLinesIndex, NBandDecor: integer;
+  bLineWithCaret, bHandled: boolean;
+  NLinesIndex, NBandDecor, NBookmarkIndex: integer;
+  TempRect: TRect;
 begin
   St:= Strings;
   WrapItem:= FWrapInfo[AWrapIndex];
@@ -4695,14 +4716,25 @@ begin
   if GutterItem.Visible then
     if WrapItem.bInitial then
     begin
-      if St.Bookmarks.Find(NLinesIndex)>=0 then
-        DoEventDrawBookmarkIcon(C, NLinesIndex,
-          Rect(
-            GutterItem.Left,
-            ARect.Top,
-            GutterItem.Right,
-            ARect.Bottom
-            ));
+      NBookmarkIndex:= St.Bookmarks.Find(NLinesIndex);
+      if NBookmarkIndex>=0 then
+      begin
+        TempRect:= Rect(
+          GutterItem.Left,
+          ARect.Top,
+          GutterItem.Right,
+          ARect.Bottom
+          );
+        bHandled:= false;
+        DoEventDrawBookmarkIcon(
+          C,
+          NLinesIndex,
+          NBookmarkIndex,
+          TempRect,
+          bHandled);
+        if not bHandled then
+          DoPaintGutterBookmarkStdIcon(C, TempRect);
+      end;
     end;
 
   //gutter band: fold
@@ -8542,10 +8574,11 @@ begin
     FOnClickMicromap(Self, AX, AY);
 end;
 
-procedure TATSynEdit.DoEventDrawBookmarkIcon(C: TCanvas; ALineNumber: integer; const ARect: TRect);
+procedure TATSynEdit.DoEventDrawBookmarkIcon(C: TCanvas; ALineIndex, ABookmarkIndex: integer;
+  const ARect: TRect; var AHandled: boolean);
 begin
   if Assigned(FOnDrawBookmarkIcon) then
-    FOnDrawBookmarkIcon(Self, C, ALineNumber, ARect);
+    FOnDrawBookmarkIcon(Self, C, ALineIndex, ABookmarkIndex, ARect, AHandled);
 end;
 
 procedure TATSynEdit.DoEventBeforeCalcHilite;
