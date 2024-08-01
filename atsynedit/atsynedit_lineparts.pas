@@ -33,11 +33,16 @@ type
   TATLinePart = bitpacked record
     Offset: Longint; //4 bytes, 2 bytes are not enough (app will crash on line length 120K, with wrap=off)
     Len: Longint; //Word is enough, but Longint makes SizeOf=24 bytes, better
-    ColorFont, ColorBG, ColorBorder: TColor;
-    FontStyles: byte;
-    Dummy: byte; //to align SizeOf to 24 bytes
-    BorderUp, BorderDown, BorderLeft, BorderRight: TATLineStyle;
-  end;
+    case Boolean of
+      false: (
+        ColorFont, ColorBG, ColorBorder: TColor;
+        FontStyles: byte;
+        Dummy: byte; //to align SizeOf to 24 bytes
+        BorderUp, BorderDown, BorderLeft, BorderRight: TATLineStyle;
+        );
+      true:
+        ( QWord1, QWord2: QWord );
+    end;
   PATLinePart = ^TATLinePart;
 
 procedure InitLinePart(out Part: TATLinePart);
@@ -48,6 +53,8 @@ type
   TATLineParts = array[0..cMaxLineParts-1] of TATLinePart;
   PATLineParts = ^TATLineParts;
 
+
+function DoPartsHaveSameStyles(var A, B: TATLinePart): boolean; inline;
 procedure DoPartFind(var P: TATLineParts; APos: integer; out AIndex, AOffsetLeft: integer);
 function DoPartInsert(var AParts: TATLineParts; var APart: TATLinePart; AKeepFontStyles, AMainText: boolean): boolean;
 procedure DoPartSetColorBG(var P: TATLineParts; AColor: TColor; AForceColor: boolean);
@@ -105,6 +112,13 @@ begin
   Part.ColorBG:= clNone;
   Part.ColorFont:= clNone;
   Part.ColorBorder:= clNone;
+end;
+
+function DoPartsHaveSameStyles(var A, B: TATLinePart): boolean;
+begin
+  Result:=
+    (A.QWord1=B.QWord1) and
+    (A.QWord2=B.QWord2);
 end;
 
 procedure DoPartFind(var P: TATLineParts; APos: integer; out AIndex,
