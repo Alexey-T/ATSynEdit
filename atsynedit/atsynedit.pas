@@ -3591,7 +3591,8 @@ end;
 
 procedure TATSynEdit.DoPaintMouseSelFrame(C: TCanvas);
 const
-  cMinSize = 4; //minimal width/height of the frame in pixels
+  cMinW = 8; //minimal width/height of the frame in pixels
+  cMinH = 6;
 var
   X1, X2, Y1, Y2: integer;
   XX1, XX2, YY1, YY2: integer;
@@ -3611,8 +3612,8 @@ begin
   YY2:= Min(Height+1, Max(Y1, Y2));
 
   if XX1<0 then exit;
-  if XX2-XX1<cMinSize then exit;
-  if YY2-YY1<cMinSize then exit;
+  if XX2-XX1<cMinW then exit;
+  if YY2-YY1<cMinH then exit;
 
   //avoid TCanvas.DrawFocusRect(), sometimes it's painted bad on Qt5
   C.Pen.Color:= ColorBlendHalf(Colors.TextFont, Colors.TextBG);
