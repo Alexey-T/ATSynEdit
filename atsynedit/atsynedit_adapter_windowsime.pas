@@ -92,11 +92,10 @@ begin
     for i:=0 to position-1 do
       s:=s+buffer[i];
   cm:=CompForm.Canvas.TextExtent(s);
-  cm.cy:=tm.cy+2;
   CompForm.Canvas.Pen.Color:=clInfoText;
   CompForm.Canvas.Pen.Mode:=pmNotXor;
-  CompForm.Canvas.Line(cm.cx  ,0,cm.cx  ,cm.cy+2);
-  CompForm.Canvas.Line(cm.cx+1,0,cm.cx+1,cm.cy+2);
+  CompForm.Canvas.Line(cm.cx  ,0,cm.cx  ,cm.cy);
+  CompForm.Canvas.Line(cm.cx+1,0,cm.cx+1,cm.cy);
 end;
 
 procedure TATAdapterWindowsIME.UpdateCandidatePos(Sender: TObject);
