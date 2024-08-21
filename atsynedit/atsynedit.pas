@@ -8427,7 +8427,6 @@ end;
 procedure TATSynEdit.DoEventCarets;
 var
   SClip: string;
-  NCaretY: integer;
   Caret: TATCaretItem;
 begin
   if Carets.Count=1 then
