@@ -271,6 +271,7 @@ function SCountTextLines(const Str, StrBreak: UnicodeString): SizeInt;
 procedure SSplitByChar(const S: string; Sep: char; out S1, S2: string);
 procedure SDeleteAndInsert(var AStr: UnicodeString; AFromPos, ACount: SizeInt; const AReplace: UnicodeString);
 procedure SDeleteHtmlTags(var S: string);
+function SFindUnpairedBracketBackward(const S: UnicodeString; APos: integer; out ABracketChar: char): integer;
 
 
 implementation
@@ -1555,5 +1556,59 @@ begin
   until false;
 end;
 
+
+function SFindUnpairedBracketBackward(const S: UnicodeString; APos: integer; out ABracketChar: char): integer;
+var
+  LevelCurly, LevelSquare, LevelRound: integer;
+  iChar: integer;
+begin
+  Result:= 0;
+  ABracketChar:= #0;
+  if S='' then exit;
+  if APos<1 then exit;
+
+  LevelCurly:= 0;
+  LevelSquare:= 0;
+  LevelRound:= 0;
+
+  for iChar:= Min(APos, Length(S)) downto 1 do
+  begin
+    case S[iChar] of
+      '}':
+        Inc(LevelCurly);
+      ']':
+        Inc(LevelSquare);
+      ')':
+        Inc(LevelRound);
+      '{':
+        begin
+          Dec(LevelCurly);
+          if LevelCurly<0 then
+          begin
+            ABracketChar:= S[iChar];
+            exit(iChar);
+          end;
+        end;
+      '[':
+        begin
+          Dec(LevelSquare);
+          if LevelSquare<0 then
+          begin
+            ABracketChar:= S[iChar];
+            exit(iChar);
+          end;
+        end;
+      '(':
+        begin
+          Dec(LevelRound);
+          if LevelRound<0 then
+          begin
+            ABracketChar:= S[iChar];
+            exit(iChar);
+          end;
+        end;
+    end;
+  end;
+end;
 
 end.

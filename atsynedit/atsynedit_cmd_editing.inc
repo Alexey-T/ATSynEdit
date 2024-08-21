@@ -597,9 +597,10 @@ var
   Caret: TATCaretItem;
   St: TATStrings;
   Shift, PosAfter: TPoint;
-  Str: atString;
+  Str, StrPart: atString;
   bNeedGroup, bBetterBrackets, bForceIndent: boolean;
   NCaretX, NShiftX, NShiftY, iCaret: integer;
+  BracketChar: char;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
@@ -631,24 +632,22 @@ begin
     begin
       Str:= St.Lines[Caret.PosY];
       NCaretX:= Caret.PosX;
+      StrPart:= Copy(Str, NCaretX, 2);
 
-      //ignore previous wordchars and spaces
-      while (NCaretX>1) and (IsCharWord(Str[NCaretX]) or IsCharSpace(Str[NCaretX])) do
-        Dec(NCaretX);
-      Str:= Copy(Str, NCaretX, 2);
-
-      //for situation 'text {|text' we got Str='{t', so delete last 't'
-      if (Length(Str)>1) and (Pos(Str[1], '{([')>0) and (Pos(Str[2], '})]')=0) then
-        SetLength(Str, 1);
-
-      if (FOptAutoIndentBetterBracketsCurly and (Str='{}')) or
-         (FOptAutoIndentBetterBracketsRound and (Str='()')) or
-         (FOptAutoIndentBetterBracketsSquare and (Str='[]')) then
-        bBetterBrackets:= true;
-
-      if (FOptAutoIndentBetterBracketsCurly and (Str='{')) or
-         (FOptAutoIndentBetterBracketsSquare and (Str='[')) then
-        bForceIndent:= true;
+      if (FOptAutoIndentBetterBracketsCurly and (StrPart='{}')) or
+         (FOptAutoIndentBetterBracketsRound and (StrPart='()')) or
+         (FOptAutoIndentBetterBracketsSquare and (StrPart='[]')) then
+        bBetterBrackets:= true
+      else
+      begin
+        NCaretX:= SFindUnpairedBracketBackward(Str, NCaretX, BracketChar);
+        if BracketChar<>#0 then
+        begin
+          if (FOptAutoIndentBetterBracketsCurly and (BracketChar='{')) or
+             (FOptAutoIndentBetterBracketsSquare and (BracketChar='[')) then
+            bForceIndent:= true;
+        end;
+      end;
     end;
 
     Str:= GetAutoIndentString(Caret.PosX, Caret.PosY, not bBetterBrackets, bForceIndent);
