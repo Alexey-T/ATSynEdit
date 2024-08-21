@@ -599,7 +599,7 @@ var
   Shift, PosAfter: TPoint;
   Str: atString;
   bNeedGroup, bBetterBrackets, bForceIndent: boolean;
-  NShiftX, NShiftY, iCaret: integer;
+  NCaretX, NShiftX, NShiftY, iCaret: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
@@ -629,7 +629,13 @@ begin
 
     if (Caret.PosX>0) and (Caret.PosX<=St.LinesLen[Caret.PosY]) then
     begin
-      Str:= St.LineSub(Caret.PosY, Caret.PosX, 2);
+      Str:= St.Lines[Caret.PosY];
+      NCaretX:= Caret.PosX;
+
+      //ignore previous wordchars and spaces
+      while (NCaretX>1) and (IsCharWord(Str[NCaretX]) or IsCharSpace(Str[NCaretX])) do
+        Dec(NCaretX);
+      Str:= Copy(Str, NCaretX, 2);
 
       //for situation 'text {|text' we got Str='{t', so delete last 't'
       if (Length(Str)>1) and (Pos(Str[1], '{([')>0) and (Pos(Str[2], '})]')=0) then
