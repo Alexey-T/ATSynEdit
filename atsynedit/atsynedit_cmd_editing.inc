@@ -631,6 +631,9 @@ begin
     if (Caret.PosX>0) and (Caret.PosX<=Length(Str)) then
     begin
       Str:= Copy(Str, Caret.PosX, 2);
+      //for situation 'text {|text', we got Str='{t', so delete last 't'
+      if (Length(Str)>1) and (Pos(Str[2], '{}()[]')=0) then
+        SetLength(Str, 1);
       if (FOptAutoIndentBetterBracketsCurly and (Str='{}')) or
          (FOptAutoIndentBetterBracketsRound and (Str='()')) or
          (FOptAutoIndentBetterBracketsSquare and (Str='[]')) then
