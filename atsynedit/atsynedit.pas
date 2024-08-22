@@ -456,6 +456,7 @@ type
     AKeepCaret, ASelectThen: boolean) of object;
   TATSynEditHotspotEvent = procedure(Sender: TObject; AHotspotIndex: integer) of object;
   TATSynEditCheckInputEvent = procedure(Sender: TObject; AChar: WideChar; var AllowInput: boolean) of object;
+  TATSynEditGetTokenEvent = function(Sender: TObject; AX, AY: integer): TATTokenKind of object;
 
 type
   { TATFoldedMark }
@@ -727,8 +728,6 @@ type
     FDropMarker_Coord: TATPoint;
     FAdapterIsDataReady: boolean;
     FTimingQueue: TATTimingQueue;
-    FOnCheckInput: TATSynEditCheckInputEvent;
-    FOnBeforeCalcHilite: TNotifyEvent;
     FOnClickDbl,
     FOnClickTriple,
     FOnClickMiddle: TATSynEditClickEvent;
@@ -765,6 +764,9 @@ type
     FOnPaste: TATSynEditPasteEvent;
     FOnHotspotEnter: TATSynEditHotspotEvent;
     FOnHotspotExit: TATSynEditHotspotEvent;
+    FOnCheckInput: TATSynEditCheckInputEvent;
+    FOnBeforeCalcHilite: TNotifyEvent;
+    FOnGetToken: TATSynEditGetTokenEvent;
     FWrapInfo: TATWrapInfo;
     FWrapTemps: TATWrapItems;
     FWrapMode: TATEditorWrapMode;
@@ -1100,6 +1102,8 @@ type
     procedure DoStringsOnUnfoldLine(Sender: TObject; ALine: SizeInt);
     function FindLineNextNonspaceBegin(const ALine: UnicodeString; AFromOffset: integer): integer;
     function FindLineNextNonspaceEnd(const ALine: UnicodeString; AFromOffset: integer): integer;
+    function FindUnpairedBracketBackward(const ALine: UnicodeString;
+      ALineIndex, AColumn: integer; out ABracketChar: char): integer;
     function GetLineIndentInSpaces(ALine: integer): integer;
     function GetLineIndentInPixels(ALine: integer; const ACharSize: TATEditorCharSize): integer;
     procedure InitClipboardExData(out Data: TATEditorClipboardExData);
@@ -1156,6 +1160,7 @@ type
     procedure DoHandleRightClick(X, Y: integer);
     function DoHandleClickEvent(AEvent: TATSynEditClickEvent): boolean;
     procedure DoHotspotsExit;
+    function DoGetTokenKind(AX, AY: integer): TATTokenKind;
     procedure DoHintShowForScrolling;
     procedure DoHintHide;
     procedure DoHintShowForBookmark(ALine: integer);
@@ -1951,6 +1956,7 @@ type
     property OnPaste: TATSynEditPasteEvent read FOnPaste write FOnPaste;
     property OnHotspotEnter: TATSynEditHotspotEvent read FOnHotspotEnter write FOnHotspotEnter;
     property OnHotspotExit: TATSynEditHotspotEvent read FOnHotspotExit write FOnHotspotExit;
+    property OnGetToken: TATSynEditGetTokenEvent read FOnGetToken write FOnGetToken;
 
     //misc
     property CursorText: TCursor read FCursorText write FCursorText default crIBeam;
@@ -10121,6 +10127,13 @@ begin
   end;
 end;
 
+function TATSynEdit.DoGetTokenKind(AX, AY: integer): TATTokenKind;
+begin
+  if Assigned(FOnGetToken) then
+    Result:= FOnGetToken(Self, AX, AY)
+  else
+    Result:= TATTokenKind.Other;
+end;
 
 procedure TATSynEdit.DoPaintTextFragment(C: TCanvas;
   const ARect: TRect;

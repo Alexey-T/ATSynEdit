@@ -631,8 +631,7 @@ begin
     if (Caret.PosX>0) and (Caret.PosX<=St.LinesLen[Caret.PosY]) then
     begin
       Str:= St.Lines[Caret.PosY];
-      NCaretX:= Caret.PosX;
-      StrPart:= Copy(Str, NCaretX, 2);
+      StrPart:= Copy(Str, Caret.PosX, 2);
 
       if (FOptAutoIndentBetterBracketsCurly and (StrPart='{}')) or
          (FOptAutoIndentBetterBracketsRound and (StrPart='()')) or
@@ -640,7 +639,7 @@ begin
         bBetterBrackets:= true
       else
       begin
-        NCaretX:= SFindUnpairedBracketBackward(Str, NCaretX, BracketChar);
+        NCaretX:= FindUnpairedBracketBackward(Str, Caret.PosY, Caret.PosX, BracketChar);
         if BracketChar<>#0 then
         begin
           if (FOptAutoIndentBetterBracketsCurly and (BracketChar='{')) or
@@ -1667,5 +1666,67 @@ begin
   DoCaretSingle(0, 0);
   Strings.ActionShuffleLines;
   Result:= [TATCommandResult.Text, TATCommandResult.CaretTop];
+end;
+
+function TATSynEdit.FindUnpairedBracketBackward(const ALine: UnicodeString; ALineIndex, AColumn: integer; out ABracketChar: char): integer;
+var
+  LevelCurly, LevelSquare, LevelRound: integer;
+  TokenKind: TATTokenKind;
+  iChar: integer;
+  ch: WideChar;
+begin
+  Result:= 0;
+  ABracketChar:= #0;
+  if ALine='' then exit;
+  if AColumn<1 then exit;
+
+  LevelCurly:= 0;
+  LevelSquare:= 0;
+  LevelRound:= 0;
+
+  for iChar:= Min(AColumn, Length(ALine)) downto 1 do
+  begin
+    ch:= ALine[iChar];
+    if Pos(ch, '{}()[]')=0 then Continue;
+
+    TokenKind:= DoGetTokenKind(iChar-1, ALineIndex);
+    if TokenKind<>TATTokenKind.Other then Continue;
+
+    case ch of
+      '}':
+        Inc(LevelCurly);
+      ']':
+        Inc(LevelSquare);
+      ')':
+        Inc(LevelRound);
+      '{':
+        begin
+          Dec(LevelCurly);
+          if LevelCurly<0 then
+          begin
+            ABracketChar:= ch;
+            exit(iChar);
+          end;
+        end;
+      '[':
+        begin
+          Dec(LevelSquare);
+          if LevelSquare<0 then
+          begin
+            ABracketChar:= ch;
+            exit(iChar);
+          end;
+        end;
+      '(':
+        begin
+          Dec(LevelRound);
+          if LevelRound<0 then
+          begin
+            ABracketChar:= ch;
+            exit(iChar);
+          end;
+        end;
+    end;
+  end;
 end;
 
