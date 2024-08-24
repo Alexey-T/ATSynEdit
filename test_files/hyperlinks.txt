@@ -1,28 +1,23 @@
 
 https://test@github.com/Alexey-T/EControl.git
-http://test.my.domain.com:2100/integrator/services/WebService?WSDL
-https://custom.domain.com/docs/display/project/Main+Docs%20and%23%and#some-link
+http://test.my.domain.com:2100/services/WebService?WSDL
+https://custom.domain.com/project/Main+Docs%20and%23%and#some-link
 http://dd.dd/~mmm20/test.c
-
 http://www.designboom.com/weblog/index.php?&start=30&num_record_tot=20
 http://www.imkerverein-dachau.de/index.php?cat=home&site=
 http://www.die-partei.de/?start=0
 http://openrouteservice.org/index.php?&start=8.2,4.4
-
-http://nzbindex.nl/search/?q=&age=&max=250&minage=&sort=agedesc&minsize=&maxsize=&dq=&nfo=&hidespam=0&hidespam=1&more=1
-
+http://nzbindex.nl/search/?q=&age=agedesc&more=1
 https://www.my.org/index.php?c=1
 http://m.org/m/i.php?&start=aa&c=bb
 http://m.org/i.php?c=a&cc
-
 http://userbase.kde.org/index.php?title=Special&www=wwww
 http://www.die-partei.de/?start=0
-
-https://vnotex.github.io/vnote/zh_cn/#!docs/%E5%BC%80%E5%8F%91%E8%80%85/%E6%9E%84%E5%BB%BAVNote.md
-https://en.wikipedia.org/wiki/Flip-flop_(electronics)#Master%E2%80%93slave_edge-triggered_D_flip-flop
-
+https://vnotex.github.io/vnote/zh_cn/#!docs/%BA.md
+https://en.wikipedia.org/wiki/Flip-flop_(electronics)#Master_flip-flop
 https://wiki.freepascal.org/CudaText#Linux:_Qt5_and_Qt6_builds
-https://kx.studio/Applications:Catia
+https://kx.studio/App:Catia
+http://site.com/test_{var}_{var2}.txt
 
 ---
 must _not_ catch too many chars:
