@@ -723,6 +723,7 @@ begin
   until false;
 end;
 
+
 //global vars to avoid mem allocs, speeds up rendering by 10-30%
 var
   ListOffsets: TATIntFixedArray;
@@ -846,9 +847,14 @@ begin
       PartLen:= PartPtr^.Len;
       if PartLen=0 then Break;
       PartOffset:= PartPtr^.Offset;
-      PartStr:= Copy(AText, PartOffset+1, PartLen);
-      if PartStr='' then Break;
-      bSpaceChars:= IsStringSpaces(PartStr);
+      bSpaceChars:= IsStringSpaces(AText, PartOffset+1, PartLen);
+      if bSpaceChars then
+        PartStr:= ''
+      else
+      begin
+        PartStr:= Copy(AText, PartOffset+1, PartLen);
+        if PartStr='' then Break;
+      end;
       NLastPart:= iPart;
 
       if PartOffset>0 then
