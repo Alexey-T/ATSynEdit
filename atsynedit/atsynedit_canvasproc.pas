@@ -732,6 +732,8 @@ var
   {$IF not Defined(LCLWin32)}
   DxUTF8: TATInt32FixedArray; //must be with 'longint' items
   {$endif}
+  bPartsSpaces: packed array[0..High(TATLineParts)] of boolean;
+
 
 procedure CanvasTextOut(C: TCanvas;
   APosX, APosY: integer;
@@ -762,8 +764,10 @@ var
   PartRect: TRect;
   DxPointer: PInteger;
   NStyles: integer;
-  bBold, bItalic, bSpaceChars: boolean;
+  bBold, bItalic: boolean;
   bShowUnprintedPartially: boolean;
+  PrevColor: TColor;
+  bPrevColorInited: boolean;
   ch: WideChar;
   tick: QWord;
 begin
@@ -775,6 +779,7 @@ begin
   ListInt:= Default(TATIntFixedArray);
   Dx:= Default(TATInt32FixedArray);
   //no need to clear DxUTF8
+  FillChar(bPartsSpaces, SizeOf(bPartsSpaces), 0);
 
   if AProps.SuperFast or AProps.HasAsciiNoTabs then
   begin
@@ -840,21 +845,61 @@ begin
   end
   else
   begin
-    NLastPart:= 0;
+    //first, process space-only parts
+    PrevColor:= clRed;
+    bPrevColorInited:= false;
     for iPart:= 0 to High(TATLineParts) do
     begin
       PartPtr:= @AParts^[iPart];
       PartLen:= PartPtr^.Len;
       if PartLen=0 then Break;
       PartOffset:= PartPtr^.Offset;
-      bSpaceChars:= IsStringSpaces(AText, PartOffset+1, PartLen);
-      if bSpaceChars then
-        PartStr:= ''
+      if not IsStringSpaces(AText, PartOffset+1, PartLen) then Continue;
+      bPartsSpaces[iPart]:= true;
+
+      if PartOffset>0 then
+        PixOffset1:= ListInt.Data[PartOffset-1]
       else
+        PixOffset1:= 0;
+
+      i:= Min(PartOffset+PartLen, Length(AText));
+      if i>0 then
+        PixOffset2:= ListInt.Data[i-1]
+      else
+        PixOffset2:= 0;
+
+      PartRect:= Rect(
+        APosX+PixOffset1,
+        APosY,
+        APosX+PixOffset2,
+        APosY+AProps.CharSize.Y);
+
+      {
+      //avoid clipping previous 'italic' part
+      if (iPart>0) and ((AParts^[iPart-1].FontStyles and afsFontItalic)<>0) then
+        Inc(PartRect.Left, NDeltaForItalic);
+      }
+      if (not bPrevColorInited) or (PartPtr^.ColorBG<>PrevColor) then
       begin
-        PartStr:= Copy(AText, PartOffset+1, PartLen);
-        if PartStr='' then Break;
+        PrevColor:= PartPtr^.ColorBG;
+        bPrevColorInited:= true;
+        C.Brush.Color:= PrevColor;
       end;
+
+      C.FillRect(PartRect);
+    end;
+
+    //next, process non-space parts
+    NLastPart:= 0;
+    for iPart:= 0 to High(TATLineParts) do
+    begin
+      if bPartsSpaces[iPart] then Continue;
+      PartPtr:= @AParts^[iPart];
+      PartLen:= PartPtr^.Len;
+      if PartLen=0 then Break;
+      PartOffset:= PartPtr^.Offset;
+      PartStr:= Copy(AText, PartOffset+1, PartLen);
+      if PartStr='' then Break;
       NLastPart:= iPart;
 
       if PartOffset>0 then
@@ -870,8 +915,6 @@ begin
 
       C.Brush.Color:= PartPtr^.ColorBG;
 
-      if not bSpaceChars then
-      begin
         NStyles:= PartPtr^.FontStyles;
         bBold:= (NStyles and afsFontBold)<>0;
         bItalic:= (NStyles and afsFontItalic)<>0;
@@ -911,7 +954,6 @@ begin
           C.Font.Name:= AProps.FontNormal_Name;
           C.Font.Size:= AProps.FontNormal_Size;
         end;
-      end; //if not bSpaceChars
 
       PartRect:= Rect(
         APosX+PixOffset1,
@@ -924,17 +966,6 @@ begin
       //with font eg "Fira Code Retina"
       if bItalic then
         Inc(PartRect.Right, NDeltaForItalic);
-
-      //part with only blanks, render simpler
-      //important for gtk2: tab-chars give Dx offsets, render is much slower with Dx
-      if bSpaceChars then
-      begin
-        //avoid clipping previous 'italic' part
-        if (iPart>0) and ((AParts^[iPart-1].FontStyles and afsFontItalic)<>0) then
-          Inc(PartRect.Left, NDeltaForItalic);
-        C.FillRect(PartRect);
-        Continue;
-      end;
 
       C.Brush.Style:= cTextoutBrushStyle;
 
