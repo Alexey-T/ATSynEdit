@@ -1000,7 +1000,9 @@ begin
       {$else}
       if AProps.HasAsciiNoTabs and not ATEditorOptions.TextoutNeedsOffsets then
       begin
-        Buf:= PartStr;
+        SetLength(Buf, Length(PartStr));
+        for i:= 1 to Length(PartStr) do
+          Buf[i]:= chr(ord(PartStr[i]));
         DxPointer:= nil;
       end
       else
