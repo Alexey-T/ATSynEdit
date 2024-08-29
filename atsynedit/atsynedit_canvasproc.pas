@@ -110,7 +110,7 @@ procedure CanvasTextOutSimplest_PChar(C: TCanvas; X, Y: integer; Buf: PChar; Len
 
 procedure CanvasTextOut(C: TCanvas;
   APosX, APosY: integer;
-  const AText: atString;
+  const AText: UnicodeString;
   AParts: PATLineParts;
   out ATextWidth: Int64;
   const AProps: TATCanvasTextOutProps
@@ -737,7 +737,7 @@ var
 
 procedure CanvasTextOut(C: TCanvas;
   APosX, APosY: integer;
-  const AText: atString;
+  const AText: UnicodeString;
   AParts: PATLineParts;
   out ATextWidth: Int64;
   const AProps: TATCanvasTextOutProps);
@@ -757,7 +757,7 @@ var
   NLen, NCharWidthScaled, NDeltaForItalic, iPart, i: integer;
   NLastPart: integer;
   NPosFirstChar, NPosLastChar: integer;
-  PartStr: atString;
+  PartStr: UnicodeString;
   PartOffset, PartLen,
   PixOffset1, PixOffset2: integer;
   PartPtr: ^TATLinePart;
