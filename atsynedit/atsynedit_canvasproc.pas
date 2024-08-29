@@ -660,33 +660,21 @@ end;
 
 
 function CanvasTextOutNeedsOffsets(C: TCanvas; const AStr: UnicodeString): boolean; inline;
-{
-var
-  Flags: TATWiderFlags;
-  St: TFontStyles;
-}
 begin
   if ATEditorOptions.TextoutNeedsOffsets then
     exit(true);
 
-  {
-  //detect result by presence of bold/italic tokens, offsets are needed for them,
-  //ignore underline, strikeout
-
-  St:= C.Font.Style * [fsBold, fsItalic];
-
-  if St=[] then Result:= Flags.ForNormal else
-   if St=[fsBold] then Result:= Flags.ForBold else
-    if St=[fsItalic] then Result:= Flags.ForItalic else
-     if St=[fsBold, fsItalic] then Result:= Flags.ForBoldItalic else
-      Result:= false;
-
-  if Result then exit;
-  }
-
   //force Offsets not for all unicode.
   //only for those chars, which are full-width or "hex displayed" or unknown width.
   Result:= IsStringWithUnusualWidthChars(AStr);
+end;
+
+function CanvasTextOutNeedsOffsets(C: TCanvas; ABuf: PWideChar; ACount: integer): boolean;
+begin
+  if ATEditorOptions.TextoutNeedsOffsets then
+    exit(true);
+
+  Result:= IsStringWithUnusualWidthChars(ABuf, ACount);
 end;
 
 
