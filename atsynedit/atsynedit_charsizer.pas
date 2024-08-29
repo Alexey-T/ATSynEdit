@@ -55,6 +55,7 @@ function IsCharUnicodeSpace(ch: WideChar): boolean; inline;
 function IsCharHexDisplayed(ch: WideChar): boolean; inline;
 function IsCharUnusualWidth(ch: WideChar): boolean; inline;
 function IsStringWithUnusualWidthChars(const S: UnicodeString): boolean;
+function IsStringWithUnusualWidthChars(Buf: PWideChar; ACount: integer): boolean;
 
 
 implementation
@@ -103,6 +104,16 @@ var
 begin
   for i:= 1 to Length(S) do
     if IsCharUnusualWidth(S[i]) then
+      exit(true);
+  Result:= false;
+end;
+
+function IsStringWithUnusualWidthChars(Buf: PWideChar; ACount: integer): boolean;
+var
+  i: integer;
+begin
+  for i:= 0 to ACount-1 do
+    if IsCharUnusualWidth(Buf[i]) then
       exit(true);
   Result:= false;
 end;
