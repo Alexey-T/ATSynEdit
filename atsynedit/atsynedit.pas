@@ -1168,7 +1168,7 @@ type
     procedure DoHintShowForBookmark(ALine: integer);
     procedure DoMenuGutterFold_AddDynamicItems(Menu: TPopupMenu);
     procedure DoMenuGutterFold;
-    procedure DoMenuText;
+    procedure DoMenuContextFromKeyboard;
     procedure DoMinimapClick(APosY: integer);
     procedure DoMinimapDrag(APosY: integer);
     procedure DoStringsOnChangeLog(Sender: TObject; ALine: SizeInt);

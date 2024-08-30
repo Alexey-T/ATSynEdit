@@ -1,16 +1,26 @@
 {$ifdef none}begin end;{$endif}
 
-procedure TATSynEdit.DoMenuText;
+procedure TATSynEdit.DoMenuContextFromKeyboard;
 var
-  P: TPoint;
+  Caret: TATCaretItem;
+  Pnt: TPoint;
+  PntA: TATPoint;
 begin
-  P:= ClientToScreen(Point(0, 0));
+  if Carets.Count=0 then exit;
+  Caret:= Carets[0];
+  PntA:= CaretPosToClientPos(Point(Caret.PosX, Caret.PosY));
+  //caret out of screen? don't show menu.
+  if PntA.Y<0 then exit;
+  if PntA.Y>Height then exit;
+
+  Pnt:= ClientToScreen(Point(PntA.X, PntA.Y));
+
   if Assigned(FMenuText) then
-    FMenuText.PopUp(P.X, P.Y)
+    FMenuText.PopUp(Pnt.X, Pnt.Y)
   else
   begin
     InitMenuStd;
-    FMenuStd.PopUp(P.X, P.Y);
+    FMenuStd.PopUp(Pnt.X, Pnt.Y);
   end;
 end;
 
@@ -48,7 +58,7 @@ begin
       end;
     VK_APPS:
       begin
-        DoMenuText;
+        DoMenuContextFromKeyboard;
         exit;
       end;
   end;
