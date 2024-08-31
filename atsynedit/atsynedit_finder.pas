@@ -911,6 +911,9 @@ end;
 { TATEditorFinder }
 
 procedure TATEditorFinder.UpdateCarets(ASimpleAction: boolean);
+var
+  St: TATStrings;
+  iCaret, NLen: integer;
 begin
   if FVirtualCaretsAsString='' then
     if Assigned(Editor) then
@@ -919,6 +922,27 @@ begin
   FPlaceMarker:= ASimpleAction and OptInSelection and FinderCarets.IsSelection;
 
   FinderCarets.GetSelections(FinderCaretsSel);
+
+  //fix carets if after line-end,
+  //to fix bug with find-previous when caret is after line-end
+  St:= Editor.Strings;
+  if St.Count>0 then
+    for iCaret:= 0 to FinderCarets.Count-1 do
+      with FinderCarets[iCaret] do
+      begin
+        if not St.IsIndexValid(PosY) then
+        begin
+          PosY:= St.Count-1;
+          PosX:= St.LinesLen[PosY];
+          EndX:= -1;
+          EndY:= -1;
+        end;
+        NLen:= St.LinesLen[PosY];
+        if PosX>NLen then
+          PosX:= NLen;
+        if EndX>NLen then
+          EndX:= NLen;
+      end;
 end;
 
 procedure TATEditorFinder.SetVirtualCaretsAsString(const AValue: string);
