@@ -977,6 +977,8 @@ begin
           DxPointer:= nil;
       end;
 
+      if ATEditorOptions.DebugTiming then
+        tick:= GetTickCount64;
       _TextOut_Windows(C.Handle,
         APosX+PixOffset1,
         APosY+AProps.TextOffsetFromLine,
@@ -985,7 +987,10 @@ begin
         DxPointer,
         bAllowLigatures
         );
-      {$else}
+      if ATEditorOptions.DebugTiming then
+        FTickTextout+= GetTickCount64-tick;
+
+      {$else} //non-Windows
       if AProps.HasAsciiNoTabs and not ATEditorOptions.TextoutNeedsOffsets then
       begin
         SetLength(Buf, Length(PartStr));
