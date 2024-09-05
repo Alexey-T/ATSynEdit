@@ -842,10 +842,11 @@ begin
       PartLen:= PartPtr^.Len;
       if PartLen=0 then Break;
       PartOffset:= PartPtr^.Offset;
+      if PartOffset>Length(ListInt.Data) then Break;
       if not IsStringSpaces(AText, PartOffset+1, PartLen) then Continue;
       bPartsSpaces[iPart]:= true;
 
-      if (PartOffset>0) and (PartOffset<=Length(ListInt.Data)) then
+      if PartOffset>0 then
         PixOffset1:= ListInt.Data[PartOffset-1]
       else
         PixOffset1:= 0;
@@ -886,11 +887,12 @@ begin
       PartLen:= PartPtr^.Len;
       if PartLen=0 then Break;
       PartOffset:= PartPtr^.Offset;
+      if PartOffset>Length(ListInt.Data) then Break;
       PartStr:= Copy(AText, PartOffset+1, PartLen);
       if PartStr='' then Break;
       NLastPart:= iPart;
 
-      if (PartOffset>0) and (PartOffset<=Length(ListInt.Data)) then
+      if PartOffset>0 then
         PixOffset1:= ListInt.Data[PartOffset-1]
       else
         PixOffset1:= 0;
