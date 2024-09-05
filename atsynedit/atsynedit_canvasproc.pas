@@ -845,7 +845,7 @@ begin
       if not IsStringSpaces(AText, PartOffset+1, PartLen) then Continue;
       bPartsSpaces[iPart]:= true;
 
-      if PartOffset>0 then
+      if (PartOffset>0) and (PartOffset<=Length(ListInt.Data)) then
         PixOffset1:= ListInt.Data[PartOffset-1]
       else
         PixOffset1:= 0;
@@ -890,7 +890,7 @@ begin
       if PartStr='' then Break;
       NLastPart:= iPart;
 
-      if PartOffset>0 then
+      if (PartOffset>0) and (PartOffset<=Length(ListInt.Data)) then
         PixOffset1:= ListInt.Data[PartOffset-1]
       else
         PixOffset1:= 0;
