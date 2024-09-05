@@ -2742,7 +2742,7 @@ begin
   Results:= TATFinderResults.Create;
   try
     try
-      OptDisableOnProgress:= true; //fix CudaText flickering on scrolling, CudaText issue #5679
+      OptDisableOnProgress:= true; //fix CudaText flickering on scrolling (Win64, Qt5), CudaText issue #5679
       DoAction_FindAll(Results, false);
       OptDisableOnProgress:= false;
       Result:= Results.Count;
