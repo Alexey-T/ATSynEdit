@@ -851,7 +851,7 @@ begin
       else
         PixOffset1:= 0;
 
-      i:= Min(PartOffset+PartLen, Length(AText));
+      i:= Min(PartOffset+PartLen, ListInt.Len);
       if i>0 then
         PixOffset2:= ListInt.Data[i-1]
       else
@@ -897,7 +897,7 @@ begin
       else
         PixOffset1:= 0;
 
-      i:= Min(PartOffset+PartLen, Length(AText));
+      i:= Min(PartOffset+PartLen, ListInt.Len);
       if i>0 then
         PixOffset2:= ListInt.Data[i-1]
       else
