@@ -143,7 +143,7 @@ end;
 procedure TATAdapterGTK2IME.ImeKillFocus(Sender: TObject);
 begin
   inherited ImeKillFocus(Sender);
-  ResetDefaultIMContext;
+  //ResetDefaultIMContext; //commented to fix CudaText issue #5682
   HideCompForm;
 end;
 
