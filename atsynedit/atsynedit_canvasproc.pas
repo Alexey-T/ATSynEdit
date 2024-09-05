@@ -842,7 +842,7 @@ begin
       PartLen:= PartPtr^.Len;
       if PartLen=0 then Break;
       PartOffset:= PartPtr^.Offset;
-      if PartOffset>Length(ListInt.Data) then Break;
+      if PartOffset>NLen then Break;
       if not IsStringSpaces(AText, PartOffset+1, PartLen) then Continue;
       bPartsSpaces[iPart]:= true;
 
@@ -887,7 +887,7 @@ begin
       PartLen:= PartPtr^.Len;
       if PartLen=0 then Break;
       PartOffset:= PartPtr^.Offset;
-      if PartOffset>Length(ListInt.Data) then Break;
+      if PartOffset>NLen then Break;
       PartStr:= Copy(AText, PartOffset+1, PartLen);
       if PartStr='' then Break;
       NLastPart:= iPart;
