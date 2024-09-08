@@ -742,7 +742,7 @@ var
   bAllowLigatures: boolean;
   {$endif}
   BufW: UnicodeString;
-  NLen, NCharWidthScaled, NDeltaForItalic, iPart, i: integer;
+  NLen, NCharWidthScaled, NDeltaForItalic, iPart, iPartOuter, i: integer;
   NLastPart: integer;
   NPosFirstChar, NPosLastChar: integer;
   PartStr: UnicodeString;
@@ -756,6 +756,7 @@ var
   bShowUnprintedPartially: boolean;
   PrevColor: TColor;
   bPrevColorInited: boolean;
+  bPartFirst, bPartSameStyle: boolean;
   ch: WideChar;
   tick: QWord;
 begin
@@ -880,9 +881,20 @@ begin
 
     //next, process non-space parts
     NLastPart:= 0;
-    for iPart:= 0 to High(TATLineParts) do
+   for iPartOuter:= 0 to High(TATLineParts) do
+   begin
+    if bPartsSpaces[iPartOuter] then Continue;
+    for iPart:= iPartOuter to High(TATLineParts) do
     begin
       if bPartsSpaces[iPart] then Continue;
+      bPartFirst:= iPart=iPartOuter;
+      if bPartFirst then
+        bPartSameStyle:= true
+      else
+        bPartSameStyle:= DoPartsHaveSameStyles(AParts^[iPartOuter], AParts^[iPart]);
+      if not bPartSameStyle then Continue;
+      bPartsSpaces[iPart]:= true; //mark index iPart as 'handled'
+
       PartPtr:= @AParts^[iPart];
       PartLen:= PartPtr^.Len;
       if PartLen=0 then Break;
@@ -890,7 +902,7 @@ begin
       if PartOffset>ListInt.Len then Break;
       PartStr:= Copy(AText, PartOffset+1, PartLen);
       if PartStr='' then Break;
-      NLastPart:= iPart;
+      NLastPart:= Max(NLastPart, iPart);
 
       if PartOffset>0 then
         PixOffset1:= ListInt.Data[PartOffset-1]
@@ -903,7 +915,11 @@ begin
       else
         PixOffset2:= 0;
 
-      C.Brush.Color:= PartPtr^.ColorBG;
+      if bPartFirst then
+      begin
+        //Writeln('set C: iPart='+Inttostr(iPart));
+        C.Brush.Color:= PartPtr^.ColorBG;
+        C.Brush.Style:= cTextoutBrushStyle;
 
         NStyles:= PartPtr^.FontStyles;
         bBold:= (NStyles and afsFontBold)<>0;
@@ -944,6 +960,7 @@ begin
           C.Font.Name:= AProps.FontNormal_Name;
           C.Font.Size:= AProps.FontNormal_Size;
         end;
+      end;
 
       PartRect:= Rect(
         APosX+PixOffset1,
@@ -956,8 +973,6 @@ begin
       //with font eg "Fira Code Retina"
       if bItalic then
         Inc(PartRect.Right, NDeltaForItalic);
-
-      C.Brush.Style:= cTextoutBrushStyle;
 
       {$IF Defined(LCLWin32)}
       if AProps.HasAsciiNoTabs and not ATEditorOptions.TextoutNeedsOffsets then
@@ -1072,6 +1087,7 @@ begin
         PartRect.Right, PartRect.Bottom,
         true);
     end;
+   end;
 
     //paint chars after all LineParts are painted, when too many tokens in line
     if NLastPart>=High(TATLineParts)-1 then
