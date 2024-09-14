@@ -444,8 +444,7 @@ begin
         for i:= 0 to ListNum.Count-1 do
         begin
           STemp:= St.Lines[ListNum[i]];
-          if STemp<>'' then
-            ListStr.Add(UTF8Encode(STemp));
+          ListStr.Add(UTF8Encode(STemp));
         end;
         Result:= ListStr.Text; //always use Text, need eol
       end;
