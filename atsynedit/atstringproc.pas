@@ -209,15 +209,16 @@ function IsCharSpace(ch: char): boolean; inline;
 function IsCharSymbol(ch: widechar): boolean;
 function IsCharHexDigit(ch: widechar): boolean; inline;
 function IsCharHexDigit(ch: char): boolean; inline;
-function HexDigitToInt(ch: char): integer;
-
 function IsCharSurrogateAny(ch: widechar): boolean; inline;
 function IsCharSurrogateHigh(ch: widechar): boolean; inline;
 function IsCharSurrogateLow(ch: widechar): boolean; inline;
+function IsCharCJKText(ch: widechar): boolean; inline;
+function IsCharCJKPunctuation(ch: widechar): boolean; inline;
 
 function IsStringSpaces(const S: atString): boolean; inline;
 function IsStringSpaces(const S: atString; AFrom, ALen: SizeInt): boolean;
 
+function HexDigitToInt(ch: char): integer;
 function SBeginsWith(const S, SubStr: UnicodeString): boolean;
 function SBeginsWith(const S, SubStr: string): boolean;
 function SBeginsWith(const S: UnicodeString; ch: WideChar): boolean; inline;
@@ -479,7 +480,7 @@ CJK Compatibility Ideographs            F900-FAFF   Duplicates, unifiable varian
 CJK Compatibility Ideographs Supplement 2F800-2FA1F Unifiable variants
 }
 
-function _IsCJKText(ch: widechar): boolean; inline;
+function IsCharCJKText(ch: widechar): boolean; inline;
 begin
   case Ord(ch) of
     $4E00..$9FFF,
@@ -491,7 +492,7 @@ begin
   end;
 end;
 
-function _IsCJKPunctuation(ch: widechar): boolean; inline;
+function IsCharCJKPunctuation(ch: widechar): boolean; inline;
 begin
   case Ord(ch) of
     $3002,
@@ -520,7 +521,7 @@ function TATStringTabHelper.FindWordWrapOffset(ALineIndex: integer; const S: atS
   //to wrap them with wordchars
   function _IsWord(ch: widechar): boolean;
   begin
-    if _IsCJKText(ch) then
+    if IsCharCJKText(ch) then
       Result:= false
     else
     if Pos(ch, ATEditorOptions.PunctuationToWrapWithWords)>0 then
@@ -558,7 +559,7 @@ begin
 
     if (N>NMin) and
      (IsCharSurrogateLow(ch_next) or //don't wrap inside surrogate pair
-      (_IsCJKText(ch) and _IsCJKPunctuation(ch_next)) or //don't wrap between CJK char and CJK punctuation
+      (IsCharCJKText(ch) and IsCharCJKPunctuation(ch_next)) or //don't wrap between CJK char and CJK punctuation
       (_IsWord(ch) and _IsWord(ch_next)) or //don't wrap between 2 word-chars
       (AWrapIndented and IsCharSpace(ch_next)) //space as 2nd char looks bad with Python sources
      )
