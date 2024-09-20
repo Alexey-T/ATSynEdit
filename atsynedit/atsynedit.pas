@@ -507,7 +507,7 @@ type
     cInitScrollAnimationSteps = 4;
     cInitScrollAnimationSleep = 0;
     cInitUndoLimit = 5000;
-    cInitUndoMaxCarets = 20000;
+    cInitUndoMaxCarets = 4000;
     cInitUndoIndentVert = 15;
     cInitUndoIndentHorz = 20;
     cInitUndoPause = 300;
