@@ -561,7 +561,7 @@ begin
   if FOptCaretsPrimitiveColumnSelection then
   begin
     DoSelect_ColumnBlock_Primitive(APosChar1, APosChar2);
-    UpdateSelRectFromPoints(APosChar1, APosChar2);
+    UpdateSelRectFromPoints(Pos1Col, Pos2Col);
     //DebugSelRect; //debug
     exit;
   end;
