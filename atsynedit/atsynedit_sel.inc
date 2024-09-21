@@ -507,6 +507,8 @@ begin
 
   Y:= YMin+1;
   repeat
+    LineCoord2:= ClientPosToCaretPos(ATPoint(Coord2.X, Y), Details);
+
     {
     ClientPosToCaretPos gives CudaText issue #5697. problem is visible like this:
     - file with very long lines + short lines
@@ -516,11 +518,10 @@ begin
     - unpress the mouse
     -> those short lines have BAD selected parts
     }
-    LineCoord1:= ClientPosToCaretPos(ATPoint(Coord1.X, Y), Details);
-    //workaround for the above, it is much easier to do than to improve ClientPosToCaretPos:
+    //LineCoord1:= ClientPosToCaretPos(ATPoint(Coord1.X, Y), Details);
+    // workaround for the above:
     LineCoord1.X:= ACaretPos1.X;
-
-    LineCoord2:= ClientPosToCaretPos(ATPoint(Coord2.X, Y), Details);
+    LineCoord1.Y:= LineCoord2.Y;
 
     NPosX:= LineCoord2.X;
     NPosY:= LineCoord2.Y;
