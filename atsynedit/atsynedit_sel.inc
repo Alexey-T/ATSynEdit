@@ -507,7 +507,11 @@ begin
 
   Y:= YMin+1;
   repeat
+    //ClientPosToCaretPos gives CudaText issue #5697, when short line is totally scrolled out to the left:
     LineCoord1:= ClientPosToCaretPos(ATPoint(Coord1.X, Y), Details);
+    //workaround for the above, it is much easier to do than to improve ClientPosToCaretPos:
+    LineCoord1.X:= ACaretPos1.X;
+
     LineCoord2:= ClientPosToCaretPos(ATPoint(Coord2.X, Y), Details);
 
     NPosX:= LineCoord2.X;
