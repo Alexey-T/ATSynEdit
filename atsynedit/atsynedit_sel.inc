@@ -489,18 +489,16 @@ begin
     end;
 end;
 
-procedure TATSynEdit.DoSelect_ColumnBlock_Primitive(P1, P2: TPoint);
+procedure TATSynEdit.DoSelect_ColumnBlock_Primitive(ACaretPos1, ACaretPos2: TPoint);
 var
-  St: TATStrings;
   Coord1, Coord2: TATPoint;
   LineCoord1, LineCoord2: TPoint;
   Details: TATEditorPosDetails;
   Y, YMin, YMax: Int64;
   NPosX, NPosY, NEndX, NEndY: integer;
 begin
-  St:= Strings;
-  Coord1:= CaretPosToClientPos(P1);
-  Coord2:= CaretPosToClientPos(P2);
+  Coord1:= CaretPosToClientPos(ACaretPos1);
+  Coord2:= CaretPosToClientPos(ACaretPos2);
   YMin:= Min(Coord1.Y, Coord2.Y);
   YMax:= Max(Coord1.Y, Coord2.Y);
 
@@ -530,7 +528,7 @@ begin
 
   //don't allow no carets
   if Carets.Count=0 then
-    DoCaretSingle(P2.X, P2.Y)
+    DoCaretSingle(ACaretPos2.X, ACaretPos2.Y)
   else
     Carets.DoChanged;
 end;
