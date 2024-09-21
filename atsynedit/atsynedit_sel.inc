@@ -561,6 +561,8 @@ begin
   if FOptCaretsPrimitiveColumnSelection then
   begin
     DoSelect_ColumnBlock_Primitive(APosChar1, APosChar2);
+    UpdateSelRectFromPoints(APosChar1, APosChar2);
+    //DebugSelRect; //debug
     exit;
   end;
 
@@ -580,6 +582,8 @@ begin
     PosTarget.X:= St.ColumnPosToCharPos(PosTarget.Y, PosTarget.X, FTabHelper);
     DoCaretSingle(PosTarget.X, PosTarget.Y);
   end;
+
+  //DebugSelRect; //debug
 end;
 
 procedure TATSynEdit.DoSelect_ColumnBlock_FromPointsColumns(P1, P2: TPoint);
