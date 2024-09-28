@@ -158,8 +158,7 @@ implementation
 uses
   Math,
   LCLType,
-  LCLIntf,
-  textout_faster_gtk2;
+  LCLIntf;
 
 const
   //TextOut with bsClear is faster on Linux/macOS
@@ -1032,16 +1031,6 @@ begin
 
       if ATEditorOptions.DebugTiming then
         tick:= GetTickCount64;
-      {$ifdef LCLGtk2}
-      TextOutFaster(
-        C.Handle,
-        APosX+PixOffset1,
-        APosY+AProps.TextOffsetFromLine,
-        Buf,
-        DxPointer,
-        bPartFirst
-        );
-      {$else}
       _TextOut_Unix(C.Handle,
         APosX+PixOffset1,
         APosY+AProps.TextOffsetFromLine,
@@ -1049,7 +1038,6 @@ begin
         Buf,
         DxPointer
         );
-      {$endif}
       if ATEditorOptions.DebugTiming then
         FTickTextout+= GetTickCount64-tick;
       {$endif}
