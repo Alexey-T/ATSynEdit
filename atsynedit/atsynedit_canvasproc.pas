@@ -730,9 +730,9 @@ procedure CanvasTextOut(C: TCanvas;
   out ATextWidth: Int64;
   const AProps: TATCanvasTextOutProps);
   //
-  function _IsCharSelected(NColumn: integer): boolean; inline;
+  function _IsCharSelected(AColumn: integer): boolean; inline;
   begin
-    Result:= AProps.DetectIsPosSelected(NColumn-2+AProps.CharIndexInLine, AProps.LineIndex);
+    Result:= AProps.DetectIsPosSelected(AColumn-2+AProps.CharIndexInLine, AProps.LineIndex);
   end;
   //
   procedure _PaintUnprintedChars;
