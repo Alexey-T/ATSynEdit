@@ -937,8 +937,7 @@ procedure CanvasTextOut(C: TCanvas;
 var
   PartStr: UnicodeString;
   PartRect: TRect;
-  PartOffset, PartLen,
-  PixOffset1, PixOffset2: integer;
+  PartOffset, PixOffset1, PixOffset2: integer;
   //
   {$ifdef LCLWin32}
   procedure _PaintPart_Windows;
@@ -1029,6 +1028,7 @@ var
   NLen, NCharWidthScaled, NDeltaForItalic, iPart, i: integer;
   NLastPart: integer;
   PartPtr: PATLinePart;
+  PartLen: integer;
   PrevColor: TColor;
   bPrevColorInited: boolean;
   bItalic: boolean;
