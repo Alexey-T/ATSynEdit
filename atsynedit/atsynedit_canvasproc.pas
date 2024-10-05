@@ -729,12 +729,47 @@ procedure CanvasTextOut(C: TCanvas;
   AParts: PATLineParts;
   out ATextWidth: Int64;
   const AProps: TATCanvasTextOutProps);
-//
+  //
   function _IsCharSelected(NColumn: integer): boolean; inline;
   begin
     Result:= AProps.DetectIsPosSelected(NColumn-2+AProps.CharIndexInLine, AProps.LineIndex);
   end;
-//
+  //
+  procedure _PaintAllBorders(PartPtr: PATLinePart; PartRect: TRect);
+  begin
+    //note: PartRect is changed here
+    Dec(PartRect.Right);
+    Dec(PartRect.Bottom);
+
+    CanvasLineEx(C,
+      PartPtr^.ColorBorder,
+      PartPtr^.BorderDown,
+      PartRect.Left, PartRect.Bottom,
+      PartRect.Right, PartRect.Bottom,
+      true);
+
+    CanvasLineEx(C,
+      PartPtr^.ColorBorder,
+      PartPtr^.BorderUp,
+      PartRect.Left, PartRect.Top,
+      PartRect.Right, PartRect.Top,
+      false);
+
+    CanvasLineEx(C,
+      PartPtr^.ColorBorder,
+      PartPtr^.BorderLeft,
+      PartRect.Left, PartRect.Top,
+      PartRect.Left, PartRect.Bottom,
+      false);
+
+    CanvasLineEx(C,
+      PartPtr^.ColorBorder,
+      PartPtr^.BorderRight,
+      PartRect.Right, PartRect.Top,
+      PartRect.Right, PartRect.Bottom,
+      true);
+  end;
+  //
 var
   {$IF not Defined(LCLWin32)}
   Buf: string;
@@ -1039,38 +1074,7 @@ begin
           AProps.SuperFast
           );
 
-      //paint 4 borders of part
-      //note: PartRect is changed here
-      Dec(PartRect.Right);
-      Dec(PartRect.Bottom);
-
-      CanvasLineEx(C,
-        PartPtr^.ColorBorder,
-        PartPtr^.BorderDown,
-        PartRect.Left, PartRect.Bottom,
-        PartRect.Right, PartRect.Bottom,
-        true);
-
-      CanvasLineEx(C,
-        PartPtr^.ColorBorder,
-        PartPtr^.BorderUp,
-        PartRect.Left, PartRect.Top,
-        PartRect.Right, PartRect.Top,
-        false);
-
-      CanvasLineEx(C,
-        PartPtr^.ColorBorder,
-        PartPtr^.BorderLeft,
-        PartRect.Left, PartRect.Top,
-        PartRect.Left, PartRect.Bottom,
-        false);
-
-      CanvasLineEx(C,
-        PartPtr^.ColorBorder,
-        PartPtr^.BorderRight,
-        PartRect.Right, PartRect.Top,
-        PartRect.Right, PartRect.Bottom,
-        true);
+      _PaintAllBorders(PartPtr, PartRect);
     end;
 
     //paint chars after all LineParts are painted, when too many tokens in line
