@@ -814,18 +814,48 @@ procedure CanvasTextOut(C: TCanvas;
     end;
   end;
   //
+  procedure _PaintWithoutParts;
+  var
+    Buf: string;
+    BufW: UnicodeString;
+    DxPointer: PInteger;
+  begin
+    if AProps.HasAsciiNoTabs and not ATEditorOptions.TextoutNeedsOffsets then
+    begin
+      BufW:= AText;
+      DxPointer:= nil;
+    end
+    else
+    begin
+      BufW:= SRemoveHexDisplayedChars(AText);
+      if AProps.FontProportional or CanvasTextOutNeedsOffsets(C, AText) then
+        DxPointer:= @Dx.Data[0]
+      else
+        DxPointer:= nil;
+    end;
+
+    C.Brush.Style:= cTextoutBrushStyle;
+
+    {$ifdef LCLWin32}
+    _TextOut_Windows(C.Handle, APosX, APosY, nil, BufW, DxPointer, false{no ligatures});
+    {$else}
+    Buf:= BufW;
+    _TextOut_Unix(C.Handle, APosX, APosY, nil, Buf, DxPointer);
+    {$endif}
+  end;
+  //
 var
   Buf: string;
-  BufW: UnicodeString;
   PartStr: UnicodeString;
   PartRect: TRect;
   PartOffset, PartLen,
   PixOffset1, PixOffset2: integer;
-  DxPointer: PInteger;
   //
   {$ifdef LCLWin32}
   procedure _PaintPart_Windows;
   var
+    BufW: UnicodeString;
+    DxPointer: PInteger;
     bAllowLigatures: boolean;
     tick: QWord;
   begin
@@ -865,6 +895,8 @@ var
   {$else}
   procedure _PaintPart_NonWindows;
   var
+    BufW: UnicodeString;
+    DxPointer: PInteger;
     i: integer;
     tick: QWord;
   begin
@@ -951,28 +983,7 @@ begin
 
   if AParts=nil then
   begin
-    if AProps.HasAsciiNoTabs and not ATEditorOptions.TextoutNeedsOffsets then
-    begin
-      BufW:= AText;
-      DxPointer:= nil;
-    end
-    else
-    begin
-      BufW:= SRemoveHexDisplayedChars(AText);
-      if AProps.FontProportional or CanvasTextOutNeedsOffsets(C, AText) then
-        DxPointer:= @Dx.Data[0]
-      else
-        DxPointer:= nil;
-    end;
-
-    C.Brush.Style:= cTextoutBrushStyle;
-
-    {$IF Defined(LCLWin32)}
-    _TextOut_Windows(C.Handle, APosX, APosY, nil, BufW, DxPointer, false{no ligatures});
-    {$else}
-    Buf:= BufW;
-    _TextOut_Unix(C.Handle, APosX, APosY, nil, Buf, DxPointer);
-    {$endif}
+    _PaintWithoutParts;
 
     if not AProps.HasAsciiNoTabs then
       DoPaintHexChars(C,
