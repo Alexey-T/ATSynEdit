@@ -735,38 +735,34 @@ procedure CanvasTextOut(C: TCanvas;
     Result:= AProps.DetectIsPosSelected(NColumn-2+AProps.CharIndexInLine, AProps.LineIndex);
   end;
   //
-  procedure _PaintAllBorders(Part: PATLinePart; R: TRect);
+  procedure _PaintAllBorders(APart: PATLinePart; ALeft, ATop, ARight, ABottom: integer);
   begin
-    //note: R is changed here
-    Dec(R.Right);
-    Dec(R.Bottom);
-
     CanvasLineEx(C,
-      Part^.ColorBorder,
-      Part^.BorderDown,
-      R.Left, R.Bottom,
-      R.Right, R.Bottom,
+      APart^.ColorBorder,
+      APart^.BorderDown,
+      ALeft, ABottom,
+      ARight, ABottom,
       true);
 
     CanvasLineEx(C,
-      Part^.ColorBorder,
-      Part^.BorderUp,
-      R.Left, R.Top,
-      R.Right, R.Top,
+      APart^.ColorBorder,
+      APart^.BorderUp,
+      ALeft, ATop,
+      ARight, ATop,
       false);
 
     CanvasLineEx(C,
-      Part^.ColorBorder,
-      Part^.BorderLeft,
-      R.Left, R.Top,
-      R.Left, R.Bottom,
+      APart^.ColorBorder,
+      APart^.BorderLeft,
+      ALeft, ATop,
+      ALeft, ABottom,
       false);
 
     CanvasLineEx(C,
-      Part^.ColorBorder,
-      Part^.BorderRight,
-      R.Right, R.Top,
-      R.Right, R.Bottom,
+      APart^.ColorBorder,
+      APart^.BorderRight,
+      ARight, ATop,
+      ARight, ABottom,
       true);
   end;
   //
@@ -1074,7 +1070,13 @@ begin
           AProps.SuperFast
           );
 
-      _PaintAllBorders(PartPtr, PartRect);
+      _PaintAllBorders(
+        PartPtr,
+        PartRect.Left,
+        PartRect.Top,
+        PartRect.Right-1,
+        PartRect.Bottom-1
+        );
     end;
 
     //paint chars after all LineParts are painted, when too many tokens in line
