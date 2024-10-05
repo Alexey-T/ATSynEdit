@@ -766,29 +766,153 @@ procedure CanvasTextOut(C: TCanvas;
       true);
   end;
   //
+  procedure _PrepareCanvasProps(APart: PATLinePart; out bItalic: boolean);
+  var
+    NStyles: integer;
+    bBold: boolean;
+  begin
+    C.Brush.Color:= APart^.ColorBG;
+
+    NStyles:= APart^.FontStyles;
+    bBold:= (NStyles and afsFontBold)<>0;
+    bItalic:= (NStyles and afsFontItalic)<>0;
+    //bCrossed:= (NStyles and afsFontCrossed)<>0;
+
+    C.Font.Style:= ConvertIntegerToFontStyles(NStyles);
+    C.Font.Color:= APart^.ColorFont;
+
+    if bItalic and not bBold then
+    begin
+      if AProps.FontItalic_Name<>'' then
+      begin
+        C.Font.Name:= AProps.FontItalic_Name;
+        C.Font.Size:= AProps.FontItalic_Size;
+      end;
+    end
+    else
+    if bBold and not bItalic then
+    begin
+      if AProps.FontBold_Name<>'' then
+      begin
+        C.Font.Name:= AProps.FontBold_Name;
+        C.Font.Size:= AProps.FontBold_Size;
+      end;
+    end
+    else
+    if bBold and bItalic then
+    begin
+      if AProps.FontBoldItalic_Name<>'' then
+      begin
+        C.Font.Name:= AProps.FontBoldItalic_Name;
+        C.Font.Size:= AProps.FontBoldItalic_Size;
+      end;
+    end
+    else
+    begin
+      C.Font.Name:= AProps.FontNormal_Name;
+      C.Font.Size:= AProps.FontNormal_Size;
+    end;
+  end;
+  //
 var
-  {$IF not Defined(LCLWin32)}
   Buf: string;
-  {$else}
-  bAllowLigatures: boolean;
-  {$endif}
   BufW: UnicodeString;
+  PartStr: UnicodeString;
+  PartRect: TRect;
+  PartOffset, PartLen,
+  PixOffset1, PixOffset2: integer;
+  DxPointer: PInteger;
+  //
+  {$ifdef LCLWin32}
+  procedure _PaintPart_Windows;
+  var
+    bAllowLigatures: boolean;
+    tick: QWord;
+  begin
+    if AProps.HasAsciiNoTabs and not ATEditorOptions.TextoutNeedsOffsets then
+    begin
+      BufW:= PartStr;
+      bAllowLigatures:= AProps.ShowFontLigatures;
+      DxPointer:= nil;
+    end
+    else
+    begin
+      BufW:= SRemoveHexDisplayedChars(PartStr);
+      bAllowLigatures:=
+        AProps.ShowFontLigatures
+        and not IsStringWithUnusualWidthChars(BufW); //disable ligatures if unicode chars
+
+      if AProps.FontProportional or CanvasTextOutNeedsOffsets(C, PartStr) then
+        DxPointer:= @Dx.Data[PartOffset]
+      else
+        DxPointer:= nil;
+    end;
+
+    if ATEditorOptions.DebugTiming then
+      tick:= GetTickCount64;
+    _TextOut_Windows(C.Handle,
+      APosX+PixOffset1,
+      APosY+AProps.TextOffsetFromLine,
+      @PartRect,
+      BufW,
+      DxPointer,
+      bAllowLigatures
+      );
+    if ATEditorOptions.DebugTiming then
+      FTickTextout+= GetTickCount64-tick;
+  end;
+  //
+  {$else}
+  procedure _PaintPart_NonWindows;
+  var
+    i: integer;
+    tick: QWord;
+  begin
+    if AProps.HasAsciiNoTabs and not ATEditorOptions.TextoutNeedsOffsets then
+    begin
+      SetLength(Buf, Length(PartStr));
+      for i:= 1 to Length(PartStr) do
+        Buf[i]:= chr(ord(PartStr[i]));
+      DxPointer:= nil;
+    end
+    else
+    begin
+      BufW:= PartStr;
+      Buf:= UTF8Encode(SRemoveHexDisplayedChars(BufW));
+
+      if AProps.FontProportional or CanvasTextOutNeedsOffsets(C, PartStr) then
+      begin
+        _CalcCharSizesUtf8FromWidestring(BufW, @Dx.Data[PartOffset], Dx.Len-PartOffset, DxUTF8);
+        DxPointer:= @DxUTF8.Data[0];
+      end
+      else
+        DxPointer:= nil;
+    end;
+
+    if ATEditorOptions.DebugTiming then
+      tick:= GetTickCount64;
+    _TextOut_Unix(C.Handle,
+      APosX+PixOffset1,
+      APosY+AProps.TextOffsetFromLine,
+      @PartRect,
+      Buf,
+      DxPointer
+      );
+    if ATEditorOptions.DebugTiming then
+      FTickTextout+= GetTickCount64-tick;
+  end;
+  {$endif}
+  //
+var
   NLen, NCharWidthScaled, NDeltaForItalic, iPart, i: integer;
   NLastPart: integer;
   NPosFirstChar, NPosLastChar: integer;
-  PartStr: UnicodeString;
-  PartOffset, PartLen,
-  PixOffset1, PixOffset2: integer;
   PartPtr: ^TATLinePart;
-  PartRect: TRect;
-  DxPointer: PInteger;
-  NStyles: integer;
-  bBold, bItalic: boolean;
   bShowUnprintedPartially: boolean;
   PrevColor: TColor;
+  bItalic: boolean;
   bPrevColorInited: boolean;
   ch: WideChar;
-  tick: QWord;
 begin
   NLen:= Min(Length(AText), cMaxFixedArray);
   if NLen=0 then Exit;
@@ -934,47 +1058,7 @@ begin
       else
         PixOffset2:= 0;
 
-      C.Brush.Color:= PartPtr^.ColorBG;
-
-        NStyles:= PartPtr^.FontStyles;
-        bBold:= (NStyles and afsFontBold)<>0;
-        bItalic:= (NStyles and afsFontItalic)<>0;
-        //bCrossed:= (NStyles and afsFontCrossed)<>0;
-
-        C.Font.Style:= ConvertIntegerToFontStyles(NStyles);
-        C.Font.Color:= PartPtr^.ColorFont;
-
-        if bItalic and not bBold then
-        begin
-          if AProps.FontItalic_Name<>'' then
-          begin
-            C.Font.Name:= AProps.FontItalic_Name;
-            C.Font.Size:= AProps.FontItalic_Size;
-          end;
-        end
-        else
-        if bBold and not bItalic then
-        begin
-          if AProps.FontBold_Name<>'' then
-          begin
-            C.Font.Name:= AProps.FontBold_Name;
-            C.Font.Size:= AProps.FontBold_Size;
-          end;
-        end
-        else
-        if bBold and bItalic then
-        begin
-          if AProps.FontBoldItalic_Name<>'' then
-          begin
-            C.Font.Name:= AProps.FontBoldItalic_Name;
-            C.Font.Size:= AProps.FontBoldItalic_Size;
-          end;
-        end
-        else
-        begin
-          C.Font.Name:= AProps.FontNormal_Name;
-          C.Font.Size:= AProps.FontNormal_Size;
-        end;
+      _PrepareCanvasProps(PartPtr, bItalic);
 
       PartRect:= Rect(
         APosX+PixOffset1,
@@ -990,72 +1074,10 @@ begin
 
       C.Brush.Style:= cTextoutBrushStyle;
 
-      {$IF Defined(LCLWin32)}
-      if AProps.HasAsciiNoTabs and not ATEditorOptions.TextoutNeedsOffsets then
-      begin
-        BufW:= PartStr;
-        bAllowLigatures:= AProps.ShowFontLigatures;
-        DxPointer:= nil;
-      end
-      else
-      begin
-        BufW:= SRemoveHexDisplayedChars(PartStr);
-        bAllowLigatures:=
-          AProps.ShowFontLigatures
-          and not IsStringWithUnusualWidthChars(BufW); //disable ligatures if unicode chars
-
-        if AProps.FontProportional or CanvasTextOutNeedsOffsets(C, PartStr) then
-          DxPointer:= @Dx.Data[PartOffset]
-        else
-          DxPointer:= nil;
-      end;
-
-      if ATEditorOptions.DebugTiming then
-        tick:= GetTickCount64;
-      _TextOut_Windows(C.Handle,
-        APosX+PixOffset1,
-        APosY+AProps.TextOffsetFromLine,
-        @PartRect,
-        BufW,
-        DxPointer,
-        bAllowLigatures
-        );
-      if ATEditorOptions.DebugTiming then
-        FTickTextout+= GetTickCount64-tick;
-
-      {$else} //non-Windows
-      if AProps.HasAsciiNoTabs and not ATEditorOptions.TextoutNeedsOffsets then
-      begin
-        SetLength(Buf, Length(PartStr));
-        for i:= 1 to Length(PartStr) do
-          Buf[i]:= chr(ord(PartStr[i]));
-        DxPointer:= nil;
-      end
-      else
-      begin
-        BufW:= PartStr;
-        Buf:= UTF8Encode(SRemoveHexDisplayedChars(BufW));
-
-        if AProps.FontProportional or CanvasTextOutNeedsOffsets(C, PartStr) then
-        begin
-          _CalcCharSizesUtf8FromWidestring(BufW, @Dx.Data[PartOffset], Dx.Len-PartOffset, DxUTF8);
-          DxPointer:= @DxUTF8.Data[0];
-        end
-        else
-          DxPointer:= nil;
-      end;
-
-      if ATEditorOptions.DebugTiming then
-        tick:= GetTickCount64;
-      _TextOut_Unix(C.Handle,
-        APosX+PixOffset1,
-        APosY+AProps.TextOffsetFromLine,
-        @PartRect,
-        Buf,
-        DxPointer
-        );
-      if ATEditorOptions.DebugTiming then
-        FTickTextout+= GetTickCount64-tick;
+      {$ifdef LCLWin32}
+      _PaintPart_Windows;
+      {$else}
+      _PaintPart_NonWindows;
       {$endif}
 
       if not AProps.HasAsciiNoTabs then
