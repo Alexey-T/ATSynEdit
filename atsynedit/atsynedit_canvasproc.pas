@@ -735,38 +735,38 @@ procedure CanvasTextOut(C: TCanvas;
     Result:= AProps.DetectIsPosSelected(NColumn-2+AProps.CharIndexInLine, AProps.LineIndex);
   end;
   //
-  procedure _PaintAllBorders(PartPtr: PATLinePart; PartRect: TRect);
+  procedure _PaintAllBorders(Part: PATLinePart; R: TRect);
   begin
-    //note: PartRect is changed here
-    Dec(PartRect.Right);
-    Dec(PartRect.Bottom);
+    //note: R is changed here
+    Dec(R.Right);
+    Dec(R.Bottom);
 
     CanvasLineEx(C,
-      PartPtr^.ColorBorder,
-      PartPtr^.BorderDown,
-      PartRect.Left, PartRect.Bottom,
-      PartRect.Right, PartRect.Bottom,
+      Part^.ColorBorder,
+      Part^.BorderDown,
+      R.Left, R.Bottom,
+      R.Right, R.Bottom,
       true);
 
     CanvasLineEx(C,
-      PartPtr^.ColorBorder,
-      PartPtr^.BorderUp,
-      PartRect.Left, PartRect.Top,
-      PartRect.Right, PartRect.Top,
+      Part^.ColorBorder,
+      Part^.BorderUp,
+      R.Left, R.Top,
+      R.Right, R.Top,
       false);
 
     CanvasLineEx(C,
-      PartPtr^.ColorBorder,
-      PartPtr^.BorderLeft,
-      PartRect.Left, PartRect.Top,
-      PartRect.Left, PartRect.Bottom,
+      Part^.ColorBorder,
+      Part^.BorderLeft,
+      R.Left, R.Top,
+      R.Left, R.Bottom,
       false);
 
     CanvasLineEx(C,
-      PartPtr^.ColorBorder,
-      PartPtr^.BorderRight,
-      PartRect.Right, PartRect.Top,
-      PartRect.Right, PartRect.Bottom,
+      Part^.ColorBorder,
+      Part^.BorderRight,
+      R.Right, R.Top,
+      R.Right, R.Bottom,
       true);
   end;
   //
