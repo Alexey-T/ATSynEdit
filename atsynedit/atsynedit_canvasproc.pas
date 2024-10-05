@@ -1028,10 +1028,10 @@ var
 var
   NLen, NCharWidthScaled, NDeltaForItalic, iPart, i: integer;
   NLastPart: integer;
-  PartPtr: ^TATLinePart;
+  PartPtr: PATLinePart;
   PrevColor: TColor;
-  bItalic: boolean;
   bPrevColorInited: boolean;
+  bItalic: boolean;
 begin
   NLen:= Min(Length(AText), cMaxFixedArray);
   if NLen=0 then Exit;
