@@ -935,7 +935,6 @@ procedure CanvasTextOut(C: TCanvas;
   end;
   //
 var
-  Buf: string;
   PartStr: UnicodeString;
   PartRect: TRect;
   PartOffset, PartLen,
@@ -944,8 +943,8 @@ var
   {$ifdef LCLWin32}
   procedure _PaintPart_Windows;
   var
-    BufW: UnicodeString;
-    DxPointer: PInteger;
+    BufW: UnicodeString = '';
+    DxPointer: PInteger = nil;
     bAllowLigatures: boolean;
     tick: QWord;
   begin
@@ -985,8 +984,9 @@ var
   {$else}
   procedure _PaintPart_NonWindows;
   var
-    BufW: UnicodeString;
-    DxPointer: PInteger;
+    Buf: string = '';
+    BufW: UnicodeString = '';
+    DxPointer: PInteger = nil;
     i: integer;
     tick: QWord;
   begin
