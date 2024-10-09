@@ -441,40 +441,56 @@ begin
       Result:= DoCommand_KeyHome;
     cCommand_KeyHome_Sel:
       begin
+        {
         if OptMouseColumnSelectionWithoutKey then
           Result:= DoCommand_SelectColumnToLineEdge(false)
         else
           Result:= DoCommand_KeyHome;
+          }
+        OptMouseColumnSelectionWithoutKey:= false;
+        Result:= DoCommand_KeyHome;
       end;
 
     cCommand_KeyEnd:
       Result:= DoCommand_KeyEnd;
     cCommand_KeyEnd_Sel:
       begin
+        {
         if OptMouseColumnSelectionWithoutKey then
           Result:= DoCommand_SelectColumnToLineEdge(true)
         else
           Result:= DoCommand_KeyEnd;
+          }
+        OptMouseColumnSelectionWithoutKey:= false;
+        Result:= DoCommand_KeyEnd;
       end;
 
     cCommand_KeyPageUp:
       Result:= DoCommand_KeyUpDown(false, GetPageLines, FOptKeyPageKeepsRelativePos);
     cCommand_KeyPageUp_Sel:
       begin
+        {
         if OptMouseColumnSelectionWithoutKey then
           Result:= DoCommand_SelectColumnToDirection(TATEditorSelectColumnDirection.PageUp)
         else
           Result:= DoCommand_KeyUpDown(false, GetPageLines, FOptKeyPageKeepsRelativePos);
+          }
+        OptMouseColumnSelectionWithoutKey:= false;
+        Result:= DoCommand_KeyUpDown(false, GetPageLines, FOptKeyPageKeepsRelativePos);
       end;
 
     cCommand_KeyPageDown:
       Result:= DoCommand_KeyUpDown(true, GetPageLines, FOptKeyPageKeepsRelativePos);
     cCommand_KeyPageDown_Sel:
       begin
+        {
         if OptMouseColumnSelectionWithoutKey then
           Result:= DoCommand_SelectColumnToDirection(TATEditorSelectColumnDirection.PageDown)
         else
           Result:= DoCommand_KeyUpDown(true, GetPageLines, FOptKeyPageKeepsRelativePos);
+          }
+        OptMouseColumnSelectionWithoutKey:= false;
+        Result:= DoCommand_KeyUpDown(true, GetPageLines, FOptKeyPageKeepsRelativePos);
       end;
 
     cCommand_ColSelectLeft:        Result:= DoCommand_SelectColumnToDirection(TATEditorSelectColumnDirection.Left);
