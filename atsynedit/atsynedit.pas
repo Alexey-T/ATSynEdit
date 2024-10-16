@@ -894,6 +894,7 @@ type
     FOptThemed: boolean;
     FOptAutoPairForMultiCarets: boolean;
     FOptAutoPairChars: string;
+    FOptAutoPair_DisableCharDoubling: boolean;
     FOptAutocompleteAutoshowCharCount: integer;
     FOptAutocompleteTriggerChars: string;
     FOptAutocompleteCommitChars: string;
@@ -1976,6 +1977,7 @@ type
     property OptThemed: boolean read FOptThemed write FOptThemed default false;
     property OptAutoPairForMultiCarets: boolean read FOptAutoPairForMultiCarets write FOptAutoPairForMultiCarets default cInitAutoPairForMultiCarets;
     property OptAutoPairChars: string read FOptAutoPairChars write FOptAutoPairChars stored false;
+    property OptAutoPair_DisableCharDoubling: boolean read FOptAutoPair_DisableCharDoubling write FOptAutoPair_DisableCharDoubling default false;
     property OptAutocompleteAutoshowCharCount: integer read FOptAutocompleteAutoshowCharCount write FOptAutocompleteAutoshowCharCount default 0;
     property OptAutocompleteTriggerChars: string read FOptAutocompleteTriggerChars write FOptAutocompleteTriggerChars stored false;
     property OptAutocompleteCommitChars: string read FOptAutocompleteCommitChars write FOptAutocompleteCommitChars stored false;
@@ -5340,6 +5342,7 @@ begin
 
   FOptAutoPairForMultiCarets:= cInitAutoPairForMultiCarets;
   FOptAutoPairChars:= '([{';
+  FOptAutoPair_DisableCharDoubling:= false;
   FOptAutocompleteAutoshowCharCount:= 0;
   FOptAutocompleteTriggerChars:= '';
   FOptAutocompleteCommitChars:= ' ,;/\''"';
@@ -8440,6 +8443,13 @@ begin
   if Carets.Count=1 then
   begin
     Caret:= Carets[0];
+
+    //OptAutoPair_DisableCharDoubling is to support feature of VSCode:
+    //after typing paired brackets e.g. '()', app disables typing ')' over ')';
+    //but if caret left orig line -> app don't disable typing ')' over ')'
+    if Caret.PosY<>FPrevCaret.PosY then
+      FOptAutoPair_DisableCharDoubling:= false;
+
     if (FPrevCaret.PosX=Caret.PosX) and
       (FPrevCaret.PosY=Caret.PosY) and
       (FPrevCaret.EndX=Caret.EndX) and
@@ -8476,7 +8486,6 @@ begin
       end;
     end;
   }
-
   if ATEditorOptions.AutoCopyToClipboard or
     ATEditorOptions.AutoCopyToPrimarySel then
     if (Carets.Count=1) and Carets.IsSelection then
