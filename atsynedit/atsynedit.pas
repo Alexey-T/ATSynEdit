@@ -368,8 +368,8 @@ type
     UnprintedSpaces,
     UnprintedTrailingOnly,
     UnprintedEnds,
-    UnprintedEndsOnlyWraps,
     UnprintedEndDetails,
+    UnprintedWraps,
     SavingTrimSpaces,
     SavingTrimFinalEmptyLines,
     SavingForceFinalEol
@@ -785,8 +785,8 @@ type
     FUnprintedForceTabs,
     FUnprintedEof,
     FUnprintedEnds,
-    FUnprintedEndsOnlyWraps,
-    FUnprintedEndsDetails: boolean;
+    FUnprintedEndsDetails,
+    FUnprintedWraps: boolean;
     FPrevModified: boolean;
     FPrevFont: record
       FontName: string;
@@ -2153,8 +2153,8 @@ type
     property OptUnprintedSpacesAlsoInSelection: boolean read FUnprintedSpacesAlsoInSelection write FUnprintedSpacesAlsoInSelection default false;
     property OptUnprintedForceTabs: boolean read FUnprintedForceTabs write FUnprintedForceTabs default false;
     property OptUnprintedEnds: boolean read FUnprintedEnds write FUnprintedEnds default true;
-    property OptUnprintedEndsOnlyWraps: boolean read FUnprintedEndsOnlyWraps write FUnprintedEndsOnlyWraps default false;
     property OptUnprintedEndsDetails: boolean read FUnprintedEndsDetails write FUnprintedEndsDetails default true;
+    property OptUnprintedWraps: boolean read FUnprintedWraps write FUnprintedWraps default false;
     property OptUnprintedEof: boolean read FUnprintedEof write FUnprintedEof default true;
     property OptMouseEnableAll: boolean read FOptMouseEnableAll write FOptMouseEnableAll default true;
     property OptMouseEnableNormalSelection: boolean read FOptMouseEnableNormalSelection write FOptMouseEnableNormalSelection default true;
@@ -4325,7 +4325,7 @@ begin
     end;
 
     //paint EOL mark
-    if FUnprintedVisible and FUnprintedEnds and not FUnprintedEndsOnlyWraps then
+    if FUnprintedVisible and FUnprintedEnds then
       //should UnprintedSpacesOnlyInSelection affect EOL marks? if yes, we need the following "if":
       if (not FUnprintedSpacesOnlyInSelection) or bLineEolSelected then
       begin
@@ -4349,7 +4349,7 @@ begin
   else
   begin
     //paint wrapped-line-part mark
-    if FUnprintedVisible and FUnprintedEnds and
+    if FUnprintedVisible and FUnprintedWraps and
       (not FUnprintedSpacesOnlyInSelection or bLineEolSelected) then
       begin
         if ATEditorOptions.UnprintedWrapArrowAtEdge then
@@ -5360,8 +5360,8 @@ begin
   FUnprintedSpacesBothEnds:= false;
   FUnprintedSpacesOnlyInSelection:= false;
   FUnprintedEnds:= true;
-  FUnprintedEndsOnlyWraps:= false;
   FUnprintedEndsDetails:= true;
+  FUnprintedWraps:= false;
   FUnprintedEof:= true;
 
   FTextHint:= '';
