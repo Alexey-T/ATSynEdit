@@ -125,6 +125,7 @@ type
     function LineSub(AFrom, ALen: SizeInt): UnicodeString;
     procedure LineToBuffer(OtherBuf: PWideChar);
     function CharAt(AIndex: SizeInt): WideChar;
+    function CharAt_Fast(AIndex: SizeInt): WideChar; inline; //don't have range checks
     function HasTab: boolean;
     function HasAsciiNoTabs: boolean;
     procedure Init(const S: string; AEnd: TATLineEnds; AllowBadCharsOfLen1: boolean);
@@ -844,6 +845,22 @@ begin
   else
   begin
     if (AIndex<1) or (AIndex>Length(Buf)) then exit(#0);
+    Result:= WideChar(Ord(Buf[AIndex]));
+  end;
+end;
+
+function TATStringItem.CharAt_Fast(AIndex: SizeInt): WideChar; inline;
+begin
+  if Ex.Wide then
+  begin
+    AIndex:= AIndex shl 1;
+    Dec(AIndex);
+    //if (AIndex<1) or (AIndex>Length(Buf)) then exit(#0);
+    Result:= PWideChar(@Buf[AIndex])^;
+  end
+  else
+  begin
+    //if (AIndex<1) or (AIndex>Length(Buf)) then exit(#0);
     Result:= WideChar(Ord(Buf[AIndex]));
   end;
 end;
