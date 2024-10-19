@@ -124,8 +124,7 @@ type
     function LineSubLen(AFrom, ALen: SizeInt): SizeInt;
     function LineSub(AFrom, ALen: SizeInt): UnicodeString;
     procedure LineToBuffer(OtherBuf: PWideChar);
-    function CharAt_Fast(AIndex: SizeInt): WideChar; inline; //doesn't have range checks
-    function CharAt(AIndex: SizeInt): WideChar; //has range checks
+    function CharAt(AIndex: SizeInt): WideChar;
     function HasTab: boolean;
     function HasAsciiNoTabs: boolean;
     procedure Init(const S: string; AEnd: TATLineEnds; AllowBadCharsOfLen1: boolean);
@@ -833,23 +832,20 @@ begin
   end;
 end;
 
-function TATStringItem.CharAt_Fast(AIndex: SizeInt): WideChar; inline;
+function TATStringItem.CharAt(AIndex: SizeInt): WideChar;
 begin
   if Ex.Wide then
-    Result:= PWideChar(@Buf[AIndex*2-1])^
+  begin
+    AIndex:= AIndex shl 1;
+    Dec(AIndex);
+    if (AIndex<1) or (AIndex>Length(Buf)) then exit(#0);
+    Result:= PWideChar(@Buf[AIndex])^;
+  end
   else
+  begin
+    if (AIndex<1) or (AIndex>Length(Buf)) then exit(#0);
     Result:= WideChar(Ord(Buf[AIndex]));
-end;
-
-function TATStringItem.CharAt(AIndex: SizeInt): WideChar;
-var
-  NLen: SizeInt;
-begin
-  if AIndex<=0 then exit(#0);
-  NLen:= CharLen;
-  if NLen=0 then exit(#0);
-  if AIndex>NLen then exit(#0);
-  Result:= CharAt_Fast(AIndex);
+  end;
 end;
 
 function TATStringItem.HasTab: boolean;
