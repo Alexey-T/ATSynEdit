@@ -5,7 +5,7 @@ function TATSynEdit.DoCommand_ClipboardPaste(AKeepCaret, ASelectThen: boolean;
   ): TATCommandResults;
 var
   St: TATStrings;
-  Str: atString;
+  Str: UnicodeString;
   bHandled, bNeedFixLastEol: boolean;
   bAtLineStart: boolean;
   Num64: Int64;
@@ -34,7 +34,7 @@ begin
   bAtLineStart:= FOptPasteWithEolAtLineStart and not Carets.IsSelection and SEndsWithEol(Str) and (Length(Str)>1);
   if ModeOneLine then
   begin
-    Str:= SRemoveNewlineChars(Str);
+    Str:= SRemoveNewlineChars(STrimNewlineChars(Str));
     bAtLineStart:= false;
   end;
 

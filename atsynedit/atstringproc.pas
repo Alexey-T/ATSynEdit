@@ -247,7 +247,8 @@ function SStringHasTab(const S: string): boolean; inline;
 //function SStringHasAsciiAndNoTabs(const S: atString): boolean;
 //function SStringHasAsciiAndNoTabs(const S: string): boolean;
 
-function SRemoveNewlineChars(const S: atString): atString;
+function STrimNewlineChars(const S: UnicodeString): UnicodeString;
+function SRemoveNewlineChars(const S: UnicodeString): UnicodeString;
 
 function SGetItem(var S: string; const ch: Char = ','): string;
 procedure SSwapEndianWide(var S: UnicodeString);
@@ -1072,7 +1073,20 @@ begin
 end;
 
 
-function SRemoveNewlineChars(const S: atString): atString;
+function STrimNewlineChars(const S: UnicodeString): UnicodeString;
+var
+  Ofs, Len: sizeint;
+begin
+  Len := Length(S);
+  while (Len>0) and IsCharEol(S[Len]) do
+    Dec(Len);
+  Ofs := 1;
+  while (Ofs<=Len) and IsCharEol(S[Ofs]) do
+    Inc(Ofs);
+  result := Copy(S, Ofs, 1 + Len - Ofs);
+end;
+
+function SRemoveNewlineChars(const S: UnicodeString): UnicodeString;
 var
   i: SizeInt;
 begin
