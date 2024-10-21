@@ -97,7 +97,7 @@ begin
     bHadFakeLine:= IsLastLineFake;
     LineBlockDelete(ALineFrom, Min(ALineTo, Count-1)); //too big ALineTo allowed
     LineBlockInsert(ALineFrom, ANewLines);
-    if not bHadFakeLine and IsLastLineFake then
+    if not bHadFakeLine and (Count>1) and IsLastLineFake then
       ActionDeleteFakeLineAndFinalEol;
   finally
     EndUndoGroup;
