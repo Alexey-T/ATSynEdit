@@ -5325,8 +5325,8 @@ begin
   FMarginList:= nil;
   FFoldedMarkList:= nil;
 
-  FPrevCaret.PosX:= -1;
-  FPrevCaret.PosY:= -1;
+  FPrevCaret.PosX:= 0;
+  FPrevCaret.PosY:= 0;
   FPrevCaret.EndX:= -1;
   FPrevCaret.EndY:= -1;
 
