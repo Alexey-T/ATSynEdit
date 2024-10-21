@@ -85,6 +85,8 @@ end;
 
 function TATStrings.TextReplaceLines_UTF8(ALineFrom, ALineTo: SizeInt;
   ANewLines: TStringList): boolean;
+var
+  bHadFakeLine: boolean;
 begin
   Result:= false;
   if not IsIndexValid(ALineFrom) then exit;
@@ -92,8 +94,11 @@ begin
 
   BeginUndoGroup;
   try
+    bHadFakeLine:= IsLastLineFake;
     LineBlockDelete(ALineFrom, Min(ALineTo, Count-1)); //too big ALineTo allowed
     LineBlockInsert(ALineFrom, ANewLines);
+    if not bHadFakeLine and IsLastLineFake then
+      ActionDeleteFakeLineAndFinalEol;
   finally
     EndUndoGroup;
   end;
