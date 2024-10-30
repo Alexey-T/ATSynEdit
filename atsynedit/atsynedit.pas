@@ -6760,9 +6760,12 @@ begin
     Exit;
   end;
 
+  //before PosTextClicked:=ClientPosToCaretPos need some preparing to affect
+  //GenericClientPosToCaretPos params, for Alt+Shift+click (select column block from old origin / from caret);
+  //CudaText issue #5757
   bOldColumnSelection:= FMouseDownAndColumnSelection;
   OldSelRect:= FSelRect;
-  if FMouseDownWithAlt and FMouseDownWithShift then
+  if FMouseDownWithAlt and FMouseDownWithShift and not FMouseDownWithCtrl then
   begin
     FMouseDownAndColumnSelection:= true; //to set AVirtualPos=True in GenericClientPosToCaretPos
     FSelRect:= Rect(0, 0, 1, 1); //non-empty rect, to set AAfterEofUsesLastLen=False in GenericClientPosToCaretPos
