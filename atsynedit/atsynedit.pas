@@ -6653,7 +6653,7 @@ var
   PosDetails: TATEditorPosDetails;
   ActionId: TATEditorMouseAction;
   bClickOnSelection, bClickHandled, bUnfoldClickedPos: boolean;
-  bOldColumnSelection: boolean;
+  bOldColumnSelection, bShiftAltClick: boolean;
   NGutterIndex, NRangeIndex, NLineRangeEnd: integer;
   RectMinimapSel, OldSelRect: TRect;
   Caret: TATCaretItem;
@@ -6765,7 +6765,8 @@ begin
   //CudaText issue #5757
   bOldColumnSelection:= FMouseDownAndColumnSelection;
   OldSelRect:= FSelRect;
-  if FMouseDownWithAlt and FMouseDownWithShift and not FMouseDownWithCtrl then
+  bShiftAltClick:= FMouseDownWithAlt and FMouseDownWithShift and not FMouseDownWithCtrl;
+  if bShiftAltClick then
   begin
     FMouseDownAndColumnSelection:= true; //to set AVirtualPos=True in GenericClientPosToCaretPos
     FSelRect:= Rect(0, 0, 1, 1); //non-empty rect, to set AAfterEofUsesLastLen=False in GenericClientPosToCaretPos
@@ -6773,7 +6774,7 @@ begin
   PosTextClicked:= ClientPosToCaretPos(PosCoord,
     PosDetails,
     TATEditorGapCoordAction.ToLineEnd,
-    FMouseDownAndColumnSelection
+    bShiftAltClick
     );
   FSelRect:= OldSelRect;
   FMouseDownAndColumnSelection:= bOldColumnSelection;
