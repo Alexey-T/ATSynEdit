@@ -6790,7 +6790,10 @@ begin
     if FMouseDownWithAlt or FOptMouseColumnSelectionWithoutKey then
     begin
       if not FMouseDownWithShift then
-        FMouseDownPnt_ColumnSelOrigin:= FMouseDownPnt;
+        FMouseDownPnt_ColumnSelOrigin:= FMouseDownPnt
+      else
+      if (FMouseDownPnt_ColumnSelOrigin.Y=-1) and (Carets.Count>0) then
+        FMouseDownPnt_ColumnSelOrigin:= Point(Carets[0].PosX, Carets[0].PosY);
     end
     else
       FMouseDownPnt_ColumnSelOrigin:= Point(-1, -1);
