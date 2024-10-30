@@ -7959,7 +7959,11 @@ begin
       Exit;
   end;
 
-  PCaret:= ClientPosToCaretPos(PClient, Details);
+  PCaret:= ClientPosToCaretPos(PClient,
+    Details,
+    TATEditorGapCoordAction.ToLineEnd,
+    true //to avoid selection to smaller X during column selection, CudaText issue #5756
+    );
 
   if (PCaret.X>=0) and (PCaret.Y>=0) then
   begin

@@ -592,6 +592,12 @@ begin
     Dec(APos.X, FScrollHorz.NPixelOffset); //fix for text partially scrolled, #5349
   Dec(APos.Y, FTextOffsetFromTop1);
 
+  {
+  //for debugging breakpoint
+  if not AColumnSelectionAllowsVirtualPos and FMouseDownAndColumnSelection then
+    if Random(0)=1 then ;
+  }
+
   Result:= GenericClientPosToCaretPos(APos,
     WrapInfo,
     Strings,
