@@ -6653,7 +6653,7 @@ var
   PosDetails: TATEditorPosDetails;
   ActionId: TATEditorMouseAction;
   bClickOnSelection, bClickHandled, bUnfoldClickedPos: boolean;
-  bOldColumnSelection, bShiftAltClick: boolean;
+  bOldColumnSelection, bClickToSelectColumn: boolean;
   NGutterIndex, NRangeIndex, NLineRangeEnd: integer;
   RectMinimapSel, OldSelRect: TRect;
   Caret: TATCaretItem;
@@ -6715,6 +6715,7 @@ begin
   FMouseDownWithCtrl:= ssXControl in Shift;
   FMouseDownWithAlt:= ssAlt in Shift;
   FMouseDownWithShift:= ssShift in Shift;
+  ActionId:= EditorMouseActionId(FMouseActions, Shift);
 
   if FMinimapVisible and ATPointInRect(FRectMinimap, PosCoord) then
   begin
@@ -6763,8 +6764,8 @@ begin
   //before PosTextClicked:=ClientPosToCaretPos need some preparing to affect
   //GenericClientPosToCaretPos params, for Alt+Shift+click (select column block from old origin / from caret);
   //CudaText issue #5757
-  bShiftAltClick:= FMouseDownWithAlt and FMouseDownWithShift and not FMouseDownWithCtrl;
-  if bShiftAltClick then
+  bClickToSelectColumn:= ActionId=TATEditorMouseAction.ClickAndSelVerticalBlock;
+  if bClickToSelectColumn then
   begin
     bOldColumnSelection:= FMouseDownAndColumnSelection;
     OldSelRect:= FSelRect;
@@ -6775,10 +6776,10 @@ begin
   PosTextClicked:= ClientPosToCaretPos(PosCoord,
     PosDetails,
     TATEditorGapCoordAction.ToLineEnd,
-    bShiftAltClick
+    bClickToSelectColumn
     );
 
-  if bShiftAltClick then
+  if bClickToSelectColumn then
   begin
     FSelRect:= OldSelRect;
     FMouseDownAndColumnSelection:= bOldColumnSelection;
@@ -6791,7 +6792,6 @@ begin
   FMouseDragDropping:= false;
   FMouseDragDroppingReal:= false;
   FMouseDragMinimap:= false;
-  ActionId:= EditorMouseActionId(FMouseActions, Shift);
   bClickOnSelection:= false;
 
   ClearSelRectPoints; //SelRect points will be set in MouseMove
