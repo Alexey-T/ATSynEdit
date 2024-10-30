@@ -7488,7 +7488,7 @@ begin
           end
           else
           begin
-            //drag w/out button pressed: single selection
+            //drag without Ctrl/Alt pressed: single selection
             //ssShift is allowed to select by Shift+MouseWheel
             if not FMouseDownWithCtrl and not FMouseDownWithAlt then
             begin
