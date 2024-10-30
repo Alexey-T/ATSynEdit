@@ -6763,21 +6763,26 @@ begin
   //before PosTextClicked:=ClientPosToCaretPos need some preparing to affect
   //GenericClientPosToCaretPos params, for Alt+Shift+click (select column block from old origin / from caret);
   //CudaText issue #5757
-  bOldColumnSelection:= FMouseDownAndColumnSelection;
-  OldSelRect:= FSelRect;
   bShiftAltClick:= FMouseDownWithAlt and FMouseDownWithShift and not FMouseDownWithCtrl;
   if bShiftAltClick then
   begin
+    bOldColumnSelection:= FMouseDownAndColumnSelection;
+    OldSelRect:= FSelRect;
     FMouseDownAndColumnSelection:= true; //to set AVirtualPos=True in GenericClientPosToCaretPos
     FSelRect:= Rect(0, 0, 1, 1); //non-empty rect, to set AAfterEofUsesLastLen=False in GenericClientPosToCaretPos
   end;
+
   PosTextClicked:= ClientPosToCaretPos(PosCoord,
     PosDetails,
     TATEditorGapCoordAction.ToLineEnd,
     bShiftAltClick
     );
-  FSelRect:= OldSelRect;
-  FMouseDownAndColumnSelection:= bOldColumnSelection;
+
+  if bShiftAltClick then
+  begin
+    FSelRect:= OldSelRect;
+    FMouseDownAndColumnSelection:= bOldColumnSelection;
+  end;
 
   FCaretSpecPos:= false;
   FMouseDownOnEditingArea:= false;
