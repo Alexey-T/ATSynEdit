@@ -2973,7 +2973,7 @@ begin
     if NPos>NPosLast then
     begin
       NPos:= NPosLast; //fix CudaText #4737
-      Include(FPaintFlags, TATEditorInternalFlag.RepaintNeeded);
+      Include(FPaintFlags, TATEditorInternalFlag.RepaintNeeded); //fix CudaText #5755
     end;
 
     CharSizeScaled_Prev:= CharSizeScaled;
