@@ -6811,7 +6811,8 @@ begin
     FMouseDownPnt:= PosTextClicked;
     bClickOnSelection:= Carets.FindCaretContainingPos(FMouseDownPnt.X, FMouseDownPnt.Y)>=0;
 
-    if FMouseDownWithAlt or FOptMouseColumnSelectionWithoutKey then //note: hardcoded Alt key! but hard to rewrite via ActionId
+    if (FMouseDownWithAlt and not FMouseDownWithCtrl) or FOptMouseColumnSelectionWithoutKey then
+      //note: hardcoded Alt key! but hard to rewrite via ActionId
     begin
       if not FMouseDownWithShift then
         FMouseDownPnt_ColumnSelOrigin:= FMouseDownPnt
@@ -6922,18 +6923,21 @@ begin
 
       TATEditorMouseAction.ClickAndSelVerticalBlock:
         begin
-          FSelRect:= cRectEmpty;
-          DoCaretSingleAsIs;
-          if FMouseDownPnt_ColumnSelOrigin.Y>=0 then
-            DoSelect_ColumnBlock_FromPoints(
-              FMouseDownPnt_ColumnSelOrigin,
-              FMouseDownPnt
-              )
-          else
-            DoSelect_ColumnBlock_FromPoints(
-              Point(Carets[0].PosX, Carets[0].PosY),
-              FMouseDownPnt
-              );
+          if FOptMouseEnableColumnSelection then
+          begin
+            FSelRect:= cRectEmpty;
+            DoCaretSingleAsIs;
+            if FMouseDownPnt_ColumnSelOrigin.Y>=0 then
+              DoSelect_ColumnBlock_FromPoints(
+                FMouseDownPnt_ColumnSelOrigin,
+                FMouseDownPnt
+                )
+            else
+              DoSelect_ColumnBlock_FromPoints(
+                Point(Carets[0].PosX, Carets[0].PosY),
+                FMouseDownPnt
+                );
+          end;
         end;
 
       TATEditorMouseAction.MakeCaret:
