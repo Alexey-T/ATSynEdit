@@ -954,10 +954,6 @@ type
     FOptStapleEdge1: TATEditorStapleEdge;
     FOptStapleEdge2: TATEditorStapleEdge;
     FOptStapleIndentConsidersEnd: boolean;
-    FOptMouseEnableAll: boolean;
-    FOptMouseEnableNormalSelection: boolean;
-    FOptMouseEnableColumnSelection: boolean;
-    FOptMouseColumnSelectionWithoutKey: boolean;
     FOptCaretsPrimitiveColumnSelection: boolean;
     FOptCaretsAddedToColumnSelection: boolean;
     FOptCaretPreferLeftSide: boolean;
@@ -1052,6 +1048,10 @@ type
     FOptShowCurColumn: boolean;
     FOptKeepSelFontColor: boolean;
     FOptShowMouseSelFrame: boolean;
+    FOptMouseEnableAll: boolean;
+    FOptMouseEnableNormalSelection: boolean;
+    FOptMouseEnableColumnSelection: boolean;
+    FOptMouseColumnSelectionWithoutKey: boolean;
     FOptMouseHideCursor: boolean;
     FOptMouseClickOpensURL: boolean;
     FOptMouseClickNumberSelectsLine: boolean;
