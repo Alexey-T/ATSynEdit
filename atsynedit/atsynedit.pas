@@ -6811,7 +6811,7 @@ begin
     FMouseDownPnt:= PosTextClicked;
     bClickOnSelection:= Carets.FindCaretContainingPos(FMouseDownPnt.X, FMouseDownPnt.Y)>=0;
 
-    if FMouseDownWithAlt or FOptMouseColumnSelectionWithoutKey then
+    if FMouseDownWithAlt or FOptMouseColumnSelectionWithoutKey then //note: hardcoded Alt key! but hard to rewrite via ActionId
     begin
       if not FMouseDownWithShift then
         FMouseDownPnt_ColumnSelOrigin:= FMouseDownPnt
