@@ -689,6 +689,7 @@ type
     FMouseDragCoord: TATPoint;
     FMouseDownPnt: TPoint;
     FMouseDownPnt_ColumnSelOrigin: TPoint;
+    FMouseDownAndColumnSelection: boolean;
     FMouseDownGutterLineNumber: integer;
     FMouseDownOnEditingArea: boolean;
     FMouseDownOnMinimap: boolean;
@@ -705,7 +706,6 @@ type
     FMouseDragMinimapDelta: integer;
     FMouseDragMinimapSelHeight: integer;
     FMouseDragHandlerDisabled: boolean;
-    FMouseDownAndColumnSelection: boolean;
     FMouseRightClickOnGutterIsHandled: boolean;
     FMouseAutoScrollDirection: TATEditorDirection;
     FMouseActions: TATEditorMouseActions;
