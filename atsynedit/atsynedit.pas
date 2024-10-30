@@ -688,6 +688,7 @@ type
     FMouseDownCoord: TATPoint;
     FMouseDragCoord: TATPoint;
     FMouseDownPnt: TPoint;
+    FMouseDownPnt_ColumnSelOrigin: TPoint;
     FMouseDownGutterLineNumber: integer;
     FMouseDownOnEditingArea: boolean;
     FMouseDownOnMinimap: boolean;
@@ -5582,6 +5583,7 @@ begin
   FOptDimUnfocusedBack:= cInitDimUnfocusedBack;
 
   ClearMouseDownVariables;
+  FMouseDownPnt_ColumnSelOrigin:= Point(-1, -1);
   FMouseNiceScrollPos:= ATPoint(0, 0);
 
   FSelRect:= cRectEmpty;
@@ -6785,6 +6787,14 @@ begin
     FMouseDownPnt:= PosTextClicked;
     bClickOnSelection:= Carets.FindCaretContainingPos(FMouseDownPnt.X, FMouseDownPnt.Y)>=0;
 
+    if FMouseDownWithAlt or FOptMouseColumnSelectionWithoutKey then
+    begin
+      if not FMouseDownWithShift then
+        FMouseDownPnt_ColumnSelOrigin:= FMouseDownPnt;
+    end
+    else
+      FMouseDownPnt_ColumnSelOrigin:= Point(-1, -1);
+
     if Shift=[ssMiddle] then
       if DoHandleClickEvent(FOnClickMiddle) then Exit;
 
@@ -6887,9 +6897,14 @@ begin
         begin
           FSelRect:= cRectEmpty;
           DoCaretSingleAsIs;
-          with Carets[0] do
+          if FMouseDownPnt_ColumnSelOrigin.Y>=0 then
             DoSelect_ColumnBlock_FromPoints(
-              Point(PosX, PosY),
+              FMouseDownPnt_ColumnSelOrigin,
+              FMouseDownPnt
+              )
+          else
+            DoSelect_ColumnBlock_FromPoints(
+              Point(Carets[0].PosX, Carets[0].PosY),
               FMouseDownPnt
               );
         end;
