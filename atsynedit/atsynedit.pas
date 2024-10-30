@@ -6653,8 +6653,9 @@ var
   PosDetails: TATEditorPosDetails;
   ActionId: TATEditorMouseAction;
   bClickOnSelection, bClickHandled, bUnfoldClickedPos: boolean;
+  bOldColumnSelection: boolean;
   NGutterIndex, NRangeIndex, NLineRangeEnd: integer;
-  RectMinimapSel: TRect;
+  RectMinimapSel, OldSelRect: TRect;
   Caret: TATCaretItem;
 begin
   if not OptMouseEnableAll then exit;
@@ -6759,7 +6760,21 @@ begin
     Exit;
   end;
 
-  PosTextClicked:= ClientPosToCaretPos(PosCoord, PosDetails);
+  bOldColumnSelection:= FMouseDownAndColumnSelection;
+  OldSelRect:= FSelRect;
+  if FMouseDownWithAlt and FMouseDownWithShift then
+  begin
+    FMouseDownAndColumnSelection:= true; //to set AVirtualPos=True in GenericClientPosToCaretPos
+    FSelRect:= Rect(0, 0, 1, 1); //non-empty rect, to set AAfterEofUsesLastLen=False in GenericClientPosToCaretPos
+  end;
+  PosTextClicked:= ClientPosToCaretPos(PosCoord,
+    PosDetails,
+    TATEditorGapCoordAction.ToLineEnd,
+    FMouseDownAndColumnSelection
+    );
+  FSelRect:= OldSelRect;
+  FMouseDownAndColumnSelection:= bOldColumnSelection;
+
   FCaretSpecPos:= false;
   FMouseDownOnEditingArea:= false;
   FMouseDownOnMinimap:= false;
