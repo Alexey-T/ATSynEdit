@@ -2970,7 +2970,11 @@ begin
   begin
     UpdateScrollInfoVertPartial(NPage, NMax);
     NPosLast:= Max(0, NMax-NPage);
-    NPos:= Min(NPos, NPosLast); //fix CudaText #4737
+    if NPos>NPosLast then
+    begin
+      NPos:= NPosLast; //fix CudaText #4737
+      Include(FPaintFlags, TATEditorInternalFlag.RepaintNeeded);
+    end;
 
     CharSizeScaled_Prev:= CharSizeScaled;
     CharSizeScaled:= FCharSize.Y * ATEditorCharXScale;
