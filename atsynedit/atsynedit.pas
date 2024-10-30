@@ -6655,7 +6655,7 @@ var
   bClickOnSelection, bClickHandled, bUnfoldClickedPos: boolean;
   bOldColumnSelection, bClickToSelectColumn: boolean;
   NGutterIndex, NRangeIndex, NLineRangeEnd: integer;
-  RectMinimapSel, OldSelRect: TRect;
+  RectMinimapSel: TRect;
   Caret: TATCaretItem;
 begin
   if not OptMouseEnableAll then exit;
@@ -6768,9 +6768,7 @@ begin
   if bClickToSelectColumn then
   begin
     bOldColumnSelection:= FMouseDownAndColumnSelection;
-    OldSelRect:= FSelRect;
     FMouseDownAndColumnSelection:= true; //to set AVirtualPos=True in GenericClientPosToCaretPos
-    FSelRect:= Rect(0, 0, 1, 1); //non-empty rect, to set AAfterEofUsesLastLen=False in GenericClientPosToCaretPos
   end;
 
   PosTextClicked:= ClientPosToCaretPos(PosCoord,
@@ -6781,7 +6779,6 @@ begin
 
   if bClickToSelectColumn then
   begin
-    FSelRect:= OldSelRect;
     FMouseDownAndColumnSelection:= bOldColumnSelection;
   end;
 

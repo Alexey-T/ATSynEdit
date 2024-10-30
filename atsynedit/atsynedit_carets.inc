@@ -609,7 +609,7 @@ begin
     FCaretVirtual or (AColumnSelectionAllowsVirtualPos and FMouseDownAndColumnSelection),
     ADetails,
     AGapCoordAction,
-    IsSelRectEmpty,
+    not FMouseDownAndColumnSelection, //IsSelRectEmpty {was in 2024.10}
     FEditorIndex);
 end;
 
