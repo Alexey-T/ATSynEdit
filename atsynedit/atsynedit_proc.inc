@@ -199,11 +199,28 @@ begin
 end;
 
 function EditorLinkIsEmail(const S: string): boolean;
+var
+  N, K: integer;
 begin
   if SBeginsWith(S, 'mailto:') then
     Result:= true
   else
-    Result:= (Pos('://', S)=0) and (Pos('@', S)>0) and (Pos('.', S)>0);
+  begin
+    Result:= false;
+    N:= Pos('://', S);
+    if N>0 then exit;
+
+    N:= Pos('@', S);
+    if (N<=1) or (N>=Length(S)-1) then exit;
+    if not IsCharWordA(S[N-1]) then exit;
+    if not IsCharWordA(S[N+1]) then exit;
+
+    K:= Pos('.', S, N);
+    if (K<=N+1) or (K>=Length(S)-1) then exit;
+    if not IsCharWordA(S[K-1]) then exit;
+    if not IsCharWordA(S[K+1]) then exit;
+    Result:= true;
+  end;
 end;
 
 procedure EditorOpenLink(const S: string);
