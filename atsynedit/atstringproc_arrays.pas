@@ -129,8 +129,8 @@ begin
 
     Sep.GetItemStr(SItem);
     SSplitByChar(SItem, ',', S1, S2);
-    A[i].X2:= StrToIntDef(S1, 0);
-    A[i].Y2:= StrToIntDef(S2, 0);
+    A[i].X2:= StrToIntDef(S1, -1);
+    A[i].Y2:= StrToIntDef(S2, -1);
   end;
 end;
 
