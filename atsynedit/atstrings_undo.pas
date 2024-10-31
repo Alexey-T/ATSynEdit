@@ -156,7 +156,7 @@ begin
     IntToStr(ItemIndex)+PartSep+
     IntToStr(Ord(ItemEnd))+PartSep+
     IntToStr(Ord(ItemLineState))+PartSep+
-    PointsPairArrayToString(ItemCarets)+MarkersSep+
+    PointPairArrayToString(ItemCarets)+MarkersSep+
       MarkerArrayToString(ItemMarkers)+MarkersSep+
       IntToStr(ItemGlobalCounter)+MarkersSep+
       IntToStr(ItemTickCount)+PartSep+
@@ -190,7 +190,7 @@ begin
   Sep2.Init(S, MarkersSep);
   //a) carets
   Sep2.GetItemStr(SubItem);
-  StringToPointsPairArray(ItemCarets, SubItem);
+  StringToPointPairArray(ItemCarets, SubItem);
   //b) markers
   Sep2.GetItemStr(SubItem);
   if SubItem<>'' then

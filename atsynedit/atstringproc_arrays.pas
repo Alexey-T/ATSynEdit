@@ -15,14 +15,14 @@ uses
   ATStringProc_Separator;
 
 function MarkerArrayToString(const Ar: TATMarkerMarkerArray): string;
-function PointsPairArrayToString(const A: TATPointPairArray): string;
+function PointPairArrayToString(const A: TATPointPairArray): string;
 
-procedure StringToMarkerArray(out Ar: TATMarkerMarkerArray; const AStr: string);
-procedure StringToPointsPairArray(out A: TATPointPairArray; const AStr: string);
+procedure StringToMarkerArray(out Ar: TATMarkerMarkerArray; const S: string);
+procedure StringToPointPairArray(out A: TATPointPairArray; const S: string);
 
 implementation
 
-function PointsPairArrayToString(const A: TATPointPairArray): string;
+function PointPairArrayToString(const A: TATPointPairArray): string;
 var
   L: TStringList;
   NLen, i: integer;
@@ -82,21 +82,21 @@ begin
 end;
 
 
-procedure StringToMarkerArray(out Ar: TATMarkerMarkerArray; const AStr: string);
+procedure StringToMarkerArray(out Ar: TATMarkerMarkerArray; const S: string);
 var
   Sep: TATStringSeparator;
   Len: integer;
   i: integer;
 begin
   Ar:= nil;
-  if AStr='' then
+  if S='' then
     exit;
 
-  Len:= SFindCharCount(AStr, ',');
+  Len:= SFindCharCount(S, ',');
   if Len=0 then exit;
   SetLength(Ar, Len div 7);
 
-  Sep.Init(AStr);
+  Sep.Init(S);
   for i:= 0 to Length(Ar)-1 do
   begin
     Sep.GetItemInt(Ar[i].PosX, 0);
@@ -110,16 +110,16 @@ begin
 end;
 
 
-procedure StringToPointsPairArray(out A: TATPointPairArray; const AStr: string);
+procedure StringToPointPairArray(out A: TATPointPairArray; const S: string);
 var
   Sep: TATStringSeparator;
   SItem, S1, S2: string;
   i, NLen: integer;
 begin
-  NLen:= SFindCharCount(AStr, ';') div 2;
+  NLen:= SFindCharCount(S, ';') div 2;
   A:= nil;
   SetLength(A, NLen);
-  Sep.Init(AStr, ';');
+  Sep.Init(S, ';');
   for i:= 0 to NLen-1 do
   begin
     Sep.GetItemStr(SItem);
