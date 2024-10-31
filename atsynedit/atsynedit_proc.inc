@@ -133,7 +133,7 @@ procedure InitEditorMouseActions(out M: TATEditorMouseActions; ANoCtrlClickForCa
 var
   NCount: integer;
   //
-  procedure Add(AId: TATEditorMouseAction; AState: TShiftState); inline;
+  procedure Add(AId: TATEditorMouseAction; AState: TShiftState);
   begin
     M[NCount].MouseActionId:= AId;
     M[NCount].MouseState:= AState;
@@ -199,16 +199,11 @@ begin
 end;
 
 function EditorLinkIsEmail(const S: string): boolean;
-const
-  MailPrefix = 'mailto:';
 begin
-  if SBeginsWith(S, MailPrefix) then
+  if SBeginsWith(S, 'mailto:') then
     Result:= true
   else
-  if (Pos('://', S)=0) and (Pos('@', S)>0) and (Pos('.', S)>0) then
-    Result:= true
-  else
-    Result:= false;
+    Result:= (Pos('://', S)=0) and (Pos('@', S)>0) and (Pos('.', S)>0);
 end;
 
 procedure EditorOpenLink(const S: string);
