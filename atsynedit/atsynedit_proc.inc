@@ -198,32 +198,32 @@ begin
   {$endif}
 end;
 
-function EditorLinkIsEmail(const S: string): boolean;
+function EditorLinkIsEmail(S: string): boolean;
+const
+  MailPrefix = 'mailto:';
 var
   N, K: integer;
 begin
-  if SBeginsWith(S, 'mailto:') then
-    Result:= true
-  else
-  begin
-    Result:= false;
-    if S='' then exit;
-    if not IsCharWordA(S[1]) then exit;
-    if not IsCharWordA(S[Length(S)]) then exit;
-    N:= Pos('://', S);
-    if N>0 then exit;
+  Result:= false;
+  if SBeginsWith(S, MailPrefix) then
+    Delete(S, 1, Length(MailPrefix));
 
-    N:= Pos('@', S);
-    if (N<=1) or (N>=Length(S)-1) then exit;
-    if not IsCharWordA(S[N-1]) then exit;
-    if not IsCharWordA(S[N+1]) then exit;
+  if S='' then exit;
+  if not IsCharWordA(S[1]) then exit;
+  if not IsCharWordA(S[Length(S)]) then exit;
+  N:= Pos('://', S);
+  if N>0 then exit;
 
-    K:= Pos('.', S, N);
-    if (K<=N+1) or (K>=Length(S)-1) then exit;
-    if not IsCharWordA(S[K-1]) then exit;
-    if not IsCharWordA(S[K+1]) then exit;
-    Result:= true;
-  end;
+  N:= Pos('@', S);
+  if (N<=1) or (N>=Length(S)-1) then exit;
+  if not IsCharWordA(S[N-1]) then exit;
+  if not IsCharWordA(S[N+1]) then exit;
+
+  K:= Pos('.', S, N);
+  if (K<=N+1) or (K>=Length(S)-1) then exit;
+  if not IsCharWordA(S[K-1]) then exit;
+  if not IsCharWordA(S[K+1]) then exit;
+  Result:= true;
 end;
 
 procedure EditorOpenLink(const S: string);
