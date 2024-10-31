@@ -207,6 +207,9 @@ begin
   else
   begin
     Result:= false;
+    if S='' then exit;
+    if not IsCharWordA(S[1]) then exit;
+    if not IsCharWordA(S[Length(S)]) then exit;
     N:= Pos('://', S);
     if N>0 then exit;
 
