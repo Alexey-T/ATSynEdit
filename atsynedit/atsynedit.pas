@@ -1570,10 +1570,10 @@ type
     function GetCommandFromKey(var Key: Word; Shift: TShiftState): integer;
     function DoMouseWheelAction(Shift: TShiftState; AWheelDelta: integer;
       AForceHorz: boolean): boolean;
-    function GetCaretsArray: TATPointArray;
+    function GetCaretsArray: TATPointPairArray;
     function GetMarkersArray: TATMarkerMarkerArray;
     function GetAttribsArray: TATMarkerAttribArray;
-    procedure SetCaretsArray(const Ar: TATPointArray);
+    procedure SetCaretsArray(const Ar: TATPointPairArray);
     procedure SetMarkersArray(const Ar: TATMarkerMarkerArray);
     procedure SetAttribsArray(const Ar: TATMarkerAttribArray);
     property MouseNiceScroll: boolean read GetMouseNiceScroll write SetMouseNiceScroll;

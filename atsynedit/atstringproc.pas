@@ -64,6 +64,8 @@ type
   TATIntArray = array of integer;
   TATPointArray = array of TPoint;
   TATInt64Array = array of Int64;
+  TATPointPair = packed record X, Y, X2, Y2: integer; end;
+  TATPointPairArray = array of TATPointPair;
 
 type
   TATMarkerMarkerRecord = record

@@ -165,10 +165,10 @@ type
   TATLoadStreamOptions = set of TATLoadStreamOption;
 
 type
-  TATStringsGetCarets = function: TATPointArray of object;
+  TATStringsGetCarets = function: TATPointPairArray of object;
   TATStringsGetMarkers = function: TATMarkerMarkerArray of object;
   TATStringsGetAttribs = function: TATMarkerAttribArray of object;
-  TATStringsSetCarets = procedure(const ACarets: TATPointArray) of object;
+  TATStringsSetCarets = procedure(const ACarets: TATPointPairArray) of object;
   TATStringsSetMarkers = procedure(const AMarkers: TATMarkerMarkerArray) of object;
   TATStringsSetAttribs = procedure(const AMarkers: TATMarkerAttribArray) of object;
   TATStringsChangeLogEvent = procedure(Sender: TObject; ALine: SizeInt) of object;
@@ -247,7 +247,7 @@ type
     function DebugText: string;
     function IsFilled: boolean;
     procedure DoFinalizeSaving;
-    function GetCaretsArray: TATPointArray;
+    function GetCaretsArray: TATPointPairArray;
     function GetMarkersArray: TATMarkerMarkerArray;
     function GetAttribsArray: TATMarkerAttribArray;
     function GetLine(AIndex: SizeInt): atString;
@@ -275,7 +275,7 @@ type
     procedure LineInsertEx(ALineIndex: SizeInt; const AString: atString; AEnd: TATLineEnds; AWithEvent: boolean=true);
     procedure LineAddEx(const AString: atString; AEnd: TATLineEnds);
     function IsSavingWithSignature: boolean;
-    procedure SetCaretsArray(const L: TATPointArray);
+    procedure SetCaretsArray(const L: TATPointPairArray);
     procedure SetMarkersArray(const L: TATMarkerMarkerArray);
     procedure SetAttribsArray(const L: TATMarkerAttribArray);
     procedure SetEndings(AValue: TATLineEnds);
@@ -302,7 +302,7 @@ type
     procedure AddUpdatesAction(ALineIndex: integer; AAction: TATEditAction);
     procedure UpdateModified;
   public
-    CaretsAfterLastEdition: TATPointArray;
+    CaretsAfterLastEdition: TATPointPairArray;
     EditingActive: boolean;
     EditingTopLine: SizeInt;
     StringBufferObject: TObject;
@@ -386,7 +386,7 @@ type
     procedure ActionSort(AAction: TATStringsSortAction; AFrom, ATo: SizeInt);
     procedure ActionReverseLines;
     procedure ActionShuffleLines;
-    procedure ActionAddJumpToUndo(constref ACaretsArray: TATPointArray);
+    procedure ActionAddJumpToUndo(constref ACaretsArray: TATPointPairArray);
     //file
     procedure LoadFromStream(AStream: TStream; AOptions: TATLoadStreamOptions);
     procedure LoadFromFile(const AFilename: string; AOptions: TATLoadStreamOptions);
@@ -1929,7 +1929,7 @@ var
   CurIndex: integer;
   CurLineEnd: TATLineEnds;
   CurLineState: TATLineState;
-  CurCaretsArray: TATPointArray;
+  CurCaretsArray: TATPointPairArray;
   CurMarkersArray: TATMarkerMarkerArray;
   CurAttribsArray: TATMarkerAttribArray;
   OtherList: TATUndoList;
@@ -2141,7 +2141,7 @@ begin
   end;
 end;
 
-function TATStrings.GetCaretsArray: TATPointArray;
+function TATStrings.GetCaretsArray: TATPointPairArray;
 begin
   if Assigned(FOnGetCaretsArray) then
     Result:= FOnGetCaretsArray()
@@ -2165,7 +2165,7 @@ begin
     Result:= nil;
 end;
 
-procedure TATStrings.SetCaretsArray(const L: TATPointArray);
+procedure TATStrings.SetCaretsArray(const L: TATPointPairArray);
 begin
   if Assigned(FOnSetCaretsArray) then
     FOnSetCaretsArray(L);
@@ -2385,18 +2385,17 @@ end;
 
 procedure TATStrings.ActionSaveLastEditionPos(AX: SizeInt; AY: SizeInt);
 var
-  Ar: TATPointArray;
+  Ar: TATPointPairArray;
 begin
   ModifiedRecent:= false;
 
   if (AX>=0) and (AY>=0) then
   begin
-    //2 items per caret
-    SetLength(Ar{%H-}, 2);
+    SetLength(Ar{%H-}, 1);
     Ar[0].X:= AX;
     Ar[0].Y:= AY;
-    Ar[1].X:= -1;
-    Ar[1].Y:= -1;
+    Ar[0].X2:= -1;
+    Ar[0].Y2:= -1;
   end
   else
     Ar:= GetCaretsArray;
@@ -2588,7 +2587,7 @@ begin
   DoEventLog(0);
 end;
 
-procedure TATStrings.ActionAddJumpToUndo(constref ACaretsArray: TATPointArray);
+procedure TATStrings.ActionAddJumpToUndo(constref ACaretsArray: TATPointPairArray);
 var
   Item: TATUndoItem;
 begin

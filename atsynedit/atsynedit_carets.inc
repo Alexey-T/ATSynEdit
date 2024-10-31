@@ -989,7 +989,7 @@ begin
   DoCaretSingle(AX, AY, NEndX, NEndY);
 end;
 
-function TATSynEdit.GetCaretsArray: TATPointArray;
+function TATSynEdit.GetCaretsArray: TATPointPairArray;
 begin
   Result:= nil;
   if Assigned(FCarets) then
@@ -1010,7 +1010,7 @@ begin
     Result:= FAttribs.AsAttribArray;
 end;
 
-procedure TATSynEdit.SetCaretsArray(const Ar: TATPointArray);
+procedure TATSynEdit.SetCaretsArray(const Ar: TATPointPairArray);
 begin
   if Assigned(FCarets) then
   begin

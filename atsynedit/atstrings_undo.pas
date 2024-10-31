@@ -70,7 +70,7 @@ type
     ItemText: UnicodeString; //text of that editor line
     ItemEnd: TATLineEnds; //line-ending of that editor line
     ItemLineState: TATLineState; //line-state of that editor line
-    ItemCarets: TATPointArray; //carets packed into array
+    ItemCarets: TATPointPairArray; //carets packed into array
     ItemMarkers: TATMarkerMarkerArray;
     ItemAttribs: TATMarkerAttribArray;
     ItemSoftMark: boolean; //undo soft-mark. logic is described in ATSynEdit Wiki page
@@ -79,7 +79,7 @@ type
     constructor Create(AAction: TATEditAction; AIndex: integer;
       const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState;
       ASoftMark, AHardMark: boolean;
-      const ACarets: TATPointArray;
+      const ACarets: TATPointPairArray;
       const AMarkers: TATMarkerMarkerArray;
       const AAttribs: TATMarkerAttribArray;
       ACommandCode: integer;
@@ -123,7 +123,7 @@ type
     procedure DeleteTrailingCaretJumps;
     procedure Add(AAction: TATEditAction; AIndex: integer; const AText: atString;
       AEnd: TATLineEnds; ALineState: TATLineState;
-      const ACarets: TATPointArray;
+      const ACarets: TATPointPairArray;
       const AMarkers: TATMarkerMarkerArray;
       const AAttribs: TATMarkerAttribArray;
       ACommandCode: integer;
@@ -156,7 +156,7 @@ begin
     IntToStr(ItemIndex)+PartSep+
     IntToStr(Ord(ItemEnd))+PartSep+
     IntToStr(Ord(ItemLineState))+PartSep+
-    PointsArrayToString(ItemCarets)+MarkersSep+
+    PointsPairArrayToString(ItemCarets)+MarkersSep+
       MarkerArrayToString(ItemMarkers)+MarkersSep+
       IntToStr(ItemGlobalCounter)+MarkersSep+
       IntToStr(ItemTickCount)+PartSep+
@@ -190,7 +190,7 @@ begin
   Sep2.Init(S, MarkersSep);
   //a) carets
   Sep2.GetItemStr(SubItem);
-  StringToPointsArray(ItemCarets, SubItem);
+  StringToPointsPairArray(ItemCarets, SubItem);
   //b) markers
   Sep2.GetItemStr(SubItem);
   if SubItem<>'' then
@@ -234,7 +234,7 @@ end;
 constructor TATUndoItem.Create(AAction: TATEditAction; AIndex: integer;
   const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState;
   ASoftMark, AHardMark: boolean;
-  const ACarets: TATPointArray;
+  const ACarets: TATPointPairArray;
   const AMarkers: TATMarkerMarkerArray;
   const AAttribs: TATMarkerAttribArray;
   ACommandCode: integer;
@@ -347,7 +347,7 @@ end;
 
 procedure TATUndoList.Add(AAction: TATEditAction; AIndex: integer;
   const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState;
-  const ACarets: TATPointArray;
+  const ACarets: TATPointPairArray;
   const AMarkers: TATMarkerMarkerArray;
   const AAttribs: TATMarkerAttribArray;
   ACommandCode: integer;
@@ -439,7 +439,7 @@ end;
 procedure TATUndoList.AddUnmodifiedMark;
 var
   Item: TATUndoItem;
-  Carets: TATPointArray;
+  Carets: TATPointPairArray;
   Markers: TATMarkerMarkerArray;
   Attribs: TATMarkerAttribArray;
 begin

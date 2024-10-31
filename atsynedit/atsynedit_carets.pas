@@ -138,8 +138,8 @@ type
     procedure DeleteDups(AJoinAdjacentCarets: boolean);
     function IsJoinNeeded(AIndex1, AIndex2: integer;
       out OutPosX, OutPosY, OutEndX, OutEndY: integer): boolean;
-    function GetAsArray: TATPointArray;
-    procedure SetAsArray(const Res: TATPointArray);
+    function GetAsArray: TATPointPairArray;
+    procedure SetAsArray(const Res: TATPointPairArray);
     function GetAsString: string;
     procedure SetAsString(const AValue: string);
   public
@@ -168,7 +168,7 @@ type
     function DebugText: string;
     property ManyAllowed: boolean read FManyAllowed write FManyAllowed;
     property OneLine: boolean read FOneLine write FOneLine;
-    property AsArray: TATPointArray read GetAsArray write SetAsArray;
+    property AsArray: TATPointPairArray read GetAsArray write SetAsArray;
     property AsString: string read GetAsString write SetAsString;
     property OnCaretChanged: TNotifyEvent read FOnCaretChanged write FOnCaretChanged;
     procedure UpdateMemory(AMode: TATCaretMemoryAction; AArrowUpDown: boolean);
@@ -1177,33 +1177,33 @@ begin
         ])+sLineBreak;
 end;
 
-function TATCarets.GetAsArray: TATPointArray;
+function TATCarets.GetAsArray: TATPointPairArray;
 var
   Item: TATCaretItem;
   i: integer;
 begin
-  SetLength(Result{%H-}, Count*2);
+  SetLength(Result{%H-}, Count);
   for i:= 0 to Count-1 do
   begin
     Item:= Items[i];
-    Result[i*2].X:= Item.PosX;
-    Result[i*2].Y:= Item.PosY;
-    Result[i*2+1].X:= Item.EndX;
-    Result[i*2+1].Y:= Item.EndY;
+    Result[i].X:= Item.PosX;
+    Result[i].Y:= Item.PosY;
+    Result[i].X2:= Item.EndX;
+    Result[i].Y2:= Item.EndY;
   end;
 end;
 
-procedure TATCarets.SetAsArray(const Res: TATPointArray);
+procedure TATCarets.SetAsArray(const Res: TATPointPairArray);
 var
   i: integer;
 begin
   Clear;
-  for i:= 0 to Length(Res) div 2 - 1 do
+  for i:= 0 to Length(Res)-1 do
     Add(
-      Res[i*2].X,
-      Res[i*2].Y,
-      Res[i*2+1].X,
-      Res[i*2+1].Y,
+      Res[i].X,
+      Res[i].Y,
+      Res[i].X2,
+      Res[i].Y2,
       false{AWithEvent}
       );
   DoChanged;
