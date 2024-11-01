@@ -134,19 +134,5 @@ begin
   end;
 end;
 
-procedure StringToInt64Array(var A: TATInt64Array; const AStr: string);
-var
-  Sep: TATStringSeparator;
-  i, NLen: integer;
-begin
-  NLen:= SFindCharCount(AStr, ',');
-  SetLength(A, NLen);
-  Sep.Init(AStr, ',');
-  for i:= 0 to NLen-1 do
-  begin
-    Sep.GetItemInt64(A[i], 0);
-  end;
-end;
-
 end.
 
