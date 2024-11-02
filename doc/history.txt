@@ -1,5 +1,7 @@
 2024.11.02
++ add: prop OptGutterWidthBookmarks
 + add: prop OptGutterWidthLineStates
+* removed: ATEditorOptions.GutterSizeBookmarks
 * removed: ATEditorOptions.GutterSizeLineStates
 
 2024.08.22

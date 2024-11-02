@@ -123,7 +123,6 @@ type
     TimerIntervalAutoScroll: integer;
     TimerIntervalNiceScroll: integer;
 
-    GutterSizeBookmarks: integer;
     GutterSizeNumbers: integer;
     GutterSizeFolding: integer;
     GutterSizeSeparator: integer;
@@ -453,7 +452,6 @@ initialization
     TimerIntervalAutoScroll:= 100;
     TimerIntervalNiceScroll:= 40;
 
-    GutterSizeBookmarks:= 16;
     GutterSizeNumbers:= 10;
     GutterSizeFolding:= 14;
     GutterSizeSeparator:= 1;
