@@ -1685,15 +1685,6 @@ type
     property Gutter: TATGutter read FGutter;
     property GutterDecor: TATGutterDecor read GetGutterDecor;
     property GutterDecorAlignment: TAlignment read FGutterDecorAlignment write FGutterDecorAlignment;
-    {
-    property GutterBandBookmarks: integer read FGutterBandBookmarks;
-    property GutterBandNumbers: integer read FGutterBandNumbers;
-    property GutterBandStates: integer read FGutterBandStates;
-    property GutterBandFolding: integer read FGutterBandFolding;
-    property GutterBandSeparator: integer read FGutterBandSeparator;
-    property GutterBandEmpty: integer read FGutterBandEmpty;
-    property GutterBandDecor: integer read FGutterBandDecor;
-    }
     //files
     property FileName: string read FFileName write FFileName;
     procedure LoadFromFile(const AFilename: string; AOptions: TATLoadStreamOptions); virtual;
@@ -4775,7 +4766,7 @@ begin
       );
   end;
 
-  //gutter band: state
+  //gutter band: line state
   GutterItem:= FGutter[FGutterBandStates];
   if GutterItem.Visible then
   begin
