@@ -1009,6 +1009,7 @@ type
     FOptGutterShowFoldLines: boolean;
     FOptGutterShowFoldLinesAll: boolean;
     FOptGutterShowFoldLinesForCaret: boolean;
+    FOptGutterShowBracketDecor: boolean;
     FOptGutterIcons: TATEditorGutterIcons;
     FOptNumbersAutosize: boolean;
     FOptNumbersAlignment: TAlignment;
@@ -2083,6 +2084,7 @@ type
     property OptGutterShowFoldLines: boolean read FOptGutterShowFoldLines write FOptGutterShowFoldLines default true;
     property OptGutterShowFoldLinesAll: boolean read FOptGutterShowFoldLinesAll write FOptGutterShowFoldLinesAll default false;
     property OptGutterShowFoldLinesForCaret: boolean read FOptGutterShowFoldLinesForCaret write FOptGutterShowFoldLinesForCaret default true;
+    property OptGutterShowBracketDecor: boolean read FOptGutterShowBracketDecor write FOptGutterShowBracketDecor default true;
     property OptGutterIcons: TATEditorGutterIcons read FOptGutterIcons write FOptGutterIcons default TATEditorGutterIcons.PlusMinus;
     property OptBorderVisible: boolean read FOptBorderVisible write FOptBorderVisible default cInitBorderVisible;
     property OptBorderWidth: integer read FOptBorderWidth write FOptBorderWidth default cInitBorderWidth;
@@ -5383,6 +5385,7 @@ begin
   FOptGutterShowFoldLines:= true;
   FOptGutterShowFoldLinesAll:= false;
   FOptGutterShowFoldLinesForCaret:= true;
+  FOptGutterShowBracketDecor:= true;
   FOptGutterIcons:= TATEditorGutterIcons.PlusMinus;
 
   FGutterDecorAlignment:= taCenter;
