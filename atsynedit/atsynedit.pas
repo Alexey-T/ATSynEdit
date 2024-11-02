@@ -552,6 +552,9 @@ type
     cInitGutterPlusSize = 4;
     cInitGutterWidthBookmarks = 16;
     cInitGutterWidthNumbers = 10;
+    cInitGutterWidthFolding = 14;
+    cInitGutterWidthSeparator = 1;
+    cInitGutterWidthEmpty = 2;
     cInitGutterWidthLineStates = 3;
     cInitMarkerSize = 30;
     cInitFoldStyle = TATEditorFoldStyle.HereWithTruncatedText;
@@ -1015,6 +1018,9 @@ type
     FOptGutterShowBracketDecor: boolean;
     FOptGutterWidthBookmarks: integer;
     FOptGutterWidthNumbers: integer;
+    FOptGutterWidthFolding: integer;
+    FOptGutterWidthSeparator: integer;
+    FOptGutterWidthEmpty: integer;
     FOptGutterWidthLineStates: integer;
     FOptGutterIcons: TATEditorGutterIcons;
     FOptNumbersAutosize: boolean;
@@ -2084,6 +2090,9 @@ type
     property OptGutterShowBracketDecor: boolean read FOptGutterShowBracketDecor write FOptGutterShowBracketDecor default true;
     property OptGutterWidthBookmarks: integer read FOptGutterWidthBookmarks write FOptGutterWidthBookmarks default cInitGutterWidthBookmarks;
     property OptGutterWidthNumbers: integer read FOptGutterWidthNumbers write FOptGutterWidthNumbers default cInitGutterWidthNumbers;
+    property OptGutterWidthFolding: integer read FOptGutterWidthFolding write FOptGutterWidthFolding default cInitGutterWidthFolding;
+    property OptGutterWidthSeparator: integer read FOptGutterWidthSeparator write FOptGutterWidthSeparator default cInitGutterWidthSeparator;
+    property OptGutterWidthEmpty: integer read FOptGutterWidthEmpty write FOptGutterWidthEmpty default cInitGutterWidthEmpty;
     property OptGutterWidthLineStates: integer read FOptGutterWidthLineStates write FOptGutterWidthLineStates default cInitGutterWidthLineStates;
     property OptGutterIcons: TATEditorGutterIcons read FOptGutterIcons write FOptGutterIcons default TATEditorGutterIcons.PlusMinus;
     property OptBorderVisible: boolean read FOptBorderVisible write FOptBorderVisible default cInitBorderVisible;
@@ -2438,6 +2447,18 @@ begin
   NBandIndex:= FGutter.FindIndexByTag(ATEditorOptions.GutterTagBookmarks);
   if NBandIndex>=0 then
     FGutter[NBandIndex].Size:= FOptGutterWidthBookmarks;
+
+  NBandIndex:= FGutter.FindIndexByTag(ATEditorOptions.GutterTagFolding);
+  if NBandIndex>=0 then
+    FGutter[NBandIndex].Size:= FOptGutterWidthFolding;
+
+  NBandIndex:= FGutter.FindIndexByTag(ATEditorOptions.GutterTagSeparator);
+  if NBandIndex>=0 then
+    FGutter[NBandIndex].Size:= FOptGutterWidthSeparator;
+
+  NBandIndex:= FGutter.FindIndexByTag(ATEditorOptions.GutterTagEmpty);
+  if NBandIndex>=0 then
+    FGutter[NBandIndex].Size:= FOptGutterWidthEmpty;
 
   NBandIndex:= FGutter.FindIndexByTag(ATEditorOptions.GutterTagLineStates);
   if NBandIndex>=0 then
@@ -5406,18 +5427,21 @@ begin
   FOptGutterShowBracketDecor:= true;
   FOptGutterWidthBookmarks:= cInitGutterWidthBookmarks;
   FOptGutterWidthNumbers:= cInitGutterWidthNumbers;
+  FOptGutterWidthFolding:= cInitGutterWidthFolding;
+  FOptGutterWidthSeparator:= cInitGutterWidthSeparator;
+  FOptGutterWidthEmpty:= cInitGutterWidthEmpty;
   FOptGutterWidthLineStates:= cInitGutterWidthLineStates;
   FOptGutterIcons:= TATEditorGutterIcons.PlusMinus;
 
   FGutterDecorAlignment:= taCenter;
   FGutterBandDecor:= -1;
 
-  FGutter.Add(-1, cInitGutterWidthBookmarks,            ATEditorOptions.GutterTagBookmarks,  true, true);
-  FGutter.Add(-1, cInitGutterWidthNumbers,              ATEditorOptions.GutterTagNumbers,    false, true);
-  FGutter.Add(-1, cInitGutterWidthLineStates,           ATEditorOptions.GutterTagLineStates, true, true);
-  FGutter.Add(-1, ATEditorOptions.GutterSizeFolding,    ATEditorOptions.GutterTagFolding,    true, true);
-  FGutter.Add(-1, ATEditorOptions.GutterSizeSeparator,  ATEditorOptions.GutterTagSeparator,  false, false);
-  FGutter.Add(-1, ATEditorOptions.GutterSizeEmpty,      ATEditorOptions.GutterTagEmpty,      false, true);
+  FGutter.Add(-1, cInitGutterWidthBookmarks,  ATEditorOptions.GutterTagBookmarks,  true, true);
+  FGutter.Add(-1, cInitGutterWidthNumbers,    ATEditorOptions.GutterTagNumbers,    false, true);
+  FGutter.Add(-1, cInitGutterWidthLineStates, ATEditorOptions.GutterTagLineStates, true, true);
+  FGutter.Add(-1, cInitGutterWidthFolding,    ATEditorOptions.GutterTagFolding,    true, true);
+  FGutter.Add(-1, cInitGutterWidthSeparator,  ATEditorOptions.GutterTagSeparator,  false, false);
+  FGutter.Add(-1, cInitGutterWidthEmpty,      ATEditorOptions.GutterTagEmpty,      false, true);
   UpdateGutterBandIndexes;
 
   FOptNumbersAutosize:= true;

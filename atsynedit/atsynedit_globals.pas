@@ -123,10 +123,6 @@ type
     TimerIntervalAutoScroll: integer;
     TimerIntervalNiceScroll: integer;
 
-    GutterSizeFolding: integer;
-    GutterSizeSeparator: integer;
-    GutterSizeEmpty: integer;
-
     FoldedLenOfEmptyHint: integer;
     FoldedMarkIndentInner: integer;
     FoldedMarkIndentOuter: integer;
@@ -450,11 +446,6 @@ initialization
 
     TimerIntervalAutoScroll:= 100;
     TimerIntervalNiceScroll:= 40;
-
-    //todo: remove all these, replace them with OptGutterWidth*
-    GutterSizeFolding:= 14;
-    GutterSizeSeparator:= 1;
-    GutterSizeEmpty:= 2;
 
     FoldedLenOfEmptyHint:= 60;
     FoldedMarkIndentInner:= 1; //indent inside [...] folded-mark

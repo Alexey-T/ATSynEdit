@@ -1,10 +1,11 @@
 2024.11.02
 + add: prop OptGutterWidthBookmarks
 + add: prop OptGutterWidthNumbers
++ add: prop OptGutterWidthFolding
++ add: prop OptGutterWidthSeparator
++ add: prop OptGutterWidthEmpty
 + add: prop OptGutterWidthLineStates
-* removed: ATEditorOptions.GutterSizeBookmarks
-* removed: ATEditorOptions.GutterSizeNumbers
-* removed: ATEditorOptions.GutterSizeLineStates
+* removed: ATEditorOptions.GutterSize*
 
 2024.08.22
 + add: event OnGetToken, used in calculating auto-indent string
