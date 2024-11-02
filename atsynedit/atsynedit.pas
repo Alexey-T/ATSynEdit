@@ -550,6 +550,7 @@ type
     cInitBitmapWidth = 1000;
     cInitBitmapHeight = 800;
     cInitGutterPlusSize = 4;
+    cInitGutterWidthLineStates = 3;
     cInitMarkerSize = 30;
     cInitFoldStyle = TATEditorFoldStyle.HereWithTruncatedText;
     cInitFoldUnderlineOffset = 3;
@@ -1010,6 +1011,7 @@ type
     FOptGutterShowFoldLinesAll: boolean;
     FOptGutterShowFoldLinesForCaret: boolean;
     FOptGutterShowBracketDecor: boolean;
+    FOptGutterWidthLineStates: integer;
     FOptGutterIcons: TATEditorGutterIcons;
     FOptNumbersAutosize: boolean;
     FOptNumbersAlignment: TAlignment;
@@ -2076,6 +2078,7 @@ type
     property OptGutterShowFoldLinesAll: boolean read FOptGutterShowFoldLinesAll write FOptGutterShowFoldLinesAll default false;
     property OptGutterShowFoldLinesForCaret: boolean read FOptGutterShowFoldLinesForCaret write FOptGutterShowFoldLinesForCaret default true;
     property OptGutterShowBracketDecor: boolean read FOptGutterShowBracketDecor write FOptGutterShowBracketDecor default true;
+    property OptGutterWidthLineStates: integer read FOptGutterWidthLineStates write FOptGutterWidthLineStates default cInitGutterWidthLineStates;
     property OptGutterIcons: TATEditorGutterIcons read FOptGutterIcons write FOptGutterIcons default TATEditorGutterIcons.PlusMinus;
     property OptBorderVisible: boolean read FOptBorderVisible write FOptBorderVisible default cInitBorderVisible;
     property OptBorderWidth: integer read FOptBorderWidth write FOptBorderWidth default cInitBorderWidth;
@@ -2390,35 +2393,38 @@ procedure TATSynEdit.UpdateGutterAutosize;
 var
   NCnt, NLen, NBandIndex: integer;
 begin
-  NCnt:= Strings.Count;
+  if FOptNumbersAutosize then
+  begin
+    NCnt:= Strings.Count;
 
-  if NCnt>=1000000000 then NLen:= 10
-  else
-  if NCnt>=100000000 then NLen:= 9
-  else
-  if NCnt>=10000000 then NLen:= 8
-  else
-  if NCnt>=1000000 then NLen:= 7
-  else
-  if NCnt>=100000 then NLen:= 6
-  else
-  if NCnt>=10000 then NLen:= 5
-  else
-  if NCnt>=1000 then NLen:= 4
-  else
-  if NCnt>=100 then NLen:= 3
-  else
-    NLen:= 2;
+    if NCnt>=1000000000 then NLen:= 10
+    else
+    if NCnt>=100000000 then NLen:= 9
+    else
+    if NCnt>=10000000 then NLen:= 8
+    else
+    if NCnt>=1000000 then NLen:= 7
+    else
+    if NCnt>=100000 then NLen:= 6
+    else
+    if NCnt>=10000 then NLen:= 5
+    else
+    if NCnt>=1000 then NLen:= 4
+    else
+    if NCnt>=100 then NLen:= 3
+    else
+      NLen:= 2;
 
-  if FOptNumbersStyle=TATEditorNumbersStyle.Relative then //add space for '-'
-    Inc(NLen);
+    if FOptNumbersStyle=TATEditorNumbersStyle.Relative then //add space for '-'
+      Inc(NLen);
 
-  NBandIndex:= FGutter.FindIndexByTag(ATEditorOptions.GutterTagNumbers);
-  FGutter[NBandIndex].Size:=
-    NLen*FCharSize.XScaled div ATEditorCharXScale + 2*FNumbersIndent;
+    NBandIndex:= FGutter.FindIndexByTag(ATEditorOptions.GutterTagNumbers);
+    FGutter[NBandIndex].Size:=
+      NLen*FCharSize.XScaled div ATEditorCharXScale + 2*FNumbersIndent;
+  end;
 
   NBandIndex:= FGutter.FindIndexByTag(ATEditorOptions.GutterTagLineStates);
-  FGutter[NBandIndex].Size:= ATEditorOptions.GutterSizeLineStates;
+  FGutter[NBandIndex].Size:= FOptGutterWidthLineStates;
 
   FGutter.Update;
 end;
@@ -3351,7 +3357,7 @@ begin
   else
     FRulerHeight:= FCharSize.Y * (SFindCharCount(FOptRulerText, #10)+1);
 
-  if FOptGutterVisible and FOptNumbersAutosize then
+  if FOptGutterVisible then
     UpdateGutterAutosize;
 
   FTextOffset:= GetTextOffset; //after gutter autosize
@@ -5381,6 +5387,7 @@ begin
   FOptGutterShowFoldLinesAll:= false;
   FOptGutterShowFoldLinesForCaret:= true;
   FOptGutterShowBracketDecor:= true;
+  FOptGutterWidthLineStates:= cInitGutterWidthLineStates;
   FOptGutterIcons:= TATEditorGutterIcons.PlusMinus;
 
   FGutterDecorAlignment:= taCenter;
@@ -5388,7 +5395,7 @@ begin
 
   FGutter.Add(-1, ATEditorOptions.GutterSizeBookmarks,  ATEditorOptions.GutterTagBookmarks,  true, true);
   FGutter.Add(-1, ATEditorOptions.GutterSizeNumbers,    ATEditorOptions.GutterTagNumbers,    false, true);
-  FGutter.Add(-1, ATEditorOptions.GutterSizeLineStates, ATEditorOptions.GutterTagLineStates, true, true);
+  FGutter.Add(-1, cInitGutterWidthLineStates,           ATEditorOptions.GutterTagLineStates, true, true);
   FGutter.Add(-1, ATEditorOptions.GutterSizeFolding,    ATEditorOptions.GutterTagFolding,    true, true);
   FGutter.Add(-1, ATEditorOptions.GutterSizeSeparator,  ATEditorOptions.GutterTagSeparator,  false, false);
   FGutter.Add(-1, ATEditorOptions.GutterSizeEmpty,      ATEditorOptions.GutterTagEmpty,      false, true);

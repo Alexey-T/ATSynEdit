@@ -1,3 +1,7 @@
+2024.11.02
++ add: prop OptGutterWidthLineStates
+* removed: ATEditorOptions.GutterSizeLineStates
+
 2024.08.22
 + add: event OnGetToken, used in calculating auto-indent string
 

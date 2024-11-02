@@ -126,7 +126,6 @@ type
     GutterSizeBookmarks: integer;
     GutterSizeNumbers: integer;
     GutterSizeFolding: integer;
-    GutterSizeLineStates: integer;
     GutterSizeSeparator: integer;
     GutterSizeEmpty: integer;
 
@@ -457,7 +456,6 @@ initialization
     GutterSizeBookmarks:= 16;
     GutterSizeNumbers:= 10;
     GutterSizeFolding:= 14;
-    GutterSizeLineStates:= 3;
     GutterSizeSeparator:= 1;
     GutterSizeEmpty:= 2;
 
