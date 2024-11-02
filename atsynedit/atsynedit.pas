@@ -2416,6 +2416,10 @@ begin
   NBandIndex:= FGutter.FindIndexByTag(ATEditorOptions.GutterTagNumbers);
   FGutter[NBandIndex].Size:=
     NLen*FCharSize.XScaled div ATEditorCharXScale + 2*FNumbersIndent;
+
+  NBandIndex:= FGutter.FindIndexByTag(ATEditorOptions.GutterTagLineStates);
+  FGutter[NBandIndex].Size:= ATEditorOptions.GutterSizeLineStates;
+
   FGutter.Update;
 end;
 
