@@ -123,7 +123,6 @@ type
     TimerIntervalAutoScroll: integer;
     TimerIntervalNiceScroll: integer;
 
-    GutterSizeNumbers: integer;
     GutterSizeFolding: integer;
     GutterSizeSeparator: integer;
     GutterSizeEmpty: integer;
@@ -453,7 +452,6 @@ initialization
     TimerIntervalNiceScroll:= 40;
 
     //todo: remove all these, replace them with OptGutterWidth*
-    GutterSizeNumbers:= 10;
     GutterSizeFolding:= 14;
     GutterSizeSeparator:= 1;
     GutterSizeEmpty:= 2;

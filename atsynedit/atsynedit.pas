@@ -551,6 +551,7 @@ type
     cInitBitmapHeight = 800;
     cInitGutterPlusSize = 4;
     cInitGutterWidthBookmarks = 16;
+    cInitGutterWidthNumbers = 10;
     cInitGutterWidthLineStates = 3;
     cInitMarkerSize = 30;
     cInitFoldStyle = TATEditorFoldStyle.HereWithTruncatedText;
@@ -1013,6 +1014,7 @@ type
     FOptGutterShowFoldLinesForCaret: boolean;
     FOptGutterShowBracketDecor: boolean;
     FOptGutterWidthBookmarks: integer;
+    FOptGutterWidthNumbers: integer;
     FOptGutterWidthLineStates: integer;
     FOptGutterIcons: TATEditorGutterIcons;
     FOptNumbersAutosize: boolean;
@@ -2081,6 +2083,7 @@ type
     property OptGutterShowFoldLinesForCaret: boolean read FOptGutterShowFoldLinesForCaret write FOptGutterShowFoldLinesForCaret default true;
     property OptGutterShowBracketDecor: boolean read FOptGutterShowBracketDecor write FOptGutterShowBracketDecor default true;
     property OptGutterWidthBookmarks: integer read FOptGutterWidthBookmarks write FOptGutterWidthBookmarks default cInitGutterWidthBookmarks;
+    property OptGutterWidthNumbers: integer read FOptGutterWidthNumbers write FOptGutterWidthNumbers default cInitGutterWidthNumbers;
     property OptGutterWidthLineStates: integer read FOptGutterWidthLineStates write FOptGutterWidthLineStates default cInitGutterWidthLineStates;
     property OptGutterIcons: TATEditorGutterIcons read FOptGutterIcons write FOptGutterIcons default TATEditorGutterIcons.PlusMinus;
     property OptBorderVisible: boolean read FOptBorderVisible write FOptBorderVisible default cInitBorderVisible;
@@ -2424,6 +2427,12 @@ begin
     NBandIndex:= FGutter.FindIndexByTag(ATEditorOptions.GutterTagNumbers);
     FGutter[NBandIndex].Size:=
       NLen*FCharSize.XScaled div ATEditorCharXScale + 2*FNumbersIndent;
+  end
+  else
+  begin
+    NBandIndex:= FGutter.FindIndexByTag(ATEditorOptions.GutterTagNumbers);
+    if NBandIndex>=0 then
+      FGutter[NBandIndex].Size:= FOptGutterWidthNumbers;
   end;
 
   NBandIndex:= FGutter.FindIndexByTag(ATEditorOptions.GutterTagBookmarks);
@@ -5396,6 +5405,7 @@ begin
   FOptGutterShowFoldLinesForCaret:= true;
   FOptGutterShowBracketDecor:= true;
   FOptGutterWidthBookmarks:= cInitGutterWidthBookmarks;
+  FOptGutterWidthNumbers:= cInitGutterWidthNumbers;
   FOptGutterWidthLineStates:= cInitGutterWidthLineStates;
   FOptGutterIcons:= TATEditorGutterIcons.PlusMinus;
 
@@ -5403,7 +5413,7 @@ begin
   FGutterBandDecor:= -1;
 
   FGutter.Add(-1, cInitGutterWidthBookmarks,            ATEditorOptions.GutterTagBookmarks,  true, true);
-  FGutter.Add(-1, ATEditorOptions.GutterSizeNumbers,    ATEditorOptions.GutterTagNumbers,    false, true);
+  FGutter.Add(-1, cInitGutterWidthNumbers,              ATEditorOptions.GutterTagNumbers,    false, true);
   FGutter.Add(-1, cInitGutterWidthLineStates,           ATEditorOptions.GutterTagLineStates, true, true);
   FGutter.Add(-1, ATEditorOptions.GutterSizeFolding,    ATEditorOptions.GutterTagFolding,    true, true);
   FGutter.Add(-1, ATEditorOptions.GutterSizeSeparator,  ATEditorOptions.GutterTagSeparator,  false, false);
