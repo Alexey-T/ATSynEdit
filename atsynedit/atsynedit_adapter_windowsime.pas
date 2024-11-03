@@ -20,7 +20,8 @@ type
     FSelText: UnicodeString;
     position: Integer;
     buffer: array[0..256] of WideChar;        { use static buffer. to avoid unexpected exception on FPC }
-    SpacingY: Integer;
+    CaretWidth: Integer;
+    CaretHeight: Integer;
     //clbuffer: array[0..256] of longint;
     //attrsize: Integer;
     //attrbuf: array[0..255] of Byte;
@@ -84,19 +85,19 @@ begin
     exit;
   // draw text
   tm:=CompForm.Canvas.TextExtent(buffer);
-  CompForm.Width:=tm.cx+2;
-  CompForm.Height:=tm.cy+SpacingY+2;
+  CompForm.Width:=tm.cx+CaretWidth+1;
+  CompForm.Height:=CaretHeight;
   CompForm.Canvas.TextOut(1,0,buffer);
   // draw IME Caret
   s:='';
   if position>0 then
     for i:=0 to position-1 do
       s:=s+buffer[i];
-  cm:=CompForm.Canvas.TextExtent(s);
+  cm:=CompForm.Canvas.TextExtent(UTF8Encode(s));
   CompForm.Canvas.Pen.Color:=clInfoText;
   CompForm.Canvas.Pen.Mode:=pmNotXor;
-  CompForm.Canvas.Line(cm.cx  ,0,cm.cx  ,cm.cy);
-  CompForm.Canvas.Line(cm.cx+1,0,cm.cx+1,cm.cy);
+  for i:= 0 to CaretWidth-1 do
+    CompForm.Canvas.Line(cm.cx+i,0,cm.cx+i,CompForm.Height);
 end;
 
 procedure TATAdapterWindowsIME.UpdateCandidatePos(Sender: TObject);
@@ -166,7 +167,11 @@ begin
     CompForm.Color:=clInfoBk;
   end;
   CompForm.Font:=ed.Font;
-  SpacingY:=ed.OptSpacingY;
+  CompForm.Canvas.Font:=ed.Font;
+  CaretHeight:=ed.TextCharSize.Y;
+  CaretWidth:=ed.CaretShapeNormal.Width;
+  if CaretWidth<0 then
+    CaretWidth:=Abs(CaretWidth)*CompForm.Canvas.TextWidth('0') div 100;
   if ed.Carets.Count>0 then begin
     Caret:=ed.Carets[0];
     CompPos:=ed.CaretPosToClientPos(Point(Caret.PosX,Caret.PosY));
