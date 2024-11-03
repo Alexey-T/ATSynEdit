@@ -554,7 +554,7 @@ type
     cInitGutterWidthBookmarks = 16;
     cInitGutterWidthNumbers = 10;
     cInitGutterWidthFolding = 14;
-    cInitGutterWidthSeparator = 0;
+    cInitGutterWidthSeparator = 1;
     cInitGutterWidthEmpty = 2;
     cInitGutterWidthLineStates = 3;
     cInitMarkerSize = 30;
