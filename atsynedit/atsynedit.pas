@@ -2442,46 +2442,28 @@ begin
   begin
     NBandIndex:= FGutter.FindIndexByTag(ATEditorOptions.GutterTagNumbers);
     if NBandIndex>=0 then
-    begin
       FGutter[NBandIndex].Size:= FOptGutterWidthNumbers;
-      FGutter[NBandIndex].Visible:= FOptGutterWidthNumbers>0;
-    end;
   end;
 
   NBandIndex:= FGutter.FindIndexByTag(ATEditorOptions.GutterTagBookmarks);
   if NBandIndex>=0 then
-  begin
     FGutter[NBandIndex].Size:= FOptGutterWidthBookmarks;
-    FGutter[NBandIndex].Visible:= FOptGutterWidthBookmarks>0;
-  end;
 
   NBandIndex:= FGutter.FindIndexByTag(ATEditorOptions.GutterTagFolding);
   if NBandIndex>=0 then
-  begin
     FGutter[NBandIndex].Size:= FOptGutterWidthFolding;
-    FGutter[NBandIndex].Visible:= FOptGutterWidthFolding>0;
-  end;
 
   NBandIndex:= FGutter.FindIndexByTag(ATEditorOptions.GutterTagSeparator);
   if NBandIndex>=0 then
-  begin
     FGutter[NBandIndex].Size:= FOptGutterWidthSeparator;
-    FGutter[NBandIndex].Visible:= FOptGutterWidthSeparator>0;
-  end;
 
   NBandIndex:= FGutter.FindIndexByTag(ATEditorOptions.GutterTagEmpty);
   if NBandIndex>=0 then
-  begin
     FGutter[NBandIndex].Size:= FOptGutterWidthEmpty;
-    FGutter[NBandIndex].Visible:= FOptGutterWidthEmpty>0;
-  end;
 
   NBandIndex:= FGutter.FindIndexByTag(ATEditorOptions.GutterTagLineStates);
   if NBandIndex>=0 then
-  begin
     FGutter[NBandIndex].Size:= FOptGutterWidthLineStates;
-    FGutter[NBandIndex].Visible:= FOptGutterWidthLineStates>0;
-  end;
 
   FGutter.Update;
 end;
