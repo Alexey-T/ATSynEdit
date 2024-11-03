@@ -158,6 +158,7 @@ var
   ed: TATSynEdit;
   CompPos: TATPoint;
   Caret: TATCaretItem;
+  CharWidth: Integer;
 begin
   ed:=TATSynEdit(Sender);
   if not Assigned(CompForm) then begin
@@ -180,8 +181,11 @@ begin
 
   CaretHeight:=ed.TextCharSize.Y;
   CaretWidth:=ed.CaretShapeNormal.Width;
-  if CaretWidth<0 then
-    CaretWidth:=Abs(CaretWidth)*CompForm.Canvas.TextWidth('0') div 100;
+  if CaretWidth<0 then //Width<0 means value in percents, e.g. -100 means 100%
+  begin
+    CharWidth:=CompForm.Canvas.TextWidth('0');
+    CaretWidth:=Abs(CaretWidth)*CharWidth div 100;
+  end;
   CaretVisible:=true;
   CaretTimer.Enabled:=ed.OptCaretBlinkEnabled;
   CaretTimer.Interval:=ed.OptCaretBlinkTime;
