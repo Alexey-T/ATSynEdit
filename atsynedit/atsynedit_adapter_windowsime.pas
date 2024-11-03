@@ -89,16 +89,15 @@ begin
     exit;
   // draw text
   tm:=CompForm.Canvas.TextExtent(buffer);
-  CompForm.Width:=tm.cx+CaretWidth+1;
+  CompForm.Width:=tm.cx+CaretWidth;
   CompForm.Height:=CaretHeight;
-  CompForm.Canvas.TextOut(1,0,buffer);
+  CompForm.Canvas.TextOut(0,0,buffer);
   // draw IME Caret
   if CaretVisible then
   begin
-    s:='';
     SetLength(s,position);
-    for i:=0 to position-1 do
-      s[i+1]:=buffer[i];
+    for i:=1 to Length(s) do
+      s[i]:=buffer[i-1];
     cm:=CompForm.Canvas.TextExtent(UTF8Encode(s));
     CompForm.Canvas.Pen.Color:=clInfoText;
     CompForm.Canvas.Pen.Mode:=pmNotXor;
