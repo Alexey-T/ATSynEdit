@@ -10,6 +10,7 @@ interface
 uses
   Messages,
   Forms,
+  ExtCtrls,
   ATSynEdit_Adapters;
 
 type
@@ -22,6 +23,8 @@ type
     buffer: array[0..256] of WideChar;        { use static buffer. to avoid unexpected exception on FPC }
     CaretWidth: Integer;
     CaretHeight: Integer;
+    CaretVisible: Boolean;
+    CaretTimer: TTimer;
     //clbuffer: array[0..256] of longint;
     //attrsize: Integer;
     //attrbuf: array[0..255] of Byte;
@@ -30,6 +33,7 @@ type
     procedure UpdateCandidatePos(Sender: TObject);
     procedure UpdateCompForm(Sender: TObject);
     procedure HideCompForm;
+    procedure CaretTimerTick(Sender: TObject);
   public
     procedure Stop(Sender: TObject; Success: boolean); override;
     procedure ImeRequest(Sender: TObject; var Msg: TMessage); override;
@@ -89,15 +93,18 @@ begin
   CompForm.Height:=CaretHeight;
   CompForm.Canvas.TextOut(1,0,buffer);
   // draw IME Caret
-  s:='';
-  if position>0 then
+  if CaretVisible then
+  begin
+    s:='';
+    SetLength(s,position);
     for i:=0 to position-1 do
-      s:=s+buffer[i];
-  cm:=CompForm.Canvas.TextExtent(UTF8Encode(s));
-  CompForm.Canvas.Pen.Color:=clInfoText;
-  CompForm.Canvas.Pen.Mode:=pmNotXor;
-  for i:= 0 to CaretWidth-1 do
-    CompForm.Canvas.Line(cm.cx+i,0,cm.cx+i,CompForm.Height);
+      s[i+1]:=buffer[i];
+    cm:=CompForm.Canvas.TextExtent(UTF8Encode(s));
+    CompForm.Canvas.Pen.Color:=clInfoText;
+    CompForm.Canvas.Pen.Mode:=pmNotXor;
+    for i:= 0 to CaretWidth-1 do
+      CompForm.Canvas.Line(cm.cx+i,0,cm.cx+i,CompForm.Height);
+  end;
 end;
 
 procedure TATAdapterWindowsIME.UpdateCandidatePos(Sender: TObject);
@@ -165,13 +172,21 @@ begin
     CompForm.Height:=16;
     CompForm.Width:=16;
     CompForm.Color:=clInfoBk;
+    CaretTimer:=TTimer.Create(CompForm);
+    CaretTimer.Enabled:=false;
+    CaretTimer.OnTimer:=@CaretTimerTick;
   end;
   CompForm.Font:=ed.Font;
   CompForm.Canvas.Font:=ed.Font;
+
   CaretHeight:=ed.TextCharSize.Y;
   CaretWidth:=ed.CaretShapeNormal.Width;
   if CaretWidth<0 then
     CaretWidth:=Abs(CaretWidth)*CompForm.Canvas.TextWidth('0') div 100;
+  CaretVisible:=true;
+  CaretTimer.Enabled:=ed.OptCaretBlinkEnabled;
+  CaretTimer.Interval:=ed.OptCaretBlinkTime;
+
   if ed.Carets.Count>0 then begin
     Caret:=ed.Carets[0];
     CompPos:=ed.CaretPosToClientPos(Point(Caret.PosX,Caret.PosY));
@@ -358,6 +373,16 @@ begin
 
   //WriteLn(Format('WM_IME_ENDCOMPOSITION %x, %x',[Msg.wParam,Msg.lParam]));
   Msg.Result:= -1;
+end;
+
+procedure TATAdapterWindowsIME.CaretTimerTick(Sender: TObject);
+begin
+  if (CompForm=nil) or (not CompForm.Visible) then begin
+    CaretTimer.Enabled:=false;
+    exit;
+  end;
+  CaretVisible:= not CaretVisible;
+  CompForm.Invalidate;
 end;
 
 
