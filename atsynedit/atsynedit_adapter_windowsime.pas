@@ -20,6 +20,7 @@ type
     FSelText: UnicodeString;
     position: Integer;
     buffer: array[0..256] of WideChar;        { use static buffer. to avoid unexpected exception on FPC }
+    SpacingY: Integer;
     //clbuffer: array[0..256] of longint;
     //attrsize: Integer;
     //attrbuf: array[0..255] of Byte;
@@ -84,7 +85,7 @@ begin
   // draw text
   tm:=CompForm.Canvas.TextExtent(buffer);
   CompForm.Width:=tm.cx+2;
-  CompForm.Height:=tm.cy+2;
+  CompForm.Height:=tm.cy+SpacingY+2;
   CompForm.Canvas.TextOut(1,0,buffer);
   // draw IME Caret
   s:='';
@@ -165,6 +166,7 @@ begin
     CompForm.Color:=clInfoBk;
   end;
   CompForm.Font:=ed.Font;
+  SpacingY:=ed.OptSpacingY;
   if ed.Carets.Count>0 then begin
     Caret:=ed.Carets[0];
     CompPos:=ed.CaretPosToClientPos(Point(Caret.PosX,Caret.PosY));
