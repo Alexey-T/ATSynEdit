@@ -1452,7 +1452,7 @@ type
     function UpdateLinksRegexObject: boolean;
     procedure UpdateTabHelper;
     procedure UpdateCursor;
-    procedure UpdateGutterAutosize;
+    procedure UpdateGutterColumns;
     procedure UpdateMinimapAutosize;
     procedure UpdateFoldedMarkTooltip;
     procedure UpdateClientSizes;
@@ -2405,7 +2405,7 @@ begin
   end;
 end;
 
-procedure TATSynEdit.UpdateGutterAutosize;
+procedure TATSynEdit.UpdateGutterColumns;
 var
   NCnt, NLen, NBandIndex: integer;
 begin
@@ -2435,8 +2435,8 @@ begin
       Inc(NLen);
 
     NBandIndex:= FGutter.FindIndexByTag(ATEditorOptions.GutterTagNumbers);
-    FGutter[NBandIndex].Size:=
-      NLen*FCharSize.XScaled div ATEditorCharXScale + 2*FNumbersIndent;
+    if NBandIndex>=0 then
+      FGutter[NBandIndex].Size:= NLen*FCharSize.XScaled div ATEditorCharXScale + 2*FNumbersIndent;
   end
   else
   begin
@@ -3397,7 +3397,7 @@ begin
     FRulerHeight:= FCharSize.Y * (SFindCharCount(FOptRulerText, #10)+1);
 
   if FOptGutterVisible then
-    UpdateGutterAutosize;
+    UpdateGutterColumns;
 
   FTextOffset:= GetTextOffset; //after gutter autosize
 
