@@ -450,7 +450,7 @@ begin
           Result:= DoCommand_KeyUpDown(true, 1, false);
           }
         OptMouseColumnSelectionWithoutKey:= false;
-        DoCommand_KeyUpDown(true, 1, false);
+        Result:= DoCommand_KeyUpDown(true, 1, false);
       end;
 
     cCommand_KeyHome:
