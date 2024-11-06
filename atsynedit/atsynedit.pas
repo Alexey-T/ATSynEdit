@@ -2559,7 +2559,9 @@ end;
 procedure TATSynEdit.SetMarginRight(AValue: integer);
 begin
   if AValue=FMarginRight then Exit;
-  FMarginRight:= Max(AValue, ATEditorOptions.MinMarginRt);
+  FMarginRight:= AValue;
+  if AValue>=0 then
+    FMarginRight:= Max(FMarginRight, ATEditorOptions.MinMarginRt);
   if FWrapMode=TATEditorWrapMode.AtWindowOrMargin then
     FWrapUpdateNeeded:= true;
 end;
@@ -2634,7 +2636,12 @@ begin
     TATEditorWrapMode.ModeOn:
       FWrapInfo.WrapColumn:= Max(ATEditorOptions.MinWrapColumn, NNewVisibleColumns-FWrapAddSpace);
     TATEditorWrapMode.AtWindowOrMargin:
-      FWrapInfo.WrapColumn:= Max(ATEditorOptions.MinWrapColumn, Min(NNewVisibleColumns-FWrapAddSpace, FMarginRight));
+      begin
+        if FMarginRight>=0 then
+          FWrapInfo.WrapColumn:= Max(ATEditorOptions.MinWrapColumn, Min(NNewVisibleColumns-FWrapAddSpace, FMarginRight))
+        else
+          FWrapInfo.WrapColumn:= Max(ATEditorOptions.MinWrapColumn, NNewVisibleColumns+FMarginRight);
+      end;
   end;
 
   bUseCachedUpdate:=
@@ -4141,7 +4148,12 @@ begin
     TATEditorWrapMode.ModeOn:
       AScrollHorz.NMax:= GetVisibleColumns;
     TATEditorWrapMode.AtWindowOrMargin:
-      AScrollHorz.NMax:= Min(GetVisibleColumns, FMarginRight);
+      begin
+        if FMarginRight>=0 then
+          AScrollHorz.NMax:= Min(GetVisibleColumns, FMarginRight)
+        else
+          AScrollHorz.NMax:= GetVisibleColumns;
+      end
     else
       begin
         //avoid these calculations for huge line length=40M in wrapped mode, because
@@ -4504,7 +4516,12 @@ begin
     TATEditorFoldedUnderlineSize.BeginToMargin:
       begin
         NCoordLeft:= ARectLine.Left+FFoldUnderlineOffset;
-        NCoordRight:= Min(ARectLine.Right-FFoldUnderlineOffset, ARectLine.Left+FMarginRight*ACharSize.XScaled div ATEditorCharXScale-AScrollHorz.SmoothPos);
+        NCoordRight:= Min(
+          ARectLine.Right - FFoldUnderlineOffset,
+          ARectLine.Left + IfThen(FMarginRight>=0, FMarginRight, GetVisibleColumns+FMarginRight) *
+            ACharSize.XScaled div ATEditorCharXScale
+            - AScrollHorz.SmoothPos
+          );
       end;
   end;
 
@@ -5069,13 +5086,19 @@ procedure TATSynEdit.DoPaintMargins(C: TCanvas);
     Result:= FRectMain.Left + FCharSize.XScaled *(NMargin-FScrollHorz.NPos) div ATEditorCharXScale;
   end;
 var
-  NWidth, i: integer;
+  NWidth, NX, iMargin: integer;
 begin
   NWidth:= ATEditorScale(1);
-  if FMarginRight>1 then
-    DoPaintMarginLineTo(C, PosX(FMarginRight), NWidth, Colors.MarginRight);
-  for i:= 0 to Length(FMarginList)-1 do
-    DoPaintMarginLineTo(C, PosX(FMarginList[i]), NWidth, Colors.MarginUser);
+
+  if FMarginRight>=0 then
+    NX:= FMarginRight
+  else
+    NX:= GetVisibleColumns+FMarginRight;
+  NX:= Max(NX, ATEditorOptions.MinMarginRt);
+  DoPaintMarginLineTo(C, PosX(NX), NWidth, Colors.MarginRight);
+
+  for iMargin:= 0 to Length(FMarginList)-1 do
+    DoPaintMarginLineTo(C, PosX(FMarginList[iMargin]), NWidth, Colors.MarginUser);
 end;
 
 
