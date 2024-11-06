@@ -4518,8 +4518,12 @@ begin
         NCoordLeft:= ARectLine.Left+FFoldUnderlineOffset;
         NCoordRight:= Min(
           ARectLine.Right - FFoldUnderlineOffset,
-          ARectLine.Left + IfThen(FMarginRight>=0, FMarginRight, GetVisibleColumns+FMarginRight) *
-            ACharSize.XScaled div ATEditorCharXScale
+          ARectLine.Left +
+            Max(
+              IfThen(FMarginRight>=0, FMarginRight, GetVisibleColumns+FMarginRight),
+              ATEditorOptions.MinMarginRt
+              )
+            * ACharSize.XScaled div ATEditorCharXScale
             - AScrollHorz.SmoothPos
           );
       end;
