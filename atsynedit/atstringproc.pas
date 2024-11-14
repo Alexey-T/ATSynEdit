@@ -1232,7 +1232,7 @@ var
 begin
   Result:= S;
   for i:= 1 to Length(Result) do
-    if (i=1) or not IsCharWord(S[i-1], SNonWordChars) then
+    if (i=1) or (S[i-1]='_') or not IsCharWord(S[i-1], SNonWordChars) then
       Result[i]:= SCharUpper(Result[i])
     else
       Result[i]:= SCharLower(Result[i]);
