@@ -575,7 +575,7 @@ type
     cUrlRegex_WebBegin = '\b(https?://|ftp://)';
     cUrlRegex_WebSite = '\w[\w\-\.@]*(:\d+)?'; // @ for password; :\d+ is port
     cUrlRegex_WebAnchor = '(\#[\w\-\./%:!]*)?';
-    cUrlRegex_WebParams = '(\?[^\s"''<>]*[\w/\-\+\*])?';
+    cUrlRegex_WebParams = '(\?[^\s"''<>]*[\w/\-\+\*=])?';
     cUrlRegex_WebFolder =
       '[~\w\.\-\+/%@!%:&\*=\|,;\$]' + //always allowed chars
       '|\(.*?\)' +
