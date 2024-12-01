@@ -200,19 +200,14 @@ end;
 function TATSynEdit.DoCommand_ClipboardPasteFromRecents: TATCommandResults;
   //
   function PrepareStringForMenu(const S: string): string;
-  var
-    i: integer;
   begin
     Result:= S;
-    SDeleteFrom(Result, #10);
-    if Trim(Result)<>'' then exit;
-    Result:= S;
-    i:= 1;
-    while (i<=Length(Result)) and (Result[i] in [' ', #9, #10, #13]) do
-      Inc(i);
-    Delete(Result, 1, i-1);
-    SDeleteFrom(Result, #10);
-    Result:= '[...] '+Result;
+    //replace EOLs with space, almost like ST4
+    Result:= StringReplace(Result, #13#10, ' ', [rfReplaceAll]);
+    Result:= StringReplace(Result, #13, ' ', [rfReplaceAll]);
+    Result:= StringReplace(Result, #10, ' ', [rfReplaceAll]);
+    if Length(Result)>ATEditorOptions.MaxClipboardRecentsMenuitemLen then
+      Result:= Copy(Result, 1, ATEditorOptions.MaxClipboardRecentsMenuitemLen)+'...';
   end;
   //
 var
@@ -241,8 +236,6 @@ begin
     ClipExItem:= ATEditorClipboardRecents.Items[i];
     S:= ClipExItem.Text;
     S:= PrepareStringForMenu(S);
-    if Length(S)>ATEditorOptions.MaxClipboardRecentsMenuitemLen then
-      S:= Copy(S, 1, ATEditorOptions.MaxClipboardRecentsMenuitemLen)+'...';
     mi.Caption:= S;
     mi.Tag:= i;
     mi.OnClick:= @MenuitemClipboardRecentsClick;
