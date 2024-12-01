@@ -202,10 +202,15 @@ function TATSynEdit.DoCommand_ClipboardPasteFromRecents: TATCommandResults;
   function PrepareStringForMenu(const S: string): string;
   begin
     Result:= S;
+
     //replace EOLs with space, almost like ST4
     Result:= StringReplace(Result, #13#10, ' ', [rfReplaceAll]);
     Result:= StringReplace(Result, #13, ' ', [rfReplaceAll]);
     Result:= StringReplace(Result, #10, ' ', [rfReplaceAll]);
+
+    //delete indent
+    Result:= TrimLeftSet(Result, [' ', #9]);
+
     if Length(Result)>ATEditorOptions.MaxClipboardRecentsMenuitemLen then
       Result:= Copy(Result, 1, ATEditorOptions.MaxClipboardRecentsMenuitemLen)+'...';
   end;
