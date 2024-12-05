@@ -557,6 +557,21 @@ var
 begin
   St:= Strings;
 
+  //exclude last empty line (CudaText issue #5794)
+  if APosChar1.Y<>APosChar2.Y then
+  begin
+    if APosChar2.Y>=APosChar1.Y then
+    begin
+      if St.IsIndexValid(APosChar2.Y) and (St.LinesLen[APosChar2.Y]=0) then
+        Dec(APosChar2.Y);
+    end
+    else
+    begin
+      if St.IsIndexValid(APosChar1.Y) and (St.LinesLen[APosChar1.Y]=0) then
+        Dec(APosChar1.Y);
+    end;
+  end;
+
   Pos1Col:= APosChar1;
   Pos2Col:= APosChar2;
   Pos1Col.X:= St.CharPosToColumnPos(Pos1Col.Y, Pos1Col.X, FTabHelper);
