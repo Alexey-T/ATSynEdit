@@ -164,7 +164,8 @@ begin
   Add(TATEditorMouseAction.ClickMiddle, [ssMiddle]);
   Add(TATEditorMouseAction.MakeCaret, [ssMiddle, ssXControl]);
 
-  Add(TATEditorMouseAction.ClickSimple, [ssLeft, ssAlt]);
+  Add(TATEditorMouseAction.ClickAndSelVerticalBlock, [ssLeft, ssAlt]);
+    //Alt+click must make action SelVerticalBlock to fix vert block even when clicked after line-end, CudaText #5794
   Add(TATEditorMouseAction.ClickSimple, [ssLeft, ssAltGr]);
   Add(TATEditorMouseAction.ClickSimple, [ssLeft, ssAlt, ssXControl]);
   Add(TATEditorMouseAction.ClickSimple, [ssLeft, ssAlt, ssShift, ssXControl]);
