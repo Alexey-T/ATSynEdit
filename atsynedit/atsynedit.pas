@@ -505,6 +505,8 @@ type
     cInitAutoPairForMultiCarets = true;
     cInitInputNumberAllowNegative = true;
     cInitMaskChar = '*';
+    cInitGapBitmapAlignment = taCenter;
+    cInitGapBitmapIndent = 10;
     cInitScrollAnimationSteps = 4;
     cInitScrollAnimationSleep = 0;
     cInitUndoLimit = 5000;
@@ -1994,7 +1996,7 @@ type
     property OptAutocompleteCommitIfSingleItem: boolean read FOptAutocompleteCommitIfSingleItem write FOptAutocompleteCommitIfSingleItem default false;
 
     property OptForceSeparateCharSizer: boolean read FOptForceSeparateCharSizer write FOptForceSeparateCharSizer default false;
-    property OptGapBitmapAlignment: TAlignment read FOptGapBitmapAlignment write FOptGapBitmapAlignment default taCenter;
+    property OptGapBitmapAlignment: TAlignment read FOptGapBitmapAlignment write FOptGapBitmapAlignment default cInitGapBitmapAlignment;
     property OptFlickerReducingPause: integer read FOptFlickerReducingPause write FOptFlickerReducingPause default 0;
     property OptInputNumberOnly: boolean read FOptInputNumberOnly write FOptInputNumberOnly default false;
     property OptInputNumberAllowNegative: boolean read FOptInputNumberAllowNegative write FOptInputNumberAllowNegative default cInitInputNumberAllowNegative;
@@ -5405,7 +5407,7 @@ begin
   FPrevCaret.EndX:= -1;
   FPrevCaret.EndY:= -1;
 
-  FOptGapBitmapAlignment:= taCenter;
+  FOptGapBitmapAlignment:= cInitGapBitmapAlignment;
   FOptFlickerReducingPause:= 0;
   FOptInputNumberOnly:= false;
   FOptInputNumberAllowNegative:= cInitInputNumberAllowNegative;
