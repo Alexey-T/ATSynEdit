@@ -1,3 +1,6 @@
+2024.12.13
++ add: prop OptGapBitmapIndent (used only when OptGapBitmapAlignment = left)
+
 2024.11.02
 + add: prop OptGutterWidthBookmarks
 + add: prop OptGutterWidthNumbers

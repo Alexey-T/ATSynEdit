@@ -506,7 +506,7 @@ type
     cInitInputNumberAllowNegative = true;
     cInitMaskChar = '*';
     cInitGapBitmapAlignment = taCenter;
-    cInitGapBitmapIndent = 10;
+    cInitGapBitmapIndent = 0;
     cInitScrollAnimationSteps = 4;
     cInitScrollAnimationSleep = 0;
     cInitUndoLimit = 5000;
@@ -917,6 +917,7 @@ type
     //options
     FOptForceSeparateCharSizer: boolean;
     FOptGapBitmapAlignment: TAlignment;
+    FOptGapBitmapIndent: integer;
     FOptFlickerReducingPause: integer;
     FOptInputNumberOnly: boolean;
     FOptInputNumberAllowNegative: boolean;
@@ -1997,6 +1998,7 @@ type
 
     property OptForceSeparateCharSizer: boolean read FOptForceSeparateCharSizer write FOptForceSeparateCharSizer default false;
     property OptGapBitmapAlignment: TAlignment read FOptGapBitmapAlignment write FOptGapBitmapAlignment default cInitGapBitmapAlignment;
+    property OptGapBitmapIndent: integer read FOptGapBitmapIndent write FOptGapBitmapIndent default cInitGapBitmapIndent;
     property OptFlickerReducingPause: integer read FOptFlickerReducingPause write FOptFlickerReducingPause default 0;
     property OptInputNumberOnly: boolean read FOptInputNumberOnly write FOptInputNumberOnly default false;
     property OptInputNumberAllowNegative: boolean read FOptInputNumberAllowNegative write FOptInputNumberAllowNegative default cInitInputNumberAllowNegative;
@@ -5048,7 +5050,8 @@ begin
       taCenter:
         RHere.Left:= GetGapBitmapPosLeft(ARect, AGap.Bitmap.Width);
       taLeftJustify:
-        RHere.Left:= ARect.Left;
+        RHere.Left:= ARect.Left +
+                     Int64(FOptGapBitmapIndent)*FCharSize.XScaled*FCharSize.XSpacePercents div ATEditorCharXScale div 100;
       taRightJustify:
         RHere.Left:= Max(ARect.Left, ARect.Right-AGap.Bitmap.Width);
     end;
@@ -5408,6 +5411,7 @@ begin
   FPrevCaret.EndY:= -1;
 
   FOptGapBitmapAlignment:= cInitGapBitmapAlignment;
+  FOptGapBitmapIndent:= cInitGapBitmapIndent;
   FOptFlickerReducingPause:= 0;
   FOptInputNumberOnly:= false;
   FOptInputNumberAllowNegative:= cInitInputNumberAllowNegative;
