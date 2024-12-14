@@ -17,12 +17,7 @@ var
   SQuad: UCS4String;
   NLast, i: integer;
   bCancel: boolean;
-  OldErrorMode: TEncConvErrorMode;
 begin
- OldErrorMode:= EncConvErrorMode;
- EncConvErrorMode:= eemException;
- try
-
   if AWithSignature then
   begin
     case FEncoding of
@@ -125,11 +120,8 @@ begin
     end;
   end;
 
- finally
   FProgressValue:= 0;
   FProgressKind:= TATStringsProgressKind.None;
-  EncConvErrorMode:= OldErrorMode;
- end;
 end;
 
 function TATStrings.IsSavingWithSignature: boolean;
@@ -154,7 +146,9 @@ var
   fs: TFileStream;
   ms: TMemoryStream;
   NMode: word;
+  OldErrorMode: TEncConvErrorMode;
 begin
+  OldErrorMode:= EncConvErrorMode;
   NMode:= fmOpenReadWrite or fmShareDenyWrite;
   //don't set fmCreate for existing file, to keep NTFS file streams
   if not FileExists(AFilename) then
@@ -164,6 +158,7 @@ begin
     //new method to save, with MemoryStream, takes much more memory
     ms:= TMemoryStream.Create;
     fs:= TFileStream.Create(AFilename, NMode);
+    EncConvErrorMode:= eemException;
     try
       SaveToStream(ms, FEncoding, IsSavingWithSignature);
       ms.Seek(0, soFromBeginning);
@@ -171,17 +166,20 @@ begin
       fs.Seek(0, soFromBeginning);
       fs.CopyFrom(ms, ms.Size);
     finally
+      EncConvErrorMode:= OldErrorMode;
       FreeAndNil(fs);
       FreeAndNil(ms);
     end;
   except
     //revert to old slower method
     fs:= TFileStream.Create(AFilename, NMode);
+    EncConvErrorMode:= eemException;
     try
       fs.Size:= 0; //important to avoid tail from old contents
       fs.Seek(0, soFromBeginning);
       SaveToStream(fs, FEncoding, IsSavingWithSignature);
     finally
+      EncConvErrorMode:= OldErrorMode;
       FreeAndNil(fs);
     end;
   end;
