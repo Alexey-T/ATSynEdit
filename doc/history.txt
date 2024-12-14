@@ -1,4 +1,5 @@
-2024.12.13
+2024.12.14
++ add: event OnEnabledUndoRedoChanged
 + add: prop OptGapBitmapIndent (used only when OptGapBitmapAlignment = left)
 
 2024.11.02
