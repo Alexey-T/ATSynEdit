@@ -512,11 +512,9 @@ function TATUndoList.IsEmpty: boolean;
 var
   N: integer;
 begin
-  N:= Count;
-  repeat
-    Dec(N);
-    if N<0 then
-      exit(true);
+  Result:= true;
+  for N:= Count-1 downto 0 do
+  begin
     case Items[N].ItemAction of
       //ignore some kind of items for IsEmpty
       TATEditAction.ClearModified,
@@ -525,7 +523,7 @@ begin
       else
         exit(false);
     end;
-  until false;
+  end;
 end;
 
 
