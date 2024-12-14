@@ -17,8 +17,11 @@ var
   SQuad: UCS4String;
   NLast, i: integer;
   bCancel: boolean;
+  OldErrorMode: TEncConvErrorMode;
 begin
-  EncConvErrorMode:= eemException;
+ OldErrorMode:= EncConvErrorMode;
+ EncConvErrorMode:= eemException;
+ try
 
   if AWithSignature then
   begin
@@ -122,8 +125,11 @@ begin
     end;
   end;
 
+ finally
   FProgressValue:= 0;
   FProgressKind:= TATStringsProgressKind.None;
+  EncConvErrorMode:= OldErrorMode;
+ end;
 end;
 
 function TATStrings.IsSavingWithSignature: boolean;
