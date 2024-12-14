@@ -509,20 +509,19 @@ begin
 end;
 
 function TATUndoList.IsEmpty: boolean;
+const
+  cIgnoredActions = [
+    TATEditAction.ClearModified,
+    TATEditAction.CaretJump
+    ];
 var
-  N: integer;
+  i: integer;
 begin
   Result:= true;
-  for N:= Count-1 downto 0 do
+  for i:= Count-1 downto 0 do
   begin
-    case Items[N].ItemAction of
-      //ignore some kind of items for IsEmpty
-      TATEditAction.ClearModified,
-      TATEditAction.CaretJump:
-        Continue;
-      else
-        exit(false);
-    end;
+    if not (Items[i].ItemAction in cIgnoredActions) then
+      exit(false);
   end;
 end;
 
