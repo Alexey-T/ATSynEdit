@@ -458,6 +458,7 @@ type
   TATSynEditHotspotEvent = procedure(Sender: TObject; AHotspotIndex: integer) of object;
   TATSynEditCheckInputEvent = procedure(Sender: TObject; AChar: WideChar; var AllowInput: boolean) of object;
   TATSynEditGetTokenEvent = function(Sender: TObject; AX, AY: integer): TATTokenKind of object;
+  TATSynEditEnabledUndoRedoChanged = procedure(Sender: TObject; AUndoEnabled, ARedoEnabled: boolean) of object;
 
 type
   { TATFoldedMark }
@@ -731,6 +732,8 @@ type
     FLastLineOfSlowEvents: integer;
     FLastUndoTick: QWord;
     FLastUndoPaused: boolean;
+    FLastEnabledUndo: boolean;
+    FLastEnabledRedo: boolean;
     FLastCaretY: integer;
     FLineTopTodo: integer;
     FIsRunningCommand: boolean;
@@ -779,6 +782,7 @@ type
     FOnCheckInput: TATSynEditCheckInputEvent;
     FOnBeforeCalcHilite: TNotifyEvent;
     FOnGetToken: TATSynEditGetTokenEvent;
+    FOnEnabledUndoRedoChanged: TATSynEditEnabledUndoRedoChanged;
     FWrapInfo: TATWrapInfo;
     FWrapTemps: TATWrapItems;
     FWrapMode: TATEditorWrapMode;
@@ -1969,6 +1973,7 @@ type
     property OnHotspotEnter: TATSynEditHotspotEvent read FOnHotspotEnter write FOnHotspotEnter;
     property OnHotspotExit: TATSynEditHotspotEvent read FOnHotspotExit write FOnHotspotExit;
     property OnGetToken: TATSynEditGetTokenEvent read FOnGetToken write FOnGetToken;
+    property OnEnabledUndoRedoChanged: TATSynEditEnabledUndoRedoChanged read FOnEnabledUndoRedoChanged write FOnEnabledUndoRedoChanged;
 
     //misc
     property CursorText: TCursor read FCursorText write FCursorText default crIBeam;
@@ -6278,7 +6283,9 @@ end;
 
 procedure TATSynEdit.Paint;
 var
+  St: TATStrings;
   NLine: integer;
+  bEnabledUndo, bEnabledRedo: boolean;
 begin
   if not HandleAllocated then exit;
 
@@ -6314,6 +6321,20 @@ begin
   begin
     Exclude(FPaintFlags, TATEditorInternalFlag.ScrollEventNeeded);
     DoEventScroll;
+  end;
+
+  if Assigned(FOnEnabledUndoRedoChanged) then
+  begin
+    St:= Strings;
+    bEnabledUndo:= (not St.ReadOnly) and (not St.UndoEmpty);
+    bEnabledRedo:= (not St.ReadOnly) and (not St.RedoEmpty);
+    if (bEnabledUndo<>FLastEnabledUndo) or
+       (bEnabledRedo<>FLastEnabledRedo) then
+    begin
+      FLastEnabledUndo:= bEnabledUndo;
+      FLastEnabledRedo:= bEnabledRedo;
+      FOnEnabledUndoRedoChanged(Self, bEnabledUndo, bEnabledRedo);
+    end;
   end;
 end;
 
