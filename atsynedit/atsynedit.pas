@@ -1398,6 +1398,7 @@ type
     procedure DoEventDrawBookmarkIcon(C: TCanvas; ALineIndex, ABookmarkIndex: integer;
       const ARect: TRect; var AHandled: boolean);
     procedure DoEventCommandAfter(ACommand: integer; const AText: string);
+    procedure DoEventEnabledUndoRedoChanged;
     //
     function GetEndOfFilePos: TPoint;
     function GetMarginString: string;
@@ -6283,9 +6284,7 @@ end;
 
 procedure TATSynEdit.Paint;
 var
-  St: TATStrings;
   NLine: integer;
-  bEnabledUndo, bEnabledRedo: boolean;
 begin
   if not HandleAllocated then exit;
 
@@ -6323,6 +6322,15 @@ begin
     DoEventScroll;
   end;
 
+  DoEventEnabledUndoRedoChanged;
+end;
+
+
+procedure TATSynEdit.DoEventEnabledUndoRedoChanged;
+var
+  St: TATStrings;
+  bEnabledUndo, bEnabledRedo: boolean;
+begin
   if Assigned(FOnEnabledUndoRedoChanged) then
   begin
     St:= Strings;
