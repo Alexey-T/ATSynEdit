@@ -6476,8 +6476,23 @@ begin
 end;
 
 procedure TATSynEdit.WMEraseBkgnd(var Msg: TLMEraseBkgnd);
+var
+  R: TRect;
 begin
-  //needed to remove flickering on resize and mouse-over
+  //to avoid flickering with white on app startup
+  {$ifdef windows}
+  if Msg.DC<>0 then
+  begin
+    Brush.Color:= Colors.TextBG;
+    R.Left:= 0;
+    R.Top:= 0;
+    R.Width:= Width;
+    R.Height:= Height;
+    Windows.FillRect(Msg.DC, R, Brush.Reference.Handle);
+  end;
+  {$endif}
+
+  //to remove flickering on resize and mouse-over
   Msg.Result:= 1;
 end;
 
