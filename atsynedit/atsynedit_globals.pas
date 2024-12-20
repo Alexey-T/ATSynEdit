@@ -153,6 +153,7 @@ type
     HintBookmarkDy: integer;
     HintBookmarkMaxWidth: integer;
     UrlMarkerTag: integer;
+    EditorWasPaintedOnce: boolean;
 
     //UI strings
     TextHintScrollPrefix: string;

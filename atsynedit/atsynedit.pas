@@ -6314,6 +6314,7 @@ begin
     PaintEx(NLine);
   finally
     FPaintWorking:= false;
+    ATEditorOptions.EditorWasPaintedOnce:= true;
   end;
 
   if TATEditorInternalFlag.ScrollEventNeeded in FPaintFlags then
@@ -6481,7 +6482,7 @@ var
 begin
   //to avoid flickering with white on app startup
   {$ifdef windows}
-  if Msg.DC<>0 then
+  if (not ATEditorOptions.EditorWasPaintedOnce) and (Msg.DC<>0) then
   begin
     Brush.Color:= Colors.TextBG;
     R.Left:= 0;
