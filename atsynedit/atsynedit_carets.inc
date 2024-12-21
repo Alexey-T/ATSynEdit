@@ -1012,7 +1012,7 @@ end;
 
 procedure TATSynEdit.SetCaretsArray(const Ar: TATPointPairArray);
 begin
-  if Assigned(FCarets) then
+  if Assigned(FCarets) and (Length(Ar)>0) then
   begin
     FCarets.AsArray:= Ar;
     DoCaretsFixIncorrectPos(false);

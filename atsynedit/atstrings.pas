@@ -194,6 +194,7 @@ type
     FGutterDecor2: TATGutterDecor;
     FUndoList,
     FRedoList: TATUndoList;
+    FUndoSavesCaretsArray: boolean;
     FRunningUndoOrRedo: TATEditorRunningUndoOrRedo;
     FCommandCode: integer;
     FUndoLimit: integer;
@@ -371,6 +372,7 @@ type
     property GutterDecor1: TATGutterDecor read FGutterDecor1 write FGutterDecor1;
     property GutterDecor2: TATGutterDecor read FGutterDecor2 write FGutterDecor2;
     property CommandCode: integer read FCommandCode write FCommandCode; //Affects UndoList/RedoList's items ACommandCode field
+    property UndoSavesCaretsArray: boolean read FUndoSavesCaretsArray write FUndoSavesCaretsArray;
     //actions
     procedure ActionDeleteFakeLine;
     procedure ActionDeleteFakeLineAndFinalEol;
@@ -1332,6 +1334,7 @@ begin
   FModifiedRecent:= false;
   FModifiedVersion:= 0;
   FChangeBlockActive:= false;
+  FUndoSavesCaretsArray:= true;
 
   FSaveSignUtf8:= true;
   FSaveSignWide:= true;
@@ -2195,6 +2198,7 @@ procedure TATStrings.AddUndoItem(AAction: TATEditAction; AIndex: SizeInt;
   ACommandCode: integer);
 var
   CurList: TATUndoList;
+  CurCarets: TATPointPairArray;
 begin
   if FUndoList=nil then exit;
   if FRedoList=nil then exit;
@@ -2227,13 +2231,18 @@ begin
     AddUpdatesAction(AIndex, AAction);
   end;
 
+  if FUndoSavesCaretsArray then
+    CurCarets:= GetCaretsArray
+  else
+    CurCarets:= nil;
+
   CurList.Add(
     AAction,
     AIndex,
     AText,
     AEnd,
     ALineState,
-    GetCaretsArray,
+    CurCarets,
     GetMarkersArray,
     GetAttribsArray,
     ACommandCode,
@@ -2304,6 +2313,7 @@ begin
     if List.IsEmpty then Break;
 
     UndoSingle(List, bSoftMarked, bHardMarked, bHardMarkedNext, bMarkedUnmodified, NCommandCode, NTickCount);
+    FUndoSavesCaretsArray:= false;
 
     //handle unmodified
     //don't clear FModified if List.IsEmpty! http://synwrite.sourceforge.net/forums/viewtopic.php?f=5&t=2504
@@ -2336,6 +2346,8 @@ begin
     if bSoftMarked then
       Break;
   until false;
+
+  FUndoSavesCaretsArray:= true;
 
   //apply SoftMark to ListOther
   if bSoftMarked and AGrouped then

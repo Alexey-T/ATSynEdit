@@ -54,7 +54,7 @@ var
   TextItem: atString;
   X1, Y1, X2, Y2, X_saved: integer;
   bSel, bNeedGroup, bInsertLinePerCaret: boolean;
-  iCaret: integer;
+  iCaret, NLastCaret: integer;
   NTextLines: integer;
 begin
   Result:= [];
@@ -115,7 +115,8 @@ begin
     if Carets.IsSelection then
       Result:= DoCommand_TextDeleteSelection(true);
 
-    for iCaret:= Carets.Count-1 downto 0 do
+    NLastCaret:= Carets.Count-1;
+    for iCaret:= NLastCaret downto 0 do
     begin
       Caret:= Carets[iCaret];
       Caret.GetRange(X1, Y1, X2, Y2, bSel);
@@ -132,6 +133,8 @@ begin
         TextItem:= UTF8Decode(TextItems[iCaret])
       else
         TextItem:= AText;
+
+      St.UndoSavesCaretsArray:= (iCaret=0) or (iCaret=NLastCaret);
 
       if bSel then
         St.TextReplaceRange(X1, Y1, X2, Y2, TextItem, Shift, PosAfter, false)
