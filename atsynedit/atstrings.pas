@@ -194,7 +194,6 @@ type
     FGutterDecor2: TATGutterDecor;
     FUndoList,
     FRedoList: TATUndoList;
-    FUndoSavesCaretsArray: boolean;
     FRunningUndoOrRedo: TATEditorRunningUndoOrRedo;
     FCommandCode: integer;
     FUndoLimit: integer;
@@ -235,6 +234,7 @@ type
     FLastCommandChangedLines: integer;
     FEnabledBookmarksUpdate: boolean;
     FEnabledChangeEvents: boolean;
+    FEnabledCaretsInUndo: boolean;
     FLoadingForcedANSI: boolean;
     FLastUndoY: SizeInt;
 
@@ -366,13 +366,13 @@ type
     property ChangeBlockActive: boolean read FChangeBlockActive write FChangeBlockActive;
     property EnabledBookmarksUpdate: boolean read FEnabledBookmarksUpdate write FEnabledBookmarksUpdate;
     property EnabledChangeEvents: boolean read FEnabledChangeEvents write FEnabledChangeEvents;
+    property EnabledCaretsInUndo: boolean read FEnabledCaretsInUndo write FEnabledCaretsInUndo;
     property Gaps: TATGaps read FGaps;
     property Bookmarks: TATBookmarks read FBookmarks;
     property Bookmarks2: TATBookmarks read FBookmarks2;
     property GutterDecor1: TATGutterDecor read FGutterDecor1 write FGutterDecor1;
     property GutterDecor2: TATGutterDecor read FGutterDecor2 write FGutterDecor2;
     property CommandCode: integer read FCommandCode write FCommandCode; //Affects UndoList/RedoList's items ACommandCode field
-    property UndoSavesCaretsArray: boolean read FUndoSavesCaretsArray write FUndoSavesCaretsArray;
     //actions
     procedure ActionDeleteFakeLine;
     procedure ActionDeleteFakeLineAndFinalEol;
@@ -1323,6 +1323,7 @@ begin
   FBookmarks2:= TATBookmarks.Create;
   FEnabledBookmarksUpdate:= true;
   FEnabledChangeEvents:= true;
+  FEnabledCaretsInUndo:= true;
 
   FEncoding:= TATFileEncoding.UTF8;
   FEncodingDetect:= true;
@@ -1334,7 +1335,6 @@ begin
   FModifiedRecent:= false;
   FModifiedVersion:= 0;
   FChangeBlockActive:= false;
-  FUndoSavesCaretsArray:= true;
 
   FSaveSignUtf8:= true;
   FSaveSignWide:= true;
@@ -2231,7 +2231,7 @@ begin
     AddUpdatesAction(AIndex, AAction);
   end;
 
-  if FUndoSavesCaretsArray then
+  if FEnabledCaretsInUndo then
     CurCarets:= GetCaretsArray
   else
     CurCarets:= nil;
@@ -2313,7 +2313,7 @@ begin
     if List.IsEmpty then Break;
 
     UndoSingle(List, bSoftMarked, bHardMarked, bHardMarkedNext, bMarkedUnmodified, NCommandCode, NTickCount);
-    FUndoSavesCaretsArray:= false;
+    FEnabledCaretsInUndo:= false;
 
     //handle unmodified
     //don't clear FModified if List.IsEmpty! http://synwrite.sourceforge.net/forums/viewtopic.php?f=5&t=2504
@@ -2347,7 +2347,7 @@ begin
       Break;
   until false;
 
-  FUndoSavesCaretsArray:= true;
+  FEnabledCaretsInUndo:= true;
 
   //apply SoftMark to ListOther
   if bSoftMarked and AGrouped then

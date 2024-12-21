@@ -134,7 +134,7 @@ begin
       else
         TextItem:= AText;
 
-      St.UndoSavesCaretsArray:= (iCaret=0) or (iCaret=NLastCaret);
+      St.EnabledCaretsInUndo:= (iCaret=0) or (iCaret=NLastCaret);
 
       if bSel then
         St.TextReplaceRange(X1, Y1, X2, Y2, TextItem, Shift, PosAfter, false)
@@ -353,7 +353,7 @@ var
   bNeedGroup: boolean;
   bChange, bChangeOne: boolean;
   ch: WideChar;
-  iCaret: integer;
+  iCaret, NLastCaret: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
@@ -375,9 +375,11 @@ begin
 
   bChange:= false;
 
-  for iCaret:= 0 to Carets.Count-1 do
+  NLastCaret:= Carets.Count-1;
+  for iCaret:= 0 to NLastCaret do
   begin
     Caret:= Carets[iCaret];
+    St.EnabledCaretsInUndo:= (iCaret=0) or (iCaret=NLastCaret);
     if not St.IsIndexValid(Caret.PosY) then Continue;
     NDeleteLen:= ADeleteLen;
 
@@ -529,7 +531,7 @@ var
   Shift, PosEnd, PosAfter: TPoint;
   bNeedGroup: boolean;
   ch: WideChar;
-  iCaret: integer;
+  iCaret, NLastCaret: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
@@ -549,9 +551,11 @@ begin
   if bNeedGroup then
     St.BeginUndoGroup;
 
-  for iCaret:= 0 to Carets.Count-1 do
+  NLastCaret:= Carets.Count-1;
+  for iCaret:= 0 to NLastCaret do
   begin
     Caret:= Carets[iCaret];
+    St.EnabledCaretsInUndo:= (iCaret=0) or (iCaret=NLastCaret);
     if not St.IsIndexValid(Caret.PosY) then Continue;
 
     NLineLen:= St.LinesLen[Caret.PosY];
@@ -880,7 +884,7 @@ var
   bNeedGroup: boolean;
   bChange, bChangeOne: boolean;
   NPosX, NLen: integer;
-  iCaret: integer;
+  iCaret, NLastCaret: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
@@ -905,9 +909,11 @@ begin
   if bNeedGroup then
     St.BeginUndoGroup;
 
-  for iCaret:= FCarets.Count-1 downto 0 do
+  NLastCaret:= FCarets.Count-1;
+  for iCaret:= NLastCaret downto 0 do
   begin
     Caret:= FCarets[iCaret];
+    St.EnabledCaretsInUndo:= (iCaret=0) or (iCaret=NLastCaret);
     if not St.IsIndexValid(Caret.PosY) then Continue;
     Str:= St.Lines[Caret.PosY];
     Shift.X:= 0;
