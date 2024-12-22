@@ -2231,6 +2231,13 @@ begin
     AddUpdatesAction(AIndex, AAction);
   end;
 
+  {
+  EnabledCaretsInUndo is important for multi-carets, with lot of carets, e.g. 10K carets.
+  it must be True for first _handled_ caret (first handled caret can be last caret),
+  and False when adding UndoItems for other carets.
+  otherwise, mem usage for UndoItems will jump to O(caret_count**2).
+  and now it is O(caret_count).
+  }
   if FEnabledCaretsInUndo then
     CurCarets:= GetCaretsArray
   else
