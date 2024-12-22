@@ -2237,7 +2237,7 @@ begin
   and False when adding UndoItems for other carets.
   without EnabledCaretsInUndo, mem usage for UndoItems is O(caret_count**2) - for 18K carets
   it is fatal, 'out of memory' error, after typing several chars.
-  and now it is O(caret_count).
+  and now mem usage is O(caret_count).
   }
   if FEnabledCaretsInUndo then
     CurCarets:= GetCaretsArray
