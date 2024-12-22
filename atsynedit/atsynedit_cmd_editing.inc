@@ -842,7 +842,7 @@ var
   Str: atString;
   Caret: TATCaretItem;
   bChange: boolean;
-  NLen, i: integer;
+  NLen, iCaret, NLastCaret: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
@@ -850,9 +850,11 @@ begin
   bChange:= false;
   St:= Strings;
 
-  for i:= FCarets.Count-1 downto 0 do
+  NLastCaret:= FCarets.Count-1;
+  for iCaret:= NLastCaret downto 0 do
   begin
-    Caret:= FCarets[i];
+    Caret:= FCarets[iCaret];
+    St.EnabledCaretsInUndo:= (iCaret=NLastCaret);
     if not St.IsIndexValid(Caret.PosY) then Continue;
     NLen:= St.LinesLen[Caret.PosY];
     if Caret.PosX<NLen then
@@ -865,6 +867,8 @@ begin
       bChange:= true;
     end;
   end;
+
+  St.EnabledCaretsInUndo:= true;
 
   Result:= [TATCommandResult.CaretAny];
   if bChange then
