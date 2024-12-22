@@ -2235,7 +2235,8 @@ begin
   EnabledCaretsInUndo is important for multi-carets, with lot of carets, e.g. 10K carets.
   it must be True for first _handled_ caret (first handled caret can be last caret),
   and False when adding UndoItems for other carets.
-  otherwise, mem usage for UndoItems will jump to O(caret_count**2).
+  without EnabledCaretsInUndo, mem usage for UndoItems is O(caret_count**2) - for 18K carets
+  it is fatal, 'out of memory' error, after typing several chars.
   and now it is O(caret_count).
   }
   if FEnabledCaretsInUndo then
