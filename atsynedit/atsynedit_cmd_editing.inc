@@ -120,6 +120,7 @@ begin
     begin
       Caret:= Carets[iCaret];
       Caret.GetRange(X1, Y1, X2, Y2, bSel);
+      St.EnabledCaretsInUndo:= (iCaret=NLastCaret);
 
       X_saved:= -1;
       if AInsertAtLineStarts and not bSel then
@@ -133,8 +134,6 @@ begin
         TextItem:= UTF8Decode(TextItems[iCaret])
       else
         TextItem:= AText;
-
-      St.EnabledCaretsInUndo:= (iCaret=0) or (iCaret=NLastCaret);
 
       if bSel then
         St.TextReplaceRange(X1, Y1, X2, Y2, TextItem, Shift, PosAfter, false)
@@ -161,6 +160,7 @@ begin
       FreeAndNil(TextItems);
     if bNeedGroup then
       St.EndUndoGroup;
+    St.EnabledCaretsInUndo:= true;
   end;
 
   //changed for issue CudaText#3065
@@ -379,7 +379,7 @@ begin
   for iCaret:= 0 to NLastCaret do
   begin
     Caret:= Carets[iCaret];
-    St.EnabledCaretsInUndo:= (iCaret=0) or (iCaret=NLastCaret);
+    St.EnabledCaretsInUndo:= (iCaret=0);
     if not St.IsIndexValid(Caret.PosY) then Continue;
     NDeleteLen:= ADeleteLen;
 
@@ -415,6 +415,8 @@ begin
     if bChangeOne then
       bChange:= true;
   end;
+
+  St.EnabledCaretsInUndo:= true;
 
   if bNeedGroup then
     St.EndUndoGroup;
@@ -555,7 +557,7 @@ begin
   for iCaret:= 0 to NLastCaret do
   begin
     Caret:= Carets[iCaret];
-    St.EnabledCaretsInUndo:= (iCaret=0) or (iCaret=NLastCaret);
+    St.EnabledCaretsInUndo:= (iCaret=0);
     if not St.IsIndexValid(Caret.PosY) then Continue;
 
     NLineLen:= St.LinesLen[Caret.PosY];
@@ -592,6 +594,8 @@ begin
     Caret.PosX:= PosAfter.X;
     Caret.PosY:= PosAfter.Y;
   end;
+
+  St.EnabledCaretsInUndo:= true;
 
   if bNeedGroup then
     St.EndUndoGroup;
@@ -913,7 +917,7 @@ begin
   for iCaret:= NLastCaret downto 0 do
   begin
     Caret:= FCarets[iCaret];
-    St.EnabledCaretsInUndo:= (iCaret=0) or (iCaret=NLastCaret);
+    St.EnabledCaretsInUndo:= (iCaret=NLastCaret);
     if not St.IsIndexValid(Caret.PosY) then Continue;
     Str:= St.Lines[Caret.PosY];
     Shift.X:= 0;
@@ -979,6 +983,8 @@ begin
       Caret.PosY:= PosAfter.Y;
     end;
   end;
+
+  St.EnabledCaretsInUndo:= true;
 
   if bNeedGroup then
     St.EndUndoGroup;
