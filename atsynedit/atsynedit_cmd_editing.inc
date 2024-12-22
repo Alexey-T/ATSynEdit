@@ -1014,7 +1014,7 @@ var
   Str: atString;
   Shift, PosAfter: TPoint;
   bNeedGroup: boolean;
-  NLen, N1, N2, iCaret: integer;
+  NLen, N1, N2, iCaret, NLastCaret: integer;
   bChange: boolean;
 begin
   Result:= [];
@@ -1026,9 +1026,11 @@ begin
   if bNeedGroup then
     St.BeginUndoGroup;
 
-  for iCaret:= FCarets.Count-1 downto 0 do
+  NLastCaret:= FCarets.Count-1;
+  for iCaret:= NLastCaret downto 0 do
   begin
     Caret:= FCarets[iCaret];
+    St.EnabledCaretsInUndo:= (iCaret=NLastCaret);
     if not St.IsIndexValid(Caret.PosY) then Continue;
     Str:= St.Lines[Caret.PosY];
     NLen:= Length(Str);
@@ -1074,6 +1076,8 @@ begin
       PosAfter);
   end;
 
+  St.EnabledCaretsInUndo:= true;
+
   if bNeedGroup then
     St.EndUndoGroup;
 
@@ -1098,20 +1102,26 @@ end;
 
 function TATSynEdit.DoCommand_TextIndentUnindent_StreamBlock(ARight: boolean): TATCommandResults;
 var
+  St: TATStrings;
   bChange, bChangeOne: boolean;
-  i: integer;
+  iCaret, NLastCaret: integer;
 begin
   DoCaretsDeleteOnSameLines;
 
+  St:= Strings;
   bChange:= false;
   bChangeOne:= false;
 
-  for i:= Carets.Count-1 downto 0 do
+  NLastCaret:= FCarets.Count-1;
+  for iCaret:= NLastCaret downto 0 do
   begin
-    DoCommand_TextIndentUnindent_StreamBlock_OneCaret(ARight, Carets[i], bChangeOne);
+    St.EnabledCaretsInUndo:= (iCaret=NLastCaret);
+    DoCommand_TextIndentUnindent_StreamBlock_OneCaret(ARight, Carets[iCaret], bChangeOne);
     if bChangeOne then
       bChange:= true;
   end;
+
+  St.EnabledCaretsInUndo:= true;
 
   Result:= [TATCommandResult.CaretAny];
   if bChange then
@@ -1514,7 +1524,7 @@ var
   X1, Y1, X2, Y2: integer;
   Shift, PosAfter: TPoint;
   bSel, bChange: boolean;
-  i: integer;
+  iCaret, NLastCaret: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
@@ -1523,9 +1533,11 @@ begin
 
   St.BeginUndoGroup;
   try
-    for i:= Carets.Count-1 downto 0 do
+    NLastCaret:= FCarets.Count-1;
+    for iCaret:= NLastCaret downto 0 do
     begin
-      Caret:= Carets[i];
+      Caret:= Carets[iCaret];
+      St.EnabledCaretsInUndo:= (iCaret=NLastCaret);
       if not St.IsIndexValid(Caret.PosY) then Continue;
       Caret.GetRange(X1, Y1, X2, Y2, bSel);
       if not bSel then
@@ -1557,6 +1569,7 @@ begin
       end;
     end;
   finally
+    St.EnabledCaretsInUndo:= true;
     St.EndUndoGroup;
   end;
 
