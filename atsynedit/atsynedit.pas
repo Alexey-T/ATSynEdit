@@ -581,10 +581,10 @@ type
     cUrlRegex_WebParams = '(\?[^\s"''<>]*[\w/\-\+\*=])?';
     cUrlRegex_WebFolder =
       '[~\w\.\-\+/%@!%:&\*=\|,;\$]' + //always allowed chars
-      '|\(.*?\)' +
-      '|\[.*?\]' +
-      '|\{.*?\}' + //brackets pair
-      '|([''"`](?![\x20\x09\x0A\x0D.,;:]))'; //chars allowed only if not followed by a delimiter
+      '|\(.*?\)' + //brackets pair
+      '|\[.*?\]' + //brackets pair
+      '|\{.*?\}';  //brackets pair
+      //'|([''"`](?![\x20\x09\x0A\x0D.,;:]))'; //chars allowed only if not followed by a delimiter
 
     cUrlRegex_Web =
       cUrlRegex_WebBegin
