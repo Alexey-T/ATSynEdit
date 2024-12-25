@@ -610,7 +610,7 @@ var
   Shift, PosAfter: TPoint;
   Str, StrPart: atString;
   bNeedGroup, bBetterBrackets, bForceIndent: boolean;
-  NCaretX, NShiftX, NShiftY, iCaret: integer;
+  NCaretX, NShiftX, NShiftY, iCaret, NLastCaret: integer;
   BracketChar: char;
 begin
   Result:= [];
@@ -625,10 +625,12 @@ begin
 
   DoSelectionDeleteOrReset;
 
-  for iCaret:= FCarets.Count-1 downto 0 do
+  NLastCaret:= FCarets.Count-1;
+  for iCaret:= NLastCaret downto 0 do
   begin
     Caret:= FCarets[iCaret];
     if not St.IsIndexValid(Caret.PosY) then Continue;
+    St.EnabledCaretsInUndo:= iCaret=NLastCaret;
 
     //reset empty selection, fixing CudaText issue #4271
     if Caret.IsSelectionEmpty then
@@ -686,6 +688,7 @@ begin
     Caret.SavedX:= 0;
   end;
 
+  St.EnabledCaretsInUndo:= true;
   if bNeedGroup then
     St.EndUndoGroup;
 
