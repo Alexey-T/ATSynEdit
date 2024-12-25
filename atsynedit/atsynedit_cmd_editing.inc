@@ -754,7 +754,7 @@ function TATSynEdit.DoCommand_TextDuplicateLine: TATCommandResults;
 var
   St: TATStrings;
   Caret: TATCaretItem;
-  Line1, Line2, iCaret, iLine: integer;
+  Line1, Line2, iCaret, iLine, NLastCaret: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
@@ -765,10 +765,12 @@ begin
   St:= Strings;
   St.BeginUndoGroup;
   try
-    for iCaret:= Carets.Count-1 downto 0 do
+    NLastCaret:= Carets.Count-1;
+    for iCaret:= NLastCaret downto 0 do
     begin
       Caret:= Carets[iCaret];
       if not St.IsIndexValid(Caret.PosY) then Continue;
+      St.EnabledCaretsInUndo:= iCaret=NLastCaret;
 
       //universal code, for selection or not
       Caret.GetSelLines(Line1, Line2, true);
@@ -776,6 +778,7 @@ begin
 
       if St.LinesEnds[Line2]=TATLineEnds.None then
         St.LinesEnds[Line2]:= St.Endings;
+
       for iLine:= Line2 downto Line1 do
       begin
         St.LineInsert(Line2+1, St.Lines[iLine]);
@@ -797,6 +800,7 @@ begin
       end;
     end;
   finally
+    St.EnabledCaretsInUndo:= true;
     St.EndUndoGroup;
   end;
 
