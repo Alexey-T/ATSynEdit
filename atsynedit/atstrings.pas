@@ -214,9 +214,11 @@ type
     FProgressValue: SizeInt;
     FProgressKind: TATStringsProgressKind;
     FOnGetCaretsArray: TATStringsGetCarets;
+    FOnGetCaretsArray2: TATStringsGetCarets;
     FOnGetMarkersArray: TATStringsGetMarkers;
     FOnGetAttribsArray: TATStringsGetAttribs;
     FOnSetCaretsArray: TATStringsSetCarets;
+    FOnSetCaretsArray2: TATStringsSetCarets;
     FOnSetMarkersArray: TATStringsSetMarkers;
     FOnSetAttribsArray: TATStringsSetAttribs;
     FOnProgress: TATStringsProgressEvent;
@@ -249,6 +251,7 @@ type
     function IsFilled: boolean;
     procedure DoFinalizeSaving;
     function GetCaretsArray: TATPointPairArray;
+    function GetCaretsArray2: TATPointPairArray;
     function GetMarkersArray: TATMarkerMarkerArray;
     function GetAttribsArray: TATMarkerAttribArray;
     function GetLine(AIndex: SizeInt): atString;
@@ -277,6 +280,7 @@ type
     procedure LineAddEx(const AString: atString; AEnd: TATLineEnds);
     function IsSavingWithSignature: boolean;
     procedure SetCaretsArray(const L: TATPointPairArray);
+    procedure SetCaretsArray2(const L: TATPointPairArray);
     procedure SetMarkersArray(const L: TATMarkerMarkerArray);
     procedure SetAttribsArray(const L: TATMarkerAttribArray);
     procedure SetEndings(AValue: TATLineEnds);
@@ -423,9 +427,11 @@ type
     function TextSubstringLength(AX1, AY1, AX2, AY2: SizeInt; const AEolString: UnicodeString=#10): SizeInt;
     //undo
     property OnGetCaretsArray: TATStringsGetCarets read FOnGetCaretsArray write FOnGetCaretsArray;
+    property OnGetCaretsArray2: TATStringsGetCarets read FOnGetCaretsArray2 write FOnGetCaretsArray2;
     property OnGetMarkersArray: TATStringsGetMarkers read FOnGetMarkersArray write FOnGetMarkersArray;
     property OnGetAttribsArray: TATStringsGetAttribs read FOnGetAttribsArray write FOnGetAttribsArray;
     property OnSetCaretsArray: TATStringsSetCarets read FOnSetCaretsArray write FOnSetCaretsArray;
+    property OnSetCaretsArray2: TATStringsSetCarets read FOnSetCaretsArray2 write FOnSetCaretsArray2;
     property OnSetMarkersArray: TATStringsSetMarkers read FOnSetMarkersArray write FOnSetMarkersArray;
     property OnSetAttribsArray: TATStringsSetAttribs read FOnSetAttribsArray write FOnSetAttribsArray;
     procedure SetGroupMark;
@@ -1933,6 +1939,7 @@ var
   CurLineEnd: TATLineEnds;
   CurLineState: TATLineState;
   CurCaretsArray: TATPointPairArray;
+  CurCaretsArray2: TATPointPairArray;
   CurMarkersArray: TATMarkerMarkerArray;
   CurAttribsArray: TATMarkerAttribArray;
   OtherList: TATUndoList;
@@ -1962,6 +1969,7 @@ begin
   CurLineEnd:= CurItem.ItemEnd;
   CurLineState:= CurItem.ItemLineState;
   CurCaretsArray:= CurItem.ItemCarets;
+  CurCaretsArray2:= CurItem.ItemCarets2;
   CurMarkersArray:= CurItem.ItemMarkers;
   CurAttribsArray:= CurItem.ItemAttribs;
   ACommandCode:= CurItem.ItemCommandCode;
@@ -2101,6 +2109,7 @@ begin
             TATLineEnds.None,
             TATLineState.None,
             CurCaretsArray,
+            CurCaretsArray2,
             CurMarkersArray,
             CurAttribsArray,
             ACommandCode,
@@ -2111,6 +2120,8 @@ begin
 
     if Length(CurCaretsArray)>0 then
       SetCaretsArray(CurCaretsArray);
+    if Length(CurCaretsArray2)>0 then
+      SetCaretsArray2(CurCaretsArray2);
     SetMarkersArray(CurMarkersArray);
     SetAttribsArray(CurAttribsArray);
 
@@ -2152,6 +2163,14 @@ begin
     Result:= nil;
 end;
 
+function TATStrings.GetCaretsArray2: TATPointPairArray;
+begin
+  if Assigned(FOnGetCaretsArray2) then
+    Result:= FOnGetCaretsArray2()
+  else
+    Result:= nil;
+end;
+
 function TATStrings.GetMarkersArray: TATMarkerMarkerArray;
 begin
   if Assigned(FOnGetMarkersArray) then
@@ -2172,6 +2191,12 @@ procedure TATStrings.SetCaretsArray(const L: TATPointPairArray);
 begin
   if Assigned(FOnSetCaretsArray) then
     FOnSetCaretsArray(L);
+end;
+
+procedure TATStrings.SetCaretsArray2(const L: TATPointPairArray);
+begin
+  if Assigned(FOnSetCaretsArray2) then
+    FOnSetCaretsArray2(L);
 end;
 
 procedure TATStrings.SetMarkersArray(const L: TATMarkerMarkerArray);
@@ -2198,7 +2223,7 @@ procedure TATStrings.AddUndoItem(AAction: TATEditAction; AIndex: SizeInt;
   ACommandCode: integer);
 var
   CurList: TATUndoList;
-  CurCarets: TATPointPairArray;
+  CurCarets, CurCarets2: TATPointPairArray;
 begin
   if FUndoList=nil then exit;
   if FRedoList=nil then exit;
@@ -2240,9 +2265,15 @@ begin
   and now mem usage is O(caret_count).
   }
   if FEnabledCaretsInUndo then
-    CurCarets:= GetCaretsArray
+  begin
+    CurCarets:= GetCaretsArray;
+    CurCarets2:= GetCaretsArray2;
+  end
   else
+  begin
     CurCarets:= nil;
+    CurCarets2:= nil;
+  end;
 
   CurList.Add(
     AAction,
@@ -2251,6 +2282,7 @@ begin
     AEnd,
     ALineState,
     CurCarets,
+    CurCarets2,
     GetMarkersArray,
     GetAttribsArray,
     ACommandCode,
