@@ -1964,6 +1964,8 @@ begin
   AHardMarked:= false;
   AHardMarkedNext:= false;
   AUnmodifiedNext:= false;
+  ACommandCode:= 0;
+  ATickCount:= 0;
   if FReadOnly then Exit;
   if ACurList=nil then Exit;
 
