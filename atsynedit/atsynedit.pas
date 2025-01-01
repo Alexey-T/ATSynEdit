@@ -10135,7 +10135,7 @@ var
   Cur: TCursor;
   EdOther: TATSynEdit;
 begin
-  Sleep(30); //avoid bug CPU load, as method is called often
+  Sleep(30); //avoid big CPU load, as method is called often
 
   if (Source is TATSynEdit) and (Source<>Self) then
   begin
