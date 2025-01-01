@@ -384,6 +384,7 @@ var
   bNotEmpty: boolean;
 begin
   if FLocked then Exit;
+  if FMaxCount=0 then Exit;
   bNotEmpty:= Count>0;
 
   if bNotEmpty then
