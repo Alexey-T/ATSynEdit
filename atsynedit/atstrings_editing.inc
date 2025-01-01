@@ -206,12 +206,10 @@ begin
   //----------------------
   //Insert multi-line text
 
-  Block:= TATStrings.Create(0); //set UndoLimit=0
+  Block:= TATStrings.Create(0); //set UndoLimit=0 to avoid undo in Block
   try
     FChangeBlockActive:= true;
     BeginUndoGroup;
-    Block.FUndoList.Locked:= true; //to avoid Undo in Block
-    Block.FRedoList.Locked:= true;
     Block.LoadFromString(StrLead+AText);
     BlockOriginalLineCount:= Block.Count;
 
