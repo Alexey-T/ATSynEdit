@@ -1520,11 +1520,14 @@ begin
   //2024.01
   //_adding_ lines makes action=Change, so allows cached WrapInfo update
   //(action=Insert makes EnabledCachedWrapUpdate:=False);
-  //it solves https://github.com/Alexey-T/CudaText/issues/5360
+  //it solves CudaText issue #5360
   EditAction:= TATEditAction.Insert;
+
   NOldCount:= Count;
-  if (ALineIndex=NOldCount) or
-    ((ALineIndex=NOldCount-1) and IsLastLineFake) then
+  if (ALineIndex=NOldCount)
+    //below line is commented 2025.01 to fix CudaText issue #5764
+    // or ((ALineIndex=NOldCount-1) and IsLastLineFake)
+  then
     EditAction:= TATEditAction.Add;
 
   AddUndoItem(EditAction, ALineIndex, '', TATLineEnds.None, TATLineState.None, FCommandCode);
