@@ -162,6 +162,7 @@ begin
       MarkerArrayToString(ItemMarkers)+MarkersSep+
       IntToStr(ItemGlobalCounter)+MarkersSep+
       IntToStr(ItemTickCount)+MarkersSep+
+      IntToStr(ItemCommandCode)+MarkersSep+
       PointPairArrayToString(ItemCarets2)+MarkersSep+
       MarkerArrayToString(ItemMarkers2)+PartSep+
     IntToStr(Ord(ItemSoftMark))+PartSep+
@@ -189,7 +190,8 @@ begin
   Sep.GetItemInt(N, 0);
   ItemLineState:= TATLineState(N);
 
-  //this item contains: carets+#1+markers+#1+global_cnt+#1+tick_cnt
+  //this item contains:
+  //  carets, markers, global_cnt, tick_cnt, commandcode, carets2, markers2
   Sep.GetItemStr(S);
   Sep2.Init(S, MarkersSep);
   //a) carets
@@ -202,15 +204,16 @@ begin
   else
     ItemMarkers:= nil;
   //c) global_cnt
-  Sep2.GetItemStr(SubItem);
-  ItemGlobalCounter:= StrToDWordDef(SubItem, 0);
+  Sep2.GetItemDWord(ItemGlobalCounter, 0);
   //d) tick_cnt
   Sep2.GetItemStr(SubItem);
   ItemTickCount:= StrToQWordDef(SubItem, 0);
-  //e) carets2
+  //e) commandcode
+  Sep2.GetItemInt(ItemCommandCode, 0);
+  //f) carets2
   Sep2.GetItemStr(SubItem);
   StringToPointPairArray(ItemCarets2, SubItem);
-  //f) markers2
+  //g) markers2
   Sep2.GetItemStr(SubItem);
   if SubItem<>'' then
     StringToMarkerArray(ItemMarkers2, SubItem)
