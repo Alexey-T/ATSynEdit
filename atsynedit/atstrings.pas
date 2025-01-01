@@ -1517,10 +1517,11 @@ begin
 
   UpdateModified;
 
-  //2024.01
-  //_adding_ lines makes action=Change, so allows cached WrapInfo update
-  //(action=Insert makes EnabledCachedWrapUpdate:=False);
-  //it solves CudaText issue #5360
+  {
+  2024.01, _adding_ lines makes action=Add, so allows cached WrapInfo update
+  (action=Insert makes EnabledCachedWrapUpdate:=False);
+  it solves CudaText issue #5360
+  }
   EditAction:= TATEditAction.Insert;
 
   NOldCount:= Count;
