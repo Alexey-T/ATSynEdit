@@ -210,6 +210,8 @@ begin
   try
     FChangeBlockActive:= true;
     BeginUndoGroup;
+    Block.FUndoList.Locked:= true; //to avoid Undo in Block
+    Block.FRedoList.Locked:= true;
     Block.LoadFromString(StrLead+AText);
     BlockOriginalLineCount:= Block.Count;
 
