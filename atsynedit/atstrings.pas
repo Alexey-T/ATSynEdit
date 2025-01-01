@@ -2257,6 +2257,7 @@ var
 begin
   if FUndoList=nil then exit;
   if FRedoList=nil then exit;
+  if FUndoLimit=0 then exit;
 
   if not FUndoList.Locked then
     CurList:= FUndoList

@@ -206,7 +206,7 @@ begin
   //----------------------
   //Insert multi-line text
 
-  Block:= TATStrings.Create(FUndoLimit);
+  Block:= TATStrings.Create(0); //set UndoLimit=0
   try
     FChangeBlockActive:= true;
     BeginUndoGroup;
