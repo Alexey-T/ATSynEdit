@@ -410,25 +410,6 @@ begin
         Exit;
   end;
 
-  {
-  //why it is commented: it was optimization, but it is risky, it caused
-  //this issue: after Alt+Up / Alt+Down -> Undo runs with error (loosing one line)
-
-  //optimization: not insert+delete of the same index?
-  if bNotEmpty and (AAction=aeaDelete) then
-  begin
-    Item:= Last;
-    if (Item.ItemAction=aeaInsert) and
-      (Item.ItemIndex=AIndex) and
-      (Item.ItemCommandCode=ACommandCode) and
-      (GetTickCount64-Item.ItemTickCount<ATStrings_PauseForUndoGroup) then
-      begin
-        DeleteLast;
-        Exit
-      end;
-  end;
-  }
-
   //don't save TickCount if we are running Undo/Redo
   if AUndoOrRedo=TATEditorRunningUndoOrRedo.NotUndoRedo then
   begin
