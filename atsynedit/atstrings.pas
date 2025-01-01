@@ -1525,7 +1525,16 @@ begin
 
   NOldCount:= Count;
   if (ALineIndex=NOldCount)
-    //below line is commented 2025.01 to fix CudaText issue #5764
+    {
+    below line is commented 2025.01 to fix CudaText issue #5764.
+    we must change EditAction to Add very carefully, we cannot do it when
+    last empty line is _changed_, we can do it only when line is really appended.
+    otherwise:
+      - new document with line "aa" and 2nd empty line
+      - paste 3 lines at and
+      - call undo + redo + undo
+      --> gives wrong 2nd 'undo', because 'redo' changed EditAction to Add when not ok
+    }
     // or ((ALineIndex=NOldCount-1) and IsLastLineFake)
   then
     EditAction:= TATEditAction.Add;
