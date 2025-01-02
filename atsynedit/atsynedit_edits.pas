@@ -247,6 +247,23 @@ begin
   end;
 end;
 
+function STruncateTooLongCssContent(const S: string): string;
+//avoid crash with long CSS content on Linux gtk2, on showing text in PopupMenu.
+//see https://gitlab.com/freepascal.org/lazarus/lazarus/-/issues/40079
+var
+  N: integer;
+begin
+  Result:= S;
+  {$if defined(LCLGtk2)}
+  if Length(Result)>800 then
+  begin
+    N:= Pos('{', Result, 4);
+    if N>0 then
+      Result:= Copy(Result, 1, N)+'...';
+  end;
+  {$endif}
+end;
+
 procedure TATComboEdit.DoComboMenu;
 var
   mi: TMenuItem;
@@ -262,7 +279,7 @@ begin
     for i:= 0 to FItems.Count-1 do
     begin
       mi:= TMenuItem.Create(Self);
-      mi.Caption:= FItems[i];
+      mi.Caption:= STruncateTooLongCssContent(FItems[i]);
       mi.Tag:= i;
       mi.OnClick:= @MenuItemClick;
       Add(mi);
