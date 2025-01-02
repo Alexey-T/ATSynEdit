@@ -253,17 +253,22 @@ function STruncateTooLongCssContent(const S: string): string;
 const
   cBigLength = 500;
 var
-  N, N2: integer;
+  NOpen, NClose1, NClose2: integer;
 begin
   Result:= S;
   {$if defined(LCLGtk2)}
   if Length(Result)>=cBigLength then
   begin
-    N:= Pos('{', Result, 4);
-    if N=0 then exit;
-    N2:= Pos('}', Result, N); //text must have closing } too
-    if N2=0 then exit;
-    Result:= Copy(Result, 1, N)+'...}';
+    NOpen:= Pos('{', Result, 4);
+    if NOpen=0 then exit;
+    NClose1:= Pos('}', Result, NOpen);
+    if NClose1=0 then exit;
+    //text must end with '}' with optional spaces
+    NClose2:= Length(Result);
+    while (NClose2>NClose1) and (Result[NClose2]=' ') do
+      Dec(NClose2); //skip trailing spaces
+    if S[NClose2]<>'}' then exit;
+    Result:= Copy(Result, 1, NOpen)+'...}';
   end;
   {$endif}
 end;
