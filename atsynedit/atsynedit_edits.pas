@@ -251,15 +251,17 @@ function STruncateTooLongCssContent(const S: string): string;
 //avoid crash with long CSS content on Linux gtk2, on showing text in PopupMenu.
 //see https://gitlab.com/freepascal.org/lazarus/lazarus/-/issues/40079
 var
-  N: integer;
+  N, N2: integer;
 begin
   Result:= S;
   {$if defined(LCLGtk2)}
   if Length(Result)>800 then
   begin
     N:= Pos('{', Result, 4);
-    if N>0 then
-      Result:= Copy(Result, 1, N)+'...';
+    if N=0 then exit;
+    N2:= Pos('}', Result, N); //text must have closing } too
+    if N2=0 then exit;
+    Result:= Copy(Result, 1, N)+'...';
   end;
   {$endif}
 end;
