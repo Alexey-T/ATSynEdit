@@ -261,7 +261,7 @@ begin
     if N=0 then exit;
     N2:= Pos('}', Result, N); //text must have closing } too
     if N2=0 then exit;
-    Result:= Copy(Result, 1, N)+'...';
+    Result:= Copy(Result, 1, N)+'...}';
   end;
   {$endif}
 end;
