@@ -1520,7 +1520,8 @@ begin
   {
   2024.01, _adding_ lines makes action=Add, so allows cached WrapInfo update
   (action=Insert makes EnabledCachedWrapUpdate:=False);
-  it solves CudaText issue #5360
+  it solves CudaText issue #5360:
+  ed.set_text_line was of time complexity O(n), while it must be O(1).
   }
   EditAction:= TATEditAction.Insert;
 
