@@ -123,8 +123,7 @@ end;
 function TATSynEdit.DoCommand_ScaleDelta(AIncrease: boolean): TATCommandResults;
 begin
   DoScaleFontDelta(AIncrease, true);
-  if Assigned(FOnChangeZoom) then
-    FOnChangeZoom(Self);
+  DoEventZoom;
   Result:= [TATCommandResult.State];
 end;
 
@@ -132,8 +131,7 @@ function TATSynEdit.DoCommand_ScaleReset: TATCommandResults;
 begin
   //use OptScaleFont setter, not FOptScaleFont
   OptScaleFont:= 0;
-  if Assigned(FOnChangeZoom) then
-    FOnChangeZoom(Self);
+  DoEventZoom;
   Result:= [TATCommandResult.State];
 end;
 
