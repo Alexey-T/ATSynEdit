@@ -254,12 +254,8 @@ const
   cBigLength = 110;
 begin
   Result:= S;
-  {$if defined(LCLGtk2)}
-  if Length(Result)>=cBigLength then
-  begin
+  if Length(Result)>cBigLength then
     Result:= Copy(Result, 1, cBigLength)+'...';
-  end;
-  {$endif}
 end;
 
 procedure TATComboEdit.DoComboMenu;
