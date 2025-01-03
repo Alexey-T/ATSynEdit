@@ -247,7 +247,7 @@ begin
   end;
 end;
 
-function STruncateTooLongCssContent(const S: string): string;
+function STruncateTooLongContent(const S: string): string;
 //avoid crash with long CSS content on Linux gtk2, on showing text in PopupMenu.
 //see https://gitlab.com/freepascal.org/lazarus/lazarus/-/issues/40079
 const
@@ -273,7 +273,7 @@ begin
     for i:= 0 to FItems.Count-1 do
     begin
       mi:= TMenuItem.Create(Self);
-      mi.Caption:= STruncateTooLongCssContent(FItems[i]);
+      mi.Caption:= STruncateTooLongContent(FItems[i]);
       mi.Tag:= i;
       mi.OnClick:= @MenuItemClick;
       Add(mi);
