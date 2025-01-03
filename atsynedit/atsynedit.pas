@@ -7751,7 +7751,7 @@ function TATSynEdit.DoMouseWheel(Shift: TShiftState; WheelDelta: integer;
   MousePos: TPoint): boolean;
 begin
   if not OptMouseEnableAll then exit(false);
-
+  inherited;
   Result:= DoMouseWheelAction(Shift, WheelDelta, false)
 end;
 
