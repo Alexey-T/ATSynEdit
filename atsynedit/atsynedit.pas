@@ -8085,7 +8085,8 @@ var
   bFocused: boolean;
 begin
   if not FCaretShowEnabled then exit;
-  if not Application.Active then exit;
+  if not IsLibrary then
+    if not Application.Active then exit;
 
   if FCaretStopUnfocused then
   begin
