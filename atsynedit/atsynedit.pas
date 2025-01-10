@@ -8057,7 +8057,7 @@ begin
     //WriteLn('not focused 1');
     exit;
   end;
-  if not Application.Active then
+  if not IsLibrary and not Application.Active then
   begin
     //WriteLn('not focused 2');
     exit;
