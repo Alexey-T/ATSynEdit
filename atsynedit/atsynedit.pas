@@ -7892,7 +7892,7 @@ begin
       end;
     end;
 
-  if FOptMouse2ClickOpensURL then
+  if FOptMouse2ClickOpensURL and Assigned(FOnClickLink) then
     if Carets.Count>0 then
     begin
       Caret:= Carets[0];
