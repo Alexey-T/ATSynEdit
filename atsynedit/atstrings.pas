@@ -2764,7 +2764,6 @@ begin
 
   case AMode of
     TATTrimSpaces.Right:
-      begin
         for iLine:= 0 to Count-1 do
         begin
           NLen:= LinesLen[iLine];
@@ -2777,10 +2776,8 @@ begin
           Inc(FLastCommandChangedLines);
           Result:= true;
         end;
-      end;
 
     TATTrimSpaces.Left:
-      begin
         for iLine:= 0 to Count-1 do
         begin
           NLen:= LinesLen[iLine];
@@ -2793,10 +2790,8 @@ begin
           Inc(FLastCommandChangedLines);
           Result:= true;
         end;
-      end;
 
     TATTrimSpaces.All:
-      begin
         for iLine:= 0 to Count-1 do
         begin
           NLen:= LinesLen[iLine];
@@ -2809,7 +2804,6 @@ begin
           Inc(FLastCommandChangedLines);
           Result:= true;
         end;
-      end;
   end;
 end;
 
