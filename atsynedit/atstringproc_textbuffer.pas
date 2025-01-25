@@ -56,6 +56,7 @@ type
   end;
 
 var
+  //this var is set by EControl parser thread, when thread gets an exception
   EditorParserExceptionMessage: string;
 
 implementation
