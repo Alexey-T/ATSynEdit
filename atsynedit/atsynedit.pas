@@ -3663,11 +3663,11 @@ begin
     FOptCorner2ColorBorder
     );
 
-  if EditorAdapterExceptionMessage<>'' then
+  if EditorParserExceptionMessage<>'' then
   begin
     C.Font.Color:= clRed;
     C.Brush.Color:= clWhite;
-    CanvasTextOutSimplest(C, 4, 4, EditorAdapterExceptionMessage);
+    CanvasTextOutSimplest(C, 4, 4, EditorParserExceptionMessage);
   end;
 end;
 

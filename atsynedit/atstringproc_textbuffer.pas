@@ -56,7 +56,7 @@ type
   end;
 
 var
-  EditorAdapterExceptionMessage: string;
+  EditorParserExceptionMessage: string;
 
 implementation
 
