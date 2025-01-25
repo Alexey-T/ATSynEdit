@@ -5880,11 +5880,20 @@ procedure TATSynEdit.SaveToFile(const AFilename: string);
 var
   St: TATStrings;
   bChange1, bChange2, bChange3: boolean;
+  NPrevUndoLimit: integer;
 begin
   St:= Strings;
   bChange1:= false;
   bChange2:= false;
   bChange3:= false;
+
+  {
+  decrease chance of memory-overflow (by Undo items), which may happen when doing
+  trim-trailing-spaces with lot of lines with trailing spaces
+  }
+  NPrevUndoLimit:= St.UndoLimit;
+  if not St.UndoAfterSave then
+    St.UndoLimit:= 0;
 
   if FOptSavingForceFinalEol then
     bChange1:= St.ActionEnsureFinalEol;
@@ -5911,6 +5920,9 @@ begin
   end;
 
   St.SaveToFile(AFilename);
+  if not St.UndoAfterSave then
+    St.UndoLimit:= NPrevUndoLimit;
+
   FFileName:= AFilename;
   Modified:= false;
 end;
