@@ -2756,43 +2756,47 @@ end;
 
 function TATStrings.ActionTrimSpaces(AMode: TATTrimSpaces): boolean;
 var
-  i: SizeInt;
-  S1, S2: atString;
+  NLen, iLine: SizeInt;
+  S: atString;
 begin
   Result:= false;
   FLastCommandChangedLines:= 0;
 
-  for i:= 0 to Count-1 do
+  for iLine:= 0 to Count-1 do
   begin
-    S1:= Lines[i];
-    if S1='' then Continue;
+    NLen:= LinesLen[iLine];
+    if NLen=0 then Continue;
 
     case AMode of
-      TATTrimSpaces.Left:
-        begin
-          if not IsCharSpace(S1[1]) then
-            Continue;
-          S2:= STrimLeft(S1);
-        end;
       TATTrimSpaces.Right:
         begin
-          if not IsCharSpace(S1[Length(S1)]) then
+          if not IsCharSpace(LineCharAt(iLine, NLen)) then
             Continue;
-          S2:= STrimRight(S1);
+          S:= Lines[iLine];
+          Lines[iLine]:= STrimRight(S);
+          Inc(FLastCommandChangedLines);
+          Result:= true;
         end;
+
+      TATTrimSpaces.Left:
+        begin
+          if not IsCharSpace(LineCharAt(iLine, 1)) then
+            Continue;
+          S:= Lines[iLine];
+          Lines[iLine]:= STrimLeft(S);
+          Inc(FLastCommandChangedLines);
+          Result:= true;
+        end;
+
       TATTrimSpaces.All:
         begin
-          if not IsCharSpace(S1[1]) and not IsCharSpace(S1[Length(S1)]) then
+          if not IsCharSpace(LineCharAt(iLine, 1)) and not IsCharSpace(LineCharAt(iLine, NLen)) then
             Continue;
-          S2:= STrimAll(S1);
+          S:= Lines[iLine];
+          Lines[iLine]:= STrimAll(S);
+          Inc(FLastCommandChangedLines);
+          Result:= true;
         end;
-    end;
-
-    if S2<>S1 then
-    begin
-      Inc(FLastCommandChangedLines);
-      Lines[i]:= S2;
-      Result:= true;
     end;
   end;
 end;
