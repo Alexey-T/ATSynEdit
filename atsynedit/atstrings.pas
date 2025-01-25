@@ -2762,14 +2762,14 @@ begin
   Result:= false;
   FLastCommandChangedLines:= 0;
 
-  for iLine:= 0 to Count-1 do
-  begin
-    NLen:= LinesLen[iLine];
-    if NLen=0 then Continue;
-
-    case AMode of
-      TATTrimSpaces.Right:
+  case AMode of
+    TATTrimSpaces.Right:
+      begin
+        for iLine:= 0 to Count-1 do
         begin
+          NLen:= LinesLen[iLine];
+          if NLen=0 then Continue;
+
           if not IsCharSpace(LineCharAt(iLine, NLen)) then
             Continue;
           S:= Lines[iLine];
@@ -2777,9 +2777,15 @@ begin
           Inc(FLastCommandChangedLines);
           Result:= true;
         end;
+      end;
 
-      TATTrimSpaces.Left:
+    TATTrimSpaces.Left:
+      begin
+        for iLine:= 0 to Count-1 do
         begin
+          NLen:= LinesLen[iLine];
+          if NLen=0 then Continue;
+
           if not IsCharSpace(LineCharAt(iLine, 1)) then
             Continue;
           S:= Lines[iLine];
@@ -2787,9 +2793,15 @@ begin
           Inc(FLastCommandChangedLines);
           Result:= true;
         end;
+      end;
 
-      TATTrimSpaces.All:
+    TATTrimSpaces.All:
+      begin
+        for iLine:= 0 to Count-1 do
         begin
+          NLen:= LinesLen[iLine];
+          if NLen=0 then Continue;
+
           if not IsCharSpace(LineCharAt(iLine, 1)) and not IsCharSpace(LineCharAt(iLine, NLen)) then
             Continue;
           S:= Lines[iLine];
@@ -2797,7 +2809,7 @@ begin
           Inc(FLastCommandChangedLines);
           Result:= true;
         end;
-    end;
+      end;
   end;
 end;
 
