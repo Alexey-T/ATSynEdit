@@ -3662,6 +3662,13 @@ begin
     FOptCorner2ColorBack,
     FOptCorner2ColorBorder
     );
+
+  if EditorAdapterExceptionMessage<>'' then
+  begin
+    C.Font.Color:= clRed;
+    C.Brush.Color:= clWhite;
+    CanvasTextOutSimplest(C, 4, 4, EditorAdapterExceptionMessage);
+  end;
 end;
 
 procedure TATSynEdit.DoPaintMouseSelFrame(C: TCanvas);

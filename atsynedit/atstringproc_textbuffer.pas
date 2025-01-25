@@ -55,6 +55,9 @@ type
     property OnChange: TATStringBufferChange read FOnChange write FOnChange;
   end;
 
+var
+  EditorAdapterExceptionMessage: string;
+
 implementation
 
 { TATStringBuffer }
