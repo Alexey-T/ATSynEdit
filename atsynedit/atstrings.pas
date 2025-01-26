@@ -2757,54 +2757,51 @@ end;
 function TATStrings.ActionTrimSpaces(AMode: TATTrimSpaces): boolean;
 var
   NLen, iLine: SizeInt;
-  S: atString;
 begin
   Result:= false;
   FLastCommandChangedLines:= 0;
+  EnabledCaretsInUndo:= true;
 
-  case AMode of
-    TATTrimSpaces.Right:
-        for iLine:= 0 to Count-1 do
+  for iLine:= 0 to Count-1 do
+  begin
+    NLen:= LinesLen[iLine];
+    if NLen=0 then Continue;
+
+    case AMode of
+      TATTrimSpaces.Right:
         begin
-          NLen:= LinesLen[iLine];
-          if NLen=0 then Continue;
-
           if not IsCharSpace(LineCharAt(iLine, NLen)) then
             Continue;
-          S:= Lines[iLine];
-          Lines[iLine]:= STrimRight(S);
+          Lines[iLine]:= STrimRight(Lines[iLine]);
           Inc(FLastCommandChangedLines);
+          EnabledCaretsInUndo:= false;
           Result:= true;
         end;
 
-    TATTrimSpaces.Left:
-        for iLine:= 0 to Count-1 do
+      TATTrimSpaces.Left:
         begin
-          NLen:= LinesLen[iLine];
-          if NLen=0 then Continue;
-
           if not IsCharSpace(LineCharAt(iLine, 1)) then
             Continue;
-          S:= Lines[iLine];
-          Lines[iLine]:= STrimLeft(S);
+          Lines[iLine]:= STrimLeft(Lines[iLine]);
           Inc(FLastCommandChangedLines);
+          EnabledCaretsInUndo:= false;
           Result:= true;
         end;
 
-    TATTrimSpaces.All:
-        for iLine:= 0 to Count-1 do
+      TATTrimSpaces.All:
         begin
-          NLen:= LinesLen[iLine];
-          if NLen=0 then Continue;
-
-          if not IsCharSpace(LineCharAt(iLine, 1)) and not IsCharSpace(LineCharAt(iLine, NLen)) then
+          if not IsCharSpace(LineCharAt(iLine, 1)) and
+             not IsCharSpace(LineCharAt(iLine, NLen)) then
             Continue;
-          S:= Lines[iLine];
-          Lines[iLine]:= STrimAll(S);
+          Lines[iLine]:= STrimAll(Lines[iLine]);
           Inc(FLastCommandChangedLines);
+          EnabledCaretsInUndo:= false;
           Result:= true;
         end;
+    end;
   end;
+
+  EnabledCaretsInUndo:= true;
 end;
 
 function TATStrings.IsPosFolded(AX, AY, AIndexClient: SizeInt): boolean;
