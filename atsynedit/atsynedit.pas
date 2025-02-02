@@ -1392,6 +1392,7 @@ type
     function GetCaretManyAllowed: boolean;
     //events
     procedure DoEventBeforeCalcHilite;
+    procedure DoEventAfterCalcHilite;
     procedure DoEventClickMicromap(AX, AY: integer);
     procedure DoEventClickGutter(ABandIndex, ALineNumber: integer; var AHandled: boolean);
     function DoEventCommand(ACommand: integer; AInvoke: TATCommandInvoke; const AText: string): boolean;
@@ -3994,6 +3995,8 @@ begin
 
   //block staples
   DoPaintStaples(C, ARect, ACharSize, AScrollHorz);
+
+  DoEventAfterCalcHilite;
 end;
 
 procedure TATSynEdit.DoPaintMinimapTextToBGRABitmap(
@@ -8804,6 +8807,15 @@ begin
 
   if Assigned(FOnBeforeCalcHilite) then
     FOnBeforeCalcHilite(Self);
+end;
+
+procedure TATSynEdit.DoEventAfterCalcHilite;
+begin
+  if Assigned(FAdapterHilite) then
+    FAdapterHilite.OnEditorAfterCalcHilite(Self);
+
+  //if Assigned(FOnAfterCalcHilite) then
+  //  FOnAfterCalcHilite(Self);
 end;
 
 
