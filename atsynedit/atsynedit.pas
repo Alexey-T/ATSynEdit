@@ -4732,16 +4732,6 @@ begin
       if NColorAfter<>clNone then
         FillOneLine(NColorAfter, ARectLine.Left);
     end;
-
-    {
-    //TODO???
-    DoPaintSelectedLineBG(C, ACharSize, ARectLine,
-      CurrPoint,
-      CurrPointText,
-      WrapItem,
-      0,
-      AScrollHorz);
-    }
   end;
 end;
 
