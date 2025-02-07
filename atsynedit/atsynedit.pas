@@ -4025,18 +4025,23 @@ begin
   RectLine.Top:= 0;
   RectLine.Bottom:= ARect.Top;
 
-  repeat
-    RectLine.Top:= RectLine.Bottom;
-    RectLine.Bottom:= RectLine.Top+ACharSize.Y;
-    if RectLine.Top>ARect.Bottom then Break;
+  DoEventBeforeCalcHilite(false);
+  try
+    repeat
+      RectLine.Top:= RectLine.Bottom;
+      RectLine.Bottom:= RectLine.Top+ACharSize.Y;
+      if RectLine.Top>ARect.Bottom then Break;
 
-    if not FWrapInfo.IsIndexValid(NWrapIndex) then
-      Break;
+      if not FWrapInfo.IsIndexValid(NWrapIndex) then
+        Break;
 
-    DoPaintMinimapLine(RectLine, ACharSize, AScrollHorz, NWrapIndex, FPartsMinimap);
+      DoPaintMinimapLine(RectLine, ACharSize, AScrollHorz, NWrapIndex, FPartsMinimap);
 
-    Inc(NWrapIndex);
-  until false;
+      Inc(NWrapIndex);
+    until false;
+  finally
+    DoEventAfterCalcHilite(false);
+  end;
 end;
 
 
