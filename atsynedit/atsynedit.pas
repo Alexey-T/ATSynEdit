@@ -1321,7 +1321,7 @@ type
       const ACharSize: TATEditorCharSize;
       AWithGutter: boolean;
       var AScrollHorz, AScrollVert: TATEditorScrollInfo;
-      NWrapIndex: integer);
+      AWrapIndex: integer);
     procedure DoPaintTextFragment(C: TCanvas;
       const ARect: TRect;
       ALineFrom: integer;
@@ -3828,7 +3828,7 @@ procedure TATSynEdit.DoPaintText(C: TCanvas;
   const ACharSize: TATEditorCharSize;
   AWithGutter: boolean;
   var AScrollHorz, AScrollVert: TATEditorScrollInfo;
-  NWrapIndex: integer);
+  AWrapIndex: integer);
 var
   RectLine: TRect;
   GapItemTop, GapItemCur: TATGapItem;
@@ -3914,10 +3914,10 @@ begin
     RectLine.Bottom:= RectLine.Top+ACharSize.Y;
     if RectLine.Top>ARect.Bottom then Break;
 
-    if not FWrapInfo.IsIndexValid(NWrapIndex) then
+    if not FWrapInfo.IsIndexValid(AWrapIndex) then
     begin
       //paint end-of-file arrow
-      if NWrapIndex>=0 then
+      if AWrapIndex>=0 then
         if OptUnprintedVisible and OptUnprintedEof then
           if OptUnprintedEndsDetails then
             DoPaintUnprintedSymbols(C,
@@ -3937,12 +3937,12 @@ begin
       Break;
     end;
 
-    WrapItem:= FWrapInfo[NWrapIndex];
+    WrapItem:= FWrapInfo[AWrapIndex];
     GapItemTop:= nil;
     GapItemCur:= nil;
 
     //consider gap before 1st line
-    if (NWrapIndex=0) and AScrollVert.TopGapVisible and (Gaps.SizeOfGapTop>0) then
+    if (AWrapIndex=0) and AScrollVert.TopGapVisible and (Gaps.SizeOfGapTop>0) then
     begin
       GapItemTop:= Gaps.Find(-1);
       if Assigned(GapItemTop) then
@@ -3974,7 +3974,7 @@ begin
       RectLine,
       ACharSize,
       AScrollHorz,
-      NWrapIndex,
+      AWrapIndex,
       FParts);
 
     //paint gap after line
@@ -3988,12 +3988,12 @@ begin
         GapItemCur);
 
     if AWithGutter then
-      DoPaintGutterOfLine(C, RectLine, ACharSize, NWrapIndex);
+      DoPaintGutterOfLine(C, RectLine, ACharSize, AWrapIndex);
 
     //update LineBottom as index of last painted line
     FLineBottom:= WrapItem.NLineIndex;
 
-    Inc(NWrapIndex);
+    Inc(AWrapIndex);
    until false;
   finally
     DoEventAfterCalcHilite(true);
@@ -10542,7 +10542,7 @@ begin
   else
     NPanelLeft:= FRectMinimap.Left - NPanelWidth - 1;
   NPanelHeight:= FMinimapTooltipHeight*FCharSize.Y + 2;
-  NPanelTop:= Max(0, Min(ClientHeight-NPanelHeight,
+  NPanelTop:= Max(0, Min(Int64(ClientHeight-NPanelHeight),
     Pnt.Y - FCharSize.Y*FMinimapTooltipHeight div 2 ));
 
   if FMinimapTooltipBitmap=nil then
