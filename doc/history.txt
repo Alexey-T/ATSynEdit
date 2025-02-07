@@ -1,3 +1,7 @@
+2025.02.07
++ add: event OnAfterCalcHilite
+* change: added param AMainText to adapter's OnEditorCalcPosColor
+
 2024.12.14
 + add: event OnEnabledUndoRedoChanged
 + add: prop OptGapBitmapIndent (used only when OptGapBitmapAlignment = left)

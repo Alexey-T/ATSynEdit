@@ -781,6 +781,7 @@ type
     FOnHotspotExit: TATSynEditHotspotEvent;
     FOnCheckInput: TATSynEditCheckInputEvent;
     FOnBeforeCalcHilite: TNotifyEvent;
+    FOnAfterCalcHilite: TNotifyEvent;
     FOnGetToken: TATSynEditGetTokenEvent;
     FOnEnabledUndoRedoChanged: TATSynEditEnabledUndoRedoChanged;
     FWrapInfo: TATWrapInfo;
@@ -1970,6 +1971,7 @@ type
     property OnCalcTabSize: TATStringTabCalcEvent read FOnCalcTabSize write FOnCalcTabSize;
     property OnCalcBookmarkColor: TATSynEditCalcBookmarkColorEvent read FOnCalcBookmarkColor write FOnCalcBookmarkColor;
     property OnBeforeCalcHilite: TNotifyEvent read FOnBeforeCalcHilite write FOnBeforeCalcHilite;
+    property OnAfterCalcHilite: TNotifyEvent read FOnAfterCalcHilite write FOnAfterCalcHilite;
     property OnPaint;
     property OnPaste: TATSynEditPasteEvent read FOnPaste write FOnPaste;
     property OnHotspotEnter: TATSynEditHotspotEvent read FOnHotspotEnter write FOnHotspotEnter;
@@ -8815,8 +8817,8 @@ begin
   if Assigned(FAdapterHilite) then
     FAdapterHilite.OnEditorAfterCalcHilite(Self);
 
-  //if Assigned(FOnAfterCalcHilite) then
-  //  FOnAfterCalcHilite(Self);
+  if Assigned(FOnAfterCalcHilite) then
+    FOnAfterCalcHilite(Self);
 end;
 
 
