@@ -3899,14 +3899,14 @@ begin
   AScrollHorz.NMax:= 1;
   {$endif}
 
-  DoEventBeforeCalcHilite;
-
   RectLine.Left:= ARect.Left;
   RectLine.Right:= ARect.Right;
   RectLine.Top:= 0;
   RectLine.Bottom:= ARect.Top;
 
-  repeat
+  DoEventBeforeCalcHilite;
+  try
+   repeat
     RectLine.Top:= RectLine.Bottom;
     RectLine.Bottom:= RectLine.Top+ACharSize.Y;
     if RectLine.Top>ARect.Bottom then Break;
@@ -3991,12 +3991,13 @@ begin
     FLineBottom:= WrapItem.NLineIndex;
 
     Inc(NWrapIndex);
-  until false;
+   until false;
+  finally
+    DoEventAfterCalcHilite;
+  end;
 
   //block staples
   DoPaintStaples(C, ARect, ACharSize, AScrollHorz);
-
-  DoEventAfterCalcHilite;
 end;
 
 procedure TATSynEdit.DoPaintMinimapTextToBGRABitmap(
