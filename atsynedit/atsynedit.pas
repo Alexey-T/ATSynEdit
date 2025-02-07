@@ -4074,7 +4074,7 @@ var
   NCoordSep: Int64;
   WrapItem: TATWrapItem;
   StringItem: PATStringItem;
-  NColorEntire, NColorAfter: TColor;
+  NColorEntire, NColorAfter, NColorIndent: TColor;
   NDimValue: integer;
   ChosenBackColorEnum: TATEditorChosenBackColor;
   StrOutput: atString;
@@ -4243,16 +4243,6 @@ begin
   //paint line
   if StrOutput<>'' then
   begin
-    if (WrapItem.NIndent>0) then
-    begin
-      NColorAfter:= FColorBG;
-      DoCalcPosColor(WrapItem.NCharIndex, NLinesIndex, NColorAfter, true);
-      DoPaintLineIndent(C, ARectLine, ACharSize,
-        ARectLine.Top, WrapItem.NIndent,
-        NColorAfter,
-        AScrollHorz.NPos, FOptShowIndentLines);
-    end;
-
     NColorAfter:= clNone;
 
     DoCalcLineHilite(
@@ -4266,6 +4256,22 @@ begin
       true,
       true
       );
+
+    if WrapItem.NIndent>0 then
+    begin
+      {
+      //before (2025.02):
+      NColorIndent:= FColorBG;
+      DoCalcPosColor(WrapItem.NCharIndex, NLinesIndex, NColorIndent, true);
+      }
+      //after:
+      NColorIndent:= ATempParts[0].ColorBG;
+
+      DoPaintLineIndent(C, ARectLine, ACharSize,
+        ARectLine.Top, WrapItem.NIndent,
+        NColorIndent,
+        AScrollHorz.NPos, FOptShowIndentLines);
+    end;
 
     if ATempParts[0].Offset<0 then
     begin
