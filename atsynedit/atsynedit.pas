@@ -458,6 +458,7 @@ type
   TATSynEditHotspotEvent = procedure(Sender: TObject; AHotspotIndex: integer) of object;
   TATSynEditCheckInputEvent = procedure(Sender: TObject; AChar: WideChar; var AllowInput: boolean) of object;
   TATSynEditGetTokenEvent = function(Sender: TObject; AX, AY: integer): TATTokenKind of object;
+  TATSynEditBeforeOrAfterHiliteEvent = procedure(Sender: TObject; AMainText: boolean) of object;
   TATSynEditEnabledUndoRedoChanged = procedure(Sender: TObject; AUndoEnabled, ARedoEnabled: boolean) of object;
 
 type
@@ -780,8 +781,8 @@ type
     FOnHotspotEnter: TATSynEditHotspotEvent;
     FOnHotspotExit: TATSynEditHotspotEvent;
     FOnCheckInput: TATSynEditCheckInputEvent;
-    FOnBeforeCalcHilite: TNotifyEvent;
-    FOnAfterCalcHilite: TNotifyEvent;
+    FOnBeforeCalcHilite: TATSynEditBeforeOrAfterHiliteEvent;
+    FOnAfterCalcHilite: TATSynEditBeforeOrAfterHiliteEvent;
     FOnGetToken: TATSynEditGetTokenEvent;
     FOnEnabledUndoRedoChanged: TATSynEditEnabledUndoRedoChanged;
     FWrapInfo: TATWrapInfo;
@@ -1392,8 +1393,8 @@ type
     procedure DoCaretsExtend(ADown: boolean; ALines: integer);
     function GetCaretManyAllowed: boolean;
     //events
-    procedure DoEventBeforeCalcHilite;
-    procedure DoEventAfterCalcHilite;
+    procedure DoEventBeforeCalcHilite(AMainText: boolean);
+    procedure DoEventAfterCalcHilite(AMainText: boolean);
     procedure DoEventClickMicromap(AX, AY: integer);
     procedure DoEventClickGutter(ABandIndex, ALineNumber: integer; var AHandled: boolean);
     function DoEventCommand(ACommand: integer; AInvoke: TATCommandInvoke; const AText: string): boolean;
@@ -1970,8 +1971,8 @@ type
     property OnCalcStaple: TATSynEditCalcStapleEvent read FOnCalcStaple write FOnCalcStaple;
     property OnCalcTabSize: TATStringTabCalcEvent read FOnCalcTabSize write FOnCalcTabSize;
     property OnCalcBookmarkColor: TATSynEditCalcBookmarkColorEvent read FOnCalcBookmarkColor write FOnCalcBookmarkColor;
-    property OnBeforeCalcHilite: TNotifyEvent read FOnBeforeCalcHilite write FOnBeforeCalcHilite;
-    property OnAfterCalcHilite: TNotifyEvent read FOnAfterCalcHilite write FOnAfterCalcHilite;
+    property OnBeforeCalcHilite: TATSynEditBeforeOrAfterHiliteEvent read FOnBeforeCalcHilite write FOnBeforeCalcHilite;
+    property OnAfterCalcHilite: TATSynEditBeforeOrAfterHiliteEvent read FOnAfterCalcHilite write FOnAfterCalcHilite;
     property OnPaint;
     property OnPaste: TATSynEditPasteEvent read FOnPaste write FOnPaste;
     property OnHotspotEnter: TATSynEditHotspotEvent read FOnHotspotEnter write FOnHotspotEnter;
@@ -3906,7 +3907,7 @@ begin
   RectLine.Top:= 0;
   RectLine.Bottom:= ARect.Top;
 
-  DoEventBeforeCalcHilite;
+  DoEventBeforeCalcHilite(true);
   try
    repeat
     RectLine.Top:= RectLine.Bottom;
@@ -3995,7 +3996,7 @@ begin
     Inc(NWrapIndex);
    until false;
   finally
-    DoEventAfterCalcHilite;
+    DoEventAfterCalcHilite(true);
   end;
 
   //block staples
@@ -8803,22 +8804,22 @@ begin
     FOnDrawBookmarkIcon(Self, C, ALineIndex, ABookmarkIndex, ARect, AHandled);
 end;
 
-procedure TATSynEdit.DoEventBeforeCalcHilite;
+procedure TATSynEdit.DoEventBeforeCalcHilite(AMainText: boolean);
 begin
   if Assigned(FAdapterHilite) then
-    FAdapterHilite.OnEditorBeforeCalcHilite(Self);
+    FAdapterHilite.OnEditorBeforeCalcHilite(Self, AMainText);
 
   if Assigned(FOnBeforeCalcHilite) then
-    FOnBeforeCalcHilite(Self);
+    FOnBeforeCalcHilite(Self, AMainText);
 end;
 
-procedure TATSynEdit.DoEventAfterCalcHilite;
+procedure TATSynEdit.DoEventAfterCalcHilite(AMainText: boolean);
 begin
   if Assigned(FAdapterHilite) then
-    FAdapterHilite.OnEditorAfterCalcHilite(Self);
+    FAdapterHilite.OnEditorAfterCalcHilite(Self, AMainText);
 
   if Assigned(FOnAfterCalcHilite) then
-    FOnAfterCalcHilite(Self);
+    FOnAfterCalcHilite(Self, AMainText);
 end;
 
 

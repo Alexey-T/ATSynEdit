@@ -59,11 +59,11 @@ type
     procedure OnEditorScroll(Sender: TObject); virtual;
     //called after editor is scrolled horz/vert.
 
-    procedure OnEditorBeforeCalcHilite(Sender: TObject); virtual;
+    procedure OnEditorBeforeCalcHilite(Sender: TObject; AMainText: boolean); virtual;
     //called before calculation of hilites for n lines, before 1st of these lines.
     //adapter should prepare buffers here for next lines.
 
-    procedure OnEditorAfterCalcHilite(Sender: TObject); virtual;
+    procedure OnEditorAfterCalcHilite(Sender: TObject; AMainText: boolean); virtual;
 
     function IsParsedAtLeastPartially: boolean; virtual;
     //returns False to supress unneeded painting, when parsing is not done
@@ -241,12 +241,12 @@ begin
   //
 end;
 
-procedure TATAdapterHilite.OnEditorBeforeCalcHilite(Sender: TObject);
+procedure TATAdapterHilite.OnEditorBeforeCalcHilite(Sender: TObject; AMainText: boolean);
 begin
   //
 end;
 
-procedure TATAdapterHilite.OnEditorAfterCalcHilite(Sender: TObject);
+procedure TATAdapterHilite.OnEditorAfterCalcHilite(Sender: TObject; AMainText: boolean);
 begin
   //
 end;

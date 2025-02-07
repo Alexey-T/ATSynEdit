@@ -1,6 +1,6 @@
 2025.02.07
 + add: event OnAfterCalcHilite
-* change: added param AMainText to adapter's OnEditorCalcPosColor
+* change: added param AMainText to adapter's OnEditorBeforeCalcHilite, OnEditorCalcPosColor
 
 2024.12.14
 + add: event OnEnabledUndoRedoChanged
