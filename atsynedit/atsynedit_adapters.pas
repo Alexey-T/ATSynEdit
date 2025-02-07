@@ -45,7 +45,8 @@ type
     //ALineLen is len of line part, starting from ACharIndex.
 
     procedure OnEditorCalcPosColor(Sender: TObject;
-      AX, AY: integer; var AColor: TColor); virtual;
+      AX, AY: integer; var AColor: TColor;
+      AMainText: boolean); virtual;
     //called to calculate BG/background color at position (usually pos after line end).
 
     procedure OnEditorCalcPosForeground(Sender: TObject;
@@ -218,7 +219,8 @@ begin
 end;
 
 procedure TATAdapterHilite.OnEditorCalcPosColor(Sender: TObject;
-  AX, AY: integer; var AColor: TColor);
+  AX, AY: integer; var AColor: TColor;
+  AMainText: boolean);
 begin
   //
 end;

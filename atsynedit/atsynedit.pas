@@ -1164,7 +1164,7 @@ type
     procedure SetShowOsBarHorz(AValue: boolean);
     procedure DebugFindWrapIndex;
     function DoCalcIndentCharsFromPrevLines(AX, AY: integer): integer;
-    procedure DoCalcPosColor(AX, AY: integer; var AColor: TColor);
+    procedure DoCalcPosColor(AX, AY: integer; var AColor: TColor; AMainText: boolean);
     procedure DoCalcLineEntireColor(ALine: integer; AUseColorOfCurrentLine: boolean;
       out AColor: TColor; out AColorForced: boolean;
       out AChosenEnum: TATEditorChosenBackColor;
@@ -4238,7 +4238,7 @@ begin
     if (WrapItem.NIndent>0) then
     begin
       NColorAfter:= FColorBG;
-      DoCalcPosColor(WrapItem.NCharIndex, NLinesIndex, NColorAfter);
+      DoCalcPosColor(WrapItem.NCharIndex, NLinesIndex, NColorAfter, true);
       DoPaintLineIndent(C, ARectLine, ACharSize,
         ARectLine.Top, WrapItem.NIndent,
         NColorAfter,
@@ -4363,7 +4363,7 @@ begin
     begin
       NColorAfter:= clNone;
       //visible StrOutput is empty, but the line itself may be not empty (because of horz scroll)
-      DoCalcPosColor(NLineLen, NLinesIndex, NColorAfter);
+      DoCalcPosColor(NLineLen, NLinesIndex, NColorAfter, true);
       if NColorAfter<>clNone then
         FillOneLine(NColorAfter{, ARectLine.Left});
     end;
@@ -4714,7 +4714,7 @@ begin
     if FOptShowFullHilite then
     begin
       NColorAfter:= clNone;
-      DoCalcPosColor(0, NLinesIndex, NColorAfter);
+      DoCalcPosColor(0, NLinesIndex, NColorAfter, false);
       if NColorAfter<>clNone then
         FillOneLine(NColorAfter, ARectLine.Left);
     end;

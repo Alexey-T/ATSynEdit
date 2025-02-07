@@ -323,10 +323,11 @@ begin
 end;
 
 
-procedure TATSynEdit.DoCalcPosColor(AX, AY: integer; var AColor: TColor);
+procedure TATSynEdit.DoCalcPosColor(AX, AY: integer; var AColor: TColor;
+  AMainText: boolean);
 begin
   if Assigned(FAdapterHilite) then
-    FAdapterHilite.OnEditorCalcPosColor(Self, AX, AY, AColor);
+    FAdapterHilite.OnEditorCalcPosColor(Self, AX, AY, AColor, AMainText);
 end;
 
 procedure TATSynEdit.DoCalcLineEntireColor(ALine: integer;
