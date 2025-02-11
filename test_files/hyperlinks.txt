@@ -18,6 +18,7 @@ https://en.wikipedia.org/wiki/Flip-flop_(electronics)#Master_flip-flop
 https://wiki.freepascal.org/CudaText#Linux:_Qt5_and_Qt6_builds
 https://kx.studio/App:Catia
 http://site.com/test_{var}_{var2}.txt
+http://a.com/a/a[a]=[a[&a={a}&a={a}&a=a-a/a.a
 
 ---
 must _not_ catch too many chars:
