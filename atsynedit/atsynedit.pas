@@ -7568,7 +7568,7 @@ begin
     //auto-scroll must not work when cursor is over minimap/micromap
     (not bOnMinimap) and
     (not bOnMicromap) and
-    (not bOnGutter);
+    ((not bOnGutter) or bOnGutterBookmk);
 
   if bStartTimerScroll then
     InitTimerScroll;
