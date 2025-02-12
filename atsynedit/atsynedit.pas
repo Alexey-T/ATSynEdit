@@ -7569,6 +7569,7 @@ begin
     (not bOnMinimap) and
     (not bOnMicromap) and
     ((not bOnGutter) or bOnGutterBookmk);
+                        //cursor on bookmarks-column? allow. this gutter column can be the leftmost UI element.
 
   if bStartTimerScroll then
     InitTimerScroll;
