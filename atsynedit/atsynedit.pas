@@ -911,6 +911,7 @@ type
     FOptAutoPairForMultiCarets: boolean;
     FOptAutoPairChars: string;
     FOptAutoPair_DisableCharDoubling: boolean;
+    FOptAutocompleteSymbolsAllowedBeforeCaret: string;
     FOptAutocompleteAutoshowCharCount: integer;
     FOptAutocompleteTriggerChars: string;
     FOptAutocompleteCommitChars: string;
@@ -1997,6 +1998,7 @@ type
     property OptAutoPairForMultiCarets: boolean read FOptAutoPairForMultiCarets write FOptAutoPairForMultiCarets default cInitAutoPairForMultiCarets;
     property OptAutoPairChars: string read FOptAutoPairChars write FOptAutoPairChars stored false;
     property OptAutoPair_DisableCharDoubling: boolean read FOptAutoPair_DisableCharDoubling write FOptAutoPair_DisableCharDoubling default false;
+    property OptAutocompleteSymbolsAllowedBeforeCaret: string read FOptAutocompleteSymbolsAllowedBeforeCaret write FOptAutocompleteSymbolsAllowedBeforeCaret stored false;
     property OptAutocompleteAutoshowCharCount: integer read FOptAutocompleteAutoshowCharCount write FOptAutocompleteAutoshowCharCount default 0;
     property OptAutocompleteTriggerChars: string read FOptAutocompleteTriggerChars write FOptAutocompleteTriggerChars stored false;
     property OptAutocompleteCommitChars: string read FOptAutocompleteCommitChars write FOptAutocompleteCommitChars stored false;
@@ -5445,6 +5447,8 @@ begin
   FOptAutoPairForMultiCarets:= cInitAutoPairForMultiCarets;
   FOptAutoPairChars:= '([{';
   FOptAutoPair_DisableCharDoubling:= false;
+
+  FOptAutocompleteSymbolsAllowedBeforeCaret:= '.:>''"'; //why such default: see ATSynEdit_Cmp_Form.pas
   FOptAutocompleteAutoshowCharCount:= 0;
   FOptAutocompleteTriggerChars:= '';
   FOptAutocompleteCommitChars:= ' ,;/\''"';
