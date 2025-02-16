@@ -1644,7 +1644,8 @@ begin
   if Carets.Count>0 then
   begin
     Caret:= Carets[0];
-    Caret.GetSelLines(NFrom, NTo);
+    if Caret.IsSelection then
+      Caret.GetSelLines(NFrom, NTo);
   end;
 
   Strings.ActionSort(AAction, NFrom, NTo);
