@@ -1862,6 +1862,7 @@ end;
 function TATStrings.TextSubstring(AX1, AY1, AX2, AY2: SizeInt;
   const AEolString: UnicodeString = #10): atString;
 var
+  List: TStringList;
   i: SizeInt;
 begin
   Result:= '';
@@ -1873,14 +1874,25 @@ begin
     Exit(LineSub(AY1, AX1+1, AX2-AX1));
 
   //first line
-  Result:= LineSub(AY1, AX1+1, MaxInt);
+  List:= TStringList.Create;
+  try
+    List.LineBreak:= UTF8Encode(AEolString);
+    List.TrailingLineBreak:= false;
 
-  //middle
-  for i:= AY1+1 to AY2-1 do
-    Result+= AEolString+Lines[i];
+    //first
+    List.Add(UTF8Encode(LineSub(AY1, AX1+1, MaxInt)));
 
-  //last line
-  Result+= AEolString+LineSub(AY2, 1, AX2);
+    //middle
+    for i:= AY1+1 to AY2-1 do
+      List.Add(UTF8Encode(Lines[i]));
+
+    //last line
+    List.Add(UTF8Encode(LineSub(AY2, 1, AX2)));
+
+    Result:= UTF8Decode(List.Text);
+  finally
+    FreeAndNil(List);
+  end;
 end;
 
 function TATStrings.TextSubstringLength(AX1, AY1, AX2, AY2: SizeInt;
