@@ -2402,6 +2402,7 @@ begin
   }
   FLastUndoY:= -1;
 
+ try
   repeat
     //better to have this, e.g. for Undo after Ctrl+A, Del
     //we can have not fixed 'chain reaction of pauses'
@@ -2444,7 +2445,7 @@ begin
     if bSoftMarked then
       Break;
   until false;
-
+ finally
   FEnabledCaretsInUndo:= true;
 
   //apply SoftMark to ListOther
@@ -2462,6 +2463,7 @@ begin
     List.SoftMark:= true;
 
   FRunningUndoOrRedo:= PrevUndoOrRedo;
+ end; //of try/finally
 end;
 
 procedure TATStrings.ClearUndo(ALocked: boolean = false);
