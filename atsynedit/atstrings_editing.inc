@@ -590,8 +590,6 @@ begin
   end
   else
   begin
-    //bDelEmpty:= false;
-
     //for empty last line
     if (AToY>0) and (LinesLen[AToY]=0) then
     begin
@@ -601,10 +599,6 @@ begin
       Dec(AToY);
       AToX:= LinesLen[AToY];
     end;
-
-    ////this caused incorrect deletion of entire lines, when selected till end of line, w/o LF
-    //if AFromX=0 then
-    //  bDelEmpty:= true;
 
     //remember no final eol
     bDeleteEol_Alt:= (AFromY=0) and (AToY=Count-1) and (LinesEnds[AToY]=TATLineEnds.None);
@@ -619,10 +613,6 @@ begin
     
     //del middle lines
     LineBlockDelete(AFromY+1, AToY, false{AForceLast});
-
-    //if bDelEmpty then
-    //  if Str='' then
-    //    LineDelete(AFromY, false{AForceLast});
 
     if bDeleteEol then
     begin
