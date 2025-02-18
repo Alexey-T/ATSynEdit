@@ -330,8 +330,8 @@ type
     procedure LineAdd(const AString: atString);
     procedure LineInsert(ALineIndex: SizeInt; const AString: atString; AWithEvent: boolean=true);
     procedure LineInsertStrings(ALineIndex: SizeInt; ABlock: TATStrings; AWithFinalEol: boolean);
-    procedure LineDelete(ALineIndex: SizeInt; AForceLast: boolean= true;
-      AWithEvent: boolean=true; AWithUndo: boolean=true; ACheckIndexValid: boolean=true);
+    procedure LineDelete(ALineIndex: SizeInt; AForceLast: boolean=true;
+      AWithEvent: boolean=true; AWithUndo: boolean=true);
     procedure LineMove(AIndexFrom, AIndexTo: SizeInt; AWithUndo: boolean=true);
     property Lines[Index: SizeInt]: atString read GetLine write SetLine;
     property LinesAscii[Index: SizeInt]: boolean read GetLineAscii;
@@ -1651,14 +1651,13 @@ end;
 procedure TATStrings.LineDelete(ALineIndex: SizeInt;
   AForceLast: boolean=true;
   AWithEvent: boolean=true;
-  AWithUndo: boolean=true;
-  ACheckIndexValid: boolean=true);
+  AWithUndo: boolean=true);
 var
   Item: PATStringItem;
 begin
   if FReadOnly then Exit;
 
-  if not ACheckIndexValid or IsIndexValid(ALineIndex) then
+  if IsIndexValid(ALineIndex) then
   begin
     Item:= FList.GetItem(ALineIndex);
 
@@ -1675,7 +1674,7 @@ begin
     FList.Delete(ALineIndex);
   end;
   //else
-  //  raise Exception.Create('Invalid Delete index: '+IntToStr(ALineIndex));
+  //  raise Exception.Create('Invalid LineDelete index: '+IntToStr(ALineIndex));
 
   if AForceLast then
     ActionAddFakeLineIfNeeded;

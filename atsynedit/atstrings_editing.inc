@@ -506,8 +506,7 @@ begin
     LineDelete(i,
       false{AForceLast},
       false{WithEvent},
-      true{AWithUndo},
-      false{ACheckIndexValid}
+      true{AWithUndo}
       );
 
   (*
