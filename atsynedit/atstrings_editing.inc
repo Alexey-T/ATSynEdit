@@ -597,7 +597,7 @@ begin
     begin
       if AToY=Count-1 then //AFromY<AToY here
         bDeleteEol:= true;
-      LineDelete(AToY);
+      LineDelete(AToY, false{AForceLast});
       Dec(AToY);
       AToX:= LinesLen[AToY];
     end;
@@ -618,7 +618,7 @@ begin
     LinesEnds[AFromY]:= LinesEnds[AToY];
     
     //del middle lines
-    LineBlockDelete(AFromY+1, AToY);
+    LineBlockDelete(AFromY+1, AToY, false{AForceLast});
 
     //if bDelEmpty then
     //  if Str='' then
