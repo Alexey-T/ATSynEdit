@@ -2166,13 +2166,12 @@ begin
     SetMarkersArray(CurMarkersArray);
     SetMarkersArray2(CurMarkersArray2);
     SetAttribsArray(CurAttribsArray);
-
+  finally
     if bEnableEventAfter then
       if Assigned(FOnUndoAfter) then
         FOnUndoAfter(Self, NEventX, NEventY);
 
     ActionDeleteDupFakeLines;
-  finally
     ACurList.Locked:= false;
     CommandCode:= 0;
   end;
