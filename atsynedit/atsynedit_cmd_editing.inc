@@ -1340,7 +1340,12 @@ begin
     end;
   end;
 
-  Result:= [TATCommandResult.Text, TATCommandResult.CaretBottom, TATCommandResult.CaretLazy, TATCommandResult.UndoRedo];
+  Result:= [
+    TATCommandResult.Text,
+    TATCommandResult.CaretBottom,
+    TATCommandResult.CaretLazy,
+    TATCommandResult.UndoRedo
+    ];
 end;
 
 
