@@ -331,7 +331,7 @@ type
     procedure LineInsert(ALineIndex: SizeInt; const AString: atString; AWithEvent: boolean=true);
     procedure LineInsertStrings(ALineIndex: SizeInt; ABlock: TATStrings; AWithFinalEol: boolean);
     procedure LineDelete(ALineIndex: SizeInt; AForceLast: boolean= true;
-      AWithEvent: boolean=true; AWithUndo: boolean=true);
+      AWithEvent: boolean=true; AWithUndo: boolean=true; ACheckIndexValid: boolean=true);
     procedure LineMove(AIndexFrom, AIndexTo: SizeInt; AWithUndo: boolean=true);
     property Lines[Index: SizeInt]: atString read GetLine write SetLine;
     property LinesAscii[Index: SizeInt]: boolean read GetLineAscii;
@@ -1648,14 +1648,17 @@ begin
   Result:= FList.Count;
 end;
 
-procedure TATStrings.LineDelete(ALineIndex: SizeInt; AForceLast: boolean = true;
-  AWithEvent: boolean=true; AWithUndo: boolean=true);
+procedure TATStrings.LineDelete(ALineIndex: SizeInt;
+  AForceLast: boolean=true;
+  AWithEvent: boolean=true;
+  AWithUndo: boolean=true;
+  ACheckIndexValid: boolean=true);
 var
   Item: PATStringItem;
 begin
   if FReadOnly then Exit;
 
-  if IsIndexValid(ALineIndex) then
+  if not ACheckIndexValid or IsIndexValid(ALineIndex) then
   begin
     Item:= FList.GetItem(ALineIndex);
 

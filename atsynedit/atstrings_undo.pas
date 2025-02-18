@@ -104,8 +104,10 @@ type
     FLastTick: QWord;
     FNewCommandMark: boolean;
     function GetAsString: string;
+    function GetCapacity: integer;
     function GetItem(N: integer): TATUndoItem;
     procedure SetAsString(const AValue: string);
+    procedure SetCapacity(AValue: integer);
   public
     constructor Create(AMaxCount: integer); virtual;
     destructor Destroy; override;
@@ -118,6 +120,7 @@ type
     property SoftMark: boolean read FSoftMark write FSoftMark;
     property HardMark: boolean read FHardMark write FHardMark;
     property Locked: boolean read FLocked write FLocked;
+    property Capacity: integer read GetCapacity write SetCapacity;
     procedure Clear;
     procedure Delete(N: integer);
     procedure DeleteLast;
@@ -583,6 +586,16 @@ begin
   finally
     FreeAndNil(L);
   end;
+end;
+
+function TATUndoList.GetCapacity: integer;
+begin
+  Result:= FList.Capacity;
+end;
+
+procedure TATUndoList.SetCapacity(AValue: integer);
+begin
+  FList.Capacity:= AValue;
 end;
 
 

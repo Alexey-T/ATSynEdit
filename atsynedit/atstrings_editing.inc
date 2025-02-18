@@ -471,12 +471,28 @@ end;
 
 procedure TATStrings.LineBlockDelete(ALine1, ALine2: SizeInt; AForceLast: boolean = true);
 var
+  CurUndoList: TATUndoList;
   NCount, i: SizeInt;
+  NNeedUndoCapacity: integer;
 begin
   if ALine1>ALine2 then Exit;
   NCount:= Count;
   if ALine1>=NCount then ALine1:= NCount-1;
   if ALine2>=NCount then ALine2:= NCount-1;
+
+  case FRunningUndoOrRedo of
+    TATEditorRunningUndoOrRedo.Undo:
+      CurUndoList:= FRedoList;
+    TATEditorRunningUndoOrRedo.Redo:
+      CurUndoList:= FUndoList;
+    else
+      CurUndoList:= FUndoList;
+  end;
+
+  //reduce reallocs when adding lot of undo-items
+  NNeedUndoCapacity:= CurUndoList.Count+(ALine2-ALine1+2);
+  if CurUndoList.Capacity<NNeedUndoCapacity then
+    CurUndoList.Capacity:= NNeedUndoCapacity;
 
   FChangeBlockActive:= true;
   DoOnChangeBlock(
@@ -487,7 +503,13 @@ begin
 
   //delete slowly with undo; yes, we do it for any count of deleted lines
   for i:= ALine2 downto ALine1 do
-    LineDelete(i, false{AForceLast}, false{WithEvent});
+    LineDelete(i,
+      false{AForceLast},
+      false{WithEvent},
+      true{AWithUndo},
+      false{ACheckIndexValid}
+      );
+
   (*
   if (ALine2-ALine1)<FUndoList.MaxCount then
   begin
