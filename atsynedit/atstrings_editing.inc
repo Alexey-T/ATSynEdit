@@ -576,7 +576,7 @@ begin
   if (AFromX=0) and (AToX=0) then
   begin
     //selected entire lines
-    LineBlockDelete(AFromY, AToY-1);
+    LineBlockDelete(AFromY, AToY-1, false{AForceLast});
 
     AShift.Y:= -(AToY-AFromY);
   end
@@ -622,7 +622,7 @@ begin
 
     //if bDelEmpty then
     //  if Str='' then
-    //    LineDelete(AFromY);
+    //    LineDelete(AFromY, false{AForceLast});
 
     if bDeleteEol then
     begin
