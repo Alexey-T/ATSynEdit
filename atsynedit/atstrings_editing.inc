@@ -471,15 +471,19 @@ end;
 
 procedure TATStrings.LineBlockDelete(ALine1, ALine2: SizeInt; AForceLast: boolean = true);
 var
-  CurUndoList: TATUndoList;
   NCount, i: SizeInt;
-  NNeedUndoCapacity: integer;
+  //CurUndoList: TATUndoList;
+  //NNeedUndoCapacity: integer;
 begin
   if ALine1>ALine2 then Exit;
   NCount:= Count;
   if ALine1>=NCount then ALine1:= NCount-1;
   if ALine2>=NCount then ALine2:= NCount-1;
 
+  {
+  //reduce reallocs when adding lot of undo-items.
+  //but, seems it don't give any speedup.
+  //on deleting 700K lines on CPU Intel Core i3 3GHz - time is ~1sec.
   case FRunningUndoOrRedo of
     TATEditorRunningUndoOrRedo.Undo:
       CurUndoList:= FRedoList;
@@ -489,10 +493,10 @@ begin
       CurUndoList:= FUndoList;
   end;
 
-  //reduce reallocs when adding lot of undo-items
   NNeedUndoCapacity:= CurUndoList.Count+(ALine2-ALine1+2);
   if CurUndoList.Capacity<NNeedUndoCapacity then
     CurUndoList.Capacity:= NNeedUndoCapacity;
+  }
 
   FChangeBlockActive:= true;
   DoOnChangeBlock(
