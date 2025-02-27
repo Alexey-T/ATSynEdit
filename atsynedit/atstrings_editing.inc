@@ -223,6 +223,7 @@ begin
       Lines[AY]:= StrTail
     else
     if Lines[AY]<>'' then
+      //TOFIX: we should not call LineDelete on inserting, avoid it! CudaText issue #5876
       LineDelete(AY);
 
     if Assigned(FOnChangeBlock) then
