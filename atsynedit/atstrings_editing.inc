@@ -116,7 +116,7 @@ var
   bAtLineEnd, bAtFileEnd, bAtEmptyLine,
   bBlockWithEol, bUseBlockFinalEol: boolean;
   BlockOriginalLineCount: integer;
-  NDeleteLen: SizeInt;
+  NDeleteLen, NLineOfBlockInsert: SizeInt;
 begin
   AShift.X:= 0;
   AShift.Y:= 0;
@@ -217,21 +217,26 @@ begin
     if not bBlockWithEol or bAtEmptyLine then
       Block.ActionDeleteFakeLine;
     if Block.Count=0 then Exit;
+    NLineOfBlockInsert:= AY;
     //ShowMessage('block lines '+IntToStr(Block.Count));
 
     if StrTail<>'' then
       Lines[AY]:= StrTail
     else
     if Lines[AY]<>'' then
+    begin
       //TOFIX: we should not call LineDelete on inserting, avoid it! CudaText issue #5876
-      LineDelete(AY);
+      Lines[AY]:= Block.Lines[0];
+      Block.LineDelete(0);
+      Inc(NLineOfBlockInsert);
+    end;
 
     if Assigned(FOnChangeBlock) then
     begin
       BlockUTF8:= ATStrings_To_StringList(Block);
       try
         DoOnChangeBlock(
-          0, AY,
+          0, NLineOfBlockInsert,
           0, 0,
           TATBlockChangeKind.InsertLines,
           BlockUTF8);
@@ -261,7 +266,7 @@ begin
     else
       bUseBlockFinalEol:= bBlockWithEol;
 
-    LineInsertStrings(AY, Block, bUseBlockFinalEol);
+    LineInsertStrings(NLineOfBlockInsert, Block, bUseBlockFinalEol);
 
     //fix CudaText issue #3408
     if bTrimRedundantEol then
