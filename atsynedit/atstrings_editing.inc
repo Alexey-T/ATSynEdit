@@ -135,7 +135,7 @@ begin
   bAtEmptyLine:= Str='';
   bInsertSingleLine:= not SStringHasEol(AText);
 
-  if bBlockWithEol and bAtFileEnd then
+  if not bBlockWithEol and bAtFileEnd then
   begin
     if Count=0 then
       bTrimRedundantEol:= true
@@ -280,7 +280,7 @@ begin
     else
     begin
       APosAfter.X:= Block.LinesLen[Block.Count-1];
-      APosAfter.Y:= AY+Block.Count-1;
+      APosAfter.Y:= AY+BlockOriginalLineCount-1;
     end;
 
     AShift.Y:= APosAfter.Y-AY;
