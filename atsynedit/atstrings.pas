@@ -329,7 +329,7 @@ type
     procedure LineAddRaw(const AString: atString; AEnd: TATLineEnds; AWithEvent: boolean=true);
     procedure LineAdd(const AString: atString);
     procedure LineInsert(ALineIndex: SizeInt; const AString: atString; AWithEvent: boolean=true);
-    procedure LineInsertStrings(ALineIndex: SizeInt; ABlock: TATStrings; AWithFinalEol: boolean);
+    procedure LineInsertStrings(ALineIndex: SizeInt; ABlock: TATStrings; AWithFinalEol: boolean); deprecated 'Dont use it, not safe code';
     procedure LineDelete(ALineIndex: SizeInt; AForceLast: boolean=true;
       AWithEvent: boolean=true; AWithUndo: boolean=true);
     procedure LineMove(AIndexFrom, AIndexTo: SizeInt; AWithUndo: boolean=true);
@@ -1579,6 +1579,10 @@ begin
 end;
 
 procedure TATStrings.LineInsertStrings(ALineIndex: SizeInt; ABlock: TATStrings; AWithFinalEol: boolean);
+{
+2025.03: this method is now not used at all, to delete.
+before, it was called from TextInsert and gave CudaText #5898.
+}
 //AWithFinalEol:
 //  True to insert whole lines;
 //  False to insert whole lines except last + concat last item to existing line

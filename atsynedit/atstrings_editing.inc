@@ -116,7 +116,7 @@ var
   bAtLineEnd, bAtFileEnd, bAtEmptyLine,
   bBlockWithEol, bUseBlockFinalEol: boolean;
   BlockOriginalLineCount: integer;
-  NDeleteLen, NLineOfBlockInsert: SizeInt;
+  NDeleteLen, NLineOfBlockInsert, iLine: SizeInt;
 begin
   AShift.X:= 0;
   AShift.Y:= 0;
@@ -267,16 +267,13 @@ begin
     else
       bUseBlockFinalEol:= bBlockWithEol;
 
-    if Block.Count=1 then
+    for iLine:= 0 to Block.Count-1 do
     begin
-      //this block solves CudaText bug #5880 (post 2) - after Redo text is empty
-      if NLineOfBlockInsert>=Count then
-        LineAdd(Block.Lines[0])
+      if IsIndexValid(NLineOfBlockInsert+iLine) then
+        LineInsert(NLineOfBlockInsert+iLine, Block.Lines[iLine], false)
       else
-        LineInsert(NLineOfBlockInsert, Block.Lines[0])
-    end
-    else
-      LineInsertStrings(NLineOfBlockInsert, Block, bUseBlockFinalEol);
+        LineAdd(Block.Lines[iLine]);
+    end;
 
     //fix CudaText issue #3408
     if bTrimRedundantEol then
