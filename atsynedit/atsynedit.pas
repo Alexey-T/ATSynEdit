@@ -9471,7 +9471,7 @@ var
   Rng: PATFoldRange;
   Caret: TATCaretItem;
   NLineIndex: integer;
-  NIndexOfCurrentRng, NIndexOfCaretRng: integer;
+  NIndexOfCurrentRng, NIndexOfLineRng, NIndexOfCaretRng: integer;
 begin
   Result:= false;
   AProps:= Default(TATFoldBarProps);
@@ -9489,9 +9489,8 @@ begin
         NIndexOfCaretRng:= FFold.FindDeepestRangeContainingLine(Caret.PosY, false, FFoldIconForMinimalRange);
     end;
 
-  //NIndexOfCurrentRng:= FFold.FindDeepestRangeContainingLine(NLineIndex, false, FFoldIconForMinimalRange);
-  ////using of DeepestRange method is bad, better to show Folded-state of the 1st range at line
-  NIndexOfCurrentRng:= FFold.FindRangeWithPlusAtLine_ViaIndexer(NLineIndex);
+  NIndexOfCurrentRng:= FFold.FindDeepestRangeContainingLine(NLineIndex, false, FFoldIconForMinimalRange);
+  NIndexOfLineRng:= FFold.FindRangeWithPlusAtLine_ViaIndexer(NLineIndex);
 
   if NIndexOfCurrentRng<0 then exit;
   AProps.HiliteLines:= NIndexOfCurrentRng=NIndexOfCaretRng;
@@ -9507,8 +9506,14 @@ begin
   if Rng^.Y=NLineIndex then
   begin
     AProps.State:= TATFoldBarState.SBegin;
+    {
     //don't override found [+], 2 blocks can start at same pos
     if not AProps.IsPlus then
+      AProps.IsPlus:= Rng^.Folded;
+    }
+    if NIndexOfLineRng>=0 then
+      AProps.IsPlus:= FFold.ItemPtr(NIndexOfLineRng)^.Folded
+    else
       AProps.IsPlus:= Rng^.Folded;
   end;
 
