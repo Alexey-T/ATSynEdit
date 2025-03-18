@@ -1116,9 +1116,10 @@ type
     FOptDimUnfocusedBack: integer;
 
     //
+    function DoCalcFoldDeepestRangeContainingCaret: integer;
     function DoCalcForegroundFromAttribs(AX, AY: integer; var AColor: TColor;
       var AFontStyles: TFontStyles): boolean;
-    function DoCalcFoldProps(AWrapItemIndex: integer; out AProps: TATFoldBarProps): boolean;
+    function DoCalcFoldProps(AWrapItemIndex, AFoldRangeWithCaret: integer; out AProps: TATFoldBarProps): boolean;
     class function CheckInputForNumberOnly(const S: UnicodeString; X: integer;
       ch: WideChar; AllowNegative: boolean): boolean;
     procedure ClearSelRectPoints;
@@ -1308,7 +1309,7 @@ type
     procedure DoPaintGutterOfLine(C: TCanvas;
       ARect: TRect;
       const ACharSize: TATEditorCharSize;
-      AWrapIndex: integer);
+      AWrapIndex, AFoldRangeWithCaret: integer);
     procedure DoPaintGutterBookmarkStdIcon(C: TCanvas; ARect: TRect);
     procedure DoPaintNiceScroll(C: TCanvas);
     procedure DoPaintGutterNumber(C: TCanvas; ALineIndex, ACoordTop: integer; ABand: TATGutterItem);
@@ -1377,8 +1378,9 @@ type
     procedure DoPaintMarkerOfDragDrop(C: TCanvas);
     procedure DoPaintGutterPlusMinus(C: TCanvas; AX, AY: integer; APlus: boolean;
       ALineColor: TColor);
-    procedure DoPaintGutterFolding(C: TCanvas; AWrapItemIndex: integer; ACoordX1,
-      ACoordX2, ACoordY1, ACoordY2: integer);
+    procedure DoPaintGutterFolding(C: TCanvas;
+      AWrapItemIndex, AFoldRangeWithCaret: integer;
+      ACoordX1, ACoordX2, ACoordY1, ACoordY2: integer);
     procedure DoPaintGutterDecor(C: TCanvas; ALine: integer; const ARect: TRect);
     procedure DoPaintGutterBandBG(C: TCanvas; AColor: TColor; AX1, AY1, AX2,
       AY2: integer; AEntireHeight: boolean);
@@ -3836,7 +3838,7 @@ var
   GapItemTop, GapItemCur: TATGapItem;
   GutterItem: TATGutterItem;
   WrapItem: TATWrapItem;
-  NLineCount: integer;
+  NLineCount, NFoldRangeWithCaret: integer;
 begin
   //wrap turned off can cause bad scrollpos, fix it
   with AScrollVert do
@@ -3908,6 +3910,11 @@ begin
   RectLine.Right:= ARect.Right;
   RectLine.Top:= 0;
   RectLine.Bottom:= ARect.Top;
+
+  if AWithGutter then
+    NFoldRangeWithCaret:= DoCalcFoldDeepestRangeContainingCaret
+  else
+    NFoldRangeWithCaret:= -1;
 
   DoEventBeforeCalcHilite(true);
   try
@@ -3990,7 +3997,12 @@ begin
         GapItemCur);
 
     if AWithGutter then
-      DoPaintGutterOfLine(C, RectLine, ACharSize, AWrapIndex);
+      DoPaintGutterOfLine(C,
+        RectLine,
+        ACharSize,
+        AWrapIndex,
+        NFoldRangeWithCaret
+        );
 
     //update LineBottom as index of last painted line
     FLineBottom:= WrapItem.NLineIndex;
@@ -4762,7 +4774,7 @@ end;
 procedure TATSynEdit.DoPaintGutterOfLine(C: TCanvas;
   ARect: TRect;
   const ACharSize: TATEditorCharSize;
-  AWrapIndex: integer);
+  AWrapIndex, AFoldRangeWithCaret: integer);
 var
   St: TATStrings;
   WrapItem: TATWrapItem;
@@ -4861,6 +4873,7 @@ begin
       false);
     DoPaintGutterFolding(C,
       AWrapIndex,
+      AFoldRangeWithCaret,
       GutterItem.Left,
       GutterItem.Right,
       ARect.Top,
@@ -9465,13 +9478,26 @@ begin
 end;
 
 
-function TATSynEdit.DoCalcFoldProps(AWrapItemIndex: integer; out AProps: TATFoldBarProps): boolean;
+function TATSynEdit.DoCalcFoldDeepestRangeContainingCaret: integer;
+var
+  Caret: TATCaretItem;
+begin
+  Result:= -1;
+  if FOptGutterShowFoldLinesForCaret then
+    if Carets.Count>0 then
+    begin
+      Caret:= Carets[0];
+      if Strings.IsIndexValid(Caret.PosY) then
+        Result:= FFold.FindDeepestRangeContainingLine(Caret.PosY, false, FFoldIconForMinimalRange);
+    end;
+end;
+
+function TATSynEdit.DoCalcFoldProps(AWrapItemIndex, AFoldRangeWithCaret: integer; out AProps: TATFoldBarProps): boolean;
 var
   WrapItem: TATWrapItem;
   Rng: PATFoldRange;
-  Caret: TATCaretItem;
   NLineIndex: integer;
-  NIndexOfCurrentRng, NIndexOfLineRng, NIndexOfCaretRng: integer;
+  NIndexOfCurrentRng, NIndexOfLineRng: integer;
 begin
   Result:= false;
   AProps:= Default(TATFoldBarProps);
@@ -9479,21 +9505,11 @@ begin
   WrapItem:= FWrapInfo[AWrapItemIndex];
   NLineIndex:= WrapItem.NLineIndex;
 
-  //find deepest range which includes caret pos
-  NIndexOfCaretRng:= -1;
-  if FOptGutterShowFoldLinesForCaret then
-    if Carets.Count>0 then
-    begin
-      Caret:= Carets[0];
-      if Strings.IsIndexValid(Caret.PosY) then
-        NIndexOfCaretRng:= FFold.FindDeepestRangeContainingLine(Caret.PosY, false, FFoldIconForMinimalRange);
-    end;
-
   NIndexOfCurrentRng:= FFold.FindDeepestRangeContainingLine(NLineIndex, false, FFoldIconForMinimalRange);
   NIndexOfLineRng:= FFold.FindRangeWithPlusAtLine_ViaIndexer(NLineIndex);
 
   if NIndexOfCurrentRng<0 then exit;
-  AProps.HiliteLines:= NIndexOfCurrentRng=NIndexOfCaretRng;
+  AProps.HiliteLines:= NIndexOfCurrentRng=AFoldRangeWithCaret;
 
   Rng:= Fold.ItemPtr(NIndexOfCurrentRng);
 
@@ -9535,7 +9551,7 @@ begin
 end;
 
 procedure TATSynEdit.DoPaintGutterFolding(C: TCanvas;
-  AWrapItemIndex: integer;
+  AWrapItemIndex, AFoldRangeWithCaret: integer;
   ACoordX1, ACoordX2, ACoordY1, ACoordY2: integer);
 var
   CoordXCenter, CoordYCenter: integer;
@@ -9571,7 +9587,7 @@ begin
   //fixing CudaText issue #4285, needed only for macOS
   C.AntialiasingMode:= amOff;
 
-  bOk:= DoCalcFoldProps(AWrapItemIndex, Props);
+  bOk:= DoCalcFoldProps(AWrapItemIndex, AFoldRangeWithCaret, Props);
   if not bOk then exit;
 
   if Props.HiliteLines then
