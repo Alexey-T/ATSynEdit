@@ -1380,7 +1380,7 @@ type
       ALineColor: TColor);
     procedure DoPaintGutterFolding(C: TCanvas;
       AWrapItemIndex, AFoldRangeWithCaret: integer;
-      ACoordX1, ACoordX2, ACoordY1, ACoordY2: integer);
+      ACoord1, ACoord2: TPoint);
     procedure DoPaintGutterDecor(C: TCanvas; ALine: integer; const ARect: TRect);
     procedure DoPaintGutterBandBG(C: TCanvas; AColor: TColor; AX1, AY1, AX2,
       AY2: integer; AEntireHeight: boolean);
@@ -4874,10 +4874,8 @@ begin
     DoPaintGutterFolding(C,
       AWrapIndex,
       AFoldRangeWithCaret,
-      GutterItem.Left,
-      GutterItem.Right,
-      ARect.Top,
-      ARect.Bottom
+      Point(GutterItem.Left, ARect.Top),
+      Point(GutterItem.Right, ARect.Bottom)
       );
   end;
 
@@ -9552,7 +9550,7 @@ end;
 
 procedure TATSynEdit.DoPaintGutterFolding(C: TCanvas;
   AWrapItemIndex, AFoldRangeWithCaret: integer;
-  ACoordX1, ACoordX2, ACoordY1, ACoordY2: integer);
+  ACoord1, ACoord2: TPoint);
 var
   CoordXCenter, CoordYCenter: integer;
   Props: TATFoldBarProps;
@@ -9562,7 +9560,7 @@ var
     if Props.IsLineUp then
       CanvasLineVert(C,
         CoordXCenter,
-        ACoordY1,
+        ACoord1.Y,
         CoordYCenter
         );
   end;
@@ -9572,7 +9570,7 @@ var
       CanvasLineVert(C,
         CoordXCenter,
         CoordYCenter,
-        ACoordY2+1
+        ACoord2.Y+1
         );
   end;
   //
@@ -9605,8 +9603,8 @@ begin
   C.Pen.Width:= DoScaleFont(1);
   C.Pen.EndCap:= pecFlat;
 
-  CoordXCenter:= (ACoordX1+ACoordX2) div 2;
-  CoordYCenter:= (ACoordY1+ACoordY2) div 2;
+  CoordXCenter:= (ACoord1.X+ACoord2.X) div 2;
+  CoordYCenter:= (ACoord1.Y+ACoord2.Y) div 2;
 
   case Props.State of
     TATFoldBarState.SBegin:
@@ -9629,15 +9627,15 @@ begin
           DrawDown;
         end;
 
-        Dec(ACoordY2, ATEditorOptions.SizeGutterFoldLineDx);
+        Dec(ACoord2.Y, ATEditorOptions.SizeGutterFoldLineDx);
         CanvasLineVert(C,
           CoordXCenter,
-          ACoordY1,
-          ACoordY2
+          ACoord1.Y,
+          ACoord2.Y
           );
         CanvasLineHorz(C,
           CoordXCenter,
-          ACoordY2,
+          ACoord2.Y,
           CoordXCenter + DoScaleFont(FOptGutterPlusSize)
           );
       end;
@@ -9646,8 +9644,8 @@ begin
       begin
         CanvasLineVert(C,
           CoordXCenter,
-          ACoordY1,
-          ACoordY2
+          ACoord1.Y,
+          ACoord2.Y
           );
       end;
 
