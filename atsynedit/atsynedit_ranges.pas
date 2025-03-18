@@ -122,6 +122,7 @@ type
     function FindDeepestRangeContainingLine(ALine: integer; AWithStaple: boolean; AMinimalRangeHeight: integer): integer;
     function FindRangeWithPlusAtLine(ALine: integer; AReturnInsertPos: boolean=false): integer;
     function FindRangeWithPlusAtLine_ViaIndexer(ALine: integer): integer;
+    function FindRangeWithPlusAtPos(ALine, AColumn: integer): integer;
     function FindRangeLevel(AIndex: integer): integer;
     function MessageText(AMaxCount: integer): string;
     function MessageLineIndexer(AMaxCount: integer): string;
@@ -844,6 +845,32 @@ begin
   //if skipped not too far, it is the result
   if (m<NCount) and (FList.ItemPtr(m)^.Y=ALine) then
     Result:= m;
+end;
+
+
+function TATFoldRanges.FindRangeWithPlusAtPos(ALine, AColumn: integer): integer;
+var
+  RangeFirst, RangeNext: PATFoldRange;
+  N: integer;
+begin
+  Result:= FindRangeWithPlusAtLine(ALine);
+  if Result>=0 then
+  begin
+    N:= Result;
+    RangeFirst:= ItemPtr(N);
+    if RangeFirst^.X<AColumn+1 then
+      repeat
+        Inc(N);
+        if N>=Count then Break;
+        RangeNext:= ItemPtr(N);
+        if RangeNext^.Y>ALine then Break;
+        if RangeNext^.X=AColumn+1 then
+        begin
+          Result:= N;
+          Break;
+        end;
+      until false;
+  end;
 end;
 
 
