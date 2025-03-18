@@ -227,7 +227,7 @@ begin
     begin
       Lines[AY]:= Block.Lines[0];
       Block.LineDelete(0);
-      if Block.Count>0 then
+      if (Block.Count>0) and (LinesEnds[AY]=TATLineEnds.None) then
         LinesEnds[AY]:= Endings;
       Inc(NLineOfBlockInsert);
     end;
