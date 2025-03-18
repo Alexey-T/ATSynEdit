@@ -853,7 +853,7 @@ var
   RangeFirst, RangeNext: PATFoldRange;
   N: integer;
 begin
-  Result:= FindRangeWithPlusAtLine(ALine);
+  Result:= FindRangeWithPlusAtLine_ViaIndexer(ALine);
   if Result>=0 then
   begin
     N:= Result;
