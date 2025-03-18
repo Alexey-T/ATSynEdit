@@ -1207,6 +1207,12 @@ begin
   //Assert(IsIndexValid(AIndex));
   if FReadOnly then Exit;
 
+  {
+  //debug
+  if AValue=TATLineEnds.None then
+    if Random(0)=2 then ;
+    }
+
   Item:= FList.GetItem(AIndex);
 
   UpdateModified;
@@ -1400,16 +1406,22 @@ begin
 end;
 
 function TATStrings.IsLastLineFake: boolean;
+var
+  NCount: SizeInt;
 begin
-  Result:= (Count>0) and
-    FList.GetItem(FList.Count-1)^.IsFake;
+  NCount:= Count;
+  Result:= (NCount>0) and
+    FList.GetItem(NCount-1)^.IsFake;
 end;
 
 function TATStrings.IsLastFakeLineUnneeded: boolean;
+var
+  NCount: SizeInt;
 begin
-  Result:= (Count>1) and
+  NCount:= Count;
+  Result:= (NCount>1) and
     IsLastLineFake and
-    (FList.GetItem(FList.Count-2)^.LineEnds=TATLineEnds.None);
+    (FList.GetItem(NCount-2)^.LineEnds=TATLineEnds.None);
 end;
 
 procedure TATStrings.ActionDeleteFakeLine;
@@ -1419,11 +1431,14 @@ begin
 end;
 
 procedure TATStrings.ActionDeleteFakeLineAndFinalEol;
+var
+  NCount: SizeInt;
 begin
   ActionDeleteFakeLine;
-  if Count>0 then
-    if LinesEnds[Count-1]<>TATLineEnds.None then
-      LinesEnds[Count-1]:= TATLineEnds.None;
+  NCount:= Count;
+  if NCount>0 then
+    if LinesEnds[NCount-1]<>TATLineEnds.None then
+      LinesEnds[NCount-1]:= TATLineEnds.None;
 end;
 
 function TATStrings.ActionAddFakeLineIfNeeded: boolean;
