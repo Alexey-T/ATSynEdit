@@ -2130,7 +2130,9 @@ begin
       TATEditAction.Insert:
         begin
           if IsIndexValid(CurIndex) then
-            LineDelete(CurIndex);
+            LineDelete(CurIndex, false{AForceLast});
+            //AForceLast=false to fix CudaText #5898
+            //"now at least Redo don't loose text of line, it only looses final EOL."
         end;
 
       TATEditAction.Delete:
