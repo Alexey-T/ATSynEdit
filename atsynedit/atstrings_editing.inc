@@ -225,7 +225,6 @@ begin
     else
     if Lines[AY]<>'' then
     begin
-      //TOFIX: we should not call LineDelete on inserting, avoid it! CudaText issue #5876
       Lines[AY]:= Block.Lines[0];
       Block.LineDelete(0);
       Inc(NLineOfBlockInsert);
