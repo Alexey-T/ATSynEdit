@@ -146,7 +146,7 @@ begin
     end
   end
   else
-    bTrimRedundantEol:= false;
+    bTrimRedundantEol:= bBlockWithEol; //was False before
 
   if not bAtLineEnd then
   begin
@@ -227,6 +227,8 @@ begin
     begin
       Lines[AY]:= Block.Lines[0];
       Block.LineDelete(0);
+      if Block.Count>0 then
+        LinesEnds[AY]:= Endings;
       Inc(NLineOfBlockInsert);
     end;
 
