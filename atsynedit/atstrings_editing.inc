@@ -267,7 +267,16 @@ begin
     else
       bUseBlockFinalEol:= bBlockWithEol;
 
-    LineInsertStrings(NLineOfBlockInsert, Block, bUseBlockFinalEol);
+    if Block.Count=1 then
+    begin
+      //this block solves CudaText bug #5880 (post 2) - after Redo text is empty
+      if NLineOfBlockInsert>=Count then
+        LineAdd(Block.Lines[0])
+      else
+        LineInsert(NLineOfBlockInsert, Block.Lines[0])
+    end
+    else
+      LineInsertStrings(NLineOfBlockInsert, Block, bUseBlockFinalEol);
 
     //fix CudaText issue #3408
     if bTrimRedundantEol then
