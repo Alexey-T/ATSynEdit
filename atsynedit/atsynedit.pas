@@ -9489,7 +9489,10 @@ begin
         NIndexOfCaretRng:= FFold.FindDeepestRangeContainingLine(Caret.PosY, false, FFoldIconForMinimalRange);
     end;
 
-  NIndexOfCurrentRng:= FFold.FindDeepestRangeContainingLine(NLineIndex, false, FFoldIconForMinimalRange);
+  //NIndexOfCurrentRng:= FFold.FindDeepestRangeContainingLine(NLineIndex, false, FFoldIconForMinimalRange);
+  ////using of DeepestRange method is bad, better to show Folded-state of the 1st range at line
+  NIndexOfCurrentRng:= FFold.FindRangeWithPlusAtLine_ViaIndexer(NLineIndex);
+
   if NIndexOfCurrentRng<0 then exit;
   AProps.HiliteLines:= NIndexOfCurrentRng=NIndexOfCaretRng;
 
