@@ -1237,7 +1237,7 @@ type
     procedure DoPartCalc_ApplyAttribsOver(var AParts: TATLineParts; AOffsetMax,
       ALineIndex, ACharIndex: integer; AColorBG: TColor; AMainText: boolean);
     function GetAutoIndentString(APosX, APosY: integer; AUseIndentRegexRule, AForceIndent: boolean): atString;
-    function GetFoldedMarkText(ALine: integer): string;
+    function GetFoldedMarkText(APosX, APosY: integer): string;
     function GetModified: boolean;
     function GetModifiedBookmarks: boolean;
     procedure SetModifiedBookmarks(AValue: boolean);
@@ -4068,7 +4068,7 @@ procedure TATSynEdit.DoPaintLine(C: TCanvas;
   //
 var
   St: TATStrings;
-  NLinesIndex, NLineLen, NCount: integer;
+  NLinesIndex, NColumnIndex, NLineLen, NCount: integer;
   NOutputCharsSkipped: Int64;
   NOutputStrWidth, NOutputMaximalChars: Int64;
   NOutputCellPercentsSkipped: Int64;
@@ -4463,12 +4463,16 @@ begin
 
   //draw collapsed-mark
   if WrapItem.NFinal=TATWrapItemFinal.Collapsed then
+  begin
+    NColumnIndex:= St.LinesFoldFrom[NLinesIndex, FEditorIndex]-1;
     DoPaintFoldedMark(C,
-      St.LinesFoldFrom[NLinesIndex, FEditorIndex]-1,
+      NColumnIndex,
       NLinesIndex,
       CoordAfterText.X,
       CoordAfterText.Y,
-      GetFoldedMarkText(NLinesIndex));
+      GetFoldedMarkText(NColumnIndex, NLinesIndex)
+      );
+  end;
 
   //draw separators
   if (LineSeparator<>TATLineSeparator.None) then

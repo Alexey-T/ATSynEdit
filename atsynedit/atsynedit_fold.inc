@@ -248,20 +248,37 @@ begin
 end;
 
 
-function TATSynEdit.GetFoldedMarkText(ALine: integer): string;
+function TATSynEdit.GetFoldedMarkText(APosX, APosY: integer): string;
 const
   cDefaultHint = '...';
 var
-  N: integer;
+  RangeFirst, RangeNext: PATFoldRange;
+  NRange: integer;
 begin
   Result:= '';
 
   if FFoldStyle=TATEditorFoldStyle.FromEndOfLineAlways then
     exit(cDefaultHint);
 
-  N:= FFold.FindRangeWithPlusAtLine(ALine);
-  if N>=0 then
-    Result:= FFold.ItemPtr(N)^.Hint;
+  NRange:= FFold.FindRangeWithPlusAtLine(APosY);
+  if NRange>=0 then
+  begin
+    RangeFirst:= FFold.ItemPtr(NRange);
+    if RangeFirst^.X<APosX+1 then
+      repeat
+        Inc(NRange);
+        if NRange>=FFold.Count then Break;
+        RangeNext:= FFold.ItemPtr(NRange);
+        if RangeNext^.Y>APosY then Break;
+        if RangeNext^.X=APosX+1 then
+        begin
+          RangeFirst:= RangeNext;
+          Break;
+        end;
+      until false;
+    Result:= RangeFirst^.Hint;
+  end;
+
   if Result='' then
     Result:= cDefaultHint;
 end;
