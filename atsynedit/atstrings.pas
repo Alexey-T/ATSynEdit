@@ -392,7 +392,7 @@ type
     function ActionAddFakeLineIfNeeded: boolean;
     function ActionTrimSpaces(AMode: TATTrimSpaces): boolean;
     function ActionEnsureFinalEol: boolean;
-    procedure ActionEnsureEolBeforeLast;
+    function ActionFixEolBeforeLast: boolean;
     function ActionTrimFinalEmptyLines: boolean;
     procedure ActionSort(AAction: TATStringsSortAction; AFrom, ATo: SizeInt);
     procedure ActionReverseLines;
@@ -2137,7 +2137,10 @@ begin
       TATEditAction.Delete:
         begin
           if CurIndex>=Count then
-            LineAddRaw(CurText, CurLineEnd)
+          begin
+            LineAddRaw(CurText, CurLineEnd);
+            ActionFixEolBeforeLast;
+          end
           else
             LineInsertRaw(CurIndex, CurText, CurLineEnd);
           if IsIndexValid(CurIndex) then
@@ -2782,11 +2785,18 @@ begin
   end;
 end;
 
-procedure TATStrings.ActionEnsureEolBeforeLast;
+function TATStrings.ActionFixEolBeforeLast: boolean;
 var
   NCount: SizeInt;
 begin
+  Result:= false;
   NCount:= Count;
+  if (NCount>1) then
+    if LinesEnds[NCount-2]=TATLineEnds.None then
+    begin
+      LinesEnds[NCount-2]:= Endings;
+      Result:= true;
+    end;
 end;
 
 function TATStrings.ActionTrimFinalEmptyLines: boolean;
