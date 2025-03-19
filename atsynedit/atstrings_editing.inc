@@ -128,6 +128,8 @@ begin
   if AText='' then Exit;
 
   Str:= Lines[AY];
+  StrLead:= '';
+  StrTail:= '';
 
   bBlockWithEol:= SEndsWithEol(AText);
   bAtLineEnd:= AX>=Length(Str);
