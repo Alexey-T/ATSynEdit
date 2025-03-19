@@ -113,8 +113,7 @@ var
   Block: TATStrings;
   BlockUTF8: TStringList;
   bTrimRedundantEol, bInsertSingleLine,
-  bAtLineEnd, bAtFileEnd, bAtEmptyLine,
-  bBlockWithEol{, bUseBlockFinalEol}: boolean;
+  bAtLineEnd, bAtFileEnd, bAtEmptyLine, bBlockWithEol: boolean;
   NBlockOriginalCount, NBlockLastCount,
   NDeleteLen, NLineOfBlockInsert, iLine: SizeInt;
 begin
@@ -137,7 +136,6 @@ begin
   bAtEmptyLine:= Str='';
   bInsertSingleLine:= not SStringHasEol(AText);
   bTrimRedundantEol:= false;
-  //bUseBlockFinalEol:= true;
 
   if bAtFileEnd then
     bTrimRedundantEol:= not bBlockWithEol
@@ -220,9 +218,11 @@ begin
     Block.LoadFromString(UTF8Encode(StrLead+AText));
     NBlockOriginalCount:= Block.Count;
 
+    {
     //note: tricky condition to remove last empty line from Block
     if not bBlockWithEol or bAtEmptyLine then
       Block.ActionDeleteFakeLine;
+      }
     if Block.Count=0 then Exit;
     NLineOfBlockInsert:= AY;
     //ShowMessage('block lines '+IntToStr(Block.Count));
@@ -262,27 +262,15 @@ begin
     end;
 
     {
-    set bUseBlockFinalEol.
-    this is weak place - gave bug before. how to test:
-    1) copy to clipboard 3 lines without EOL
-      test paste at:
+    must test like this:
+    1) copy to clipboard 3 lines without trailing EOL
+      test pasting at:
        a) empty line
        b) middle of line
        c) end of non-empty line
-    2) copy to clipboard 3 lines with EOL
-       test again, a) b) c)
+    2) copy to clipboard 3 lines with trailing EOL
+       again: a) b) c)
     }
-    {
-    if not bAtFileEnd then
-    begin
-      if bBlockWithEol then
-        bUseBlockFinalEol:= bAtLineEnd
-      else
-        bUseBlockFinalEol:= bAtLineEnd and not bAtEmptyLine;
-    end
-    else
-      bUseBlockFinalEol:= bBlockWithEol;
-      }
 
     Block.ActionDeleteFakeLine;
     NBlockLastCount:= Block.Count;
