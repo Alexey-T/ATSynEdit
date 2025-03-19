@@ -221,7 +221,15 @@ begin
     //ShowMessage('block lines '+IntToStr(Block.Count));
 
     if StrTail<>'' then
-      Lines[AY]:= StrTail
+    begin
+      if not bBlockWithEol then
+      begin
+        Lines[AY]:= Block.Lines[Block.Count-1]+StrTail;
+        Block.LineDelete(Block.Count-1);
+      end
+      else
+        Lines[AY]:= StrTail;
+    end
     else
     if Lines[AY]<>'' then
     begin
