@@ -140,6 +140,9 @@ begin
     if Count=0 then
       bTrimRedundantEol:= true
     else
+    if (Count=1) and (LinesLen[0]=0) then
+      bTrimRedundantEol:= not bBlockWithEol
+    else
     begin
       LastItem:= FList.GetItem(Count-1);
       bTrimRedundantEol:= (LastItem^.CharLen>0) and (LastItem^.LineEnds=TATLineEnds.None);
