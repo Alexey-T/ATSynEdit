@@ -137,10 +137,7 @@ begin
 
   if not bBlockWithEol or bAtFileEnd then
   begin
-    if Count=0 then
-      bTrimRedundantEol:= true
-    else
-    if (Count=1) and (LinesLen[0]=0) then
+    if (Count=0) or ((Count=1) and (LinesLen[0]=0)) then
       bTrimRedundantEol:= not bBlockWithEol
     else
     begin
