@@ -217,7 +217,7 @@ begin
   try
     FChangeBlockActive:= true;
     BeginUndoGroup;
-    Block.LoadFromString(StrLead+AText);
+    Block.LoadFromString(UTF8Encode(StrLead+AText));
     NBlockOriginalCount:= Block.Count;
 
     //note: tricky condition to remove last empty line from Block
@@ -284,12 +284,7 @@ begin
       bUseBlockFinalEol:= bBlockWithEol;
       }
 
-    if {not bUseBlockFinalEol}bBlockWithEol then
-      if Block.IsLastLineFake then
-      begin
-        Block.ActionDeleteFakeLine;
-      end;
-
+    Block.ActionDeleteFakeLine;
     NBlockLastCount:= Block.Count;
     if NBlockLastCount=0 then
       ActionAddFakeLineIfNeeded
