@@ -136,6 +136,8 @@ begin
   bAtFileEnd:= bAtLineEnd and (AY>=Count-1);
   bAtEmptyLine:= Str='';
   bInsertSingleLine:= not SStringHasEol(AText);
+  bTrimRedundantEol:= false;
+  bUseBlockFinalEol:= true;
 
   if bAtFileEnd then
     bTrimRedundantEol:= not bBlockWithEol
