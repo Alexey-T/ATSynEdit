@@ -215,17 +215,11 @@ begin
   try
     FChangeBlockActive:= true;
     BeginUndoGroup;
+
     Block.LoadFromString(UTF8Encode(StrLead+AText));
     NBlockOriginalCount:= Block.Count;
-
-    {
-    //note: tricky condition to remove last empty line from Block
-    if not bBlockWithEol or bAtEmptyLine then
-      Block.ActionDeleteFakeLine;
-      }
     if Block.Count=0 then Exit;
     NLineOfBlockInsert:= AY;
-    //ShowMessage('block lines '+IntToStr(Block.Count));
 
     if StrTail<>'' then
     begin
