@@ -115,7 +115,7 @@ var
   bTrimRedundantEol, bInsertSingleLine,
   bAtLineEnd, bAtFileEnd, bAtEmptyLine,
   bBlockWithEol, bUseBlockFinalEol: boolean;
-  BlockOriginalLineCount, BlockLastLineCount: SizeInt;
+  NBlockOriginalCount, NBlockLastCount,
   NDeleteLen, NLineOfBlockInsert, iLine: SizeInt;
 begin
   AShift.X:= 0;
@@ -211,7 +211,7 @@ begin
     FChangeBlockActive:= true;
     BeginUndoGroup;
     Block.LoadFromString(StrLead+AText);
-    BlockOriginalLineCount:= Block.Count;
+    NBlockOriginalCount:= Block.Count;
 
     //note: tricky condition to remove last empty line from Block
     if not bBlockWithEol or bAtEmptyLine then
@@ -275,10 +275,10 @@ begin
     else
       bUseBlockFinalEol:= bBlockWithEol;
 
-    BlockLastLineCount:= Block.Count;
-    for iLine:= 0 to BlockLastLineCount-1 do
+    NBlockLastCount:= Block.Count;
+    for iLine:= 0 to NBlockLastCount-1 do
     begin
-      if iLine=BlockLastLineCount-1 then
+      if iLine=NBlockLastCount-1 then
         if not bUseBlockFinalEol and bBlockWithEol then
           Break;
 
@@ -295,12 +295,12 @@ begin
     if bBlockWithEol then
     begin
       APosAfter.X:= 0;
-      APosAfter.Y:= AY+BlockOriginalLineCount-1;
+      APosAfter.Y:= AY+NBlockOriginalCount-1;
     end
     else
     begin
       APosAfter.X:= Block.LinesLen[Block.Count-1];
-      APosAfter.Y:= AY+BlockOriginalLineCount-1;
+      APosAfter.Y:= AY+NBlockOriginalCount-1;
     end;
 
     AShift.Y:= APosAfter.Y-AY;
