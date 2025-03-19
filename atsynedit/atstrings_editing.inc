@@ -114,7 +114,7 @@ var
   BlockUTF8: TStringList;
   bTrimRedundantEol, bInsertSingleLine,
   bAtLineEnd, bAtFileEnd, bAtEmptyLine,
-  bBlockWithEol, bUseBlockFinalEol: boolean;
+  bBlockWithEol{, bUseBlockFinalEol}: boolean;
   NBlockOriginalCount, NBlockLastCount,
   NDeleteLen, NLineOfBlockInsert, iLine: SizeInt;
 begin
@@ -137,7 +137,7 @@ begin
   bAtEmptyLine:= Str='';
   bInsertSingleLine:= not SStringHasEol(AText);
   bTrimRedundantEol:= false;
-  bUseBlockFinalEol:= true;
+  //bUseBlockFinalEol:= true;
 
   if bAtFileEnd then
     bTrimRedundantEol:= not bBlockWithEol
@@ -241,7 +241,7 @@ begin
     if Lines[AY]<>'' then
     begin
       Lines[AY]:= Block.Lines[0];
-      Block.LineDelete(0);
+      Block.LineDelete(0, false, false, false);
       if (Block.Count>0) and (LinesEnds[AY]=TATLineEnds.None) then
         LinesEnds[AY]:= Endings;
       Inc(NLineOfBlockInsert);
@@ -272,6 +272,7 @@ begin
     2) copy to clipboard 3 lines with EOL
        test again, a) b) c)
     }
+    {
     if not bAtFileEnd then
     begin
       if bBlockWithEol then
@@ -281,15 +282,20 @@ begin
     end
     else
       bUseBlockFinalEol:= bBlockWithEol;
+      }
+
+    if {not bUseBlockFinalEol}bBlockWithEol then
+      if Block.IsLastLineFake then
+      begin
+        Block.ActionDeleteFakeLine;
+      end;
 
     NBlockLastCount:= Block.Count;
+    if NBlockLastCount=0 then
+      ActionAddFakeLineIfNeeded
+    else
     for iLine:= 0 to NBlockLastCount-1 do
     begin
-      if iLine=NBlockLastCount-1 then
-        if not bUseBlockFinalEol then
-          if Block.LinesLen[iLine]=0 then
-            Break;
-
       if IsIndexValid(NLineOfBlockInsert+iLine) then
         LineInsert(NLineOfBlockInsert+iLine, Block.Lines[iLine], false)
       else
