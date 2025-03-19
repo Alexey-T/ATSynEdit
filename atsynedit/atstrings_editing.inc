@@ -311,6 +311,9 @@ begin
       APosAfter.Y:= AY+NBlockOriginalCount-1;
     end;
 
+    //make sure caret won't go after last line
+    APosAfter.Y:= Min(APosAfter.Y, Count-1);
+
     AShift.Y:= APosAfter.Y-AY;
 
   finally
