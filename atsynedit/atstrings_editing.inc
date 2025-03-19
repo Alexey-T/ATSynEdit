@@ -135,7 +135,10 @@ begin
   bAtEmptyLine:= Str='';
   bInsertSingleLine:= not SStringHasEol(AText);
 
-  if not bBlockWithEol or bAtFileEnd then
+  if bAtFileEnd then
+    bTrimRedundantEol:= not bBlockWithEol
+  else
+  if not bBlockWithEol then
   begin
     if (Count=0) or ((Count=1) and (LinesLen[0]=0)) then
       bTrimRedundantEol:= not bBlockWithEol
