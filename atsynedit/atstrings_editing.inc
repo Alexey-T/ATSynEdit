@@ -311,8 +311,12 @@ begin
       APosAfter.Y:= AY+NBlockOriginalCount-1;
     end;
 
-    //make sure caret won't go after last line
-    APosAfter.Y:= Min(APosAfter.Y, Count-1);
+    //sometimes caret can go after end, due to unfixed TextInsert bug
+    if not IsIndexValid(APosAfter.Y) then
+    begin
+      APosAfter.Y:= Count-1;
+      APosAfter.X:= LinesLen[APosAfter.Y];
+    end;
 
     AShift.Y:= APosAfter.Y-AY;
 
