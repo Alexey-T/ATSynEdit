@@ -115,7 +115,7 @@ var
   bTrimRedundantEol, bInsertSingleLine,
   bAtLineEnd, bAtFileEnd, bAtEmptyLine,
   bBlockWithEol, bUseBlockFinalEol: boolean;
-  BlockOriginalLineCount, BlockLastLineCount: integer;
+  BlockOriginalLineCount, BlockLastLineCount: SizeInt;
   NDeleteLen, NLineOfBlockInsert, iLine: SizeInt;
 begin
   AShift.X:= 0;
@@ -279,9 +279,8 @@ begin
     for iLine:= 0 to BlockLastLineCount-1 do
     begin
       if iLine=BlockLastLineCount-1 then
-        if not bUseBlockFinalEol then
-          if Block.LinesLen[iLine]=0 then
-            Break;
+        if not bUseBlockFinalEol and bBlockWithEol then
+          Break;
 
       if IsIndexValid(NLineOfBlockInsert+iLine) then
         LineInsert(NLineOfBlockInsert+iLine, Block.Lines[iLine], false)
