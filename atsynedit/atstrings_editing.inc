@@ -294,7 +294,7 @@ begin
       APosAfter.Y:= AY+NBlockOriginalCount-1;
     end;
 
-    //sometimes caret can go after end, due to unfixed TextInsert bug
+    //make sure caret won't go after text end, due to unfixed bugs (currently cannot reproduce)
     if not IsIndexValid(APosAfter.Y) then
     begin
       APosAfter.Y:= Count-1;
