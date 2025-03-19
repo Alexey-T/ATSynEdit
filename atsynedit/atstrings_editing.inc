@@ -279,8 +279,9 @@ begin
     for iLine:= 0 to NBlockLastCount-1 do
     begin
       if iLine=NBlockLastCount-1 then
-        if not bUseBlockFinalEol and bBlockWithEol then
-          Break;
+        if not bUseBlockFinalEol then
+          if Block.LinesLen[iLine]=0 then
+            Break;
 
       if IsIndexValid(NLineOfBlockInsert+iLine) then
         LineInsert(NLineOfBlockInsert+iLine, Block.Lines[iLine], false)
