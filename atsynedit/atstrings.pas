@@ -392,6 +392,7 @@ type
     function ActionAddFakeLineIfNeeded: boolean;
     function ActionTrimSpaces(AMode: TATTrimSpaces): boolean;
     function ActionEnsureFinalEol: boolean;
+    procedure ActionEnsureEolBeforeLast;
     function ActionTrimFinalEmptyLines: boolean;
     procedure ActionSort(AAction: TATStringsSortAction; AFrom, ATo: SizeInt);
     procedure ActionReverseLines;
@@ -2130,9 +2131,7 @@ begin
       TATEditAction.Insert:
         begin
           if IsIndexValid(CurIndex) then
-            LineDelete(CurIndex, false{AForceLast});
-            //AForceLast=false to fix CudaText #5898
-            //"now at least Redo don't loose text of line, it only looses final EOL."
+            LineDelete(CurIndex, true{AForceLast});
         end;
 
       TATEditAction.Delete:
@@ -2766,26 +2765,39 @@ begin
 end;
 
 function TATStrings.ActionEnsureFinalEol: boolean;
+var
+  NCount: SizeInt;
 begin
   Result:= false;
   if IsLastLineFake then Exit;
-  if Count>0 then
+  NCount:= Count;
+  if NCount>0 then
   begin
-    if LinesEnds[Count-1]=TATLineEnds.None then
+    if LinesEnds[NCount-1]=TATLineEnds.None then
     begin
-      LinesEnds[Count-1]:= Endings;
+      LinesEnds[NCount-1]:= Endings;
       ActionAddFakeLineIfNeeded;
       Result:= true;
     end;
   end;
 end;
 
+procedure TATStrings.ActionEnsureEolBeforeLast;
+var
+  NCount: SizeInt;
+begin
+  NCount:= Count;
+end;
+
 function TATStrings.ActionTrimFinalEmptyLines: boolean;
+var
+  NCount: SizeInt;
 begin
   Result:= false;
-  while (Count>1) and (Lines[Count-1]='') and (Lines[Count-2]='') do
+  NCount:= Count;
+  while (NCount>1) and (Lines[NCount-1]='') and (Lines[NCount-2]='') do
   begin
-    LineDelete(Count-2);
+    LineDelete(NCount-2);
     Result:= true;
   end;
 end;
