@@ -51,6 +51,7 @@ type
     function IsHintSame(const AOtherHint: TATFoldHintTrimmed): boolean;
     function MessageText: string;
     class operator =(const a, b: TATFoldRange): boolean;
+    procedure Assign(constref R: TATFoldRange);
   end;
 
   { TATFoldRangeList }
@@ -277,6 +278,18 @@ end;
 class operator TATFoldRange.=(const a, b: TATFoldRange): boolean;
 begin
   Result:= false;
+end;
+
+procedure TATFoldRange.Assign(constref R: TATFoldRange);
+begin
+  Tag:= R.Tag;
+  X:= R.X;
+  Y:= R.Y;
+  X2:= R.X2;
+  Y2:= R.Y2;
+  Folded:= R.Folded;
+  Staple:= R.Staple;
+  Hint:= R.Hint;
 end;
 
 { TATFoldRanges }
