@@ -307,6 +307,7 @@ begin
     FreeAndNil(Block);
     EndUndoGroup;
     FChangeBlockActive:= false;
+    DoEventLog(AY);
   end;
 end;
 
