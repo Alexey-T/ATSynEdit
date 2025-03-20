@@ -303,11 +303,13 @@ begin
 
     AShift.Y:= APosAfter.Y-AY;
 
+    DoEventLog(AY);
+    DoEventChange(TATLineChangeKind.Added, AY, NBlockOriginalCount);
+
   finally
     FreeAndNil(Block);
     EndUndoGroup;
     FChangeBlockActive:= false;
-    DoEventLog(AY);
   end;
 end;
 
