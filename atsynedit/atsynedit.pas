@@ -5846,6 +5846,9 @@ begin
     LCLIntf.SetFocus(Handle);
 
   {$ifdef darwin}
+  //why we don't enable this on Windows: it will give regression in CudaText:
+  //click on code-tree filter, then click on main editor: now both editor + filter have blinking caret
+
   //DoEnter is not called, so caret don't blink in ui-tab opened by Command+N
   DoEnter;
   {$endif}
