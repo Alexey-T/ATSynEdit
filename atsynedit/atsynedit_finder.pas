@@ -1571,13 +1571,13 @@ begin
     Editor.Strings.SetNewCommandMark;
 
   UpdateFragments;
-  EnableCaretEvent:= false;
+  //EnableCaretEvent:= false; //for usual find-next, we need EnableCaretEvent=True
   DoFixCaretSelectionDirection;
 
   if not OptInSelection or (Length(FFragments)=0) then
   begin
     Result:= DoFindOrReplace_InFragment(AReplace, AForMany, AChanged, AUpdateCaret);
-    EnableCaretEvent:= true;
+    //EnableCaretEvent:= true;
     exit
   end;
 
