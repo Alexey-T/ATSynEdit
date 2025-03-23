@@ -640,7 +640,7 @@ var
 begin
   St:= Strings;
   Caret:= Carets[0];
-  if (Caret.EndY>=0) and (Caret.EndX>=0) then
+  if St.IsIndexValid(Caret.EndY) and (Caret.EndX>=0) then
   begin
     ABegin.X:= St.CharPosToColumnPos(Caret.EndY, Caret.EndX, FTabHelper);
     ABegin.Y:= Caret.EndY;
