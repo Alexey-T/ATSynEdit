@@ -913,9 +913,19 @@ end;
 procedure TATEditorFinder.UpdateFinderCarets(ASimpleAction: boolean);
 var
   St: TATStrings;
-  iCaret, NLen: integer;
   Caret: TATCaretItem;
+  iCaret, NLen: integer;
 begin
+  St:= Editor.Strings;
+  if St.Count=0 then
+  begin
+    FinderCarets.Clear;
+    FinderCarets.Add(0, 0);
+    FinderCaretsSel.Clear;
+    FPlaceMarker:= false;
+    Exit
+  end;
+
   if FVirtualCaretsAsString='' then
     if Assigned(Editor) then
       FinderCarets.Assign(Editor.Carets);
@@ -926,38 +936,36 @@ begin
 
   //fix carets if after line-end,
   //to fix bug with find-previous when caret is after line-end
-  St:= Editor.Strings;
-  if St.Count>0 then
-    for iCaret:= 0 to FinderCarets.Count-1 do
+  for iCaret:= 0 to FinderCarets.Count-1 do
+  begin
+    Caret:= FinderCarets[iCaret];
+    if St.IsIndexValid(Caret.PosY) then
     begin
-      Caret:= FinderCarets[iCaret];
-      if St.IsIndexValid(Caret.PosY) then
-      begin
-        NLen:= St.LinesLen[Caret.PosY];
-        if Caret.PosX>NLen then
-          Caret.PosX:= NLen;
-      end
-      else
-      begin
-        Caret.PosY:= St.Count-1;
-        Caret.PosX:= St.LinesLen[Caret.PosY];
-        Caret.EndX:= -1;
-        Caret.EndY:= -1;
-        Continue;
-      end;
-
-      if St.IsIndexValid(Caret.EndY) then
-      begin
-        NLen:= St.LinesLen[Caret.EndY];
-        if Caret.EndX>NLen then
-          Caret.EndX:= NLen;
-      end
-      else
-      begin
-        Caret.EndY:= -1;
-        Caret.EndX:= -1;
-      end;
+      NLen:= St.LinesLen[Caret.PosY];
+      if Caret.PosX>NLen then
+        Caret.PosX:= NLen;
+    end
+    else
+    begin
+      Caret.PosY:= St.Count-1;
+      Caret.PosX:= St.LinesLen[Caret.PosY];
+      Caret.EndX:= -1;
+      Caret.EndY:= -1;
+      Continue;
     end;
+
+    if St.IsIndexValid(Caret.EndY) then
+    begin
+      NLen:= St.LinesLen[Caret.EndY];
+      if Caret.EndX>NLen then
+        Caret.EndX:= NLen;
+    end
+    else
+    begin
+      Caret.EndY:= -1;
+      Caret.EndX:= -1;
+    end;
+  end;
 end;
 
 procedure TATEditorFinder.SetVirtualCaretsAsString(const AValue: string);
