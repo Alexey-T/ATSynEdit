@@ -395,9 +395,9 @@ const
 var
   Pnt: TPoint;
   PntCoord: TATPoint;
-  IntList: TATIntArray;
   Details: TATEditorPosDetails;
-  Rng: PATFoldRange;
+  RangeIndexes: TATIntArray;
+  Range: PATFoldRange;
   mi: TMenuItem;
   SHintW: UnicodeString;
   NLineOfCursor, NLineOfRange: integer;
@@ -411,8 +411,8 @@ begin
   NLineOfCursor:= Pnt.Y;
   if NLineOfCursor<0 then Exit;
 
-  IntList:= Fold.FindRangesWithLine(NLineOfCursor, false{OnlyFolded});
-  if Length(IntList)=0 then Exit;
+  RangeIndexes:= Fold.FindRangesWithLine(NLineOfCursor, false{OnlyFolded});
+  if Length(RangeIndexes)=0 then Exit;
 
   //separator
   mi:= TMenuItem.Create(Self);
@@ -420,14 +420,14 @@ begin
   Menu.Items.Add(mi);
 
   //items for ranges for current line
-  for iRange:= 0 to High(IntList) do
+  for iRange:= 0 to High(RangeIndexes) do
   begin
-    Rng:= Fold.ItemPtr(IntList[iRange]);
-    NLineOfRange:= Rng^.Y;
+    Range:= Fold.ItemPtr(RangeIndexes[iRange]);
+    NLineOfRange:= Range^.Y;
     if not Strings.IsIndexValid(NLineOfRange) then Continue;
 
     mi:= TMenuItem.Create(Self);
-    mi.Tag:= IntList[iRange];
+    mi.Tag:= RangeIndexes[iRange];
     mi.OnClick:= @MenuFoldPlusMinusClick;
 
     SHintW:= Strings.LineSub(NLineOfRange, 1, ATEditorOptions.FoldedLenOfEmptyHint);
@@ -438,7 +438,7 @@ begin
       ATEditorOptions.TextHintScrollPrefix+' '+IntToStr(NLineOfRange+1)+': '+
       UTF8Encode(SHintW);
 
-    if Rng^.Folded then
+    if Range^.Folded then
       mi.ImageIndex:= 0
     else
       mi.ImageIndex:= 1;
