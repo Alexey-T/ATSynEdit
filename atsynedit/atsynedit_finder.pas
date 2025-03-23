@@ -914,6 +914,7 @@ procedure TATEditorFinder.UpdateFinderCarets(ASimpleAction: boolean);
 var
   St: TATStrings;
   iCaret, NLen: integer;
+  Caret: TATCaretItem;
 begin
   if FVirtualCaretsAsString='' then
     if Assigned(Editor) then
@@ -928,28 +929,35 @@ begin
   St:= Editor.Strings;
   if St.Count>0 then
     for iCaret:= 0 to FinderCarets.Count-1 do
-      with FinderCarets[iCaret] do
+    begin
+      Caret:= FinderCarets[iCaret];
+      if St.IsIndexValid(Caret.PosY) then
       begin
-        if not St.IsIndexValid(PosY) then
-        begin
-          PosY:= St.Count-1;
-          PosX:= St.LinesLen[PosY];
-          EndX:= -1;
-          EndY:= -1;
-          Continue;
-        end;
-
-        NLen:= St.LinesLen[PosY];
-        if PosX>NLen then
-          PosX:= NLen;
-
-        if St.IsIndexValid(EndY) then
-        begin
-          NLen:= St.LinesLen[EndY];
-          if EndX>NLen then
-            EndX:= NLen;
-        end;
+        NLen:= St.LinesLen[Caret.PosY];
+        if Caret.PosX>NLen then
+          Caret.PosX:= NLen;
+      end
+      else
+      begin
+        Caret.PosY:= St.Count-1;
+        Caret.PosX:= St.LinesLen[Caret.PosY];
+        Caret.EndX:= -1;
+        Caret.EndY:= -1;
+        Continue;
       end;
+
+      if St.IsIndexValid(Caret.EndY) then
+      begin
+        NLen:= St.LinesLen[Caret.EndY];
+        if Caret.EndX>NLen then
+          Caret.EndX:= NLen;
+      end
+      else
+      begin
+        Caret.EndY:= -1;
+        Caret.EndX:= -1;
+      end;
+    end;
 end;
 
 procedure TATEditorFinder.SetVirtualCaretsAsString(const AValue: string);
