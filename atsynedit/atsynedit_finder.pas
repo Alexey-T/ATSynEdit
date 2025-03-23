@@ -936,12 +936,19 @@ begin
           PosX:= St.LinesLen[PosY];
           EndX:= -1;
           EndY:= -1;
+          Continue;
         end;
+
         NLen:= St.LinesLen[PosY];
         if PosX>NLen then
           PosX:= NLen;
-        if EndX>NLen then
-          EndX:= NLen;
+
+        if St.IsIndexValid(EndY) then
+        begin
+          NLen:= St.LinesLen[EndY];
+          if EndX>NLen then
+            EndX:= NLen;
+        end;
       end;
 end;
 
