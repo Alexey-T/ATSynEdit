@@ -390,15 +390,17 @@ end;
 
 
 procedure TATSynEdit.DoMenuGutterFold_AddDynamicItems(Menu: TPopupMenu);
+const
+  cEllipsisChar: WideChar = #$2026;
 var
   Pnt: TPoint;
   PntCoord: TATPoint;
-  NLine: integer;
   IntList: TATIntArray;
   Details: TATEditorPosDetails;
   Rng: PATFoldRange;
   mi: TMenuItem;
-  i: integer;
+  SHintW: UnicodeString;
+  NLine, i: integer;
 begin
   //calc ranges for curr line
   Pnt:= ScreenToClient(Mouse.CursorPos);
@@ -424,9 +426,13 @@ begin
     mi.Tag:= IntList[i];
     mi.OnClick:= @MenuFoldPlusMinusClick;
 
+    SHintW:= Strings.LineSub(Rng^.Y, 1, ATEditorOptions.FoldedLenOfEmptyHint);
+    if Strings.LinesLen[Rng^.Y]>ATEditorOptions.FoldedLenOfEmptyHint then
+      SHintW:= SHintW+cEllipsisChar;
+
     mi.Caption:=
       ATEditorOptions.TextHintScrollPrefix+' '+IntToStr(Rng^.Y+1)+': '+
-      UTF8Encode(Strings.LineSub(Rng^.Y, 1, ATEditorOptions.FoldedLenOfEmptyHint));
+      UTF8Encode(SHintW);
 
     if Rng^.Folded then
       mi.ImageIndex:= 0
