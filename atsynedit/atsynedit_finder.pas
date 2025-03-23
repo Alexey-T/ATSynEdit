@@ -916,8 +916,12 @@ var
   Caret: TATCaretItem;
   iCaret, NLen: integer;
 begin
-  St:= Editor.Strings;
-  if St.Count=0 then
+  if Assigned(Editor) then
+    St:= Editor.Strings
+  else
+    St:= nil;
+
+  if (St=nil) or (St.Count=0) then
   begin
     FinderCarets.Clear;
     FinderCarets.Add(0, 0);
@@ -927,8 +931,7 @@ begin
   end;
 
   if FVirtualCaretsAsString='' then
-    if Assigned(Editor) then
-      FinderCarets.Assign(Editor.Carets);
+    FinderCarets.Assign(Editor.Carets);
 
   FPlaceMarker:= ASimpleAction and OptInSelection and FinderCarets.IsSelection;
 
