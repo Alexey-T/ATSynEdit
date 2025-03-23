@@ -401,7 +401,7 @@ var
   mi: TMenuItem;
   SHintW: UnicodeString;
   NLineOfCursor, NLineOfRange: integer;
-  i: integer;
+  iRange: integer;
 begin
   //calc ranges for curr line
   Pnt:= ScreenToClient(Mouse.CursorPos);
@@ -420,14 +420,14 @@ begin
   Menu.Items.Add(mi);
 
   //items for ranges for current line
-  for i:= 0 to High(IntList) do
+  for iRange:= 0 to High(IntList) do
   begin
-    Rng:= Fold.ItemPtr(IntList[i]);
+    Rng:= Fold.ItemPtr(IntList[iRange]);
     NLineOfRange:= Rng^.Y;
     if not Strings.IsIndexValid(NLineOfRange) then Continue;
 
     mi:= TMenuItem.Create(Self);
-    mi.Tag:= IntList[i];
+    mi.Tag:= IntList[iRange];
     mi.OnClick:= @MenuFoldPlusMinusClick;
 
     SHintW:= Strings.LineSub(NLineOfRange, 1, ATEditorOptions.FoldedLenOfEmptyHint);
