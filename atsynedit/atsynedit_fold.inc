@@ -400,17 +400,18 @@ var
   Rng: PATFoldRange;
   mi: TMenuItem;
   SHintW: UnicodeString;
-  NLine, i: integer;
+  NLineOfCursor, NLineOfRange: integer;
+  i: integer;
 begin
   //calc ranges for curr line
   Pnt:= ScreenToClient(Mouse.CursorPos);
   PntCoord.X:= Pnt.X;
   PntCoord.Y:= Pnt.Y;
   Pnt:= ClientPosToCaretPos(PntCoord, Details);
-  NLine:= Pnt.Y;
-  if NLine<0 then Exit;
+  NLineOfCursor:= Pnt.Y;
+  if NLineOfCursor<0 then Exit;
 
-  IntList:= Fold.FindRangesWithLine(NLine, false{OnlyFolded});
+  IntList:= Fold.FindRangesWithLine(NLineOfCursor, false{OnlyFolded});
   if Length(IntList)=0 then Exit;
 
   //separator
@@ -422,16 +423,19 @@ begin
   for i:= 0 to High(IntList) do
   begin
     Rng:= Fold.ItemPtr(IntList[i]);
+    NLineOfRange:= Rng^.Y;
+    if not Strings.IsIndexValid(NLineOfRange) then Continue;
+
     mi:= TMenuItem.Create(Self);
     mi.Tag:= IntList[i];
     mi.OnClick:= @MenuFoldPlusMinusClick;
 
-    SHintW:= Strings.LineSub(Rng^.Y, 1, ATEditorOptions.FoldedLenOfEmptyHint);
-    if Strings.LinesLen[Rng^.Y]>ATEditorOptions.FoldedLenOfEmptyHint then
+    SHintW:= Strings.LineSub(NLineOfRange, 1, ATEditorOptions.FoldedLenOfEmptyHint);
+    if Strings.LinesLen[NLineOfRange]>ATEditorOptions.FoldedLenOfEmptyHint then
       SHintW:= SHintW+cEllipsisChar;
 
     mi.Caption:=
-      ATEditorOptions.TextHintScrollPrefix+' '+IntToStr(Rng^.Y+1)+': '+
+      ATEditorOptions.TextHintScrollPrefix+' '+IntToStr(NLineOfRange+1)+': '+
       UTF8Encode(SHintW);
 
     if Rng^.Folded then
