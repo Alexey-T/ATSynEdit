@@ -190,7 +190,7 @@ type
     procedure SetEnableChangeEvent(AValue: boolean);
     function ConfirmWrappedSearch: boolean;
     function IsSelStartsAtMatch: boolean;
-    procedure UpdateCarets(ASimpleAction: boolean);
+    procedure UpdateFinderCarets(ASimpleAction: boolean);
     procedure SetVirtualCaretsAsString(const AValue: string);
     procedure ClearMatchPos; override;
     function FindMatch_InEditor(APosStart, APosEnd: TPoint; AWithEvent: boolean;
@@ -910,7 +910,7 @@ end;
 
 { TATEditorFinder }
 
-procedure TATEditorFinder.UpdateCarets(ASimpleAction: boolean);
+procedure TATEditorFinder.UpdateFinderCarets(ASimpleAction: boolean);
 var
   St: TATStrings;
   iCaret, NLen: integer;
@@ -1070,7 +1070,7 @@ var
   PosEnd: TPoint;
   bStartAtEdge: boolean;
 begin
-  UpdateCarets(true);
+  UpdateFinderCarets(true);
   if OptRegex then
     raise Exception.Create('Finder FindSimple called in regex mode');
 
@@ -1185,7 +1185,7 @@ function TATEditorFinder.DoAction_CountAll(AWithEvent: boolean): integer;
 var
   i: integer;
 begin
-  UpdateCarets(false);
+  UpdateFinderCarets(false);
   UpdateFragments;
   if OptRegex then
     UpdateBuffer;
@@ -1208,7 +1208,7 @@ var
   NListCount, iFragment: integer;
 begin
   BeginTiming;
-  UpdateCarets(false);
+  UpdateFinderCarets(false);
   UpdateFragments;
   if OptRegex then
     UpdateBuffer;
@@ -1246,7 +1246,7 @@ var
 begin
   if not OptRegex then
     raise Exception.Create('Finder Extract action called for non-regex mode');
-  UpdateCarets(false);
+  UpdateFinderCarets(false);
   UpdateBuffer;
   BeginTiming;
 
@@ -1290,7 +1290,7 @@ begin
   EnableChangeEvent:= false; //avoid big slowdown if lexer is set
   EnableCaretEvent:= false;
 
-  UpdateCarets(false);
+  UpdateFinderCarets(false);
   UpdateFragments;
   if OptRegex then
     UpdateBuffer;
@@ -1556,7 +1556,7 @@ begin
   Result:= false;
   AChanged:= false;
   FReplacedAtLine:= MaxInt;
-  UpdateCarets(true);
+  UpdateFinderCarets(true);
   BeginTiming;
   if OptInSelection and not FinderCarets.IsSelection then exit;
 
@@ -2027,7 +2027,7 @@ begin
   if Editor.ModeReadOnly then exit;
   Editor.Strings.SetNewCommandMark;
 
-  UpdateCarets(true);
+  UpdateFinderCarets(true);
   if OptInSelection and not FinderCarets.IsSelection then exit;
   UpdateFragments;
 
