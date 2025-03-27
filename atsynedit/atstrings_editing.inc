@@ -149,9 +149,7 @@ begin
       LastItem:= FList.GetItem(Count-1);
       bTrimRedundantEol:= (LastItem^.CharLen>0) and (LastItem^.LineEnds=TATLineEnds.None);
     end
-  end
-  else
-    bTrimRedundantEol:= bBlockWithEol; //was False before
+  end;
 
   if not bAtLineEnd then
   begin
