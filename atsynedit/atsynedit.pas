@@ -9363,11 +9363,14 @@ end;
 
 procedure TATSynEdit.EndUpdate;
 begin
-  Dec(FPaintLocked);
-  if FPaintLocked<0 then
-    FPaintLocked:= 0;
-  if FPaintLocked=0 then
-    Invalidate;
+  if FPaintLocked<=0 then
+    FPaintLocked:= 0
+  else
+  begin
+    Dec(FPaintLocked);
+    if FPaintLocked=0 then
+      Invalidate;
+  end;
 end;
 
 function TATSynEdit.IsLocked: boolean;
