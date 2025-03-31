@@ -5526,7 +5526,7 @@ begin
   FOptGutterWidthLineStates:= cInitGutterWidthLineStates;
   FOptGutterIcons:= TATEditorGutterIcons.PlusMinus;
 
-  FGutterDecorAlignment:= taCenter;
+  FGutterDecorAlignment:= taLeftJustify;
   FGutterBandDecor:= -1;
 
   FGutter.Add(-1, cInitGutterWidthBookmarks,  ATEditorOptions.GutterTagBookmarks,  true, true);
@@ -9690,7 +9690,7 @@ procedure TATSynEdit.DoPaintGutterDecor(C: TCanvas; ALine: integer; const ARect:
   var
     Style, StylePrev: TFontStyles;
     Ext: TSize;
-    NText, NImageIndex, NImageCount: integer;
+    NLeftPos, NImageIndex, NImageCount: integer;
     bPaintIcon: boolean;
     DecorText: string;
   begin
@@ -9718,16 +9718,16 @@ procedure TATSynEdit.DoPaintGutterDecor(C: TCanvas; ALine: integer; const ARect:
 
       case FGutterDecorAlignment of
         taCenter:
-          NText:= (ARect.Left+ARect.Right-Ext.cx) div 2;
+          NLeftPos:= (ARect.Left+ARect.Right-Ext.cx) div 2;
         taLeftJustify:
-          NText:= ARect.Left;
+          NLeftPos:= ARect.Left;
         taRightJustify:
-          NText:= ARect.Right-Ext.cx;
+          NLeftPos:= ARect.Right-Ext.cx;
       end;
 
       C.Brush.Style:= bsClear;
       C.TextOut(
-        NText,
+        NLeftPos,
         (ARect.Top+ARect.Bottom-Ext.cy) div 2,
         DecorText
         );
@@ -9738,8 +9738,17 @@ procedure TATSynEdit.DoPaintGutterDecor(C: TCanvas; ALine: integer; const ARect:
     //paint decor icon
     if bPaintIcon then
     begin
+      case FGutterDecorAlignment of
+        taCenter:
+          NLeftPos:= (ARect.Left+ARect.Right-FGutterDecorImages.Width) div 2;
+        taLeftJustify:
+          NLeftPos:= ARect.Left;
+        taRightJustify:
+          NLeftPos:= ARect.Right-FGutterDecorImages.Width;
+      end;
+
       FGutterDecorImages.Draw(C,
-          (ARect.Left+ARect.Right-FGutterDecorImages.Width) div 2,
+          NLeftPos,
           (ARect.Top+ARect.Bottom-FGutterDecorImages.Height) div 2,
           NImageIndex
           );
