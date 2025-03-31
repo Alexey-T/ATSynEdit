@@ -4828,7 +4828,8 @@ begin
   GutterItem:= FGutter[NBandDecor];
   if GutterItem.Visible then
     if WrapItem.bInitial then
-      DoPaintGutterDecor(C, NLinesIndex,
+      DoPaintGutterDecor(C,
+        NLinesIndex,
         Rect(
           GutterItem.Left,
           ARect.Top,
