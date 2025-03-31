@@ -1381,7 +1381,8 @@ type
     procedure DoPaintGutterFolding(C: TCanvas;
       AWrapItemIndex, AFoldRangeWithCaret: integer;
       ACoord1, ACoord2: TPoint);
-    procedure DoPaintGutterDecor(C: TCanvas; ALine: integer; const ARect: TRect);
+    procedure DoPaintGutterDecor(C: TCanvas; ALine: integer; const ARect: TRect;
+      out AIconPainted: boolean);
     procedure DoPaintGutterBandBG(C: TCanvas; AColor: TColor; AX1, AY1, AX2,
       AY2: integer; AEntireHeight: boolean);
     procedure DoPaintLockedWarning(C: TCanvas);
@@ -4780,7 +4781,7 @@ var
   WrapItem: TATWrapItem;
   LineState: TATLineState;
   GutterItem: TATGutterItem;
-  bLineWithCaret, bHandled: boolean;
+  bLineWithCaret, bHandled, bIconPainted: boolean;
   NLinesIndex, NBandDecor, NBookmarkIndex: integer;
   TempRect: TRect;
 begin
@@ -4789,6 +4790,7 @@ begin
   NLinesIndex:= WrapItem.NLineIndex;
   if not St.IsIndexValid(NLinesIndex) then exit;
   bLineWithCaret:= IsLineWithCaret(NLinesIndex);
+  bIconPainted:= false;
 
   Inc(ARect.Top, FTextOffsetFromTop);
 
@@ -4832,7 +4834,9 @@ begin
           ARect.Top,
           GutterItem.Right,
           ARect.Bottom
-          ));
+          ),
+        bIconPainted
+        );
 
   //gutter band: bookmark
   GutterItem:= FGutter[FGutterBandBookmarks];
@@ -4848,6 +4852,13 @@ begin
           GutterItem.Right,
           ARect.Bottom
           );
+
+        if bIconPainted then
+        begin
+          Inc(TempRect.Left, ImagesGutterDecor.Width div 2);
+          Inc(TempRect.Right, ImagesGutterDecor.Width div 2);
+        end;
+
         bHandled:= false;
         DoEventDrawBookmarkIcon(
           C,
@@ -9665,7 +9676,8 @@ begin
   C.Pen.Width:= OldPenWidth;
 end;
 
-procedure TATSynEdit.DoPaintGutterDecor(C: TCanvas; ALine: integer; const ARect: TRect);
+procedure TATSynEdit.DoPaintGutterDecor(C: TCanvas; ALine: integer; const ARect: TRect;
+  out AIconPainted: boolean);
   //
   procedure PaintDecorItem(var Decor: TATGutterDecorItem);
   var
@@ -9739,6 +9751,7 @@ var
   Decor: PATGutterDecorItem;
   NItem: integer;
 begin
+  AIconPainted:= false;
   if FGutterDecor=nil then exit;
   NItem:= FGutterDecor.Find(ALine);
   if NItem<0 then exit;
@@ -9746,13 +9759,17 @@ begin
   //paint first found item
   Decor:= FGutterDecor.ItemPtr(NItem);
   PaintDecorItem(Decor^);
+  AIconPainted:= not Decor^.IsBackgroundFill;
 
   //paint next item, if first one is background-filler
   if Decor^.IsBackgroundFill and FGutterDecor.IsIndexValid(NItem+1) then
   begin
     Decor:= FGutterDecor.ItemPtr(NItem+1);
     if Decor^.Data.LineNum=ALine then
+    begin
       PaintDecorItem(Decor^);
+      AIconPainted:= true;
+    end;
   end;
 end;
 
