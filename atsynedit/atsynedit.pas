@@ -4853,6 +4853,7 @@ begin
           ARect.Bottom
           );
 
+        //if decor's icon was painted on this place before, shift current bookmark's icon to the right
         if bIconPainted then
         begin
           if Assigned(FGutterDecorImages) then
