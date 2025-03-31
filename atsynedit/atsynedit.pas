@@ -4782,7 +4782,7 @@ var
   LineState: TATLineState;
   GutterItem: TATGutterItem;
   bLineWithCaret, bHandled, bIconPainted: boolean;
-  NLinesIndex, NBandDecor, NBookmarkIndex: integer;
+  NLinesIndex, NBandDecor, NBookmarkIndex, NShift2ndIcon: integer;
   TempRect: TRect;
 begin
   St:= Strings;
@@ -4855,8 +4855,13 @@ begin
 
         if bIconPainted then
         begin
-          Inc(TempRect.Left, ImagesGutterDecor.Width div 2);
-          Inc(TempRect.Right, ImagesGutterDecor.Width div 2);
+          if Assigned(FGutterDecorImages) then
+            NShift2ndIcon:= FGutterDecorImages.Width * ATEditorOptions.GutterShift2ndIconRightByPercents div 100
+          else
+            NShift2ndIcon:= 16 div 2;
+          NShift2ndIcon:= DoScaleFont(NShift2ndIcon);
+          Inc(TempRect.Left, NShift2ndIcon);
+          Inc(TempRect.Right, NShift2ndIcon);
         end;
 
         bHandled:= false;

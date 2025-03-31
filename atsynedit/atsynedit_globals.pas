@@ -56,6 +56,7 @@ type
     SampleChar = '0';
     MaxVisibleColumns = 500;
     MaxLineLenToCalculateAutoIndent = 200;
+    GutterShift2ndIconRightByPercents = 50;
 
     GutterTagBookmarks = 1;
     GutterTagNumbers = 2;
