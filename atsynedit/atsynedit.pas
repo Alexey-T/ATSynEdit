@@ -568,7 +568,7 @@ type
     cInitFoldTooltipLineCount = 15;
     cInitFoldTooltipWidthPercents = 80;
     cInitMinLineLenToCalcURL = 4;
-    cInitMaxLineLenToCalcURL = 1200; //AliExpress has URLs of len 520
+    cInitMaxLineLenToCalcURL = 5000; //AliExpress has URLs of len 520, but for text files with long paragraphs we need bigger limit
     cInitDragDropMarkerWidth = 4;
     cInitStapleHiliteAlpha = 180;
     cInitZebraAlphaBlend = 235;
