@@ -2794,7 +2794,7 @@ begin
         if Editor.IsPosInVisibleArea(Res.PosBegin.X, Res.PosBegin.Y) then
           bMatchVisible:= true;
 
-      //single line attr
+      //single line attrib
       if Res.PosBegin.Y=Res.PosEnd.Y then
       begin
         PosX:= Res.PosBegin.X;
@@ -2811,7 +2811,8 @@ begin
           );
       end
       else
-      //add N attrs per each line of a match
+      //multi-line attrib
+      //add N attribs per each line of a match
       for iLine:= Res.PosBegin.Y to Res.PosEnd.Y do
         if St.IsIndexValid(iLine) then
         begin
