@@ -300,9 +300,15 @@ begin
     end;
 
     AShift.Y:= Max(1, APosAfter.Y-AY - IfThen(bBlockWithEol, 1));
+    //to check that AShift.Y is ok:
+    //paste eg 3-lines block, when eg 4 carets exist below (on different lines),
+    //and check how 4 carets were shifted down.
 
     DoEventLog(AY);
-    DoEventChange(TATLineChangeKind.Added, AY, NBlockOriginalCount);
+    DoEventChange(TATLineChangeKind.Added, AY, AShift.Y);
+    //to check DoEventChange params are ok:
+    //paste eg 3-lines block, when a bookmark exists below,
+    //and check how bookmark was shifted down.
 
   finally
     FreeAndNil(Block);
