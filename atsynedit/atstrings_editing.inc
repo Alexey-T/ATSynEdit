@@ -299,7 +299,7 @@ begin
       APosAfter.X:= LinesLen[APosAfter.Y];
     end;
 
-    AShift.Y:= APosAfter.Y-AY;
+    AShift.Y:= Max(1, APosAfter.Y-AY - IfThen(bBlockWithEol, 1));
 
     DoEventLog(AY);
     DoEventChange(TATLineChangeKind.Added, AY, NBlockOriginalCount);
