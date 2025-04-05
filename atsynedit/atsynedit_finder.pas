@@ -2801,6 +2801,7 @@ begin
         PosY:= Res.PosBegin.Y;
         SelY:= 0;
         SelX:= Abs(Res.PosEnd.X-Res.PosBegin.X);
+        if SelX=PosX then Continue; //don't add attrib for zero-len match
         Editor.Attribs.Add(
           Point(PosX, PosY),
           Point(SelX, SelY),
