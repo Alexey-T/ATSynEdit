@@ -299,7 +299,7 @@ begin
       APosAfter.X:= LinesLen[APosAfter.Y];
     end;
 
-    AShift.Y:= Max(1, APosAfter.Y-AY - IfThen(bBlockWithEol, 1));
+    AShift.Y:= Max(1, APosAfter.Y-AY - IfThen(bBlockWithEol and bAtLineEnd, 1));
     //to check that AShift.Y is ok:
     //paste eg 3-lines block, when eg 4 carets exist below (on different lines),
     //and check how 4 carets were shifted down.
