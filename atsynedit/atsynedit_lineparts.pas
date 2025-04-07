@@ -87,7 +87,7 @@ begin
   v1:= Byte(c1 shr 16);
   v2:= Byte(c2 shr 16);
   b:= Byte(A * (v1 - v2) shr 8 + v2);
-  Result := (b shl 16) + (g shl 8) + r;
+  Result := Longint(b shl 16) + (g shl 8) + r;
 end;
 
 function ColorBlendHalf(c1, c2: Longint): Longint;
@@ -103,7 +103,7 @@ begin
   v1:= Byte(c1 shr 16);
   v2:= Byte(c2 shr 16);
   b:= Byte((v1+v2) shr 1);
-  Result := (b shl 16) + (g shl 8) + r;
+  Result := Longint(b shl 16) + (g shl 8) + r;
 end;
 
 procedure InitLinePart(out Part: TATLinePart);
