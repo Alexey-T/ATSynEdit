@@ -96,13 +96,13 @@ var
 begin
   v1:= Byte(c1);
   v2:= Byte(c2);
-  r:= (v1+v2) shr 1;
+  r:= Byte((v1+v2) shr 1);
   v1:= Byte(c1 shr 8);
   v2:= Byte(c2 shr 8);
-  g:= (v1+v2) shr 1;
+  g:= Byte((v1+v2) shr 1);
   v1:= Byte(c1 shr 16);
   v2:= Byte(c2 shr 16);
-  b:= (v1+v2) shr 1;
+  b:= Byte((v1+v2) shr 1);
   Result := (b shl 16) + (g shl 8) + r;
 end;
 
