@@ -80,13 +80,13 @@ var
 begin
   v1:= Byte(c1);
   v2:= Byte(c2);
-  r:= A * (v1 - v2) shr 8 + v2;
+  r:= Byte(A * (v1 - v2) shr 8 + v2); //typecast is required, to avoid range-error in $R+
   v1:= Byte(c1 shr 8);
   v2:= Byte(c2 shr 8);
-  g:= A * (v1 - v2) shr 8 + v2;
+  g:= Byte(A * (v1 - v2) shr 8 + v2);
   v1:= Byte(c1 shr 16);
   v2:= Byte(c2 shr 16);
-  b:= A * (v1 - v2) shr 8 + v2;
+  b:= Byte(A * (v1 - v2) shr 8 + v2);
   Result := (b shl 16) + (g shl 8) + r;
 end;
 
