@@ -388,10 +388,8 @@ var
   MaxCount, i: integer;
 begin
   if CharIndex<1 then exit(false);
-  if CharIndex>Length(SLine) then exit(false);
-
   MaxCount:= Min(Length(SFind), Length(SLine)-CharIndex+1);
-  if MaxCount=0 then exit(true); //True for empty text
+  if MaxCount<=0 then exit(true); //True for empty text
 
   pf:= @SFind[1];
   ps:= @SLine[CharIndex];
