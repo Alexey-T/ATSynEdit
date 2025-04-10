@@ -381,7 +381,6 @@ function STestStringMatch(
   CharIndex: integer;
   CaseSens: boolean): boolean;
 //- if CaseSens=False, SFind must be already in uppercase
-//- CharIndex check must be in caller
 //- function must return True for empty SFind (it's used in backward search for multi-line text)
 var
   pf, ps: PWideChar;
@@ -389,6 +388,8 @@ var
   MaxCount, i: integer;
 begin
   if CharIndex<1 then exit(false);
+  if CharIndex>Length(SLine) then exit(false);
+
   MaxCount:= Min(Length(SFind), Length(SLine)-CharIndex+1);
   if MaxCount=0 then exit(true); //True for empty text
 
