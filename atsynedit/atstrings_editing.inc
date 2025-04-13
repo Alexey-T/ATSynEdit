@@ -292,7 +292,7 @@ begin
       APosAfter.Y:= AY+NBlockOriginalCount-1;
     end;
 
-    //make sure caret won't go after text end, due to unfixed bugs (currently cannot reproduce)
+    //make sure caret won't go after text end
     if not IsIndexValid(APosAfter.Y) then
     begin
       APosAfter.Y:= Count-1;
