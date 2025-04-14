@@ -113,7 +113,8 @@ var
   Block: TATStrings;
   BlockUTF8: TStringList;
   bTrimRedundantEol, bInsertSingleLine,
-  bAtLineEnd, bAtFileEnd, bAtEmptyLine, bBlockWithEol: boolean;
+  bAtLineEnd, bAtFileEnd, bAtEmptyLine,
+  bBlockWithEol, bBlockBeginsWithEol: boolean;
   NBlockOriginalCount, NBlockLastCount, NBlockLastLineLen,
   NDeleteLen, NLineOfBlockInsert, iLine: SizeInt;
 begin
@@ -131,6 +132,7 @@ begin
   StrTail:= '';
 
   bBlockWithEol:= SEndsWithEol(AText);
+  bBlockBeginsWithEol:= IsCharEol(AText[1]);
   bAtLineEnd:= AX>=Length(Str);
   bAtFileEnd:= bAtLineEnd and (AY>=Count-1);
   bAtEmptyLine:= Str='';
@@ -304,7 +306,7 @@ begin
 
     AShift.Y:= Max(1,
       APosAfter.Y - AY
-      - IfThen((bBlockWithEol and bAtLineEnd) and not bAtEmptyLine, 1)
+      - IfThen(bBlockWithEol and not bBlockBeginsWithEol and bAtLineEnd and not bAtEmptyLine, 1)
       );
     //to check that AShift.Y is ok:
     //paste eg 3-lines block, when eg 4 carets exist below (on different lines),
