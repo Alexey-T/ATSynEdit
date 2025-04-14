@@ -114,7 +114,7 @@ var
   BlockUTF8: TStringList;
   bTrimRedundantEol, bInsertSingleLine,
   bAtLineEnd, bAtFileEnd, bAtEmptyLine, bBlockWithEol: boolean;
-  NBlockOriginalCount, NBlockLastCount,
+  NBlockOriginalCount, NBlockLastCount, NBlockLastLineLen,
   NDeleteLen, NLineOfBlockInsert, iLine: SizeInt;
 begin
   AShift.X:= 0;
@@ -218,6 +218,7 @@ begin
     NBlockOriginalCount:= Block.Count;
     if Block.Count=0 then Exit;
     NLineOfBlockInsert:= AY;
+    NBlockLastLineLen:= Block.LinesLen[Block.Count-1];
 
     if StrTail<>'' then
     begin
@@ -288,7 +289,7 @@ begin
     end
     else
     begin
-      APosAfter.X:= Block.LinesLen[Block.Count-1];
+      APosAfter.X:= NBlockLastLineLen;
       APosAfter.Y:= AY+NBlockOriginalCount-1;
     end;
 
