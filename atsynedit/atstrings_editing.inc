@@ -114,7 +114,8 @@ var
   BlockUTF8: TStringList;
   bTrimRedundantEol, bInsertSingleLine,
   bAtLineEnd, bAtFileEnd, bAtEmptyLine,
-  bBlockWithEol, bBlockBeginsWithEol: boolean;
+  //bBlockBeginsWithEol,
+  bBlockWithEol: boolean;
   NBlockOriginalCount, NBlockLastCount, NBlockLastLineLen,
   NDeleteLen, NLineOfBlockInsert, iLine: SizeInt;
 begin
@@ -132,7 +133,7 @@ begin
   StrTail:= '';
 
   bBlockWithEol:= SEndsWithEol(AText);
-  bBlockBeginsWithEol:= IsCharEol(AText[1]);
+  //bBlockBeginsWithEol:= IsCharEol(AText[1]);
   bAtLineEnd:= AX>=Length(Str);
   bAtFileEnd:= bAtLineEnd and (AY>=Count-1);
   bAtEmptyLine:= Str='';
