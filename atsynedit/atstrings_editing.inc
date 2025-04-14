@@ -305,8 +305,11 @@ begin
     end;
 
     AShift.Y:= APosAfter.Y-AY;
+    {
+    //commented to fix CudaText #5925
     if bBlockWithEol and not bBlockBeginsWithEol and bAtLineEnd and not bAtEmptyLine then
       Dec(AShift.Y);
+      }
     AShift.Y:= Max(1, AShift.Y);
     //to check that AShift.Y is ok:
     //paste eg 3-lines block, when eg 4 carets exist below (on different lines),
