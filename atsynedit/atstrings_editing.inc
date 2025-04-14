@@ -304,10 +304,10 @@ begin
       APosAfter.X:= LinesLen[APosAfter.Y];
     end;
 
-    AShift.Y:= Max(1,
-      APosAfter.Y - AY
-      - IfThen(bBlockWithEol and not bBlockBeginsWithEol and bAtLineEnd and not bAtEmptyLine, 1)
-      );
+    AShift.Y:= APosAfter.Y-AY;
+    if bBlockWithEol and not bBlockBeginsWithEol and bAtLineEnd and not bAtEmptyLine then
+      Dec(AShift.Y);
+    AShift.Y:= Max(1, AShift.Y);
     //to check that AShift.Y is ok:
     //paste eg 3-lines block, when eg 4 carets exist below (on different lines),
     //and check how 4 carets were shifted down.
