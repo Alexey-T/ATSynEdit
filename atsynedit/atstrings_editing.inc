@@ -265,7 +265,7 @@ begin
        again: a) b) c)
     }
 
-    if not (bBlockWithEol and bAtLineEnd) then
+    if not (bBlockWithEol and bAtLineEnd and not bAtEmptyLine) then
       Block.ActionDeleteFakeLine;
 
     NBlockLastCount:= Block.Count;
