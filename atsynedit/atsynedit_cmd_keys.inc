@@ -118,7 +118,7 @@ end;
 function TATSynEdit.DoCommand_KeyLeft(ASelCommand: boolean): TATCommandResults;
 var
   Caret: TATCaretItem;
-  bMultiCarets: boolean;
+  bMultiCarets, bKeepSel: boolean;
   i: integer;
 begin
   //changed because of issue CudaText#3065
@@ -131,7 +131,9 @@ begin
     Caret:= FCarets[i];
     if not Strings.IsIndexValid(Caret.PosY) then Continue;
 
-    if not ASelCommand and FOptKeyLeftRightSwapSel and Caret.SwapEdge(true, FOptKeyLeftRightSwapSelAndSelect) then
+    bKeepSel:= not ASelCommand and FOptKeyLeftRightSwapSel and Caret.SwapEdge(true, FOptKeyLeftRightSwapSelAndSelect);
+
+    if bKeepSel then
     begin
       //none
     end
@@ -151,7 +153,7 @@ begin
     end;
 
     //fixing CudaText #4391
-    if not ASelCommand and bMultiCarets then
+    if not ASelCommand and not bKeepSel then
       Caret.SelectNone
     else
     if not bMultiCarets and Caret.IsSelectionEmpty then
@@ -163,7 +165,7 @@ function TATSynEdit.DoCommand_KeyRight(ASelCommand: boolean): TATCommandResults;
 var
   St: TATStrings;
   Caret: TATCaretItem;
-  bMultiCarets: boolean;
+  bMultiCarets, bKeepSel: boolean;
   i: integer;
 begin
   //changed because of issue CudaText#3065
@@ -177,7 +179,9 @@ begin
     Caret:= FCarets[i];
     if not St.IsIndexValid(Caret.PosY) then Continue;
 
-    if not ASelCommand and FOptKeyLeftRightSwapSel and Caret.SwapEdge(false, FOptKeyLeftRightSwapSelAndSelect) then
+    bKeepSel:= not ASelCommand and FOptKeyLeftRightSwapSel and Caret.SwapEdge(false, FOptKeyLeftRightSwapSelAndSelect);
+
+    if bKeepSel then
     begin
       //none
     end
@@ -197,7 +201,7 @@ begin
     end;
 
     //fixing CudaText #4391
-    if not ASelCommand and bMultiCarets then
+    if not ASelCommand and not bKeepSel then
       Caret.SelectNone
     else
     if not bMultiCarets and Caret.IsSelectionEmpty then
