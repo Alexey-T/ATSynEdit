@@ -279,7 +279,7 @@ begin
     begin
       if IsIndexValid(NLineOfBlockInsert+iLine) then
       begin
-        if (iLine=NBlockLastCount-1) and not bBlockWithEol and bAtEmptyLine then
+        if (iLine=NBlockLastCount-1) and not bBlockWithEol and bAtEmptyLine then //to fix redundant newline on pasting "11<eol>22"
           Lines[NLineOfBlockInsert+iLine]:= Block.Lines[iLine]
         else
           LineInsert(NLineOfBlockInsert+iLine, Block.Lines[iLine], false);
