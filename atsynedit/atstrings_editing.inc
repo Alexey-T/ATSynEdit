@@ -278,7 +278,12 @@ begin
     for iLine:= 0 to NBlockLastCount-1 do
     begin
       if IsIndexValid(NLineOfBlockInsert+iLine) then
-        LineInsert(NLineOfBlockInsert+iLine, Block.Lines[iLine], false)
+      begin
+        if (iLine=NBlockLastCount-1) and not bBlockWithEol and bAtEmptyLine then
+          Lines[NLineOfBlockInsert+iLine]:= Block.Lines[iLine]
+        else
+          LineInsert(NLineOfBlockInsert+iLine, Block.Lines[iLine], false);
+      end
       else
         LineAdd(Block.Lines[iLine]);
     end;
