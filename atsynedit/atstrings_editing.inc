@@ -228,7 +228,7 @@ begin
       if not bBlockWithEol then
       begin
         Lines[AY]:= Block.Lines[Block.Count-1]+StrTail;
-        Block.LineDelete(Block.Count-1);
+        Block.LineDelete(Block.Count-1, false, false, false);
       end
       else
         Lines[AY]:= StrTail;
