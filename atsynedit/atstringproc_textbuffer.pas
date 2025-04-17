@@ -279,7 +279,7 @@ end;
 
 function TATStringBuffer.LineLength(N: integer): integer;
 begin
-  if (N<0) or (N>=Count) then
+  if (N<0) or (N>=Count-1) then
     Result:= 0
   else
     Result:= FList[N+1]-FList[N]-LenEOL;
