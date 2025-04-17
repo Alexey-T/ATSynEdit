@@ -23,7 +23,6 @@ type
     FCaret,
     FMarkers,
     FDragDropMarker,
-    FGitMarkerBG,
     FGutterFont,
     FGutterBG,
     FGutterCaretFont,
@@ -76,7 +75,6 @@ type
     property Caret: TColor read FCaret write FCaret;
     property Markers: TColor read FMarkers write FMarkers;
     property DragDropMarker: TColor read FDragDropMarker write FDragDropMarker;
-    property GitMarkerBG: TColor read FGitMarkerBG write FGitMarkerBG;
     property GutterFont: TColor read FGutterFont write FGutterFont;
     property GutterBG: TColor read FGutterBG write FGutterBG;
     property GutterCaretFont: TColor read FGutterCaretFont write FGutterCaretFont;
@@ -137,7 +135,6 @@ begin
   C.Caret:= clBlack;
   C.Markers:= $0000c0;
   C.DragDropMarker:= C.Markers;
-  C.GitMarkerBG:= C.Markers;
   C.GutterFont:= clGray;
   C.GutterBG:= $e0e0e0;
   C.GutterCaretFont:= clGray;
