@@ -278,10 +278,10 @@ end;
 
 function TATStringBuffer.LineLength(N: integer): integer;
 begin
-  if (N<0) or (N>=Count-1) then
-    Result:= 0
+  if (N>=0) and (N+1<Count) then
+    Result:= FList[N+1]-FList[N]-LenEOL
   else
-    Result:= FList[N+1]-FList[N]-LenEOL;
+    Result:= 0;
 end;
 
 function TATStringBuffer.OffsetToOffsetOfLineStart(APos: integer): integer;
