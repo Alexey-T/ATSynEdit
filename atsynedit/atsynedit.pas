@@ -1169,7 +1169,9 @@ type
     procedure DebugFindWrapIndex;
     function DoCalcIndentCharsFromPrevLines(AX, AY: integer): integer;
     procedure DoCalcPosColor(AX, AY: integer; var AColor: TColor; AMainText: boolean);
-    procedure DoCalcLineEntireColor(ALine: integer; AUseColorOfCurrentLine: boolean;
+    procedure DoCalcLineEntireColor(ALine: integer;
+      AUseColorOfCurrentLine: boolean;
+      AUseColorOfCurrentLine2: boolean;
       out AColor: TColor; out AColorForced: boolean;
       out AChosenEnum: TATEditorChosenBackColor;
       AHiliteLineWithSelection: boolean);
@@ -4101,7 +4103,8 @@ var
   NSubPos, NSubLen: integer;
   bHiliteLinesWithSelection: boolean;
   bTrimmedNonSpaces: boolean;
-  bUseColorOfCurrentLine: boolean;
+  bUseColorOfCurrentLine,
+  bUseColorOfCurrentLine2: boolean;
 begin
   St:= Strings;
   bHiliteLinesWithSelection:= false;
@@ -4231,11 +4234,13 @@ begin
   C.Font.Color:= FColorFont;
 
   bUseColorOfCurrentLine:= false;
+  bUseColorOfCurrentLine2:= false;
   if bLineWithCaret then
     if FOptShowCurLine and (not FOptShowCurLineOnlyFocused or FIsEntered) then
     begin
+      bUseColorOfCurrentLine2:= not IsWrapItemWithCaret(WrapItem);
       if FOptShowCurLineMinimal then
-        bUseColorOfCurrentLine:= IsWrapItemWithCaret(WrapItem)
+        bUseColorOfCurrentLine:= not bUseColorOfCurrentLine2
       else
         bUseColorOfCurrentLine:= true;
     end;
@@ -4243,6 +4248,7 @@ begin
   DoCalcLineEntireColor(
     NLinesIndex,
     bUseColorOfCurrentLine,
+    bUseColorOfCurrentLine2,
     NColorEntire,
     bLineColorForced,
     ChosenBackColorEnum,
@@ -4650,7 +4656,8 @@ var
   ChosenBackColorEnum: TATEditorChosenBackColor;
   bLineColorForced: boolean;
   bUseSetPixel: boolean;
-  bUseColorOfCurrentLine: boolean;
+  bUseColorOfCurrentLine,
+  bUseColorOfCurrentLine2: boolean;
 begin
   St:= Strings;
   bUseSetPixel:=
@@ -4674,10 +4681,12 @@ begin
   CurrPointText.Y:= CurrPoint.Y;
 
   bUseColorOfCurrentLine:= false;
+  bUseColorOfCurrentLine2:= false;
 
   DoCalcLineEntireColor(
     NLinesIndex,
     bUseColorOfCurrentLine,
+    bUseColorOfCurrentLine2,
     NColorEntire,
     bLineColorForced,
     ChosenBackColorEnum,

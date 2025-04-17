@@ -332,6 +332,7 @@ end;
 
 procedure TATSynEdit.DoCalcLineEntireColor(ALine: integer;
   AUseColorOfCurrentLine: boolean;
+  AUseColorOfCurrentLine2: boolean;
   out AColor: TColor; out AColorForced: boolean;
   out AChosenEnum: TATEditorChosenBackColor;
   AHiliteLineWithSelection: boolean);
@@ -354,13 +355,19 @@ begin
   //Colors.CurrentLineBG should be assigned _after_ Colors.MarkedLinesBG
   if AUseColorOfCurrentLine then
   begin
-    AColor:= Colors.CurrentLineBG;
+    if AUseColorOfCurrentLine2 and (Colors.CurrentLineBG2<>clNone) then
+      AColor:= Colors.CurrentLineBG2
+    else
+      AColor:= Colors.CurrentLineBG;
     AChosenEnum:= TATEditorChosenBackColor.CurrentLineBG;
   end
   else
   if AHiliteLineWithSelection and TempSel_IsLineWithSelection(ALine) then
   begin
-    AColor:= Colors.CurrentLineBG;
+    if AUseColorOfCurrentLine2 and (Colors.CurrentLineBG2<>clNone) then
+      AColor:= Colors.CurrentLineBG2
+    else
+      AColor:= Colors.CurrentLineBG;
     AChosenEnum:= TATEditorChosenBackColor.CurrentLineBG;
   end
   else

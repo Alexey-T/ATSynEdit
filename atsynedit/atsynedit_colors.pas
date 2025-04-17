@@ -32,6 +32,7 @@ type
     FGutterFoldBG,
     FGutterSeparatorBG,
     FCurrentLineBG,
+    FCurrentLineBG2,
     FMarginRight,
     FMarginCaret,
     FMarginUser,
@@ -83,7 +84,8 @@ type
     property GutterFoldLine2: TColor read FGutterFoldLine2 write FGutterFoldLine2;
     property GutterFoldBG: TColor read FGutterFoldBG write FGutterFoldBG;
     property GutterSeparatorBG: TColor read FGutterSeparatorBG write FGutterSeparatorBG;
-    property CurrentLineBG: TColor read FCurrentLineBG write FCurrentLineBG;
+    property CurrentLineBG: TColor read FCurrentLineBG write FCurrentLineBG; //for wrapped part with caret
+    property CurrentLineBG2: TColor read FCurrentLineBG2 write FCurrentLineBG2; //for wrapped part(s) without caret
     property MarginRight: TColor read FMarginRight write FMarginRight;
     property MarginCaret: TColor read FMarginCaret write FMarginCaret;
     property MarginUser: TColor read FMarginUser write FMarginUser;
@@ -144,6 +146,7 @@ begin
   C.GutterFoldBG:= $c8c8c8;
   C.GutterSeparatorBG:= clBlack;
   C.CurrentLineBG:= $d0f0d0;
+  C.CurrentLineBG2:= clNone;
   C.BookmarkBG:= clMoneyGreen;
   C.BookmarkIcon:= clMedGray;
   C.RulerBG:= C.GutterBG;
