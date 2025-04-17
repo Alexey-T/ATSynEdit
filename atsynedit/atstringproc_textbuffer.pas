@@ -48,8 +48,7 @@ type
     function TextLength: integer;
     function OffsetOfLineIndex(N: integer): integer;
     function LineLength(N: integer): integer;
-    function OffsetToDistanceFromLineStart(APos: integer): integer; inline;
-    function OffsetToOffsetOfLineStart(APos: integer): integer; inline;
+    function OffsetToOffsetOfLineStart(APos: integer): integer;
     function OffsetToOffsetOfLineEnd(APos: integer): integer;
     property Count: integer read GetCount;
     property OnChange: TATStringBufferChange read FOnChange write FOnChange;
@@ -285,28 +284,9 @@ begin
     Result:= FList[N+1]-FList[N]-LenEOL;
 end;
 
-(*
-//old code, seems it's slower so del'ed
 function TATStringBuffer.OffsetToOffsetOfLineStart(APos: integer): integer;
-var
-  N: integer;
 begin
-  N:= StrToCaret(APos).Y;
-  Result:= OffsetOfLineIndex(N);
-end;
-
-function TATStringBuffer.OffsetToOffsetOfLineEnd(APos: integer): integer;
-var
-  N: integer;
-begin
-  N:= StrToCaret(APos).Y;
-  Result:= OffsetOfLineIndex(N)+LineLength(N);
-end;
-*)
-
-function TATStringBuffer.OffsetToOffsetOfLineStart(APos: integer): integer; inline;
-begin
-  Result:= APos-OffsetToDistanceFromLineStart(APos);
+  Result:= APos-StrToCaret(APos).X;
 end;
 
 function TATStringBuffer.OffsetToOffsetOfLineEnd(APos: integer): integer;
@@ -316,12 +296,6 @@ begin
   NLine:= StrToCaret(APos).Y;
   Result:= OffsetOfLineIndex(NLine+1)-LenEOL;
 end;
-
-function TATStringBuffer.OffsetToDistanceFromLineStart(APos: integer): integer; inline;
-begin
-  Result:= StrToCaret(APos).X;
-end;
-
 
 end.
 
