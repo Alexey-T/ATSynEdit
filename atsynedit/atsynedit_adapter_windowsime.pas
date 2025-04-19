@@ -346,7 +346,8 @@ begin
               end;}
               UpdateCompForm(Sender);
             end;
-          end;
+          end else
+            buffer[0]:=#0;
       finally
         ImmReleaseContext(Ed.Handle,IMC);
       end;
