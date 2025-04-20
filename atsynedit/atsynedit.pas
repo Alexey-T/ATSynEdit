@@ -8684,10 +8684,12 @@ begin
             P.X:= (ABand.Left + ABand.Right - NNumberWidth) div 2;
         end;
 
-        Inc(P.Y, FTextOffsetFromTop);
-
         C.Brush.Style:= bsClear;
-        CanvasTextOutSimplest(C, P.X, P.Y+FPaddingTop, SText);
+        CanvasTextOutSimplest(C,
+          P.X,
+          P.Y+FTextOffsetFromTop+FPaddingTop,
+          SText
+          );
       end;
   end;
 end;
