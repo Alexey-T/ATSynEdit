@@ -1015,7 +1015,7 @@ var
       tick:= GetTickCount64;
     _TextOut_Unix(C.Handle,
       APosX+PixOffset1,
-      APosY+AProps.TextOffsetFromLine,
+      APosY+AProps.TextOffsetFromLine+AProps.PaddingTop,
       @PartRect,
       Buf,
       DxPointer
