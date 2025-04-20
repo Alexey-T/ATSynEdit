@@ -70,11 +70,11 @@ type
     CharIndexInLine: integer; //for part of long wrapped line, this is the char index of part's begin
     CharSize: TATEditorCharSize;
     CharsSkipped: integer; //count of chars removed from the line start, before passing line to renderer
-    PaddingTop: integer; //line spacing above the text
     TrimmedTrailingNonSpaces: boolean; //lines's trailing non-space chars were removed before passing line to renderer (for speedup for too long line)
     DrawEvent: TATSynEditDrawLineEvent;
     ControlWidth: integer; //width of editor control, plus small delta to render 2 edge chars
-    TextOffsetFromLine: integer; //Y offset, additional to Y coord of line (to emulate indent of 1st line from top edge)
+    PaddingTopEdge: integer; //Y offset, additional to Y coord of line (to emulate indent of 1st line from top edge)
+    PaddingTop: integer; //Y offset, from text inside each line
     ShowUnprinted: boolean; //unprinted chars: global enabling flag
     ShowUnprintedSpacesTrailing: boolean;
     ShowUnprintedSpacesBothEnds: boolean;
@@ -971,7 +971,7 @@ var
       tick:= GetTickCount64;
     _TextOut_Windows(C.Handle,
       APosX+PixOffset1,
-      APosY+AProps.TextOffsetFromLine+AProps.PaddingTop,
+      APosY+AProps.PaddingTopEdge+AProps.PaddingTop,
       @PartRect,
       BufW,
       DxPointer,
@@ -1015,7 +1015,7 @@ var
       tick:= GetTickCount64;
     _TextOut_Unix(C.Handle,
       APosX+PixOffset1,
-      APosY+AProps.TextOffsetFromLine+AProps.PaddingTop,
+      APosY+AProps.PaddingTopEdge+AProps.PaddingTop,
       @PartRect,
       Buf,
       DxPointer
@@ -1184,7 +1184,7 @@ begin
           PartStr,
           @Dx.Data[PartOffset],
           APosX+PixOffset1,
-          APosY+AProps.TextOffsetFromLine+AProps.PaddingTop,
+          APosY+AProps.PaddingTopEdge+AProps.PaddingTop,
           AProps.CharSize,
           AProps.ColorUnprintedHexFont,
           PartPtr^.ColorBG,
@@ -1215,7 +1215,7 @@ begin
       {$IF Defined(LCLWin32)}
       _TextOut_Windows(C.Handle,
         APosX+PixOffset1,
-        APosY+AProps.TextOffsetFromLine+AProps.PaddingTop,
+        APosY+AProps.PaddingTopEdge+AProps.PaddingTop,
         nil,
         PartStr,
         nil,
@@ -1224,7 +1224,7 @@ begin
       {$else}
       _TextOut_Unix(C.Handle,
         APosX+PixOffset1,
-        APosY+AProps.TextOffsetFromLine+AProps.PaddingTop,
+        APosY+AProps.PaddingTopEdge+AProps.PaddingTop,
         nil,
         PartStr,
         nil

@@ -4344,11 +4344,11 @@ begin
       TextOutProps.CharIndexInLine:= WrapItem.NCharIndex;
       TextOutProps.CharSize:= ACharSize;
       TextOutProps.CharsSkipped:= NOutputCellPercentsSkipped div 100;
-      TextOutProps.PaddingTop:= FPaddingTop;
       TextOutProps.TrimmedTrailingNonSpaces:= bTrimmedNonSpaces;
       TextOutProps.DrawEvent:= Event;
       TextOutProps.ControlWidth:= ClientWidth+ACharSize.XScaled div ATEditorCharXScale * 2;
-      TextOutProps.TextOffsetFromLine:= FTextOffsetFromTop;
+      TextOutProps.PaddingTopEdge:= FTextOffsetFromTop;
+      TextOutProps.PaddingTop:= FPaddingTop;
 
       TextOutProps.ShowUnprinted:= FUnprintedVisible and FUnprintedSpaces;
       TextOutProps.ShowUnprintedSpacesTrailing:= FUnprintedSpacesTrailing;
@@ -10489,7 +10489,7 @@ begin
   TextOutProps.CharsSkipped:= 0;
   TextOutProps.DrawEvent:= nil;
   TextOutProps.ControlWidth:= ARect.Width;
-  TextOutProps.TextOffsetFromLine:= FTextOffsetFromTop;
+  TextOutProps.PaddingTopEdge:= FTextOffsetFromTop;
   TextOutProps.PaddingTop:= FPaddingTop;
 
   TextOutProps.ShowUnprinted:= FUnprintedVisible and FUnprintedSpaces;
