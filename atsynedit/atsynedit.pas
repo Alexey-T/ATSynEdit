@@ -5227,7 +5227,7 @@ begin
 
   C.TextOut(
     ACoordX+ATEditorOptions.FoldedMarkIndentInner,
-    ACoordY+FTextOffsetFromTop,
+    ACoordY+FTextOffsetFromTop+FPaddingTop,
     Str);
   NWidth:= C.TextWidth(Str) + 2*ATEditorOptions.FoldedMarkIndentInner;
 
