@@ -928,10 +928,10 @@ procedure CanvasTextOut(C: TCanvas;
     C.Brush.Style:= cTextoutBrushStyle;
 
     {$ifdef LCLWin32}
-    _TextOut_Windows(C.Handle, APosX, APosY, nil, BufW, DxPointer, false{no ligatures});
+    _TextOut_Windows(C.Handle, APosX, APosY+AProps.PaddingTop, nil, BufW, DxPointer, false{no ligatures});
     {$else}
     Buf:= BufW;
-    _TextOut_Unix(C.Handle, APosX, APosY, nil, Buf, DxPointer);
+    _TextOut_Unix(C.Handle, APosX, APosY+AProps.PaddingTop, nil, Buf, DxPointer);
     {$endif}
   end;
   //
