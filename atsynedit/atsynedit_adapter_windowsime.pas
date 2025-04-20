@@ -304,6 +304,7 @@ begin
                                    False);
               FSelText:='';
               HideCompForm;
+              buffer[0]:=#0;
             end;
             { insert composition string }
             if imeCode and GCS_COMPSTR<>0 then begin
@@ -345,7 +346,8 @@ begin
               end;}
               UpdateCompForm(Sender);
             end;
-          end;
+          end else
+            buffer[0]:=#0;
       finally
         ImmReleaseContext(Ed.Handle,IMC);
       end;
@@ -362,6 +364,13 @@ var
 begin
   Ed:= TATSynEdit(Sender);
   position:=0;
+  if buffer[0]<>#0 then
+  begin
+    Ed.TextInsertAtCarets(buffer, False,
+                         Ed.ModeOverwrite and (Length(FSelText)=0),
+                         False);
+    FSelText:='';
+  end;
   Len:= Length(FSelText);
   Ed.TextInsertAtCarets(FSelText, False, False, Len>0);
   HideCompForm;
