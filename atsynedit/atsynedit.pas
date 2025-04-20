@@ -642,8 +642,10 @@ type
     FCursorMinimap: TCursor;
     FCursorMicromap: TCursor;
     FTextOffset: TPoint;
-    FTextOffsetFromTop: integer;
-    FTextOffsetFromTop1: integer;
+    FPaddingTopEdge: integer; //offset of entire text-rect from top edge
+    FPaddingTopEdge1: integer; //same as above, maybe with 1-2px adjustment
+    FPaddingTop: integer; //offset of text from line's top
+    FPaddingBottom: integer; //offset of text's bottom from line's bottom
     FTextHint: string;
     FTextHintFontStyle: TFontStyles;
     FTextHintCenter: boolean;
@@ -822,8 +824,6 @@ type
     end;
     FCharSize: TATEditorCharSize;
     FCharSizeMinimap: TATEditorCharSize;
-    FPaddingTop: integer;
-    FPaddingBottom: integer;
     FGutter: TATGutter;
     FGutterDecor: TATGutterDecor;
     FGutterDecorImages: TImageList;
@@ -3401,10 +3401,10 @@ begin
   UpdateCharSize(FCharSize, C, FPaddingTop, FPaddingBottom);
 
   if FPaddingBottom<0 then
-    FTextOffsetFromTop:= FPaddingBottom
+    FPaddingTopEdge:= FPaddingBottom
   else
-    FTextOffsetFromTop:= 0;
-  FTextOffsetFromTop1:= FTextOffsetFromTop; //"-1" gives artifacts on gutter bands
+    FPaddingTopEdge:= 0;
+  FPaddingTopEdge1:= FPaddingTopEdge; //"-1" gives artifacts on gutter bands
 
   if FMinimapCustomScale<=0 then
   begin
@@ -4082,9 +4082,9 @@ procedure TATSynEdit.DoPaintLine(C: TCanvas;
     C.Brush.Color:= AFillColor;
     C.FillRect(
       ARectLine.Left,
-      ARectLine.Top+FTextOffsetFromTop1,
+      ARectLine.Top+FPaddingTopEdge1,
       ARectLine.Right,
-      ARectLine.Bottom+FTextOffsetFromTop1
+      ARectLine.Bottom+FPaddingTopEdge1
       );
   end;
   //
@@ -4132,7 +4132,7 @@ begin
                     - AScrollHorz.SmoothPos
                     + AScrollHorz.NPixelOffset;
   CurrPointText.Y:= CurrPoint.Y;
-  Inc(CurrPointText.Y, FTextOffsetFromTop1);
+  Inc(CurrPointText.Y, FPaddingTopEdge1);
 
   bTrimmedNonSpaces:= false;
 
@@ -4347,7 +4347,7 @@ begin
       TextOutProps.TrimmedTrailingNonSpaces:= bTrimmedNonSpaces;
       TextOutProps.DrawEvent:= Event;
       TextOutProps.ControlWidth:= ClientWidth+ACharSize.XScaled div ATEditorCharXScale * 2;
-      TextOutProps.PaddingTopEdge:= FTextOffsetFromTop;
+      TextOutProps.PaddingTopEdge:= FPaddingTopEdge;
       TextOutProps.PaddingTop:= FPaddingTop;
 
       TextOutProps.ShowUnprinted:= FUnprintedVisible and FUnprintedSpaces;
@@ -4809,7 +4809,7 @@ begin
   bLineWithCaret:= IsLineWithCaret(NLinesIndex);
   bIconPainted:= false;
 
-  Inc(ARect.Top, FTextOffsetFromTop);
+  Inc(ARect.Top, FPaddingTopEdge);
 
   //paint area over scrolled text
   C.Brush.Color:= FColorGutterBG;
@@ -5227,7 +5227,7 @@ begin
 
   C.TextOut(
     ACoordX+ATEditorOptions.FoldedMarkIndentInner,
-    ACoordY+FTextOffsetFromTop+FPaddingTop,
+    ACoordY+FPaddingTopEdge+FPaddingTop,
     Str);
   NWidth:= C.TextWidth(Str) + 2*ATEditorOptions.FoldedMarkIndentInner;
 
@@ -8687,7 +8687,7 @@ begin
         C.Brush.Style:= bsClear;
         CanvasTextOutSimplest(C,
           P.X,
-          P.Y+FTextOffsetFromTop+FPaddingTop,
+          P.Y+FPaddingTopEdge+FPaddingTop,
           SText
           );
       end;
@@ -10065,7 +10065,7 @@ end;
 procedure TATSynEdit.DoPaintGutterPlusMinus(C: TCanvas; AX, AY: integer;
   APlus: boolean; ALineColor: TColor);
 begin
-  Inc(AY, FTextOffsetFromTop);
+  Inc(AY, FPaddingTopEdge);
 
   case OptGutterIcons of
     TATEditorGutterIcons.PlusMinus:
@@ -10489,7 +10489,7 @@ begin
   TextOutProps.CharsSkipped:= 0;
   TextOutProps.DrawEvent:= nil;
   TextOutProps.ControlWidth:= ARect.Width;
-  TextOutProps.PaddingTopEdge:= FTextOffsetFromTop;
+  TextOutProps.PaddingTopEdge:= FPaddingTopEdge;
   TextOutProps.PaddingTop:= FPaddingTop;
 
   TextOutProps.ShowUnprinted:= FUnprintedVisible and FUnprintedSpaces;
