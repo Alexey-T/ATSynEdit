@@ -536,8 +536,8 @@ type
     cInitRulerMarkBig = 7;
     cInitWrapMode = TATEditorWrapMode.ModeOff;
     cInitWrapEnabledForMaxLines = 60*1000;
-    cInitPaddingTop = 0;
-    cInitPaddingBottom = 1;
+    cInitSpacingTop = 0;
+    cInitSpacingBottom = 1;
     cInitCaretBlinkTime = 600;
     cInitMinimapVisible = false;
     cInitMinimapSelColorChange = 6; //how much minimap sel-rect is darker, in %
@@ -642,10 +642,10 @@ type
     FCursorMinimap: TCursor;
     FCursorMicromap: TCursor;
     FTextOffset: TPoint;
-    FPaddingTopEdge: integer; //offset of entire text-rect from top edge
-    FPaddingTopEdge1: integer; //same as above, maybe with 1-2px adjustment
-    FPaddingTop: integer; //offset of text from line's top
-    FPaddingBottom: integer; //offset of text's bottom from line's bottom
+    FSpacingTopEdge: integer; //offset of entire text-rect from top edge
+    FSpacingTopEdge1: integer; //same as above, maybe with 1-2px adjustment
+    FSpacingTop: integer; //offset of text from line's top
+    FSpacingBottom: integer; //offset of text's bottom from line's bottom
     FTextHint: string;
     FTextHintFontStyle: TFontStyles;
     FTextHintCenter: boolean;
@@ -810,8 +810,8 @@ type
     FPrevFont: record
       FontName: string;
       FontSize: integer;
-      PaddingTop: integer;
-      PaddingBottom: integer;
+      SpacingTop: integer;
+      SpacingBottom: integer;
       OptScaleFont: integer;
       GlobalScale: integer;
       GlobalScaleFont: integer;
@@ -1431,8 +1431,8 @@ type
     procedure SetMouseNiceScroll(AValue: boolean);
     procedure SetCaretManyAllowed(AValue: boolean);
     procedure SetCaretBlinkTime(AValue: integer);
-    procedure SetPaddingTop(AValue: integer);
-    procedure SetPaddingBottom(AValue: integer);
+    procedure SetSpacingTop(AValue: integer);
+    procedure SetSpacingBottom(AValue: integer);
     procedure SetMarginString(const AValue: string);
     procedure SetMicromapVisible(AValue: boolean);
     procedure SetMinimapVisible(AValue: boolean);
@@ -1481,7 +1481,7 @@ type
     function UpdateScrollInfoFromMessage(var AInfo: TATEditorScrollInfo; const AMsg: TLMScroll): boolean;
     procedure UpdateCaretsCoords(AOnlyLast: boolean=false; ASkipInvisible: boolean=false);
     procedure UpdateMarkersCoords;
-    procedure UpdateCharSize(var ACharSize: TATEditorCharSize; C: TCanvas; APaddingTop, APaddingBottom: integer);
+    procedure UpdateCharSize(var ACharSize: TATEditorCharSize; C: TCanvas; ASpacingTop, ASpacingBottom: integer);
     function GetScrollbarVisible(bVertical: boolean): boolean;
     procedure SetMarginRight(AValue: integer);
 
@@ -2170,8 +2170,8 @@ type
     property OptMicromapSelections: boolean read FMicromapSelections write FMicromapSelections default true;
     property OptMicromapBookmarks: boolean read FMicromapBookmarks write FMicromapBookmarks default cInitMicromapBookmarks;
     property OptMicromapShowForMinCount: integer read FMicromapShowForMinCount write FMicromapShowForMinCount default cInitMicromapShowForMinCount;
-    property OptPaddingTop: integer read FPaddingTop write SetPaddingTop default cInitPaddingTop;
-    property OptPaddingBottom: integer read FPaddingBottom write SetPaddingBottom default cInitPaddingBottom;
+    property OptSpacingTop: integer read FSpacingTop write SetSpacingTop default cInitSpacingTop;
+    property OptSpacingBottom: integer read FSpacingBottom write SetSpacingBottom default cInitSpacingBottom;
     property OptWrapMode: TATEditorWrapMode read FWrapMode write SetWrapMode default cInitWrapMode;
     property OptWrapIndented: boolean read FWrapIndented write SetWrapIndented default true;
     property OptWrapAddSpace: integer read FWrapAddSpace write FWrapAddSpace default 1;
@@ -3398,13 +3398,13 @@ begin
     FCharSizer:= TATCharSizer.Create(Self);
     FTabHelper.CharSizer:= FCharSizer;
   end;
-  UpdateCharSize(FCharSize, C, FPaddingTop, FPaddingBottom);
+  UpdateCharSize(FCharSize, C, FSpacingTop, FSpacingBottom);
 
-  if FPaddingBottom<0 then
-    FPaddingTopEdge:= FPaddingBottom
+  if FSpacingBottom<0 then
+    FSpacingTopEdge:= FSpacingBottom
   else
-    FPaddingTopEdge:= 0;
-  FPaddingTopEdge1:= FPaddingTopEdge; //"-1" gives artifacts on gutter bands
+    FSpacingTopEdge:= 0;
+  FSpacingTopEdge1:= FSpacingTopEdge; //"-1" gives artifacts on gutter bands
 
   if FMinimapCustomScale<=0 then
   begin
@@ -3761,7 +3761,7 @@ begin
 end;
 
 procedure TATSynEdit.UpdateCharSize(var ACharSize: TATEditorCharSize; C: TCanvas;
-  APaddingTop, APaddingBottom: integer);
+  ASpacingTop, ASpacingBottom: integer);
   //
   procedure UpdateFontProportional(TempC: TCanvas);
   begin
@@ -3777,16 +3777,16 @@ begin
   //user told that caching helps here, on low-spec PC
   if (FPrevFont.FontName=Self.Font.Name) and
     (FPrevFont.FontSize=Self.Font.Size) and
-    (FPrevFont.PaddingTop=APaddingTop) and
-    (FPrevFont.PaddingBottom=APaddingBottom) and
+    (FPrevFont.SpacingTop=ASpacingTop) and
+    (FPrevFont.SpacingBottom=ASpacingBottom) and
     (FPrevFont.OptScaleFont=FOptScaleFont) and
     (FPrevFont.GlobalScale=ATEditorScalePercents) and
     (FPrevFont.GlobalScaleFont=ATEditorScaleFontPercents) then exit;
 
   FPrevFont.FontName:= Self.Font.Name;
   FPrevFont.FontSize:= Self.Font.Size;
-  FPrevFont.PaddingTop:= APaddingTop;
-  FPrevFont.PaddingBottom:= APaddingBottom;
+  FPrevFont.SpacingTop:= ASpacingTop;
+  FPrevFont.SpacingBottom:= ASpacingBottom;
   FPrevFont.OptScaleFont:= FOptScaleFont;
   FPrevFont.GlobalScale:= ATEditorScalePercents;
   FPrevFont.GlobalScaleFont:= ATEditorScaleFontPercents;
@@ -3813,7 +3813,7 @@ begin
 
   ACharSize.XScaled:= Max(1, Size.cx) * ATEditorCharXScale div SampleStrLen;
 
-  ACharSize.Y:= Max(1, Size.cy + APaddingTop + APaddingBottom);
+  ACharSize.Y:= Max(1, Size.cy + ASpacingTop + ASpacingBottom);
 
   if FFontProportional then
     ACharSize.XSpacePercents:= FCharSizer.GetSpaceWidth
@@ -4082,9 +4082,9 @@ procedure TATSynEdit.DoPaintLine(C: TCanvas;
     C.Brush.Color:= AFillColor;
     C.FillRect(
       ARectLine.Left,
-      ARectLine.Top+FPaddingTopEdge1,
+      ARectLine.Top+FSpacingTopEdge1,
       ARectLine.Right,
-      ARectLine.Bottom+FPaddingTopEdge1
+      ARectLine.Bottom+FSpacingTopEdge1
       );
   end;
   //
@@ -4132,7 +4132,7 @@ begin
                     - AScrollHorz.SmoothPos
                     + AScrollHorz.NPixelOffset;
   CurrPointText.Y:= CurrPoint.Y;
-  Inc(CurrPointText.Y, FPaddingTopEdge1);
+  Inc(CurrPointText.Y, FSpacingTopEdge1);
 
   bTrimmedNonSpaces:= false;
 
@@ -4347,8 +4347,8 @@ begin
       TextOutProps.TrimmedTrailingNonSpaces:= bTrimmedNonSpaces;
       TextOutProps.DrawEvent:= Event;
       TextOutProps.ControlWidth:= ClientWidth+ACharSize.XScaled div ATEditorCharXScale * 2;
-      TextOutProps.PaddingTopEdge:= FPaddingTopEdge;
-      TextOutProps.PaddingTop:= FPaddingTop;
+      TextOutProps.SpacingTopEdge:= FSpacingTopEdge;
+      TextOutProps.SpacingTop:= FSpacingTop;
 
       TextOutProps.ShowUnprinted:= FUnprintedVisible and FUnprintedSpaces;
       TextOutProps.ShowUnprintedSpacesTrailing:= FUnprintedSpacesTrailing;
@@ -4809,7 +4809,7 @@ begin
   bLineWithCaret:= IsLineWithCaret(NLinesIndex);
   bIconPainted:= false;
 
-  Inc(ARect.Top, FPaddingTopEdge);
+  Inc(ARect.Top, FSpacingTopEdge);
 
   //paint area over scrolled text
   C.Brush.Color:= FColorGutterBG;
@@ -5227,7 +5227,7 @@ begin
 
   C.TextOut(
     ACoordX+ATEditorOptions.FoldedMarkIndentInner,
-    ACoordY+FPaddingTopEdge+FPaddingTop,
+    ACoordY+FSpacingTopEdge+FSpacingTop,
     Str);
   NWidth:= C.TextWidth(Str) + 2*ATEditorOptions.FoldedMarkIndentInner;
 
@@ -5601,8 +5601,8 @@ begin
   FMinimapTooltipFontSize:= 0;
   FMinimapHiliteLinesWithSelection:= true;
 
-  FPaddingTop:= cInitPaddingTop;
-  FPaddingBottom:= cInitPaddingBottom;
+  FSpacingTop:= cInitSpacingTop;
+  FSpacingBottom:= cInitSpacingBottom;
   FCharSizeMinimap.XScaled:= 1 * ATEditorCharXScale;
   FCharSizeMinimap.XSpacePercents:= 100;
   FCharSizeMinimap.Y:= 2;
@@ -6017,17 +6017,17 @@ begin
   FTimerBlink.Interval:= AValue;
 end;
 
-procedure TATSynEdit.SetPaddingTop(AValue: integer);
+procedure TATSynEdit.SetSpacingTop(AValue: integer);
 begin
-  if FPaddingTop=AValue then Exit;
-  FPaddingTop:= AValue;
+  if FSpacingTop=AValue then Exit;
+  FSpacingTop:= AValue;
   FWrapUpdateNeeded:= true;
 end;
 
-procedure TATSynEdit.SetPaddingBottom(AValue: integer);
+procedure TATSynEdit.SetSpacingBottom(AValue: integer);
 begin
-  if FPaddingBottom=AValue then Exit;
-  FPaddingBottom:= AValue;
+  if FSpacingBottom=AValue then Exit;
+  FSpacingBottom:= AValue;
   FWrapUpdateNeeded:= true;
 end;
 
@@ -6214,8 +6214,8 @@ begin
 
   Result.Y:= OptTextOffsetTop;
 
-  if FPaddingBottom<0 then
-    Result.Y:= Max(Result.Y, -FPaddingBottom*2); //*2 is needed to not clip the first line
+  if FSpacingBottom<0 then
+    Result.Y:= Max(Result.Y, -FSpacingBottom*2); //*2 is needed to not clip the first line
 
   if FOptRulerVisible then
     Inc(Result.Y, FRulerHeight);
@@ -8336,8 +8336,8 @@ begin
       C.Brush.Style:= bsClear;
       NCoordX:= ACaret.CoordX;
       NCoordY:= ACaret.CoordY;
-      if FPaddingBottom<0 then
-        Inc(NCoordY, FPaddingBottom);
+      if FSpacingBottom<0 then
+        Inc(NCoordY, FSpacingBottom);
       CanvasTextOutSimplest(C, NCoordX, NCoordY, UnicodeString(ACaret.CharAtCaret));
     end;
   end;
@@ -8687,7 +8687,7 @@ begin
         C.Brush.Style:= bsClear;
         CanvasTextOutSimplest(C,
           P.X,
-          P.Y+FPaddingTopEdge+FPaddingTop,
+          P.Y+FSpacingTopEdge+FSpacingTop,
           SText
           );
       end;
@@ -10065,7 +10065,7 @@ end;
 procedure TATSynEdit.DoPaintGutterPlusMinus(C: TCanvas; AX, AY: integer;
   APlus: boolean; ALineColor: TColor);
 begin
-  Inc(AY, FPaddingTopEdge);
+  Inc(AY, FSpacingTopEdge);
 
   case OptGutterIcons of
     TATEditorGutterIcons.PlusMinus:
@@ -10489,8 +10489,8 @@ begin
   TextOutProps.CharsSkipped:= 0;
   TextOutProps.DrawEvent:= nil;
   TextOutProps.ControlWidth:= ARect.Width;
-  TextOutProps.PaddingTopEdge:= FPaddingTopEdge;
-  TextOutProps.PaddingTop:= FPaddingTop;
+  TextOutProps.SpacingTopEdge:= FSpacingTopEdge;
+  TextOutProps.SpacingTop:= FSpacingTop;
 
   TextOutProps.ShowUnprinted:= FUnprintedVisible and FUnprintedSpaces;
   TextOutProps.ShowUnprintedSpacesTrailing:= FUnprintedSpacesTrailing;

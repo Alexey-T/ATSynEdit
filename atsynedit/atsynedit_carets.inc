@@ -573,7 +573,7 @@ begin
     );
 
   if Result.Y>=0 then
-    Inc(Result.Y, FPaddingTopEdge1);
+    Inc(Result.Y, FSpacingTopEdge1);
 
   {
   if OptWrapMode<>TATEditorWrapMode.ModeOff then
@@ -590,7 +590,7 @@ function TATSynEdit.ClientPosToCaretPos(
 begin
   if FOptScrollSmooth then
     Dec(APos.X, FScrollHorz.NPixelOffset); //fix for text partially scrolled, #5349
-  Dec(APos.Y, FPaddingTopEdge1);
+  Dec(APos.Y, FSpacingTopEdge1);
 
   {
   //for debugging breakpoint
