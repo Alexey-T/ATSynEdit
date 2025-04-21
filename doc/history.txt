@@ -1,5 +1,5 @@
 2025.04.20
-* change: removed OptSpacingY, added OptPaddingTop & OptPaddingBottom instead
+* change: removed prop OptSpacingY, added OptSpacingTop & OptSpacingBottom instead
 
 2025.04.17
 + add: Colors.CurrentLineBG2, it's used for wrapped line parts without caret
