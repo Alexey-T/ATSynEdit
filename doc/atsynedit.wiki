@@ -385,10 +385,6 @@ Attribs object is used in CudaText: app adds attr items to hilite brackets, to h
 
 If you add attrib item, create new object of type TATLinePartClass, fill its Data, and pass object to TATMarkers.Add. This object is freed automatically if attrib item deleted or all attribs cleared.
 
-=== Colors object ===
-
-Contains color properties of type TColor. For ex, Colors.TextFont is text font color, Colors.TextBG is text background color.
-
 === Gaps object ===
 
 type TATGaps in unit atsynedit_gaps. Holds list of items TATGapItem. Each item has properties:
