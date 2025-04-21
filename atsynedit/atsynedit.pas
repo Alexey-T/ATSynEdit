@@ -1480,7 +1480,7 @@ type
     function UpdateScrollInfoFromMessage(var AInfo: TATEditorScrollInfo; const AMsg: TLMScroll): boolean;
     procedure UpdateCaretsCoords(AOnlyLast: boolean=false; ASkipInvisible: boolean=false);
     procedure UpdateMarkersCoords;
-    procedure UpdateCharSize(var ACharSize: TATEditorCharSize; C: TCanvas; ASpacingTop, ASpacingBottom: integer);
+    procedure UpdateCharSize(var ACharSize: TATEditorCharSize; C: TCanvas);
     function GetScrollbarVisible(bVertical: boolean): boolean;
     procedure SetMarginRight(AValue: integer);
 
@@ -3397,7 +3397,7 @@ begin
     FCharSizer:= TATCharSizer.Create(Self);
     FTabHelper.CharSizer:= FCharSizer;
   end;
-  UpdateCharSize(FCharSize, C, FSpacingTop, FSpacingBottom);
+  UpdateCharSize(FCharSize, C);
 
   if FSpacingBottom<0 then
     FSpacingTopEdge:= FSpacingBottom
@@ -3759,8 +3759,7 @@ begin
   end;
 end;
 
-procedure TATSynEdit.UpdateCharSize(var ACharSize: TATEditorCharSize; C: TCanvas;
-  ASpacingTop, ASpacingBottom: integer);
+procedure TATSynEdit.UpdateCharSize(var ACharSize: TATEditorCharSize; C: TCanvas);
   //
   procedure UpdateFontProportional(TempC: TCanvas);
   begin
@@ -3776,16 +3775,16 @@ begin
   //user told that caching helps here, on low-spec PC
   if (FPrevFont.FontName=Self.Font.Name) and
     (FPrevFont.FontSize=Self.Font.Size) and
-    (FPrevFont.SpacingTop=ASpacingTop) and
-    (FPrevFont.SpacingBottom=ASpacingBottom) and
+    (FPrevFont.SpacingTop=FSpacingTop) and
+    (FPrevFont.SpacingBottom=FSpacingBottom) and
     (FPrevFont.OptScaleFont=FOptScaleFont) and
     (FPrevFont.GlobalScale=ATEditorScalePercents) and
     (FPrevFont.GlobalScaleFont=ATEditorScaleFontPercents) then exit;
 
   FPrevFont.FontName:= Self.Font.Name;
   FPrevFont.FontSize:= Self.Font.Size;
-  FPrevFont.SpacingTop:= ASpacingTop;
-  FPrevFont.SpacingBottom:= ASpacingBottom;
+  FPrevFont.SpacingTop:= FSpacingTop;
+  FPrevFont.SpacingBottom:= FSpacingBottom;
   FPrevFont.OptScaleFont:= FOptScaleFont;
   FPrevFont.GlobalScale:= ATEditorScalePercents;
   FPrevFont.GlobalScaleFont:= ATEditorScaleFontPercents;
@@ -3812,7 +3811,7 @@ begin
 
   ACharSize.XScaled:= Max(1, Size.cx) * ATEditorCharXScale div SampleStrLen;
 
-  ACharSize.Y:= Max(1, Size.cy + ASpacingTop + ASpacingBottom);
+  ACharSize.Y:= Max(1, Size.cy + FSpacingTop + FSpacingBottom);
 
   if FFontProportional then
     ACharSize.XSpacePercents:= FCharSizer.GetSpaceWidth
