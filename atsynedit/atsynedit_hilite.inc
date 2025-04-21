@@ -197,10 +197,10 @@ begin
         if bSel then
         begin
           if not FOptKeepSelFontColor then
-            ColorFont:= FColors.TextSelFont
+            ColorFont:= Colors.TextSelFont
           else
-            ColorFont:= FColors.TextFont;
-          ColorBG:= FColors.TextSelBG;
+            ColorFont:= Colors.TextFont;
+          ColorBG:= Colors.TextSelBG;
         end
         else
         begin

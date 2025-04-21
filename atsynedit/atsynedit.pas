@@ -835,7 +835,6 @@ type
     FGutterBandSeparator: integer;
     FGutterBandEmpty: integer;
     FGutterBandDecor: integer;
-    FColors: TATEditorColors;
     FColorFont: TColor;
     FColorBG: TColor;
     FColorGutterBG: TColor;
@@ -1611,6 +1610,7 @@ type
     procedure InvalidateEx(AForceRepaint, AForceOnScroll: boolean);
 
   public
+    Colors: TATEditorColors;
     TagString: string; //to store plugin specific data in CudaText
     ModifiedOptions: TATEditorModifiedOptions;
 
@@ -1997,7 +1997,6 @@ type
     property CursorGutterNumbers: TCursor read FCursorGutterNumbers write FCursorGutterNumbers default crDefault;
     property CursorMinimap: TCursor read FCursorMinimap write FCursorMinimap default crDefault;
     property CursorMicromap: TCursor read FCursorMicromap write FCursorMicromap default crDefault;
-    property Colors: TATEditorColors read FColors write FColors stored false;
     property ImagesGutterDecor: TImageList read FGutterDecorImages write FGutterDecorImages;
     property WantTabs: boolean read FWantTabs write FWantTabs default true;
     property WantReturns: boolean read FWantReturns write FWantReturns default true;
@@ -5391,8 +5390,7 @@ begin
   FPaintLocked:= 0;
   FPaintFlags:= [TATEditorInternalFlag.Bitmap];
 
-  FColors:= TATEditorColors.Create;
-  InitDefaultColors(FColors);
+  Colors.Init;
   InitEditorMouseActions(FMouseActions, false);
 
   FCursorText:= crIBeam;
@@ -5851,7 +5849,6 @@ begin
   if Assigned(FGutterDecor) then
     FreeAndNil(FGutterDecor);
   FreeAndNil(FBitmap);
-  FreeAndNil(FColors);
   FreeAndNil(FLinkCache);
   FreeAndNil(FFontItalic);
   FreeAndNil(FFontBold);

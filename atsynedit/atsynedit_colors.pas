@@ -5,181 +5,127 @@ License: MPL 2.0 or LGPL
 unit ATSynEdit_Colors;
 
 {$mode objfpc}{$H+}
+{$ModeSwitch advancedrecords}
 
 interface
 
 uses
-  Classes, SysUtils, Graphics;
+  Graphics;
 
 type
-  TATEditorColors = class(TPersistent)
-  private
-    FTextFont,
-    FTextBG,
-    FTextDisabledFont,
-    FTextDisabledBG,
-    FTextSelFont,
-    FTextSelBG,
-    FCaret,
-    FMarkers,
-    FDragDropMarker,
-    FGutterFont,
-    FGutterBG,
-    FGutterCaretFont,
-    FGutterCaretBG,
-    FGutterFoldLine,
-    FGutterFoldLine2,
-    FGutterFoldBG,
-    FGutterSeparatorBG,
-    FCurrentLineBG,
-    FCurrentLineBG2,
-    FMarginRight,
-    FMarginCaret,
-    FMarginUser,
-    FIndentVertLines,
-    FBookmarkBG,
-    FBookmarkIcon,
-    FRulerFont,
-    FRulerBG,
-    FCollapseLine,
-    FCollapseMarkFont,
-    FCollapseMarkBG,
-    FCollapseMarkBorder,
-    FUnprintedFont,
-    FUnprintedBG,
-    FUnprintedHexFont,
-    FMinimapBorder,
-    FMinimapTooltipBG,
-    FMinimapTooltipBorder,
-    FStateChanged,
-    FStateAdded,
-    FStateSaved,
-    FTextHintFont,
-    FBlockStaple,
-    FBlockStapleForCaret,
-    FBlockSepLine,
-    FLinks,
-    FLockedBG,
-    FMarkedLinesBG,
-    FBorderLine,
-    FBorderLineFocused,
-    FBorderParentBG,
-    FComboboxArrow,
-    FComboboxArrowBG: TColor;
-  published
-    property TextFont: TColor read FTextFont write FTextFont;
-    property TextBG: TColor read FTextBG write FTextBG;
-    property TextDisabledFont: TColor read FTextDisabledFont write FTextDisabledFont;
-    property TextDisabledBG: TColor read FTextDisabledBG write FTextDisabledBG;
-    property TextSelFont: TColor read FTextSelFont write FTextSelFont;
-    property TextSelBG: TColor read FTextSelBG write FTextSelBG;
-    property Caret: TColor read FCaret write FCaret;
-    property Markers: TColor read FMarkers write FMarkers;
-    property DragDropMarker: TColor read FDragDropMarker write FDragDropMarker;
-    property GutterFont: TColor read FGutterFont write FGutterFont;
-    property GutterBG: TColor read FGutterBG write FGutterBG;
-    property GutterCaretFont: TColor read FGutterCaretFont write FGutterCaretFont;
-    property GutterCaretBG: TColor read FGutterCaretBG write FGutterCaretBG;
-    property GutterFoldLine: TColor read FGutterFoldLine write FGutterFoldLine;
-    property GutterFoldLine2: TColor read FGutterFoldLine2 write FGutterFoldLine2;
-    property GutterFoldBG: TColor read FGutterFoldBG write FGutterFoldBG;
-    property GutterSeparatorBG: TColor read FGutterSeparatorBG write FGutterSeparatorBG;
-    property CurrentLineBG: TColor read FCurrentLineBG write FCurrentLineBG; //for wrapped part with caret
-    property CurrentLineBG2: TColor read FCurrentLineBG2 write FCurrentLineBG2; //for wrapped part(s) without caret
-    property MarginRight: TColor read FMarginRight write FMarginRight;
-    property MarginCaret: TColor read FMarginCaret write FMarginCaret;
-    property MarginUser: TColor read FMarginUser write FMarginUser;
-    property IndentVertLines: TColor read FIndentVertLines write FIndentVertLines;
-    property BookmarkBG: TColor read FBookmarkBG write FBookmarkBG;
-    property BookmarkIcon: TColor read FBookmarkIcon write FBookmarkIcon;
-    property RulerFont: TColor read FRulerFont write FRulerFont;
-    property RulerBG: TColor read FRulerBG write FRulerBG;
-    property CollapseLine: TColor read FCollapseLine write FCollapseLine;
-    property CollapseMarkFont: TColor read FCollapseMarkFont write FCollapseMarkFont;
-    property CollapseMarkBG: TColor read FCollapseMarkBG write FCollapseMarkBG;
-    property CollapseMarkBorder: TColor read FCollapseMarkBorder write FCollapseMarkBorder;
-    property UnprintedFont: TColor read FUnprintedFont write FUnprintedFont;
-    property UnprintedBG: TColor read FUnprintedBG write FUnprintedBG;
-    property UnprintedHexFont: TColor read FUnprintedHexFont write FUnprintedHexFont;
-    property MinimapBorder: TColor read FMinimapBorder write FMinimapBorder;
-    property MinimapTooltipBG: TColor read FMinimapTooltipBG write FMinimapTooltipBG;
-    property MinimapTooltipBorder: TColor read FMinimapTooltipBorder write FMinimapTooltipBorder;
-    property StateChanged: TColor read FStateChanged write FStateChanged;
-    property StateAdded: TColor read FStateAdded write FStateAdded;
-    property StateSaved: TColor read FStateSaved write FStateSaved;
-    property BlockStaple: TColor read FBlockStaple write FBlockStaple;
-    property BlockStapleForCaret: TColor read FBlockStapleForCaret write FBlockStapleForCaret;
-    property BlockSepLine: TColor read FBlockSepLine write FBlockSepLine;
-    property Links: TColor read FLinks write FLinks;
-    property LockedBG: TColor read FLockedBG write FLockedBG;
-    property TextHintFont: TColor read FTextHintFont write FTextHintFont;
-    property MarkedLinesBG: TColor read FMarkedLinesBG write FMarkedLinesBG;
-    property BorderLine: TColor read FBorderLine write FBorderLine;
-    property BorderLineFocused: TColor read FBorderLineFocused write FBorderLineFocused;
-    property BorderParentBG: TColor read FBorderParentBG write FBorderParentBG;
-    property ComboboxArrow: TColor read FComboboxArrow write FComboboxArrow;
-    property ComboboxArrowBG: TColor read FComboboxArrowBG write FComboboxArrowBG;
+  TATEditorColors = record
+    TextFont,
+    TextBG,
+    TextDisabledFont,
+    TextDisabledBG,
+    TextSelFont,
+    TextSelBG,
+    Caret,
+    Markers,
+    DragDropMarker,
+    GutterFont,
+    GutterBG,
+    GutterCaretFont,
+    GutterCaretBG,
+    GutterFoldLine,
+    GutterFoldLine2,
+    GutterFoldBG,
+    GutterSeparatorBG,
+    CurrentLineBG,
+    CurrentLineBG2,
+    MarginRight,
+    MarginCaret,
+    MarginUser,
+    IndentVertLines,
+    BookmarkBG,
+    BookmarkIcon,
+    RulerFont,
+    RulerBG,
+    CollapseLine,
+    CollapseMarkFont,
+    CollapseMarkBG,
+    CollapseMarkBorder,
+    UnprintedFont,
+    UnprintedBG,
+    UnprintedHexFont,
+    MinimapBorder,
+    MinimapTooltipBG,
+    MinimapTooltipBorder,
+    StateChanged,
+    StateAdded,
+    StateSaved,
+    TextHintFont,
+    BlockStaple,
+    BlockStapleForCaret,
+    BlockSepLine,
+    Links,
+    LockedBG,
+    MarkedLinesBG,
+    BorderLine,
+    BorderLineFocused,
+    BorderParentBG,
+    ComboboxArrow,
+    ComboboxArrowBG: TColor;
+    procedure Init;
   end;
-
-procedure InitDefaultColors(C: TATEditorColors);
 
 
 implementation
 
-procedure InitDefaultColors(C: TATEditorColors);
+procedure TATEditorColors.Init;
 begin
-  C.TextFont:= clBlack;
-  C.TextBG:= clWhite;
-  C.TextSelFont:= clHighlightText;
-  C.TextSelBG:= clHighlight;
-  C.TextDisabledFont:= clGray;
-  C.TextDisabledBG:= $f0f0f0;
-  C.Caret:= clBlack;
-  C.Markers:= $0000c0;
-  C.DragDropMarker:= C.Markers;
-  C.GutterFont:= clGray;
-  C.GutterBG:= $e0e0e0;
-  C.GutterCaretFont:= clGray;
-  C.GutterCaretBG:= $c8c8c8;
-  C.GutterFoldLine:= clGray;
-  C.GutterFoldLine2:= $904040;
-  C.GutterFoldBG:= $c8c8c8;
-  C.GutterSeparatorBG:= clBlack;
-  C.CurrentLineBG:= $d0f0d0;
-  C.CurrentLineBG2:= clNone;
-  C.BookmarkBG:= clMoneyGreen;
-  C.BookmarkIcon:= clMedGray;
-  C.RulerBG:= C.GutterBG;
-  C.RulerFont:= clGray;
-  C.CollapseLine:= $a06060;
-  C.CollapseMarkFont:= $e08080;
-  C.CollapseMarkBG:= clCream;
-  C.CollapseMarkBorder:= $e08080;
-  C.MarginRight:= clLtGray;
-  C.MarginCaret:= clLime;
-  C.MarginUser:= clYellow;
-  C.IndentVertLines:= clMedGray;
-  C.UnprintedFont:= $5050f0;
-  C.UnprintedBG:= $e0e0e0;
-  C.UnprintedHexFont:= clMedGray;
-  C.MinimapBorder:= clLtGray;
-  C.MinimapTooltipBG:= clMoneyGreen;
-  C.MinimapTooltipBorder:= clGray;
-  C.StateChanged:= $00f0f0;
-  C.StateAdded:= $20c020;
-  C.StateSaved:= clMedGray;
-  C.TextHintFont:= clGray;
-  C.BlockStaple:= clMedGray;
-  C.BlockStapleForCaret:= clNone;
-  C.BlockSepLine:= clMedGray;
-  C.Links:= clBlue;
-  C.LockedBG:= $e0e0e0;
-  C.MarkedLinesBG:= $f0e0b0;
-  C.BorderLine:= clMedGray;
-  C.BorderLineFocused:= clNavy;
-  C.BorderParentBG:= clWindow;
-  C.ComboboxArrow:= clGray;
-  C.ComboboxArrowBG:= $f0f0f0;
+  TextFont:= clBlack;
+  TextBG:= clWhite;
+  TextSelFont:= clHighlightText;
+  TextSelBG:= clHighlight;
+  TextDisabledFont:= clGray;
+  TextDisabledBG:= $f0f0f0;
+  Caret:= clBlack;
+  Markers:= $0000c0;
+  DragDropMarker:= Markers;
+  GutterFont:= clGray;
+  GutterBG:= $e0e0e0;
+  GutterCaretFont:= clGray;
+  GutterCaretBG:= $c8c8c8;
+  GutterFoldLine:= clGray;
+  GutterFoldLine2:= $904040;
+  GutterFoldBG:= $c8c8c8;
+  GutterSeparatorBG:= clBlack;
+  CurrentLineBG:= $d0f0d0;
+  CurrentLineBG2:= clNone;
+  BookmarkBG:= clMoneyGreen;
+  BookmarkIcon:= clMedGray;
+  RulerBG:= GutterBG;
+  RulerFont:= clGray;
+  CollapseLine:= $a06060;
+  CollapseMarkFont:= $e08080;
+  CollapseMarkBG:= clCream;
+  CollapseMarkBorder:= $e08080;
+  MarginRight:= clLtGray;
+  MarginCaret:= clLime;
+  MarginUser:= clYellow;
+  IndentVertLines:= clMedGray;
+  UnprintedFont:= $5050f0;
+  UnprintedBG:= $e0e0e0;
+  UnprintedHexFont:= clMedGray;
+  MinimapBorder:= clLtGray;
+  MinimapTooltipBG:= clMoneyGreen;
+  MinimapTooltipBorder:= clGray;
+  StateChanged:= $00f0f0;
+  StateAdded:= $20c020;
+  StateSaved:= clMedGray;
+  TextHintFont:= clGray;
+  BlockStaple:= clMedGray;
+  BlockStapleForCaret:= clNone;
+  BlockSepLine:= clMedGray;
+  Links:= clBlue;
+  LockedBG:= $e0e0e0;
+  MarkedLinesBG:= $f0e0b0;
+  BorderLine:= clMedGray;
+  BorderLineFocused:= clNavy;
+  BorderParentBG:= clWindow;
+  ComboboxArrow:= clGray;
+  ComboboxArrowBG:= $f0f0f0;
 end;
 
 end.
