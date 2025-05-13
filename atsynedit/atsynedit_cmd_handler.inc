@@ -426,7 +426,7 @@ begin
       end;
 
     cCommand_KeyUp:
-      Result:= DoCommand_KeyUpDown(false, 1, false);
+      Result:= DoCommand_KeyUpDown(false, 1, false, false);
     cCommand_KeyUp_Sel:
       begin
         {
@@ -436,11 +436,11 @@ begin
           Result:= DoCommand_KeyUpDown(false, 1, false);
           }
         OptMouseColumnSelectionWithoutKey:= false;
-        Result:= DoCommand_KeyUpDown(false, 1, false);
+        Result:= DoCommand_KeyUpDown(false, 1, false, true);
       end;
 
     cCommand_KeyDown:
-      Result:= DoCommand_KeyUpDown(true, 1, false);
+      Result:= DoCommand_KeyUpDown(true, 1, false, false);
     cCommand_KeyDown_Sel:
       begin
         {
@@ -450,7 +450,7 @@ begin
           Result:= DoCommand_KeyUpDown(true, 1, false);
           }
         OptMouseColumnSelectionWithoutKey:= false;
-        Result:= DoCommand_KeyUpDown(true, 1, false);
+        Result:= DoCommand_KeyUpDown(true, 1, false, true);
       end;
 
     cCommand_KeyHome:
@@ -482,7 +482,7 @@ begin
       end;
 
     cCommand_KeyPageUp:
-      Result:= DoCommand_KeyUpDown(false, GetPageLines, FOptKeyPageKeepsRelativePos);
+      Result:= DoCommand_KeyUpDown(false, GetPageLines, FOptKeyPageKeepsRelativePos, false);
     cCommand_KeyPageUp_Sel:
       begin
         {
@@ -492,11 +492,11 @@ begin
           Result:= DoCommand_KeyUpDown(false, GetPageLines, FOptKeyPageKeepsRelativePos);
           }
         OptMouseColumnSelectionWithoutKey:= false;
-        Result:= DoCommand_KeyUpDown(false, GetPageLines, FOptKeyPageKeepsRelativePos);
+        Result:= DoCommand_KeyUpDown(false, GetPageLines, FOptKeyPageKeepsRelativePos, true);
       end;
 
     cCommand_KeyPageDown:
-      Result:= DoCommand_KeyUpDown(true, GetPageLines, FOptKeyPageKeepsRelativePos);
+      Result:= DoCommand_KeyUpDown(true, GetPageLines, FOptKeyPageKeepsRelativePos, false);
     cCommand_KeyPageDown_Sel:
       begin
         {
@@ -506,7 +506,7 @@ begin
           Result:= DoCommand_KeyUpDown(true, GetPageLines, FOptKeyPageKeepsRelativePos);
           }
         OptMouseColumnSelectionWithoutKey:= false;
-        Result:= DoCommand_KeyUpDown(true, GetPageLines, FOptKeyPageKeepsRelativePos);
+        Result:= DoCommand_KeyUpDown(true, GetPageLines, FOptKeyPageKeepsRelativePos, true);
       end;
 
     cCommand_ColSelectLeft:        Result:= DoCommand_SelectColumnToDirection(TATEditorSelectColumnDirection.Left);

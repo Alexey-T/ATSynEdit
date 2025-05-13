@@ -23,10 +23,12 @@ const
   _base_KeyPageUp   = 106 or cCmdFlag_Caret;
   _base_KeyPageDown = 107 or cCmdFlag_Caret;
 
-  cCommand_KeyUp           = _base_KeyUp or cCmdFlag_ResetSel;
-  cCommand_KeyDown         = _base_KeyDown or cCmdFlag_ResetSel;
-  cCommand_KeyLeft         = _base_KeyLeft; //handles sel
-  cCommand_KeyRight        = _base_KeyRight; //handles sel
+  cCommand_KeyUp           = _base_KeyUp;
+  cCommand_KeyDown         = _base_KeyDown;
+    //why KeyUp/KeyDown don't have cCmdFlag_ResetSel? because we need to support this feature:
+    //multi-line selection, caret on bottom. pressing Up must move caret from _top_ edge of selection.
+  cCommand_KeyLeft         = _base_KeyLeft;
+  cCommand_KeyRight        = _base_KeyRight;
     //why KeyLeft/KeyRight don't have cCmdFlag_ResetSel? because we need to support this feature:
     //Left with selection moves caret to left sel edge;
     //Right with selection moves caret to right sel edge.

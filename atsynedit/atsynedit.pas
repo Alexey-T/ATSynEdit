@@ -1561,7 +1561,7 @@ type
     function DoCommand_KeyEnd: TATCommandResults;
     function DoCommand_KeyLeft(ASelCommand: boolean): TATCommandResults;
     function DoCommand_KeyRight(ASelCommand: boolean): TATCommandResults;
-    function DoCommand_KeyUpDown(ADown: boolean; ALines: integer; AKeepRelativePos: boolean): TATCommandResults;
+    function DoCommand_KeyUpDown(ADown: boolean; ALines: integer; AKeepRelativePos, AWithSel: boolean): TATCommandResults;
     function DoCommand_KeyUpDown_NextLine(ADown: boolean; ALines: integer): TATCommandResults;
     function DoCommand_KeyUpDown_Wrapped(ADown: boolean; ALines: integer): TATCommandResults;
     function DoCommand_TextBackspace: TATCommandResults;
