@@ -5646,11 +5646,19 @@ begin
   FOptKeyBackspaceUnindent:= true;
   FOptKeyBackspaceGoesToPrevLine:= true;
   FOptKeyPageKeepsRelativePos:= true;
+  FOptKeyPageUpDownSize:= TATEditorPageDownSize.FullMinus1;
   FOptKeyUpDownNavigateWrapped:= true;
   FOptKeyUpDownAllowToEdge:= false;
   FOptKeyUpDownKeepColumn:= true;
   FOptKeyUpDownSwapSel:= true;
+  FOptKeyLeftRightGoToNextLineWithCarets:= true;
+  FOptKeyLeftRightSwapSel:= true;
+  FOptKeyLeftRightSwapSelAndSelect:= false;
+  FOptKeyEndToNonSpace:= true;
+  FOptKeyHomeToNonSpace:= true;
   FOptKeyHomeEndNavigateWrapped:= true;
+  FOptKeyTabIndents:= true;
+  FOptKeyTabIndentsVerticalBlock:= false;
 
   FOptOverwriteAllowedOnPaste:= false;
   FOptNonWordChars:= ATEditorOptions.DefaultNonWordChars;
@@ -5703,16 +5711,6 @@ begin
   FOptShowCurLineIfWithoutSel:= true;
   FOptShowCurColumn:= false;
   FOptShowMouseSelFrame:= cInitShowMouseSelFrame;
-
-  FOptKeyPageUpDownSize:= TATEditorPageDownSize.FullMinus1;
-  FOptKeyLeftRightGoToNextLineWithCarets:= true;
-  FOptKeyLeftRightSwapSel:= true;
-  FOptKeyLeftRightSwapSelAndSelect:= false;
-  FOptKeyHomeToNonSpace:= true;
-  FOptKeyEndToNonSpace:= true;
-  FOptKeyTabIndents:= true;
-  FOptKeyTabIndentsVerticalBlock:= false;
-
   FOptShowIndentLines:= true;
   FOptShowGutterCaretBG:= true;
   FOptIndentSize:= 2;
