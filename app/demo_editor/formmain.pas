@@ -521,7 +521,7 @@ begin
   chkNewScroll.Checked:= ed.OptScrollbarsNew;
   edFontsize.Value:= ed.Font.Size;
   edTabsize.Value:= ed.OptTabSize;
-  edSpaceY.Value:= ed.OptSpacingY;
+  edSpaceY.Value:= ed.OptSpacingBottom;
   edMarginFixed.Value:= ed.OptMarginRight;
   case ed.OptWrapMode of
     TATEditorWrapMode.ModeOff:
@@ -1452,7 +1452,7 @@ end;
 procedure TfmMain.edSpaceYChange(Sender: TObject);
 begin
   if wait then Exit;
-  ed.OptSpacingY:= edSpaceY.Value;
+  ed.OptSpacingBottom:= edSpaceY.Value;
   ed.Update;
 end;
 
