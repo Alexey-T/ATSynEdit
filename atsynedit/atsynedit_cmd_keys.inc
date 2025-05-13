@@ -224,15 +224,16 @@ begin
   begin
     //feature like in Sublime Text/ VSCode: with multi-line selection, caret at bottom,
     //pressing Up - moves caret from the _top_ edge of selection.
-    if (ALines=1) and (Carets.Count=1) and Carets.IsSelection then
-    begin
-      Caret:= Carets[0];
-      if Caret.IsForwardSelection<>ADown then
+    if FOptKeyUpDownSwapSel then
+      if (ALines=1) and (Carets.Count=1) and Carets.IsSelection then
       begin
-        Caret.SwapSelection;
-        UpdateCaretsCoords(false, false);
+        Caret:= Carets[0];
+        if Caret.IsForwardSelection<>ADown then
+        begin
+          Caret.SwapSelection;
+          UpdateCaretsCoords(false, false);
+        end;
       end;
-    end;
     DoSelect_None;
   end;
 

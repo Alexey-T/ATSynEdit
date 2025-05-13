@@ -1062,6 +1062,7 @@ type
     FOptKeyUpDownNavigateWrapped: boolean;
     FOptKeyUpDownAllowToEdge: boolean;
     FOptKeyUpDownKeepColumn: boolean;
+    FOptKeyUpDownSwapSel: boolean;
     FOptKeyLeftRightGoToNextLineWithCarets: boolean;
     FOptKeyLeftRightSwapSel: boolean;
     FOptKeyLeftRightSwapSelAndSelect: boolean;
@@ -2226,6 +2227,7 @@ type
     property OptKeyUpDownNavigateWrapped: boolean read FOptKeyUpDownNavigateWrapped write FOptKeyUpDownNavigateWrapped default true;
     property OptKeyUpDownAllowToEdge: boolean read FOptKeyUpDownAllowToEdge write FOptKeyUpDownAllowToEdge default false;
     property OptKeyUpDownKeepColumn: boolean read FOptKeyUpDownKeepColumn write FOptKeyUpDownKeepColumn default true;
+    property OptKeyUpDownSwapSel: boolean read FOptKeyUpDownSwapSel write FOptKeyUpDownSwapSel default true;
     property OptKeyHomeEndNavigateWrapped: boolean read FOptKeyHomeEndNavigateWrapped write FOptKeyHomeEndNavigateWrapped default true;
     property OptKeyPageUpDownSize: TATEditorPageDownSize read FOptKeyPageUpDownSize write FOptKeyPageUpDownSize default TATEditorPageDownSize.FullMinus1;
     property OptKeyLeftRightGoToNextLineWithCarets: boolean read FOptKeyLeftRightGoToNextLineWithCarets write FOptKeyLeftRightGoToNextLineWithCarets default true;
@@ -5646,8 +5648,9 @@ begin
   FOptKeyPageKeepsRelativePos:= true;
   FOptKeyUpDownNavigateWrapped:= true;
   FOptKeyUpDownAllowToEdge:= false;
-  FOptKeyHomeEndNavigateWrapped:= true;
   FOptKeyUpDownKeepColumn:= true;
+  FOptKeyUpDownSwapSel:= true;
+  FOptKeyHomeEndNavigateWrapped:= true;
 
   FOptOverwriteAllowedOnPaste:= false;
   FOptNonWordChars:= ATEditorOptions.DefaultNonWordChars;
