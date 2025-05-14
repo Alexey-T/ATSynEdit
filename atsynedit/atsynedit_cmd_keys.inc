@@ -212,8 +212,9 @@ end;
 function TATSynEdit.DoCommand_KeyUpDown(ADown: boolean; ALines: integer;
   AKeepRelativePos, AWithSel: boolean): TATCommandResults;
 var
-  NRelative: integer;
   Caret: TATCaretItem;
+  NRelative, iCaret: integer;
+  bChange: boolean;
 begin
   FCaretSpecPos:= true;
 
@@ -224,16 +225,20 @@ begin
   begin
     //feature like in Sublime Text/ VSCode: with multi-line selection, caret at bottom,
     //pressing Up - moves caret from the _top_ edge of selection.
+    bChange:= false;
     if FOptKeyUpDownSwapSel then
-      if (ALines=1) and (Carets.Count=1) and Carets.IsSelection then
-      begin
-        Caret:= Carets[0];
-        if Caret.IsForwardSelection<>ADown then
+      if (ALines=1) and Carets.IsSelectionInAllCarets then
+        for iCaret:= Carets.Count-1 downto 0 do
         begin
-          Caret.SwapSelection;
-          UpdateCaretsCoords(false, false);
+          Caret:= Carets[iCaret];
+          if Caret.IsForwardSelection<>ADown then
+          begin
+            Caret.SwapSelection;
+            bChange:= true;
+          end;
         end;
-      end;
+    if bChange then
+      UpdateCaretsCoords(false, false);
     DoSelect_None;
   end;
 
