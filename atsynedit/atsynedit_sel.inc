@@ -477,16 +477,11 @@ end;
 
 procedure TATSynEdit.DoSelect_None;
 var
-  i: integer;
+  iCaret: integer;
 begin
   FSelRect:= cRectEmpty;
-
-  for i:= 0 to Carets.Count-1 do
-    with Carets[i] do
-    begin
-      EndX:= -1;
-      EndY:= -1;
-    end;
+  for iCaret:= 0 to Carets.Count-1 do
+    Carets[iCaret].SelectNone;
 end;
 
 procedure TATSynEdit.DoSelect_ColumnBlock_Primitive(ACaretPos1, ACaretPos2: TPoint);
