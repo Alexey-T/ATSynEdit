@@ -2056,7 +2056,6 @@ begin
   CommandCode:= ACommandCode;
 
   CurItem:= nil;
-  ACurList.DeleteLast;
   ACurList.Locked:= true;
 
   if ACurList=FUndoList then
@@ -2200,13 +2199,17 @@ begin
     SetMarkersArray(CurMarkersArray);
     SetMarkersArray2(CurMarkersArray2);
     SetAttribsArray(CurAttribsArray);
+
   finally
+    ACurList.Locked:= false;
+    if Result then
+      ACurList.DeleteLast;
+    ActionDeleteDupFakeLines;
+
     if bEnableEventAfter then
       if Assigned(FOnUndoAfter) then
         FOnUndoAfter(Self, NEventX, NEventY);
 
-    ActionDeleteDupFakeLines;
-    ACurList.Locked:= false;
     CommandCode:= 0;
   end;
 end;
