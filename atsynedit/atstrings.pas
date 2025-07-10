@@ -304,10 +304,10 @@ type
     procedure SetRedoAsString(const AValue: string);
     procedure SetUndoAsString(const AValue: string);
     procedure SetUndoLimit(AValue: integer);
-    procedure UndoSingle(ACurList: TATUndoList; out ASoftMarked, AHardMarked,
+    function UndoSingle(ACurList: TATUndoList; out ASoftMarked, AHardMarked,
       AHardMarkedNext, AUnmodifiedNext: boolean;
       out ACommandCode: integer;
-      out ATickCount: QWord);
+      out ATickCount: QWord): boolean;
     procedure AddUpdatesAction(ALineIndex: integer; AAction: TATEditAction);
     procedure UpdateModified;
   public
@@ -1986,9 +1986,9 @@ begin
     end;
 end;
 
-procedure TATStrings.UndoSingle(ACurList: TATUndoList;
+function TATStrings.UndoSingle(ACurList: TATUndoList;
   out ASoftMarked, AHardMarked, AHardMarkedNext, AUnmodifiedNext: boolean;
-  out ACommandCode: integer; out ATickCount: QWord);
+  out ACommandCode: integer; out ATickCount: QWord): boolean;
 var
   CurItem, PrevItem: TATUndoItem;
   CurAction: TATEditAction;
@@ -2008,6 +2008,7 @@ var
   bEnableEventBefore,
   bEnableEventAfter: boolean;
 begin
+  Result:= true;
   ASoftMarked:= true;
   AHardMarked:= false;
   AHardMarkedNext:= false;
@@ -2131,7 +2132,11 @@ begin
       TATEditAction.Insert:
         begin
           if IsIndexValid(CurIndex) then
+          begin
+            if LinesLen[CurIndex]>ATEditorOptions.MaxLineLenForUndo then
+              exit(false);
             LineDelete(CurIndex, true{AForceLast});
+          end;
         end;
 
       TATEditAction.Delete:
@@ -2152,6 +2157,8 @@ begin
           NStringsCount:= Count;
           if NStringsCount>1 then
           begin
+            if LinesLen[NStringsCount-1]>ATEditorOptions.MaxLineLenForUndo then
+              exit(false);
             LineDelete(NStringsCount-1, false);
             ActionDeleteFakeLineAndFinalEol; //fixes CudaText #5379
           end
@@ -2435,7 +2442,7 @@ begin
     if List.Count=0 then Break;
     if List.IsEmpty then Break;
 
-    UndoSingle(List, bSoftMarked, bHardMarked, bHardMarkedNext, bMarkedUnmodified, NCommandCode, NTickCount);
+    if not UndoSingle(List, bSoftMarked, bHardMarked, bHardMarkedNext, bMarkedUnmodified, NCommandCode, NTickCount) then Break;
     FEnabledCaretsInUndo:= false;
 
     //handle unmodified
