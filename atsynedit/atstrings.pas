@@ -2115,6 +2115,8 @@ begin
         begin
           if IsIndexValid(CurIndex) then
           begin
+            if LinesLen[CurIndex]>ATEditorOptions.MaxLineLenForUndo then
+              exit(false);
             Lines[CurIndex]:= CurText;
             LinesState[CurIndex]:= CurLineState;
           end;
