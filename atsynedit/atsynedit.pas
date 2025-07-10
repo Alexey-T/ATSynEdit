@@ -1770,6 +1770,7 @@ type
       const AHint: string; AAutoDelete: TATBookmarkAutoDelete; AShowInList: boolean; const ATag: Int64);
     procedure BookmarkToggleForLine(ALine, ABmKind: integer;
       const AHint: string; AAutoDelete: TATBookmarkAutoDelete; AShowInList: boolean; const ATag: Int64);
+    procedure BookmarkToggleForCarets(ABmKind: integer; AShowInList: boolean; const ATag: Int64);
     procedure BookmarkDeleteForLineEx(ALine: integer; ABookmarksObj: TATBookmarks);
     procedure BookmarkDeleteForLine(ALine: integer);
     procedure BookmarkDeleteForLine_2(ALine: integer);

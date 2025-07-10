@@ -90,6 +90,23 @@ begin
 end;
 
 
+procedure TATSynEdit.BookmarkToggleForCarets(ABmKind: integer; AShowInList: boolean; const ATag: Int64);
+var
+  Caret: TATCaretItem;
+  iCaret, NLine, NLinePrev: integer;
+begin
+  NLinePrev:= -1;
+  for iCaret:= 0 to Carets.Count-1 do
+  begin
+    Caret:= Carets[iCaret];
+    NLine:= Caret.PosY;
+    if NLine=NLinePrev then Continue;
+    NLinePrev:= NLine;
+    BookmarkToggleForLine(NLine, ABmKind, '', TATBookmarkAutoDelete.ByOption, AShowInList, ATag);
+  end;
+end;
+
+
 procedure TATSynEdit.BookmarkDeleteForLineEx(ALine: integer; ABookmarksObj: TATBookmarks);
 begin
   if not Strings.IsIndexValid(ALine) then exit;
