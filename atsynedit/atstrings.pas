@@ -229,6 +229,7 @@ type
     FOnChangeEx2: TATStringsChangeExEvent;
     FOnUndoBefore: TATStringsUndoEvent;
     FOnUndoAfter: TATStringsUndoEvent;
+    FOnUndoTooLongLine: TATStringsUndoEvent;
     FOnChangeBlock: TATStringsChangeBlockEvent;
     FOnUnfoldLine: TATStringsUnfoldLineEvent;
     FChangeBlockActive: boolean;
@@ -473,6 +474,7 @@ type
     property OnChangeBlock: TATStringsChangeBlockEvent read FOnChangeBlock write FOnChangeBlock;
     property OnUndoBefore: TATStringsUndoEvent read FOnUndoBefore write FOnUndoBefore;
     property OnUndoAfter: TATStringsUndoEvent read FOnUndoAfter write FOnUndoAfter;
+    property OnUndoTooLongLine: TATStringsUndoEvent read FOnUndoTooLongLine write FOnUndoTooLongLine;
     property OnUnfoldLine: TATStringsUnfoldLineEvent read FOnUnfoldLine write FOnUnfoldLine;
   end;
 
@@ -2469,7 +2471,12 @@ begin
              NCommandCode,
              NTickCount,
              NLineIndexFailed) then
+             begin
+               if Assigned(FOnUndoTooLongLine) then
+                 FOnUndoTooLongLine(Self, -1, NLineIndexFailed);
                Break;
+             end;
+
     FEnabledCaretsInUndo:= false;
 
     //handle unmodified

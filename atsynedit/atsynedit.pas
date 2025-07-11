@@ -460,6 +460,7 @@ type
   TATSynEditGetTokenEvent = function(Sender: TObject; AX, AY: integer): TATTokenKind of object;
   TATSynEditBeforeOrAfterHiliteEvent = procedure(Sender: TObject; AMainText: boolean) of object;
   TATSynEditEnabledUndoRedoChanged = procedure(Sender: TObject; AUndoEnabled, ARedoEnabled: boolean) of object;
+  TATSynEditUndoTooLongLineEvent = procedure(Sender: TObject; ALineIndex: integer) of object;
 
 type
   { TATFoldedMark }
@@ -788,6 +789,7 @@ type
     FOnAfterCalcHilite: TATSynEditBeforeOrAfterHiliteEvent;
     FOnGetToken: TATSynEditGetTokenEvent;
     FOnEnabledUndoRedoChanged: TATSynEditEnabledUndoRedoChanged;
+    FOnUndoTooLongLine: TATSynEditUndoTooLongLineEvent;
     FWrapInfo: TATWrapInfo;
     FWrapTemps: TATWrapItems;
     FWrapMode: TATEditorWrapMode;
@@ -1207,6 +1209,7 @@ type
     procedure DoStringsOnProgress(Sender: TObject; var ACancel: boolean);
     procedure DoStringsOnUndoAfter(Sender: TObject; AX, AY: SizeInt);
     procedure DoStringsOnUndoBefore(Sender: TObject; AX, AY: SizeInt);
+    procedure DoStringsOnUndoTooLongLine(Sender: TObject; AX, AY: SizeInt);
     procedure DoScroll_SetPos(var AScrollInfo: TATEditorScrollInfo; APos: integer);
     procedure DoScroll_LineTop(ALine: integer; AUpdate: boolean);
     function DoScroll_IndentFromBottom(AWrapInfoIndex, AIndentVert: integer): boolean;
@@ -1991,6 +1994,7 @@ type
     property OnHotspotExit: TATSynEditHotspotEvent read FOnHotspotExit write FOnHotspotExit;
     property OnGetToken: TATSynEditGetTokenEvent read FOnGetToken write FOnGetToken;
     property OnEnabledUndoRedoChanged: TATSynEditEnabledUndoRedoChanged read FOnEnabledUndoRedoChanged write FOnEnabledUndoRedoChanged;
+    property OnUndoTooLongLine: TATSynEditUndoTooLongLineEvent read FOnUndoTooLongLine write FOnUndoTooLongLine;
 
     //misc
     property CursorText: TCursor read FCursorText write FCursorText default crIBeam;
@@ -5443,6 +5447,7 @@ begin
   FStringsInt.OnChangeLog:= @DoStringsOnChangeLog;
   FStringsInt.OnUndoBefore:= @DoStringsOnUndoBefore;
   FStringsInt.OnUndoAfter:= @DoStringsOnUndoAfter;
+  FStringsInt.OnUndoTooLongLine:= @DoStringsOnUndoTooLongLine;
   FStringsInt.OnUnfoldLine:= @DoStringsOnUnfoldLine;
 
   FFold:= TATFoldRanges.Create;
@@ -11296,6 +11301,12 @@ begin
 
   if FOptUndoPauseHighlightLine then
     OptShowCurLine:= OldOption;
+end;
+
+procedure TATSynEdit.DoStringsOnUndoTooLongLine(Sender: TObject; AX, AY: SizeInt);
+begin
+  if Assigned(FOnUndoTooLongLine) then
+    FOnUndoTooLongLine(Self, AY);
 end;
 
 procedure TATSynEdit.DoStringsOnUnfoldLine(Sender: TObject; ALine: SizeInt);
