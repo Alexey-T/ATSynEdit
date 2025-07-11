@@ -307,7 +307,8 @@ type
     function UndoSingle(ACurList: TATUndoList; out ASoftMarked, AHardMarked,
       AHardMarkedNext, AUnmodifiedNext: boolean;
       out ACommandCode: integer;
-      out ATickCount: QWord): boolean;
+      out ATickCount: QWord;
+      out ALineIndexFailed: integer): boolean;
     procedure AddUpdatesAction(ALineIndex: integer; AAction: TATEditAction);
     procedure UpdateModified;
   public
@@ -1988,7 +1989,9 @@ end;
 
 function TATStrings.UndoSingle(ACurList: TATUndoList;
   out ASoftMarked, AHardMarked, AHardMarkedNext, AUnmodifiedNext: boolean;
-  out ACommandCode: integer; out ATickCount: QWord): boolean;
+  out ACommandCode: integer;
+  out ATickCount: QWord;
+  out ALineIndexFailed: integer): boolean;
 var
   CurItem, PrevItem: TATUndoItem;
   CurAction: TATEditAction;
@@ -2015,6 +2018,7 @@ begin
   AUnmodifiedNext:= false;
   ACommandCode:= 0;
   ATickCount:= 0;
+  ALineIndexFailed:= -1;
   if FReadOnly then Exit;
   if ACurList=nil then Exit;
 
@@ -2115,7 +2119,10 @@ begin
           if IsIndexValid(CurIndex) then
           begin
             if LinesLen[CurIndex]>ATEditorOptions.MaxLineLenForUndo then
+            begin
+              ALineIndexFailed:= CurIndex;
               exit(false);
+            end;
             Lines[CurIndex]:= CurText;
             LinesState[CurIndex]:= CurLineState;
           end;
@@ -2135,7 +2142,10 @@ begin
           if IsIndexValid(CurIndex) then
           begin
             if LinesLen[CurIndex]>ATEditorOptions.MaxLineLenForUndo then
+            begin
+              ALineIndexFailed:= CurIndex;
               exit(false);
+            end;
             LineDelete(CurIndex, true{AForceLast});
           end;
         end;
@@ -2159,7 +2169,10 @@ begin
           if NStringsCount>1 then
           begin
             if LinesLen[NStringsCount-1]>ATEditorOptions.MaxLineLenForUndo then
+            begin
+              ALineIndexFailed:= NStringsCount-1;
               exit(false);
+            end;
             LineDelete(NStringsCount-1, false);
             ActionDeleteFakeLineAndFinalEol; //fixes CudaText #5379
           end
@@ -2392,7 +2405,7 @@ var
   bHardMarked,
   bHardMarkedNext,
   bMarkedUnmodified: boolean;
-  NCommandCode: integer;
+  NCommandCode, NLineIndexFailed: integer;
   NTickCount: QWord;
   PrevUndoOrRedo: TATEditorRunningUndoOrRedo;
 begin
@@ -2447,7 +2460,16 @@ begin
     if List.Count=0 then Break;
     if List.IsEmpty then Break;
 
-    if not UndoSingle(List, bSoftMarked, bHardMarked, bHardMarkedNext, bMarkedUnmodified, NCommandCode, NTickCount) then Break;
+    if not UndoSingle(
+             List,
+             bSoftMarked,
+             bHardMarked,
+             bHardMarkedNext,
+             bMarkedUnmodified,
+             NCommandCode,
+             NTickCount,
+             NLineIndexFailed) then
+               Break;
     FEnabledCaretsInUndo:= false;
 
     //handle unmodified
