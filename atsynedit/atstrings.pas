@@ -2346,6 +2346,8 @@ begin
 
   if Length(AText)>ATEditorOptions.MaxLineLenForUndo then
   begin
+    if Assigned(FOnUndoTooLongLine) then
+      FOnUndoTooLongLine(Self, -1, -1);
     CurList.Clear;
     exit
   end;
