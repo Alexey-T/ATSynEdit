@@ -351,6 +351,7 @@ var
   St: TATStrings;
   Caret: TATCaretItem;
   Data: TATBookmarkData;
+  bAdded: boolean;
   i: integer;
 begin
   Data:= Default(TATBookmarkData);
@@ -359,6 +360,8 @@ begin
   Data.AutoDelete:= TATBookmarkAutoDelete.ByOption;
 
   St:= Strings;
+  bAdded:= false;
+
   for i:= 0 to Carets.Count-1 do
   begin
     Caret:= Carets[i];
@@ -367,9 +370,11 @@ begin
       begin
         Data.LineNum:= Caret.PosY;
         St.Bookmarks.Add(Data);
+        bAdded:= true;
       end;
   end;
 
-  DoChangeBookmarks;
+  if bAdded then
+    DoChangeBookmarks;
 end;
 
