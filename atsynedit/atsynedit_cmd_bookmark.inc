@@ -358,17 +358,16 @@ begin
   Data.ShowInBookmarkList:= true;
   Data.AutoDelete:= TATBookmarkAutoDelete.ByOption;
 
-  BookmarkDeleteAll(false);
-
   St:= Strings;
   for i:= 0 to Carets.Count-1 do
   begin
     Caret:= Carets[i];
     if St.IsIndexValid(Caret.PosY) then
-    begin
-      Data.LineNum:= Caret.PosY;
-      St.Bookmarks.Add(Data);
-    end;
+      if St.Bookmarks.Find(Caret.PosY)=-1 then
+      begin
+        Data.LineNum:= Caret.PosY;
+        St.Bookmarks.Add(Data);
+      end;
   end;
 
   DoChangeBookmarks;
