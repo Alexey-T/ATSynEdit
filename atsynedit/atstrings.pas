@@ -1593,8 +1593,14 @@ end;
 
 procedure TATStrings.LineInsert(ALineIndex: SizeInt; const AString: atString;
   AWithEvent: boolean=true);
+var
+  bAtEnd: boolean;
 begin
+  bAtEnd:= ALineIndex=Count;
   LineInsertEx(ALineIndex, AString, FEndings, AWithEvent);
+  if bAtEnd then
+    if (ALineIndex-1>=0) and (LinesEnds[ALineIndex-1]=TATLineEnds.None) then
+      LinesEnds[ALineIndex-1]:= Endings;
 end;
 
 procedure TATStrings.LineInsertStrings(ALineIndex: SizeInt; ABlock: TATStrings; AWithFinalEol: boolean);
