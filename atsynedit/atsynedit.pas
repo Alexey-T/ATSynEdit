@@ -7295,6 +7295,7 @@ begin
       FMouseDragMinimap:= false;
     end;
     ClearMouseDownVariables;
+    UpdateCursor;
     Exit
   end;
 
@@ -7336,6 +7337,7 @@ begin
       end;
 
   ClearMouseDownVariables;
+  UpdateCursor;
 
   if Carets.Count=1 then
     with Carets[0] do
