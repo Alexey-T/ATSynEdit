@@ -1635,7 +1635,7 @@ type
     procedure UpdateCaretsAndMarkersOnEditing(AFromCaret: integer; APos, APosEnd, AShift, APosAfter: TPoint);
     procedure UpdateMarkersOnDeleting(AX1, AY1, AX2, AY2: integer);
     //events
-    procedure DoEventCarets; virtual;
+    procedure DoEventCarets(AllowCheckDuplicatePos: boolean=true); virtual;
     procedure DoEventScroll; virtual;
     procedure DoEventChange(ALineIndex: integer=-1; AllowOnChange: boolean=true); virtual;
     procedure DoEventChangeModified;
@@ -8715,7 +8715,7 @@ begin
 end;
 
 
-procedure TATSynEdit.DoEventCarets;
+procedure TATSynEdit.DoEventCarets(AllowCheckDuplicatePos: boolean=true);
 var
   SClip: string;
   Caret: TATCaretItem;
@@ -8730,10 +8730,16 @@ begin
     if Caret.PosY<>FPrevCaret.PosY then
       FOptAutoPair_DisableCharDoubling:= false;
 
-    if (FPrevCaret.PosX=Caret.PosX) and
+    if AllowCheckDuplicatePos and
+      (FPrevCaret.PosX=Caret.PosX) and
       (FPrevCaret.PosY=Caret.PosY) and
       (FPrevCaret.EndX=Caret.EndX) and
-      (FPrevCaret.EndY=Caret.EndY) then exit;
+      (FPrevCaret.EndY=Caret.EndY) then
+      begin
+        if Random(0)=1 then ; //for breakpoint
+        exit;
+      end;
+
     FPrevCaret.PosX:= Caret.PosX;
     FPrevCaret.PosY:= Caret.PosY;
     FPrevCaret.EndX:= Caret.EndX;
