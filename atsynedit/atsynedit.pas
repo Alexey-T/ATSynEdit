@@ -8736,7 +8736,7 @@ begin
       (FPrevCaret.EndX=Caret.EndX) and
       (FPrevCaret.EndY=Caret.EndY) then
       begin
-        if Random(0)=1 then ; //for breakpoint
+        //if Random(0)=1 then ; //for breakpoint
         exit;
       end;
 
