@@ -93,7 +93,7 @@ end;
 function TATSynEdit.DoCommand_SelectColumnToDirection(ADir: TATEditorSelectColumnDirection): TATCommandResults;
 var
   N, NPageLines: integer;
-  bDown: boolean;
+  bDown, bHadSelection: boolean;
 begin
   Result:= [];
   if Carets.Count=0 then Exit;
@@ -120,6 +120,8 @@ begin
   bDown:= ADir in [TATEditorSelectColumnDirection.Down, TATEditorSelectColumnDirection.PageDown];
   if not bDown then
     NPageLines:= -NPageLines;
+
+  bHadSelection:= Carets.IsSelection;
 
   //make correct FSelRectEnd, w/o making any carets
   case ADir of
@@ -158,6 +160,13 @@ begin
   //this makes multi-carets from FSelRectBegin/FSelRectEnd
   //and considers OptCaretsPrimitiveColumnSelection
   DoSelect_ColumnBlock_FromPointsColumns(FSelRectBegin, FSelRectEnd);
+
+  //DoSelect_ColumnBlock_xxxx call for the case "primitive column selection"
+  //can make selection for the new caret (part of one long wrapped line).
+  //when we do "extend carets line up" and go through long wrapped line.
+  //this selection is very bad looking. let's avoid it.
+  if OptCaretsPrimitiveColumnSelection and not bHadSelection and Carets.IsSelection then
+    DoSelect_None;
 
   //DebugSelRect; ////debug
 end;
