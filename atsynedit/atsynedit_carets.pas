@@ -78,6 +78,7 @@ type
     function IsInVisibleRect(const R: TRect): boolean;
     function IsFromDoubleClick: boolean;
     function FirstTouchedLine: integer;
+    procedure Clear;
     procedure ClearDoubleClickRange;
     procedure UpdateMemory(AMode: TATCaretMemoryAction; AArrowUpDown: boolean);
     procedure UpdateOnEditing(APos, APosEnd, AShift: TPoint);
@@ -558,6 +559,24 @@ begin
     Result:= EndY
   else
     Result:= PosY;
+end;
+
+procedure TATCaretItem.Clear;
+begin
+  PosX:= 0;
+  PosY:= 0;
+  EndX:= -1;
+  EndY:= -1;
+  CoordX:= 0;
+  CoordY:= 0;
+  OldRect:= Default(TRect);
+  SavedX:= 0;
+  SavedX_Pre:= 0;
+  BeforeExtendX:= 0;
+  CharAtCaret:= #0;
+  CharColor:= clNone;
+  CharStyles:= [];
+  ClearDoubleClickRange;
 end;
 
 procedure TATCaretItem.UpdateMemory(AMode: TATCaretMemoryAction; AArrowUpDown: boolean);

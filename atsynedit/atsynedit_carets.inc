@@ -965,10 +965,20 @@ end;
 
 
 procedure TATSynEdit.DoCaretSingle(APosX, APosY, AEndX, AEndY: integer);
+var
+  Caret: TATCaretItem;
 begin
   FSelRect:= cRectEmpty;
-  Carets.Clear;
-  Carets.Add(APosX, APosY, AEndX, AEndY);
+  if Carets.Count=1 then
+  begin
+    Caret:= Carets[0];
+    Caret.Clear;
+    Caret.Change(APosX, APosY, AEndX, AEndY);
+  end;
+  begin
+    Carets.Clear;
+    Carets.Add(APosX, APosY, AEndX, AEndY);
+  end
 end;
 
 procedure TATSynEdit.DoCaretSingle(AX, AY: integer; AClearSelection: boolean);
