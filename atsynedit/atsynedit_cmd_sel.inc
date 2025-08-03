@@ -165,8 +165,13 @@ begin
   //can make selection for the new caret (part of one long wrapped line).
   //when we do "extend carets line up" and go through long wrapped line.
   //this selection is very bad looking. let's avoid it.
-  if OptCaretsPrimitiveColumnSelection and not bHadSelection and Carets.IsSelection then
-    DoSelect_None;
+  if ADir in [
+      TATEditorSelectColumnDirection.Up,
+      TATEditorSelectColumnDirection.PageUp,
+      TATEditorSelectColumnDirection.Down,
+      TATEditorSelectColumnDirection.PageDown] then
+    if OptCaretsPrimitiveColumnSelection and not bHadSelection and Carets.IsSelection then
+      DoSelect_None;
 
   //DebugSelRect; ////debug
 end;
