@@ -69,7 +69,7 @@ begin
     end
     else
     begin
-      LineInsert(AFromY, '');
+      LineInsert(AFromY, '', false);
       TextInsert(AFromX, AFromY, SBegin, false, AShift, APosAfter);
     end;
     exit;
