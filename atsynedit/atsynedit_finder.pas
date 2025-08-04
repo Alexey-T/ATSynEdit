@@ -1457,7 +1457,6 @@ procedure TATEditorFinder.DoReplaceTextInEditor(APosBegin, APosEnd: TPoint;
 var
   Shift: TPoint;
   Strs: TATStrings;
-  SBegin: UnicodeString;
 begin
   Strs:= Editor.Strings;
   //FReplacedAtEndOfText:=
@@ -1466,35 +1465,6 @@ begin
 
   FReplacedAtLine:= Min(FReplacedAtLine, APosBegin.Y);
 
-  //handle specially: regex replacement of '^' (zero-len match) to text+EOL.
-  //to avoid changing line-states of text following the zero-len match.
-  if (APosBegin=APosEnd) and (APosBegin.X=0) and SEndsWithEol(AReplacement) then
-  begin
-    SBegin:= AReplacement;
-    UniqueString(SBegin);
-    if SEndsWith(SBegin, #10) then
-      SetLength(SBegin, Length(SBegin)-1);
-    if SEndsWith(SBegin, #13) then
-      SetLength(SBegin, Length(SBegin)-1);
-    if not SStringHasEol(SBegin) then
-    begin
-      Strs.LineInsert(APosBegin.Y, SBegin);
-      APosAfterReplace:= Point(APosBegin.X, APosBegin.Y+1);
-    end
-    else
-    begin
-      Strs.LineInsert(APosBegin.Y, '');
-      Strs.TextInsert(
-        APosBegin.X,
-        APosBegin.Y,
-        SBegin,
-        false,
-        Shift,
-        APosAfterReplace
-        );
-    end;
-  end
-  else
   Strs.TextReplaceRange(
     APosBegin.X, APosBegin.Y,
     APosEnd.X, APosEnd.Y,

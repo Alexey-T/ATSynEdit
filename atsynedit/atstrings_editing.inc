@@ -45,11 +45,35 @@ procedure TATStrings.TextReplaceRange(AFromX, AFromY, AToX, AToY: SizeInt;
 var
   bOneLine, bOneEol: boolean;
   NCountEol, N: SizeInt;
-  SPart1, SPart2: atString;
+  SPart1, SPart2, SBegin: atString;
 begin
   NCountEol:= SFindCharCount(AText, #10);
   bOneLine:= (AFromY=AToY) and (NCountEol=0);
   bOneEol:= (AFromY=AToY) and (NCountEol=1);
+
+  //handle specially: regex replacement of '^' (zero-len match) to text+EOL.
+  //to avoid changing line-states of text following the zero-len match.
+  if (AFromX=AToX) and (AFromY=AToY) and (AFromX=0) and (NCountEol>0) and SEndsWithEol(AText) then
+  begin
+    SBegin:= AText;
+    UniqueString(SBegin);
+    if SEndsWith(SBegin, #10) then
+      SetLength(SBegin, Length(SBegin)-1);
+    if SEndsWith(SBegin, #13) then
+      SetLength(SBegin, Length(SBegin)-1);
+    if not SStringHasEol(SBegin) then
+    begin
+      LineInsert(AFromY, SBegin);
+      AShift:= Point(0, 1);
+      APosAfter:= Point(AFromX, AFromY+1);
+    end
+    else
+    begin
+      LineInsert(AFromY, '');
+      TextInsert(AFromX, AFromY, SBegin, false, AShift, APosAfter);
+    end;
+    exit;
+  end;
 
   if bOneLine then
   begin
