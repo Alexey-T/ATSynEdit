@@ -1468,13 +1468,16 @@ begin
 
   //handle specially: regex replacement of '^' (zero-len match) to text+EOL.
   //to avoid changing line-states of text following the zero-len match.
-  if (APosBegin=APosEnd) and (APosBegin.X=0) and SEndsWith(AReplacement, #10) then
+  if (APosBegin=APosEnd) and (APosBegin.X=0) and SEndsWithEol(AReplacement) then
   begin
     SBegin:= Copy(AReplacement, 1, Length(AReplacement)-1);
     if SEndsWith(SBegin, #13) then
       SetLength(SBegin, Length(SBegin)-1);
-    if (Pos(#10, SBegin)=0) and (Pos(#13, SBegin)=0) then
-      Strs.LineInsert(APosBegin.Y, SBegin)
+    if not SStringHasEol(SBegin) then
+    begin
+      Strs.LineInsert(APosBegin.Y, SBegin);
+      APosAfterReplace:= Point(APosBegin.X, APosBegin.Y+1);
+    end
     else
     begin
       Strs.LineInsert(APosBegin.Y, '');
