@@ -6562,8 +6562,11 @@ begin
       exit;
     end;
 
-  InitMenuStd;
+  if FMenuText=nil then
+    InitMenuStd;
+
   inherited;
+
   if not Handled then
   begin
     DoHandleRightClick(MousePos.X, MousePos.Y);
