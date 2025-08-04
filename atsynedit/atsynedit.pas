@@ -9019,13 +9019,13 @@ end;
 
 procedure TATSynEdit.InitMenuStd;
   //
-  function Add(const SName: string; Cmd: integer): TMenuItem; inline;
+  function Add(const ACaption: string; ACommand: integer): TMenuItem;
   var
     MI: TMenuItem;
   begin
     MI:= TMenuItem.Create(FMenuStd);
-    MI.Caption:= SName;
-    MI.Tag:= Cmd;
+    MI.Caption:= ACaption;
+    MI.Tag:= ACommand;
     MI.OnClick:= @MenuStdClick;
     Result:= MI;
     FMenuStd.Items.Add(MI);
