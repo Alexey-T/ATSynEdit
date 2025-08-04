@@ -1470,7 +1470,10 @@ begin
   //to avoid changing line-states of text following the zero-len match.
   if (APosBegin=APosEnd) and (APosBegin.X=0) and SEndsWithEol(AReplacement) then
   begin
-    SBegin:= Copy(AReplacement, 1, Length(AReplacement)-1);
+    SBegin:= AReplacement;
+    UniqueString(SBegin);
+    if SEndsWith(SBegin, #10) then
+      SetLength(SBegin, Length(SBegin)-1);
     if SEndsWith(SBegin, #13) then
       SetLength(SBegin, Length(SBegin)-1);
     if not SStringHasEol(SBegin) then
