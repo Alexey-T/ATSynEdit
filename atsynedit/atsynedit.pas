@@ -5768,17 +5768,6 @@ begin
   FScrollHorzMinimap.Vertical:= false;
 
   FKeymap:= KeymapFull;
-  FHintWnd:= nil;
-
-  FMenuStd:= nil;
-  FMenuText:= nil;
-  FMenuGutterBm:= nil;
-  FMenuGutterNum:= nil;
-  FMenuGutterFold:= nil;
-  FMenuGutterFoldStd:= nil;
-  FMenuMinimap:= nil;
-  FMenuMicromap:= nil;
-  FMenuRuler:= nil;
 
   //must call UpdateTabHelper also before first Paint
   UpdateTabHelper;
