@@ -557,19 +557,7 @@ begin
 
   try
     if FRegex.ExecPos(AFromPos, false, OptBack) then
-    begin
-      FoundPos:= FRegex.MatchPos[0];
-      FoundLen:= FRegex.MatchLen[0];
-      if CheckTokensBuffer(FoundPos, FoundPos+FoundLen) then
-      begin
-        Result:= true;
-        FMatchPos:= FoundPos;
-        FMatchLen:= FoundLen;
-        exit
-      end;
-
       repeat
-        if not FRegex.ExecNext(OptBack) then exit;
         FoundPos:= FRegex.MatchPos[0];
         FoundLen:= FRegex.MatchLen[0];
         if CheckTokensBuffer(FoundPos, FoundPos+FoundLen) then
@@ -579,8 +567,7 @@ begin
           FMatchLen:= FoundLen;
           exit
         end;
-      until false;
-    end;
+      until not FRegex.ExecNext(OptBack);
   except
     on E: ERegExpr do
     begin
