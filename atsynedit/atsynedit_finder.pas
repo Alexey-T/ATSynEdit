@@ -1404,7 +1404,7 @@ begin
       else if OptPreserveCase then
       begin
         SReplacement:= GetPreserveCaseReplacement(St.TextSubstring(PosBegin.X, PosBegin.Y, PosEnd.X, PosEnd.Y));
-        bRepWithoutEol:= Pos(#10, SReplacement)=0;
+        bRepWithoutEol:= bRepWithoutEolFixed;
       end
       else
       begin
