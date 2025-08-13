@@ -1355,10 +1355,13 @@ var
   PosBegin, PosEnd, PosAfter: TPoint;
   SReplacement: UnicodeString;
   NListCount, NLastResult, iResult: integer;
-  bOk: boolean;
+  bOk, bRepWithoutEol, bRepWithoutEolFixed: boolean;
 begin
   Result:= 0;
   St:= Editor.Strings;
+
+  bRepWithoutEol:= false;
+  bRepWithoutEolFixed:= Pos(#10, StrReplace)=0;
 
   //first, we collect positions of all matches to L,
   //then we do the loop over L and replace all matches there;
@@ -1388,21 +1391,33 @@ begin
       if OptRegex then
       begin
         if OptRegexSubst and (StrReplace<>'') then
-          SReplacement:= Res.Replacement
+        begin
+          SReplacement:= Res.Replacement;
+          bRepWithoutEol:= Pos(#10, SReplacement)=0;
+        end
         else
+        begin
           SReplacement:= StrReplace;
+          bRepWithoutEol:= bRepWithoutEolFixed;
+        end;
       end
       else if OptPreserveCase then
-        SReplacement:= GetPreserveCaseReplacement(St.TextSubstring(PosBegin.X, PosBegin.Y, PosEnd.X, PosEnd.Y))
+      begin
+        SReplacement:= GetPreserveCaseReplacement(St.TextSubstring(PosBegin.X, PosBegin.Y, PosEnd.X, PosEnd.Y));
+        bRepWithoutEol:= Pos(#10, SReplacement)=0;
+      end
       else
+      begin
         SReplacement:= StrReplace;
+        bRepWithoutEol:= bRepWithoutEolFixed;
+      end;
 
       //for single-line matches:
       //don't replace _in editor_, replace only inside one string,
       //and when we go to another string, put old string to editor.
       //huge speedup for huge one-liners of length 400k, with 20k matches.
 
-      if (PosBegin.Y=PosEnd.Y) and (Pos(#10, SReplacement)=0) then
+      if bRepWithoutEol and (PosBegin.Y=PosEnd.Y) then
       begin
         if BufferLineIndex<>PosBegin.Y then
         begin
