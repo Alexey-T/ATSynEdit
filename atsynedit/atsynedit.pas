@@ -793,6 +793,7 @@ type
     FWrapInfo: TATWrapInfo;
     FWrapTemps: TATWrapItems;
     FWrapMode: TATEditorWrapMode;
+    FWrapModeOnForMargin: boolean; //on toggling off->on - activate "by window or margin" mode
     FWrapUpdateNeeded: boolean;
     FWrapIndented: boolean;
     FWrapAddSpace: integer;
@@ -1541,7 +1542,7 @@ type
     function DoCommand_CancelKeepFirstVisible: TATCommandResults;
     function DoCommand_ToggleReadOnly: TATCommandResults;
     function DoCommand_ToggleOverwrite: TATCommandResults;
-    function DoCommand_ToggleWordWrap(AltOrder: boolean): TATCommandResults;
+    function DoCommand_ToggleWordWrap(ALoopAllValues: boolean): TATCommandResults;
     function DoCommand_ToggleUnprinted: TATCommandResults;
     function DoCommand_ToggleUnprintedSpaces: TATCommandResults;
     function DoCommand_ToggleUnprintedSpacesTrailing: TATCommandResults;

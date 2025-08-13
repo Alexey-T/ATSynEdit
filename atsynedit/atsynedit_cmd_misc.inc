@@ -6,7 +6,12 @@ begin
   Result:= [TATCommandResult.State];
 end;
 
-function TATSynEdit.DoCommand_ToggleWordWrap(AltOrder: boolean): TATCommandResults;
+function TATSynEdit.DoCommand_ToggleWordWrap(ALoopAllValues: boolean): TATCommandResults;
+{
+ALoopAllValues=false: off -> on_by_window -> off
+                  OR: off -> on_by_margin -> off
+ALoopAllValues=true: off -> on_by_window -> on_by_margin -> off
+}
 var
   bCaretVisible: boolean;
 begin
@@ -14,16 +19,34 @@ begin
 
   case FWrapMode of
     TATEditorWrapMode.ModeOff:
-      OptWrapMode:= TATEditorWrapMode.ModeOn;
+      begin
+        if ALoopAllValues then
+        begin
+          OptWrapMode:= TATEditorWrapMode.ModeOn;
+          FWrapModeOnForMargin:= false;
+        end
+        else
+        if FWrapModeOnForMargin then
+          OptWrapMode:= TATEditorWrapMode.AtWindowOrMargin
+        else
+          OptWrapMode:= TATEditorWrapMode.ModeOn;
+      end;
+
     TATEditorWrapMode.ModeOn:
       begin
-        if AltOrder then
-          OptWrapMode:= TATEditorWrapMode.AtWindowOrMargin
+        if ALoopAllValues then
+        begin
+          OptWrapMode:= TATEditorWrapMode.AtWindowOrMargin;
+          FWrapModeOnForMargin:= true;
+        end
         else
           OptWrapMode:= TATEditorWrapMode.ModeOff;
       end;
+
     TATEditorWrapMode.AtWindowOrMargin:
-      OptWrapMode:= TATEditorWrapMode.ModeOff;
+      begin
+        OptWrapMode:= TATEditorWrapMode.ModeOff;
+      end;
   end;
 
   Include(ModifiedOptions, TATEditorModifiedOption.WordWrap);

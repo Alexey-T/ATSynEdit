@@ -130,8 +130,8 @@ begin
 
   M.Add(cCommand_ToggleOverwrite, 'toggle insert/overwrite mode', [VK_INSERT], []);
   M.Add(cCommand_ToggleReadOnly, 'toggle read-only mode', [], []);
-  M.Add(cCommand_ToggleWordWrap, 'toggle word-wrap mode (off/window)', [scXControl+VK_U], []);
-  M.Add(cCommand_ToggleWordWrapAlt, 'toggle word-wrap mode (off/window/margin)', [], []);
+  M.Add(cCommand_ToggleWordWrap, 'toggle word-wrap mode (off / on)', [scXControl+VK_U], []);
+  M.Add(cCommand_ToggleWordWrapAlt, 'toggle word-wrap mode (off / on_by_window / on_by_margin)', [], []);
 
   M.Add(cCommand_ToggleUnprinted, 'toggle unprinted chars: enable other options', [], []);
   M.Add(cCommand_ToggleUnprintedSpaces, 'toggle unprinted chars: spaces/tabs', [], []);
