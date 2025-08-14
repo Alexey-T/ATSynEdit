@@ -2970,8 +2970,15 @@ begin
   NLine:= LineTop;
   FWrapMode:= AValue;
 
+  case FWrapMode of
+    TATEditorWrapMode.ModeOn:
+      FWrapModeOnForMargin:= false;
+    TATEditorWrapMode.AtWindowOrMargin:
+      FWrapModeOnForMargin:= true;
+  end;
+
   FWrapUpdateNeeded:= true;
-  UpdateWrapInfo; //helps to solve https://github.com/Alexey-T/CudaText/issues/2879
+  UpdateWrapInfo; //helps to solve CudaText issue #2879
                   //FWrapUpdateNeeded:=true and Update() is not enough
 
   if FWrapMode<>TATEditorWrapMode.ModeOff then
