@@ -137,10 +137,12 @@ begin
 
   for i:= $2010 to $2027 do
     FixedSizes[i]:= uw_normal;
-  FixedSizes[$2026]:= 0; //ellipsis char should be full-width? but user wants normal width, CudaText issue #3873
 
   for i:= $2030 to $203A do
     FixedSizes[i]:= uw_normal;
+  FixedSizes[$203C]:= uw_normal;
+  FixedSizes[$2044]:= uw_normal;
+
   //"Superscripts and Subscripts" block which goes from 0x2070 to 0x209F
   for i:= $2070 to $209F do
     FixedSizes[i]:= uw_normal;
