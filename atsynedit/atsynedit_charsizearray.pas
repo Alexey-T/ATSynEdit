@@ -29,7 +29,7 @@ begin
   //Basic Latin
   //Latin-1 Supplement
   //Latin Extended-A
-  for i:= $0 to $24F do
+  for i:= $20 to $24F do
     FixedSizes[i]:= uw_normal;
 
   //IPA Extensions
@@ -228,9 +228,11 @@ begin
   FixedSizes[$01C3]:= uw_hexshow; //for Unicode attack: https://www.opennet.ru/opennews/art.shtml?num=56131
   FixedSizes[$FEFF]:= uw_hexshow;
 
+  {
   //line-break chars
   FixedSizes[$0A]:= uw_space;
   FixedSizes[$0D]:= uw_space;
+  }
 
   //space chars
   FixedSizes[$9]:= uw_space;
