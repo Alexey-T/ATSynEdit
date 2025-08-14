@@ -17,37 +17,38 @@ var
 begin
   bCaretVisible:= IsCaretOnVisibleRect;
 
-  case FWrapMode of
-    TATEditorWrapMode.ModeOff:
-      begin
-        if ALoopAllValues then
+  if ALoopAllValues then
+    case FWrapMode of
+      TATEditorWrapMode.ModeOff:
         begin
-          OptWrapMode:= TATEditorWrapMode.ModeOn;
+          OptWrapMode:= Succ(OptWrapMode);
           FWrapModeOnForMargin:= false;
-        end
-        else
-        if FWrapModeOnForMargin then
-          OptWrapMode:= TATEditorWrapMode.AtWindowOrMargin
-        else
-          OptWrapMode:= TATEditorWrapMode.ModeOn;
-      end;
-
-    TATEditorWrapMode.ModeOn:
-      begin
-        if ALoopAllValues then
+        end;
+      TATEditorWrapMode.ModeOn:
         begin
-          OptWrapMode:= TATEditorWrapMode.AtWindowOrMargin;
+          OptWrapMode:= Succ(OptWrapMode);
           FWrapModeOnForMargin:= true;
-        end
-        else
+        end;
+      TATEditorWrapMode.AtWindowOrMargin:
+        begin
           OptWrapMode:= TATEditorWrapMode.ModeOff;
-      end;
-
-    TATEditorWrapMode.AtWindowOrMargin:
-      begin
-        OptWrapMode:= TATEditorWrapMode.ModeOff;
-      end;
-  end;
+        end;
+    end
+  else
+    case FWrapMode of
+      TATEditorWrapMode.ModeOff:
+        begin
+          if FWrapModeOnForMargin then
+            OptWrapMode:= TATEditorWrapMode.AtWindowOrMargin
+          else
+            OptWrapMode:= TATEditorWrapMode.ModeOn;
+        end;
+      TATEditorWrapMode.ModeOn,
+      TATEditorWrapMode.AtWindowOrMargin:
+        begin
+          OptWrapMode:= TATEditorWrapMode.ModeOff;
+        end;
+    end;
 
   Include(ModifiedOptions, TATEditorModifiedOption.WordWrap);
   Result:= [TATCommandResult.State];
