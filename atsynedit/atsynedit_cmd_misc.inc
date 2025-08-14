@@ -21,12 +21,12 @@ begin
     case FWrapMode of
       TATEditorWrapMode.ModeOff:
         begin
-          OptWrapMode:= Succ(OptWrapMode);
+          OptWrapMode:= TATEditorWrapMode.ModeOn;
           FWrapModeOnForMargin:= false;
         end;
       TATEditorWrapMode.ModeOn:
         begin
-          OptWrapMode:= Succ(OptWrapMode);
+          OptWrapMode:= TATEditorWrapMode.AtWindowOrMargin;
           FWrapModeOnForMargin:= true;
         end;
       TATEditorWrapMode.AtWindowOrMargin:
