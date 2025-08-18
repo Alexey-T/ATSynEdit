@@ -66511,7 +66511,7 @@ const
     #$039F, // U+03BF
     #$03A0, // U+03C0
     #$03A1, // U+03C1
-    #$03A3, // U+03C2
+    #$03A2, // U+03C2 - maps to undefined char U+03A2, but it's OK for case-insensitive search
     #$03A3, // U+03C3
     #$03A4, // U+03C4
     #$03A5, // U+03C5
@@ -132019,7 +132019,7 @@ const
     #$03BF, // U+039F
     #$03C0, // U+03A0
     #$03C1, // U+03A1
-    #$03A2, // U+03A2
+    #$03C2, // U+03A2 - corrected to match with U+03C2
     #$03C3, // U+03A3
     #$03C4, // U+03A4
     #$03C5, // U+03A5
