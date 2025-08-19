@@ -114,7 +114,7 @@ interface
 {$IFDEF D8} {$DEFINE InlineFuncs} {$ENDIF}
 {$IFDEF FPC} {$DEFINE InlineFuncs} {$ENDIF}
 
-{$IF DEFINED(D8) OR DEFINED(FPC)}
+{$IF DEFINED(D2009) OR DEFINED(FPC)}
 {$PointerMath on}
 {$DEFINE HASPOINTERARRAYACCESS}
 {$ELSE}
@@ -617,7 +617,7 @@ type
     function ExecPrim(AOffset: Integer; ASlowChecks, ABackward: Boolean; ATryMatchOnlyStartingBefore: Integer): Boolean;
     function ExecPrimProtected(AOffset: Integer; ASlowChecks, ABackward: Boolean; ATryMatchOnlyStartingBefore: Integer): Boolean; {$IFDEF InlineFuncs}inline;{$ENDIF}
 
-    function GetSubExprCount: Integer;
+    function GetSubExprMatchCount: Integer;
     function GetMatchPos(Idx: Integer): PtrInt;
     function GetMatchLen(Idx: Integer): PtrInt;
     function GetMatch(Idx: Integer): RegExprString;
@@ -799,7 +799,7 @@ type
     // Exec ('23'): SubExprMatchCount=2, Match[0]='23', [1]='', [2]='3'
     // Exec ('2'): SubExprMatchCount=0, Match[0]='2'
     // Exec ('7') - return False: SubExprMatchCount=-1
-    property SubExprMatchCount: Integer read GetSubExprCount;
+    property SubExprMatchCount: Integer read GetSubExprMatchCount;
 
     // pos of entrance subexpr. #Idx into tested in last Exec*
     // string. First subexpr. has Idx=1, last - MatchCount,
@@ -952,7 +952,7 @@ uses
 const
   // TRegExpr.VersionMajor/Minor return values of these constants:
   REVersionMajor = 1;
-  REVersionMinor = 188;
+  REVersionMinor = 192;
 
   OpKind_End = REChar(1);
   OpKind_MetaClass = REChar(2);
@@ -971,7 +971,11 @@ const
   RegExprLineSeparatorsSet = [$d, $a, $b, $c] {$IFDEF UnicodeRE} + [$85] {$ENDIF};
   RegExprHorzSeparatorsSet = [9, $20, $A0];
 
+{$ifdef CPU16}
+  MaxBracesArg = $7FFF - 1;
+{$else}
   MaxBracesArg = $7FFFFFFF - 1; // max value for {n,m} arguments
+{$endif}
 
 type
   TRENextOff = PtrInt;
@@ -2083,12 +2087,15 @@ begin
   end;
 end;
 
-function TRegExpr.GetSubExprCount: Integer;
+function TRegExpr.GetSubExprMatchCount: Integer;
 begin
-  Result := -1;
   // if nothing found, we must return -1 per TRegExpr docs
-  if (GrpBounds[0].GrpStart[0] <> nil) then
-    Result := GrpCount;
+  Result := -1;
+  if Length(GrpBounds[0].GrpStart) = 0 then
+    Exit;
+  Result := GrpCount;
+  while (Result >= 0) and (GrpBounds[0].GrpStart[ Result ] = nil) do
+    Dec(Result);
 end;
 
 function TRegExpr.GetMatchPos(Idx: Integer): PtrInt;
@@ -4216,13 +4223,12 @@ begin
       if fCompModifiers.S then
       begin
         ret := EmitNode(OP_ANY);
-        FlagParse := FlagParse or FLAG_HASWIDTH or FLAG_SIMPLE;
       end
       else
       begin // not /s, so emit [^:LineSeparators:]
         ret := EmitNode(OP_ANY_ML);
-        FlagParse := FlagParse or FLAG_HASWIDTH; // not so simple ;)
       end;
+      FlagParse := FlagParse or FLAG_HASWIDTH or FLAG_SIMPLE;
      end;
 
     '[':
@@ -5059,6 +5065,13 @@ begin
         {$ENDIF}
       end;
 
+    OP_ANY_ML:
+      while (Result < TheMax) and not IsCustomLineSeparator(scan^) do
+      begin
+        Inc(Result);
+        Inc(scan);
+      end;
+
     OP_EXACTLY:
       begin // in opnd can be only ONE char !!!
         {
@@ -5590,7 +5603,6 @@ begin
       OP_ANY_ML:
         begin
           if (regInput >= fInputCurrentEnd) or
-            IsPairedBreak(regInput) or
             IsCustomLineSeparator(regInput^)
           then
             Exit;
@@ -6933,10 +6945,19 @@ begin
     Exit;
   end;
 
-  Offset := PtrEnd - fInputStart + 1;
+  if ABackward then
+    Offset := PtrEnd - fInputStart - 1
+  else
+    Offset := PtrEnd - fInputStart + 1;
+
   // prevent infinite looping if empty string matches r.e.
   if PtrBegin = PtrEnd then
-    Inc(Offset);
+  begin
+    if ABackward then
+      Dec(Offset)
+    else
+      Inc(Offset);
+  end;
 
   Result := ExecPrim(Offset, False, ABackward, 0);
 end; { of function TRegExpr.ExecNext
@@ -7348,10 +7369,16 @@ begin
       OP_NOTBOUND:
         ;
 
-      OP_ANY,
-      OP_ANY_ML:
-        begin // we can better define ANYML
+      OP_ANY:
+        begin
           FirstCharSet := RegExprAllSet;
+          Exit;
+        end;
+
+      OP_ANY_ML:
+        begin
+          // There are still some Unicode breaks that will wrongly be in FirstCharSet
+          FirstCharSet := RegExprAllSet - [10..13];
           Exit;
         end;
 
