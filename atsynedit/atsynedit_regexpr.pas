@@ -952,7 +952,7 @@ uses
 const
   // TRegExpr.VersionMajor/Minor return values of these constants:
   REVersionMajor = 1;
-  REVersionMinor = 192;
+  REVersionMinor = 193;
 
   OpKind_End = REChar(1);
   OpKind_MetaClass = REChar(2);
@@ -5710,8 +5710,8 @@ begin
           if (regInput + no > fInputCurrentEnd) then
             Exit;
           Inc(opnd, RENumberSz);
-          // Inline the first character, for speed.
-          if (opnd^ <> regInput^) and (_LowerCase(opnd^) <> regInput^) then
+          // Prefer _UpperCase usage here, because _LowerCase fails with 'Greek lowercase final sigma'
+          if (opnd^ <> regInput^) and (opnd^ <> _UpperCase(regInput^)) then
             Exit;
           save := regInput;
           Inc(regInput, no);
@@ -5719,7 +5719,7 @@ begin
           begin
             Inc(save);
             Inc(opnd);
-            if (opnd^ <> save^) and (_LowerCase(opnd^) <> save^) then
+            if (opnd^ <> save^) and (opnd^ <> _UpperCase(save^)) then
               Exit;
             Dec(no);
           end;
