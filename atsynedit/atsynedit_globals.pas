@@ -444,7 +444,7 @@ initialization
       {$endif} ;
 
     EnableLigaturesOnLineWithCaret:= false;
-    DefaultNonWordChars:= '-+*=/\()[]{}<>"''.,:;~?!@#$%^&|`…«»';
+    DefaultNonWordChars:= '-+*=/\()[]{}<>"''.,:;~?!@#$%^&|`…«»‘’“”';
 
     TimerIntervalAutoScroll:= 100;
     TimerIntervalNiceScroll:= 40;
