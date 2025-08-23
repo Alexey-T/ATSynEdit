@@ -1575,19 +1575,18 @@ end;
 
 procedure SFixGreekTextAfterCaseConversion(var S: UnicodeString);
 var
-  SNonWord: UnicodeString = '';
+  SNonWord: UnicodeString;
   NLen, i: SizeInt;
 begin
   UniqueString(S);
   NLen:= Length(S);
+  SNonWord:= ATEditorOptions.DefaultNonWordChars;
 
   //replace sigma 'σ' at word ends to final sigma 'ς'
   i:= 0;
   repeat
     i:= Pos('σ', S, i+1);
     if i=0 then Break;
-    if SNonWord='' then
-      SNonWord:= ATEditorOptions.DefaultNonWordChars+'«»';
     if ((i=1) or IsCharWord(S[i-1], SNonWord)) and
        ((i=NLen) or not IsCharWord(S[i+1], SNonWord)) then
       S[i]:= 'ς';
