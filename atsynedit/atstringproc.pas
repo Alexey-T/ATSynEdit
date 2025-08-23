@@ -274,6 +274,7 @@ function SCountTextLines(const Str, StrBreak: UnicodeString): SizeInt;
 procedure SSplitByChar(const S: string; Sep: char; out S1, S2: string);
 procedure SDeleteAndInsert(var AStr: UnicodeString; AFromPos, ACount: SizeInt; const AReplace: UnicodeString);
 procedure SDeleteHtmlTags(var S: string);
+procedure SFixGreekTextAfterCaseConversion(var S: UnicodeString);
 
 
 implementation
@@ -1560,7 +1561,7 @@ end;
 
 procedure SDeleteHtmlTags(var S: string);
 var
-  n1, n2: integer;
+  n1, n2: SizeInt;
 begin
   repeat
     n1:= Pos('<', S);
@@ -1569,6 +1570,38 @@ begin
     if n2=0 then Break;
     Delete(S, n1, n2-n1+1);
   until false;
+end;
+
+
+procedure SFixGreekTextAfterCaseConversion(var S: UnicodeString);
+var
+  SNonWord: UnicodeString = '';
+  NLen, i: SizeInt;
+begin
+  UniqueString(S);
+  NLen:= Length(S);
+
+  //replace sigma 'σ' at word ends to final sigma 'ς'
+  i:= 0;
+  repeat
+    i:= Pos('σ', S, i+1);
+    if i=0 then Break;
+    if SNonWord='' then
+      SNonWord:= ATEditorOptions.DefaultNonWordChars+'«»';
+    if ((i=1) or IsCharWord(S[i-1], SNonWord)) and
+       ((i=NLen) or not IsCharWord(S[i+1], SNonWord)) then
+      S[i]:= 'ς';
+  until false;
+
+  S:= UnicodeStringReplace(S, 'Ά' , 'Α', [rfReplaceAll]);
+  S:= UnicodeStringReplace(S, 'Έ' , 'Ε', [rfReplaceAll]);
+  S:= UnicodeStringReplace(S, 'Ή' , 'Η', [rfReplaceAll]);
+  S:= UnicodeStringReplace(S, 'Ί' , 'Ι', [rfReplaceAll]);
+  S:= UnicodeStringReplace(S, 'Ϊ' , 'Ι', [rfReplaceAll]);
+  S:= UnicodeStringReplace(S, 'Ϊ́' , 'Ι', [rfReplaceAll]);
+  S:= UnicodeStringReplace(S, 'Ό' , 'Ο', [rfReplaceAll]);
+  S:= UnicodeStringReplace(S, 'Ύ' , 'Υ', [rfReplaceAll]);
+  S:= UnicodeStringReplace(S, 'Ώ' , 'Ω', [rfReplaceAll]);
 end;
 
 end.

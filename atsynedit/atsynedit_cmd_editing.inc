@@ -1574,6 +1574,8 @@ begin
           Str2:= SCaseSentence(Str1, FOptNonWordChars);
       end;
 
+      SFixGreekTextAfterCaseConversion(Str2);
+
       if Str1<>Str2 then
       begin
         St.TextReplaceRange(X1, Y1, X2, Y2, Str2, Shift, PosAfter, false);
