@@ -131,6 +131,8 @@ function SCharLower(ch: WideChar): WideChar; inline;
 function SCaseTitle(const S, SNonWordChars: atString): atString;
 function SCaseInvert(const S: atString): atString;
 function SCaseSentence(const S, SNonWordChars: atString): atString;
+function SCaseUpper(const S: atString): atString;
+function SCaseLower(const S: atString): atString;
 
 function StringOfCharW(ch: WideChar; Len: SizeInt): UnicodeString;
 
@@ -1254,6 +1256,24 @@ begin
     else
       Result[i]:= SCharLower(ch);
   end;
+end;
+
+function SCaseUpper(const S: atString): atString;
+var
+  i: SizeInt;
+begin
+  Result:= S;
+  for i:= 1 to Length(Result) do
+    Result[i]:= SCharUpper(Result[i]);
+end;
+
+function SCaseLower(const S: atString): atString;
+var
+  i: SizeInt;
+begin
+  Result:= S;
+  for i:= 1 to Length(Result) do
+    Result[i]:= SCharLower(Result[i]);
 end;
 
 function SCaseSentence(const S, SNonWordChars: atString): atString;

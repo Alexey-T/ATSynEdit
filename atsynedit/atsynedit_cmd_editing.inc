@@ -1563,9 +1563,9 @@ begin
       Str1:= St.TextSubstring(X1, Y1, X2, Y2);
       case AMode of
         TATEditorCaseConvert.Lower:
-          Str2:= UnicodeLowerCase(Str1);
+          Str2:= SCaseLower(Str1);
         TATEditorCaseConvert.Upper:
-          Str2:= UnicodeUpperCase(Str1);
+          Str2:= SCaseUpper(Str1); //if we use UpperCase than Greek lowercase final-sigma is not converted to uppercase sigma
         TATEditorCaseConvert.Title:
           Str2:= SCaseTitle(Str1, FOptNonWordChars);
         TATEditorCaseConvert.Invert:
