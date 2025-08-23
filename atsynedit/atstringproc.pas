@@ -1582,7 +1582,7 @@ begin
   NLen:= Length(S);
   SNonWord:= ATEditorOptions.DefaultNonWordChars;
 
-  //replace sigma 'σ' at word ends to final sigma 'ς'
+  //replace sigma 'σ' at word ends to final-sigma 'ς'
   i:= 0;
   repeat
     i:= Pos('σ', S, i+1);
@@ -1592,6 +1592,7 @@ begin
       S[i]:= 'ς';
   until false;
 
+  //uppercase letters don't need diacritics (this is what Remove_Greek_Accents CudaText plugin does)
   S:= UnicodeStringReplace(S, 'Ά' , 'Α', [rfReplaceAll]);
   S:= UnicodeStringReplace(S, 'Έ' , 'Ε', [rfReplaceAll]);
   S:= UnicodeStringReplace(S, 'Ή' , 'Η', [rfReplaceAll]);
