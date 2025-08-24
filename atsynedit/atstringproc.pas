@@ -1617,7 +1617,7 @@ begin
   S:= UnicodeStringReplace(S, 'Έ' , 'Ε', [rfReplaceAll]);
   S:= UnicodeStringReplace(S, 'Ή' , 'Η', [rfReplaceAll]);
   S:= UnicodeStringReplace(S, 'Ί' , 'Ι', [rfReplaceAll]);
-  S:= UnicodeStringReplace(S, 'Ϊ' , 'Ι', [rfReplaceAll]);
+  S:= UnicodeStringReplace(S, 'Ϊ́' , 'Ι', [rfReplaceAll]);
   S:= UnicodeStringReplace(S, 'Ό' , 'Ο', [rfReplaceAll]);
   S:= UnicodeStringReplace(S, 'Ύ' , 'Υ', [rfReplaceAll]);
   S:= UnicodeStringReplace(S, 'Ώ' , 'Ω', [rfReplaceAll]);
