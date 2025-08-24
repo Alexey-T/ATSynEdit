@@ -2473,6 +2473,9 @@ begin
     if List.IsEmpty then Break;
 
     bLineIndexChanged:= false;
+    if List.Last.ItemAction=TATEditAction.CaretJump then
+      bLineIndexChanged:= true
+    else
     if List.Count>1 then
     begin
       NLinePrev1:= List.Items[List.Count-1].GetCaretY;
