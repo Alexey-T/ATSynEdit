@@ -2411,6 +2411,7 @@ procedure TATStrings.UndoOrRedo(AUndo: boolean; AGrouped: boolean);
 var
   List, ListOther: TATUndoList;
   LastItem: TATUndoItem;
+  bLineIndexChanged,
   bSoftMarked,
   bHardMarked,
   bHardMarkedNext,
@@ -2470,6 +2471,11 @@ begin
     if List.Count=0 then Break;
     if List.IsEmpty then Break;
 
+    bLineIndexChanged:=
+      (List.Count>1) and
+      (List.Items[List.Count-1].GetCaretY <>
+       List.Items[List.Count-2].GetCaretY);
+
     if not UndoSingle(
              List,
              bSoftMarked,
@@ -2500,6 +2506,8 @@ begin
         //ListOther.Last.ItemSoftMark:= ?? //for redo needed Softmark too but don't know how
       end;
 
+    if bLineIndexChanged then
+      Break;
     if bHardMarked and bHardMarkedNext and not bSoftMarked then
       Continue;
     if not AGrouped then

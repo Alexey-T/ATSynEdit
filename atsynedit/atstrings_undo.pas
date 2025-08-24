@@ -89,6 +89,7 @@ type
     constructor CreateEmpty;
     procedure Assign(const D: TATUndoItem);
     property AsString: string read GetAsString write SetAsString;
+    function GetCaretY: integer;
   end;
 
 type
@@ -248,6 +249,14 @@ begin
   ItemCommandCode:= D.ItemCommandCode;
   ItemTickCount:= D.ItemTickCount;
   ItemGlobalCounter:= D.ItemGlobalCounter;
+end;
+
+function TATUndoItem.GetCaretY: integer;
+begin
+  if Length(ItemCarets)>0 then
+    Result:= ItemCarets[0].Y
+  else
+    Result:= -1;
 end;
 
 
