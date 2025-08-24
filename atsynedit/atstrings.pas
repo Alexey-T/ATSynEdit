@@ -2417,6 +2417,7 @@ var
   bHardMarkedNext,
   bMarkedUnmodified: boolean;
   NCommandCode, NLineIndexFailed: integer;
+  NLinePrev1, NLinePrev2: integer;
   NTickCount: QWord;
   PrevUndoOrRedo: TATEditorRunningUndoOrRedo;
 begin
@@ -2471,10 +2472,16 @@ begin
     if List.Count=0 then Break;
     if List.IsEmpty then Break;
 
-    bLineIndexChanged:=
-      (List.Count>1) and
-      (List.Items[List.Count-1].GetCaretY <>
-       List.Items[List.Count-2].GetCaretY);
+    bLineIndexChanged:= false;
+    if List.Count>1 then
+    begin
+      NLinePrev1:= List.Items[List.Count-1].GetCaretY;
+      NLinePrev2:= List.Items[List.Count-2].GetCaretY;
+      if (NLinePrev1>=0) and
+        (NLinePrev2>=0) and
+        (NLinePrev1<>NLinePrev2) then
+        bLineIndexChanged:= true;
+    end;
 
     if not UndoSingle(
              List,
