@@ -1340,13 +1340,22 @@ var
   St: TATStrings;
   BufferLine: UnicodeString = '';
   BufferLineIndex: integer = -1;
+  bSimpleReplace: boolean;
   //
   procedure FlushBufferLine;
   var
+    RepFlags: TReplaceFlags;
     Shift, PosAfter: TPoint;
   begin
     if St.IsIndexValid(BufferLineIndex) then
     begin
+      if bSimpleReplace then
+      begin
+        RepFlags:= [rfReplaceAll];
+        if not OptCase then
+          Include(RepFlags, rfIgnoreCase);
+        BufferLine:= UnicodeStringReplace(BufferLine, StrFind, StrReplace, RepFlags);
+      end;
       if Pos(#10, BufferLine)>0 then
         St.TextReplaceRange(0, BufferLineIndex, St.LinesLen[BufferLineIndex], BufferLineIndex, BufferLine, Shift, PosAfter, false)
       else
@@ -1366,6 +1375,15 @@ var
 begin
   Result:= 0;
   St:= Editor.Strings;
+
+  //allow to use UnicodeStringReplace for entire line?
+  bSimpleReplace:=
+    (not OptRegex) and
+    (not OptInSelection) and
+    (not OptWords) and
+    (not OptPreserveCase) and
+    (not OptConfirmReplace) and
+    (OptTokens=TATFinderTokensAllowed.All);
 
   //first, we collect positions of all matches to L,
   //then we do the loop over L and replace all matches there;
@@ -1426,7 +1444,8 @@ begin
           BufferLineIndex:= PosBegin.Y;
           BufferLine:= St.Lines[BufferLineIndex];
         end;
-        SDeleteAndInsert(BufferLine, PosBegin.X+1, PosEnd.X-PosBegin.X, SReplacement);
+        if not bSimpleReplace then
+          SDeleteAndInsert(BufferLine, PosBegin.X+1, PosEnd.X-PosBegin.X, SReplacement);
       end
       else
       begin
