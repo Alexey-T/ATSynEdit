@@ -5040,7 +5040,6 @@ var
   scan: PRegExprChar;
   opnd: PRegExprChar;
   TheMax: PtrInt; // PtrInt, gets diff of 2 pointers
-  InvChar: REChar;
   {$IFDEF UnicodeEx}
   i: Integer;
   {$ENDIF}
@@ -5104,8 +5103,7 @@ begin
         end;
         if Result < TheMax then
         begin
-          InvChar := _LowerCase(opnd^); // store in register
-          while (Result < TheMax) and ((opnd^ = scan^) or (InvChar = scan^)) do
+          while (Result < TheMax) and (opnd^ = _UpperCase(scan^)) do
           begin
             Inc(Result);
             Inc(scan);
