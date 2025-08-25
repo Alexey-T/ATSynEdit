@@ -1383,7 +1383,9 @@ begin
     (not OptWords) and
     (not OptPreserveCase) and
     (not OptConfirmReplace) and
-    (OptTokens=TATFinderTokensAllowed.All);
+    (OptTokens=TATFinderTokensAllowed.All) and
+    //search-text must not have problematic chars: small iota with tonos and dialytika
+    (Pos('ΐ', StrFind)=0);
 
   //first, we collect positions of all matches to L,
   //then we do the loop over L and replace all matches there;
