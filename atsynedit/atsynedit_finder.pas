@@ -1342,16 +1342,9 @@ var
   BufferLineIndex: integer = -1;
   //
   procedure FlushBufferLine;
-  var
-    Shift, PosAfter: TPoint;
   begin
     if St.IsIndexValid(BufferLineIndex) then
-    begin
-      if Pos(#10, BufferLine)>0 then
-        St.TextReplaceRange(0, BufferLineIndex, St.LinesLen[BufferLineIndex], BufferLineIndex, BufferLine, Shift, PosAfter, false)
-      else
-        St.Lines[BufferLineIndex]:= BufferLine;
-    end;
+      St.Lines[BufferLineIndex]:= BufferLine;
     BufferLineIndex:= -1;
     BufferLine:= '';
   end;
@@ -1362,10 +1355,13 @@ var
   PosBegin, PosEnd, PosAfter: TPoint;
   SReplacement: UnicodeString;
   NListCount, NLastResult, iResult: integer;
-  bOk: boolean;
+  bOk, bRepWithoutEol, bRepWithoutEolFixed: boolean;
 begin
   Result:= 0;
   St:= Editor.Strings;
+
+  bRepWithoutEol:= false;
+  bRepWithoutEolFixed:= Pos(#10, StrReplace)=0;
 
   //first, we collect positions of all matches to L,
   //then we do the loop over L and replace all matches there;
@@ -1397,20 +1393,23 @@ begin
         if OptRegexSubst and (StrReplace<>'') then
         begin
           SReplacement:= Res.Replacement;
-          //bRepWithEol:= bRepWithEol or (Pos(#10, SReplacement)>0);
+          bRepWithoutEol:= Pos(#10, SReplacement)=0;
         end
         else
         begin
           SReplacement:= StrReplace;
+          bRepWithoutEol:= bRepWithoutEolFixed;
         end;
       end
       else if OptPreserveCase then
       begin
         SReplacement:= GetPreserveCaseReplacement(St.TextSubstring(PosBegin.X, PosBegin.Y, PosEnd.X, PosEnd.Y));
+        bRepWithoutEol:= bRepWithoutEolFixed;
       end
       else
       begin
         SReplacement:= StrReplace;
+        bRepWithoutEol:= bRepWithoutEolFixed;
       end;
 
       //for single-line matches:
@@ -1418,7 +1417,7 @@ begin
       //and when we go to another string, put old string to editor.
       //huge speedup for huge one-liners of length 400k, with 20k matches.
 
-      if (PosBegin.Y=PosEnd.Y) then
+      if bRepWithoutEol and (PosBegin.Y=PosEnd.Y) then
       begin
         if BufferLineIndex<>PosBegin.Y then
         begin
