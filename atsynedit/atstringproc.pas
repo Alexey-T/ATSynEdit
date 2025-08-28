@@ -1628,10 +1628,15 @@ end;
 function SStringHasCharsBadForLigatures(const S: UnicodeString): boolean;
 var
   i: SizeInt;
+  N: word;
 begin
-  for i:= $10A0 to $10FF do //Georgian chars are badly rendered (disappear) with ligatures=on on Win32
-    if Pos(WideChar(i), S)>0 then
+  for i:= 1 to Length(S) do
+  begin
+    N:= Ord(S[i]);
+    //Georgian chars are badly rendered (disappear) with ligatures=on on Win32
+    if (N>=$10A0) and (N<=$10FF) then
       exit(true);
+  end;
   Result:= false;
 end;
 
