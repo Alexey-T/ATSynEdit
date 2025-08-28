@@ -246,13 +246,12 @@ function _TextOut_Windows(DC: HDC;
 var
   CharPlaceInfo: GCP_RESULTSW;
   Glyphs: array of WideChar;
-  bHandled: boolean;
 begin
-  bHandled:= false;
   if AllowLigatures and not SStringHasCharsBadForLigatures(Str) then
   begin
     CharPlaceInfo:= Default(GCP_RESULTSW);
     CharPlaceInfo.lStructSize:= SizeOf(CharPlaceInfo);
+    Glyphs:= nil;
     SetLength(Glyphs, Length(Str));
     CharPlaceInfo.lpGlyphs:= @Glyphs[0];
     CharPlaceInfo.nGlyphs:= Length(Glyphs);
@@ -260,12 +259,11 @@ begin
     if GetCharacterPlacementW(DC, PWChar(Str), Length(Str), 0, @CharPlaceInfo, GCP_LIGATE)<> 0 then
     begin
       Result:= Windows.ExtTextOutW(DC, X, Y, ETO_CLIPPED or ETO_OPAQUE or ETO_GLYPH_INDEX, Rect, Pointer(Glyphs), Length(Glyphs), Dx);
-      bHandled:= true;
+      exit; //important
     end;
   end;
 
-  if not bHandled then
-    Result:= Windows.ExtTextOutW(DC, X, Y, ETO_CLIPPED or ETO_OPAQUE, Rect, PWChar(Str), Length(Str), Dx);
+  Result:= Windows.ExtTextOutW(DC, X, Y, ETO_CLIPPED or ETO_OPAQUE, Rect, PWChar(Str), Length(Str), Dx);
 end;
 
 {$else}
