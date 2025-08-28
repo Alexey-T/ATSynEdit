@@ -24,7 +24,8 @@ procedure InitFixedSizes;
 var
   i: word;
 begin
-  FillChar(FixedSizes, SizeOf(FixedSizes), 0);
+  ////global vars are always inited with zeros
+  //FillChar(FixedSizes, SizeOf(FixedSizes), 0);
 
   //Basic Latin
   //Latin-1 Supplement
