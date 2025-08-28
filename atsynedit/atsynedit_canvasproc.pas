@@ -247,7 +247,7 @@ var
   CharPlaceInfo: GCP_RESULTSW;
   Glyphs: array of WideChar;
 begin
-  if AllowLigatures then
+  if AllowLigatures and not SStringHasCharsBadForLigatures(Str) then
   begin
     ZeroMemory(@CharPlaceInfo, SizeOf(CharPlaceInfo));
     CharPlaceInfo.lStructSize:= SizeOf(CharPlaceInfo);

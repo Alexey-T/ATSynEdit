@@ -249,6 +249,7 @@ function SStringHasTab(const S: atString): boolean; inline;
 function SStringHasTab(const S: string): boolean; inline;
 //function SStringHasAsciiAndNoTabs(const S: atString): boolean;
 //function SStringHasAsciiAndNoTabs(const S: string): boolean;
+function SStringHasCharsBadForLigatures(const S: UnicodeString): boolean;
 
 function STrimNewlineChars(const S: UnicodeString): UnicodeString;
 function SRemoveNewlineChars(const S: UnicodeString): UnicodeString;
@@ -1621,6 +1622,17 @@ begin
   S:= UnicodeStringReplace(S, 'Ό' , 'Ο', [rfReplaceAll]);
   S:= UnicodeStringReplace(S, 'Ύ' , 'Υ', [rfReplaceAll]);
   S:= UnicodeStringReplace(S, 'Ώ' , 'Ω', [rfReplaceAll]);
+end;
+
+
+function SStringHasCharsBadForLigatures(const S: UnicodeString): boolean;
+var
+  i: SizeInt;
+begin
+  for i:= $10A0 to $10FF do //Georgian chars are badly rendered (disappear) with ligatures=on on Win32
+    if Pos(WideChar(i), S)>0 then
+      exit(true);
+  Result:= false;
 end;
 
 end.
