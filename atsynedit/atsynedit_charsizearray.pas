@@ -126,6 +126,8 @@ begin
   //Georgian - normal width
   for i:= $10A0 to $10FF do
     FixedSizes[i]:= uw_normal;
+  //one Georgian char is fullwidth
+  FixedSizes[$10DA]:= uw_fullwidth;
 
   //Latin extended additional
   for i:= $1EA0 to $1EF9 do
