@@ -20,48 +20,39 @@ const
 
 implementation
 
+procedure Fill(IndexFrom, IndexTo: word; Value: byte); inline;
+begin
+  FillChar(FixedSizes[IndexFrom], IndexTo-IndexFrom+1, Value);
+end;
+
 procedure InitFixedSizes;
-var
-  i: word;
 begin
   //Basic Latin
   //Latin-1 Supplement
   //Latin Extended-A
-  for i:= $20 to $24F do
-    FixedSizes[i]:= uw_normal;
+  Fill($20, $24F, uw_normal);
 
   //IPA Extensions
-  for i:= $250 to $2D7 do
-    FixedSizes[i]:= uw_normal;
+  Fill($250, $2D7, uw_normal);
 
   //some Latin are full-width
-  for i:= $1C4 to $1CC do
-    FixedSizes[i]:= uw_fullwidth;
+  Fill($1C4, $1CC, uw_fullwidth);
   FixedSizes[$1F1]:= uw_fullwidth;
   FixedSizes[$1F2]:= uw_fullwidth;
   FixedSizes[$1F3]:= uw_fullwidth;
   FixedSizes[$24A]:= uw_fullwidth;
 
   //Cyrillic, https://www.compart.com/en/unicode/block/U+0400
-  for i:= $400 to $45A do //Russian is here
-    FixedSizes[i]:= uw_normal;
-  for i:= $45B to $45F do
-    FixedSizes[i]:= uw_normal;
-  for i:= $460 to $461 do
-    FixedSizes[i]:= uw_fullwidth;
-  for i:= $462 to $4FF do
-    FixedSizes[i]:= uw_normal;
+  Fill($400, $45A, uw_normal);
+  Fill($45B, $45F, uw_normal);
+  Fill($460, $461, uw_fullwidth);
+  Fill($462, $4FF, uw_normal);
 
-  for i:= $500 to $52F do
-    FixedSizes[i]:= uw_fullwidth;
-  for i:= $2DE0 to $2DFF do
-    FixedSizes[i]:= uw_fullwidth;
-  for i:= $A640 to $A69F do
-    FixedSizes[i]:= uw_fullwidth;
-  for i:= $1C80 to $1C8F do
-    FixedSizes[i]:= uw_fullwidth;
-  for i:= $1D2B to $1D78 do
-    FixedSizes[i]:= uw_fullwidth;
+  Fill($500, $52F, uw_fullwidth);
+  Fill($2DE0, $2DFF, uw_fullwidth);
+  Fill($A640, $A69F, uw_fullwidth);
+  Fill($1C80, $1C8F, uw_fullwidth);
+  Fill($1D2B, $1D78, uw_fullwidth);
 
   //German, https://resources.german.lsa.umich.edu/schreiben/unicode/
   FixedSizes[$00DF]:= uw_normal;
@@ -73,83 +64,61 @@ begin
   FixedSizes[$00DC]:= uw_normal;
 
   //Greek and Coptic, https://unicode.org/charts/PDF/U0370.pdf
-  for i:= $370 to $3ff do
-    FixedSizes[i]:= uw_normal;
+  Fill($370, $3ff, uw_normal);
 
   //Chinese, http://www.unicode.org/versions/Unicode5.0.0/ch12.pdf#G12159
-  for i:= $3400 to $9FFF do
-    FixedSizes[i]:= uw_fullwidth;
-  for i:= $F900 to $FAFF do
-    FixedSizes[i]:= uw_fullwidth;
+  Fill($3400, $9FFF, uw_fullwidth);
+  Fill($F900, $FAFF, uw_fullwidth);
 
   //Japanese punctuation, Hiragana, Katakana, http://www.rikai.com/library/kanjitables/kanji_codes.unicode.shtml
-  for i:= $3000 to $30ff do
-    FixedSizes[i]:= uw_fullwidth;
+  Fill($3000, $30ff, uw_fullwidth);
   //full-width Roman
-  for i:= $ff00 to $ff5f do
-    FixedSizes[i]:= uw_fullwidth;
+  Fill($ff00, $ff5f, uw_fullwidth);
   //half-width Katakana
-  for i:= $ff60 to $ff9f do
-    FixedSizes[i]:= uw_normal;
-  for i:= $ffa0 to $ffef do
-    FixedSizes[i]:= uw_fullwidth;
+  Fill($ff60, $ff9f, uw_normal);
+  Fill($ffa0, $ffef, uw_fullwidth);
 
   //Hebrew, https://en.wikipedia.org/wiki/Hebrew_(Unicode_block)
-  for i:= $0590 to $05FF do
-    FixedSizes[i]:= uw_fullwidth;
+  Fill($0590, $05FF, uw_fullwidth);
   //Arabic, https://en.wikipedia.org/wiki/Arabic_script_in_Unicode
-  for i:= $0600 to $06FF do
-    FixedSizes[i]:= uw_fullwidth;
+  Fill($0600, $06FF, uw_fullwidth);
   //Syriac
-  for i:= $0700 to $074F do
-    FixedSizes[i]:= uw_fullwidth;
-  for i:= $0750 to $077F do
-    FixedSizes[i]:= uw_fullwidth;
-  for i:= $08A0 to $08FF do
-    FixedSizes[i]:= uw_fullwidth;
+  Fill($0700, $074F, uw_fullwidth);
+  Fill($0750, $077F, uw_fullwidth);
+  Fill($08A0, $08FF, uw_fullwidth);
   //Khmer
-  for i:= $1780 to $17FF do
-    FixedSizes[i]:= uw_fullwidth;
-  for i:= $FB50 to $FDFF do
-    FixedSizes[i]:= uw_fullwidth;
-  for i:= $FE70 to $FEFF do
-    FixedSizes[i]:= uw_fullwidth;
+  Fill($1780, $17FF, uw_fullwidth);
+  Fill($FB50, $FDFF, uw_fullwidth);
+  Fill($FE70, $FEFF, uw_fullwidth);
 
   {
   //Georgian, better to have the autodetect
-  for i:= $10A0 to $10FF do
-    FixedSizes[i]:= uw_normal;
+  Fill($10A0, $10FF, uw_normal);
   //one Georgian char is fullwidth
   FixedSizes[$10DA]:= uw_fullwidth;
   }
 
   //Latin extended additional
-  for i:= $1EA0 to $1EF9 do
-    FixedSizes[i]:= uw_normal;
+  Fill($1EA0, $1EF9, uw_normal);
 
   //Greek extended
-  for i:= $1F00 to $1FFF do
-    FixedSizes[i]:= uw_normal;
+  Fill($1F00, $1FFF, uw_normal);
 
   //General punctuation range, https://www.unicodepedia.com/groups/general-punctuation/
-  for i:= $2010 to $203A do
-    FixedSizes[i]:= uw_normal;
-  for i:= $203B to $206F do
-    FixedSizes[i]:= uw_fullwidth;
+  Fill($2010, $203A, uw_normal);
+  Fill($203B, $206F, uw_fullwidth);
   FixedSizes[$203C]:= uw_normal;
   FixedSizes[$2044]:= uw_normal;
 
   //"Superscripts and Subscripts" block
-  for i:= $2070 to $209F do
-    FixedSizes[i]:= uw_normal;
+  Fill($2070, $209F, uw_normal);
 
   FixedSizes[$20AC]:= uw_normal;
   FixedSizes[$2122]:= uw_normal;
 
   //math operators
   { //let's not force widths of math chars - see CudaText issue #3873, where user asked to force them
-  for i:= $2200 to $22FF do
-    FixedSizes[i]:= uw_fullwidth;
+  Fill($2200, $22FF, uw_fullwidth);
   FixedSizes[$2200]:= uw_normal;
   FixedSizes[$2203]:= uw_normal;
   FixedSizes[$2205]:= uw_normal;
@@ -171,34 +140,24 @@ begin
   }
 
   //"Miscellaneous Symbols" block which goes from 0x2600 to 0x26FF
-  for i:= $2600 to $265F do
-    FixedSizes[i]:= uw_fullwidth;
-  for i:= $2668 to $26FF do
-    FixedSizes[i]:= uw_fullwidth;
+  Fill($2600, $265F, uw_fullwidth);
+  Fill($2668, $26FF, uw_fullwidth);
 
   //------------------------------------
   //combining chars
   // https://en.wikipedia.org/wiki/Combining_character
-  for i:=$0300 to $036F do
-    FixedSizes[i]:= uw_combined;
-  for i:=$483 to $489 do
-    FixedSizes[i]:= uw_combined;
-  for i:=$1AB0 to $1AFF do
-    FixedSizes[i]:= uw_combined;
-  for i:=$1DC0 to $1DFF do
-    FixedSizes[i]:= uw_combined;
-  for i:=$20D0 to $20FF do
-    FixedSizes[i]:= uw_combined;
-  for i:=$FE20 to $FE2F do
-    FixedSizes[i]:= uw_combined;
+  Fill($0300, $036F, uw_combined);
+  Fill($483, $489, uw_combined);
+  Fill($1AB0, $1AFF, uw_combined);
+  Fill($1DC0, $1DFF, uw_combined);
+  Fill($20D0, $20FF, uw_combined);
+  Fill($FE20, $FE2F, uw_combined);
 
   // https://www.compart.com/en/unicode/block/U+0E80
   FixedSizes[$eb1]:= uw_combined;
   FixedSizes[$eb4]:= uw_combined;
-  for i:= $eb4 to $ebc do
-    FixedSizes[i]:= uw_combined;
-  for i:= $ec8 to $ecd do
-    FixedSizes[i]:= uw_combined;
+  Fill($eb4, $ebc, uw_combined);
+  Fill($ec8, $ecd, uw_combined);
 
   FixedSizes[$3099]:= uw_combined;
   FixedSizes[$309A]:= uw_combined;
@@ -207,17 +166,13 @@ begin
   //hex display
   // http://unicode.org/reports/tr9/#Directional_Formatting_Characters
   // https://en.wikipedia.org/wiki/Whitespace_character#Unicode
-  for i:= 0 to $20-1 do //ascii control chars
-    if i<>9 then
-      FixedSizes[i]:= uw_hexshow;
+  Fill(0, $20-1, uw_hexshow);
+  FixedSizes[9]:= uw_space;
 
   //for Unicode BiDi chars attack: https://www.opennet.ru/opennews/art.shtml?num=56083
-  for i:= $2000 to $200F do //white spaces + specials
-    FixedSizes[i]:= uw_hexshow;
-  for i:= $2028 to $202F do  //white spaces + specials
-    FixedSizes[i]:= uw_hexshow;
-  for i:= $2066 to $2069 do
-    FixedSizes[i]:= uw_hexshow;
+  Fill($2000, $200F, uw_hexshow);
+  Fill($2028, $202F, uw_hexshow);
+  Fill($2066, $2069, uw_hexshow);
   FixedSizes[$061C]:= uw_hexshow;
 
   FixedSizes[$85]:= uw_hexshow; //white space
