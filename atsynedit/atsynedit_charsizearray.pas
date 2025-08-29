@@ -43,7 +43,7 @@ begin
   FixedSizes[$24A]:= uw_fullwidth;
 
   //Cyrillic, https://www.compart.com/en/unicode/block/U+0400
-  Fill($400, $45A, uw_normal);
+  Fill($400, $45A, uw_normal); //Russian is here
   Fill($45B, $45F, uw_normal);
   Fill($460, $461, uw_fullwidth);
   Fill($462, $4FF, uw_normal);
@@ -81,15 +81,13 @@ begin
   //Hebrew, https://en.wikipedia.org/wiki/Hebrew_(Unicode_block)
   Fill($0590, $05FF, uw_fullwidth);
   //Arabic, https://en.wikipedia.org/wiki/Arabic_script_in_Unicode
-  Fill($0600, $06FF, uw_fullwidth);
-  //Syriac
-  Fill($0700, $074F, uw_fullwidth);
-  Fill($0750, $077F, uw_fullwidth);
+  Fill($0600, $077F, uw_fullwidth);
   Fill($08A0, $08FF, uw_fullwidth);
-  //Khmer
-  Fill($1780, $17FF, uw_fullwidth);
   Fill($FB50, $FDFF, uw_fullwidth);
   Fill($FE70, $FEFF, uw_fullwidth);
+
+  //Khmer
+  Fill($1780, $17FF, uw_fullwidth);
 
   {
   //Georgian, better to have the autodetect
