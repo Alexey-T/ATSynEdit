@@ -88,7 +88,7 @@ type
     ItalicFontLongerInPercents: integer;
     UnprintedTabCharLength: integer;
     UnprintedTabPointerScale: integer;
-    UnprintedEofCharLength: integer;
+    UnprintedEofArrowScale: integer;
     UnprintedSpaceDotScale: integer;
     UnprintedEndDotScale: integer;
     UnprintedEndFontScale: integer;
@@ -401,7 +401,7 @@ initialization
     ItalicFontLongerInPercents:= 40;
     UnprintedTabCharLength:= 1;
     UnprintedTabPointerScale:= 22;
-    UnprintedEofCharLength:= 1;
+    UnprintedEofArrowScale:= 130;
     UnprintedSpaceDotScale:= 15;
     UnprintedEndDotScale:= 30;
     UnprintedEndFontScale:= 40;
