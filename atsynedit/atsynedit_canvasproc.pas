@@ -650,7 +650,8 @@ begin
     AColorFont,
     ATEditorOptions.UnprintedWrapArrowLength,
     ATEditorOptions.UnprintedWrapArrowWidth,
-    ATEditorOptions.UnprintedTabPointerScale
+    ATEditorOptions.UnprintedTabPointerScale,
+    true
     )
 end;
 
