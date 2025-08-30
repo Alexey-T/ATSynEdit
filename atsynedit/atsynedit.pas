@@ -3960,24 +3960,12 @@ begin
               Colors.UnprintedFont,
               Colors.UnprintedBG)
           else
-            CanvasUnprintedSpace(C,
-              Rect(
-                RectLine.Left,
-                RectLine.Top,
-                RectLine.Left+ACharSize.XScaled div ATEditorCharXScale,
-                RectLine.Top+ACharSize.Y
-                ),
-              ATEditorOptions.UnprintedEndDotScale,
-              Colors.UnprintedFont
-              );
-          {
             CanvasArrowHorz(C,
               RectLine,
               Colors.UnprintedFont,
               ATEditorOptions.UnprintedEofCharLength*ACharSize.XScaled div ATEditorCharXScale,
               false,
               ATEditorOptions.UnprintedTabPointerScale);
-              }
       Break;
     end;
 
