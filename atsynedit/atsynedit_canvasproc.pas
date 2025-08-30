@@ -137,9 +137,10 @@ procedure DoPaintUnprintedSymbols(C: TCanvas;
   AColorFont, AColorBG: TColor);
 
 procedure DoPaintUnprintedEndSymbol(C: TCanvas;
+  ALineEnds: TATLineEnds;
   AX, AY: integer;
   const ACharSize: TATEditorCharSize;
-  AColorFont, AColorBg: TColor);
+  AColorFont: TColor);
 
 procedure DoPaintUnprintedWrapMark(C: TCanvas;
   AX, AY: integer;
@@ -615,9 +616,10 @@ begin
 end;
 
 procedure DoPaintUnprintedEndSymbol(C: TCanvas;
+  ALineEnds: TATLineEnds;
   AX, AY: integer;
   const ACharSize: TATEditorCharSize;
-  AColorFont, AColorBg: TColor);
+  AColorFont: TColor);
 begin
   case ATEditorOptions.UnprintedEndSymbol of
     TATEditorUnptintedEolSymbol.Dot:
@@ -625,13 +627,37 @@ begin
         Rect(AX, AY, AX+ACharSize.XScaled div ATEditorCharXScale, AY+ACharSize.Y),
         ATEditorOptions.UnprintedEndDotScale,
         AColorFont);
+
     TATEditorUnptintedEolSymbol.ArrowDown:
-      CanvasArrowDown(C,
-        Rect(AX, AY, AX+ACharSize.XScaled div ATEditorCharXScale, AY+ACharSize.Y),
-        AColorFont,
-        ATEditorOptions.UnprintedEndArrowLength,
-        ATEditorOptions.UnprintedTabPointerScale
-        );
+      begin
+        case ALineEnds of
+          TATLineEnds.Unix:
+            CanvasArrowDown(C,
+              Rect(AX, AY, AX+ACharSize.XScaled div ATEditorCharXScale, AY+ACharSize.Y),
+              AColorFont,
+              ATEditorOptions.UnprintedEndArrowLength,
+              ATEditorOptions.UnprintedTabPointerScale
+              );
+          TATLineEnds.Windows:
+            CanvasArrowWrapped(C,
+              Rect(AX, AY, AX+ACharSize.XScaled div ATEditorCharXScale, AY+ACharSize.Y),
+              AColorFont,
+              ATEditorOptions.UnprintedWrapArrowLength,
+              ATEditorOptions.UnprintedWrapArrowWidth,
+              ATEditorOptions.UnprintedTabPointerScale,
+              false
+              );
+          TATLineEnds.Mac:
+            CanvasArrowHorz(C,
+              Rect(AX, AY, AX+ACharSize.XScaled div ATEditorCharXScale, AY+ACharSize.Y),
+              AColorFont,
+              ATEditorOptions.UnprintedEndArrowLength,
+              false,
+              ATEditorOptions.UnprintedTabPointerScale
+              );
+        end;
+      end;
+
     TATEditorUnptintedEolSymbol.Pilcrow:
       CanvasPilcrowChar(C,
         Rect(AX, AY, AX+ACharSize.XScaled div ATEditorCharXScale, AY+ACharSize.Y),

@@ -4476,11 +4476,11 @@ begin
             Colors.UnprintedBG)
         else
           DoPaintUnprintedEndSymbol(C,
+            St.LinesEnds[WrapItem.NLineIndex],
             CoordAfterText.X,
             CoordAfterText.Y,
             ACharSize,
-            Colors.UnprintedFont,
-            Colors.TextBG);
+            Colors.UnprintedFont);
       end;
   end
   else
