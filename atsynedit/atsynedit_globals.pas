@@ -88,12 +88,12 @@ type
     ItalicFontLongerInPercents: integer;
     UnprintedTabCharLength: integer;
     UnprintedTabPointerScale: integer;
-    UnprintedEofArrowScale: integer;
     UnprintedSpaceDotScale: integer;
     UnprintedEndDotScale: integer;
     UnprintedEndFontScale: integer;
     UnprintedEndSymbol: TATEditorUnptintedEolSymbol;
     UnprintedEndArrowLength: integer;
+    UnprintedEofArrowLength: integer;
     UnprintedPilcrowScale: integer;
     UnprintedWrapArrowLength: integer;
     UnprintedWrapArrowWidth: integer;
@@ -401,12 +401,12 @@ initialization
     ItalicFontLongerInPercents:= 40;
     UnprintedTabCharLength:= 1;
     UnprintedTabPointerScale:= 22;
-    UnprintedEofArrowScale:= 130;
     UnprintedSpaceDotScale:= 15;
     UnprintedEndDotScale:= 30;
     UnprintedEndFontScale:= 40;
     UnprintedEndSymbol:= TATEditorUnptintedEolSymbol.ArrowDown;
     UnprintedEndArrowLength:= 70;
+    UnprintedEofArrowLength:= 130;
     UnprintedPilcrowScale:= 80;
     UnprintedWrapArrowLength:= 40;
     UnprintedWrapArrowWidth:= 80;

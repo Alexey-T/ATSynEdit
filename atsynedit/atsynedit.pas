@@ -3963,7 +3963,7 @@ begin
             CanvasArrowHorz(C,
               RectLine,
               Colors.UnprintedFont,
-              ATEditorOptions.UnprintedEofArrowScale*ACharSize.XScaled div ATEditorCharXScale div 100,
+              ATEditorOptions.UnprintedEofArrowLength*ACharSize.XScaled div ATEditorCharXScale div 100,
               false,
               ATEditorOptions.UnprintedTabPointerScale);
       Break;
