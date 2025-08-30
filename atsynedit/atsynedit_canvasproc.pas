@@ -150,6 +150,9 @@ procedure DoPaintUnprintedWrapMark(C: TCanvas;
 function CanvasTextWidth(const S: atString; ALineIndex: integer;
   ATabHelper: TATStringTabHelper; ACharWidth: integer; AFontProportional: boolean): Int64; inline;
 
+procedure CanvasUnprintedSpace(C: TCanvas; const ARect: TRect;
+  AScale: integer; AFontColor: TColor);
+
 procedure UpdateWiderFlags(C: TCanvas; out Flags: TATWiderFlags);
 
 var
