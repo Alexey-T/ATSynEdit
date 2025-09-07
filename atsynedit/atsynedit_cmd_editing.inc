@@ -782,7 +782,7 @@ begin
       for iLine:= Line2 downto Line1 do
       begin
         St.LineInsert(Line2+1, St.Lines[iLine]);
-        if St.IsIndexValid(Line2+1) and (Line2+1<St.Count-1) then
+        if {St.IsIndexValid(Line2+1) and} (Line2+1<St.Count-1) then //don't set LinesEnd for fake like
           St.LinesEnds[Line2+1]:= St.Endings;
       end;
 
