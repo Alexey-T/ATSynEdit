@@ -279,9 +279,6 @@ type
     function GetUndoEmpty: boolean;
     function GetUndoLimit: integer;
     function IsLastFakeLineUnneeded: boolean;
-    procedure LineInsertRaw(ALineIndex: SizeInt; const AString: atString; AEnd: TATLineEnds; AWithEvent: boolean=true);
-    procedure LineInsertEx(ALineIndex: SizeInt; const AString: atString; AEnd: TATLineEnds; AWithEvent: boolean=true);
-    procedure LineAddEx(const AString: atString; AEnd: TATLineEnds);
     function IsSavingWithSignature: boolean;
     procedure SetCaretsArray(const L: TATPointPairArray);
     procedure SetCaretsArray2(const L: TATPointPairArray);
@@ -330,6 +327,9 @@ type
     procedure LineAddRaw_NoUndo(const S: UnicodeString; AEnd: TATLineEnds);
     procedure LineAddRaw(const AString: atString; AEnd: TATLineEnds; AWithEvent: boolean=true);
     procedure LineAdd(const AString: atString);
+    procedure LineAddEx(const AString: atString; AEnd: TATLineEnds);
+    procedure LineInsertRaw(ALineIndex: SizeInt; const AString: atString; AEnd: TATLineEnds; AWithEvent: boolean=true);
+    procedure LineInsertEx(ALineIndex: SizeInt; const AString: atString; AEnd: TATLineEnds; AWithEvent: boolean=true);
     procedure LineInsert(ALineIndex: SizeInt; const AString: atString; AWithEvent: boolean=true);
     procedure LineInsertStrings(ALineIndex: SizeInt; ABlock: TATStrings; AWithFinalEol: boolean); deprecated 'Dont use it, not safe code';
     procedure LineDelete(ALineIndex: SizeInt; AForceLast: boolean=true;
