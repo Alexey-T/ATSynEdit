@@ -855,8 +855,8 @@ begin
       St.Lines[iLine]:= SLineNew;
     Inc(iBlockIndex);
   end;
-
 end;
+
 
 procedure TATSynEdit.DebugSelRect;
 begin
