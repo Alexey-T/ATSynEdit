@@ -755,6 +755,9 @@ var
   St: TATStrings;
   Caret: TATCaretItem;
   Line1, Line2, iCaret, iLine, NLastCaret: integer;
+  S_Orig, S_Part: UnicodeString;
+  CurSelRect: TRect;
+  bVertBlock: boolean;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
@@ -763,9 +766,43 @@ begin
   DoCaretsDeleteOnSameLines;
 
   St:= Strings;
+  NLastCaret:= Carets.Count-1;
+  bVertBlock:= (Carets.Count>0) and IsSelColumn;
+
+  if bVertBlock then
+  begin
+    CurSelRect:= FSelRect;
+    //FSelRect can be empty, but it's still vert block
+    if CurSelRect=cRectEmpty then
+      CurSelRect:= Rect(
+        Carets[0].GetLeftEdge.X,
+        Carets[0].PosY,
+        Carets[NLastCaret].GetRightEdge.X,
+        Carets[NLastCaret].PosY
+        );
+  end
+  else
+    CurSelRect:= cRectEmpty;
+
   St.BeginUndoGroup;
   try
-    NLastCaret:= Carets.Count-1;
+    //handle vertical block specially: duplicate its parts to the right
+    if bVertBlock then
+    begin
+      for iLine:= CurSelRect.Bottom downto CurSelRect.Top do
+        if St.IsIndexValid(iLine) then
+        begin
+          S_Orig:= St.Lines[iLine];
+          S_Part:= Copy(S_Orig, CurSelRect.Left+1, CurSelRect.Width);
+          if S_Part<>'' then
+          begin
+            Insert(S_Part, S_Orig, CurSelRect.Right+1);
+            St.Lines[iLine]:= S_Orig;
+          end;
+        end;
+    end
+    else
+    //handle normal selection(s) or just caret(s)
     for iCaret:= NLastCaret downto 0 do
     begin
       Caret:= Carets[iCaret];
@@ -805,7 +842,9 @@ begin
     St.EndUndoGroup;
   end;
 
-  Result:= [TATCommandResult.Text, TATCommandResult.CaretTop];
+  Result:= [TATCommandResult.Text];
+  if not bVertBlock then
+    Include(Result, TATCommandResult.CaretTop);
 end;
 
 function TATSynEdit.DoCommand_TextDeleteToLineBegin: TATCommandResults;
