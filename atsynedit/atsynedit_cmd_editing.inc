@@ -780,10 +780,16 @@ begin
     //e.g. after we call "duplicate line" 1st time, FSelRect becomes empty
     if IsSelRectEmpty then
       CurSelRect:= Rect(
+        {
         Carets[0].GetLeftEdge.X,
         Carets[0].PosY,
         Carets[NLastCaret].GetRightEdge.X,
         Carets[NLastCaret].PosY
+        }
+        Min(FSelRectBegin.X, FSelRectEnd.X),
+        FSelRectBegin.Y,
+        Max(FSelRectBegin.X, FSelRectEnd.X),
+        FSelRectEnd.Y
         );
   end
   else
