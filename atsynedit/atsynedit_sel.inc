@@ -817,6 +817,46 @@ begin
   end;
 end;
 
+
+procedure TATSynEdit.DoSelect_ColumnBlock_CopyToStringlist(const ASelRect: TRect; AList: TStringList);
+var
+  St: TATStrings;
+  NBlockWidth, iLine: integer;
+  S: UnicodeString;
+begin
+  AList.Clear;
+  St:= Strings;
+  NBlockWidth:= ASelRect.Width;
+  for iLine:= ASelRect.Top to ASelRect.Bottom do
+  begin
+    if not St.IsIndexValid(iLine) then Break;
+    S:= St.LineSub(iLine, ASelRect.Left+1, NBlockWidth);
+    AList.Add(UTF8Encode(S));
+  end;
+end;
+
+procedure TATSynEdit.DoSelect_ColumnBlock_InsertFromStringlist(ATextPos: TPoint; AList: TStringList);
+var
+  St: TATStrings;
+  SLineOrig, SLineNew: UnicodeString;
+  iLine, iBlockIndex: integer;
+begin
+  St:= Strings;
+  iBlockIndex:= 0;
+  for iLine:= ATextPos.Y to ATextPos.Y+AList.Count-1 do
+  begin
+    if not St.IsIndexValid(iLine) then Break;
+    if iBlockIndex>=AList.Count then Break;
+    SLineOrig:= St.Lines[iLine];
+    SLineNew:= SLineOrig;
+    Insert(UTF8Decode(AList[iBlockIndex]), SLineNew, ATextPos.X+1);
+    if SLineOrig<>SLineNew then
+      St.Lines[iLine]:= SLineNew;
+    Inc(iBlockIndex);
+  end;
+
+end;
+
 procedure TATSynEdit.DebugSelRect;
 begin
   Application.MainForm.Caption:= Format('SelRect %d:%d-%d:%d, SelRectBegin %d:%d, SelRectEnd %d:%d', [

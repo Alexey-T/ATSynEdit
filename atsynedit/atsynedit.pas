@@ -1853,6 +1853,8 @@ type
       AUpdateSelRectPoints: boolean=true);
     procedure DoSelect_ColumnBlock_FromPointsColumns(P1, P2: TPoint);
     procedure DoSelect_ColumnBlock_Primitive(ACaretPos1, ACaretPos2: TPoint);
+    procedure DoSelect_ColumnBlock_CopyToStringlist(const ASelRect: TRect; AList: TStringList);
+    procedure DoSelect_ColumnBlock_InsertFromStringlist(ATextPos: TPoint; AList: TStringList);
     procedure DoScrollToBeginOrEnd(AToBegin: boolean);
     procedure DoScrollByDelta(ADeltaX, ADeltaY: integer);
     procedure DoScrollByDeltaInPixels(ADeltaX, ADeltaY: integer);
