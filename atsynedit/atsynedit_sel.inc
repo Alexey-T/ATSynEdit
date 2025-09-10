@@ -838,7 +838,7 @@ end;
 procedure TATSynEdit.DoSelect_ColumnBlock_InsertFromStringlist(ATextPos: TPoint; AList: TStringList);
 var
   St: TATStrings;
-  SLineOrig, SLineNew: UnicodeString;
+  SLineOrig, SLineNew, SPart: UnicodeString;
   iLine, iBlockIndex: integer;
 begin
   St:= Strings;
@@ -846,10 +846,11 @@ begin
   for iLine:= ATextPos.Y to ATextPos.Y+AList.Count-1 do
   begin
     if not St.IsIndexValid(iLine) then Break;
-    if iBlockIndex>=AList.Count then Break;
+    //if iBlockIndex>=AList.Count then Break;
     SLineOrig:= St.Lines[iLine];
     SLineNew:= SLineOrig;
-    Insert(UTF8Decode(AList[iBlockIndex]), SLineNew, ATextPos.X+1);
+    SPart:= UTF8Decode(AList[iBlockIndex]);
+    Insert(SPart, SLineNew, ATextPos.X+1);
     if SLineOrig<>SLineNew then
       St.Lines[iLine]:= SLineNew;
     Inc(iBlockIndex);
