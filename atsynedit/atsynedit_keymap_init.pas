@@ -80,7 +80,7 @@ begin
   M.Add(cCommand_DeleteFinalEndOfLine, 'delete final end-of-line', [], []);
 
   M.Add(cCommand_TextDeleteLine, 'delete line(s)', [scXControl+VK_Y], []);
-  M.Add(cCommand_TextDuplicateLine, 'duplicate line(s)', [scXControl+VK_D], []);
+  M.Add(cCommand_TextDuplicateLine, 'duplicate line(s) or column block', [scXControl+VK_D], []);
 
   M.Add(cCommand_GotoTextBegin,      'go to text begin',          {$ifndef darwin} [scXControl+VK_HOME],         [] {$else} [VK_HOME], [scMeta+VK_UP]  {$endif});
   M.Add(cCommand_GotoTextBegin_Sel,  'go to text begin + select', {$ifndef darwin} [scXControl+scShift+VK_HOME], [] {$else} [scShift+VK_HOME], []      {$endif});
