@@ -217,11 +217,11 @@ function ATEditorScale(AValue: integer): integer;
 function ATEditorScaleFont(AValue: integer): integer;
 
 const
-  crNiceScrollNone  = TCursor(-70);
-  crNiceScrollUp    = TCursor(-71);
-  crNiceScrollDown  = TCursor(-72);
-  crNiceScrollLeft  = TCursor(-73);
-  crNiceScrollRight = TCursor(-74);
+  crNiceScrollNone  = TCursor(-40);
+  crNiceScrollUp    = TCursor(-41);
+  crNiceScrollDown  = TCursor(-42);
+  crNiceScrollLeft  = TCursor(-43);
+  crNiceScrollRight = TCursor(-44);
 
 function ATEditorGetClipboardExData(out AInfo: TATEditorClipboardExData): boolean;
 
