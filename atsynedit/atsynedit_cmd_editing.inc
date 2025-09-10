@@ -768,7 +768,10 @@ begin
 
   St:= Strings;
   NLastCaret:= Carets.Count-1;
-  bVertBlock:= (Carets.Count>0) and IsSelColumn;
+  bVertBlock:= (Carets.Count>0) and (
+     IsSelColumn or
+     DoSelect_MultiCaretsLookLikeColumnSelection //allows to select by words and still treat the block as vertical
+     );
 
   if bVertBlock then
   begin
