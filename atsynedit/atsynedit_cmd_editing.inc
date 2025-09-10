@@ -773,7 +773,8 @@ begin
   begin
     CurSelRect:= FSelRect;
     //FSelRect can be empty, but it's still vert block
-    if CurSelRect=cRectEmpty then
+    //e.g. after we call "duplicate line" 1st time, FSelRect becomes empty
+    if IsSelRectEmpty then
       CurSelRect:= Rect(
         Carets[0].GetLeftEdge.X,
         Carets[0].PosY,
