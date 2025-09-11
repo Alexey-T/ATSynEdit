@@ -807,6 +807,7 @@ begin
       DoSelect_ColumnBlock_InsertFromStringArray(
         Point(CurSelRect.Right, CurSelRect.Top),
         BlockArray);
+      BlockArray:= nil;
     end
     else
     //handle normal selection(s) or just caret(s)
