@@ -755,7 +755,7 @@ function TATSynEdit.DoCommand_TextDuplicateLine: TATCommandResults;
 var
   St: TATStrings;
   Caret: TATCaretItem;
-  BlockList: TStringList;
+  BlockArray: TATUnicodeStringArray;
   Line1, Line2, iCaret, iLine, NLastCaret: integer;
   CurSelRect: TRect;
   bVertBlock: boolean;
@@ -800,17 +800,13 @@ begin
     //handle vertical block specially: duplicate its parts to the right
     if bVertBlock then
     begin
-      BlockList:= TStringList.Create;
-      try
-        DoSelect_ColumnBlock_CopyToStringlist(
-          CurSelRect,
-          BlockList);
-        DoSelect_ColumnBlock_InsertFromStringlist(
-          Point(CurSelRect.Right, CurSelRect.Top),
-          BlockList);
-      finally
-        FreeAndNil(BlockList);
-      end;
+      BlockArray:= nil;
+      DoSelect_ColumnBlock_CopyToStringArray(
+        CurSelRect,
+        BlockArray);
+      DoSelect_ColumnBlock_InsertFromStringArray(
+        Point(CurSelRect.Right, CurSelRect.Top),
+        BlockArray);
     end
     else
     //handle normal selection(s) or just caret(s)

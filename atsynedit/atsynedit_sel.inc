@@ -818,42 +818,37 @@ begin
 end;
 
 
-procedure TATSynEdit.DoSelect_ColumnBlock_CopyToStringlist(const ASelRect: TRect; AList: TStringList);
+procedure TATSynEdit.DoSelect_ColumnBlock_CopyToStringArray(const ASelRect: TRect; var Ar: TATUnicodeStringArray);
 var
   St: TATStrings;
-  NBlockWidth, iLine: integer;
-  S: UnicodeString;
+  NLen, NBlockWidth, i: integer;
 begin
-  AList.Clear;
   St:= Strings;
   NBlockWidth:= ASelRect.Width;
-  for iLine:= ASelRect.Top to ASelRect.Bottom do
-  begin
-    if not St.IsIndexValid(iLine) then Break;
-    S:= St.LineSub(iLine, ASelRect.Left+1, NBlockWidth);
-    AList.Add(UTF8Encode(S));
-  end;
+  NLen:= Max(0, Min(St.Count-1, ASelRect.Bottom)-ASelRect.Top+1);
+  SetLength(Ar, NLen);
+  for i:= 0 to NLen-1 do
+    Ar[i]:= St.LineSub(ASelRect.Top+i, ASelRect.Left+1, NBlockWidth);
 end;
 
-procedure TATSynEdit.DoSelect_ColumnBlock_InsertFromStringlist(ATextPos: TPoint; AList: TStringList);
+procedure TATSynEdit.DoSelect_ColumnBlock_InsertFromStringArray(ATextPos: TPoint; const Ar: TATUnicodeStringArray);
 var
   St: TATStrings;
   SLineOrig, SLineNew, SPart: UnicodeString;
-  iLine, iBlockIndex: integer;
+  iLine, iArrayIndex: integer;
 begin
   St:= Strings;
-  iBlockIndex:= 0;
-  for iLine:= ATextPos.Y to ATextPos.Y+AList.Count-1 do
+  iArrayIndex:= 0;
+  for iLine:= ATextPos.Y to ATextPos.Y+Length(Ar)-1 do
   begin
     if not St.IsIndexValid(iLine) then Break;
-    //if iBlockIndex>=AList.Count then Break;
     SLineOrig:= St.Lines[iLine];
     SLineNew:= SLineOrig;
-    SPart:= UTF8Decode(AList[iBlockIndex]);
+    SPart:= Ar[iArrayIndex];
     Insert(SPart, SLineNew, ATextPos.X+1);
     if SLineOrig<>SLineNew then
       St.Lines[iLine]:= SLineNew;
-    Inc(iBlockIndex);
+    Inc(iArrayIndex);
   end;
 end;
 
