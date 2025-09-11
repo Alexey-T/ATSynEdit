@@ -1308,7 +1308,7 @@ var
   Str: atString;
   NBlockBeginY, NBlockEndY, NIndentAtCol: integer;
   bChange: boolean;
-  i: integer;
+  iLine: integer;
 begin
   St:= Strings;
   NBlockBeginY:= Min(SelRect.Top, St.Count-1);
@@ -1318,20 +1318,20 @@ begin
 
   St.BeginUndoGroup;
   try
-    for i:= NBlockBeginY to NBlockEndY do
+    for iLine:= NBlockBeginY to NBlockEndY do
     begin
-      Str:= St.Lines[i];
+      Str:= St.Lines[iLine];
       if Trim(Str)='' then Continue;
 
       Str:= Copy(Str, 1, NIndentAtCol) +
             FTabHelper.IndentUnindent(
-              i,
+              iLine,
               Copy(Str, NIndentAtCol+1, MaxInt),
               ARight);
 
-      if St.Lines[i]<>Str then
+      if St.Lines[iLine]<>Str then
       begin
-        St.Lines[i]:= Str;
+        St.Lines[iLine]:= Str;
         bChange:= true;
       end;
     end;
