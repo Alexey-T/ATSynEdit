@@ -27,7 +27,6 @@ uses
   ATStringProc_TextBuffer;
 
 type
-  TATFinderStringArray = array of UnicodeString;
   TATFinderProgress = procedure(Sender: TObject;
     const ACurPos, AMaxPos: Int64;
     var AContinue: boolean) of object;
@@ -337,7 +336,7 @@ begin
   end;
 end;
 
-procedure StringArray_SetFromString(out L: TATFinderStringArray; const Str: UnicodeString; Reversed: boolean);
+procedure StringArray_SetFromString(out L: TATUnicodeStringArray; const Str: UnicodeString; Reversed: boolean);
 var
   NCount, i: integer;
   Sep: TATStringSeparator;
@@ -359,7 +358,7 @@ begin
   end;
 end;
 
-function StringArray_GetText(const L: TATFinderStringArray): UnicodeString;
+function StringArray_GetText(const L: TATUnicodeStringArray): UnicodeString;
 var
   S: UnicodeString;
   Last, i: integer;
@@ -2314,7 +2313,7 @@ function TATEditorFinder.FindMatch_InEditor(APosStart, APosEnd: TPoint;
   const AFirstLoopedLine: UnicodeString): boolean;
 var
   PartCount: integer;
-  ListParts, ListLooped: TATFinderStringArray;
+  ListParts, ListLooped: TATUnicodeStringArray;
   SLinePartW, SLineLoopedW: UnicodeString;
   SLinePart_Len, SLineLooped_Len: integer;
   //---------
