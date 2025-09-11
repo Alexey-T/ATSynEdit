@@ -523,6 +523,9 @@ begin
   begin
     SwapInt(PosX, EndX);
     SwapInt(PosY, EndY);
+
+    SavedX:= 0;
+    SavedX_Pre:= 0;
   end;
 end;
 

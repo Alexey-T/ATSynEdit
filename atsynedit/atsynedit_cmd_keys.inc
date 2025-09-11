@@ -233,8 +233,6 @@ begin
         if Caret.IsSelection and (Caret.IsForwardSelection<>ADown) then
         begin
           Caret.SwapSelection;
-          Caret.SavedX:= 0;
-          Caret.SavedX_Pre:= 0;
           bChange:= true;
         end;
       end;
