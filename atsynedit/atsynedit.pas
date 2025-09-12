@@ -6879,11 +6879,11 @@ var
   PosTextClicked: TPoint;
   PosDetails: TATEditorPosDetails;
   ActionId: TATEditorMouseAction;
-  bClickOnSelection, bClickHandled, bUnfoldClickedPos: boolean;
-  bOldColumnSelection, bClickToSelectColumn: boolean;
-  NGutterIndex, NRangeIndex, NLineRangeEnd: integer;
-  RectMinimapSel: TRect;
   Caret: TATCaretItem;
+  RectMinimapSel: TRect;
+  bClickOnSelection, bClickHandled, bUnfoldClickedPos: boolean;
+  bOldColumnSelection, bClickToSelectColumn, bClickNear: boolean;
+  NGutterIndex, NRangeIndex, NLineRangeEnd, NLineOfCaretPrev: integer;
 begin
   if not OptMouseEnableAll then exit;
   inherited;
@@ -7087,7 +7087,11 @@ begin
 
       TATEditorMouseAction.ClickSimple:
         begin
-          ActionAddJumpToUndo;
+          bClickNear:= (Carets.Count=1) and
+            (Abs(Carets[0].PosY - FMouseDownPnt.Y) < ATEditorOptions.MinLineDiffForUndoCaretJump);
+          if not bClickNear then
+            ActionAddJumpToUndo;
+
           Strings.SetGroupMark;
 
           FSelRect:= cRectEmpty;
