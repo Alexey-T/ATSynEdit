@@ -56,7 +56,6 @@ type
     SampleChar = '0';
     MaxVisibleColumns = 500;
     MaxLineLenToCalculateAutoIndent = 200;
-    MinLineDiffForUndoCaretJump = 3;
     GutterShift2ndIconRightByPercents = 50;
 
     GutterTagBookmarks = 1;
@@ -117,6 +116,7 @@ type
     MinWordWrapOffset: integer;
     PunctuationToWrapWithWords: UnicodeString;
     MaxLineLenForUndo: integer;
+    MinLineDiffForUndoCaretJump: integer;
     TextoutNeedsOffsets: boolean;
     CaretTextOverInvertedRect: boolean;
     EnableLigaturesOnLineWithCaret: boolean;
@@ -430,6 +430,7 @@ initialization
     MinWordWrapOffset:= 3;
     PunctuationToWrapWithWords:= '.,;:''"`~?!&%$()[]';
     MaxLineLenForUndo:= 10*1000*1000;
+    MinLineDiffForUndoCaretJump:= 3;
 
     //Win: seems no slowdown from offsets
     //macOS: better to use True, fonts have floating width value, e.g. 10.2 pixels
