@@ -6883,7 +6883,7 @@ var
   RectMinimapSel: TRect;
   bClickOnSelection, bClickHandled, bUnfoldClickedPos: boolean;
   bOldColumnSelection, bClickToSelectColumn, bClickNear: boolean;
-  NGutterIndex, NRangeIndex, NLineRangeEnd, NLineOfCaretPrev: integer;
+  NGutterIndex, NRangeIndex, NLineRangeEnd: integer;
 begin
   if not OptMouseEnableAll then exit;
   inherited;
