@@ -11344,7 +11344,6 @@ begin
   begin
     St.SetGroupMark; //solve CudaText #3269
     St.ActionAddJumpToUndo(St.CaretsAfterLastEdition);
-    //ActionAddJumpToUndo(GetCaretsArray); //bad, parameter is needed only for another array
   end;
 end;
 
