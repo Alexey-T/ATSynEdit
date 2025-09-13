@@ -261,7 +261,7 @@ begin
         NTo:= NFrom;
       end;
 
-      NLastLine:= Max(0, St.Count-1-1); //-2: to fix Undo cannot undo operation at last line
+      NLastLine:= St.Count-1-1; //-2: to fix Undo cannot undo move-down operation at last line
 
       if ADown then
       //move lines down
