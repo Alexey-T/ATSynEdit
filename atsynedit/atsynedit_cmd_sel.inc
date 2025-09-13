@@ -261,7 +261,15 @@ begin
         NTo:= NFrom;
       end;
 
-      NLastLine:= St.Count-1-1; //-2: to fix Undo cannot undo move-down operation at last line
+      NLastLine:= St.Count-1-1;
+      {
+      -2: to fix Undo cannot undo move-down at last line.
+      Undo cannot undo at last line, because St.LineMove makes 2 undo-items
+      Delete+Insert which cannot be undone at last line.
+
+      yes, this adds limitation to move-line-down: we cannot do it
+      on 2-lines file. we can live with this limitation.
+      }
 
       if ADown then
       //move lines down
