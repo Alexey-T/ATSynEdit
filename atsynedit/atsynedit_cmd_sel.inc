@@ -266,7 +266,8 @@ begin
       //Delete+Insert which cannot be undone at last line.
       NLastLine:= St.Count-1-1;
 
-      //this is to remove limitation: cannot move-line-down on 2-lines document (without fake like)
+      //if move-down runs at the end, and no fake line present, force it.
+      //this is to remove limitation: cannot move-down on 2-lines document without fake like.
       if NTo>=NLastLine then
         if St.ActionEnsureFinalEol then
           Inc(NLastLine);
