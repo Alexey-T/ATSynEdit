@@ -247,11 +247,11 @@ begin
 
   DoCaretsDeleteOnSameLines;
 
-  try
-    St.BeginUndoGroup;
-    St.EnabledBookmarksUpdate:= false;
-    NLastLine:= St.Count-1;
+  St.BeginUndoGroup;
+  St.EnabledBookmarksUpdate:= false;
+  NLastLine:= St.Count-1;
 
+  try
     for iCaret:= Carets.Count-1 downto 0 do
     begin
       Caret:= Carets[iCaret];
