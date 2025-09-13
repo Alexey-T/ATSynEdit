@@ -261,12 +261,12 @@ begin
         NTo:= NFrom;
       end;
 
-      { -2: to fix Undo cannot undo move-down at last line.
-      Undo cannot undo at last line, because St.LineMove makes 2 undo-items
-      Delete+Insert which cannot be undone at last line. }
+      //-2: to fix Undo cannot undo move-down at last line.
+      //Undo cannot undo at last line, because St.LineMove makes 2 undo-items
+      //Delete+Insert which cannot be undone at last line.
       NLastLine:= St.Count-1-1;
 
-      //this is needed to remove limitation: cannot move-line-down on 2-lines document
+      //this is to remove limitation: cannot move-line-down on 2-lines document (without fake like)
       if NTo>=NLastLine then
         if St.ActionEnsureFinalEol then
           Inc(NLastLine);
