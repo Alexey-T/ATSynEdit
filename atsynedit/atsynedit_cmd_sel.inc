@@ -262,6 +262,8 @@ begin
       end;
 
       NLastLine:= St.Count-1;
+      if St.IsLastLineFake then
+        NLastLine:= Max(0, NLastLine-1); //to fix Undo cannot undo moving line down from fake-like
 
       if ADown then
       //move lines down
