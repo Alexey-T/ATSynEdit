@@ -234,10 +234,10 @@ end;
 
 function TATSynEdit.DoCommand_MoveSelectionUpDown(ADown: boolean): TATCommandResults;
 var
-  NFrom, NTo, NLastLine, iLine: integer;
-  Caret: TATCaretItem;
   St: TATStrings;
+  Caret: TATCaretItem;
   Pnt: TPoint;
+  NFrom, NTo, NLastLine, iCaret, iLine: integer;
   bLastNoEol: boolean;
 begin
   Result:= [];
@@ -245,76 +245,79 @@ begin
   if ModeOneLine then Exit;
   St:= Strings;
 
-  DoCaretSingleAsIs;
-  Caret:= Carets[0];
-  Caret.GetSelLines(NFrom, NTo);
-  if NFrom<0 then
-  begin
-    NFrom:= Caret.PosY;
-    NTo:= NFrom;
-  end;
+  DoCaretsDeleteOnSameLines;
 
   try
     St.BeginUndoGroup;
     St.EnabledBookmarksUpdate:= false;
     NLastLine:= St.Count-1;
 
-    if ADown then
-    //move lines down
+    for iCaret:= Carets.Count-1 downto 0 do
     begin
-      if NTo>=NLastLine then Exit;
-      bLastNoEol:= (NTo+1=NLastLine) and (St.LinesEnds[NLastLine]=TATLineEnds.None);
-
-      {
-      S:= St.Lines[NTo+1];
-      St.LineDelete(NTo+1);
-      St.LineInsert(NFrom, S);
-      }
-      St.LineMove(NTo+1, NFrom);
-
-      if bLastNoEol then
-        St.ActionDeleteFakeLineAndFinalEol;
-
-      Inc(Caret.PosY);
-      if Caret.EndY>=0 then
-        Inc(Caret.EndY);
-
-      //correct caret if out of file
-      if Caret.PosY>=St.Count then
+      Caret:= Carets[iCaret];
+      Caret.GetSelLines(NFrom, NTo);
+      if NFrom<0 then
       begin
-        Pnt:= GetEndOfFilePos;
-        Caret.PosX:= Pnt.X;
-        Caret.PosY:= Pnt.Y;
+        NFrom:= Caret.PosY;
+        NTo:= NFrom;
       end;
-    end
-    else
-    //move lines up
-    begin
-      if NFrom<=0 then Exit;
-      bLastNoEol:= (NTo=NLastLine) and (St.LinesEnds[NTo]=TATLineEnds.None);
 
-      if bLastNoEol then
-        St.LinesEnds[NTo]:= St.Endings;
+      if ADown then
+      //move lines down
+      begin
+        if NTo>=NLastLine then Exit;
+        bLastNoEol:= (NTo+1=NLastLine) and (St.LinesEnds[NLastLine]=TATLineEnds.None);
 
-      {
-      S:= St.Lines[NFrom-1];
-      St.LineDelete(NFrom-1);
-      St.LineInsert(NTo, S);
-      }
-      St.LineMove(NFrom-1, NTo);
+        {
+        S:= St.Lines[NTo+1];
+        St.LineDelete(NTo+1);
+        St.LineInsert(NFrom, S);
+        }
+        St.LineMove(NTo+1, NFrom);
 
-      if bLastNoEol then
-        St.ActionDeleteFakeLineAndFinalEol;
+        if bLastNoEol then
+          St.ActionDeleteFakeLineAndFinalEol;
 
-      Dec(Caret.PosY);
-      if Caret.EndY>=0 then
-        Dec(Caret.EndY);
+        Inc(Caret.PosY);
+        if Caret.EndY>=0 then
+          Inc(Caret.EndY);
+
+        //correct caret if out of file
+        if Caret.PosY>=St.Count then
+        begin
+          Pnt:= GetEndOfFilePos;
+          Caret.PosX:= Pnt.X;
+          Caret.PosY:= Pnt.Y;
+        end;
+      end
+      else
+      //move lines up
+      begin
+        if NFrom<=0 then Exit;
+        bLastNoEol:= (NTo=NLastLine) and (St.LinesEnds[NTo]=TATLineEnds.None);
+
+        if bLastNoEol then
+          St.LinesEnds[NTo]:= St.Endings;
+
+        {
+        S:= St.Lines[NFrom-1];
+        St.LineDelete(NFrom-1);
+        St.LineInsert(NTo, S);
+        }
+        St.LineMove(NFrom-1, NTo);
+
+        if bLastNoEol then
+          St.ActionDeleteFakeLineAndFinalEol;
+
+        Dec(Caret.PosY);
+        if Caret.EndY>=0 then
+          Dec(Caret.EndY);
+      end;
+
+      //make it like in Sublime
+      for iLine:= IfThen(ADown, NFrom+1, NFrom) to IfThen(ADown, NTo, NTo-1) do
+        St.LinesState[iLine]:= TATLineState.Changed;
     end;
-
-    //make it like in Sublime
-    for iLine:= IfThen(ADown, NFrom+1, NFrom) to IfThen(ADown, NTo, NTo-1) do
-      St.LinesState[iLine]:= TATLineState.Changed;
-
   finally
     St.EndUndoGroup;
     St.EnabledBookmarksUpdate:= true;
