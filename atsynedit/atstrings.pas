@@ -2185,7 +2185,10 @@ begin
             ActionDeleteFakeLineAndFinalEol; //fixes CudaText #5379
           end
           else
-            Lines[0]:= '';
+          if IsIndexValid(0) then
+            Lines[0]:= ''
+          else
+            LineAdd('');
         end;
 
       TATEditAction.ClearModified:
