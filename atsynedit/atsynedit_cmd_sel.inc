@@ -249,7 +249,6 @@ begin
 
   St.BeginUndoGroup;
   St.EnabledBookmarksUpdate:= false;
-  NLastLine:= St.Count-1;
 
   try
     for iCaret:= Carets.Count-1 downto 0 do
@@ -261,6 +260,8 @@ begin
         NFrom:= Caret.PosY;
         NTo:= NFrom;
       end;
+
+      NLastLine:= St.Count-1;
 
       if ADown then
       //move lines down
