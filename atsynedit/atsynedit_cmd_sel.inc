@@ -265,7 +265,7 @@ begin
       if ADown then
       //move lines down
       begin
-        if NTo>=NLastLine then Exit;
+        if NTo>=NLastLine then Continue;
         bLastNoEol:= (NTo+1=NLastLine) and (St.LinesEnds[NLastLine]=TATLineEnds.None);
 
         {
@@ -293,7 +293,7 @@ begin
       else
       //move lines up
       begin
-        if NFrom<=0 then Exit;
+        if NFrom<=0 then Break;
         bLastNoEol:= (NTo=NLastLine) and (St.LinesEnds[NTo]=TATLineEnds.None);
 
         if bLastNoEol then
