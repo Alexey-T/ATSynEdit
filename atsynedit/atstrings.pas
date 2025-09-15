@@ -2852,14 +2852,11 @@ begin
 end;
 
 function TATStrings.ActionTrimFinalEmptyLines: boolean;
-var
-  NCount: SizeInt;
 begin
   Result:= false;
-  NCount:= Count;
-  while (NCount>1) and (Lines[NCount-1]='') and (Lines[NCount-2]='') do
+  while (Count>=2) and (LinesLen[Count-1]=0) and (LinesLen[Count-2]=0) do
   begin
-    LineDelete(NCount-2);
+    LineDelete(Count-2);
     Result:= true;
   end;
 end;
