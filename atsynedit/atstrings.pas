@@ -158,9 +158,9 @@ type
     );
 
   TATLoadStreamOption = (
-    FromUTF8,
-    AllowBadCharsOfLen1,
-    KeepScroll
+    FromUTF8, // Stream already has UTF8 encoding, so we can load it faster.
+    AllowBadCharsOfLen1, // Ignore incorrect UTF8 sequences of length=1. Otherwise, raise exception.
+    KeepScroll // Keep vertical scroll position in editor after stream is loaded.
     );
   TATLoadStreamOptions = set of TATLoadStreamOption;
 
