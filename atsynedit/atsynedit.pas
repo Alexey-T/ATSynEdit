@@ -463,6 +463,7 @@ type
   TATSynEditBeforeOrAfterHiliteEvent = procedure(Sender: TObject; AMainText: boolean) of object;
   TATSynEditEnabledUndoRedoChanged = procedure(Sender: TObject; AUndoEnabled, ARedoEnabled: boolean) of object;
   TATSynEditUndoTooLongLineEvent = procedure(Sender: TObject; ALineIndex: integer) of object;
+  TATSynEditDropdownEvent = procedure(Sender: TPopupMenu) of object;
 
 type
   { TATFoldedMark }
