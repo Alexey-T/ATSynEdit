@@ -6904,6 +6904,8 @@ begin
   begin
     PosTextClicked:= ClientPosToCaretPos(PosCoord, PosDetails);
 
+    {
+    //commented 2025.09: do we need to handle right-click on gutter?
     if FOptGutterVisible and ATPointInRect(FRectGutter, PosCoord) then
     begin
       NGutterIndex:= FGutter.FindIndexAtCoordX(PosCoord.X);
@@ -6915,6 +6917,7 @@ begin
         exit;
       end;
     end;
+    }
 
     if FOptMouseRightClickMovesCaret then
     begin
