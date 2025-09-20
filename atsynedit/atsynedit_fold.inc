@@ -385,6 +385,8 @@ begin
   //dynamic items [+], [-]
   DoMenuGutterFold_AddDynamicItems(Menu);
 
+  if Assigned(GlobalApplyPopupTheme) then
+    GlobalApplyPopupTheme(Menu);
   Menu.Popup;
 end;
 

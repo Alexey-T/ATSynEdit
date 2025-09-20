@@ -36,6 +36,7 @@ uses
   ATStrings,
   ATStringProc_WordJump,
   ATCanvasPrimitives,
+  ATFlatThemes,
   ATSynEdit_Globals,
   ATSynEdit_CharSizer,
   {$ifdef USE_FPC_REGEXPR}
@@ -7401,10 +7402,16 @@ begin
   if PtInRect(FRectMain, PosCoord) then
   begin
     if Assigned(FMenuText) then
-      FMenuText.PopUp
+    begin
+      if Assigned(GlobalApplyPopupTheme) then
+        GlobalApplyPopupTheme(FMenuText);
+      FMenuText.PopUp;
+    end
     else
     begin
       InitMenuStd;
+      if Assigned(GlobalApplyPopupTheme) then
+        GlobalApplyPopupTheme(FMenuStd);
       FMenuStd.PopUp;
     end;
   end
@@ -7413,26 +7420,58 @@ begin
   begin
     NGutterIndex:= FGutter.FindIndexAtCoordX(X);
     if NGutterIndex=FGutterBandBookmarks then
-      if Assigned(FMenuGutterBm) then FMenuGutterBm.PopUp;
+      if Assigned(FMenuGutterBm) then
+      begin
+        if Assigned(GlobalApplyPopupTheme) then
+          GlobalApplyPopupTheme(FMenuGutterBm);
+        FMenuGutterBm.PopUp;
+      end;
     if NGutterIndex=FGutterBandNumbers then
-      if Assigned(FMenuGutterNum) then FMenuGutterNum.PopUp;
+      if Assigned(FMenuGutterNum) then
+      begin
+        if Assigned(GlobalApplyPopupTheme) then
+          GlobalApplyPopupTheme(FMenuGutterNum);
+        FMenuGutterNum.PopUp;
+      end;
     if NGutterIndex=FGutterBandFolding then
-      if Assigned(FMenuGutterFold) then FMenuGutterFold.PopUp else DoMenuGutterFold;
+      if Assigned(FMenuGutterFold) then
+      begin
+        if Assigned(GlobalApplyPopupTheme) then
+          GlobalApplyPopupTheme(FMenuGutterFold);
+        FMenuGutterFold.PopUp;
+      end
+      else
+        DoMenuGutterFold;
   end
   else
   if FMinimapVisible and PtInRect(FRectMinimap, PosCoord) then
   begin
-    if Assigned(FMenuMinimap) then FMenuMinimap.PopUp;
+    if Assigned(FMenuMinimap) then
+    begin
+      if Assigned(GlobalApplyPopupTheme) then
+        GlobalApplyPopupTheme(FMenuMinimap);
+      FMenuMinimap.PopUp;
+    end;
   end
   else
   if FMicromapVisible and not FMicromapOnScrollbar and PtInRect(FRectMicromap, PosCoord) then
   begin
-    if Assigned(FMenuMicromap) then FMenuMicromap.PopUp;
+    if Assigned(FMenuMicromap) then
+    begin
+      if Assigned(GlobalApplyPopupTheme) then
+        GlobalApplyPopupTheme(FMenuMicromap);
+      FMenuMicromap.PopUp;
+    end;
   end
   else
   if FOptRulerVisible and PtInRect(FRectRuler, PosCoord) then
   begin
-    if Assigned(FMenuRuler) then FMenuRuler.PopUp;
+    if Assigned(FMenuRuler) then
+    begin
+      if Assigned(GlobalApplyPopupTheme) then
+        GlobalApplyPopupTheme(FMenuRuler);
+      FMenuRuler.PopUp;
+    end;
   end;
 end;
 
