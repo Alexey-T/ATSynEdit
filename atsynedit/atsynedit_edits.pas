@@ -13,6 +13,7 @@ uses
   Menus, Math, Forms,
   LCLType,
   ATCanvasPrimitives,
+  ATFlatThemes,
   ATScrollbar,
   ATStrings,
   ATSynEdit,
@@ -44,7 +45,6 @@ type
     FItemIndex: integer;
     FOptComboboxShowX: boolean;
     FMenu: TPopupMenu;
-    FOnDropdownPopup: TATSynEditDropdownEvent;
     procedure DoComboMenu;
     procedure DoComboUpDown(ADown: boolean);
     procedure MicromapClick(Sender: TObject; AX, AY: integer);
@@ -60,7 +60,6 @@ type
     procedure DoAddLineToHistory(const AStr: atString; AMaxItems: integer);
   published
     property OptComboboxShowX: boolean read FOptComboboxShowX write FOptComboboxShowX default false;
-    property OnDropdownPopup: TATSynEditDropdownEvent read FOnDropdownPopup write FOnDropdownPopup;
   end;
 
 
@@ -286,8 +285,8 @@ begin
   P:= Point(Width, 0);
   P:= ClientToScreen(P);
 
-  if Assigned(FOnDropdownPopup) then
-    FOnDropdownPopup(FMenu);
+  if Assigned(GlobalApplyPopupTheme) then
+    GlobalApplyPopupTheme(FMenu);
   FMenu.PopUp(P.X, P.Y);
 end;
 
