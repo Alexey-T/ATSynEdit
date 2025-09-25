@@ -241,7 +241,7 @@ type
     FEnabledChangeEvents: boolean;
     FEnabledCaretsInUndo: boolean;
     FLoadingForcedANSI: boolean;
-    FIsLoading: boolean;
+    FLoadingFromStream: boolean;
     FLastUndoY: SizeInt;
 
     function Compare_Asc(Key1, Key2: Pointer): Integer;
@@ -366,7 +366,7 @@ type
     property EncodingDetectDefaultUtf8: boolean read FEncodingDetectDefaultUtf8 write FEncodingDetectDefaultUtf8;
     property Endings: TATLineEnds read FEndings write SetEndings;
     property LoadingForcedANSI: boolean read FLoadingForcedANSI;
-    property IsLoading: boolean read FIsLoading write FIsLoading;
+    property LoadingFromStream: boolean read FLoadingFromStream write FLoadingFromStream;
     property IndexesOfEditedLines: TATIntegerList read FIndexesOfEditedLines; //list has line indexes of edited lines; UpdateWrapInfo maybe performs cached update
     property EnableCachedWrapinfoUpdate: boolean read FEnableCachedWrapinfoUpdate write FEnableCachedWrapinfoUpdate; //if False, UpdateWrapInfo cached update will be disabled for the next call
     property Modified: boolean read FModified write SetModified;
