@@ -729,6 +729,7 @@ var
   fs: TFileStream;
   ms: TMemoryStream;
 begin
+  FIsLoading:= true;
   fs:= TFileStream.Create(AFilename, fmOpenRead or fmShareDenyNone);
   try
     if fs.Size>=0 then
@@ -746,6 +747,7 @@ begin
     end;
   finally
     FreeAndNil(fs);
+    FIsLoading:= false;
   end;
 end;
 
