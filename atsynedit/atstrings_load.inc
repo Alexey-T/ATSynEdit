@@ -536,20 +536,6 @@ var
       if Len>=MaxInt-12 then
         raise EEditorTooLongLine.Create('Too big line length on reading: 0x'+IntToHex(Len, 8));
 
-      {
-      //call OnProgress each 1M chars
-      //it's smooth enough progress, on 280Mb log, 10 seconds
-      //2022.01: not needed now, because we call OnProgress in _FindNextEol
-
-      if NStart-NPrevProgressPos>TATEditorOptions.ProgressLoadChars then
-      begin
-        NPrevProgressPos:= NStart;
-        FProgressValue:= Int64(NStart)*100 div NStreamSize;
-        if Assigned(FOnProgress) then
-          FOnProgress(Self);
-      end;
-      }
-
       if LineEnd=TATLineEnds.Windows then
         Inc(NEnd, CharSize*2)
       else
