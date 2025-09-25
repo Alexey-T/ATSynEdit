@@ -19,13 +19,7 @@ end;
 
 function IsByteAscii(value: byte): boolean; inline;
 begin
-  case value of
-    9, 10, 13,
-    32..126:
-      Result:= true;
-    else
-      Result:= false;
-  end;
+  Result:= value in [9, 10, 13, 32..126];
 end;
 
 
