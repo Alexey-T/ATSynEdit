@@ -541,7 +541,7 @@ var
 
       if Application.Terminated then
       begin
-        Clear;
+        Clear(false);
         Break;
       end;
 
