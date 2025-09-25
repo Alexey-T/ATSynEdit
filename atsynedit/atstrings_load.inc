@@ -532,13 +532,18 @@ var
     LineEndDeltas[true]:= CharSize*2;
 
     repeat
-      if Application.Terminated then Break;
       _FindNextEol(NStart, NEnd, LineEnd);
       Len:= NEnd-NStart;
       if Len>=MaxInt-12 then
         raise EEditorTooLongLine.Create('Too big line length on reading: 0x'+IntToHex(Len, 8));
 
       Inc(NEnd, LineEndDeltas[LineEnd=TATLineEnds.Windows]);
+
+      if Application.Terminated then
+      begin
+        Clear;
+        Break;
+      end;
 
       if Len=0 then
         LineAddRaw_NoUndo('', LineEnd, false)
