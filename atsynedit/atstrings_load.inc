@@ -530,6 +530,7 @@ var
     FProgressValue:= 0;
 
     repeat
+      if Application.Terminated then Break;
       _FindNextEol(NStart, NEnd, LineEnd);
       Len:= NEnd-NStart;
       if Len>=MaxInt-12 then
@@ -607,7 +608,7 @@ var
   end;
   //------
 var
-  bWithBom: boolean;
+  bWithBom, bCancel: boolean;
 begin
   AForcedToANSI:= false;
 
@@ -678,7 +679,16 @@ begin
   BufSize:= NStreamSize-NSignatureLen;
   if BufSize<=0 then Exit;
 
+  //show progress=0 before calling GetMem which may be very slow for huge file
+  FProgressValue:= 0;
+  if Assigned(FOnProgress) then
+  begin
+    bCancel:= false;
+    FOnProgress(Self, bCancel);
+  end;
+
   GetMem(Buf, BufSize);
+
   try
     Stream.Position:= NSignatureLen;
     Stream.ReadBuffer(Buf^, BufSize);
