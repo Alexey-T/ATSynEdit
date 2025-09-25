@@ -664,9 +664,10 @@ begin
   BufSize:= NStreamSize-NSignatureLen;
   if BufSize<=0 then Exit;
 
-  //show progress=0 before calling GetMem which may be very slow for huge file
-  if BufSize>10*1024*1024 then
+  //show progress before calling GetMem which may be very slow for huge file
+  if BufSize>50*1024*1024 then
   begin
+    FProgressKind:= TATStringsProgressKind.None;
     FProgressValue:= 0;
     if Assigned(FOnProgress) then
     begin
