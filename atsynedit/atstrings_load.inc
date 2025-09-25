@@ -665,11 +665,14 @@ begin
   if BufSize<=0 then Exit;
 
   //show progress=0 before calling GetMem which may be very slow for huge file
-  FProgressValue:= 0;
-  if Assigned(FOnProgress) then
+  if BufSize>10*1024*1024 then
   begin
-    bCancel:= false;
-    FOnProgress(Self, bCancel);
+    FProgressValue:= 0;
+    if Assigned(FOnProgress) then
+    begin
+      bCancel:= false;
+      FOnProgress(Self, bCancel);
+    end;
   end;
 
   GetMem(Buf, BufSize);
