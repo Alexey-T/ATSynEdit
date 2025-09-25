@@ -517,17 +517,19 @@ var
   procedure _LoadItems;
   var
     Len, NStart, NEnd: SizeInt;
-    //NPrevProgressPos: SizeInt;
+    LineEndDeltas: array[boolean] of SizeInt;
     LineEnd: TATLineEnds;
     SA, SUtf8: string;
     SWide: UnicodeString;
     SQuad: UCS4String;
   begin
     NStart:= 0;
-    //NPrevProgressPos:= 0;
 
     FProgressKind:= TATStringsProgressKind.Loading;
     FProgressValue:= 0;
+
+    LineEndDeltas[false]:= CharSize;
+    LineEndDeltas[true]:= CharSize*2;
 
     repeat
       if Application.Terminated then Break;
@@ -536,10 +538,7 @@ var
       if Len>=MaxInt-12 then
         raise EEditorTooLongLine.Create('Too big line length on reading: 0x'+IntToHex(Len, 8));
 
-      if LineEnd=TATLineEnds.Windows then
-        Inc(NEnd, CharSize*2)
-      else
-        Inc(NEnd, CharSize);
+      Inc(NEnd, LineEndDeltas[LineEnd=TATLineEnds.Windows]);
 
       if Len=0 then
         LineAddRaw_NoUndo('', LineEnd, false)
