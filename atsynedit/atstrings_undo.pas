@@ -75,6 +75,7 @@ type
     ItemMarkers: TATMarkerMarkerArray; //markers
     ItemMarkers2: TATMarkerMarkerArray; //markers for 'paired' editor
     ItemAttribs: TATMarkerAttribArray; //attributes
+    ItemCaretJump: TPoint; //coord of mouse-click for CaretJump items
     ItemSoftMark: boolean; //undo soft-mark. logic is described in ATSynEdit Wiki page
     ItemHardMark: boolean; //undo hard-mark
 

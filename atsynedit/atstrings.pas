@@ -2015,6 +2015,7 @@ var
   CurAttribsArray: TATMarkerAttribArray;
   CurIndex: SizeInt;
   CurText: atString;
+  CurCaretJump: TPoint;
   OtherList: TATUndoList;
   NCurCount, NStringsCount: SizeInt;
   NEventX, NEventY: SizeInt;
@@ -2050,6 +2051,7 @@ begin
   CurMarkersArray:= CurItem.ItemMarkers;
   CurMarkersArray2:= CurItem.ItemMarkers2;
   CurAttribsArray:= CurItem.ItemAttribs;
+  CurCaretJump:= CurItem.ItemCaretJump;
   ACommandCode:= CurItem.ItemCommandCode;
   ASoftMarked:= CurItem.ItemSoftMark;
   AHardMarked:= CurItem.ItemHardMark;
@@ -2228,11 +2230,16 @@ begin
             ACommandCode,
             FRunningUndoOrRedo
             );
-          //for CaretJump and redo, CurCaretsArray2 has special role: target caret pos
+          OtherList.Last.ItemCaretJump:= CurCaretJump;
+
           if FRunningUndoOrRedo=TATEditorRunningUndoOrRedo.Redo then
           begin
-            CurCaretsArray:= CurCaretsArray2;
-            CurCaretsArray2:= nil;
+            SetLength(CurCaretsArray, 1);
+            CurCaretsArray[0].X:= CurCaretJump.X;
+            CurCaretsArray[0].Y:= CurCaretJump.Y;
+            CurCaretsArray[0].X2:= -1;
+            CurCaretsArray[0].Y2:= -1;
+            CurCaretsArray2:= CurCaretsArray;
           end;
         end;
     end;
@@ -2809,16 +2816,7 @@ begin
   begin
     if Length(ACaretsArray)>0 then
       Item.ItemCarets:= ACaretsArray;
-
-    //for CaretJump, ItemCarets2 has special role: target caret pos
-    if ANewCaretPos.Y<>-1 then
-    begin
-      SetLength(Item.ItemCarets2, 1);
-      Item.ItemCarets2[0].X:= ANewCaretPos.X;
-      Item.ItemCarets2[0].Y:= ANewCaretPos.Y;
-      Item.ItemCarets2[0].X2:= -1;
-      Item.ItemCarets2[0].Y2:= -1;
-    end;
+    Item.ItemCaretJump:= ANewCaretPos;
   end;
 end;
 
