@@ -2229,6 +2229,7 @@ begin
             FRunningUndoOrRedo
             );
 
+          //for CaretJump items, ItemMarkers has special meaning, caret-jump pos
           if FRunningUndoOrRedo=TATEditorRunningUndoOrRedo.Redo then
             if Length(CurMarkersArray)>0 then
             begin
