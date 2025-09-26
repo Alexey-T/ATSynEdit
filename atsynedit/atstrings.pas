@@ -93,10 +93,10 @@ type
   TATStringItem_FoldFrom = 0..255; //8 bits should be enougth
 
   TATStringItemEx = bitpacked record
-    Ends: TATBits2; //kind of line-endings (LF/CR/CRLF/none)
+    Ends: TATBits2; //line-endings (LF/CR/CRLF/none)
     State: TATBits2; //line-state (normal/modified/saved...)
     HasTab: TATBits2; //string has tab-char
-    HasAsciiNoTabs: TATBits2; //string has ascii-chars without tab-char
+    HasAsciiNoTabs: TATBits2; //string has only ASCII-chars without tab-char
     FoldFrom_0,
     FoldFrom_1: TATStringItem_FoldFrom;
       //state of partial folding:
