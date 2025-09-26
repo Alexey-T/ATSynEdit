@@ -2006,8 +2006,6 @@ function TATStrings.UndoSingle(ACurList: TATUndoList;
 var
   CurItem, PrevItem: TATUndoItem;
   CurAction: TATEditAction;
-  CurText: atString;
-  CurIndex: integer;
   CurLineEnd: TATLineEnds;
   CurLineState: TATLineState;
   CurCaretsArray: TATPointPairArray;
@@ -2015,10 +2013,12 @@ var
   CurMarkersArray: TATMarkerMarkerArray;
   CurMarkersArray2: TATMarkerMarkerArray;
   CurAttribsArray: TATMarkerAttribArray;
+  CurIndex: SizeInt;
+  CurText: atString;
   OtherList: TATUndoList;
   NCurCount, NStringsCount: SizeInt;
   NEventX, NEventY: SizeInt;
-  bWithoutPause: boolean;
+  bWithoutPause,
   bEnableEventBefore,
   bEnableEventAfter: boolean;
 begin
@@ -2228,30 +2228,19 @@ begin
             ACommandCode,
             FRunningUndoOrRedo
             );
+          //for CaretJump and redo, CurCaretsArray2 has special role: target caret pos
+          if FRunningUndoOrRedo=TATEditorRunningUndoOrRedo.Redo then
+          begin
+            CurCaretsArray:= CurCaretsArray2;
+            CurCaretsArray2:= nil;
+          end;
         end;
     end;
 
-    if CurAction=TATEditAction.CaretJump then
-    begin
-      //for redo, CurCaretsArray2 has special role: target caret pos
-      if FRunningUndoOrRedo=TATEditorRunningUndoOrRedo.Redo then
-      begin
-        if Length(CurCaretsArray2)>0 then
-          SetCaretsArray(CurCaretsArray2);
-      end
-      else
-      begin
-        if Length(CurCaretsArray)>0 then
-          SetCaretsArray(CurCaretsArray);
-      end;
-    end
-    else
-    begin
-      if Length(CurCaretsArray)>0 then
-        SetCaretsArray(CurCaretsArray);
-      if Length(CurCaretsArray2)>0 then
-        SetCaretsArray2(CurCaretsArray2);
-    end;
+    if Length(CurCaretsArray)>0 then
+      SetCaretsArray(CurCaretsArray);
+    if Length(CurCaretsArray2)>0 then
+      SetCaretsArray2(CurCaretsArray2);
 
     SetMarkersArray(CurMarkersArray);
     SetMarkersArray2(CurMarkersArray2);

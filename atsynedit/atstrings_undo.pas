@@ -66,15 +66,15 @@ type
                               //it's used mainly for commands "move lines up/down", CudaText issue #3289
 
     ItemAction: TATEditAction; //action of undo-item
-    ItemIndex: integer; //index of editor line
+    ItemIndex: SizeInt; //index of editor line
     ItemText: UnicodeString; //text of that editor line
     ItemEnd: TATLineEnds; //line-ending of that editor line
     ItemLineState: TATLineState; //line-state of that editor line
-    ItemCarets: TATPointPairArray; //carets packed into array
-    ItemCarets2: TATPointPairArray;
-    ItemMarkers: TATMarkerMarkerArray;
-    ItemMarkers2: TATMarkerMarkerArray;
-    ItemAttribs: TATMarkerAttribArray;
+    ItemCarets: TATPointPairArray; //carets
+    ItemCarets2: TATPointPairArray; //carets for 'paired' editor (one frame in CudaText has 2 editors)
+    ItemMarkers: TATMarkerMarkerArray; //markers
+    ItemMarkers2: TATMarkerMarkerArray; //markers for 'paired' editor
+    ItemAttribs: TATMarkerAttribArray; //attributes
     ItemSoftMark: boolean; //undo soft-mark. logic is described in ATSynEdit Wiki page
     ItemHardMark: boolean; //undo hard-mark
 
