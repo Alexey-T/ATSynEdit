@@ -2136,6 +2136,9 @@ begin
             end;
             Lines[CurIndex]:= CurText;
             LinesState[CurIndex]:= CurLineState;
+            //force caret to line CurIndex, to fix wrong undo-data after first undo/redo with caret-jump (CudaText #6027)
+            if Length(CurCaretsArray)=1 then
+              CurCaretsArray[0].Y:= CurIndex;
           end;
         end;
 
@@ -2145,6 +2148,9 @@ begin
           begin
             LinesEnds[CurIndex]:= CurLineEnd;
             LinesState[CurIndex]:= CurLineState;
+            //force caret to line CurIndex, to fix wrong undo-data after first undo/redo with caret-jump (CudaText #6027)
+            if Length(CurCaretsArray)=1 then
+              CurCaretsArray[0].Y:= CurIndex;
           end;
         end;
 
@@ -2158,6 +2164,9 @@ begin
               exit(false);
             end;
             LineDelete(CurIndex, true{AForceLast});
+            //force caret to line CurIndex, to fix wrong undo-data after first undo/redo with caret-jump (CudaText #6027)
+            if Length(CurCaretsArray)=1 then
+              CurCaretsArray[0].Y:= CurIndex;
           end;
         end;
 
@@ -2172,6 +2181,9 @@ begin
             LineInsertRaw(CurIndex, CurText, CurLineEnd);
           if IsIndexValid(CurIndex) then
             LinesState[CurIndex]:= CurLineState;
+          //force caret to line CurIndex, to fix wrong undo-data after first undo/redo with caret-jump (CudaText #6027)
+          if Length(CurCaretsArray)=1 then
+            CurCaretsArray[0].Y:= CurIndex;
         end;
 
       TATEditAction.Add:
