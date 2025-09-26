@@ -72,7 +72,7 @@ type
     ItemLineState: TATLineState; //line-state of that editor line
     ItemCarets: TATPointPairArray; //carets
     ItemCarets2: TATPointPairArray; //carets for 'paired' editor (one frame in CudaText has 2 editors)
-    ItemMarkers: TATMarkerMarkerArray; //markers
+    ItemMarkers: TATMarkerMarkerArray; //markers; also reused for caret pos for CaretJump action
     ItemMarkers2: TATMarkerMarkerArray; //markers for 'paired' editor
     ItemAttribs: TATMarkerAttribArray; //attributes
     ItemSoftMark: boolean; //undo soft-mark. logic is described in ATSynEdit Wiki page
