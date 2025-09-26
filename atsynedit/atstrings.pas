@@ -2015,7 +2015,7 @@ var
   CurAttribsArray: TATMarkerAttribArray;
   CurIndex: SizeInt;
   CurText: atString;
-  CurCaretJump: TPoint;
+  CurCaretJumpY: integer;
   OtherList: TATUndoList;
   NCurCount, NStringsCount: SizeInt;
   NEventX, NEventY: SizeInt;
@@ -2051,7 +2051,7 @@ begin
   CurMarkersArray:= CurItem.ItemMarkers;
   CurMarkersArray2:= CurItem.ItemMarkers2;
   CurAttribsArray:= CurItem.ItemAttribs;
-  CurCaretJump:= CurItem.ItemCaretJump;
+  CurCaretJumpY:= CurItem.ItemCommandCode; //field is reused
   ACommandCode:= CurItem.ItemCommandCode;
   ASoftMarked:= CurItem.ItemSoftMark;
   AHardMarked:= CurItem.ItemHardMark;
@@ -2227,16 +2227,15 @@ begin
             CurMarkersArray,
             CurMarkersArray2,
             CurAttribsArray,
-            ACommandCode,
+            CurCaretJumpY, //ACommandCode,
             FRunningUndoOrRedo
             );
-          OtherList.Last.ItemCaretJump:= CurCaretJump;
 
           if FRunningUndoOrRedo=TATEditorRunningUndoOrRedo.Redo then
           begin
             SetLength(CurCaretsArray, 1);
-            CurCaretsArray[0].X:= CurCaretJump.X;
-            CurCaretsArray[0].Y:= CurCaretJump.Y;
+            CurCaretsArray[0].X:= 0;
+            CurCaretsArray[0].Y:= CurCaretJumpY;
             CurCaretsArray[0].X2:= -1;
             CurCaretsArray[0].Y2:= -1;
             CurCaretsArray2:= CurCaretsArray;
@@ -2809,14 +2808,20 @@ var
   Item: TATUndoItem;
 begin
   if FUndoList.Locked then exit;
-  AddUndoItem(TATEditAction.CaretJump, 0, '', TATLineEnds.None, TATLineState.None, FCommandCode);
+  AddUndoItem(
+    TATEditAction.CaretJump,
+    0,
+    '',
+    TATLineEnds.None,
+    TATLineState.None,
+    ANewCaretPos.Y //instead of CommandCode
+    );
 
   Item:= FUndoList.Last;
   if Assigned(Item) then
   begin
     if Length(ACaretsArray)>0 then
       Item.ItemCarets:= ACaretsArray;
-    Item.ItemCaretJump:= ANewCaretPos;
   end;
 end;
 
