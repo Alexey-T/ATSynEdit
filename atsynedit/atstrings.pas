@@ -93,18 +93,19 @@ type
   TATStringItem_FoldFrom = 0..255; //8 bits should be enougth
 
   TATStringItemEx = bitpacked record
-    Ends: TATBits2;
-    State: TATBits2;
-    HasTab: TATBits2;
-    HasAsciiNoTabs: TATBits2;
+    Ends: TATBits2; //kind of line-endings (LF/CR/CRLF/none)
+    State: TATBits2; //line-state (normal/modified/saved...)
+    HasTab: TATBits2; //string has tab-char
+    HasAsciiNoTabs: TATBits2; //string has ascii-chars without tab-char
     FoldFrom_0,
     FoldFrom_1: TATStringItem_FoldFrom;
+      //state of partial folding:
       //0: line not folded
       //>0: line folded from this char-pos
-    Wide: boolean;
-    Updated: boolean;
-    Sep: TATBits2;
-    Hidden_0, Hidden_1: boolean;
+    Wide: boolean; //string is actually a UnicodeString packed into AnsiString
+    Updated: boolean; //string was changed by last editing operations
+    Sep: TATBits2; //kind of separator line near StringItem; not used in CudaText
+    Hidden_0, Hidden_1: boolean; //line is fully hidden by folding
   end;
 
   TATStringItem = packed record
