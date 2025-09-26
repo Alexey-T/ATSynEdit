@@ -2061,7 +2061,7 @@ begin
       Editor.DoEventCarets;
 
     //solve CudaText issue #3261:
-    Editor.ActionAddJumpToUndo;
+    Editor.ActionAddJumpToUndo(Point(APosX, APosY));
   end;
 end;
 

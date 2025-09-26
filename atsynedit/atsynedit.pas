@@ -1695,7 +1695,7 @@ type
     property UndoAsString: string read GetUndoAsString write SetUndoAsString;
     property RedoAsString: string read GetRedoAsString write SetRedoAsString;
     procedure DoStringsOnChangeEx(Sender: TObject; AChange: TATLineChangeKind; ALine, AItemCount: SizeInt);
-    procedure ActionAddJumpToUndo;
+    procedure ActionAddJumpToUndo(ANewCaretPos: TPoint);
     property Text: UnicodeString read GetText write SetText;
     property SelRect: TRect read FSelRect;
     function IsEmpty: boolean;
@@ -7094,7 +7094,7 @@ begin
           bClickNear:= (Carets.Count=1) and
             (Abs(Carets[0].PosY - FMouseDownPnt.Y) < ATEditorOptions.MinLineDiffForUndoCaretJump);
           if not bClickNear then
-            ActionAddJumpToUndo;
+            ActionAddJumpToUndo(FMouseDownPnt);
 
           Strings.SetGroupMark;
 
@@ -11381,7 +11381,7 @@ begin
 end;
 
 
-procedure TATSynEdit.ActionAddJumpToUndo;
+procedure TATSynEdit.ActionAddJumpToUndo(ANewCaretPos: TPoint);
 var
   St: TATStrings;
 begin
@@ -11389,7 +11389,7 @@ begin
   if FOptUndoForCaretJump then
   begin
     St.SetGroupMark; //solve CudaText #3269
-    St.ActionAddJumpToUndo(St.CaretsAfterLastEdition);
+    St.ActionAddJumpToUndo(St.CaretsAfterLastEdition, ANewCaretPos);
   end;
 end;
 

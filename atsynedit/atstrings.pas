@@ -402,7 +402,7 @@ type
     procedure ActionSort(AAction: TATStringsSortAction; AFrom, ATo: SizeInt);
     procedure ActionReverseLines;
     procedure ActionShuffleLines;
-    procedure ActionAddJumpToUndo(constref ACaretsArray: TATPointPairArray);
+    procedure ActionAddJumpToUndo(constref ACaretsArray: TATPointPairArray; ANewCaretPos: TPoint);
     //file
     procedure LoadFromStream(AStream: TStream; AOptions: TATLoadStreamOptions);
     procedure LoadFromFile(const AFilename: string; AOptions: TATLoadStreamOptions);
@@ -2231,10 +2231,28 @@ begin
         end;
     end;
 
-    if Length(CurCaretsArray)>0 then
-      SetCaretsArray(CurCaretsArray);
-    if Length(CurCaretsArray2)>0 then
-      SetCaretsArray2(CurCaretsArray2);
+    if CurAction=TATEditAction.CaretJump then
+    begin
+      //for redo, CurCaretsArray2 has special role: target caret pos
+      if FRunningUndoOrRedo=TATEditorRunningUndoOrRedo.Redo then
+      begin
+        if Length(CurCaretsArray2)>0 then
+          SetCaretsArray(CurCaretsArray2);
+      end
+      else
+      begin
+        if Length(CurCaretsArray)>0 then
+          SetCaretsArray(CurCaretsArray);
+      end;
+    end
+    else
+    begin
+      if Length(CurCaretsArray)>0 then
+        SetCaretsArray(CurCaretsArray);
+      if Length(CurCaretsArray2)>0 then
+        SetCaretsArray2(CurCaretsArray2);
+    end;
+
     SetMarkersArray(CurMarkersArray);
     SetMarkersArray2(CurMarkersArray2);
     SetAttribsArray(CurAttribsArray);
@@ -2790,16 +2808,24 @@ begin
   DoEventLog(0);
 end;
 
-procedure TATStrings.ActionAddJumpToUndo(constref ACaretsArray: TATPointPairArray);
+procedure TATStrings.ActionAddJumpToUndo(constref ACaretsArray: TATPointPairArray; ANewCaretPos: TPoint);
 var
   Item: TATUndoItem;
 begin
   if FUndoList.Locked then exit;
   AddUndoItem(TATEditAction.CaretJump, 0, '', TATLineEnds.None, TATLineState.None, FCommandCode);
+
   Item:= FUndoList.Last;
   if Assigned(Item) then
+  begin
     if Length(ACaretsArray)>0 then
       Item.ItemCarets:= ACaretsArray;
+    SetLength(Item.ItemCarets2, 1);
+    Item.ItemCarets2[0].X:= ANewCaretPos.X;
+    Item.ItemCarets2[0].Y:= ANewCaretPos.Y;
+    Item.ItemCarets2[0].X2:= -1;
+    Item.ItemCarets2[0].Y2:= -1;
+  end;
 end;
 
 
