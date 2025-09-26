@@ -2015,7 +2015,6 @@ var
   CurAttribsArray: TATMarkerAttribArray;
   CurIndex: SizeInt;
   CurText: atString;
-  CurCaretJumpY: integer;
   OtherList: TATUndoList;
   NCurCount, NStringsCount: SizeInt;
   NEventX, NEventY: SizeInt;
@@ -2051,7 +2050,6 @@ begin
   CurMarkersArray:= CurItem.ItemMarkers;
   CurMarkersArray2:= CurItem.ItemMarkers2;
   CurAttribsArray:= CurItem.ItemAttribs;
-  CurCaretJumpY:= CurItem.ItemCommandCode; //field is reused
   ACommandCode:= CurItem.ItemCommandCode;
   ASoftMarked:= CurItem.ItemSoftMark;
   AHardMarked:= CurItem.ItemHardMark;
@@ -2227,19 +2225,20 @@ begin
             CurMarkersArray,
             CurMarkersArray2,
             CurAttribsArray,
-            CurCaretJumpY, //ACommandCode,
+            ACommandCode,
             FRunningUndoOrRedo
             );
 
           if FRunningUndoOrRedo=TATEditorRunningUndoOrRedo.Redo then
-          begin
-            SetLength(CurCaretsArray, 1);
-            CurCaretsArray[0].X:= 0;
-            CurCaretsArray[0].Y:= CurCaretJumpY;
-            CurCaretsArray[0].X2:= -1;
-            CurCaretsArray[0].Y2:= -1;
-            CurCaretsArray2:= CurCaretsArray;
-          end;
+            if Length(CurMarkersArray)>0 then
+            begin
+              SetLength(CurCaretsArray, 1);
+              CurCaretsArray[0].X:= CurMarkersArray[0].PosX;
+              CurCaretsArray[0].Y:= CurMarkersArray[0].PosY;
+              CurCaretsArray[0].X2:= -1;
+              CurCaretsArray[0].Y2:= -1;
+              CurCaretsArray2:= CurCaretsArray;
+            end;
         end;
     end;
 
@@ -2248,9 +2247,12 @@ begin
     if Length(CurCaretsArray2)>0 then
       SetCaretsArray2(CurCaretsArray2);
 
-    SetMarkersArray(CurMarkersArray);
-    SetMarkersArray2(CurMarkersArray2);
-    SetAttribsArray(CurAttribsArray);
+    if CurAction<>TATEditAction.CaretJump then
+    begin
+      SetMarkersArray(CurMarkersArray);
+      SetMarkersArray2(CurMarkersArray2);
+      SetAttribsArray(CurAttribsArray);
+    end;
 
   finally
     ACurList.Locked:= false;
@@ -2814,7 +2816,7 @@ begin
     '',
     TATLineEnds.None,
     TATLineState.None,
-    ANewCaretPos.Y //instead of CommandCode
+    0
     );
 
   Item:= FUndoList.Last;
@@ -2822,6 +2824,12 @@ begin
   begin
     if Length(ACaretsArray)>0 then
       Item.ItemCarets:= ACaretsArray;
+    if ANewCaretPos.Y>=0 then
+    begin
+      SetLength(Item.ItemMarkers, 1);
+      Item.ItemMarkers[0].PosX:= ANewCaretPos.X;
+      Item.ItemMarkers[0].PosY:= ANewCaretPos.Y;
+    end;
   end;
 end;
 
