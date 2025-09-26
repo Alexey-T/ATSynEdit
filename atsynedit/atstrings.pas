@@ -2820,11 +2820,16 @@ begin
   begin
     if Length(ACaretsArray)>0 then
       Item.ItemCarets:= ACaretsArray;
-    SetLength(Item.ItemCarets2, 1);
-    Item.ItemCarets2[0].X:= ANewCaretPos.X;
-    Item.ItemCarets2[0].Y:= ANewCaretPos.Y;
-    Item.ItemCarets2[0].X2:= -1;
-    Item.ItemCarets2[0].Y2:= -1;
+
+    //for CaretJump, ItemCarets2 has special role: target caret pos
+    if ANewCaretPos.Y<>-1 then
+    begin
+      SetLength(Item.ItemCarets2, 1);
+      Item.ItemCarets2[0].X:= ANewCaretPos.X;
+      Item.ItemCarets2[0].Y:= ANewCaretPos.Y;
+      Item.ItemCarets2[0].X2:= -1;
+      Item.ItemCarets2[0].Y2:= -1;
+    end;
   end;
 end;
 
