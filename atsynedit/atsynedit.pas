@@ -9132,9 +9132,9 @@ begin
   begin
     FTimerHotspotEnter:= TTimer.Create(Self);
     FTimerHotspotEnter.Enabled:= false;
-    FTimerHotspotEnter.Interval:= ATEditorOptions.TimerIntervalHotspotEnter;
     FTimerHotspotEnter.OnTimer:= @TimerHotspotEnterTick;
   end;
+  FTimerHotspotEnter.Interval:= ATEditorOptions.TimerIntervalHotspotEnter;
 end;
 
 //drop selection of 1st caret into mouse-pos
