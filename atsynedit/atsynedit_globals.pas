@@ -124,6 +124,7 @@ type
 
     TimerIntervalAutoScroll: integer;
     TimerIntervalNiceScroll: integer;
+    TimerIntervalHotspotEnter: integer;
 
     FoldedLenOfEmptyHint: integer;
     FoldedMarkIndentInner: integer;
@@ -450,6 +451,7 @@ initialization
 
     TimerIntervalAutoScroll:= 100;
     TimerIntervalNiceScroll:= 40;
+    TimerIntervalHotspotEnter:= 500;
 
     FoldedLenOfEmptyHint:= 60;
     FoldedMarkIndentInner:= 1; //indent inside [...] folded-mark

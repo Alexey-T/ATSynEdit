@@ -612,6 +612,7 @@ type
     FTimerNiceScroll: TTimer;
     FTimerDelayedParsing: TTimer;
     FTimerFlicker: TTimer;
+    FTimerHotspotEnter: TTimer;
     FPaintFlags: TATEditorInternalFlags;
     FPaintLocked: integer;
     FBitmap: TBitmap;
@@ -1275,6 +1276,7 @@ type
     procedure InitMenuStd;
     procedure InitTimerScroll;
     procedure InitTimerNiceScroll;
+    procedure InitTimerHotspotEnter;
     procedure StartTimerDelayedParsing;
     function IsWrapItemWithCaret(constref AWrapItem: TATWrapItem): boolean;
     procedure MenuStdClick(Sender: TObject);
@@ -1499,6 +1501,7 @@ type
     procedure TimerNiceScrollTick(Sender: TObject);
     procedure TimerDelayedParsingTick(Sender: TObject);
     procedure TimerFlickerTick(Sender: TObject);
+    procedure TimerHotspotEnterTick(Sender: TObject);
 
     //carets
     procedure DoCaretAddToPoint(AX, AY: integer);
@@ -7762,14 +7765,19 @@ begin
             if nIndexHotspot<>FLastHotspot then
             begin
               if FLastHotspot>=0 then
+              begin
+                if Assigned(FTimerHotspotEnter) then
+                  FTimerHotspotEnter.Enabled:= false;
                 if Assigned(FOnHotspotExit) then
                   FOnHotspotExit(Self, FLastHotspot);
-
-              if nIndexHotspot>=0 then
-                if Assigned(FOnHotspotEnter) then
-                  FOnHotspotEnter(Self, nIndexHotspot);
+              end;
 
               FLastHotspot:= nIndexHotspot;
+              if nIndexHotspot>=0 then
+              begin
+                InitTimerHotspotEnter;
+                FTimerHotspotEnter.Enabled:= true;
+              end;
             end;
           end;
         end;
@@ -9115,6 +9123,17 @@ begin
     FTimerNiceScroll.Enabled:= false;
     FTimerNiceScroll.Interval:= ATEditorOptions.TimerIntervalNiceScroll;
     FTimerNiceScroll.OnTimer:= @TimerNiceScrollTick;
+  end;
+end;
+
+procedure TATSynEdit.InitTimerHotspotEnter;
+begin
+  if FTimerHotspotEnter=nil then
+  begin
+    FTimerHotspotEnter:= TTimer.Create(Self);
+    FTimerHotspotEnter.Enabled:= false;
+    FTimerHotspotEnter.Interval:= ATEditorOptions.TimerIntervalHotspotEnter;
+    FTimerHotspotEnter.OnTimer:= @TimerHotspotEnterTick;
   end;
 end;
 
@@ -10495,6 +10514,15 @@ begin
   inherited Invalidate;
 end;
 
+procedure TATSynEdit.TimerHotspotEnterTick(Sender: TObject);
+begin
+  FTimerHotspotEnter.Enabled:= false;
+  if FLastHotspot>=0 then
+    if Assigned(FOnHotspotEnter) then
+      FOnHotspotEnter(Self, FLastHotspot);
+end;
+
+
 procedure TATSynEdit.DoStringsOnProgress(Sender: TObject; var ACancel: boolean);
 begin
   Invalidate;
@@ -11457,7 +11485,6 @@ begin
   FOptScaleFont:=AValue;
   UpdateInitialVars(Canvas);
 end;
-
 
 procedure TATSynEdit.DoHandleWheelRecord(const ARec: TATEditorWheelRecord);
 begin
