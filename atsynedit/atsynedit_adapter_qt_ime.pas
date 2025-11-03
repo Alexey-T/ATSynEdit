@@ -4,15 +4,6 @@ interface
 
 uses
   LMessages,
-  {$if defined(LCLQT5)}
-  qt5,
-  {$endif}
-  {$if defined(LCLQT6)}
-  qt6,
-  {$endif}
-  {$if defined(LCLQT)}
-  qt,
-  {$endif}
   Forms,
   ATSynEdit_Adapters;
 
