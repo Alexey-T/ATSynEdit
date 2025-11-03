@@ -22,6 +22,7 @@ uses
   ATSynEdit_Adapter_gtk2IME,
   {$endif}
   {$if defined(LCLQT5) or defined(LCLQt6) or defined(LCLQt)}
+  qtwidgets,
   ATSynEdit_Adapter_QT_IME,
   {$endif}
   Messages, //for Win32 and macOS
@@ -1922,6 +1923,8 @@ type
 
     {$if defined(LCLQT5) or defined(LCLQt6) or defined(LCLQt)}
     procedure WM_QT_IM_COMPOSITION(var Msg: TLMessage); message LM_IM_COMPOSITION;
+    procedure WM_QT_IM_QueryCaretPos(var Msg: TLMessage); message LM_IM_COMPOSITION+
+      1;
     {$endif}
 
     {$ifdef LCLCOCOA}
@@ -9963,6 +9966,13 @@ begin
   if Assigned(FAdapterIME) then
     FAdapterIME.QTIMComposition(Self, Msg);
 end;
+
+procedure TATSynEdit.WM_QT_IM_QueryCaretPos(var Msg: TLMessage);
+begin
+  if Assigned(FAdapterIME) then
+    FAdapterIME.QTIMQueryCaretPos(Self,Msg);
+end;
+
 {$endif}
 
 {$ifdef LCLGTK2}

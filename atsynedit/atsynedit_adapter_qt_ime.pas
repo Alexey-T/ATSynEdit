@@ -4,6 +4,15 @@ interface
 
 uses
   LMessages,
+  {$if defined(LCLQT5)}
+  qt5,
+  {$endif}
+  {$if defined(LCLQT6)}
+  qt6,
+  {$endif}
+  {$if defined(LCLQT)}
+  qt,
+  {$endif}
   Forms,
   ATSynEdit_Adapters;
 
@@ -21,10 +30,10 @@ type
     procedure HideCompForm;
   public
     procedure Stop(Sender: TObject; Success: boolean); override;
-    procedure ImeEnter(Sender: TObject); override;
     procedure ImeExit(Sender: TObject); override;
     procedure ImeKillFocus(Sender: TObject); override;
     procedure QTIMComposition(Sender: TObject; var Message: TLMessage); override;
+    procedure QTIMQueryCaretPos(Sender: TObject; var Message: TLMessage); override;
   end;
 
 implementation
@@ -117,18 +126,6 @@ begin
   inherited Stop(Sender, Success);
 end;
 
-procedure TATAdapterQTIME.ImeEnter(Sender: TObject);
-var
-  Ed: TATSynEdit;
-  Caret: TATCaretItem;
-begin
-  Ed:=TATSynEdit(Sender);
-  if Ed.Carets.Count>0 then
-  begin
-    Caret:= Ed.Carets[0];
-  end;
-end;
-
 procedure TATAdapterQTIME.ImeExit(Sender: TObject);
 begin
   HideCompForm;
@@ -158,13 +155,7 @@ begin
       UpdateCompForm(Ed);  // initialize composition form
     end;
     if (Message.WParam and (GTK_IM_FLAG_START or GTK_IM_FLAG_PREEDIT))<>0 then
-    begin
-      //if Ed.Carets.Count>0 then
-      //begin
-      //  Caret:= Ed.Carets[0];
-      //end;
       UpdateCompForm(Ed);
-    end;
     // valid string at composition & commit
     if Message.WParam and (GTK_IM_FLAG_COMMIT or GTK_IM_FLAG_PREEDIT)<>0 then
     begin
@@ -197,6 +188,26 @@ begin
     end;
   end;
 end;
+
+procedure TATAdapterQTIME.QTIMQueryCaretPos(Sender: TObject;
+  var Message: TLMessage);
+var
+  Ed: TATSynEdit;
+  Caret: TATCaretItem;
+begin
+  if Message.WParam=0 then
+  begin
+    Ed:= TATSynEdit(Sender);
+    if Ed.Carets.Count>0 then
+    begin
+      Caret:=Ed.Carets[0];
+      PPoint(Message.LParam)^.X:=Caret.CoordX;
+      PPoint(Message.LParam)^.Y:=Caret.CoordY;
+    end;
+  end;
+end;
+
+initialization
 
 end.
 
