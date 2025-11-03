@@ -3045,10 +3045,17 @@ var
 begin
   P1:= PATStringItem(Key1);
   P2:= PATStringItem(Key2);
+
+  Result:= UnicodeCompareStr(P1^.Line, P2^.Line);
+
+  {
+  //this code is bad: if some lines have unicode, and some not -->
+  //resulting order changes on every sort! CudaText issue #6094
   if P1^.Ex.Wide or P2^.Ex.Wide then
     Result:= UnicodeCompareStr(P1^.Line, P2^.Line)
   else
     Result:= CompareStr(P1^.Buf, P2^.Buf);
+    }
 end;
 
 function TATStrings.Compare_AscNoCase(Key1, Key2: Pointer): Integer;
@@ -3057,10 +3064,17 @@ var
 begin
   P1:= PATStringItem(Key1);
   P2:= PATStringItem(Key2);
+
+  Result:= UnicodeCompareText(P1^.Line, P2^.Line);
+
+  {
+  //this code is bad: if some lines have unicode, and some not -->
+  //resulting order changes on every sort! CudaText issue #6094
   if P1^.Ex.Wide or P2^.Ex.Wide then
     Result:= UnicodeCompareText(P1^.Line, P2^.Line)
   else
     Result:= CompareText(P1^.Buf, P2^.Buf);
+    }
 end;
 
 function TATStrings.Compare_Desc(Key1, Key2: Pointer): Integer;
