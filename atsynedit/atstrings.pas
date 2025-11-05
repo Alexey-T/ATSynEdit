@@ -3039,6 +3039,49 @@ begin
   end;
 end;
 
+{
+_MyUnicode* funcs are to be consistent on all platforms.
+FPC's UnicodeCompareStr() is not consistent on Win/Linux.
+}
+function _MyUnicodeCompareStr(const S1, S2: UnicodeString): Integer;
+var
+  C1, C2: UnicodeChar;
+  I, Len: SizeInt;
+begin
+  Len := Min(Length(S1), Length(S2));
+  for I := 1 to Len do
+  begin
+    C1 := S1[I];
+    C2 := S2[I];
+    if C1 <> C2 then
+    begin
+      Result := Ord(C1) - Ord(C2);
+      Exit;
+    end;
+  end;
+  Result := Length(S1) - Length(S2);
+end;
+
+function _MyUnicodeCompareText(const S1, S2: UnicodeString): Integer;
+var
+  C1, C2: UnicodeChar;
+  I, Len: SizeInt;
+begin
+  Len := Min(Length(S1), Length(S2));
+  for I := 1 to Len do
+  begin
+    C1 := UpCase(S1[I]);
+    C2 := UpCase(S2[I]);
+    if C1 <> C2 then
+    begin
+      Result := Ord(C1) - Ord(C2);
+      Exit;
+    end;
+  end;
+  Result := Length(S1) - Length(S2);
+end;
+
+
 function TATStrings.Compare_Asc(Key1, Key2: Pointer): Integer;
 var
   P1, P2: PATStringItem;
@@ -3046,7 +3089,7 @@ begin
   P1:= PATStringItem(Key1);
   P2:= PATStringItem(Key2);
 
-  Result:= UnicodeCompareStr(P1^.Line, P2^.Line);
+  Result:= _MyUnicodeCompareStr(P1^.Line, P2^.Line);
 
   {
   //this code is bad: if some lines have unicode, and some not -->
@@ -3065,7 +3108,7 @@ begin
   P1:= PATStringItem(Key1);
   P2:= PATStringItem(Key2);
 
-  Result:= UnicodeCompareText(P1^.Line, P2^.Line);
+  Result:= _MyUnicodeCompareText(P1^.Line, P2^.Line);
 
   {
   //this code is bad: if some lines have unicode, and some not -->
