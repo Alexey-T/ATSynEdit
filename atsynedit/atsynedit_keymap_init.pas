@@ -163,10 +163,10 @@ begin
   M.Add(cCommand_Undo, 'perform undo', [scXControl+VK_Z], []);
   M.Add(cCommand_Redo, 'perform redo', [scXControl+scShift+VK_Z], []);
 
-  M.Add(cCommand_Sort_Asc,        '(without undo) sort ascending', [], []);
   M.Add(cCommand_Sort_AscNoCase,  '(without undo) sort ascending, ignore case', [], []);
-  M.Add(cCommand_Sort_Desc,       '(without undo) sort descending', [], []);
+  M.Add(cCommand_Sort_Asc,        '(without undo) sort ascending, case sensitive', [], []);
   M.Add(cCommand_Sort_DescNoCase, '(without undo) sort descending, ignore case', [], []);
+  M.Add(cCommand_Sort_Desc,       '(without undo) sort descending, case sensitive', [], []);
 
   M.Add(cCommand_DeleteAllBlanks,      '(without undo) delete all blank lines', [], []);
   M.Add(cCommand_DeleteAdjacentBlanks, '(without undo) delete adjacent blank lines', [], []);
