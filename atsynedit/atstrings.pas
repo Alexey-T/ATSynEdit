@@ -3175,7 +3175,7 @@ begin
 
   if bAllText then
   begin
-    RemoveEmptyLines;
+    //RemoveEmptyLines; //GitHub user asked to not remove empty lines, issue #6094
     FList.Sort(Func);
     if bWasFakeLine then
       ActionAddFakeLineIfNeeded;
