@@ -513,8 +513,6 @@ type
     cInitMaskChar = '*';
     cInitGapBitmapAlignment = taCenter;
     cInitGapBitmapIndent = 0;
-    cInitScrollAnimationSteps = 4;
-    cInitScrollAnimationSleep = 0;
     cInitUndoLimit = 5000;
     cInitUndoMaxCarets = 4000;
     cInitUndoIndentVert = 15;
@@ -939,8 +937,6 @@ type
     FOptInputNumberAllowNegative: boolean;
     FOptMaskChar: WideChar;
     FOptMaskCharUsed: boolean;
-    FOptScrollAnimationSteps: integer;
-    FOptScrollAnimationSleep: integer;
     FOptScaleFont: integer;
     FOptIdleInterval: integer;
     FOptPasteAtEndMakesFinalEmptyLine: boolean;
@@ -2039,8 +2035,6 @@ type
     property OptInputNumberAllowNegative: boolean read FOptInputNumberAllowNegative write FOptInputNumberAllowNegative default cInitInputNumberAllowNegative;
     property OptMaskChar: WideChar read FOptMaskChar write FOptMaskChar default cInitMaskChar;
     property OptMaskCharUsed: boolean read FOptMaskCharUsed write FOptMaskCharUsed default false;
-    property OptScrollAnimationSteps: integer read FOptScrollAnimationSteps write FOptScrollAnimationSteps default cInitScrollAnimationSteps;
-    property OptScrollAnimationSleep: integer read FOptScrollAnimationSleep write FOptScrollAnimationSleep default cInitScrollAnimationSleep;
     property OptScaleFont: integer read FOptScaleFont write SetOptScaleFont default 0;
     property OptIdleInterval: integer read FOptIdleInterval write FOptIdleInterval default cInitIdleInterval;
     property OptTabSpaces: boolean read FOptTabSpaces write SetTabSpaces default false;
@@ -5511,8 +5505,6 @@ begin
   FOptInputNumberAllowNegative:= cInitInputNumberAllowNegative;
   FOptMaskChar:= cInitMaskChar;
   FOptMaskCharUsed:= false;
-  FOptScrollAnimationSteps:= cInitScrollAnimationSteps;
-  FOptScrollAnimationSleep:= cInitScrollAnimationSleep;
   FOptIdleInterval:= cInitIdleInterval;
 
   FOptAutoPairForMultiCarets:= cInitAutoPairForMultiCarets;
