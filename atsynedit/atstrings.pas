@@ -176,7 +176,8 @@ type
   TATStringsChangeExEvent = procedure(Sender: TObject; AChange: TATLineChangeKind; ALine, AItemCount: SizeInt) of object;
   TATStringsChangeBlockEvent = procedure(Sender: TObject; const AStartPos, AEndPos: TPoint; 
                                  AChange: TATBlockChangeKind; ABlock: TStringList) of object;
-  TATStringsUndoEvent = procedure(Sender: TObject; AX, AY: SizeInt) of object;
+  TATStringsUndoBeforeEvent = procedure(Sender: TObject; AX, AY: SizeInt; var ABlockEvent: boolean) of object;
+  TATStringsUndoAfterEvent = procedure(Sender: TObject; AX, AY: SizeInt) of object;
   TATStringsUnfoldLineEvent = procedure(Sender: TObject; ALine: SizeInt) of object;
   TATStringsProgressEvent = procedure(Sender: TObject; var ACancel: boolean) of object;
 
@@ -228,9 +229,9 @@ type
     FOnChangeLog: TATStringsChangeLogEvent;
     FOnChangeEx: TATStringsChangeExEvent;
     FOnChangeEx2: TATStringsChangeExEvent;
-    FOnUndoBefore: TATStringsUndoEvent;
-    FOnUndoAfter: TATStringsUndoEvent;
-    FOnUndoTooLongLine: TATStringsUndoEvent;
+    FOnUndoBefore: TATStringsUndoBeforeEvent;
+    FOnUndoAfter: TATStringsUndoAfterEvent;
+    FOnUndoTooLongLine: TATStringsUndoAfterEvent;
     FOnChangeBlock: TATStringsChangeBlockEvent;
     FOnUnfoldLine: TATStringsUnfoldLineEvent;
     FChangeBlockActive: boolean;
@@ -475,9 +476,9 @@ type
     property OnChangeEx: TATStringsChangeExEvent read FOnChangeEx write FOnChangeEx;
     property OnChangeEx2: TATStringsChangeExEvent read FOnChangeEx2 write FOnChangeEx2;
     property OnChangeBlock: TATStringsChangeBlockEvent read FOnChangeBlock write FOnChangeBlock;
-    property OnUndoBefore: TATStringsUndoEvent read FOnUndoBefore write FOnUndoBefore;
-    property OnUndoAfter: TATStringsUndoEvent read FOnUndoAfter write FOnUndoAfter;
-    property OnUndoTooLongLine: TATStringsUndoEvent read FOnUndoTooLongLine write FOnUndoTooLongLine;
+    property OnUndoBefore: TATStringsUndoBeforeEvent read FOnUndoBefore write FOnUndoBefore;
+    property OnUndoAfter: TATStringsUndoAfterEvent read FOnUndoAfter write FOnUndoAfter;
+    property OnUndoTooLongLine: TATStringsUndoAfterEvent read FOnUndoTooLongLine write FOnUndoTooLongLine;
     property OnUnfoldLine: TATStringsUnfoldLineEvent read FOnUnfoldLine write FOnUnfoldLine;
   end;
 
@@ -2020,7 +2021,8 @@ var
   NEventX, NEventY: SizeInt;
   bWithoutPause,
   bEnableEventBefore,
-  bEnableEventAfter: boolean;
+  bEnableEventAfter,
+  bBlockEventBefore: boolean;
 begin
   Result:= true;
   ASoftMarked:= true;
@@ -2121,7 +2123,12 @@ begin
 
   if bEnableEventBefore then
     if Assigned(FOnUndoBefore) then
-      FOnUndoBefore(Self, NEventX, NEventY);
+    begin
+      bBlockEventBefore:= false;
+      FOnUndoBefore(Self, NEventX, NEventY, bBlockEventBefore);
+      if bBlockEventBefore then
+        bEnableEventAfter:= false;
+    end;
 
   try
     case CurAction of

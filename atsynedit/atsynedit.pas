@@ -738,7 +738,6 @@ type
     FLastCommandDelayedParsingOnLine: integer;
     FLastLineOfSlowEvents: integer;
     FLastUndoTick: QWord;
-    FLastUndoPaused: boolean;
     FLastEnabledUndo: boolean;
     FLastEnabledRedo: boolean;
     FLastCaretY: integer;
@@ -1209,7 +1208,7 @@ type
     procedure DoStringsOnChangeLog(Sender: TObject; ALine: SizeInt);
     procedure DoStringsOnProgress(Sender: TObject; var ACancel: boolean);
     procedure DoStringsOnUndoAfter(Sender: TObject; AX, AY: SizeInt);
-    procedure DoStringsOnUndoBefore(Sender: TObject; AX, AY: SizeInt);
+    procedure DoStringsOnUndoBefore(Sender: TObject; AX, AY: SizeInt; var ABlockEvent: boolean);
     procedure DoStringsOnUndoTooLongLine(Sender: TObject; AX, AY: SizeInt);
     procedure DoScroll_SetPos(var AScrollInfo: TATEditorScrollInfo; APos: integer);
     procedure DoScroll_LineTop(ALine: integer; AUpdate: boolean);
@@ -11304,12 +11303,13 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoStringsOnUndoBefore(Sender: TObject; AX, AY: SizeInt);
+procedure TATSynEdit.DoStringsOnUndoBefore(Sender: TObject; AX, AY: SizeInt;
+  var ABlockEvent: boolean);
 var
   OldOption: boolean;
   Tick: QWord;
 begin
-  FLastUndoPaused:= false;
+  ABlockEvent:= true;
 
   if ModeOneLine then exit;
   if FOptUndoPause<=0 then exit;
@@ -11325,8 +11325,7 @@ begin
     if Tick-FLastUndoTick<FOptUndoPause2 then
       exit;
 
-  //only when FLastUndoPaused=true, Strings.OnUndoAfter really works
-  FLastUndoPaused:= true;
+  ABlockEvent:= false;
   FLastUndoTick:= Tick;
 
   if FOptUndoPauseHighlightLine then
@@ -11363,7 +11362,6 @@ procedure TATSynEdit.DoStringsOnUndoAfter(Sender: TObject; AX, AY: SizeInt);
 var
   OldOption: boolean;
 begin
-  if not FLastUndoPaused then exit;
   {
   if ModeOneLine then exit;
   if FOptUndoPause<=0 then exit;
