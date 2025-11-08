@@ -11317,7 +11317,7 @@ begin
   if Carets.Count>1 then exit;
   if AY<0 then exit;
   if AY>=Strings.Count then exit; //must have for the case: big file; Ctrl+A, Del; Undo
-  if Abs(Carets[0].PosY - AY) <= 5 then exit; //avoid undo-pause for the case: typing+Enter+typing+Enter+...
+  if Abs(Carets[0].PosY-AY)<=5 then exit; //avoid undo-pause for: typing+Enter+typing+Enter+..., CudaText issue #6097
   if IsPosInVisibleArea(AX, AY) then exit;
 
   Tick:= GetTickCount64;
