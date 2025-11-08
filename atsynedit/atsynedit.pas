@@ -11361,13 +11361,9 @@ procedure TATSynEdit.DoStringsOnUndoAfter(Sender: TObject; AX, AY: SizeInt);
 var
   OldOption: boolean;
 begin
-  {
   if ModeOneLine then exit;
   if FOptUndoPause<=0 then exit;
-  if AY<0 then exit;
-  if AY>=Strings.Count then exit; //must have for the case: big file; Ctrl+A, Del; Undo
-  if IsPosInVisibleArea(AX, AY) then exit;
-  }
+  if not Strings.IsIndexValid(AY) then exit;
 
   if FOptUndoPauseHighlightLine then
   begin
