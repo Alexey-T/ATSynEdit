@@ -293,9 +293,14 @@ begin
   end;
 end;
 
+procedure _OnTreeDuplicateNode(ANode: TTreeNode; const AFileName: string);
+begin
+  //empty
+end;
+
 procedure TfmMain.AdapterParseDone(Sender: TObject);
 begin
-  adapter.TreeFill(Tree, 1000);
+  adapter.TreeFill(Tree, 1000, false, '?', @_OnTreeDuplicateNode);
   EditorChangeCaretPos(Self);
 end;
 

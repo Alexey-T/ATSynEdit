@@ -6,11 +6,11 @@ object fmMain: TfmMain
   Caption = 'Demo'
   ClientHeight = 578
   ClientWidth = 889
+  Position = poScreenCenter
+  LCLVersion = '4.99.0.0'
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
-  Position = poScreenCenter
-  LCLVersion = '2.3.0.0'
   object Panel1: TPanel
     Left = 0
     Height = 218
@@ -24,25 +24,25 @@ object fmMain: TfmMain
     TabOrder = 0
     object chkWrap: TCheckBox
       Left = 9
-      Height = 23
+      Height = 19
       Top = 8
-      Width = 98
+      Width = 74
       Caption = 'word wrap'
-      OnChange = chkWrapChange
       ParentFont = False
       TabOrder = 0
+      OnChange = chkWrapChange
     end
     object edLexer: TComboBox
       Left = 9
-      Height = 33
+      Height = 23
       Top = 120
       Width = 176
       DropDownCount = 24
-      ItemHeight = 0
-      OnChange = edLexerChange
+      ItemHeight = 15
       ParentFont = False
       Style = csDropDownList
       TabOrder = 5
+      OnChange = edLexerChange
     end
     object files: TShellListView
       Left = 352
@@ -53,34 +53,32 @@ object fmMain: TfmMain
       Color = clDefault
       HideSelection = False
       ParentFont = False
-      ReadOnly = True
       ShowColumnHeaders = False
       SortType = stText
       TabOrder = 9
       ToolTips = False
       ViewStyle = vsSmallIcon
       OnClick = filesClick
-      ObjectTypes = [otNonFolders]
     end
     object chkFullSel: TCheckBox
       Left = 9
-      Height = 23
+      Height = 19
       Top = 48
-      Width = 128
+      Width = 102
       Caption = 'show full sel-bg'
-      OnChange = chkFullSelChange
       ParentFont = False
       TabOrder = 2
+      OnChange = chkFullSelChange
     end
     object chkFullHilite: TCheckBox
       Left = 9
-      Height = 23
+      Height = 19
       Top = 68
-      Width = 152
+      Width = 122
       Caption = 'show full syntax-bg'
-      OnChange = chkFullHiliteChange
       ParentFont = False
       TabOrder = 3
+      OnChange = chkFullHiliteChange
     end
     object bOpen: TButton
       Left = 192
@@ -88,57 +86,57 @@ object fmMain: TfmMain
       Top = 8
       Width = 152
       Caption = 'open...'
-      OnClick = bOpenClick
       ParentFont = False
       TabOrder = 8
+      OnClick = bOpenClick
     end
     object chkUnpri: TCheckBox
       Left = 9
-      Height = 23
+      Height = 19
       Top = 28
-      Width = 129
+      Width = 101
       Caption = 'show unprinted'
-      OnChange = chkUnpriChange
       ParentFont = False
       TabOrder = 1
+      OnChange = chkUnpriChange
     end
     object chkShowCur: TCheckBox
       Left = 9
-      Height = 23
+      Height = 19
       Top = 88
-      Width = 131
+      Width = 105
       Caption = 'show cur line bg'
-      OnChange = chkShowCurChange
       ParentFont = False
       TabOrder = 4
+      OnChange = chkShowCurChange
     end
     object chkLexer: TCheckBox
       Left = 9
-      Height = 23
+      Height = 19
       Top = 152
-      Width = 107
+      Width = 81
       Caption = 'enable lexer'
       Checked = True
-      OnChange = chkLexerChange
       ParentFont = False
       State = cbChecked
       TabOrder = 6
+      OnChange = chkLexerChange
     end
     object chkDyn: TCheckBox
       Left = 9
-      Height = 23
+      Height = 19
       Top = 176
-      Width = 119
+      Width = 93
       Caption = 'dynamic hilite'
-      OnChange = chkDynChange
       ParentFont = False
       TabOrder = 7
+      OnChange = chkDynChange
     end
     object Label1: TLabel
       Left = 184
-      Height = 17
+      Height = 15
       Top = 183
-      Width = 71
+      Width = 57
       Caption = 'Used mem'
       ParentFont = False
     end
@@ -157,8 +155,8 @@ object fmMain: TfmMain
     RightClickSelect = True
     RowSelect = True
     TabOrder = 1
-    OnClick = TreeClick
     Options = [tvoAutoItemHeight, tvoKeepCollapsedNodes, tvoReadOnly, tvoRightClickSelect, tvoRowSelect, tvoShowButtons, tvoShowLines, tvoShowRoot, tvoToolTips]
+    OnClick = TreeClick
   end
   object PanelText: TPanel
     Left = 245
