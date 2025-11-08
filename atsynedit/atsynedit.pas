@@ -11313,9 +11313,11 @@ begin
 
   if ModeOneLine then exit;
   if FOptUndoPause<=0 then exit;
+  if Carets.Count=0 then exit;
   if Carets.Count>1 then exit;
   if AY<0 then exit;
   if AY>=Strings.Count then exit; //must have for the case: big file; Ctrl+A, Del; Undo
+  if Abs(Carets[0].PosY - AY) <= 5 then exit; //avoid undo-pause for the case: typing+Enter+typing+Enter+...
   if IsPosInVisibleArea(AX, AY) then exit;
 
   Tick:= GetTickCount64;
@@ -11323,6 +11325,7 @@ begin
     if Tick-FLastUndoTick<FOptUndoPause2 then
       exit;
 
+  //only when FLastUndoPaused=true, Strings.OnUndoAfter really works
   FLastUndoPaused:= true;
   FLastUndoTick:= Tick;
 
