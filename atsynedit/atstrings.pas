@@ -2141,8 +2141,10 @@ begin
               ALineIndexFailed:= CurIndex;
               exit(false);
             end;
-            Lines[CurIndex]:= CurText;
-            LinesState[CurIndex]:= CurLineState;
+            if Lines[CurIndex]<>CurText then //check first, fixing CudaText #6097
+              Lines[CurIndex]:= CurText;
+            if LinesState[CurIndex]<>CurLineState then
+              LinesState[CurIndex]:= CurLineState;
             //force caret to line CurIndex, to fix wrong undo-data after first undo/redo with caret-jump (CudaText #6027)
             if Length(CurCaretsArray)=1 then
               CurCaretsArray[0].Y:= CurIndex;
@@ -2183,6 +2185,15 @@ begin
           begin
             LineAddRaw(CurText, CurLineEnd);
             ActionFixEolBeforeLast;
+            //fixing CudaText #6097
+            if Length(CurCaretsArray)=0 then
+            begin
+              SetLength(CurCaretsArray, 1);
+              CurCaretsArray[0].X:= 0;
+              CurCaretsArray[0].Y:= CurIndex;
+              CurCaretsArray[0].X2:= -1;
+              CurCaretsArray[0].Y2:= -1;
+            end;
           end
           else
             LineInsertRaw(CurIndex, CurText, CurLineEnd);
