@@ -2155,8 +2155,10 @@ begin
         begin
           if IsIndexValid(CurIndex) then
           begin
-            LinesEnds[CurIndex]:= CurLineEnd;
-            LinesState[CurIndex]:= CurLineState;
+            if LinesEnds[CurIndex]<>CurLineEnd then
+              LinesEnds[CurIndex]:= CurLineEnd;
+            if LinesState[CurIndex]<>CurLineState then
+              LinesState[CurIndex]:= CurLineState;
             //force caret to line CurIndex, to fix wrong undo-data after first undo/redo with caret-jump (CudaText #6027)
             if Length(CurCaretsArray)=1 then
               CurCaretsArray[0].Y:= CurIndex;
