@@ -19,6 +19,5 @@ The Line will be Straight.(1:2)|||
 
 { //test with CudaText options
   "unicode_proportional": false, 
-  "unicode_wide_allowed": true, 
   "unicode_full_width": 200,
 }
