@@ -2175,9 +2175,13 @@ begin
               exit(false);
             end;
             LineDelete(CurIndex, true{AForceLast});
+            {
+            //2025.11: don't do this block for Insert-action, to fix CudaText #6097 part-2
+            //
             //force caret to line CurIndex, to fix wrong undo-data after first undo/redo with caret-jump (CudaText #6027)
             if Length(CurCaretsArray)=1 then
               CurCaretsArray[0].Y:= CurIndex;
+              }
           end;
         end;
 
