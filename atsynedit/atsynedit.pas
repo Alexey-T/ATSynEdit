@@ -16,14 +16,14 @@ interface
 uses
   {$ifdef Windows}
   Windows,
-  ATSynEdit_Adapter_Windows_IME,
+  ATSynEdit_Adapter_IME_Windows,
   {$endif}
   {$ifdef LCLGTK2}
-  ATSynEdit_Adapter_gtk2_IME,
+  ATSynEdit_Adapter_ime_gtk2,
   {$endif}
   {$if defined(LCLQT5) or defined(LCLQt6) or defined(LCLQt)}
   qtwidgets,
-  ATSynEdit_Adapter_QT_IME,
+  ATSynEdit_Adapter_IME_QT,
   {$endif}
   Messages, //for Win32 and macOS
   InterfaceBase,
