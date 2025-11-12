@@ -426,7 +426,7 @@ type
     procedure TextDeleteRight(AX, AY: SizeInt; ALen: SizeInt; out AShift,
       APosAfter: TPoint; ACanDelEol: boolean=true);
     function TextDeleteRange(AFromX, AFromY, AToX, AToY: SizeInt; out AShift, APosAfter: TPoint): boolean;
-    procedure TextInsertEol(AX, AY: SizeInt; AKeepCaret: boolean;
+    procedure TextInsertEol(AX, AY: SizeInt; AKeepCaret, ATrimPrevLine: boolean;
       const AStrIndent: atString; out AShift, APosAfter: TPoint);
     procedure TextDeleteLine(AX, AY: SizeInt; out AShift, APosAfter: TPoint);
     procedure TextReplace_OneLine(AY, AX1, AX2: SizeInt; const AText: atString);

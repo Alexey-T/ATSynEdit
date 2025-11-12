@@ -663,15 +663,14 @@ begin
     end;
 
     Str:= GetAutoIndentString(Caret.PosX, Caret.PosY, not bBetterBrackets, bForceIndent);
-    St.TextInsertEol(Caret.PosX, Caret.PosY, AKeepCaret, Str, Shift, PosAfter);
-
-    //after inserting EOL, trim previous line (make it empty if only spaces)
-    if FOptTrimLineOnPressingEnter then
-    begin
-      StrPart:= STrimRight(St.Lines[Caret.PosY]);
-      if St.Lines[Caret.PosY]<>StrPart then
-        St.Lines[Caret.PosY]:= StrPart;
-    end;
+    St.TextInsertEol(
+      Caret.PosX,
+      Caret.PosY,
+      AKeepCaret,
+      FOptTrimLineOnPressingEnter,
+      Str,
+      Shift,
+      PosAfter);
 
     //work to move } to next line, leave caret at current line
     if bBetterBrackets then
