@@ -2543,7 +2543,8 @@ begin
                Break;
              end;
 
-    FEnabledCaretsInUndo:= false;
+    if not ListOther.IsEmpty then //for CudaText #6097 part-3
+      FEnabledCaretsInUndo:= false;
 
     //handle unmodified
     //don't clear FModified if List.IsEmpty! http://synwrite.sourceforge.net/forums/viewtopic.php?f=5&t=2504
