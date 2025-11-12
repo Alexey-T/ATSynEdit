@@ -3,7 +3,7 @@ Windows IME support, tested with Korean/Chinese
 by https://github.com/rasberryrabbit
 refactored to separate unit by Alexey T.
 }
-unit ATSynEdit_Adapter_WindowsIME;
+unit ATSynEdit_Adapter_Windows_IME;
 
 interface
 

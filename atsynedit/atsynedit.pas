@@ -16,10 +16,10 @@ interface
 uses
   {$ifdef Windows}
   Windows,
-  ATSynEdit_Adapter_WindowsIME,
+  ATSynEdit_Adapter_Windows_IME,
   {$endif}
   {$ifdef LCLGTK2}
-  ATSynEdit_Adapter_gtk2IME,
+  ATSynEdit_Adapter_gtk2_IME,
   {$endif}
   {$if defined(LCLQT5) or defined(LCLQt6) or defined(LCLQt)}
   qtwidgets,

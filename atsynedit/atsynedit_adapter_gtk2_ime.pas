@@ -1,4 +1,4 @@
-unit atsynedit_adapter_gtk2ime;
+unit atsynedit_adapter_gtk2_ime;
 
 interface
 
@@ -211,4 +211,3 @@ begin
 end;
 
 end.
-
