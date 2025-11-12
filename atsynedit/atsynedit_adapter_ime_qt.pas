@@ -1,4 +1,4 @@
-unit atsynedit_adapter_gtk2_ime;
+unit atsynedit_adapter_ime_qt;
 
 interface
 
@@ -8,9 +8,9 @@ uses
   ATSynEdit_Adapters;
 
 type
-  { TATAdapterGTK2IME }
+  { TATAdapterQTIME }
 
-  TATAdapterGTK2IME = class(TATAdapterIME)
+  TATAdapterQTIME = class(TATAdapterIME)
   private
     FIMSelText: UnicodeString;
     buffer: UnicodeString;
@@ -21,10 +21,10 @@ type
     procedure HideCompForm;
   public
     procedure Stop(Sender: TObject; Success: boolean); override;
-    procedure ImeEnter(Sender: TObject); override;
     procedure ImeExit(Sender: TObject); override;
     procedure ImeKillFocus(Sender: TObject); override;
-    procedure GTK2IMComposition(Sender: TObject; var Message: TLMessage); override;
+    procedure QTIMComposition(Sender: TObject; var Message: TLMessage); override;
+    procedure QTIMQueryCaretPos(Sender: TObject; var Message: TLMessage); override;
   end;
 
 implementation
@@ -36,14 +36,13 @@ uses
   Classes,
   Controls,
   Graphics,
-  Gtk2Globals,
   ATStringProc,
   ATSynEdit,
   ATSynEdit_Carets;
 
-{ TATAdapterGTK2IME }
+{ TATAdapterQTIME }
 
-procedure TATAdapterGTK2IME.CompFormPaint(Sender: TObject);
+procedure TATAdapterQTIME.CompFormPaint(Sender: TObject);
 var
   tm, cm: TSize;
   s: UnicodeString;
@@ -58,7 +57,7 @@ begin
   CompForm.Canvas.TextOut(1,0,buffer);
   // draw IME Caret
   s:='';
-  // caret position in composition don't work under gtk2, position always 0
+  // caret position in composition don't work under QT, position always 0
   if position>0 then
     for i:=1 to position do
       s:=s+buffer[i];
@@ -71,7 +70,7 @@ begin
   CompForm.Canvas.Line(cm.cx+1,0,cm.cx+1,cm.cy+2);
 end;
 
-procedure TATAdapterGTK2IME.UpdateCompForm(Sender: TObject);
+procedure TATAdapterQTIME.UpdateCompForm(Sender: TObject);
 var
   ed: TATSynEdit;
   CompPos: TATPoint;
@@ -106,48 +105,30 @@ begin
   CompForm.Invalidate;
 end;
 
-procedure TATAdapterGTK2IME.HideCompForm;
+procedure TATAdapterQTIME.HideCompForm;
 begin
   if Assigned(CompForm) then
     CompForm.Hide;
 end;
 
-procedure TATAdapterGTK2IME.Stop(Sender: TObject; Success: boolean);
+procedure TATAdapterQTIME.Stop(Sender: TObject; Success: boolean);
 begin
-  ResetDefaultIMContext;
   HideCompForm;
   inherited Stop(Sender, Success);
 end;
 
-procedure TATAdapterGTK2IME.ImeEnter(Sender: TObject);
-var
-  Ed: TATSynEdit;
-  Caret: TATCaretItem;
-begin
-  Ed:=TATSynEdit(Sender);
-  if Ed.Carets.Count>0 then
-  begin
-    Caret:= Ed.Carets[0];
-    IM_Context_Set_Cursor_Pos(Caret.CoordX,Caret.CoordY+Ed.TextCharSize.Y);
-    // if symbol IM_Context_Set_Cursor_Pos cannot be compiled, you need to open IDE dialog
-    // "Tools / Configure 'Build Lazarus'", and there enable the define: WITH_GTK2_IM;
-    // then recompile the IDE.
-  end;
-end;
-
-procedure TATAdapterGTK2IME.ImeExit(Sender: TObject);
+procedure TATAdapterQTIME.ImeExit(Sender: TObject);
 begin
   HideCompForm;
 end;
 
-procedure TATAdapterGTK2IME.ImeKillFocus(Sender: TObject);
+procedure TATAdapterQTIME.ImeKillFocus(Sender: TObject);
 begin
   inherited ImeKillFocus(Sender);
-  //ResetDefaultIMContext; //commented to fix CudaText issue #5682
   HideCompForm;
 end;
 
-procedure TATAdapterGTK2IME.GTK2IMComposition(Sender: TObject;
+procedure TATAdapterQTIME.QTIMComposition(Sender: TObject;
   var Message: TLMessage);
 var
   len: Integer;
@@ -165,25 +146,15 @@ begin
       UpdateCompForm(Ed);  // initialize composition form
     end;
     if (Message.WParam and (GTK_IM_FLAG_START or GTK_IM_FLAG_PREEDIT))<>0 then
-    begin
-      if Ed.Carets.Count>0 then
-      begin
-        Caret:= Ed.Carets[0];
-        IM_Context_Set_Cursor_Pos(Caret.CoordX,Caret.CoordY+Ed.TextCharSize.Y);
-        // if symbol IM_Context_Set_Cursor_Pos cannot be compiled, you need to open IDE dialog
-        // "Tools / Configure 'Build Lazarus'", and there enable the define: WITH_GTK2_IM;
-        // then recompile the IDE.
-      end;
-    end;
+      UpdateCompForm(Ed);
     // valid string at composition & commit
     if Message.WParam and (GTK_IM_FLAG_COMMIT or GTK_IM_FLAG_PREEDIT)<>0 then
     begin
       if Message.WParam and GTK_IM_FLAG_REPLACE=0 then
         FIMSelText:=Ed.TextSelected;
       // insert preedit or commit string
-      buffer:=UTF8Decode(pchar(Message.LParam));
+      buffer:=PWideString(Message.LParam)^;
       len:=Length(buffer);
-      bOverwrite:=Ed.ModeOverwrite and (Length(FIMSelText)=0);
       // preedit
       if Message.WParam and GTK_IM_FLAG_PREEDIT<>0 then
         UpdateCompForm(Ed);
@@ -192,7 +163,6 @@ begin
       begin
         if Message.WParam and GTK_IM_FLAG_COMMIT<>0 then
         begin
-          Ed.TextInsertAtCarets(buffer, False, bOverwrite, False);
           FIMSelText:='';
           HideCompForm;
         end;
@@ -209,5 +179,25 @@ begin
     end;
   end;
 end;
+
+procedure TATAdapterQTIME.QTIMQueryCaretPos(Sender: TObject;
+  var Message: TLMessage);
+var
+  Ed: TATSynEdit;
+  Caret: TATCaretItem;
+begin
+  if Message.WParam=0 then
+  begin
+    Ed:= TATSynEdit(Sender);
+    if Ed.Carets.Count>0 then
+    begin
+      Caret:=Ed.Carets[0];
+      PPoint(Message.LParam)^.X:=Caret.CoordX;
+      PPoint(Message.LParam)^.Y:=Caret.CoordY;
+    end;
+  end;
+end;
+
+initialization
 
 end.
