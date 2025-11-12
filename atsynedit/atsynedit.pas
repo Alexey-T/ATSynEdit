@@ -2332,7 +2332,7 @@ uses
 
 {$ifdef LCLCOCOA}
 //unit was changed to an INC file because of problems with IDE under macOS
-{$I atsynedit_cocoaime.inc}
+{$I atsynedit_adapter_ime_cocoa.inc}
 {$endif}
 
 { TATMinimapThread }
