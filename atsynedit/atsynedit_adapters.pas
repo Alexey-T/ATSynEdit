@@ -123,6 +123,10 @@ type
     {$ifdef LCLGTK2}
     procedure GTK2IMComposition(Sender: TObject; var Message: TLMessage); virtual;
     {$endif}
+    {$if defined(LCLQT5) or defined(LCLQT6) or defined(LCLQT)}
+    procedure QTIMComposition(Sender: TObject; var Message: TLMessage); virtual;
+    procedure QTIMQueryCaretPos(Sender: TObject; var Message: TLMessage); virtual;
+    {$endif}
   end;
 
 
@@ -174,6 +178,21 @@ procedure TATAdapterIME.ImeKillFocus(Sender: TObject);
 begin
   //
 end;
+
+{$if defined(LCLQT5) or defined(LCLQT6) or defined(LCLQT)}
+procedure TATAdapterIME.QTIMComposition(Sender: TObject; var Message: TLMessage
+  );
+begin
+  //
+end;
+
+procedure TATAdapterIME.QTIMQueryCaretPos(Sender: TObject;
+  var Message: TLMessage);
+begin
+  //
+end;
+
+{$endif}
 
 {$ifdef LCLGTK2}
 procedure TATAdapterIME.GTK2IMComposition(Sender: TObject;

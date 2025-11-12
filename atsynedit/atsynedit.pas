@@ -21,6 +21,10 @@ uses
   {$ifdef LCLGTK2}
   ATSynEdit_Adapter_gtk2IME,
   {$endif}
+  {$if defined(LCLQT5) or defined(LCLQt6) or defined(LCLQt)}
+  qtwidgets,
+  ATSynEdit_Adapter_QT_IME,
+  {$endif}
   Messages, //for Win32 and macOS
   InterfaceBase,
   Classes, SysUtils, Graphics,
@@ -1910,6 +1914,12 @@ type
     //{$ifdef GTK2_IME_CODE}
     procedure WM_GTK_IM_COMPOSITION(var Msg: TLMessage); message LM_IM_COMPOSITION;
     //{$endif}
+    {$endif}
+
+    {$if defined(LCLQT5) or defined(LCLQt6) or defined(LCLQt)}
+    procedure WM_QT_IM_COMPOSITION(var Msg: TLMessage); message LM_IM_COMPOSITION;
+    procedure WM_QT_IM_QueryCaretPos(var Msg: TLMessage); message LM_IM_COMPOSITION+
+      1;
     {$endif}
 
     {$ifdef LCLCOCOA}
@@ -5400,6 +5410,10 @@ begin
 
   {$ifdef LCLGTK2}
   FAdapterIME:= TATAdapterGTK2IME.Create;
+  {$endif}
+
+  {$if defined(LCLQT5) or defined(LCLQt6) or defined(LCLQt)}
+  FAdapterIME:= TATAdapterQTIME.Create;
   {$endif}
 
   FPaintLocked:= 0;
@@ -9936,6 +9950,21 @@ begin
   if Assigned(FAdapterIME) then
     FAdapterIME.ImeKillFocus(Self);
 end;
+
+{$if defined(LCLQT5) or defined(LCLQt6) or defined(LCLQt)}
+procedure TATSynEdit.WM_QT_IM_COMPOSITION(var Msg: TLMessage);
+begin
+  if Assigned(FAdapterIME) then
+    FAdapterIME.QTIMComposition(Self, Msg);
+end;
+
+procedure TATSynEdit.WM_QT_IM_QueryCaretPos(var Msg: TLMessage);
+begin
+  if Assigned(FAdapterIME) then
+    FAdapterIME.QTIMQueryCaretPos(Self,Msg);
+end;
+
+{$endif}
 
 {$ifdef LCLGTK2}
 //{$ifdef GTK2_IME_CODE}
