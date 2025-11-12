@@ -608,7 +608,7 @@ var
   Caret: TATCaretItem;
   St: TATStrings;
   Shift, PosAfter: TPoint;
-  Str, StrPart: atString;
+  Str, StrPart, StrTrimmed: atString;
   bNeedGroup, bBetterBrackets, bForceIndent: boolean;
   NCaretX, NShiftX, NShiftY, iCaret, NLastCaret: integer;
   BracketChar: char;
@@ -667,7 +667,11 @@ begin
 
     //after inserting EOL, trim previous line (make it empty if only spaces)
     if FOptTrimLineOnPressingEnter then
-      St.Lines[Caret.PosY]:= STrimRight(St.Lines[Caret.PosY]);
+    begin
+      StrTrimmed:= STrimRight(St.Lines[Caret.PosY]);
+      if St.Lines[Caret.PosY]<>StrTrimmed then
+        St.Lines[Caret.PosY]:= StrTrimmed;
+    end;
 
     //work to move } to next line, leave caret at current line
     if bBetterBrackets then
