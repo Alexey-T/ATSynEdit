@@ -814,7 +814,7 @@ begin
     if AX<Length(Str) then
     begin
       StrMove:= Copy(Str, AX+1, MaxInt);
-      Delete(Str, AX+1, MaxInt);
+      SetLength(Str, AX);
       if ATrimPrevLine then
         Str:= STrimRight(Str);
       Lines[AY]:= Str;
