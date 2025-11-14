@@ -10823,15 +10823,15 @@ end;
 
 procedure TATSynEdit.FoldedMarkTooltip_OnPaint(Sender: TObject);
 var
-  CurMark: TATFoldedMark;
+  MarkPtr: PATFoldedMark;
 begin
   if FFoldedMarkList.IsIndexValid(FFoldedMarkCurrent) then
   begin
-    CurMark:= FFoldedMarkList.Items[FFoldedMarkCurrent];
+    MarkPtr:= FFoldedMarkList.InternalGet(FFoldedMarkCurrent);
     DoPaintTextFragment(
       FFoldedMarkTooltip.Canvas,
       Rect(0, 0, FFoldedMarkTooltip.Width, FFoldedMarkTooltip.Height),
-      CurMark.LineFrom,
+      MarkPtr^.LineFrom,
       false, //to paint fully folded lines, must be False
       Colors.MinimapTooltipBG,
       Colors.MinimapTooltipBorder,
