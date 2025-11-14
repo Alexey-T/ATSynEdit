@@ -8050,7 +8050,7 @@ begin
     begin
       MousePnt:= ScreenToClient(Mouse.CursorPos);
       IndexMark:= FFoldedMarkList.FindByCoord(MousePnt);
-      if IndexMark>=0 then
+      if FFoldedMarkList.IsIndexValid(IndexMark) then
       begin
         FoldMark:= FFoldedMarkList.Items[IndexMark];
         DoSelect_LinesByFoldedMark(FoldMark.LineFrom, FoldMark.LineTo);
@@ -10794,7 +10794,8 @@ procedure TATSynEdit.UpdateFoldedMarkTooltip;
 var
   CurMark: TATFoldedMark;
 begin
-  if (not FFoldTooltipVisible) or not FFoldedMarkList.IsIndexValid(FFoldedMarkCurrent) then
+  if not FFoldTooltipVisible or
+    not FFoldedMarkList.IsIndexValid(FFoldedMarkCurrent) then
   begin
     if Assigned(FFoldedMarkTooltip) then
       FFoldedMarkTooltip.Hide;
