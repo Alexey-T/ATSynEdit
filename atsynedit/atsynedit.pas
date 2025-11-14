@@ -479,7 +479,6 @@ type
     RangeIndex: integer;
     LineFrom, LineTo: integer;
     procedure Init(const ACoord: TRect; ARangeIndex, ALineFrom, ALineTo: integer);
-    procedure InitNone;
     class operator =(const a, b: TATFoldedMark): boolean;
   end;
 
