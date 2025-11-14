@@ -28,18 +28,18 @@ end;
 
 { TATFoldedMarks }
 
-function TATFoldedMarks.FindByCoord(ACoord: TPoint): TATFoldedMark;
+function TATFoldedMarks.FindByCoord(ACoord: TPoint): integer;
 var
-  Mark: TATFoldedMark;
+  MarkPtr: PATFoldedMark;
   i: integer;
 begin
+  Result:= -1;
   for i:= 0 to Count-1 do
   begin
-    Mark:= Items[i];
-    if PtInRect(Mark.Coord, ACoord) then
-      exit(Mark);
+    MarkPtr:= InternalGet(i);
+    if PtInRect(MarkPtr^.Coord, ACoord) then
+      exit(i);
   end;
-  Result.InitNone;
 end;
 
 { TATFoldedMark }
