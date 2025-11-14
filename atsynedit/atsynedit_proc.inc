@@ -44,16 +44,17 @@ end;
 
 { TATFoldedMark }
 
-procedure TATFoldedMark.Init(const ACoord: TRect; ALineFrom, ALineTo: integer);
+procedure TATFoldedMark.Init(const ACoord: TRect; ARangeIndex, ALineFrom, ALineTo: integer);
 begin
   Coord:= ACoord;
+  RangeIndex:= ARangeIndex;
   LineFrom:= ALineFrom;
   LineTo:= ALineTo;
 end;
 
 procedure TATFoldedMark.InitNone;
 begin
-  Init(Rect(0, 0, 0, 0), -1, -1);
+  Init(Rect(0, 0, 0, 0), -1, -1, -1);
 end;
 
 function TATFoldedMark.IsInited: boolean;

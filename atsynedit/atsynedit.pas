@@ -475,8 +475,9 @@ type
   TATFoldedMark = record
   public
     Coord: TRect;
+    RangeIndex: integer;
     LineFrom, LineTo: integer;
-    procedure Init(const ACoord: TRect; ALineFrom, ALineTo: integer);
+    procedure Init(const ACoord: TRect; ARangeIndex, ALineFrom, ALineTo: integer);
     procedure InitNone;
     function IsInited: boolean;
     class operator =(const a, b: TATFoldedMark): boolean;
@@ -5267,7 +5268,7 @@ begin
   begin
     NLastFoldedLine:= FFold.ItemPtr(NRangeIndex)^.Y2;
     InitFoldedMarkList;
-    FoldMark.Init(RectMark, APosY, NLastFoldedLine);
+    FoldMark.Init(RectMark, NRangeIndex, APosY, NLastFoldedLine);
     FFoldedMarkList.Add(FoldMark);
   end;
 end;
