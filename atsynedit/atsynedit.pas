@@ -487,6 +487,7 @@ type
 
   TATFoldedMarks = class(specialize TFPGList<TATFoldedMark>)
   public
+    function IsIndexValid(AIndex: integer): boolean;
     function FindByCoord(ACoord: TPoint): integer;
   end;
 
@@ -10793,7 +10794,7 @@ procedure TATSynEdit.UpdateFoldedMarkTooltip;
 var
   CurMark: TATFoldedMark;
 begin
-  if (not FFoldTooltipVisible) or (FFoldedMarkCurrent<0) then
+  if (not FFoldTooltipVisible) or not FFoldedMarkList.IsIndexValid(FFoldedMarkCurrent) then
   begin
     if Assigned(FFoldedMarkTooltip) then
       FFoldedMarkTooltip.Hide;
@@ -10824,7 +10825,7 @@ procedure TATSynEdit.FoldedMarkTooltip_OnPaint(Sender: TObject);
 var
   CurMark: TATFoldedMark;
 begin
-  if FFoldedMarkCurrent>=0 then
+  if FFoldedMarkList.IsIndexValid(FFoldedMarkCurrent) then
   begin
     CurMark:= FFoldedMarkList.Items[FFoldedMarkCurrent];
     DoPaintTextFragment(

@@ -28,6 +28,11 @@ end;
 
 { TATFoldedMarks }
 
+function TATFoldedMarks.IsIndexValid(AIndex: integer): boolean;
+begin
+  Result:= (AIndex>=0) and (AIndex<Count);
+end;
+
 function TATFoldedMarks.FindByCoord(ACoord: TPoint): integer;
 var
   MarkPtr: PATFoldedMark;
