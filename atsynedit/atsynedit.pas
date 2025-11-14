@@ -5506,6 +5506,7 @@ begin
   FMarginRight:= cInitMarginRight;
   FMarginList:= nil;
   FFoldedMarkList:= nil;
+  FFoldedMarkCurrent:= -1;
 
   FPrevCaret.PosX:= 0;
   FPrevCaret.PosY:= 0;
