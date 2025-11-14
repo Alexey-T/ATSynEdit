@@ -57,11 +57,6 @@ begin
   Init(Rect(0, 0, 0, 0), -1, -1, -1);
 end;
 
-function TATFoldedMark.IsInited: boolean;
-begin
-  Result:= LineFrom>=0;
-end;
-
 class operator TATFoldedMark.=(const a, b: TATFoldedMark): boolean;
 begin
   Result:= false;

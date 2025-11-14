@@ -480,7 +480,6 @@ type
     LineFrom, LineTo: integer;
     procedure Init(const ACoord: TRect; ARangeIndex, ALineFrom, ALineTo: integer);
     procedure InitNone;
-    function IsInited: boolean;
     class operator =(const a, b: TATFoldedMark): boolean;
   end;
 
