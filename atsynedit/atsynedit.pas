@@ -1239,8 +1239,8 @@ type
     procedure MenuFoldLevelClick(Sender: TObject);
     procedure MenuFoldUnfoldAllClick(Sender: TObject);
     procedure MenuFoldPlusMinusClick(Sender: TObject);
-    procedure FoldedMarkTooltipPaint(Sender: TObject);
-    procedure FoldedMarkMouseEnter(Sender: TObject);
+    procedure FoldedMarkTooltip_OnPaint(Sender: TObject);
+    procedure FoldedMarkTooltip_OnMouseEnter(Sender: TObject);
     procedure OnNewScrollbarHorzChanged(Sender: TObject);
     procedure OnNewScrollbarVertChanged(Sender: TObject);
     procedure DoPartCalc_CreateNew(var AParts: TATLineParts; AOffsetMax,
@@ -10813,7 +10813,7 @@ begin
   FFoldedMarkTooltip.Invalidate;
 end;
 
-procedure TATSynEdit.FoldedMarkTooltipPaint(Sender: TObject);
+procedure TATSynEdit.FoldedMarkTooltip_OnPaint(Sender: TObject);
 begin
   if FFoldedMarkCurrent.IsInited then
     DoPaintTextFragment(
@@ -10828,7 +10828,7 @@ begin
       );
 end;
 
-procedure TATSynEdit.FoldedMarkMouseEnter(Sender: TObject);
+procedure TATSynEdit.FoldedMarkTooltip_OnMouseEnter(Sender: TObject);
 begin
   if Assigned(FFoldedMarkTooltip) then
     FFoldedMarkTooltip.Hide;
@@ -11105,8 +11105,8 @@ begin
     FFoldedMarkTooltip.Height:= 15;
     FFoldedMarkTooltip.Parent:= Self;
     FFoldedMarkTooltip.BorderStyle:= bsNone;
-    FFoldedMarkTooltip.OnPaint:= @FoldedMarkTooltipPaint;
-    FFoldedMarkTooltip.OnMouseEnter:=@FoldedMarkMouseEnter;
+    FFoldedMarkTooltip.OnPaint:= @FoldedMarkTooltip_OnPaint;
+    FFoldedMarkTooltip.OnMouseEnter:= @FoldedMarkTooltip_OnMouseEnter;
   end;
 end;
 
