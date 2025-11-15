@@ -1583,7 +1583,7 @@ function TATSynEdit.DoCommand_TextChangeCase(AMode: TATEditorCaseConvert): TATCo
 var
   St: TATStrings;
   Caret: TATCaretItem;
-  Str1, Str2: atString;
+  SPrev, SNew: atString;
   X1, Y1, X2, Y2: integer;
   Shift, PosAfter: TPoint;
   bSel, bChange, bLastCharIsWordEdge: boolean;
@@ -1612,28 +1612,28 @@ begin
         Y2:= Caret.PosY;
       end;
 
-      Str1:= St.TextSubstring(X1, Y1, X2, Y2);
+      SPrev:= St.TextSubstring(X1, Y1, X2, Y2);
       if St.IsIndexValid(Y2) then
         bLastCharIsWordEdge:= not ((X2<St.LinesLen[Y2]) and IsCharWord(St.LineCharAt(Y2, X2+1)));
 
       case AMode of
         TATEditorCaseConvert.Lower:
-          Str2:= SCaseLower(Str1);
+          SNew:= SCaseLower(SPrev);
         TATEditorCaseConvert.Upper:
-          Str2:= SCaseUpper(Str1); //if we use UpperCase than Greek lowercase final-sigma is not converted to uppercase sigma
+          SNew:= SCaseUpper(SPrev); //if we use UpperCase than Greek lowercase final-sigma is not converted to uppercase sigma
         TATEditorCaseConvert.Title:
-          Str2:= SCaseTitle(Str1, FOptNonWordChars);
+          SNew:= SCaseTitle(SPrev, FOptNonWordChars);
         TATEditorCaseConvert.Invert:
-          Str2:= SCaseInvert(Str1);
+          SNew:= SCaseInvert(SPrev);
         TATEditorCaseConvert.Sentence:
-          Str2:= SCaseSentence(Str1, FOptNonWordChars);
+          SNew:= SCaseSentence(SPrev, FOptNonWordChars);
       end;
 
-      SFixGreekTextAfterCaseConversion(Str2, bLastCharIsWordEdge);
+      SFixGreekTextAfterCaseConversion(SNew, bLastCharIsWordEdge);
 
-      if Str1<>Str2 then
+      if SPrev<>SNew then
       begin
-        St.TextReplaceRange(X1, Y1, X2, Y2, Str2, Shift, PosAfter, false);
+        St.TextReplaceRange(X1, Y1, X2, Y2, SNew, Shift, PosAfter, false);
         bChange:= true;
       end;
     end;
