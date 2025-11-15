@@ -1618,15 +1618,15 @@ begin
 
       case AMode of
         TATEditorCaseConvert.Lower:
-          SNew:= SCaseLower(SPrev);
+          SNew:= SConvertCaseToLower(SPrev);
         TATEditorCaseConvert.Upper:
-          SNew:= SCaseUpper(SPrev); //if we use UpperCase than Greek lowercase final-sigma is not converted to uppercase sigma
+          SNew:= SConvertCaseToUpper(SPrev); //if we use UpperCase than Greek lowercase final-sigma is not converted to uppercase sigma
         TATEditorCaseConvert.Title:
-          SNew:= SCaseTitle(SPrev, FOptNonWordChars);
+          SNew:= SConvertCaseToTitle(SPrev, FOptNonWordChars);
         TATEditorCaseConvert.Invert:
-          SNew:= SCaseInvert(SPrev);
+          SNew:= SConvertCaseToInverted(SPrev);
         TATEditorCaseConvert.Sentence:
-          SNew:= SCaseSentence(SPrev, FOptNonWordChars);
+          SNew:= SConvertCaseToSentence(SPrev, FOptNonWordChars);
       end;
 
       SFixGreekTextAfterCaseConversion(SNew, bLastCharIsWordEdge);

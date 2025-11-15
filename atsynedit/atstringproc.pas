@@ -128,11 +128,11 @@ function IsStringWithUnicode(const S: UnicodeString): boolean; inline;
 function SCharUpper(ch: WideChar): WideChar; inline;
 function SCharLower(ch: WideChar): WideChar; inline;
 
-function SCaseTitle(const S, SNonWordChars: atString): atString;
-function SCaseInvert(const S: atString): atString;
-function SCaseSentence(const S, SNonWordChars: atString): atString;
-function SCaseUpper(const S: atString): atString;
-function SCaseLower(const S: atString): atString;
+function SConvertCaseToTitle(const S, SNonWordChars: UnicodeString): UnicodeString;
+function SConvertCaseToInverted(const S: UnicodeString): UnicodeString;
+function SConvertCaseToSentence(const S, SNonWordChars: UnicodeString): UnicodeString;
+function SConvertCaseToUpper(const S: UnicodeString): UnicodeString;
+function SConvertCaseToLower(const S: UnicodeString): UnicodeString;
 
 function StringOfCharW(ch: WideChar; Len: SizeInt): UnicodeString;
 
@@ -1230,7 +1230,7 @@ begin
 end;
 
 
-function SCaseTitle(const S, SNonWordChars: atString): atString;
+function SConvertCaseToTitle(const S, SNonWordChars: UnicodeString): UnicodeString;
 var
   i: SizeInt;
 begin
@@ -1242,7 +1242,7 @@ begin
       Result[i]:= SCharLower(Result[i]);
 end;
 
-function SCaseInvert(const S: atString): atString;
+function SConvertCaseToInverted(const S: UnicodeString): UnicodeString;
 var
   ch, ch_up: WideChar;
   i: SizeInt;
@@ -1259,7 +1259,7 @@ begin
   end;
 end;
 
-function SCaseUpper(const S: atString): atString;
+function SConvertCaseToUpper(const S: UnicodeString): UnicodeString;
 var
   i: SizeInt;
 begin
@@ -1268,7 +1268,7 @@ begin
     Result[i]:= SCharUpper(Result[i]);
 end;
 
-function SCaseLower(const S: atString): atString;
+function SConvertCaseToLower(const S: UnicodeString): UnicodeString;
 var
   i: SizeInt;
 begin
@@ -1277,7 +1277,7 @@ begin
     Result[i]:= SCharLower(Result[i]);
 end;
 
-function SCaseSentence(const S, SNonWordChars: atString): atString;
+function SConvertCaseToSentence(const S, SNonWordChars: UnicodeString): UnicodeString;
 var
   dot: boolean;
   ch: WideChar;
