@@ -277,7 +277,7 @@ function SCountTextLines(const Str, StrBreak: UnicodeString): SizeInt;
 procedure SSplitByChar(const S: string; Sep: char; out S1, S2: string);
 procedure SDeleteAndInsert(var AStr: UnicodeString; AFromPos, ACount: SizeInt; const AReplace: UnicodeString);
 procedure SDeleteHtmlTags(var S: string);
-procedure SFixGreekTextAfterCaseConversion(var S: UnicodeString);
+procedure SFixGreekTextAfterCaseConversion(var S: UnicodeString; ALastCharIsWordEdge: boolean);
 
 
 implementation
@@ -1101,7 +1101,7 @@ begin
       Result[i]:= ' ';
 end;
 
-function STrimAll(const S: unicodestring): unicodestring;
+function STrimAll(const S: UnicodeString): UnicodeString;
 var
   Ofs, Len: sizeint;
 begin
@@ -1114,7 +1114,7 @@ begin
   result := Copy(S, Ofs, 1 + Len - Ofs);
 end;
 
-function STrimLeft(const S: unicodestring): unicodestring;
+function STrimLeft(const S: UnicodeString): UnicodeString;
 var
   i,l:sizeint;
 begin
@@ -1125,7 +1125,7 @@ begin
   Result := copy(s, i, l);
 end;
 
-function STrimRight(const S: unicodestring): unicodestring;
+function STrimRight(const S: UnicodeString): UnicodeString;
 var
   l:sizeint;
 begin
@@ -1594,7 +1594,8 @@ begin
 end;
 
 
-procedure SFixGreekTextAfterCaseConversion(var S: UnicodeString);
+procedure SFixGreekTextAfterCaseConversion(var S: UnicodeString;
+  ALastCharIsWordEdge: boolean);
 var
   SNonWord: UnicodeString;
   NLen, i: SizeInt;
@@ -1607,7 +1608,10 @@ begin
   i:= 0;
   repeat
     i:= Pos('σ', S, i+1);
-    if i=0 then Break;
+    if i=0 then
+      Break;
+    if (i=NLen) and (not ALastCharIsWordEdge) then
+      Break;
     if ((i=1) or IsCharWord(S[i-1], SNonWord)) and
        ((i=NLen) or not IsCharWord(S[i+1], SNonWord)) then
       S[i]:= 'ς';

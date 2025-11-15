@@ -1586,13 +1586,14 @@ var
   Str1, Str2: atString;
   X1, Y1, X2, Y2: integer;
   Shift, PosAfter: TPoint;
-  bSel, bChange: boolean;
+  bSel, bChange, bLastCharIsWordEdge: boolean;
   iCaret, NLastCaret: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
   St:= Strings;
   bChange:= false;
+  bLastCharIsWordEdge:= true;
 
   St.BeginUndoGroup;
   try
@@ -1612,6 +1613,9 @@ begin
       end;
 
       Str1:= St.TextSubstring(X1, Y1, X2, Y2);
+      if St.IsIndexValid(Y2) then
+        bLastCharIsWordEdge:= not ((X2<St.LinesLen[Y2]) and IsCharWord(St.LineCharAt(Y2, X2+1)));
+
       case AMode of
         TATEditorCaseConvert.Lower:
           Str2:= SCaseLower(Str1);
@@ -1625,7 +1629,7 @@ begin
           Str2:= SCaseSentence(Str1, FOptNonWordChars);
       end;
 
-      SFixGreekTextAfterCaseConversion(Str2);
+      SFixGreekTextAfterCaseConversion(Str2, bLastCharIsWordEdge);
 
       if Str1<>Str2 then
       begin
