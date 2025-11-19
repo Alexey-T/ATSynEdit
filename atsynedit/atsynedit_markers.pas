@@ -49,8 +49,8 @@ type
     //with the same Tag>0 multi-carets are placed
     Tag: Int64;
 
-    //used to place marker on micromap column with given Tag
-    //used in DimRanges list, holds dim value
+    //used to save tag of micromap-column
+    //also used in DimRanges list, holds dim value
     TagEx: Int64;
 
     //text position of marker
