@@ -458,7 +458,17 @@ begin
       j:= i;
       while (j>0) and IsMarkerOk(ItemPtr(j-1)) do
         Dec(j);
-      FList.DeleteRange(j, i);
+
+      //DeleteRange can avoid mem realloc sometimes.
+      //work around this:
+      if (j=0) and (i=Count-1) then
+      begin
+        FList.Clear;
+        Break;
+      end
+      else
+        FList.DeleteRange(j, i);
+
       i:= j;
     end;
   until false;
@@ -479,7 +489,19 @@ begin
       j:= i;
       while (j>0) and (ItemPtr(j-1)^.Tag=ATag) do
         Dec(j);
-      FList.DeleteRange(j, i);
+
+      //DeleteRange reallocs mem ONLY if some condition is met.
+      //this gives problem in the CudaText plugin Spell Checker when "Clear marks"
+      //command is called with _lot_ of marks, but mem is still not freed.
+      //so work around this:
+      if (j=0) and (i=Count-1) then
+      begin
+        FList.Clear;
+        Break;
+      end
+      else
+        FList.DeleteRange(j, i);
+
       i:= j;
     end;
   until false;
