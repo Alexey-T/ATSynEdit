@@ -40,22 +40,10 @@ type
 
   PATMarkerItem = ^TATMarkerItem;
   TATMarkerItem = record
-    //text position of marker
-    PosX, PosY: integer;
-
-    //render underline near the marker, when LineLen<>0
-    LineLen: integer;
-
     //screen coords
     CoordX, CoordY: Int64;
     //screen coords of line end, when LineLen<>0
     CoordX2, CoordY2: Int64;
-
-    //used in CudaText: when "Collect marker" gets this marker, caret will be with selection
-    //if SelY=0 - LenX is length of sel (single line)
-    //if SelY>0 - LenY is Y-delta of sel-end,
-    //            LenX is absolute X of sel-end
-    SelX, SelY: integer;
 
     //used in CudaText: when "Collect marker" runs, for all markers
     //with the same Tag>0 multi-carets are placed
@@ -64,6 +52,18 @@ type
     //used to place marker on micromap column with given Tag
     //used in DimRanges list, holds dim value
     TagEx: Int64;
+
+    //text position of marker
+    PosX, PosY: integer;
+
+    //render underline near the marker, when LineLen<>0
+    LineLen: integer;
+
+    //used in CudaText: when "Collect marker" gets this marker, caret will be with selection
+    //if SelY=0 - LenX is length of sel (single line)
+    //if SelY>0 - LenY is Y-delta of sel-end,
+    //            LenX is absolute X of sel-end
+    SelX, SelY: integer;
 
     //used in Attribs object
     LinePart: TATLinePart;
