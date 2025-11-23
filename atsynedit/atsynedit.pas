@@ -2106,7 +2106,7 @@ type
     property OptShowCurLine: boolean read FOptShowCurLine write FOptShowCurLine default false;
     property OptShowCurLineMinimal: boolean read FOptShowCurLineMinimal write FOptShowCurLineMinimal default true;
     property OptShowCurLineOnlyFocused: boolean read FOptShowCurLineOnlyFocused write FOptShowCurLineOnlyFocused default false;
-    property OptShowCurLineIfWithoutSel: boolean read FOptShowCurLineIfWithoutSel write FOptShowCurLineIfWithoutSel default true;
+    property OptShowCurLineIfWithoutSel: boolean read FOptShowCurLineIfWithoutSel write FOptShowCurLineIfWithoutSel default false;
     property OptShowCurColumn: boolean read FOptShowCurColumn write FOptShowCurColumn default false;
     property OptKeepSelFontColor: boolean read FOptKeepSelFontColor write FOptKeepSelFontColor default false;
     property OptShowScrollHint: boolean read FOptShowScrollHint write FOptShowScrollHint default false;
@@ -5738,7 +5738,7 @@ begin
   FOptShowCurLine:= false;
   FOptShowCurLineMinimal:= true;
   FOptShowCurLineOnlyFocused:= false;
-  FOptShowCurLineIfWithoutSel:= true;
+  FOptShowCurLineIfWithoutSel:= false;
   FOptShowCurColumn:= false;
   FOptShowMouseSelFrame:= cInitShowMouseSelFrame;
   FOptShowIndentLines:= true;
