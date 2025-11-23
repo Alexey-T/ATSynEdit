@@ -556,6 +556,9 @@ type
     cInitMicromapOnScrollbar = false;
     cInitMicromapBookmarks = false;
     cInitShowMouseSelFrame = true;
+    cInitShowCurLineMinimal = true;
+    cInitShowCurLineOnlyFocused = false;
+    cInitShowCurLineIfWithoutSel = false;
     cInitMarginRight = 80;
     cInitTabSize = 8;
     cInitNumbersStyle = TATEditorNumbersStyle.Each5th;
@@ -2104,9 +2107,9 @@ type
     property OptShowFullWidthForSelection: boolean read FOptShowFullSel write FOptShowFullSel default false;
     property OptShowFullWidthForSyntaxHilite: boolean read FOptShowFullHilite write FOptShowFullHilite default true;
     property OptShowCurLine: boolean read FOptShowCurLine write FOptShowCurLine default false;
-    property OptShowCurLineMinimal: boolean read FOptShowCurLineMinimal write FOptShowCurLineMinimal default true;
-    property OptShowCurLineOnlyFocused: boolean read FOptShowCurLineOnlyFocused write FOptShowCurLineOnlyFocused default false;
-    property OptShowCurLineIfWithoutSel: boolean read FOptShowCurLineIfWithoutSel write FOptShowCurLineIfWithoutSel default false;
+    property OptShowCurLineMinimal: boolean read FOptShowCurLineMinimal write FOptShowCurLineMinimal default cInitShowCurLineMinimal;
+    property OptShowCurLineOnlyFocused: boolean read FOptShowCurLineOnlyFocused write FOptShowCurLineOnlyFocused default cInitShowCurLineOnlyFocused;
+    property OptShowCurLineIfWithoutSel: boolean read FOptShowCurLineIfWithoutSel write FOptShowCurLineIfWithoutSel default cInitShowCurLineIfWithoutSel;
     property OptShowCurColumn: boolean read FOptShowCurColumn write FOptShowCurColumn default false;
     property OptKeepSelFontColor: boolean read FOptKeepSelFontColor write FOptKeepSelFontColor default false;
     property OptShowScrollHint: boolean read FOptShowScrollHint write FOptShowScrollHint default false;
@@ -5736,9 +5739,9 @@ begin
   FOptShowFullSel:= false;
   FOptShowFullHilite:= true;
   FOptShowCurLine:= false;
-  FOptShowCurLineMinimal:= true;
-  FOptShowCurLineOnlyFocused:= false;
-  FOptShowCurLineIfWithoutSel:= false;
+  FOptShowCurLineMinimal:= cInitShowCurLineMinimal;
+  FOptShowCurLineOnlyFocused:= cInitShowCurLineOnlyFocused;
+  FOptShowCurLineIfWithoutSel:= cInitShowCurLineIfWithoutSel;
   FOptShowCurColumn:= false;
   FOptShowMouseSelFrame:= cInitShowMouseSelFrame;
   FOptShowIndentLines:= true;
