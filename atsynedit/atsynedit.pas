@@ -4390,6 +4390,7 @@ begin
       TextOutProps.ColorUnprintedHexFont:= Colors.UnprintedHexFont;
 
       TextOutProps.FontProportional:= FFontProportional;
+      TextOutProps.FontQuality:= Font.Quality;
 
       TextOutProps.FontNormal_Name:= Font.Name;
       TextOutProps.FontNormal_Size:= DoScaleFont(Font.Size);
@@ -10619,6 +10620,7 @@ begin
   TextOutProps.ColorUnprintedHexFont:= Colors.UnprintedHexFont;
 
   TextOutProps.FontProportional:= FFontProportional;
+  TextOutProps.FontQuality:= Font.Quality;
 
   if AFontSize<=2 then
   begin

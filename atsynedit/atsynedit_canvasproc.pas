@@ -94,6 +94,7 @@ type
     FontBold_Size: integer;
     FontBoldItalic_Name: string;
     FontBoldItalic_Size: integer;
+    FontQuality: TFontQuality;
     DetectIsPosSelected: TATSynEditCallbackIsCharSelected;
   end;
 
@@ -900,6 +901,7 @@ procedure CanvasTextOut(C: TCanvas;
 
     C.Font.Style:= ConvertIntegerToFontStyles(NStyles);
     C.Font.Color:= APart^.ColorFont;
+    C.Font.Quality:= AProps.FontQuality;
 
     if bItalic and not bBold then
     begin
