@@ -4315,16 +4315,17 @@ begin
 
     if WrapItem.NIndent>0 then
     begin
+      NColorIndent:= FColorBG;
       {
       //before 2025.02:
-      NColorIndent:= FColorBG;
+      //we had also DoCalcPosColor call, seems not needed at all.
       DoCalcPosColor(WrapItem.NCharIndex, NLinesIndex, NColorIndent, true);
 
-      //before 2025.11:
-      //but user complained about this, CudaText issue #6121
+      //2025.02 - 2025.11:
+      //it makes indent-BG colored line 1st LinePart, ie selected if 1st line char is selected.
+      //but user complained about this, CudaText issue #6121.
       NColorIndent:= ATempParts[0].ColorBG;
       }
-      NColorIndent:= FColorBG;
 
       DoPaintLineIndent(C, ARectLine, ACharSize,
         ARectLine.Top, WrapItem.NIndent,
