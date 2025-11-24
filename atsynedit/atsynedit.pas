@@ -1353,9 +1353,7 @@ type
       const ACharSize: TATEditorCharSize;
       ACoordY: integer;
       AIndentSize: integer;
-      AColorBG: TColor;
-      AScrollPos: integer;
-      AShowIndentLines: boolean);
+      AScrollPos: integer);
     procedure DoPaintMinimapAllToBGRABitmap;
     procedure DoPaintMinimapTextToBGRABitmap(
       const ARect: TRect;
@@ -4313,26 +4311,6 @@ begin
       true
       );
 
-    if WrapItem.NIndent>0 then
-    begin
-      NColorIndent:= FColorBG;
-      {
-      //before 2025.02:
-      //we had also DoCalcPosColor call, seems not needed at all.
-      DoCalcPosColor(WrapItem.NCharIndex, NLinesIndex, NColorIndent, true);
-
-      //2025.02 - 2025.11:
-      //it makes indent-BG colored line 1st LinePart, ie selected if 1st line char is selected.
-      //but user complained about this, CudaText issue #6121.
-      NColorIndent:= ATempParts[0].ColorBG;
-      }
-
-      DoPaintLineIndent(C, ARectLine, ACharSize,
-        ARectLine.Top, WrapItem.NIndent,
-        NColorIndent,
-        AScrollHorz.NPos, FOptShowIndentLines);
-    end;
-
     if ATempParts[0].Offset<0 then
     begin
       //some bug in making parts! to fix!
@@ -4451,6 +4429,11 @@ begin
       0,
       AScrollHorz);
   end;
+
+  if FOptShowIndentLines and (WrapItem.NIndent>0) then
+    DoPaintLineIndent(C, ARectLine, ACharSize,
+      ARectLine.Top, WrapItem.NIndent,
+      AScrollHorz.NPos);
 
   CoordAfterText.X:= CurrPointText.X+NOutputStrWidth;
   CoordAfterText.Y:= CurrPointText.Y;
@@ -8570,29 +8553,29 @@ procedure TATSynEdit.DoPaintLineIndent(C: TCanvas;
   const ACharSize: TATEditorCharSize;
   ACoordY: integer;
   AIndentSize: integer;
-  AColorBG: TColor;
-  AScrollPos: integer;
-  AShowIndentLines: boolean);
+  AScrollPos: integer);
 var
   i: integer;
-  RBack: TRect;
+  //RBack: TRect;
 begin
   if AIndentSize=0 then Exit;
 
+  {
+  //this code filled the background of indent; now not needed
   RBack:= Rect(0, 0, AIndentSize*ACharSize.XScaled div ATEditorCharXScale, ACharSize.Y);
   OffsetRect(RBack, ARect.Left-AScrollPos*ACharSize.XScaled div ATEditorCharXScale, ACoordY);
 
   C.Brush.Color:= AColorBG;
   C.FillRect(RBack);
+  }
 
-  if AShowIndentLines then
-    for i:= 0 to AIndentSize-1 do
-      if i mod FOptTabSize = 0 then
-        CanvasLine_DottedVertAlt(C,
-          Colors.IndentVertLines,
-          ARect.Left + (i-AScrollPos)*ACharSize.XScaled*ACharSize.XSpacePercents div ATEditorCharXScale div 100,
-          ACoordY,
-          ACoordY+ACharSize.Y);
+  for i:= 0 to AIndentSize-1 do
+    if i mod FOptTabSize = 0 then
+      CanvasLine_DottedVertAlt(C,
+        Colors.IndentVertLines,
+        ARect.Left + (i-AScrollPos)*ACharSize.XScaled*ACharSize.XSpacePercents div ATEditorCharXScale div 100,
+        ACoordY,
+        ACoordY+ACharSize.Y);
 end;
 
 procedure TATSynEdit.DoPaintSelectedLineBG(C: TCanvas;
