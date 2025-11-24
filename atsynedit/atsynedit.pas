@@ -4124,7 +4124,7 @@ var
   NCoordSep: Int64;
   WrapItem: TATWrapItem;
   StringItem: PATStringItem;
-  NColorEntire, NColorAfter, NColorIndent: TColor;
+  NColorEntire, NColorAfter: TColor;
   NDimValue: integer;
   ChosenBackColorEnum: TATEditorChosenBackColor;
   StrOutput: atString;
