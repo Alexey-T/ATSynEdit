@@ -4430,7 +4430,7 @@ begin
       AScrollHorz);
   end;
 
-  if FOptShowIndentLines and (WrapItem.NIndent>0) then
+  if FOptShowIndentLines then
     DoPaintLineIndent(C, ARectLine, ACharSize,
       ARectLine.Top, WrapItem.NIndent,
       AScrollHorz.NPos);
