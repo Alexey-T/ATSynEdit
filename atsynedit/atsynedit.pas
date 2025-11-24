@@ -4316,12 +4316,15 @@ begin
     if WrapItem.NIndent>0 then
     begin
       {
-      //before (2025.02):
+      //before 2025.02:
       NColorIndent:= FColorBG;
       DoCalcPosColor(WrapItem.NCharIndex, NLinesIndex, NColorIndent, true);
-      }
-      //after:
+
+      //before 2025.11:
+      //but user complained about this, CudaText issue #6121
       NColorIndent:= ATempParts[0].ColorBG;
+      }
+      NColorIndent:= FColorBG;
 
       DoPaintLineIndent(C, ARectLine, ACharSize,
         ARectLine.Top, WrapItem.NIndent,
