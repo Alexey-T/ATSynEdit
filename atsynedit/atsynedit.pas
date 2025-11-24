@@ -4346,65 +4346,65 @@ begin
     if Length(StrOutput)>NCount then
       SetLength(StrOutput, NCount);
 
-      TextOutProps.Editor:= Self;
-      TextOutProps.HasAsciiNoTabs:= not FFontProportional and St.LinesHasAsciiNoTabs[NLinesIndex];
-      TextOutProps.SuperFast:= bLineHuge;
-      TextOutProps.TabHelper:= FTabHelper;
-      TextOutProps.LineIndex:= NLinesIndex;
-      TextOutProps.CharIndexInLine:= WrapItem.NCharIndex;
-      TextOutProps.CharSize:= ACharSize;
-      TextOutProps.CharsSkipped:= NOutputCellPercentsSkipped div 100;
-      TextOutProps.TrimmedTrailingNonSpaces:= bTrimmedNonSpaces;
-      TextOutProps.DrawEvent:= Event;
-      TextOutProps.ControlWidth:= ClientWidth+ACharSize.XScaled div ATEditorCharXScale * 2;
-      TextOutProps.SpacingTopEdge:= FSpacingTopEdge;
-      TextOutProps.SpacingTop:= FSpacingTop;
+    TextOutProps.Editor:= Self;
+    TextOutProps.HasAsciiNoTabs:= not FFontProportional and St.LinesHasAsciiNoTabs[NLinesIndex];
+    TextOutProps.SuperFast:= bLineHuge;
+    TextOutProps.TabHelper:= FTabHelper;
+    TextOutProps.LineIndex:= NLinesIndex;
+    TextOutProps.CharIndexInLine:= WrapItem.NCharIndex;
+    TextOutProps.CharSize:= ACharSize;
+    TextOutProps.CharsSkipped:= NOutputCellPercentsSkipped div 100;
+    TextOutProps.TrimmedTrailingNonSpaces:= bTrimmedNonSpaces;
+    TextOutProps.DrawEvent:= Event;
+    TextOutProps.ControlWidth:= ClientWidth+ACharSize.XScaled div ATEditorCharXScale * 2;
+    TextOutProps.SpacingTopEdge:= FSpacingTopEdge;
+    TextOutProps.SpacingTop:= FSpacingTop;
 
-      TextOutProps.ShowUnprinted:= FUnprintedVisible and FUnprintedSpaces;
-      TextOutProps.ShowUnprintedSpacesTrailing:= FUnprintedSpacesTrailing;
-      TextOutProps.ShowUnprintedSpacesBothEnds:= FUnprintedSpacesBothEnds;
-      TextOutProps.ShowUnprintedSpacesOnlyInSelection:= FUnprintedSpacesOnlyInSelection {and TempSel_IsSelection}; //careful, CudaText #4541
-      TextOutProps.ShowUnprintedSpacesAlsoInSelection:= not FUnprintedSpacesOnlyInSelection and FUnprintedSpacesAlsoInSelection and TempSel_IsSelection;
-      TextOutProps.ShowUnprintedForceTabs:= FUnprintedForceTabs;
-      TextOutProps.DetectIsPosSelected:= @IsPosSelected;
+    TextOutProps.ShowUnprinted:= FUnprintedVisible and FUnprintedSpaces;
+    TextOutProps.ShowUnprintedSpacesTrailing:= FUnprintedSpacesTrailing;
+    TextOutProps.ShowUnprintedSpacesBothEnds:= FUnprintedSpacesBothEnds;
+    TextOutProps.ShowUnprintedSpacesOnlyInSelection:= FUnprintedSpacesOnlyInSelection {and TempSel_IsSelection}; //careful, CudaText #4541
+    TextOutProps.ShowUnprintedSpacesAlsoInSelection:= not FUnprintedSpacesOnlyInSelection and FUnprintedSpacesAlsoInSelection and TempSel_IsSelection;
+    TextOutProps.ShowUnprintedForceTabs:= FUnprintedForceTabs;
+    TextOutProps.DetectIsPosSelected:= @IsPosSelected;
 
-      TextOutProps.ShowFontLigatures:= FOptShowFontLigatures and
-                                       (ATEditorOptions.EnableLigaturesOnLineWithCaret or not bLineWithCaret);
-      TextOutProps.ColorNormalFont:= Colors.TextFont;
-      TextOutProps.ColorUnprintedFont:= Colors.UnprintedFont;
-      TextOutProps.ColorUnprintedHexFont:= Colors.UnprintedHexFont;
+    TextOutProps.ShowFontLigatures:= FOptShowFontLigatures and
+                                     (ATEditorOptions.EnableLigaturesOnLineWithCaret or not bLineWithCaret);
+    TextOutProps.ColorNormalFont:= Colors.TextFont;
+    TextOutProps.ColorUnprintedFont:= Colors.UnprintedFont;
+    TextOutProps.ColorUnprintedHexFont:= Colors.UnprintedHexFont;
 
-      TextOutProps.FontProportional:= FFontProportional;
-      TextOutProps.FontQuality:= Font.Quality;
+    TextOutProps.FontProportional:= FFontProportional;
+    TextOutProps.FontQuality:= Font.Quality;
 
-      TextOutProps.FontNormal_Name:= Font.Name;
-      TextOutProps.FontNormal_Size:= DoScaleFont(Font.Size);
+    TextOutProps.FontNormal_Name:= Font.Name;
+    TextOutProps.FontNormal_Size:= DoScaleFont(Font.Size);
 
-      TextOutProps.FontItalic_Name:= FontItalic.Name;
-      TextOutProps.FontItalic_Size:= DoScaleFont(FontItalic.Size);
+    TextOutProps.FontItalic_Name:= FontItalic.Name;
+    TextOutProps.FontItalic_Size:= DoScaleFont(FontItalic.Size);
 
-      TextOutProps.FontBold_Name:= FontBold.Name;
-      TextOutProps.FontBold_Size:= DoScaleFont(FontBold.Size);
+    TextOutProps.FontBold_Name:= FontBold.Name;
+    TextOutProps.FontBold_Size:= DoScaleFont(FontBold.Size);
 
-      TextOutProps.FontBoldItalic_Name:= FontBoldItalic.Name;
-      TextOutProps.FontBoldItalic_Size:= DoScaleFont(FontBoldItalic.Size);
+    TextOutProps.FontBoldItalic_Name:= FontBoldItalic.Name;
+    TextOutProps.FontBoldItalic_Size:= DoScaleFont(FontBoldItalic.Size);
 
-      CanvasTextOut(C,
-        CurrPointText.X,
-        CurrPointText.Y,
-        StrOutput,
-        @ATempParts,
-        NOutputStrWidth,
-        TextOutProps
-        );
+    CanvasTextOut(C,
+      CurrPointText.X,
+      CurrPointText.Y,
+      StrOutput,
+      @ATempParts,
+      NOutputStrWidth,
+      TextOutProps
+      );
 
-      //paint selection bg, after applying ColorAfterEol
-      DoPaintSelectedLineBG(C, ACharSize, ARectLine,
-        CurrPoint,
-        CurrPointText,
-        WrapItem,
-        NOutputStrWidth,
-        AScrollHorz);
+    //paint selection bg, after applying ColorAfterEol
+    DoPaintSelectedLineBG(C, ACharSize, ARectLine,
+      CurrPoint,
+      CurrPointText,
+      WrapItem,
+      NOutputStrWidth,
+      AScrollHorz);
 
     //restore after textout
     C.Font.Style:= Font.Style;
