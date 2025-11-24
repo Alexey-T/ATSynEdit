@@ -8558,10 +8558,8 @@ var
   i: integer;
   //RBack: TRect;
 begin
-  if AIndentSize=0 then Exit;
-
   {
-  //this code filled the background of indent; now not needed
+  //code filled the background of indent; now not needed
   RBack:= Rect(0, 0, AIndentSize*ACharSize.XScaled div ATEditorCharXScale, ACharSize.Y);
   OffsetRect(RBack, ARect.Left-AScrollPos*ACharSize.XScaled div ATEditorCharXScale, ACoordY);
 
