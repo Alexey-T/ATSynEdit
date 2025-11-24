@@ -4408,6 +4408,11 @@ begin
 
     //restore after textout
     C.Font.Style:= Font.Style;
+
+    if FOptShowIndentLines and (WrapItem.NIndent>0) then
+      DoPaintLineIndent(C, ARectLine, ACharSize,
+        ARectLine.Top, WrapItem.NIndent,
+        AScrollHorz.NPos);
   end
   else
   //paint empty line bg
@@ -4429,11 +4434,6 @@ begin
       0,
       AScrollHorz);
   end;
-
-  if FOptShowIndentLines and (WrapItem.NIndent>0) then
-    DoPaintLineIndent(C, ARectLine, ACharSize,
-      ARectLine.Top, WrapItem.NIndent,
-      AScrollHorz.NPos);
 
   CoordAfterText.X:= CurrPointText.X+NOutputStrWidth;
   CoordAfterText.Y:= CurrPointText.Y;
