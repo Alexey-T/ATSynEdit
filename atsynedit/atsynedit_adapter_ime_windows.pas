@@ -77,6 +77,7 @@ begin
       ImmNotifyIME(imc, NI_COMPOSITIONSTR, CPS_CANCEL, 0);
     ImmReleaseContext(Ed.Handle, imc);
   end;
+  HideCompForm;
 end;
 
 procedure TATAdapterWindowsIME.CompFormPaint(Sender: TObject);
