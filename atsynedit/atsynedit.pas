@@ -9174,7 +9174,7 @@ begin
   if Relation=TATPosRelation.Before then
   begin
     if AndDeleteSelection then
-      St.TextDeleteRange(X1, Y1, X2, Y2, Shift, PosAfter);
+      St.TextDeleteRange(X1, Y1, X2, Y2, Shift);
     St.TextInsert(P.X, P.Y, Str, false, Shift, PosAfter);
 
     //select moved text
@@ -9189,12 +9189,12 @@ begin
 
     if AndDeleteSelection then
     begin
-      St.TextDeleteRange(X1, Y1, X2, Y2, Shift, PosAfter);
+      St.TextDeleteRange(X1, Y1, X2, Y2, Shift);
       UpdateCaretsAndMarkersOnEditing(0,
         Point(X1, Y1),
         Point(X2, Y2),
         Shift,
-        PosAfter);
+        Point(X1, Y1));
     end;
   end;
 

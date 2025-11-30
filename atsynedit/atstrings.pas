@@ -425,7 +425,7 @@ type
       APosAfter: TPoint; AllowGoToPrevLine: boolean; out ATextChanged: boolean);
     procedure TextDeleteRight(AX, AY: SizeInt; ALen: SizeInt; out AShift,
       APosAfter: TPoint; ACanDelEol: boolean=true);
-    function TextDeleteRange(AFromX, AFromY, AToX, AToY: SizeInt; out AShift, APosAfter: TPoint): boolean;
+    function TextDeleteRange(AFromX, AFromY, AToX, AToY: SizeInt; out AShift: TPoint): boolean;
     procedure TextInsertEol(AX, AY: SizeInt; AKeepCaret, ATrimPrevLine: boolean;
       const AStrIndent: atString; out AShift, APosAfter: TPoint);
     procedure TextDeleteLine(AX, AY: SizeInt; out AShift, APosAfter: TPoint);

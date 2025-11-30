@@ -99,7 +99,7 @@ begin
   begin
     if AWithUndoGroup then
       BeginUndoGroup;
-    TextDeleteRange(AFromX, AFromY, AToX, AToY, AShift, APosAfter);
+    TextDeleteRange(AFromX, AFromY, AToX, AToY, AShift);
     TextInsert(AFromX, AFromY, AText, false, AShift, APosAfter);
     if AWithUndoGroup then
       EndUndoGroup;
@@ -632,7 +632,7 @@ end;
 
 
 function TATStrings.TextDeleteRange(AFromX, AFromY, AToX, AToY: SizeInt;
-  out AShift, APosAfter: TPoint): boolean;
+  out AShift: TPoint): boolean;
 var
   Str: atString;
   bDeleteEol, bDeleteEol_Alt: boolean;
@@ -640,8 +640,6 @@ begin
   Result:= false;
   AShift.X:= 0;
   AShift.Y:= 0;
-  APosAfter.X:= AFromX;
-  APosAfter.Y:= AFromY;
 
   if Count=0 then Exit;
   if not IsIndexValid(AFromY) then Exit;
