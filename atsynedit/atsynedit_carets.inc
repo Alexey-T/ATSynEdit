@@ -1262,7 +1262,7 @@ begin
   if Assigned(FOnChangeDetailed) then
     FOnChangeDetailed(Self, APos, APosEnd, AShift, APosAfter);
 
-  bDeleteToRight:= APos=APosAfter;
+  bDeleteToRight:= (APos=APosAfter) and (AShift.Y=0) and (AShift.X<0);
 
   if AFromCaret>=0 then
     for i:= AFromCaret to Carets.Count-1 do
