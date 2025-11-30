@@ -620,10 +620,14 @@ begin
     begin
       Inc(PosX, AShift.X);
       Inc(PosY, AShift.Y);
+      {
+      //this commented block made regression: CudaText #6129
+
       //CudaText issue #4384
       if AShift.Y=0 then
         if PosX<APos.X then
           PosX:= APos.X;
+          }
     end;
   end;
 
