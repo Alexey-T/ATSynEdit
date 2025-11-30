@@ -621,6 +621,9 @@ begin
     begin
       Inc(PosX, AShift.X);
       Inc(PosY, AShift.Y);
+
+      //limit the PosX by the minimum, when e.g. CudaText API "ed.delete(5, 1, 9, 1)"
+      //is called when the caret is (6, 1), to avoid decrementing PosX too much.
       //CudaText issue #4384
       if ADeleteToRight and (AShift.Y=0) then
         if PosX<APos.X then
