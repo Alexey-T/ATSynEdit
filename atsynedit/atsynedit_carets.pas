@@ -81,7 +81,7 @@ type
     procedure Clear;
     procedure ClearDoubleClickRange;
     procedure UpdateMemory(AMode: TATCaretMemoryAction; AArrowUpDown: boolean);
-    procedure UpdateOnEditing(APos, APosEnd, AShift: TPoint);
+    procedure UpdateOnEditing(APos, APosEnd, AShift: TPoint; ADeleteToRight: boolean);
     function UpdateAfterRangeFolded(ARangeX, ARangeY, ARangeY2: integer): boolean;
   end;
 
@@ -601,7 +601,8 @@ begin
   end;
 end;
 
-procedure TATCaretItem.UpdateOnEditing(APos, APosEnd, AShift: TPoint);
+procedure TATCaretItem.UpdateOnEditing(APos, APosEnd, AShift: TPoint;
+  ADeleteToRight: boolean);
 begin
   //carets below src
   if PosY>APos.Y then
@@ -620,14 +621,10 @@ begin
     begin
       Inc(PosX, AShift.X);
       Inc(PosY, AShift.Y);
-      {
-      //this commented block made regression: CudaText #6129
-
       //CudaText issue #4384
-      if AShift.Y=0 then
+      if ADeleteToRight and (AShift.Y=0) then
         if PosX<APos.X then
           PosX:= APos.X;
-          }
     end;
   end;
 

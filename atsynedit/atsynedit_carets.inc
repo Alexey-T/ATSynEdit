@@ -1254,6 +1254,7 @@ var
   {$ifdef debug_markers_shift}
   S: string;
   {$endif}
+  bDeleteToRight: boolean;
 begin
   if APos.X<0 then Exit;
   if APos.Y<0 then Exit;
@@ -1261,12 +1262,11 @@ begin
   if Assigned(FOnChangeDetailed) then
     FOnChangeDetailed(Self, APos, APosEnd, AShift, APosAfter);
 
-  //if AFromCaret<0 then
-  //  AFromCaret:= Carets.IndexOfPosYAvg(APosY);
+  bDeleteToRight:= APos=APosAfter;
 
   if AFromCaret>=0 then
     for i:= AFromCaret to Carets.Count-1 do
-      Carets[i].UpdateOnEditing(APos, APosEnd, AShift);
+      Carets[i].UpdateOnEditing(APos, APosEnd, AShift, bDeleteToRight);
 
   {$ifdef debug_markers_shift}
   S:= '';
