@@ -20,11 +20,11 @@ type
   public
     LineIndex: integer;
     Size: integer;
+    Tag: integer;
     Color: TColor;
     Bitmap: TBitmap;
     Form: TCustomForm;
     FormVisible: boolean;
-    Tag: Int64;
     DeleteOnDelLine: boolean;
     constructor Create; virtual;
     destructor Destroy; override;
@@ -53,11 +53,11 @@ type
     property Items[N: integer]: TATGapItem read GetItem; default;
     procedure Delete(N: integer);
     function Add(ALineIndex, ASize: integer; ABitmap: TBitmap; AForm: TCustomForm;
-      const ATag: Int64;
+      ATag: integer;
       AColor: TColor=clNone; ADeleteOnDelLine: boolean=true): boolean;
-    function Find(ALineIndex: integer; ATag: Int64=-1): TATGapItem;
+    function Find(ALineIndex: integer; ATag: integer=-1): TATGapItem;
     function DeleteForLineRange(ALineFrom, ALineTo: integer): boolean;
-    function DeleteWithTag(const ATag: Int64): boolean;
+    function DeleteWithTag(ATag: integer): boolean;
     function SizeForLineRange(ALineFrom, ALineTo: integer): integer;
     function SizeForAll: integer;
     property SizeOfGapTop: integer read FSizeOfGapTop;
@@ -186,7 +186,7 @@ begin
   end;
 end;
 
-function TATGaps.DeleteWithTag(const ATag: Int64): boolean;
+function TATGaps.DeleteWithTag(ATag: integer): boolean;
 var
   Item: TATGapItem;
   i: integer;
@@ -204,7 +204,7 @@ begin
 end;
 
 function TATGaps.Add(ALineIndex, ASize: integer; ABitmap: TBitmap;
-  AForm: TCustomForm; const ATag: Int64; AColor: TColor;
+  AForm: TCustomForm; ATag: integer; AColor: TColor;
   ADeleteOnDelLine: boolean): boolean;
 var
   Item: TATGapItem;
@@ -232,7 +232,7 @@ begin
   Result:= true;
 end;
 
-function TATGaps.Find(ALineIndex: integer; ATag: Int64=-1): TATGapItem;
+function TATGaps.Find(ALineIndex: integer; ATag: integer=-1): TATGapItem;
 var
   Item: TATGapItem;
   i: integer;
