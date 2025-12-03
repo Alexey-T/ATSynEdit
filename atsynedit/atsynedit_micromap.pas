@@ -12,7 +12,7 @@ uses
   Classes, SysUtils, Graphics;
 
 type
-  TATMicromapColumn = record
+  TATMicromapColumn = packed record
     NWidthUnits: integer;
     NLeft, NRight: integer;
     NTag: integer;
