@@ -8,7 +8,7 @@ begin
 end;
 
 procedure TATSynEdit.BookmarkSetForLineEx(ALine, ABmKind: integer;
-  const AHint: string; AAutoDelete: TATBookmarkAutoDelete; AShowInList: boolean; const ATag: Int64;
+  const AHint: string; AAutoDelete: TATBookmarkAutoDelete; AShowInList: boolean; ATag: integer;
   ABookmarksObj: TATBookmarks);
 var
   Data: TATBookmarkData;
@@ -30,7 +30,7 @@ end;
 
 procedure TATSynEdit.BookmarkSetForLine(ALine, ABmKind: integer;
   const AHint: string; AAutoDelete: TATBookmarkAutoDelete;
-  AShowInList: boolean; const ATag: Int64);
+  AShowInList: boolean; ATag: integer);
 begin
   BookmarkSetForLineEx(
     ALine,
@@ -45,7 +45,7 @@ end;
 
 procedure TATSynEdit.BookmarkSetForLine_2(ALine, ABmKind: integer;
   const AHint: string; AAutoDelete: TATBookmarkAutoDelete;
-  AShowInList: boolean; const ATag: Int64);
+  AShowInList: boolean; ATag: integer);
 begin
   BookmarkSetForLineEx(
     ALine,
@@ -61,7 +61,7 @@ end;
 
 procedure TATSynEdit.BookmarkToggleForLine(ALine, ABmKind: integer;
   const AHint: string; AAutoDelete: TATBookmarkAutoDelete;
-  AShowInList: boolean; const ATag: Int64);
+  AShowInList: boolean; ATag: integer);
 var
   St: TATStrings;
   NIndex: integer;
@@ -90,7 +90,7 @@ begin
 end;
 
 
-procedure TATSynEdit.BookmarkToggleForCarets(ABmKind: integer; AShowInList: boolean; const ATag: Int64);
+procedure TATSynEdit.BookmarkToggleForCarets(ABmKind: integer; AShowInList: boolean; ATag: integer);
 var
   Caret: TATCaretItem;
   iCaret, NLine, NLinePrev: integer;
@@ -126,7 +126,7 @@ begin
   BookmarkDeleteForLineEx(ALine, Strings.Bookmarks2);
 end;
 
-function TATSynEdit.BookmarkDeleteByTagEx(const ATag: Int64;
+function TATSynEdit.BookmarkDeleteByTagEx(ATag: integer;
   ABookmarksObj: TATBookmarks): boolean;
 begin
   Result:= ABookmarksObj.DeleteByTag(ATag);
@@ -137,12 +137,12 @@ begin
   end;
 end;
 
-function TATSynEdit.BookmarkDeleteByTag(const ATag: Int64): boolean;
+function TATSynEdit.BookmarkDeleteByTag(ATag: integer): boolean;
 begin
   Result:= BookmarkDeleteByTagEx(ATag, Strings.Bookmarks);
 end;
 
-function TATSynEdit.BookmarkDeleteByTag_2(const ATag: Int64): boolean;
+function TATSynEdit.BookmarkDeleteByTag_2(ATag: integer): boolean;
 begin
   Result:= BookmarkDeleteByTagEx(ATag, Strings.Bookmarks2);
 end;

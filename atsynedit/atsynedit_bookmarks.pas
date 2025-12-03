@@ -27,7 +27,7 @@ type
   { TATBookmarkData }
 
   TATBookmarkData = packed record
-    Tag: Int64;
+    Tag: integer;
     LineNum: integer;
     Kind: word;
     AutoDelete: TATBookmarkAutoDelete;
@@ -67,7 +67,7 @@ type
     procedure Clear;
     procedure Delete(N: integer);
     procedure DeleteForLine(ALine: integer);
-    function DeleteByTag(const ATag: Int64): boolean;
+    function DeleteByTag(ATag: integer): boolean;
     function Count: integer;
     function IsIndexValid(N: integer): boolean;
     property ItemPtr[N: integer]: PATBookmarkItem read GetItemPtr; default;
@@ -160,7 +160,7 @@ begin
     Delete(N);
 end;
 
-function TATBookmarks.DeleteByTag(const ATag: Int64): boolean;
+function TATBookmarks.DeleteByTag(ATag: integer): boolean;
 var
   i, j: integer;
 begin
