@@ -37,15 +37,15 @@ type
 
   PATFoldRange = ^TATFoldRange;
   TATFoldRange = packed record
-    Tag: Int64;
     X: integer; //start column
     Y: integer; //start line
     X2: integer; //ending column
     Y2: integer; //ending line, which is fully folded (can't partially fold)
     Folded: boolean;
     Staple: boolean;
+    Tag: byte; //Int64 is too much
     Hint: TATFoldHintLong;
-    procedure Init(AX, AY, AX2, AY2: integer; AStaple: boolean; const AHint: string; const ATag: Int64);
+    procedure Init(AX, AY, AX2, AY2: integer; AStaple: boolean; const AHint: string; ATag: byte);
     function IsSimple: boolean;
     function IsLineInside(ALine: integer): boolean;
     function IsHintSame(const AOtherHint: TATFoldHintTrimmed): boolean;
@@ -99,19 +99,18 @@ type
     function IsIndexValid(N: integer): boolean; inline;
     function IsRangesTouch(N1, N2: integer): boolean;
     function Add(AX, AY, AX2, AY2: integer; AWithStaple: boolean; const AHint: string;
-      const ATag: Int64=0): TATFoldRange;
+      ATag: byte=0): TATFoldRange;
     function AddSorted(AX, AY, AX2, AY2: integer; AWithStaple: boolean;
-      const AHint: string; const ATag: Int64;
+      const AHint: string; ATag: byte;
       out AItemIndex: integer): TATFoldRange;
     function Insert(AIndex: integer; AX, AY, AX2, AY2: integer; AWithStaple: boolean;
-      const AHint: string; const ATag: Int64=0): TATFoldRange;
-    //procedure Merge(AX, AY, AX2, AY2: integer; const AHint: string; const ATag: Int64);
+      const AHint: string; ATag: byte=0): TATFoldRange;
     procedure Clear;
     procedure ClearLineIndexer(ALineCount: integer; ASetLenOnly: boolean=false);
     procedure AssignList(AList: TATFoldRangeList);
     procedure Delete(AIndex: integer);
-    procedure DeleteAllByTag(const ATag: Int64);
-    //procedure DeleteAllExceptTag(const ATag: Int64);
+    procedure DeleteAllByTag(ATag: byte);
+    //procedure DeleteAllExceptTag(ATag: byte);
     function ItemPtr(AIndex: integer): PATFoldRange;
     function IsRangeInsideOther(R1, R2: PATFoldRange): boolean;
     function IsRangesSame(R1, R2: PATFoldRange): boolean;
@@ -138,7 +137,7 @@ type
   end;
 
 const
-  cTagPersistentFoldRange = -1;
+  cTagPersistentFoldRange = 255;
 
 implementation
 
@@ -227,7 +226,7 @@ end;
 { TATFoldRange }
 
 procedure TATFoldRange.Init(AX, AY, AX2, AY2: integer; AStaple: boolean;
-  const AHint: string; const ATag: Int64);
+  const AHint: string; ATag: byte);
 begin
   if (AX<=0) then
     raise Exception.Create('Incorrect range with x<=0: '+MessageText);
@@ -282,13 +281,13 @@ end;
 
 procedure TATFoldRange.Assign(constref R: TATFoldRange);
 begin
-  Tag:= R.Tag;
   X:= R.X;
   Y:= R.Y;
   X2:= R.X2;
   Y2:= R.Y2;
   Folded:= R.Folded;
   Staple:= R.Staple;
+  Tag:= R.Tag;
   Hint:= R.Hint;
 end;
 
@@ -359,7 +358,7 @@ end;
 
 function TATFoldRanges.Add(AX, AY, AX2, AY2: integer; AWithStaple: boolean;
   const AHint: string;
-  const ATag: Int64=0): TATFoldRange;
+  ATag: byte=0): TATFoldRange;
 var
   NIndex: integer;
 begin
@@ -378,7 +377,7 @@ end;
 
 function TATFoldRanges.AddSorted(AX, AY, AX2, AY2: integer; AWithStaple: boolean;
   const AHint: string;
-  const ATag: Int64;
+  ATag: byte;
   out AItemIndex: integer): TATFoldRange;
 var
   Item: PATFoldRange;
@@ -436,7 +435,7 @@ end;
 function TATFoldRanges.Insert(AIndex: integer; AX, AY, AX2, AY2: integer;
   AWithStaple: boolean;
   const AHint: string;
-  const ATag: Int64=0): TATFoldRange;
+  ATag: byte=0): TATFoldRange;
 begin
   if Count>=MaxCount then exit;
 
@@ -457,7 +456,7 @@ begin
   UpdateLineIndexer;
 end;
 
-procedure TATFoldRanges.DeleteAllByTag(const ATag: Int64);
+procedure TATFoldRanges.DeleteAllByTag(ATag: byte);
 var
   i: integer;
   bChanged: boolean;
@@ -480,7 +479,7 @@ begin
 end;
 
 {
-procedure TATFoldRanges.DeleteAllExceptTag(const ATag: Int64);
+procedure TATFoldRanges.DeleteAllExceptTag(ATag: byte);
 var
   TempList: TATFoldRangeList;
   i: integer;
@@ -983,7 +982,7 @@ begin
 end;
 
 (*
-procedure TATFoldRanges.Merge(AX, AY, AX2, AY2: integer; const AHint: string; const ATag: Int64);
+procedure TATFoldRanges.Merge(AX, AY, AX2, AY2: integer; const AHint: string; ATag: byte);
 //try to find old fold-range for the AY line;
 //if found, update the range (don't change it's Folded state) without inserting new one
 var
