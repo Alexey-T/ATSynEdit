@@ -31,8 +31,8 @@ type
 
   TATMarkerTags = record
     Tag,
-    TagEx: Int64;
-    constructor Init(const ATag, AColumnTag: Int64);
+    TagEx: integer;
+    constructor Init(ATag, AColumnTag: integer);
   end;
 
 type
@@ -47,11 +47,11 @@ type
 
     //used in CudaText: when "Collect marker" runs, for all markers
     //with the same Tag>0 multi-carets are placed
-    Tag: Int64;
+    Tag: integer;
 
     //used to save tag of micromap-column
     //also used in DimRanges list, holds dim value
-    TagEx: Int64;
+    TagEx: integer;
 
     //text position of marker
     PosX, PosY: integer;
@@ -119,7 +119,7 @@ type
       AMicromapMode: TATMarkerMicromapMode=TATMarkerMicromapMode.TextOnly;
       ALineLen: integer=0);
     function DeleteInRange(AX1, AY1, AX2, AY2: integer): boolean;
-    function DeleteWithTag(const ATag: Int64): boolean;
+    function DeleteWithTag(ATag: integer): boolean;
     function DeleteByPos(AX, AY: integer): boolean;
     procedure Find(AX, AY: integer; out AIndex: integer; out AExactMatch: boolean);
     function FindContaining(AX, AY: integer): integer;
@@ -138,7 +138,7 @@ end;
 
 { TATMarkerTags }
 
-constructor TATMarkerTags.Init(const ATag, AColumnTag: Int64);
+constructor TATMarkerTags.Init(ATag, AColumnTag: integer);
 begin
   Tag:= ATag;
   TagEx:= AColumnTag;
@@ -474,7 +474,7 @@ begin
   until false;
 end;
 
-function TATMarkers.DeleteWithTag(const ATag: Int64): boolean;
+function TATMarkers.DeleteWithTag(ATag: integer): boolean;
 var
   i, j: integer;
 begin

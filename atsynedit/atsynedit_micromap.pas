@@ -15,7 +15,7 @@ type
   TATMicromapColumn = record
     NWidthUnits: integer;
     NLeft, NRight: integer;
-    NTag: Int64;
+    NTag: integer;
     NColor: TColor;
   end;
 
@@ -29,9 +29,9 @@ type
     Columns: array of TATMicromapColumn;
     constructor Create;
     function IsIndexValid(AIndex: integer): boolean;
-    function ColumnFromTag(const ATag: Int64): integer;
-    function ColumnAdd(const ATag: Int64; AWidthUnits: integer; AColor: TColor): boolean;
-    function ColumnDelete(const ATag: Int64): boolean;
+    function ColumnFromTag(ATag: integer): integer;
+    function ColumnAdd(ATag: integer; AWidthUnits: integer; AColor: TColor): boolean;
+    function ColumnDelete(ATag: integer): boolean;
     procedure UpdateWidth(ATotalWidthPixels: integer);
   end;
 
@@ -54,7 +54,7 @@ begin
   Result:= (AIndex>=0) and (AIndex<Length(Columns));
 end;
 
-function TATMicromap.ColumnFromTag(const ATag: Int64): integer;
+function TATMicromap.ColumnFromTag(ATag: integer): integer;
 var
   i: integer;
 begin
@@ -65,7 +65,7 @@ begin
   Result:= -1;
 end;
 
-function TATMicromap.ColumnAdd(const ATag: Int64; AWidthUnits: integer; AColor: TColor): boolean;
+function TATMicromap.ColumnAdd(ATag: integer; AWidthUnits: integer; AColor: TColor): boolean;
 begin
   Result:= (ColumnFromTag(ATag)<0) and (AWidthUnits>0);
   if Result then
@@ -82,7 +82,7 @@ begin
   end;
 end;
 
-function TATMicromap.ColumnDelete(const ATag: Int64): boolean;
+function TATMicromap.ColumnDelete(ATag: integer): boolean;
 var
   NCol, NLen: integer;
 begin

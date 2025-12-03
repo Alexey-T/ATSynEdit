@@ -68,8 +68,8 @@ type
 
 type
   TATMarkerMarkerRecord = record
-    Tag: Int64;
-    TagEx: Int64;
+    Tag: integer;
+    TagEx: integer;
     PosX: integer;
     PosY: integer;
     SelX: integer;
@@ -80,8 +80,8 @@ type
 
 type
   TATMarkerAttribRecord = record
-    Tag: Int64;
-    TagEx: Int64;
+    Tag: integer;
+    TagEx: integer;
     PosX: integer;
     PosY: integer;
     SelX: integer;

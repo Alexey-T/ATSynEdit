@@ -103,8 +103,8 @@ begin
     Sep.GetItemInt(Ar[i].PosY, 0);
     Sep.GetItemInt(Ar[i].SelX, 0);
     Sep.GetItemInt(Ar[i].SelY, 0);
-    Sep.GetItemInt64(Ar[i].Tag, 0);
-    Sep.GetItemInt64(Ar[i].TagEx, 0);
+    Sep.GetItemInt(Ar[i].Tag, 0);
+    Sep.GetItemInt(Ar[i].TagEx, 0);
     Sep.GetItemInt(Ar[i].MicromapMode, 0);
   end;
 end;
