@@ -27,8 +27,8 @@ type
     function GetTextHint: string;
     procedure SetTextAll(const AValue: string);
   public
-    Tag: Int64;
     TextBuffer: PChar;
+    Tag: integer;
     LineNum: integer;
     ImageIndex: integer;
     TextColor: TColor;
@@ -72,7 +72,7 @@ type
     procedure Clear;
     procedure Delete(N: integer);
     procedure DeleteForLine(ALine: integer);
-    function DeleteByTag(const ATag: Int64): boolean;
+    function DeleteByTag(ATag: integer): boolean;
     function Count: integer; inline;
     function IsIndexValid(N: integer): boolean; inline;
     property Items[N: integer]: TATGutterDecorItem read GetItem write SetItem; default;
@@ -216,7 +216,7 @@ begin
     Delete(N);
 end;
 
-function TATGutterDecor.DeleteByTag(const ATag: Int64): boolean;
+function TATGutterDecor.DeleteByTag(ATag: integer): boolean;
 var
   i, j: integer;
 begin
