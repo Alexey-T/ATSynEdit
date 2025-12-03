@@ -15,11 +15,11 @@ uses
 type
   TATGutterItem = class
   public
-    Tag: Int64;
-    Visible: boolean;
+    Tag: integer;
     Size: integer; //column width in pixels
-    Scaled: boolean; //adjust column width using ATEditorScale()
     Left, Right: integer; //these are calculated by TATGutter.Update()
+    Visible: boolean;
+    Scaled: boolean; //adjust column width using ATEditorScale()
   end;
 
 type
@@ -38,7 +38,7 @@ type
     constructor Create; virtual;
     destructor Destroy; override;
     function IsIndexValid(N: integer): boolean; inline;
-    procedure Add(AIndex: integer; ASize: integer; ATag: Int64; AScaled, AVisible: boolean);
+    procedure Add(AIndex: integer; ASize: integer; ATag: integer; AScaled, AVisible: boolean);
     procedure Delete(N: integer);
     procedure Move(AIndexCur, AIndexNew: integer);
     procedure Clear;
@@ -47,7 +47,7 @@ type
     function Width: integer;
     procedure Update;
     function FindIndexAtCoordX(AX: integer): integer;
-    function FindIndexByTag(ATag: Int64): integer;
+    function FindIndexByTag(ATag: integer): integer;
     property OnScale: TATGutterScaleEvent read FOnScale write FOnScale;
   end;
 
@@ -82,7 +82,7 @@ begin
   inherited;
 end;
 
-procedure TATGutter.Add(AIndex: integer; ASize: integer; ATag: Int64; AScaled,
+procedure TATGutter.Add(AIndex: integer; ASize: integer; ATag: integer; AScaled,
   AVisible: boolean);
 var
   Item: TATGutterItem;
@@ -166,7 +166,7 @@ begin
         Exit(i);
 end;
 
-function TATGutter.FindIndexByTag(ATag: Int64): integer;
+function TATGutter.FindIndexByTag(ATag: integer): integer;
 var
   i: integer;
 begin
