@@ -304,43 +304,43 @@ begin
   SNewText:= GetTextForClipboard;
 
   AClipboardObject.Open;
-
- try
-  if IsSelColumn then
-  begin
-    //copy column block
-    SClipboardCopy(SNewText, AClipboardObject);
-    AClipboardObject.AddFormat(
-      ATEditorOptions.ClipboardColumnFormat,
-      ATEditorOptions.ClipboardColumnSignature,
-      SizeOf(ATEditorOptions.ClipboardColumnSignature));
-  end
-  else
-  begin
-    //copy usual block
-    if Append then
-      SClipboardCopy(AClipboardObject.AsText+SNewText, AClipboardObject)
-    else
+  try
+    if IsSelColumn then
+    begin
+      //copy column block
       SClipboardCopy(SNewText, AClipboardObject);
+      AClipboardObject.AddFormat(
+        ATEditorOptions.ClipboardColumnFormat,
+        ATEditorOptions.ClipboardColumnSignature,
+        SizeOf(ATEditorOptions.ClipboardColumnSignature));
+    end
+    else
+    begin
+      //copy usual block
+      if Append then
+        SClipboardCopy(AClipboardObject.AsText+SNewText, AClipboardObject)
+      else
+        SClipboardCopy(SNewText, AClipboardObject);
+    end;
+
+    {$ifndef windows}
+    //for Linux gtk2, not sure about Mac
+    if AClipboardObject=Clipboard then
+      SClipboardCopy(SNewText, PrimarySelection);
+    {$endif}
+
+    //if Clipboard.Open/.Close calls are missed (missed before 2025.12),
+    //.AddFormat breaks the clipboard copying to other apps on Wayland on Qt5/Qt6.
+    //CudaText issue #6111.
+    //seems it is fixed now.
+    InitClipboardExData(ClipExData);
+    AClipboardObject.AddFormat(
+      ATEditorOptions.ClipboardExFormat,
+      ClipExData,
+      SizeOf(ClipExData));
+  finally
+    AClipboardObject.Close;
   end;
-
-  {$ifndef windows}
-  //for Linux gtk2, not sure about Mac
-  if AClipboardObject=Clipboard then
-    SClipboardCopy(SNewText, PrimarySelection);
-  {$endif}
-
-  {.$if not defined(LCLQt5) and not defined(LCLQt6)}
-  //2025.12: it breaks the clipboard copying to other apps on Wayland on Qt5/Qt6, CudaText issue #6111
-  InitClipboardExData(ClipExData);
-  AClipboardObject.AddFormat(
-    ATEditorOptions.ClipboardExFormat,
-    ClipExData,
-    SizeOf(ClipExData));
-  {.$endif}
- finally
-   AClipboardObject.Close;
- end;
 
   UpdateClipboardRecents(SNewText);
 
