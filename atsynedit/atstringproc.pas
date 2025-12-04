@@ -267,7 +267,7 @@ procedure SDeleteFrom(var s: UnicodeString; const SFrom: UnicodeString); inline;
 procedure SDeleteFromEol(var S: string);
 procedure SDeleteFromEol(var S: UnicodeString);
 
-procedure SClipboardCopy(const AText: string; AClipboardObj: TClipboard=nil);
+procedure SClipboardCopy(AText: string; AClipboardObj: TClipboard=nil);
 function SFindCharCount(const S: string; ch: char): SizeInt;
 function SFindCharCount(const S: UnicodeString; ch: WideChar): SizeInt;
 function SFindRegexMatch(const Subject, Regex: UnicodeString; out MatchPos, MatchLen: SizeInt): boolean;
@@ -1383,7 +1383,7 @@ begin
     List.Delete(List.Count-1);
 end;
 
-procedure SClipboardCopy(const AText: string; AClipboardObj: TClipboard=nil);
+procedure SClipboardCopy({const? not for gtk2} AText: string; AClipboardObj: TClipboard=nil);
 begin
   if AText='' then exit;
   if AClipboardObj=nil then
