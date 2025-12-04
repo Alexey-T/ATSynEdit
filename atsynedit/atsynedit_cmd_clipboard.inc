@@ -327,11 +327,14 @@ begin
     SClipboardCopy(SNewText, PrimarySelection);
   {$endif}
 
+  {$if not defined(LCLQt5) and not defined(LCLQt6)}
+  //2025.12: it breaks the clipboard copying to other apps on Wayland on Qt5/Qt6, CudaText issue #6111
   InitClipboardExData(ClipExData);
   AClipboardObject.AddFormat(
     ATEditorOptions.ClipboardExFormat,
     ClipExData,
     SizeOf(ClipExData));
+  {$endif}
 
   UpdateClipboardRecents(SNewText);
 
