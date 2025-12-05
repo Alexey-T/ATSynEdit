@@ -923,7 +923,7 @@ type
     //these options are implemented in CudaText, they are dummy here
     FOptThemed: boolean;
     FOptAutoPairForMultiCarets: boolean;
-    FOptAutoPairChars: string;
+    FOptAutoPairChars: UnicodeString;
     FOptAutoPair_DisableCharDoubling: boolean;
     FOptAutocompleteSymbolsAllowedBeforeCaret: string;
     FOptAutocompleteAutoshowCharCount: integer;
@@ -2026,7 +2026,7 @@ type
     //options
     property OptThemed: boolean read FOptThemed write FOptThemed default false;
     property OptAutoPairForMultiCarets: boolean read FOptAutoPairForMultiCarets write FOptAutoPairForMultiCarets default cInitAutoPairForMultiCarets;
-    property OptAutoPairChars: string read FOptAutoPairChars write FOptAutoPairChars stored false;
+    property OptAutoPairChars: UnicodeString read FOptAutoPairChars write FOptAutoPairChars stored false;
     property OptAutoPair_DisableCharDoubling: boolean read FOptAutoPair_DisableCharDoubling write FOptAutoPair_DisableCharDoubling default false;
     property OptAutocompleteSymbolsAllowedBeforeCaret: string read FOptAutocompleteSymbolsAllowedBeforeCaret write FOptAutocompleteSymbolsAllowedBeforeCaret stored false;
     property OptAutocompleteAutoshowCharCount: integer read FOptAutocompleteAutoshowCharCount write FOptAutocompleteAutoshowCharCount default 0;
