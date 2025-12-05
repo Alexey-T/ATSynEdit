@@ -10131,6 +10131,7 @@ begin
 
     if MarkerPtr^.PosY<NLineTop then Continue;
     if MarkerPtr^.PosY>NLineBottom then Continue;
+    if IsPosFolded(MarkerPtr^.PosX, MarkerPtr^.PosY) then Continue;
 
     CalcMarkerCoords(MarkerPtr, CoordBegin, CoordEnd);
     if CoordBegin.X<0 then Continue;

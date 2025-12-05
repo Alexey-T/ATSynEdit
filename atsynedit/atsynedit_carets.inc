@@ -219,29 +219,20 @@ end;
 
 procedure TATSynEdit.CalcMarkerCoords(AMarker: PATMarkerItem; out ABegin, AEnd: TATPoint);
 var
-  PntCaret: TPoint;
+  Pnt: TPoint;
 begin
-  if not IsPosFolded(AMarker^.PosX, AMarker^.PosY) then
+  Pnt.X:= AMarker^.PosX;
+  Pnt.Y:= AMarker^.PosY;
+  ABegin:= CaretPosToClientPos(Pnt);
+
+  if AMarker^.LineLen<>0 then //can be positive and negative
   begin
-    PntCaret.X:= AMarker^.PosX;
-    PntCaret.Y:= AMarker^.PosY;
-    ABegin:= CaretPosToClientPos(PntCaret);
-    if AMarker^.LineLen<>0 then //can be positive and negative
-    begin
-      PntCaret.X:= AMarker^.PosX+AMarker^.LineLen;
-      PntCaret.Y:= AMarker^.PosY;
-      AEnd:= CaretPosToClientPos(PntCaret);
-    end
-    else
-    begin
-      AEnd.X:= -1;
-      AEnd.Y:= -1;
-    end;
+    Pnt.X:= AMarker^.PosX+AMarker^.LineLen;
+    Pnt.Y:= AMarker^.PosY;
+    AEnd:= CaretPosToClientPos(Pnt);
   end
   else
   begin
-    ABegin.X:= -1;
-    ABegin.Y:= -1;
     AEnd.X:= -1;
     AEnd.Y:= -1;
   end;
