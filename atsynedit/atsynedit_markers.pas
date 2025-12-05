@@ -63,8 +63,7 @@ type
     //enables to show marker on micromap
     MicromapMode: TATMarkerMicromapMode;
 
-    //a) used in Attribs list, to save tag of micromap-column
-    //b) used in DimRanges list, holds dim value
+    //used in Attribs list, tag of micromap-column
     TagEx: byte;
 
     class operator=(const A, B: TATMarkerItem): boolean;
