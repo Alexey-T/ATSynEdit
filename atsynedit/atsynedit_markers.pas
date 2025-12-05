@@ -40,6 +40,12 @@ type
 
   PATMarkerItem = ^TATMarkerItem;
   TATMarkerItem = record
+    //text position
+    PosX, PosY: integer;
+
+    //render underline, when LineLen<>0 (positive and negative are supported)
+    LineLen: integer;
+
     //used in CudaText: when "Collect marker" runs, for all markers
     //with the same Tag>0 multi-carets are placed
     Tag: integer;
@@ -47,12 +53,6 @@ type
     //used to save tag of micromap-column
     //also used in DimRanges list, holds dim value
     TagEx: integer;
-
-    //text position of marker
-    PosX, PosY: integer;
-
-    //render underline near the marker, when LineLen<>0
-    LineLen: integer;
 
     //used in CudaText: when "Collect marker" gets this marker, caret will be with selection
     //if SelY=0 - LenX is length of sel (single line)
