@@ -7,6 +7,7 @@ unit ATSynEdit_Markers;
 {$mode objfpc}{$H+}
 {$ModeSwitch advancedrecords}
 {$ScopedEnums on}
+{$MinEnumSize 2}
 
 interface
 
@@ -46,14 +47,6 @@ type
     //render underline, when LineLen<>0 (positive and negative are supported)
     LineLen: integer;
 
-    //used in CudaText: when "Collect marker" runs, for all markers
-    //with the same Tag>0 multi-carets are placed
-    Tag: integer;
-
-    //used to save tag of micromap-column
-    //also used in DimRanges list, holds dim value
-    TagEx: integer;
-
     //used in CudaText: when "Collect marker" gets this marker, caret will be with selection
     //if SelY=0 - LenX is length of sel (single line)
     //if SelY>0 - LenY is Y-delta of sel-end,
@@ -63,8 +56,16 @@ type
     //used in Attribs object
     LinePart: TATLinePart;
 
+    //used in CudaText: when "Collect marker" runs, for all markers
+    //with the same Tag>0 multi-carets are placed
+    Tag: integer;
+
     //enables to show marker on micromap
     MicromapMode: TATMarkerMicromapMode;
+
+    //a) used in Attribs list, to save tag of micromap-column
+    //b) used in DimRanges list, holds dim value
+    TagEx: word;
 
     class operator=(const A, B: TATMarkerItem): boolean;
     function SelContains(AX, AY: integer): boolean;
@@ -625,6 +626,15 @@ begin
     Item^.UpdateOnEditing(APos, APosEnd, AShift, APosAfter);
   end;
 end;
+
+{
+var
+  n, m: integer;
+initialization
+  n:= SizeOf(TATMarkerItem);
+  m:= SizeOf(TATLinePart);
+  n:= n+random(0);
+}
 
 end.
 
