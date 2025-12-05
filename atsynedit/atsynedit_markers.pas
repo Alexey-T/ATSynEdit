@@ -44,13 +44,6 @@ type
     //text position
     PosX, PosY: integer;
 
-    //used in CudaText: when "Collect marker" runs, for all markers
-    //with the same Tag>0 multi-carets are placed
-    Tag: integer;
-
-    //render underline, when LineLen<>0 (positive and negative are supported)
-    LineLen: integer;
-
     //used in CudaText: when "Collect marker" gets this marker, caret will be with selection
     //if SelY=0 - LenX is length of sel (single line)
     //if SelY>0 - LenY is Y-delta of sel-end,
@@ -59,6 +52,13 @@ type
 
     //used in Attribs object
     LinePart: TATLinePart;
+
+    //used in CudaText: when "Collect marker" runs, for all markers
+    //with the same Tag>0 multi-carets are placed
+    Tag: int16;
+
+    //render underline, when LineLen<>0 (positive and negative are supported)
+    LineLen: int16;
 
     //enables to show marker on micromap
     MicromapMode: TATMarkerMicromapMode;
@@ -628,10 +628,9 @@ end;
 
 {
 var
-  n, m: integer;
+  n: integer;
 initialization
   n:= SizeOf(TATMarkerItem);
-  m:= SizeOf(TATLinePart);
   n:= n+random(0);
 }
 
