@@ -39,7 +39,7 @@ type
   { TATMarkerItem }
 
   PATMarkerItem = ^TATMarkerItem;
-  TATMarkerItem = record
+  TATMarkerItem = packed record
     //text position
     PosX, PosY: integer;
 
