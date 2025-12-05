@@ -1490,8 +1490,7 @@ type
     function DoFormatLineNumber(N: integer): string;
     function UpdateScrollInfoFromMessage(var AInfo: TATEditorScrollInfo; const AMsg: TLMScroll): boolean;
     procedure UpdateCaretsCoords(AOnlyLast: boolean=false; ASkipInvisible: boolean=false);
-    procedure CalcMarkerCoords(AMarker: PATMarkerItem;
-      out AX, AY, AX2, AY2: Int64);
+    procedure CalcMarkerCoords(AMarker: PATMarkerItem; out AX, AY, AX2, AY2: Int64);
     procedure UpdateCharSize(var ACharSize: TATEditorCharSize; C: TCanvas);
     function GetScrollbarVisible(bVertical: boolean): boolean;
     procedure SetMarginRight(AValue: integer);

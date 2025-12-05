@@ -217,8 +217,7 @@ begin
   end;
 end;
 
-procedure TATSynEdit.CalcMarkerCoords(AMarker: PATMarkerItem;
-  out AX, AY, AX2, AY2: Int64);
+procedure TATSynEdit.CalcMarkerCoords(AMarker: PATMarkerItem; out AX, AY, AX2, AY2: Int64);
 var
   PntCaret: TPoint;
   PntCoord: TATPoint;
