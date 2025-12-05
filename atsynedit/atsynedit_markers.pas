@@ -7,7 +7,7 @@ unit ATSynEdit_Markers;
 {$mode objfpc}{$H+}
 {$ModeSwitch advancedrecords}
 {$ScopedEnums on}
-{$MinEnumSize 2}
+{$MinEnumSize 1}
 
 interface
 
@@ -44,6 +44,10 @@ type
     //text position
     PosX, PosY: integer;
 
+    //used in CudaText: when "Collect marker" runs, for all markers
+    //with the same Tag>0 multi-carets are placed
+    Tag: integer;
+
     //render underline, when LineLen<>0 (positive and negative are supported)
     LineLen: integer;
 
@@ -56,16 +60,12 @@ type
     //used in Attribs object
     LinePart: TATLinePart;
 
-    //used in CudaText: when "Collect marker" runs, for all markers
-    //with the same Tag>0 multi-carets are placed
-    Tag: integer;
-
     //enables to show marker on micromap
     MicromapMode: TATMarkerMicromapMode;
 
     //a) used in Attribs list, to save tag of micromap-column
     //b) used in DimRanges list, holds dim value
-    TagEx: word;
+    TagEx: byte;
 
     class operator=(const A, B: TATMarkerItem): boolean;
     function SelContains(AX, AY: integer): boolean;
