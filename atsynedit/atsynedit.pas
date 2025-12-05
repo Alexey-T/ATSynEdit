@@ -1490,7 +1490,9 @@ type
     function DoFormatLineNumber(N: integer): string;
     function UpdateScrollInfoFromMessage(var AInfo: TATEditorScrollInfo; const AMsg: TLMScroll): boolean;
     procedure UpdateCaretsCoords(AOnlyLast: boolean=false; ASkipInvisible: boolean=false);
-    procedure UpdateMarkersCoords;
+    procedure CalcMarkerCoords(AMarker: PATMarkerItem;
+      ALineTop, ALineBottom: integer;
+      out AX, AY, AX2, AY2: Int64);
     procedure UpdateCharSize(var ACharSize: TATEditorCharSize; C: TCanvas);
     function GetScrollbarVisible(bVertical: boolean): boolean;
     procedure SetMarginRight(AValue: integer);
@@ -6304,7 +6306,6 @@ begin
     DoPaintRulerCaretMarks(C);
   end;
 
-  UpdateMarkersCoords;
   DoPaintMarkersTo(C);
   DoPaintMarkerOfDragDrop(C);
 end;
@@ -10111,25 +10112,37 @@ end;
 procedure TATSynEdit.DoPaintMarkersTo(C: TCanvas);
 var
   Mark: TATMarkerItem;
+  CoordX, CoordY, CoordX2, CoordY2: Int64;
   PntCoord: TATPoint;
   PntShort: TPoint;
+  NLineTop, NLineBottom: integer;
   NMarkSize, NLineW: integer;
   iMark: integer;
   R: TRect;
 begin
   if FMarkers=nil then exit;
 
+  NLineTop:= LineTop;
+  NLineBottom:= LineBottom;
   NMarkSize:= Max(1, FCharSize.Y * FOptMarkersSize div (100*2));
   NLineW:= NMarkSize;
 
   for iMark:= 0 to FMarkers.Count-1 do
   begin
     Mark:= FMarkers[iMark];
-    if Mark.CoordX<0 then Continue;
-    if Mark.CoordY<0 then Continue;
 
-    PntCoord.X:= Mark.CoordX;
-    PntCoord.Y:= Mark.CoordY+FCharSize.Y;
+    CalcMarkerCoords(@Mark,
+      NLineTop,
+      NLineBottom,
+      CoordX,
+      CoordY,
+      CoordX2,
+      CoordY2);
+    if CoordX<0 then Continue;
+    if CoordY<0 then Continue;
+
+    PntCoord.X:= CoordX;
+    PntCoord.Y:= CoordY+FCharSize.Y;
 
     if ATPointInRect(FRectMain, PntCoord) then
     begin
@@ -10137,10 +10150,10 @@ begin
       PntShort.Y:= PntCoord.Y;
       CanvasPaintTriangleUp(C, Colors.Markers, PntShort, NMarkSize);
 
-      if (Mark.LineLen<>0) and (Mark.CoordY=Mark.CoordY2) then
+      if (Mark.LineLen<>0) and (CoordY=CoordY2) then
       begin
-        R.Left:= Min(PntShort.X, Mark.CoordX2);
-        R.Right:= Max(PntShort.X, Mark.CoordX2)+1;
+        R.Left:= Min(PntShort.X, CoordX2);
+        R.Right:= Max(PntShort.X, CoordX2)+1;
         R.Bottom:= PntShort.Y+NMarkSize+1;
         R.Top:= R.Bottom-NLineW;
 

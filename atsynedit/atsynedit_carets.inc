@@ -217,46 +217,36 @@ begin
   end;
 end;
 
-procedure TATSynEdit.UpdateMarkersCoords;
+procedure TATSynEdit.CalcMarkerCoords(AMarker: PATMarkerItem;
+  ALineTop, ALineBottom: integer;
+  out AX, AY, AX2, AY2: Int64);
 var
-  Marker: PATMarkerItem;
   PntCaret: TPoint;
   PntCoord: TATPoint;
-  NLineTop, NLineBottom: integer;
-  i: integer;
 begin
-  if FMarkers=nil then exit;
+  AX:= -1;
+  AY:= -1;
+  AX2:= -1;
+  AY2:= -1;
 
-  NLineTop:= LineTop;
-  NLineBottom:= LineBottom;
+  if AMarker^.PosY<ALineTop then exit;
+  if AMarker^.PosY>ALineBottom then exit;
 
-  for i:= 0 to FMarkers.Count-1 do
+  PntCaret.X:= AMarker^.PosX;
+  PntCaret.Y:= AMarker^.PosY;
+
+  if not IsPosFolded(PntCaret.X, PntCaret.Y) then
   begin
-    Marker:= FMarkers.ItemPtr(i);
-    Marker^.CoordX:= -1;
-    Marker^.CoordY:= -1;
-    Marker^.CoordX2:= -1;
-    Marker^.CoordY2:= -1;
-
-    if Marker^.PosY<NLineTop then Continue;
-    if Marker^.PosY>NLineBottom then Continue;
-
-    PntCaret.X:= Marker^.PosX;
-    PntCaret.Y:= Marker^.PosY;
-
-    if not IsPosFolded(PntCaret.X, PntCaret.Y) then
+    PntCoord:= CaretPosToClientPos(PntCaret);
+    AX:= PntCoord.X;
+    AY:= PntCoord.Y;
+    if AMarker^.LineLen<>0 then
     begin
+      PntCaret.X:= AMarker^.PosX+AMarker^.LineLen;
+      PntCaret.Y:= AMarker^.PosY;
       PntCoord:= CaretPosToClientPos(PntCaret);
-      Marker^.CoordX:= PntCoord.X;
-      Marker^.CoordY:= PntCoord.Y;
-      if Marker^.LineLen<>0 then
-      begin
-        PntCaret.X:= Marker^.PosX+Marker^.LineLen;
-        PntCaret.Y:= Marker^.PosY;
-        PntCoord:= CaretPosToClientPos(PntCaret);
-        Marker^.CoordX2:= PntCoord.X;
-        Marker^.CoordY2:= PntCoord.Y;
-      end;
+      AX2:= PntCoord.X;
+      AY2:= PntCoord.Y;
     end;
   end;
 end;

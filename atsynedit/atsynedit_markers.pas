@@ -40,11 +40,6 @@ type
 
   PATMarkerItem = ^TATMarkerItem;
   TATMarkerItem = record
-    //screen coords
-    CoordX, CoordY: Int64;
-    //screen coords of line end, when LineLen<>0
-    CoordX2, CoordY2: Int64;
-
     //used in CudaText: when "Collect marker" runs, for all markers
     //with the same Tag>0 multi-carets are placed
     Tag: integer;
@@ -385,10 +380,6 @@ begin
   Item:= Default(TATMarkerItem);
   Item.PosX:= APos.X;
   Item.PosY:= APos.Y;
-  Item.CoordX:= -1;
-  Item.CoordY:= -1;
-  Item.CoordX2:= -1;
-  Item.CoordY2:= -1;
   Item.SelX:= ASel.X;
   Item.SelY:= ASel.Y;
   Item.LineLen:= ALineLen;
