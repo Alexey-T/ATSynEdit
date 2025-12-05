@@ -226,7 +226,7 @@ begin
     PntCaret.X:= AMarker^.PosX;
     PntCaret.Y:= AMarker^.PosY;
     ABegin:= CaretPosToClientPos(PntCaret);
-    if AMarker^.LineLen<>0 then
+    if AMarker^.LineLen<>0 then //can be positive and negative
     begin
       PntCaret.X:= AMarker^.PosX+AMarker^.LineLen;
       PntCaret.Y:= AMarker^.PosY;
