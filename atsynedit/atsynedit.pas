@@ -10111,13 +10111,13 @@ end;
 
 procedure TATSynEdit.DoPaintMarkersTo(C: TCanvas);
 var
-  Mark: TATMarkerItem;
+  MarkerPtr: PATMarkerItem;
   CoordX, CoordY, CoordX2, CoordY2: Int64;
   PntCoord: TATPoint;
   PntShort: TPoint;
   NLineTop, NLineBottom: integer;
   NMarkSize, NLineW: integer;
-  iMark: integer;
+  iMarker: integer;
   R: TRect;
 begin
   if FMarkers=nil then exit;
@@ -10127,11 +10127,10 @@ begin
   NMarkSize:= Max(1, FCharSize.Y * FOptMarkersSize div (100*2));
   NLineW:= NMarkSize;
 
-  for iMark:= 0 to FMarkers.Count-1 do
+  for iMarker:= 0 to FMarkers.Count-1 do
   begin
-    Mark:= FMarkers[iMark];
-
-    CalcMarkerCoords(@Mark,
+    MarkerPtr:= Markers.ItemPtr(iMarker);
+    CalcMarkerCoords(MarkerPtr,
       NLineTop,
       NLineBottom,
       CoordX,
@@ -10150,7 +10149,7 @@ begin
       PntShort.Y:= PntCoord.Y;
       CanvasPaintTriangleUp(C, Colors.Markers, PntShort, NMarkSize);
 
-      if (Mark.LineLen<>0) and (CoordY=CoordY2) then
+      if (MarkerPtr^.LineLen<>0) and (CoordY=CoordY2) then
       begin
         R.Left:= Min(PntShort.X, CoordX2);
         R.Right:= Max(PntShort.X, CoordX2)+1;
