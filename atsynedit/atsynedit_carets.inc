@@ -217,30 +217,25 @@ begin
   end;
 end;
 
-procedure TATSynEdit.CalcMarkerCoords(AMarker: PATMarkerItem; out AX, AY, AX2, AY2: Int64);
+procedure TATSynEdit.CalcMarkerCoords(AMarker: PATMarkerItem; out ABegin, AEnd: TATPoint);
 var
   PntCaret: TPoint;
-  PntCoord: TATPoint;
 begin
-  AX:= -1;
-  AY:= -1;
-  AX2:= -1;
-  AY2:= -1;
+  ABegin.X:= -1;
+  ABegin.Y:= -1;
+  AEnd.X:= -1;
+  AEnd.Y:= -1;
 
   if not IsPosFolded(AMarker^.PosX, AMarker^.PosY) then
   begin
     PntCaret.X:= AMarker^.PosX;
     PntCaret.Y:= AMarker^.PosY;
-    PntCoord:= CaretPosToClientPos(PntCaret);
-    AX:= PntCoord.X;
-    AY:= PntCoord.Y;
+    ABegin:= CaretPosToClientPos(PntCaret);
     if AMarker^.LineLen<>0 then
     begin
       PntCaret.X:= AMarker^.PosX+AMarker^.LineLen;
       PntCaret.Y:= AMarker^.PosY;
-      PntCoord:= CaretPosToClientPos(PntCaret);
-      AX2:= PntCoord.X;
-      AY2:= PntCoord.Y;
+      AEnd:= CaretPosToClientPos(PntCaret);
     end;
   end;
 end;

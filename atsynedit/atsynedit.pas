@@ -1490,7 +1490,7 @@ type
     function DoFormatLineNumber(N: integer): string;
     function UpdateScrollInfoFromMessage(var AInfo: TATEditorScrollInfo; const AMsg: TLMScroll): boolean;
     procedure UpdateCaretsCoords(AOnlyLast: boolean=false; ASkipInvisible: boolean=false);
-    procedure CalcMarkerCoords(AMarker: PATMarkerItem; out AX, AY, AX2, AY2: Int64);
+    procedure CalcMarkerCoords(AMarker: PATMarkerItem; out ABegin, AEnd: TATPoint);
     procedure UpdateCharSize(var ACharSize: TATEditorCharSize; C: TCanvas);
     function GetScrollbarVisible(bVertical: boolean): boolean;
     procedure SetMarginRight(AValue: integer);
@@ -10110,7 +10110,7 @@ end;
 procedure TATSynEdit.DoPaintMarkersTo(C: TCanvas);
 var
   MarkerPtr: PATMarkerItem;
-  CoordX, CoordY, CoordX2, CoordY2: Int64;
+  CoordBegin, CoordEnd: TATPoint;
   PntCoord: TATPoint;
   PntShort: TPoint;
   NLineTop, NLineBottom: integer;
@@ -10132,16 +10132,12 @@ begin
     if MarkerPtr^.PosY<NLineTop then Continue;
     if MarkerPtr^.PosY>NLineBottom then Continue;
 
-    CalcMarkerCoords(MarkerPtr,
-      CoordX,
-      CoordY,
-      CoordX2,
-      CoordY2);
-    if CoordX<0 then Continue;
-    if CoordY<0 then Continue;
+    CalcMarkerCoords(MarkerPtr, CoordBegin, CoordEnd);
+    if CoordBegin.X<0 then Continue;
+    if CoordBegin.Y<0 then Continue;
 
-    PntCoord.X:= CoordX;
-    PntCoord.Y:= CoordY+FCharSize.Y;
+    PntCoord.X:= CoordBegin.X;
+    PntCoord.Y:= CoordBegin.Y+FCharSize.Y;
 
     if ATPointInRect(FRectMain, PntCoord) then
     begin
@@ -10149,10 +10145,10 @@ begin
       PntShort.Y:= PntCoord.Y;
       CanvasPaintTriangleUp(C, Colors.Markers, PntShort, NMarkSize);
 
-      if (MarkerPtr^.LineLen<>0) and (CoordY=CoordY2) then
+      if (MarkerPtr^.LineLen<>0) and (CoordBegin.Y=CoordEnd.Y) then
       begin
-        R.Left:= Min(PntShort.X, CoordX2);
-        R.Right:= Max(PntShort.X, CoordX2)+1;
+        R.Left:= Min(PntShort.X, CoordEnd.X);
+        R.Right:= Max(PntShort.X, CoordEnd.X)+1;
         R.Bottom:= PntShort.Y+NMarkSize+1;
         R.Top:= R.Bottom-NLineW;
 
