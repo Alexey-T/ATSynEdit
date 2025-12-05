@@ -407,11 +407,14 @@ end;
 procedure TATSynEdit.DoPartCalc_ApplyAttribsOver(var AParts: TATLineParts;
   AOffsetMax, ALineIndex, ACharIndex: integer; AColorBG: TColor; AMainText: boolean);
   //
-  function IsAttrLongEnough(constref Attr: TATMarkerItem): boolean;
+  function IsAttrLongEnough(AIndex: integer): boolean;
+  var
+    Attr: PATMarkerItem;
   begin
+    Attr:= FAttribs.ItemPtr(AIndex);
     Result:=
-      (Attr.PosY=ALineIndex) and
-      (Attr.PosX-ACharIndex+Attr.SelX>0);
+      (Attr^.PosY=ALineIndex) and
+      (Attr^.PosX-ACharIndex+Attr^.SelX>0);
   end;
   //
 var
@@ -431,12 +434,12 @@ begin
   //for long wrapped line with long URL attrib, overlapped by short 'Highlight All' attrib(s):
   //if nAttrIndex is of 'Highlight All' attrib, we must decrement index until we find long attrib;
   //CudaText issue #5525
-  if (nAttrIndex>0) and not IsAttrLongEnough(FAttribs[nAttrIndex]) then
+  if (nAttrIndex>0) and not IsAttrLongEnough(nAttrIndex) then
   begin
     j:= nAttrIndex-1;
-    while (j>0) and not IsAttrLongEnough(FAttribs[j]) do
+    while (j>0) and not IsAttrLongEnough(j) do
       Dec(j);
-    if IsAttrLongEnough(FAttribs[j]) then
+    if IsAttrLongEnough(j) then
       nAttrIndex:= j;
   end;
 
