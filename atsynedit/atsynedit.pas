@@ -10129,7 +10129,8 @@ begin
 
   for iMarker:= 0 to FMarkers.Count-1 do
   begin
-    MarkerPtr:= Markers.ItemPtr(iMarker);
+    MarkerPtr:= FMarkers.ItemPtr(iMarker);
+
     CalcMarkerCoords(MarkerPtr,
       NLineTop,
       NLineBottom,
