@@ -1491,7 +1491,6 @@ type
     function UpdateScrollInfoFromMessage(var AInfo: TATEditorScrollInfo; const AMsg: TLMScroll): boolean;
     procedure UpdateCaretsCoords(AOnlyLast: boolean=false; ASkipInvisible: boolean=false);
     procedure CalcMarkerCoords(AMarker: PATMarkerItem;
-      ALineTop, ALineBottom: integer;
       out AX, AY, AX2, AY2: Int64);
     procedure UpdateCharSize(var ACharSize: TATEditorCharSize; C: TCanvas);
     function GetScrollbarVisible(bVertical: boolean): boolean;
@@ -10131,9 +10130,10 @@ begin
   begin
     MarkerPtr:= FMarkers.ItemPtr(iMarker);
 
+    if MarkerPtr^.PosY<NLineTop then Continue;
+    if MarkerPtr^.PosY>NLineBottom then Continue;
+
     CalcMarkerCoords(MarkerPtr,
-      NLineTop,
-      NLineBottom,
       CoordX,
       CoordY,
       CoordX2,
