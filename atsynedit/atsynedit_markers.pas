@@ -55,7 +55,7 @@ type
 
     //used in CudaText: when "Collect marker" runs, for all markers
     //with the same Tag>0 multi-carets are placed
-    Tag: int16;
+    Tag: integer;
 
     //render underline, when LineLen<>0 (positive and negative are supported)
     LineLen: int16;
