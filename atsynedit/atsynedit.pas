@@ -5405,7 +5405,10 @@ begin
   {$endif}
 
   {$if defined(LCLQT5) or defined(LCLQt6) or defined(LCLQt)}
+  {
+  //Qt6 IME adapter has problem: https://github.com/Alexey-T/ATSynEdit/issues/349
   FAdapterIME:= TATAdapterQTIME.Create;
+  }
   {$endif}
 
   FPaintLocked:= 0;
