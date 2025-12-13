@@ -521,7 +521,8 @@ begin
   //CudaText issue #1615
   Carets.Sort;
 
-  Result:= [TATCommandResult.Text, TATCommandResult.CaretTop];
+  //return CaretAny, not CaretTop
+  Result:= [TATCommandResult.Text, TATCommandResult.CaretAny];
 end;
 
 
