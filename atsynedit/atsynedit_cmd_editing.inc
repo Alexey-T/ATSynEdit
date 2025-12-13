@@ -521,7 +521,8 @@ begin
   //CudaText issue #1615
   Carets.Sort;
 
-  //return CaretAny, not CaretTop
+  //CaretAny, not CaretTop,
+  //because we may be scrolled to 2nd caret at line 100, and 1st caret was left at line 1
   Result:= [TATCommandResult.Text, TATCommandResult.CaretAny];
 end;
 
