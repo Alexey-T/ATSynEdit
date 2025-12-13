@@ -266,6 +266,8 @@ begin
       //Delete+Insert which cannot be undone at last line.
       NLastLine:= St.Count-1-1;
 
+      if ADown and (NTo>=St.Count-1) then Continue;
+
       //if move-down runs at the end, and no fake line present, force it.
       //this is to remove limitation: cannot move-down on 2-lines document without fake like.
       if NTo>=NLastLine then
