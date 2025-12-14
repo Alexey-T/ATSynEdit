@@ -126,7 +126,7 @@ begin
   end;
 end;
 
-procedure TATSynEdit.UpdateCaretsCoords(AOnlyLast: boolean=false; ASkipInvisible: boolean=false);
+procedure TATSynEdit.UpdateCaretsCoords(AOnlyLast: boolean=false; AOnlyForVisibleArea: boolean=false);
 {
 UpdateCaretsCoords is called 2 times per each keypress. too often? no, cannot call it less.
 a) UpdateCaretsCoords is called from DoCommand (which calls DoCommandResults). call is required for
@@ -153,7 +153,7 @@ begin
   else
     NStart:= 0;
 
-  if ASkipInvisible then
+  if AOnlyForVisibleArea then
   begin
     NLineTop:= LineTop;
     NLineBottom:= LineBottom;
@@ -165,7 +165,7 @@ begin
     Caret.CoordX:= -1;
     Caret.CoordY:= -1;
 
-    if ASkipInvisible then
+    if AOnlyForVisibleArea then
     begin
       if Caret.PosY<NLineTop then Continue;
       if Caret.PosY>NLineBottom then Continue;

@@ -1489,7 +1489,7 @@ type
     procedure UpdateClientSizes;
     function DoFormatLineNumber(N: integer): string;
     function UpdateScrollInfoFromMessage(var AInfo: TATEditorScrollInfo; const AMsg: TLMScroll): boolean;
-    procedure UpdateCaretsCoords(AOnlyLast: boolean=false; ASkipInvisible: boolean=false);
+    procedure UpdateCaretsCoords(AOnlyLast: boolean=false; AOnlyForVisibleArea: boolean=false);
     procedure CalcMarkerCoords(AMarker: PATMarkerItem; out ABegin, AEnd: TATPoint);
     procedure UpdateCharSize(var ACharSize: TATEditorCharSize; C: TCanvas);
     function GetScrollbarVisible(bVertical: boolean): boolean;
