@@ -9148,6 +9148,7 @@ var
   bSel: boolean;
   Relation: TATPosRelation;
   Details: TATEditorPosDetails;
+  NChangedLine: integer;
 begin
   if ModeReadOnly then exit;
   St:= Strings;
@@ -9203,13 +9204,12 @@ begin
   DoEventCarets;
 
   EndEditing(true);
-  {
-  NChangedLine:= St.EditingTopLine; //Min(Y1, P.Y)
+
+  NChangedLine:= Min(Y1, P.Y); //St.EditingTopLine;
   DoEventChange(NChangedLine);
     //with DoEventChange(ALineIndex=-1), we have broken syntax highlight,
     //after drag-drop from huge line, to the lower position of the same huge line,
     //e.g. in 100K HTML file with huge line
-  }
 
   Update(true);
 end;
