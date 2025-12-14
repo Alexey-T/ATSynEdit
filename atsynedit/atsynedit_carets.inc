@@ -138,7 +138,6 @@ b) UpdateCaretsCoords is called from DoPaintAll. it is not related to DoCommand/
 var
   St: TATStrings;
   Caret: TATCaretItem;
-  PntCaret: TPoint;
   PntCoord: TATPoint;
   NCaretCount, NStart: integer;
   NLineTop, NLineBottom: integer;
@@ -166,21 +165,18 @@ begin
     Caret.CoordX:= -1;
     Caret.CoordY:= -1;
 
-    PntCaret.X:= Caret.PosX;
-    PntCaret.Y:= Caret.PosY;
-
-    if not St.IsIndexValid(PntCaret.Y) then
-      Continue;
-
     if ASkipInvisible then
     begin
-      if PntCaret.Y<NLineTop then Continue;
-      if PntCaret.Y>NLineBottom then Continue;
+      if Caret.PosY<NLineTop then Continue;
+      if Caret.PosY>NLineBottom then Continue;
     end;
 
-    if not IsPosFolded(PntCaret.X, PntCaret.Y) then
+    if not St.IsIndexValid(Caret.PosY) then
+      Continue;
+
+    if not IsPosFolded(Caret.PosX, Caret.PosY) then
     begin
-      PntCoord:= CaretPosToClientPos(PntCaret);
+      PntCoord:= CaretPosToClientPos(Point(Caret.PosX, Caret.PosY));
       Caret.CoordX:= PntCoord.X;
       Caret.CoordY:= PntCoord.Y;
     end;
