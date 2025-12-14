@@ -236,8 +236,12 @@ begin
           bChange:= true;
         end;
       end;
+    {
+    //commented 2025.12:
+    //no need for UpdateCaretsCoords: it is called in DoCommand_KeyUpDown_Wrapped
     if bChange then
-      UpdateCaretsCoords(false, false);
+      UpdateCaretsCoords;
+      }
     DoSelect_None;
   end;
 
