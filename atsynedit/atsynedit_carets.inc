@@ -141,7 +141,7 @@ var
   PntCaret: TPoint;
   PntCoord: TATPoint;
   NCaretCount, NStart: integer;
-  //NLineTop, NLineBottom: integer;
+  NLineTop, NLineBottom: integer;
   iCaret: integer;
 begin
   if Assigned(FOnCalcCaretsCoords) then
@@ -154,14 +154,11 @@ begin
   else
     NStart:= 0;
 
-  //fixing CudaText #4427, always update all carets
-  {
   if ASkipInvisible then
   begin
     NLineTop:= LineTop;
     NLineBottom:= LineBottom;
   end;
-  }
 
   for iCaret:= NStart to NCaretCount-1 do
   begin
@@ -175,14 +172,11 @@ begin
     if not St.IsIndexValid(PntCaret.Y) then
       Continue;
 
-    {
-    //fixing CudaText #4427
     if ASkipInvisible then
     begin
       if PntCaret.Y<NLineTop then Continue;
       if PntCaret.Y>NLineBottom then Continue;
     end;
-    }
 
     if not IsPosFolded(PntCaret.X, PntCaret.Y) then
     begin
@@ -1401,7 +1395,7 @@ end;
 procedure TATSynEdit.CalcCaretDistanceFromEdges(ACommand: integer;
   out ALinesFromTop, ALinesFromBottom: integer);
 var
-  NProximity, NPixels1, NPixels2: integer;
+  NProximity: integer;
   Caret: TATCaretItem;
   bAllowMultiCarets, bMoveDown: boolean;
 begin

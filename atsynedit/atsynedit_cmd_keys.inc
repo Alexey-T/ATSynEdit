@@ -311,6 +311,11 @@ const
 begin
   St:= Strings;
 
+  //Carets[i].Coord* may be not calculated yet (Carets[i] is out of visible area),
+  //but we need Coord* here, so call UpdateCaretsCoords
+  UpdateCaretsCoords;
+
+  {
   //fix CudaText #5526; Caret.Coord* are zero, because plugin HiOccur changed the caret
   if FCarets.Count=1 then
   begin
@@ -318,6 +323,7 @@ begin
     if (Caret.CoordX=0) and (Caret.CoordY=0) then
       UpdateCaretsCoords;
   end;
+  }
 
   for iCaret:= 0 to FCarets.Count-1 do
   begin
