@@ -1219,23 +1219,38 @@ procedure TATSynEdit.UpdateCaretsAndMarkersOnEditing(
   AFromCaret: integer; APos, APosEnd, AShift, APosAfter: TPoint);
 //for text change at unknown caret, pass AFromCaret=0
 var
-  i: integer;
+  Caret: TATCaretItem;
   {$ifdef debug_markers_shift}
   S: string;
   {$endif}
-  bDeleteToRight: boolean;
+  i: integer;
+  bDeleteToRight, bDeleteToRightInited: boolean;
 begin
-  if APos.X<0 then Exit;
+  //if APos.X<0 then Exit;
   if APos.Y<0 then Exit;
 
   if Assigned(FOnChangeDetailed) then
     FOnChangeDetailed(Self, APos, APosEnd, AShift, APosAfter);
 
-  bDeleteToRight:= (APos=APosAfter) and (AShift.Y=0) and (AShift.X<0);
+  bDeleteToRightInited:= false;
+  bDeleteToRight:= true;
 
-  if AFromCaret>=0 then
-    for i:= AFromCaret to Carets.Count-1 do
-      Carets[i].UpdateOnEditing(APos, APosEnd, AShift, bDeleteToRight);
+  for i:= AFromCaret to Carets.Count-1 do
+  begin
+    Caret:= Carets[i];
+
+    //big optimization for single-line editing, e.g. char is typed
+    if (AShift.Y=0) and (Caret.PosY>APos.Y) then
+      Break;
+
+    if not bDeleteToRightInited then
+    begin
+      bDeleteToRightInited:= true;
+      bDeleteToRight:= (APos=APosAfter) and (AShift.Y=0) and (AShift.X<0);
+    end;
+
+    Caret.UpdateOnEditing(APos, APosEnd, AShift, bDeleteToRight);
+  end;
 
   {$ifdef debug_markers_shift}
   S:= '';
