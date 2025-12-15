@@ -139,6 +139,7 @@ begin
         St.TextReplaceRange(X1, Y1, X2, Y2, TextItem, Shift, PosAfter, false)
       else
         St.TextInsert(X1, Y1, TextItem, AOvrMode, Shift, PosAfter);
+
       UpdateCaretsAndMarkersOnEditing(iCaret+1,
         Point(X1, Y1),
         Point(X1, Y1),
