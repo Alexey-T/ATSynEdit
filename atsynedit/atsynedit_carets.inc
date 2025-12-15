@@ -953,14 +953,16 @@ var
   NEndX, NEndY: integer;
   Caret: TATCaretItem;
 begin
-  NEndX:= -1;
-  NEndY:= -1;
-
   if (not AClearSelection) and (Carets.Count>0) then
   begin
     Caret:= Carets[0];
     NEndX:= Caret.EndX;
     NEndY:= Caret.EndY;
+  end
+  else
+  begin
+    NEndX:= -1;
+    NEndY:= -1;
   end;
 
   DoCaretSingle(AX, AY, NEndX, NEndY);
