@@ -1242,9 +1242,11 @@ begin
   begin
     Caret:= Carets[i];
 
-    //big optimization for single-line editing, e.g. char is typed
-    if bSingleLine and (Caret.PosY>APos.Y) then
-      Break;
+    if bSingleLine then
+    begin
+      if Caret.PosY>APos.Y then Break; //big optimization for single-line editing, e.g. char is typed
+      if Caret.PosY<APos.Y then Continue;
+    end;
 
     if not bDeleteToRightInited then
     begin
