@@ -1224,7 +1224,9 @@ var
   S: string;
   {$endif}
   i: integer;
-  bDeleteToRight, bDeleteToRightInited: boolean;
+  bSingleLine,
+  bDeleteToRight,
+  bDeleteToRightInited: boolean;
 begin
   //if APos.X<0 then Exit;
   if APos.Y<0 then Exit;
@@ -1232,6 +1234,7 @@ begin
   if Assigned(FOnChangeDetailed) then
     FOnChangeDetailed(Self, APos, APosEnd, AShift, APosAfter);
 
+  bSingleLine:= AShift.Y=0; //does it always mean that we have single-line editing? if not, will be a regression
   bDeleteToRightInited:= false;
   bDeleteToRight:= true;
 
@@ -1240,7 +1243,7 @@ begin
     Caret:= Carets[i];
 
     //big optimization for single-line editing, e.g. char is typed
-    if (AShift.Y=0) and (Caret.PosY>APos.Y) then
+    if bSingleLine and (Caret.PosY>APos.Y) then
       Break;
 
     if not bDeleteToRightInited then
