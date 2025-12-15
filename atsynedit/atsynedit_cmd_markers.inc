@@ -86,7 +86,7 @@ end;
 
 procedure TATSynEdit.MarkerClearAll;
 begin
-  if Assigned(FMarkers) then
+  if Assigned(FMarkers) and (FMarkers.Count>0) then
   begin
     FMarkers.Clear;
     Update;
@@ -95,7 +95,7 @@ end;
 
 procedure TATSynEdit.AttribClearAll;
 begin
-  if Assigned(FAttribs) then
+  if Assigned(FAttribs) and (FAttribs.Count>0) then
   begin
     FAttribs.Clear;
     Update;
