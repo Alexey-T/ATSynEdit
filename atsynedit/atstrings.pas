@@ -1491,16 +1491,20 @@ end;
 
 procedure TATStrings.LineAddEx(const AString: atString; AEnd: TATLineEnds);
 var
-  AEndInside: TATLineEnds;
+  TempEnd: TATLineEnds;
 begin
   if FReadOnly then Exit;
 
-  AEndInside:= AEnd;
-  if AEndInside=TATLineEnds.None then
-    AEndInside:= FEndings;
-
   if IsLastLineFake then
-    LineInsertRaw(Count-1, AString, AEndInside)
+  begin
+    TempEnd:= AEnd;
+    if TempEnd=TATLineEnds.None then
+      TempEnd:= FEndings;
+
+    Lines[Count-1]:= AString;
+    LinesEnds[Count-1]:= TempEnd;
+    LineAddRaw('', TATLineEnds.None);
+  end
   else
   begin
     LineAddRaw(AString, AEnd);
