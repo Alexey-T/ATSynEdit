@@ -1492,6 +1492,7 @@ end;
 procedure TATStrings.LineAddEx(const AString: atString; AEnd: TATLineEnds);
 var
   TempEnd: TATLineEnds;
+  NLastIndex: integer;
 begin
   if FReadOnly then Exit;
 
@@ -1504,8 +1505,9 @@ begin
     //avoid here LineInsert* (it was here before 2025.12),
     //because it turns off EnableCachedWrapinfoUpdate
 
-    Lines[Count-1]:= AString;
-    LinesEnds[Count-1]:= TempEnd;
+    NLastIndex:= Count-1;
+    Lines[NLastIndex]:= AString;
+    LinesEnds[NLastIndex]:= TempEnd;
     LineAddRaw('', TATLineEnds.None);
   end
   else
