@@ -1234,7 +1234,7 @@ begin
   if Assigned(FOnChangeDetailed) then
     FOnChangeDetailed(Self, APos, APosEnd, AShift, APosAfter);
 
-  bSingleLine:= AShift.Y=0; //does it always mean that we have single-line editing? if not, will be a regression
+  bSingleLine:= AShift.Y=0; //must be True only for single-line edition: e.g. char is typed, BkSp/Del in the middle of a line
   bDeleteToRightInited:= false;
   bDeleteToRight:= true;
 
@@ -1244,7 +1244,7 @@ begin
 
     if bSingleLine then
     begin
-      if Caret.PosY>APos.Y then Break; //big optimization for single-line editing, e.g. char is typed
+      if Caret.PosY>APos.Y then Break; //big optimization when char is typed with 20K carets (aligned in a column)
       if Caret.PosY<APos.Y then Continue;
     end;
 
