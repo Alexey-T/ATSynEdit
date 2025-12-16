@@ -1501,6 +1501,9 @@ begin
     if TempEnd=TATLineEnds.None then
       TempEnd:= FEndings;
 
+    //avoid here LineInsert* (it was here before 2025.12),
+    //because it turns off EnableCachedWrapinfoUpdate
+
     Lines[Count-1]:= AString;
     LinesEnds[Count-1]:= TempEnd;
     LineAddRaw('', TATLineEnds.None);
