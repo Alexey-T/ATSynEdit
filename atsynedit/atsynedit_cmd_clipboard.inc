@@ -211,8 +211,8 @@ function TATSynEdit.DoCommand_ClipboardPasteFromRecents: TATCommandResults;
     //delete indent
     Result:= TrimLeftSet(Result, [' ', #9]);
 
-    if Length(Result)>ATEditorOptions.MaxClipboardRecentsMenuitemLen then
-      Result:= Copy(Result, 1, ATEditorOptions.MaxClipboardRecentsMenuitemLen)+'...';
+    if UTF8Length(Result)>ATEditorOptions.MaxClipboardRecentsMenuitemLen then
+      Result:= UTF8Copy(Result, 1, ATEditorOptions.MaxClipboardRecentsMenuitemLen)+'...';
   end;
   //
 var
