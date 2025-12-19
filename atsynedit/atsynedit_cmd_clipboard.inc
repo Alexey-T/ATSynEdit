@@ -200,19 +200,21 @@ end;
 function TATSynEdit.DoCommand_ClipboardPasteFromRecents: TATCommandResults;
   //
   function PrepareStringForMenu(const S: string): string;
+  var
+    i: SizeInt;
   begin
     Result:= S;
-
-    //replace EOLs with space, almost like ST4
-    Result:= StringReplace(Result, #13#10, ' ', [rfReplaceAll]);
-    Result:= StringReplace(Result, #13, ' ', [rfReplaceAll]);
-    Result:= StringReplace(Result, #10, ' ', [rfReplaceAll]);
 
     //delete indent
     Result:= TrimLeftSet(Result, [' ', #9]);
 
     if UTF8Length(Result)>ATEditorOptions.MaxClipboardRecentsMenuitemLen then
       Result:= UTF8Copy(Result, 1, ATEditorOptions.MaxClipboardRecentsMenuitemLen)+'...';
+
+    //replace EOLs with space, almost like ST4
+    for i:= 1 to Length(Result) do
+      if Result[i] in [#10, #13] then
+        Result[i]:= ' ';
   end;
   //
 var
