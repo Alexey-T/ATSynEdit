@@ -100,17 +100,7 @@ You may get this error:
 
  atsynedit_adapter_gtk2ime.pas(131,5) Error: Identifier not found "IM_Context_Set_Cursor_Pos"
 
-To fix it, edit the file "atsynedit/atsynedit_package.lpk" and remove this block there:
-<syntaxhighlight lang="xml">
-      <Other>
-        <CustomOptions Value="-dGTK2_IME_CODE"/>
-        <OtherDefines Count="1">
-          <Define0 Value="GTK2_IME_CODE"/>
-        </OtherDefines>
-      </Other>
-</syntaxhighlight>
-
-Alternative solution when symbol "IM_Context_Set_Cursor_Pos" cannot be found: you need to open IDE dialog "Tools / Configure 'Build Lazarus'", and there enable the define: WITH_GTK2_IM; then recompile the IDE.
+Solution: you need to open IDE dialog "Tools / Configure 'Build Lazarus'", and there enable the define: WITH_GTK2_IM. Then recompile the IDE.
 
 == What limitations it has? ==
 * All lines have the same height
