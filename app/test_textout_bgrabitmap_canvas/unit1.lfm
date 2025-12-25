@@ -1,0 +1,12 @@
+object Form1: TForm1
+  Left = 617
+  Height = 360
+  Top = 309
+  Width = 700
+  Font.Height = 15
+  Position = poScreenCenter
+  LCLVersion = '4.99.0.0'
+  OnCreate = FormCreate
+  OnMouseMove = FormMouseMove
+  OnPaint = FormPaint
+end
