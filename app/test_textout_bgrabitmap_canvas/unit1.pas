@@ -5,8 +5,7 @@ unit Unit1;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs,
-  BGRABitmap, BGRABitmapTypes, BGRAText, BGRAPath;
+  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs;
 
 type
 
@@ -27,6 +26,10 @@ var
 
 implementation
 
+uses
+  LCLIntf, LCLProc, LCLType,
+  BGRABitmap, BGRABitmapTypes, BGRAText, BGRAPath;
+
 {$R *.lfm}
 
 { TForm1 }
@@ -46,6 +49,7 @@ end;
 
 procedure TForm1.FormPaint(Sender: TObject);
 const
+  SampleText = 'TextOut LTR TextOut LTR TextOut LTR TextOut LTR TextOut LTR';
   zoom = 1;
   cnt = 2000;
 var
@@ -60,7 +64,7 @@ begin
 
   tick_bgra:= GetTickCount64;
   for i:= 0 to cnt do
-    image.TextOut(240,190, 'TextOut LTR TextOut LTR TextOut LTR TextOut LTR TextOut LTR', BGRABlack);
+    image.TextOut(240, 190, SampleText, BGRABlack);
   tick_bgra:= GetTickCount64-tick_bgra;
 
   image.Draw(Canvas, 0,0, true);
@@ -74,11 +78,12 @@ begin
 
   tick_cnv:= GetTickCount64;
   for i:= 0 to cnt do
-    Canvas.TextOut(250,140, 'TextOut LTR TextOut LTR TextOut LTR TextOut LTR TextOut LTR');
+    ExtTextOut(Canvas.Handle, 250, 140, 0, nil, PChar(SampleText), Length(SampleText), nil);
   tick_cnv:= GetTickCount64-tick_cnv;
 
   //-----------------
 
+  Canvas.Font.Color:= clBlue;
   Canvas.TextOut(10, 10, 'time of TextOut: bgrabitmap/tcanvas = '+FloatToStr(tick_bgra/tick_cnv));
 end;
 
