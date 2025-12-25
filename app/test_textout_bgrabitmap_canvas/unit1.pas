@@ -50,14 +50,13 @@ end;
 procedure TForm1.FormPaint(Sender: TObject);
 const
   SampleText = 'TextOut LTR TextOut LTR TextOut LTR TextOut LTR TextOut LTR';
-  zoom = 1;
-  cnt = 2000;
+  cnt = 800;
 var
   tick_bgra, tick_cnv: QWord;
   image: TBGRABitmap;
   i: integer;
 begin
-  image := TBGRABitmap.Create(ClientWidth div zoom, ClientHeight div zoom, BGRAWhite);
+  image := TBGRABitmap.Create(ClientWidth, ClientHeight, BGRAWhite);
   image.FontName := Font.Name;
   image.FontHeight := round(Font.Height*96/PixelsPerInch);
   image.FontQuality := fqSystemClearType;
