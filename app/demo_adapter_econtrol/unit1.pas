@@ -41,7 +41,7 @@ type
     TimerMemory: TTimer;
     Tree: TTreeView;
     procedure AdapterParseBegin(Sender: TObject);
-    procedure AdapterParseDone(Sender: TObject);
+    procedure AdapterParseDone(Sender: TObject; ATime: integer);
     procedure bOpenClick(Sender: TObject);
     procedure chkDynChange(Sender: TObject);
     procedure chkFullHiliteChange(Sender: TObject);
@@ -298,7 +298,7 @@ begin
   //empty
 end;
 
-procedure TfmMain.AdapterParseDone(Sender: TObject);
+procedure TfmMain.AdapterParseDone(Sender: TObject; ATime: integer);
 begin
   adapter.TreeFill(Tree, 1000, false, '?', @_OnTreeDuplicateNode);
   EditorChangeCaretPos(Self);
