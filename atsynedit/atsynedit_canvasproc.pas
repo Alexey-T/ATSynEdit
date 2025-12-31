@@ -290,10 +290,12 @@ begin
     Canvas.Brush.Style:= bsSolid;
     Canvas.FillRect(Rect^);
     CairoTextOut(Canvas, X, Y, PChar(Str));
+    Result:= true;
   end
   else
   begin
-    CairoExtTextOut(Canvas, Rect^.Left, Rect^.Top, 0, Rect, PChar(Str), Length(Str), Dx);
+    //Result:= CairoExtTextOut(Canvas, Rect^.Left, Rect^.Top, 0, Rect, PChar(Str), Length(Str), Dx);
+    Result:= ExtTextOut(Canvas.Handle, X, Y, {ETO_CLIPPED or} ETO_OPAQUE, Rect, PChar(Str), Length(Str), Dx);
   end;
   {$else}
   Result:= ExtTextOut(Canvas.Handle, X, Y, {ETO_CLIPPED or} ETO_OPAQUE, Rect, PChar(Str), Length(Str), Dx);
