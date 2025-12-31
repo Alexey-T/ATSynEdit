@@ -294,8 +294,8 @@ begin
   end
   else
   begin
-    //Result:= CairoExtTextOut(Canvas, Rect^.Left, Rect^.Top, 0, Rect, PChar(Str), Length(Str), Dx);
-    Result:= ExtTextOut(Canvas.Handle, X, Y, {ETO_CLIPPED or} ETO_OPAQUE, Rect, PChar(Str), Length(Str), Dx);
+    Result:= CairoExtTextOut(Canvas, Rect^.Left, Rect^.Top, 0, Rect, PChar(Str), Length(Str), Dx);
+    //Result:= ExtTextOut(Canvas.Handle, X, Y, {ETO_CLIPPED or} ETO_OPAQUE, Rect, PChar(Str), Length(Str), Dx);
   end;
   {$else}
   Result:= ExtTextOut(Canvas.Handle, X, Y, {ETO_CLIPPED or} ETO_OPAQUE, Rect, PChar(Str), Length(Str), Dx);
