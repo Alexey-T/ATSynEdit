@@ -288,9 +288,9 @@ begin
   //  b) to fill inter-line 1px area
 
   {$ifdef USE_CAIRO}
+  Canvas.Brush.Style:= bsSolid;
   if Dx=nil then
   begin
-    Canvas.Brush.Style:= bsSolid;
     Canvas.FillRect(Rect^);
     CairoTextOut(Canvas, X, Y, PChar(Str));
     Result:= true;
