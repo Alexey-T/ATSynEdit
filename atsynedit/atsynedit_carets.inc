@@ -237,6 +237,7 @@ function GenericCaretPosToClientPos(
   ATabHelper: TATStringTabHelper;
   const ARect: TRect;
   const AScrollHorz, AScrollVert: TATEditorScrollInfo;
+  AEditorIndex: integer;
   APreferLeftSide: boolean): TATPoint;
 var
   Item: TATWrapItem;
@@ -322,9 +323,13 @@ begin
     if (AGaps.Count>0) and AWrapInfo.IsIndexValid(NScrolledVert) then
     begin
       NLineIndexTop:= AWrapInfo[NScrolledVert].NLineIndex;
-      Inc(Result.Y, AGaps.SizeForLineRange(
+      Inc(Result.Y, GapsSizeForLineRange(
+        AStrings,
+        AGaps,
+        AEditorIndex,
         NLineIndexTop, //index of top line
-        P.Y-1 //index of line before caret
+        P.Y-1, //index of line before caret
+        false
         ));
       //consider top gap
       if AScrollVert.TopGapVisible then
@@ -528,7 +533,8 @@ end;
 
 function TATSynEdit.CaretPosToClientPos(const APos: TPoint): TATPoint;
 begin
-  Result:= GenericCaretPosToClientPos(APos,
+  Result:= GenericCaretPosToClientPos(
+    APos,
     WrapInfo,
     Strings,
     Gaps,
@@ -536,6 +542,7 @@ begin
     FRectMain,
     FScrollHorz,
     FScrollVert,
+    EditorIndex,
     FCaretSpecPos or FOptCaretPreferLeftSide
     );
 

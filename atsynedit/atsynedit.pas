@@ -2337,6 +2337,42 @@ uses
 {$I atsynedit_adapter_ime_cocoa.inc}
 {$endif}
 
+
+function GapsSizeForLineRange(
+  AStrings: TATStrings;
+  AGaps: TATGaps;
+  AEditorIndex: integer;
+  ALineFrom, ALineTo: integer;
+  AForAllLines: boolean): integer;
+var
+  StItem: PATStringItem;
+  GapItem: TATGapItem;
+  iGap, iLine: integer;
+  bHidden: boolean;
+begin
+  Result:= 0;
+  for iGap:= 0 to AGaps.Count-1 do
+  begin
+    GapItem:= AGaps.Items[iGap];
+    iLine:= GapItem.LineIndex;
+    if iLine=-1 then //very top gap has LineIndex=-1
+      bHidden:= false
+    else
+    begin
+      if not AStrings.IsIndexValid(iLine) then Break;
+      StItem:= AStrings.GetItemPtr(iLine);
+      if AEditorIndex=0 then
+        bHidden:= StItem^.Ex.Hidden_0
+      else
+        bHidden:= StItem^.Ex.Hidden_1;
+    end;
+    if not bHidden then
+      if AForAllLines or ((GapItem.LineIndex>=ALineFrom) and (GapItem.LineIndex<=ALineTo)) then
+        Inc(Result, GapItem.Size);
+  end;
+end;
+
+
 { TATMinimapThread }
 
 procedure TATMinimapThread.Execute;
@@ -3063,10 +3099,10 @@ begin
       NPos:= Max(0, FScrollVert.NPos);
       if FWrapInfo.IsIndexValid(NPos) then
         NLineIndex:= FWrapInfo.Data[NPos].NLineIndex;
-      NGapPos:= Gaps.SizeForLineRange(-1, NLineIndex-1);
+      NGapPos:= GapsSizeForLineRange(Strings, Gaps, EditorIndex, -1, NLineIndex-1, false);
     end;
 
-    NGapAll:= Gaps.SizeForAll;
+    NGapAll:= GapsSizeForLineRange(Strings, Gaps, EditorIndex, 0, 0, true);
   end;
 
   if not ModeOneLine then
@@ -6674,8 +6710,10 @@ end;
 procedure _UpdateScrollInfoFromSmoothPos(
   var AInfo: TATEditorScrollInfo;
   const APos: Int64;
+  AStrings: TATStrings;
   AWrapInfo: TATWrapInfo;
-  AGaps: TATGaps);
+  AGaps: TATGaps;
+  AEditorIndex: integer);
 //Note: for vertical bar, NPos=-1 means than we are before the first line, over top gap
 var
   NPos, NPixels, NLineIndex: Int64;
@@ -6736,7 +6774,8 @@ begin
 
     repeat
       NLineIndex:= AWrapInfo.Data[NPos].NLineIndex - 1;
-      NPixels:= APos - NPos* AInfo.CharSizeScaled div ATEditorCharXScale - AGaps.SizeForLineRange(-1, NLineIndex);
+      NPixels:= APos - NPos* AInfo.CharSizeScaled div ATEditorCharXScale
+        - GapsSizeForLineRange(AStrings, AGaps, AEditorIndex, -1, NLineIndex, false);
       if NPos=0 then Break;
       if NLineIndex=0 then Break;
       if NPixels>=0 then Break;
@@ -6750,7 +6789,14 @@ end;
 
 procedure TATSynEdit.UpdateScrollInfoFromSmoothPos(var AInfo: TATEditorScrollInfo; const APos: Int64);
 begin
-  _UpdateScrollInfoFromSmoothPos(AInfo, APos, WrapInfo, Gaps);
+  _UpdateScrollInfoFromSmoothPos(
+    AInfo,
+    APos,
+    Strings,
+    WrapInfo,
+    Gaps,
+    EditorIndex
+    );
 end;
 
 function TATSynEdit.UpdateScrollInfoFromMessage(var AInfo: TATEditorScrollInfo; const AMsg: TLMScroll): boolean;
