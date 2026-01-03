@@ -9,6 +9,9 @@ unit ATSynEdit_CanvasProc;
 {$ScopedEnums on}
 
 {$I atsynedit_defines.inc}
+{$ifdef LCLGtk2}
+  {$define USE_CAIRO}
+{$endif}
 
 interface
 
@@ -160,12 +163,15 @@ implementation
 
 uses
   Math,
+  {$ifdef USE_CAIRO}
+  ATSynEdit_CanvasProc_Cairo,
+  {$endif}
   LCLType,
   LCLIntf;
 
 const
   //TextOut with bsClear is faster on Linux/macOS
-  cTextoutBrushStyle = bsClear;
+  cTextoutBrushStyle = {$ifdef USE_CAIRO} bsSolid {$else} bsClear {$endif};
 
 procedure UpdateWiderFlags(C: TCanvas; out Flags: TATWiderFlags);
 const
@@ -269,18 +275,37 @@ begin
 end;
 
 {$else}
-function _TextOut_Unix(DC: HDC;
+function _TextOut_Unix(Canvas: TCanvas;
   X, Y: Integer;
   constref Rect: PRect;
   const Str: string;
   Dx: PInteger
-  ): boolean; inline;
+  ): boolean;
 begin
   //ETO_CLIPPED runs more code in TGtk2WidgetSet.ExtTextOut
   //ETO_OPAQUE paints rect first, but it's needed
   //  a) to fill tab-chars in selection (full width >1)
   //  b) to fill inter-line 1px area
-  Result:= ExtTextOut(DC, X, Y, {ETO_CLIPPED or} ETO_OPAQUE, Rect, PChar(Str), Length(Str), Dx);
+
+  {$ifdef USE_CAIRO}
+  Canvas.Brush.Style:= bsSolid;
+  if Dx=nil then
+  begin
+    Canvas.FillRect(Rect^);
+    CairoTextOut(Canvas, X, Y, PChar(Str));
+    Result:= true;
+  end
+  else
+  begin
+    {
+    //CairoExtTextOut yet cannot render CJK chars, so it's disabled
+    Result:= CairoExtTextOut(Canvas, Rect^.Left, Rect^.Top, 0, Rect, PChar(Str), Length(Str), Dx);
+    }
+    Result:= ExtTextOut(Canvas.Handle, X, Y, {ETO_CLIPPED or} ETO_OPAQUE, Rect, PChar(Str), Length(Str), Dx);
+  end;
+  {$else}
+  Result:= ExtTextOut(Canvas.Handle, X, Y, {ETO_CLIPPED or} ETO_OPAQUE, Rect, PChar(Str), Length(Str), Dx);
+  {$endif}
 end;
 {$endif}
 
@@ -290,7 +315,11 @@ begin
   {$IF Defined(LCLWin32)}
   Windows.TextOutA(C.Handle, X, Y, PChar(S), Length(S));
   {$else}
-  LCLIntf.TextOut(C.Handle, X, Y, PChar(S), Length(S));
+    {$ifdef USE_CAIRO}
+    CairoTextOut(C, X, Y, PChar(S));
+    {$else}
+    LCLIntf.TextOut(C.Handle, X, Y, PChar(S), Length(S));
+    {$endif}
   {$endif}
 end;
 
@@ -303,7 +332,11 @@ begin
   Windows.TextOutW(C.Handle, X, Y, PWChar(S), Length(S));
   {$else}
   Buf:= UTF8Encode(S);
-  LCLIntf.TextOut(C.Handle, X, Y, PChar(Buf), Length(Buf));
+    {$ifdef USE_CAIRO}
+    CairoTextOut(C, X, Y, PChar(Buf));
+    {$else}
+    LCLIntf.TextOut(C.Handle, X, Y, PChar(Buf), Length(Buf));
+    {$endif}
   {$endif}
 end;
 
@@ -313,7 +346,11 @@ begin
   {$IF Defined(LCLWin32)}
   Windows.TextOutA(C.Handle, X, Y, Buf, Len);
   {$else}
-  LCLIntf.TextOut(C.Handle, X, Y, Buf, Len);
+    {$ifdef USE_CAIRO}
+    CairoTextOut(C, X, Y, Buf);
+    {$else}
+    LCLIntf.TextOut(C.Handle, X, Y, Buf, Len);
+    {$endif}
   {$endif}
 end;
 
@@ -962,7 +999,7 @@ procedure CanvasTextOut(C: TCanvas;
     _TextOut_Windows(C.Handle, APosX, APosY+AProps.SpacingTop, nil, BufW, DxPointer, false{no ligatures});
     {$else}
     Buf:= BufW;
-    _TextOut_Unix(C.Handle, APosX, APosY+AProps.SpacingTop, nil, Buf, DxPointer);
+    _TextOut_Unix(C, APosX, APosY+AProps.SpacingTop, nil, Buf, DxPointer);
     {$endif}
   end;
   //
@@ -1044,7 +1081,7 @@ var
 
     if ATEditorOptions.DebugTiming then
       tick:= GetTickCount64;
-    _TextOut_Unix(C.Handle,
+    _TextOut_Unix(C,
       APosX+PixOffset1,
       APosY+AProps.SpacingTopEdge+AProps.SpacingTop,
       @PartRect,
@@ -1253,7 +1290,7 @@ begin
         false
         );
       {$else}
-      _TextOut_Unix(C.Handle,
+      _TextOut_Unix(C,
         APosX+PixOffset1,
         APosY+AProps.SpacingTopEdge+AProps.SpacingTop,
         nil,
