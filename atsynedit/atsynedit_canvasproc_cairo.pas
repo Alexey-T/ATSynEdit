@@ -190,11 +190,13 @@ begin
     end;
     if ARect <> nil then
     begin
-      cairo_rectangle(ct, ARect^.Left, ARect^.Top, ARect^.Width + 1, ARect^.Height);
       if ACanvas.Brush.Style = bsSolid then
         ACanvas.FillRect(ARect^);
       if Options and ETO_CLIPPED <> 0 then
-        cairo_clip(ct);
+      begin
+        cairo_rectangle(ct, ARect^.Left, ARect^.Top, ARect^.Width + 1, ARect^.Height);
+        cairo_clip(ct)
+      end;
     end;
     cairo_set_source_color(ct, cairo_get_color(ACanvas.Font.Color));
     cairo_glyph_path(ct, glyphs, num_glyphs);
