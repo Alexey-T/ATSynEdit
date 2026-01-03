@@ -323,7 +323,7 @@ begin
     if (AGaps.Count>0) and AWrapInfo.IsIndexValid(NScrolledVert) then
     begin
       NLineIndexTop:= AWrapInfo[NScrolledVert].NLineIndex;
-      Inc(Result.Y, GapsSizeForLineRange(
+      Inc(Result.Y, GapsSize(
         AStrings,
         AGaps,
         AEditorIndex,
