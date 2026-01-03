@@ -9,6 +9,9 @@ unit ATSynEdit_CanvasProc;
 {$ScopedEnums on}
 
 {$I atsynedit_defines.inc}
+{$ifdef LCLGtk2}
+  {$define USE_CAIRO}
+{$endif}
 
 interface
 
@@ -160,7 +163,7 @@ implementation
 
 uses
   Math,
-  {$ifdef LCLGTK2}
+  {$ifdef USE_CAIRO}
   ATSynEdit_CanvasProc_Cairo,
   {$endif}
   LCLType,
@@ -168,7 +171,7 @@ uses
 
 const
   //TextOut with bsClear is faster on Linux/macOS
-  cTextoutBrushStyle = bsClear;
+  cTextoutBrushStyle = {$ifdef USE_CAIRO} bsSolid {$else} bsClear {$endif};
 
 procedure UpdateWiderFlags(C: TCanvas; out Flags: TATWiderFlags);
 const
@@ -284,7 +287,7 @@ begin
   //  a) to fill tab-chars in selection (full width >1)
   //  b) to fill inter-line 1px area
 
-  {$ifdef LCLGTK2}
+  {$ifdef USE_CAIRO}
   if Dx=nil then
   begin
     Canvas.Brush.Style:= bsSolid;
@@ -309,7 +312,7 @@ begin
   {$IF Defined(LCLWin32)}
   Windows.TextOutA(C.Handle, X, Y, PChar(S), Length(S));
   {$else}
-    {$ifdef LCLGTK2}
+    {$ifdef USE_CAIRO}
     CairoTextOut(C, X, Y, PChar(S));
     {$else}
     LCLIntf.TextOut(C.Handle, X, Y, PChar(S), Length(S));
@@ -326,7 +329,7 @@ begin
   Windows.TextOutW(C.Handle, X, Y, PWChar(S), Length(S));
   {$else}
   Buf:= UTF8Encode(S);
-    {$ifdef LCLGTK2}
+    {$ifdef USE_CAIRO}
     CairoTextOut(C, X, Y, PChar(Buf));
     {$else}
     LCLIntf.TextOut(C.Handle, X, Y, PChar(Buf), Length(Buf));
@@ -340,7 +343,7 @@ begin
   {$IF Defined(LCLWin32)}
   Windows.TextOutA(C.Handle, X, Y, Buf, Len);
   {$else}
-    {$ifdef LCLGTK2}
+    {$ifdef USE_CAIRO}
     CairoTextOut(C, X, Y, Buf);
     {$else}
     LCLIntf.TextOut(C.Handle, X, Y, Buf, Len);
