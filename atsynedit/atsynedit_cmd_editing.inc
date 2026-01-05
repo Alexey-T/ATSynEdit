@@ -522,14 +522,9 @@ begin
   //CudaText issue #1615
   Carets.Sort;
 
-  if Carets.Count=1 then
-    Result:= [TATCommandResult.Text, TATCommandResult.CaretTop]
-  else
-  begin
-    //CaretAny, not CaretTop,
-    //because we may be scrolled to 2nd caret at line 100, and 1st caret was left at line 1
-    Result:= [TATCommandResult.Text, TATCommandResult.CaretAny];
-  end;
+  //CaretLazy is needed:
+  //because we may be scrolled to 2nd caret at line 100, and 1st caret was left at line 1
+  Result:= [TATCommandResult.Text, TATCommandResult.CaretTop, TATCommandResult.CaretLazy];
 end;
 
 
