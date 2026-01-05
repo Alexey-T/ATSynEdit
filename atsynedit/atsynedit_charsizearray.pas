@@ -79,7 +79,7 @@ begin
   Fill($ffa0, $ffef, uw_fullwidth);
 
   //Hebrew, https://en.wikipedia.org/wiki/Hebrew_(Unicode_block)
-  Fill($0590, $05FF, uw_fullwidth);
+  Fill($0590, $05FF, uw_normal);
   //Arabic, https://en.wikipedia.org/wiki/Arabic_script_in_Unicode
   Fill($0600, $077F, uw_fullwidth);
   Fill($08A0, $08FF, uw_fullwidth);
