@@ -76,8 +76,8 @@ procedure TATEditorColors.Init;
 begin
   TextFont:= clBlack;
   TextBG:= clWhite;
-  TextSelFont:= clHighlightText;
-  TextSelBG:= clHighlight;
+  TextSelFont:= clWhite;
+  TextSelBG:= clNavy;
   TextDisabledFont:= clGray;
   TextDisabledBG:= $f0f0f0;
   Caret:= clBlack;
