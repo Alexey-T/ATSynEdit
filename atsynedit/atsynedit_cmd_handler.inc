@@ -195,7 +195,7 @@ begin
     ] <> [];
 end;
 
-procedure TATSynEdit.DoCommandResults(ACmd: integer; Res: TATCommandResults);
+procedure TATSynEdit.DoCommandResults(ACmd: integer; ARes: TATCommandResults);
 var
   Caret: TATCaretItem;
   St: TATStrings;
@@ -207,17 +207,17 @@ begin
   St:= Strings;
   bNeedRepaint:= false;
   bAllowRepaint:= true;
-  bTextChanged:= TATCommandResult.Text in Res;
-  bUndoRedo:= TATCommandResult.UndoRedo in Res;
-  bFoldChanged:= TATCommandResult.FoldChange in Res;
-  bCaretMoved:= IsCommandResults_CaretMove(Res);
+  bTextChanged:= TATCommandResult.Text in ARes;
+  bUndoRedo:= TATCommandResult.UndoRedo in ARes;
+  bFoldChanged:= TATCommandResult.FoldChange in ARes;
+  bCaretMoved:= IsCommandResults_CaretMove(ARes);
 
   //if one-line, try to make right edge of text near the edge of control, like Win inputs
   if ModeOneLine then
     if bTextChanged then
     begin
       FScrollHorz.SetZero;
-      Include(Res, TATCommandResult.CaretTop);
+      Include(ARes, TATCommandResult.CaretTop);
     end;
 
   //prevent bad effects when user edits a line with "fold_style":4, unfold the edited line
@@ -260,27 +260,27 @@ begin
     if Carets.Count=1 then
       bAllowCaretScroll:= true
     else
-    if TATCommandResult.CaretLazy in Res then
+    if TATCommandResult.CaretLazy in ARes then
       bAllowCaretScroll:= not IsCaretOnVisibleRect
     else
       bAllowCaretScroll:= true;
 
     if bAllowCaretScroll then
     begin
-      if TATCommandResult.CaretTop in Res then
+      if TATCommandResult.CaretTop in ARes then
         DoGotoCaret(TATCaretEdge.Top, bUndoRedo, false, false, false)
       else
-      if TATCommandResult.CaretBottom in Res then
+      if TATCommandResult.CaretBottom in ARes then
         DoGotoCaret(TATCaretEdge.Bottom, bUndoRedo, false, false, false)
       else
-      if TATCommandResult.CaretLeft in Res then
+      if TATCommandResult.CaretLeft in ARes then
         DoGotoCaret(TATCaretEdge.Left, bUndoRedo, false, false, false)
       else
-      if TATCommandResult.CaretRight in Res then
+      if TATCommandResult.CaretRight in ARes then
         DoGotoCaret(TATCaretEdge.Right, bUndoRedo, false, false, false);
     end;
 
-    if not (TATCommandResult.KeepColumnSel in Res) then
+    if not (TATCommandResult.KeepColumnSel in ARes) then
       FSelRect:= cRectEmpty;
 
     //update pixel coords, so that CudaText python code
@@ -308,7 +308,7 @@ begin
         ) //don't apply Proximity if caret was near the edge, before the command
       then
     begin
-      if (Carets.Count=1) or (Res*[TATCommandResult.CaretTop, TATCommandResult.CaretAny]<>[]) then
+      if (Carets.Count=1) or (ARes*[TATCommandResult.CaretTop, TATCommandResult.CaretAny]<>[]) then
       begin
         Caret:= Carets[0];
         if DoCaretApplyProximityToVertEdge(
@@ -319,7 +319,7 @@ begin
           UpdateCaretsCoords(false, true);
       end
       else
-      if (Carets.Count>1) and (Res*[TATCommandResult.CaretBottom]<>[]) then
+      if (Carets.Count>1) and (ARes*[TATCommandResult.CaretBottom]<>[]) then
       begin
         Caret:= Carets[Carets.Count-1];
         if DoCaretApplyProximityToVertEdge(
@@ -333,13 +333,13 @@ begin
   end
   else
   //scroll should do UpdateCaretsCoords, CudaText issue #3777
-  if TATCommandResult.Scroll in Res then
+  if TATCommandResult.Scroll in ARes then
     UpdateCaretsCoords(false, true);
 
 
   if bTextChanged then
   begin
-    if not (TATCommandResult.KeepColumnSel in Res) then
+    if not (TATCommandResult.KeepColumnSel in ARes) then
       FSelRect:= cRectEmpty;
     //fixing CudaText issue #3708, syntax highlight is broken after Undo,
     //with "Commands History" plugin (cannot find how plugin breaks it)
@@ -354,7 +354,7 @@ begin
   if bCaretMoved then
     DoEventCarets;
 
-  if TATCommandResult.State in Res then
+  if TATCommandResult.State in ARes then
     DoEventState;
 
   //when caret goes to left/top edge, must reset the NPixelOffset
