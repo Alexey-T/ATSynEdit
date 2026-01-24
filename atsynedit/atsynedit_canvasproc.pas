@@ -9,8 +9,7 @@ unit ATSynEdit_CanvasProc;
 {$ScopedEnums on}
 
 {$I atsynedit_defines.inc}
-{$if defined(LCLGtk2) and defined(Linux)}
-  //FreeBSD/NetBSD/Solaris give linking error about '-lpangocairo' if we use USE_CAIRO
+{$if defined(LCLGtk2)}
   {$define USE_CAIRO}
 {$endif}
 
