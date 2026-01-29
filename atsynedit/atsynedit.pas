@@ -506,13 +506,6 @@ type
     DefaultBG
     );
 
-  TATEditorCaretSlowFilter = (
-    None,
-    SelOne,
-    SelMany,
-    SelReset
-    );
-
 type
   { TATSynEdit }
 
@@ -1632,7 +1625,7 @@ type
     Colors: TATEditorColors;
     TagString: string; //to store plugin specific data in CudaText
     ModifiedOptions: TATEditorModifiedOptions;
-    EventCaretSlow_Filter: TATEditorCaretSlowFilter; //for CudaText
+    EventCaretSlow_Filter: string; //for CudaText
     EventCaretSlow_WithSel: boolean; //for CudaText
 
     //overrides
