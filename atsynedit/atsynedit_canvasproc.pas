@@ -109,9 +109,9 @@ procedure CanvasLineEx(C: TCanvas;
   Color: TColor; Style: TATLineStyle;
   X1, Y1, X2, Y2: integer; AtDown: boolean);
 
-procedure CanvasTextOutSimplest(C: TCanvas; const R: TRect; const S: string);
-procedure CanvasTextOutSimplest(C: TCanvas; const R: TRect; const S: UnicodeString);
-procedure CanvasTextOutSimplest_PChar(C: TCanvas; const R: TRect; Buf: PChar; Len: integer); inline;
+procedure CanvasTextOutSimplest(C: TCanvas; X, Y: integer; const S: string);
+procedure CanvasTextOutSimplest(C: TCanvas; X, Y: integer; const S: UnicodeString);
+procedure CanvasTextOutSimplest_PChar(C: TCanvas; X, Y: integer; Buf: PChar; Len: integer); inline;
 
 procedure CanvasTextOut(C: TCanvas;
   APosX, APosY: integer;
@@ -309,46 +309,47 @@ begin
 end;
 {$endif}
 
-procedure CanvasTextOutSimplest(C: TCanvas; const R: TRect; const S: string);
+procedure CanvasTextOutSimplest(C: TCanvas; X, Y: integer; const S: string);
 begin
   //don't set Brush.Style here, causes CudaText issue #3625
   {$IF Defined(LCLWin32)}
-  Windows.TextOutA(C.Handle, R.Left, R.Top, PChar(S), Length(S));
+  Windows.TextOutA(C.Handle, X, Y, PChar(S), Length(S));
   {$else}
     {$ifdef USE_CAIRO}
-    CairoTextOut(C, R.Left, R.Top, PChar(S));
+    CairoTextOut(C, X, Y, PChar(S));
     {$else}
-    LCLIntf.TextOut(C.Handle, R.Left, R.Top, PChar(S), Length(S));
+    LCLIntf.TextOut(C.Handle, X, Y, PChar(S), Length(S));
     {$endif}
   {$endif}
 end;
 
-procedure CanvasTextOutSimplest(C: TCanvas; const R: TRect; const S: UnicodeString);
+procedure CanvasTextOutSimplest(C: TCanvas; X, Y: integer; const S: UnicodeString);
 var
   Buf: string;
 begin
   //don't set Brush.Style here, causes CudaText issue #3625
   {$IF Defined(LCLWin32)}
-  Windows.TextOutW(C.Handle, R.Left, R.Top, PWChar(S), Length(S));
+  Windows.TextOutW(C.Handle, X, Y, PWChar(S), Length(S));
   {$else}
   Buf:= UTF8Encode(S);
     {$ifdef USE_CAIRO}
-    CairoTextOut(C, R.Left, R.Top, PChar(Buf));
+    CairoTextOut(C, X, Y, PChar(Buf));
     {$else}
-    LCLIntf.TextOut(C.Handle, R.Left, R.Top, PChar(Buf), Length(Buf));
+    LCLIntf.TextOut(C.Handle, X, Y, PChar(Buf), Length(Buf));
     {$endif}
   {$endif}
 end;
 
-procedure CanvasTextOutSimplest_PChar(C: TCanvas; const R: TRect; Buf: PChar; Len: integer); inline;
+
+procedure CanvasTextOutSimplest_PChar(C: TCanvas; X, Y: integer; Buf: PChar; Len: integer); inline;
 begin
   {$IF Defined(LCLWin32)}
-  Windows.TextOutA(C.Handle, R.Left, R.Top, Buf, Len);
+  Windows.TextOutA(C.Handle, X, Y, Buf, Len);
   {$else}
     {$ifdef USE_CAIRO}
-    CairoTextOut(C, R.Left, R.Top, Buf);
+    CairoTextOut(C, X, Y, Buf);
     {$else}
-    LCLIntf.TextOut(C.Handle, R.Left, R.Top, Buf, Len);
+    LCLIntf.TextOut(C.Handle, X, Y, Buf, Len);
     {$endif}
   {$endif}
 end;
@@ -540,14 +541,7 @@ begin
       end;
 
       if ASuperFast then
-        CanvasTextOutSimplest(C,
-          Rect(
-            AX,
-            AY,
-            AX+ACharSize.XScaled div ATEditorCharXScale,
-            AY+ACharSize.Y
-            ),
-          HexDummyMark)
+        CanvasTextOutSimplest(C, AX, AY, HexDummyMark)
       else
       begin
         Value:= Ord(ch);
@@ -568,15 +562,7 @@ begin
           Value:= Value shr 4;
         end;
 
-        CanvasTextOutSimplest_PChar(C,
-          Rect(
-            AX,
-            AY,
-            AX+HexLen*ACharSize.XScaled div ATEditorCharXScale,
-            AY+ACharSize.Y
-            ),
-          Buf,
-          HexLen);
+        CanvasTextOutSimplest_PChar(C, AX, AY, Buf, HexLen);
       end;
     end;
 

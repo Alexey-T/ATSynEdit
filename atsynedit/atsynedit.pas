@@ -2401,7 +2401,6 @@ var
   NTopIndent, NMarkHeight, i: integer;
   NCharWidthScaled: integer;
   Str: string;
-  R: TRect;
 begin
   NPrevFontSize:= C.Font.Size;
   NRulerStart:= FScrollHorz.NPos;
@@ -2428,11 +2427,7 @@ begin
           if (i mod 10 = 0) then
           begin
             Str:= IntToStr(NOutput);
-            R.Left:= NCoordX - NCharWidthScaled*Length(Str) div 2 div ATEditorCharXScale;
-            R.Right:= R.Left + NCharWidthScaled*Length(Str) div ATEditorCharXScale;
-            R.Top:= NTopIndent;
-            R.Bottom:= R.Top + FCharSize.Y;
-            CanvasTextOutSimplest(C, R, Str);
+            CanvasTextOutSimplest(C, NCoordX - NCharWidthScaled*Length(Str) div 2 div ATEditorCharXScale, NTopIndent, Str);
           end;
         end;
       TATEditorRulerNumeration.Num_1_11_21:
@@ -2441,11 +2436,7 @@ begin
           if (i mod 10 = 0) then
           begin
             Str:= IntToStr(NOutput+1{!});
-            R.Left:= NCoordX - NCharWidthScaled*Length(Str) div 2 div ATEditorCharXScale;
-            R.Right:= R.Left + NCharWidthScaled*Length(Str) div ATEditorCharXScale;
-            R.Top:= NTopIndent;
-            R.Bottom:= R.Top + FCharSize.Y;
-            CanvasTextOutSimplest(C, R, Str);
+            CanvasTextOutSimplest(C, NCoordX - NCharWidthScaled*Length(Str) div 2 div ATEditorCharXScale, NTopIndent, Str);
           end;
         end;
       TATEditorRulerNumeration.Num_1_10_20:
@@ -2454,11 +2445,7 @@ begin
           if (NOutput=1) or (NOutput mod 10 = 0) then
           begin
             Str:= IntToStr(NOutput);
-            R.Left:= NCoordX - NCharWidthScaled*Length(Str) div 2 div ATEditorCharXScale;
-            R.Right:= R.Left + NCharWidthScaled*Length(Str) div ATEditorCharXScale;
-            R.Top:= NTopIndent;
-            R.Bottom:= R.Top + FCharSize.Y;
-            CanvasTextOutSimplest(C, R, Str);
+            CanvasTextOutSimplest(C, NCoordX - NCharWidthScaled*Length(Str) div 2 div ATEditorCharXScale, NTopIndent, Str);
           end;
         end;
     end;
@@ -3761,7 +3748,7 @@ begin
   begin
     C.Font.Color:= clRed;
     C.Brush.Color:= clWhite;
-    C.TextOut(4, 4, EditorParserExceptionMessage);
+    CanvasTextOutSimplest(C, 4, 4, EditorParserExceptionMessage);
   end;
 end;
 
@@ -8464,14 +8451,7 @@ begin
       NCoordY:= ACaret.CoordY;
       if FSpacingBottom<0 then
         Inc(NCoordY, FSpacingBottom);
-      CanvasTextOutSimplest(C,
-        Rect(
-          NCoordX,
-          NCoordY,
-          NCoordX + FCharSize.XScaled div ATEditorCharXScale,
-          NCoordY + FCharSize.Y
-          ),
-        UnicodeString(ACaret.CharAtCaret));
+      CanvasTextOutSimplest(C, NCoordX, NCoordY, UnicodeString(ACaret.CharAtCaret));
     end;
   end;
 end;
@@ -8774,7 +8754,6 @@ procedure TATSynEdit.DoPaintGutterNumber(C: TCanvas; ALineIndex, ACoordTop: inte
 var
   SText: string;
   P: TPoint;
-  R: TRect;
   NNumberWidth, NLineWidthPx: integer;
 begin
   SText:= DoFormatLineNumber(ALineIndex+1);
@@ -8817,12 +8796,11 @@ begin
         end;
 
         C.Brush.Style:= bsClear;
-
-        R.Left:= P.X;
-        R.Top:= P.Y+FSpacingTopEdge+FSpacingTop;
-        R.Right:= R.Left + Length(SText)*FCharSize.XScaled div ATEditorCharXScale;
-        R.Bottom:= R.Top + FCharSize.Y;
-        CanvasTextOutSimplest(C, R, SText);
+        CanvasTextOutSimplest(C,
+          P.X,
+          P.Y+FSpacingTopEdge+FSpacingTop,
+          SText
+          );
       end;
   end;
 end;
@@ -10973,7 +10951,7 @@ end;
 
 procedure TATSynEdit.DoPaintTiming(C: TCanvas);
 var
-  RPlot, RText: TRect;
+  RPlot: TRect;
   Rec, RecPrev: TATTimingRec;
   NRectBottom, i: integer;
   S: string;
@@ -11038,13 +11016,7 @@ begin
   S:= Format('#%03d, %d ms', [FPaintCounter, FTickAll]);
   if FMinimapVisible then
     S+= Format(', mmap %d ms', [FTickMinimap]);
-
-  RText.Left:= RPlot.Right+3;
-  RText.Top:= ClientHeight - ATTimingIndicator.FontSize * 18 div 10;
-  RText.Right:= RText.Left + Length(S)*FCharSize.XScaled div ATEditorCharXScale;
-  RText.Bottom:= RText.Top + FCharSize.Y;
-
-  CanvasTextOutSimplest(C, RText, S);
+  CanvasTextOutSimplest(C, RPlot.Right+3, ClientHeight - ATTimingIndicator.FontSize * 18 div 10, S);
 end;
 
 
