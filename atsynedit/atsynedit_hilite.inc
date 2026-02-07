@@ -6,22 +6,22 @@ function TATSynEdit.DoCalcLineHiliteEx(ALineIndex: integer;
 const
   cMaxCharsInLine = 50*1024;
 var
-  Data: TATWrapItem;
+  WrapItem: TATWrapItem;
 begin
   AParts:= Default(TATLineParts);
   Result:= Strings.IsIndexValid(ALineIndex);
   if not Result then exit;
 
-  Data.NLineIndex:= ALineIndex;
-  Data.NCharIndex:= 1;
-  Data.NLength:= Strings.LinesLen[ALineIndex];
-  Data.NIndent:= 0;
-  Data.NFinal:= TATWrapItemFinal.Final;
-  if Data.NLength=0 then exit;
+  WrapItem.NLineIndex:= ALineIndex;
+  WrapItem.NCharIndex:= 1;
+  WrapItem.NLength:= Strings.LinesLen[ALineIndex];
+  WrapItem.NIndent:= 0;
+  WrapItem.NFinal:= TATWrapItemFinal.Final;
+  if WrapItem.NLength=0 then exit;
 
   AColorAfter:= AColorBG;
   DoCalcLineHilite(
-    Data,
+    WrapItem,
     AParts,
     0,
     cMaxCharsInLine,
@@ -33,7 +33,7 @@ begin
 end;
 
 
-procedure TATSynEdit.DoCalcLineHilite(const AData: TATWrapItem;
+procedure TATSynEdit.DoCalcLineHilite(const AWrapItem: TATWrapItem;
   var AParts: TATLineParts;
   ACharsSkipped, ACharsMax: integer;
   AColorBG: TColor; AColorForced: boolean;
@@ -43,10 +43,10 @@ var
   nMaxOffset, nCharIndex, nLineIndex, nLineLen: integer;
   bEnableHilite: boolean;
 begin
-  nMaxOffset:= Min(ACharsMax, AData.NLength-ACharsSkipped);
-  nLineIndex:= AData.NLineIndex;
-  nLineLen:= AData.NLength;
-  nCharIndex:= AData.NCharIndex+ACharsSkipped;
+  nMaxOffset:= Min(ACharsMax, AWrapItem.NLength-ACharsSkipped);
+  nLineIndex:= AWrapItem.NLineIndex;
+  nLineLen:= AWrapItem.NLength;
+  nCharIndex:= AWrapItem.NCharIndex+ACharsSkipped;
 
   ///the following line gives problems with huge lines (len>10K) in HTML, CudaText issue #3694
   //bEnableHilite:= St.LinesLen[nLineIndex]<=FOptMaxLineLenToTokenize;
