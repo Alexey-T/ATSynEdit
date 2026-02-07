@@ -360,7 +360,7 @@ function GenericClientPosToCaretPos(
   const ARect: TRect;
   const AScrollHorz, AScrollVert: TATEditorScrollInfo;
   AVirtualPos: boolean;
-  out ADetails: TATEditorPosDetails;
+  out APosDetails: TATEditorPosDetails;
   AGapCoordAction: TATEditorGapCoordAction;
   AAfterEofUsesLastLen: boolean;
   AEditorIndex: integer): TPoint;
@@ -373,11 +373,11 @@ var
   GapItem: TATGapItem;
   Str: atString;
   NStrLen: SizeInt;
-  bAllowVirtual, bGapGoesToEnd: boolean;
+  bAllowVirtualPos, bGapGoesToEnd: boolean;
 begin
   Result.X:= 0;
   Result.Y:= -1;
-  ADetails:= Default(TATEditorPosDetails);
+  APosDetails:= Default(TATEditorPosDetails);
 
   if (ATabHelper.CharSize.XScaled div ATEditorCharXScale <=0) or (ATabHelper.CharSize.Y<=0) then Exit;
   P.X:= Max(P.X, ARect.Left);
@@ -419,13 +419,13 @@ begin
         Inc(NPixels, GapItem.Size);
         if NPixels>P.Y then
         begin
-          ADetails.OnGapItem:= GapItem;
-          ADetails.OnGapPos.Y:= P.Y - (NPixels-GapItem.Size);
+          APosDetails.OnGapItem:= GapItem;
+          APosDetails.OnGapPos.Y:= P.Y - (NPixels-GapItem.Size);
           NGapObjectWidth:= GapItem.GetObjectWidth;
           if NGapObjectWidth>0 then
-            ADetails.OnGapPos.X:= P.X - GetGapBitmapPosLeft(ARect, NGapObjectWidth)
+            APosDetails.OnGapPos.X:= P.X - GetGapBitmapPosLeft(ARect, NGapObjectWidth)
           else
-            ADetails.OnGapPos.X:= P.X - ARect.Left;
+            APosDetails.OnGapPos.X:= P.X - ARect.Left;
 
           case AGapCoordAction of
             TATEditorGapCoordAction.ToLineEnd:
@@ -466,7 +466,7 @@ begin
         if not AStrings.IsIndexValid(Result.Y) then
           Exit(Point(-1, -1));
       end;
-      ADetails.BelowAllText:= true;
+      APosDetails.BelowAllText:= true;
       Exit
     end;
   end;
@@ -503,7 +503,7 @@ begin
     Result.X:= NStrLen + WrapItem.NCharIndex-1
   else
   begin
-    bAllowVirtual:= AVirtualPos and (WrapItem.NFinal=TATWrapItemFinal.Final);
+    bAllowVirtualPos:= AVirtualPos and (WrapItem.NFinal=TATWrapItemFinal.Final);
     NPixels:= Int64(P.X)-ARect.Left + AScrollHorz.SmoothPos - ATabHelper.CharSize.XScaled*ATabHelper.CharSize.XSpacePercents*WrapItem.NIndent div ATEditorCharXScale div 100;
     Result.X:= ATabHelper.FindClickedPosition(
       Result.Y,
@@ -511,24 +511,24 @@ begin
       NStrLen,
       CharOffsets,
       NPixels,
-      bAllowVirtual,
-      ADetails.EndOfWrappedLine)
+      bAllowVirtualPos,
+      APosDetails.EndOfWrappedLine)
       + WrapItem.NCharIndex - 2;
 
     //position after end of partially folded line? return position of fold begin
-    if ADetails.EndOfWrappedLine then
+    if APosDetails.EndOfWrappedLine then
     begin
       NIndex:= AStrings.LinesFoldFrom[Result.Y, AEditorIndex];
       if NIndex>0 then
       begin
-        ADetails.EndOfPartiallyFoldedLine:= true;
+        APosDetails.EndOfPartiallyFoldedLine:= true;
         Result.X:= NIndex-1;
       end;
     end;
   end;
 
   if WrapItem.NFinal=TATWrapItemFinal.Final then //don't set EndOfWrappedLine for real EOL
-    ADetails.EndOfWrappedLine:= false;
+    APosDetails.EndOfWrappedLine:= false;
 end;
 
 function TATSynEdit.CaretPosToClientPos(const APos: TPoint): TATPoint;
