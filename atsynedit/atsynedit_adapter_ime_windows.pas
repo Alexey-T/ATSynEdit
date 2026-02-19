@@ -348,7 +348,13 @@ begin
               UpdateCompForm(Sender);
             end;
           end else
+          begin
+            // escape
             buffer[0]:=#0;
+            Len:= Length(FSelText);
+            Ed.TextInsertAtCarets(FSelText, False, False, Len>0);
+            FSelText:='';
+          end;
       finally
         ImmReleaseContext(Ed.Handle,IMC);
       end;
@@ -365,15 +371,6 @@ var
 begin
   Ed:= TATSynEdit(Sender);
   position:=0;
-  if buffer[0]<>#0 then
-  begin
-    Ed.TextInsertAtCarets(buffer, False,
-                         Ed.ModeOverwrite and (Length(FSelText)=0),
-                         False);
-    FSelText:='';
-  end;
-  Len:= Length(FSelText);
-  Ed.TextInsertAtCarets(FSelText, False, False, Len>0);
   HideCompForm;
   { tweak for emoji window, but don't work currently
     it shows emoji window on previous position.
