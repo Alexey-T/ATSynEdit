@@ -289,7 +289,7 @@ begin
   for iWrap:= NWrapIndexFrom to NWrapIndexTo do
   begin
     WrapItem:= AWrapInfo[iWrap];
-    bLineHuge:= WrapItem.NLength>cMaxFixedArray;
+    bLineHuge:= WrapItem.NLength>ATEditorMaxFixedArray;
 
     if (P.X<WrapItem.NCharIndex-1) then Continue;
 
@@ -483,13 +483,13 @@ begin
   else
     NLineLenTrimmed:= Min(WrapItem.NLength, (AScrollHorz.SmoothPos + ARect.Width) * ATEditorCharXScale div ATabHelper.CharSize.XScaled);
 
-  if NLineLenOriginal>cMaxFixedArray then
+  if NLineLenOriginal>ATEditorMaxFixedArray then
   begin
-    //fake Str to calc CharOffsets only; ATabHelper.CalcCharOffsets limits len by cMaxFixedArray
-    Str:= StringOfCharW(ATEditorOptions.SampleChar, Min(NLineLenOriginal, cMaxFixedArray));
+    //fake Str to calc CharOffsets only; ATabHelper.CalcCharOffsets limits len by ATEditorMaxFixedArray
+    Str:= StringOfCharW(ATEditorOptions.SampleChar, Min(NLineLenOriginal, ATEditorMaxFixedArray));
 
     ATabHelper.CalcCharOffsets(WrapItem.NLineIndex, Str, CharOffsets, 0);
-    Str:= AStrings.LineSub(WrapItem.NLineIndex, WrapItem.NCharIndex, Min(NLineLenTrimmed, cMaxFixedArray));
+    Str:= AStrings.LineSub(WrapItem.NLineIndex, WrapItem.NCharIndex, Min(NLineLenTrimmed, ATEditorMaxFixedArray));
     NStrLen:= AStrings.LineSubLen(WrapItem.NLineIndex, WrapItem.NCharIndex, NLineLenTrimmed);
   end
   else

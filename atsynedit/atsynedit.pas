@@ -4201,7 +4201,7 @@ begin
   bTrimmedNonSpaces:= false;
 
   NLineLen:= St.LinesLen[NLinesIndex];
-  bLineHuge:= WrapItem.NLength>cMaxFixedArray;
+  bLineHuge:= WrapItem.NLength>ATEditorMaxFixedArray;
 
   if not bLineHuge then
   begin

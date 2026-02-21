@@ -24,9 +24,6 @@ type
   atChar = WideChar;
   PatChar = PWideChar;
 
-const
-  ATEditorCharXScale = 1024;
-
 type
 
   { TATPoint }
@@ -98,20 +95,24 @@ type
   TATMarkerAttribArray = array of TATMarkerAttribRecord;
 
 const
+  //TATEditorCharSize uses this constant.
+  //must be some big value from e.g. 100 to e.g. 10K.
+  ATEditorCharXScale = 1024;
+
   //if line is longer - all line chars will be rendered in normal-width (100%) cells
   //so all CJK chars (width 190%) will overlap by design
-  cMaxFixedArray = 1024;
+  ATEditorMaxFixedArray = 4*1024;
 
 type
   //must be with Int64 items, 32-bit is not enough for single line with len>40M
   TATIntFixedArray = record
-    Data: packed array[0..cMaxFixedArray-1] of Int64;
+    Data: packed array[0..ATEditorMaxFixedArray-1] of Int64;
     Len: SizeInt;
   end;
 
   //must be with Longint items, it's for Dx offsets for rendering
   TATInt32FixedArray = record
-    Data: packed array[0..cMaxFixedArray-1] of Longint;
+    Data: packed array[0..ATEditorMaxFixedArray-1] of Longint;
     Len: SizeInt;
   end;
 
@@ -552,7 +553,7 @@ begin
     Exit(Length(S));
 
   //NAvg is average wrap offset, we use it if no correct offset found
-  N:= Min(Length(S), cMaxFixedArray)-1;
+  N:= Min(Length(S), ATEditorMaxFixedArray)-1;
   while (N>0) and (Offsets.Data[N]>(AColumns+1)*100) do Dec(N);
   NAvg:= N;
   if NAvg<ATEditorOptions.MinWordWrapOffset then
@@ -662,7 +663,7 @@ begin
   if Assigned(OnCalcTabSize) then
     Result:= OnCalcTabSize(SenderObj, ALineIndex, APos)
   else
-  if Assigned(OnCalcLineLen) and (ALineIndex>=0) and (OnCalcLineLen(ALineIndex)>cMaxFixedArray) then
+  if Assigned(OnCalcLineLen) and (ALineIndex>=0) and (OnCalcLineLen(ALineIndex)>ATEditorMaxFixedArray) then
     Result:= 1
   else
   if APos>ATEditorOptions.MaxTabPositionToExpand then
@@ -735,11 +736,11 @@ var
   i: SizeInt;
 begin
   AInfo:= Default(TATIntFixedArray);
-  NLen:= Min(Length(S), cMaxFixedArray);
+  NLen:= Min(Length(S), ATEditorMaxFixedArray);
   AInfo.Len:= NLen;
   if NLen=0 then Exit;
 
-  if Length(S)>cMaxFixedArray then
+  if Length(S)>ATEditorMaxFixedArray then
   begin
     for i:= 0 to NLen-1 do
       AInfo.Data[i]:= (Int64(i)+1)*100;
@@ -789,7 +790,7 @@ begin
   NLen:= Length(S);
   if NLen=0 then Exit;
 
-  if NLen>cMaxFixedArray then
+  if NLen>ATEditorMaxFixedArray then
     exit(NLen*100);
 
   NCharsSkipped:= ACharsSkipped;

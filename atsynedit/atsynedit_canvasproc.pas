@@ -753,7 +753,7 @@ procedure _CalcCharSizesUtf8FromWidestring(const S: UnicodeString;
 var
   NLen, NSize, ResLen, i: integer;
 begin
-  NLen:= Min(Length(S), cMaxFixedArray);
+  NLen:= Min(Length(S), ATEditorMaxFixedArray);
   DxOut:= Default(TATInt32FixedArray);
 
   ResLen:= 0;
@@ -1102,7 +1102,7 @@ var
   bPrevColorInited: boolean;
   bItalic: boolean;
 begin
-  NLen:= Min(Length(AText), cMaxFixedArray);
+  NLen:= Min(Length(AText), ATEditorMaxFixedArray);
   if NLen=0 then Exit;
   NCharWidthScaled:= AProps.CharSize.XScaled;
   NDeltaForItalic:= C.Font.Size * ATEditorOptions.ItalicFontLongerInPercents div 100;
