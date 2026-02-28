@@ -7311,6 +7311,8 @@ begin
       if NGutterIndex=FGutterBandEmpty then
       begin
         DoCaretSingle(PosTextClicked.X, PosTextClicked.Y);
+        FMouseDownOnEditingArea:= true; //pretend like user clicked on editing area
+        FMouseDownPnt:= PosTextClicked;
       end;
     end;
   end;
