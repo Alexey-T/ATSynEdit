@@ -7306,6 +7306,11 @@ begin
       if NGutterIndex=FGutterBandFolding then
       begin
         DoFoldbarClick_LineIndex(PosTextClicked.Y);
+      end
+      else
+      if NGutterIndex=FGutterBandEmpty then
+      begin
+        DoCaretSingle(PosTextClicked.X, PosTextClicked.Y);
       end;
     end;
   end;
