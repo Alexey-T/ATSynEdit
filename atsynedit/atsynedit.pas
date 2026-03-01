@@ -1627,6 +1627,9 @@ type
     ModifiedOptions: TATEditorModifiedOptions;
     EventCaretSlow_Filter: string; //for CudaText
     EventCaretSlow_WithSel: boolean; //for CudaText
+    {$ifdef WINDOWS}
+    IMELangID: Word;
+    {$endif}
 
     //overrides
     constructor Create(AOwner: TComponent); override;
@@ -1912,6 +1915,7 @@ type
     procedure WMIME_StartComposition(var Msg:TMessage); message WM_IME_STARTCOMPOSITION;
     procedure WMIME_Composition(var Msg:TMessage); message WM_IME_COMPOSITION;
     procedure WMIME_EndComposition(var Msg:TMessage); message WM_IME_ENDCOMPOSITION;
+    procedure WMINPUTLANGCHANGE(var Msg:TMessage); message WM_INPUTLANGCHANGE;
     {$endif}
 
     {$ifdef LCLGTK2}
@@ -5432,6 +5436,7 @@ begin
 
   {$ifdef windows}
   FAdapterIME:= TATAdapterWindowsIME.Create;
+  IMELangID:=LoWord(DWORD_PTR(HKL(GetKeyboardLayout(0)))) and $03ff;
   {$endif}
 
   {$ifdef LCLCOCOA}
@@ -6910,6 +6915,12 @@ begin
   if Assigned(FAdapterIME) then
     FAdapterIME.ImeEndComposition(Self, Msg);
 end;
+
+procedure TATSynEdit.WMINPUTLANGCHANGE(var Msg: TMessage);
+begin
+  IMELangID := LoWord(DWORD_PTR(HKL(Msg.lParam))) and $03ff;
+end;
+
 {$endif}
 
 {$ifdef LCLCOCOA}
