@@ -368,7 +368,7 @@ var
   CharOffsets: TATIntFixedArray;
   NLineLenOriginal, NLineLenTrimmed: integer;
   NIndex, NIndexDecrement, NPixels: Int64;
-  NGapObjectWidth: integer;
+  NGapObjectWidth, NGapIndex: integer;
   WrapItem: TATWrapItem;
   GapItem: TATGapItem;
   Str: atString;
@@ -413,7 +413,7 @@ begin
     WrapItem:= AWrapInfo[NIndex];
     if (WrapItem.NFinal=TATWrapItemFinal.Final) and (AGaps.Count>0) then
     begin
-      GapItem:= AGaps.Find(WrapItem.NLineIndex);
+      GapItem:= AGaps.Find(WrapItem.NLineIndex, -1, NGapIndex);
       if Assigned(GapItem) then
       begin
         Inc(NPixels, GapItem.Size);
@@ -646,8 +646,8 @@ function TATSynEdit.DoScroll_IndentFromBottom(AWrapInfoIndex, AIndentVert: integ
 //index: original vert scroll pos
 //do dec(index), until offset (pixels) from caret to bottom is small enough
 var
-  NPixels, NPixelsNeeded, NIndex, NCell: integer;
   GapItem: TATGapItem;
+  NPixels, NPixelsNeeded, NIndex, NCell, NGapIndex: integer;
   i: integer;
 begin
   Result:= false;
@@ -676,7 +676,7 @@ begin
     //consider gap
     if FWrapInfo[NIndex].NFinal=TATWrapItemFinal.Final then
     begin
-      GapItem:= Gaps.Find(FWrapInfo[NIndex].NLineIndex);
+      GapItem:= Gaps.Find(FWrapInfo[NIndex].NLineIndex, -1, NGapIndex);
       if Assigned(GapItem) then
         Dec(NPixels, GapItem.Size);
     end;
@@ -684,7 +684,7 @@ begin
     //support gap before 1st line
     if (NIndex=0) then
     begin
-      GapItem:= Gaps.Find(-1);
+      GapItem:= Gaps.Find(-1, -1, NGapIndex);
       if Assigned(GapItem) then
         Dec(NPixels, GapItem.Size);
     end;

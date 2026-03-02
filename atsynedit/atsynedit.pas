@@ -3912,7 +3912,7 @@ var
   GapItemTop, GapItemCur: TATGapItem;
   GutterItem: TATGutterItem;
   WrapItem: TATWrapItem;
-  NLineCount, NFoldRangeWithCaret: integer;
+  NLineCount, NFoldRangeWithCaret, NGapIndex, NGapTopCoord: integer;
 begin
   //wrap turned off can cause bad scrollpos, fix it
   with AScrollVert do
@@ -4027,7 +4027,7 @@ begin
     //consider gap before 1st line
     if (AWrapIndex=0) and AScrollVert.TopGapVisible and (Gaps.SizeOfGapTop>0) then
     begin
-      GapItemTop:= Gaps.Find(-1);
+      GapItemTop:= Gaps.Find(-1, -1, NGapIndex);
       if Assigned(GapItemTop) then
         Inc(RectLine.Bottom, GapItemTop.Size);
     end;
@@ -4035,7 +4035,7 @@ begin
     //consider gap for this line
     if WrapItem.NFinal=TATWrapItemFinal.Final then
     begin
-      GapItemCur:= Gaps.Find(WrapItem.NLineIndex);
+      GapItemCur:= Gaps.Find(WrapItem.NLineIndex, -1, NGapIndex);
       if Assigned(GapItemCur) then
         Inc(RectLine.Bottom, GapItemCur.Size);
     end;
@@ -4060,15 +4060,33 @@ begin
       AWrapIndex,
       FParts);
 
-    //paint gap after line
+    //paint gap(s) after line
     if Assigned(GapItemCur) then
+    begin
+      NGapTopCoord:= RectLine.Top+ACharSize.Y;
       DoPaintGap(C,
         Rect(
           RectLine.Left,
-          RectLine.Top+ACharSize.Y,
+          NGapTopCoord,
           RectLine.Right,
-          RectLine.Top+ACharSize.Y+GapItemCur.Size),
+          NGapTopCoord+GapItemCur.Size),
         GapItemCur);
+
+      while (NGapIndex+1<Gaps.Count) and (Gaps.Items[NGapIndex+1].LineIndex=WrapItem.NLineIndex) do
+      begin
+        Inc(NGapTopCoord, GapItemCur.Size);
+        GapItemCur:= Gaps.Items[NGapIndex+1];
+        DoPaintGap(C,
+          Rect(
+            RectLine.Left,
+            NGapTopCoord,
+            RectLine.Right,
+            NGapTopCoord+GapItemCur.Size),
+          GapItemCur);
+        Inc(RectLine.Bottom, GapItemCur.Size);
+        Inc(NGapIndex);
+      end;
+    end;
 
     if AWithGutter then
       DoPaintGutterOfLine(C,
