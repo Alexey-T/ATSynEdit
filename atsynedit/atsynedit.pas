@@ -2346,8 +2346,8 @@ function _GapsSize(
   AEditorIndex: integer;
   ALineFrom, ALineTo: integer): integer;
 var
-  StItem: PATStringItem;
   GapItem: TATGapItem;
+  StItem: PATStringItem;
   iGap, iLine: integer;
   bHidden: boolean;
 begin
@@ -2356,46 +2356,12 @@ begin
   begin
     GapItem:= AGaps.Items[iGap];
     iLine:= GapItem.LineIndex;
-    if iLine=-1 then //very top gap has LineIndex=-1
-      bHidden:= false
-    else
+    if (iLine>=ALineFrom) and (iLine<=ALineTo) then
     begin
-      if not AStrings.IsIndexValid(iLine) then Break;
-      StItem:= AStrings.GetItemPtr(iLine);
-      if AEditorIndex=0 then
-        bHidden:= StItem^.Ex.Hidden_0 or (StItem^.Ex.FoldFrom_0>0)
-      else
-        bHidden:= StItem^.Ex.Hidden_1 or (StItem^.Ex.FoldFrom_1>0);
-    end;
-    if not bHidden then
-      if (GapItem.LineIndex>=ALineFrom) and (GapItem.LineIndex<=ALineTo) then
-        Inc(Result, GapItem.Size);
-  end;
-end;
-
-function _GapsSizeForOneLine(
-  AStrings: TATStrings;
-  AGaps: TATGaps;
-  AEditorIndex: integer;
-  ALineIndex: integer): integer;
-var
-  StItem: PATStringItem;
-  GapItem: TATGapItem;
-  iGap, iLine: integer;
-  bHidden: boolean;
-begin
-  Result:= 0;
-  for iGap:= 0 to AGaps.Count-1 do
-  begin
-    GapItem:= AGaps.Items[iGap];
-    iLine:= GapItem.LineIndex;
-    if iLine=ALineIndex then
-    begin
-      if iLine=-1 then //very top gap has LineIndex=-1
-        bHidden:= false
-      else
+      bHidden:= false;
+      //very top gap has LineIndex=-1, it is always visible
+      if AStrings.IsIndexValid(iLine) then
       begin
-        if not AStrings.IsIndexValid(iLine) then Break;
         StItem:= AStrings.GetItemPtr(iLine);
         if AEditorIndex=0 then
           bHidden:= StItem^.Ex.Hidden_0 or (StItem^.Ex.FoldFrom_0>0)
@@ -2406,6 +2372,15 @@ begin
         Inc(Result, GapItem.Size);
     end;
   end;
+end;
+
+function _GapsSizeForOneLine(
+  AStrings: TATStrings;
+  AGaps: TATGaps;
+  AEditorIndex: integer;
+  ALineIndex: integer): integer; inline;
+begin
+  Result:= _GapsSize(AStrings, AGaps, AEditorIndex, ALineIndex, ALineIndex);
 end;
 
 
