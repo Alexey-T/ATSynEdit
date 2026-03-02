@@ -679,12 +679,12 @@ function TATSynEdit.DoScroll_IndentFromBottom(AWrapInfoIndex, AIndentVert: integ
 //do dec(index), until offset (pixels) from caret to bottom is small enough
 var
   GapItem: TATGapItem;
-  NPixels, NPixelsNeeded, NIndex, NLineIndex, NCell, NGapIndex: integer;
+  NPixels, NPixelsNeeded, NWrapIndex, NLineIndex, NCell, NGapIndex: integer;
   i: integer;
 begin
   Result:= false;
-  NIndex:= AWrapInfoIndex;
-  if NIndex<=0 then exit;
+  NWrapIndex:= AWrapInfoIndex;
+  if NWrapIndex<=0 then exit;
 
   NCell:= FCharSize.Y;
   NPixels:= FRectMain.Height-NCell;
@@ -696,8 +696,8 @@ begin
 
   for i:= 1 to GetVisibleLines do
   begin
-    Dec(NIndex);
-    if NIndex<0 then
+    Dec(NWrapIndex);
+    if NWrapIndex<0 then
     begin
       FScrollVert.SetZero;
       Exit(true);
@@ -706,9 +706,9 @@ begin
     Dec(NPixels, NCell);
 
     //consider gap(s)
-    if FWrapInfo[NIndex].NFinal=TATWrapItemFinal.Final then
+    if FWrapInfo[NWrapIndex].NFinal=TATWrapItemFinal.Final then
     begin
-      NLineIndex:= FWrapInfo[NIndex].NLineIndex;
+      NLineIndex:= FWrapInfo[NWrapIndex].NLineIndex;
       NGapIndex:= Gaps.Find(NLineIndex);
       if NGapIndex>=0 then
       repeat
@@ -721,7 +721,7 @@ begin
     end;
 
     //support gap before 1st line
-    if (NIndex=0) then
+    if (NWrapIndex=0) then
     begin
       NGapIndex:= Gaps.Find(-1);
       if NGapIndex>=0 then
@@ -733,13 +733,13 @@ begin
 
     if NPixels<0 then
     begin
-      FScrollVert.NPos:= NIndex+1;
+      FScrollVert.NPos:= NWrapIndex+1;
       Exit(true);
     end;
 
     if NPixels<=NPixelsNeeded then
     begin
-      FScrollVert.NPos:= NIndex;
+      FScrollVert.NPos:= NWrapIndex;
       Exit(true);
     end;
   end;
