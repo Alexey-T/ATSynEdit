@@ -332,7 +332,7 @@ begin
         ));
       //consider top gap
       if AScrollVert.TopGapVisible then
-        Inc(Result.Y, _GapsSizeForOneLine(AStrings, AGaps, AEditorIndex, -1));
+        Inc(Result.Y, _GapsSize(AStrings, AGaps, AEditorIndex, -1, -1));
     end;
 
     //coords of corner
@@ -401,7 +401,7 @@ begin
   //support gap before 1st line
   if (NWrapIndex=0) and AScrollVert.TopGapVisible and (AGaps.Count>0) then
   begin
-    NGapSizeTop:= _GapsSizeForOneLine(AStrings, AGaps, AEditorIndex, -1);
+    NGapSizeTop:= _GapsSize(AStrings, AGaps, AEditorIndex, -1, -1);
     if P.Y-ARect.Top<NGapSizeTop then
     begin
       NGapIndex:= -1;
@@ -706,14 +706,14 @@ begin
     if FWrapInfo[NWrapIndex].NFinal=TATWrapItemFinal.Final then
     begin
       NLineIndex:= FWrapInfo[NWrapIndex].NLineIndex;
-      NGapsSize:= _GapsSizeForOneLine(Strings, Gaps, EditorIndex, NLineIndex);
+      NGapsSize:= GapsSize(NLineIndex, NLineIndex);
       Dec(NPixels, NGapsSize);
     end;
 
     //support gap before 1st line
     if (NWrapIndex=0) then
     begin
-      NGapsSize:= _GapsSizeForOneLine(Strings, Gaps, EditorIndex, -1);
+      NGapsSize:= GapsSize(-1, -1);
       Dec(NPixels, NGapsSize);
     end;
 
