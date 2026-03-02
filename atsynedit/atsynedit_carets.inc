@@ -364,14 +364,14 @@ function GenericClientPosToCaretPos(
   AAfterEofUsesLastLen: boolean;
   AEditorIndex: integer): TPoint;
 var
-  CharOffsets: TATIntFixedArray;
-  NLineLenOriginal, NLineLenTrimmed: integer;
-  NWrapIndex, NIndexDecrement, NPixels: Int64;
-  NGapObjectWidth, NGapIndex: integer;
   WrapItem: TATWrapItem;
   GapItem: TATGapItem;
-  Str: atString;
+  CharOffsets: TATIntFixedArray;
+  NWrapIndex, NIndexDecrement, NPixels: Int64;
   NStrLen: SizeInt;
+  NLineLenOriginal, NLineLenTrimmed: integer;
+  NGapObjectWidth, NGapIndex, NGapTopSize, NGapSizePartial: integer;
+  Str: atString;
   bAllowVirtualPos, bGapGoesToEnd, bDoBreakRepeat: boolean;
 begin
   Result.X:= 0;
@@ -400,8 +400,34 @@ begin
 
   //support gap before 1st line
   if (NWrapIndex=0) and AScrollVert.TopGapVisible and (AGaps.Count>0) then
-    Inc(NPixels,
-        _GapsSizeForOneLine(AStrings, AGaps, AEditorIndex, -1));
+  begin
+    NGapTopSize:= _GapsSizeForOneLine(AStrings, AGaps, AEditorIndex, -1);
+    if P.Y<NGapTopSize then
+    begin
+      NGapIndex:= -1;
+      NGapSizePartial:= 0;
+      repeat
+        NGapIndex:= AGaps.Find(-1, NGapIndex+1);
+        if NGapIndex<0 then Break;
+        GapItem:= AGaps.Items[NGapIndex];
+        if P.Y<NGapSizePartial+GapItem.Size then
+        begin
+          Result.X:= 0;
+          Result.Y:= 0;
+          APosDetails.OnGapItem:= GapItem;
+          APosDetails.OnGapPos.Y:= P.Y-NGapSizePartial;
+          NGapObjectWidth:= GapItem.GetObjectWidth;
+          if NGapObjectWidth>0 then
+            APosDetails.OnGapPos.X:= P.X - GetGapBitmapPosLeft(ARect, NGapObjectWidth)
+          else
+            APosDetails.OnGapPos.X:= P.X - ARect.Left;
+          Exit;
+        end;
+        Inc(NGapSizePartial, GapItem.Size);
+      until false;
+    end;
+    Inc(NPixels, NGapTopSize);
+  end;
 
   repeat
     if not AWrapInfo.IsIndexValid(NWrapIndex) then
