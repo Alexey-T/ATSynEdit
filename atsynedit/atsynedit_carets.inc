@@ -373,7 +373,7 @@ var
   GapItem: TATGapItem;
   Str: atString;
   NStrLen: SizeInt;
-  bAllowVirtualPos, bGapGoesToEnd, bBreakIndexIncrement: boolean;
+  bAllowVirtualPos, bGapGoesToEnd, bDisableIndexIncrement: boolean;
 begin
   Result.X:= 0;
   Result.Y:= -1;
@@ -417,7 +417,7 @@ begin
       if NGapIndex>=0 then
       begin
         GapItem:= AGaps[NGapIndex];
-        bBreakIndexIncrement:= false;
+        bDisableIndexIncrement:= false;
         Inc(NPixels, GapItem.Size);
         if NPixels>P.Y then
         begin
@@ -465,14 +465,14 @@ begin
                     Inc(NWrapIndex);
                 end;
             end;
-            bBreakIndexIncrement:= true;
+            bDisableIndexIncrement:= true;
             Break;
           end;
         end;
       end;
     end;
 
-    if not bBreakIndexIncrement then
+    if not bDisableIndexIncrement then
       Inc(NWrapIndex);
   until false;
 
