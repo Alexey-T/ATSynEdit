@@ -706,14 +706,14 @@ begin
     if FWrapInfo[NWrapIndex].NFinal=TATWrapItemFinal.Final then
     begin
       NLineIndex:= FWrapInfo[NWrapIndex].NLineIndex;
-      NGapsSize:= GapsSize(NLineIndex);
+      NGapsSize:= GapsSizeForLine(NLineIndex);
       Dec(NPixels, NGapsSize);
     end;
 
     //support gap before 1st line
     if (NWrapIndex=0) then
     begin
-      NGapsSize:= GapsSize(-1);
+      NGapsSize:= GapsSizeForLine(-1);
       Dec(NPixels, NGapsSize);
     end;
 

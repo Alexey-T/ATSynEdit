@@ -1146,8 +1146,8 @@ type
     function FindLineNextNonspaceEnd(const ALine: UnicodeString; AFromOffset: integer): integer;
     function FindUnpairedBracketBackward(const ALine: UnicodeString;
       ALineIndex, AColumn: integer; out ABracketChar: char): integer;
-    function GapsSize(ALineFrom, ALineTo: integer): integer;
-    function GapsSize(ALine: integer): integer;
+    function GapsSizeForRange(ALineFrom, ALineTo: integer): integer;
+    function GapsSizeForLine(ALine: integer): integer;
     function GetLineIndentInSpaces(ALine: integer): integer;
     function GetLineIndentInPixels(ALine: integer; const ACharSize: TATEditorCharSize): integer;
     procedure InitClipboardExData(out Data: TATEditorClipboardExData);
@@ -3102,10 +3102,10 @@ begin
       NPos:= Max(0, FScrollVert.NPos);
       if FWrapInfo.IsIndexValid(NPos) then
         NLineIndex:= FWrapInfo.Data[NPos].NLineIndex;
-      NGapPos:= GapsSize(-1, NLineIndex-1);
+      NGapPos:= GapsSizeForRange(-1, NLineIndex-1);
     end;
 
-    NGapAll:= GapsSize(-1, MaxInt);
+    NGapAll:= GapsSizeForRange(-1, MaxInt);
   end;
 
   if not ModeOneLine then
@@ -4031,7 +4031,7 @@ begin
     begin
       NGapIndexTop:= Gaps.Find(-1, 0);
       Inc(RectLine.Bottom,
-          GapsSize(-1));
+          GapsSizeForLine(-1));
     end;
 
     //consider gap(s) for this line
@@ -4039,7 +4039,7 @@ begin
     begin
       NGapIndexCurrent:= Gaps.Find(WrapItem.NLineIndex, 0);
       Inc(RectLine.Bottom,
-          GapsSize(WrapItem.NLineIndex));
+          GapsSizeForLine(WrapItem.NLineIndex));
     end;
 
     //paint gap before 1st line
@@ -11684,12 +11684,12 @@ begin
   end;
 end;
 
-function TATSynEdit.GapsSize(ALineFrom, ALineTo: integer): integer;
+function TATSynEdit.GapsSizeForRange(ALineFrom, ALineTo: integer): integer;
 begin
   Result:= _GapsSize(Strings, Gaps, EditorIndex, ALineFrom, ALineTo);
 end;
 
-function TATSynEdit.GapsSize(ALine: integer): integer;
+function TATSynEdit.GapsSizeForLine(ALine: integer): integer;
 begin
   Result:= _GapsSize(Strings, Gaps, EditorIndex, ALine, ALine);
 end;
