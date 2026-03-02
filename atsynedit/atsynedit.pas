@@ -4023,21 +4023,28 @@ begin
     WrapItem:= FWrapInfo[AWrapIndex];
     GapItemTop:= nil;
     GapItemCur:= nil;
+    NGapIndex:= -1;
 
     //consider gap before 1st line
     if (AWrapIndex=0) and AScrollVert.TopGapVisible and (Gaps.SizeOfGapTop>0) then
     begin
-      GapItemTop:= Gaps.Find(-1, -1, NGapIndex);
-      if Assigned(GapItemTop) then
+      NGapIndex:= Gaps.Find(-1);
+      if NGapIndex>=0 then
+      begin
+        GapItemTop:= Gaps.Items[NGapIndex];
         Inc(RectLine.Bottom, GapItemTop.Size);
+      end;
     end;
 
     //consider gap for this line
     if WrapItem.NFinal=TATWrapItemFinal.Final then
     begin
-      GapItemCur:= Gaps.Find(WrapItem.NLineIndex, -1, NGapIndex);
-      if Assigned(GapItemCur) then
+      NGapIndex:= Gaps.Find(WrapItem.NLineIndex);
+      if NGapIndex>=0 then
+      begin
+        GapItemCur:= Gaps[NGapIndex];
         Inc(RectLine.Bottom, GapItemCur.Size);
+      end;
     end;
 
     //paint gap before 1st line

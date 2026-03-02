@@ -55,7 +55,7 @@ type
     function Add(ALineIndex, ASize: integer; ABitmap: TBitmap; AForm: TCustomForm;
       ATag: integer;
       AColor: TColor=clNone; ADeleteOnDelLine: boolean=true): boolean;
-    function Find(ALineIndex: integer; ATag: integer; out AGapIndex: integer): TATGapItem;
+    function Find(ALineIndex: integer; ATag: integer=-1): integer;
     function DeleteForLineRange(ALineFrom, ALineTo: integer): boolean;
     function DeleteWithTag(ATag: integer): boolean;
     property SizeOfGapTop: integer read FSizeOfGapTop;
@@ -231,7 +231,7 @@ begin
   Result:= true;
 end;
 
-function TATGaps.Find(ALineIndex: integer; ATag: integer; out AGapIndex: integer): TATGapItem;
+function TATGaps.Find(ALineIndex: integer; ATag: integer=-1): integer;
 var
   Item: TATGapItem;
   i: integer;
@@ -241,14 +241,9 @@ begin
     Item:= Items[i];
     if (Item.LineIndex=ALineIndex) and
       ((ATag<0) or (Item.Tag=ATag)) then
-    begin
-      AGapIndex:= i;
-      Result:= Item;
-      Exit;
-    end;
+      Exit(i);
   end;
-  Result:= nil;
-  AGapIndex:= -1;
+  Result:= -1;
 end;
 
 procedure TATGaps.Update(AChange: TATLineChangeKind; ALine, AItemCount: integer);

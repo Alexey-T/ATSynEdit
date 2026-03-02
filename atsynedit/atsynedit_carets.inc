@@ -413,9 +413,10 @@ begin
     WrapItem:= AWrapInfo[NWrapIndex];
     if (WrapItem.NFinal=TATWrapItemFinal.Final) and (AGaps.Count>0) then
     begin
-      GapItem:= AGaps.Find(WrapItem.NLineIndex, -1, NGapIndex);
-      if Assigned(GapItem) then
+      NGapIndex:= AGaps.Find(WrapItem.NLineIndex);
+      if NGapIndex>=0 then
       begin
+        GapItem:= AGaps[NGapIndex];
         bBreakIndexIncrement:= false;
         Inc(NPixels, GapItem.Size);
         if NPixels>P.Y then
@@ -707,17 +708,23 @@ begin
     //consider gap
     if FWrapInfo[NIndex].NFinal=TATWrapItemFinal.Final then
     begin
-      GapItem:= Gaps.Find(FWrapInfo[NIndex].NLineIndex, -1, NGapIndex);
-      if Assigned(GapItem) then
+      NGapIndex:= Gaps.Find(FWrapInfo[NIndex].NLineIndex);
+      if NGapIndex>=0 then
+      begin
+        GapItem:= Gaps[NGapIndex];
         Dec(NPixels, GapItem.Size);
+      end;
     end;
 
     //support gap before 1st line
     if (NIndex=0) then
     begin
-      GapItem:= Gaps.Find(-1, -1, NGapIndex);
-      if Assigned(GapItem) then
+      NGapIndex:= Gaps.Find(-1);
+      if NGapIndex>=0 then
+      begin
+        GapItem:= Gaps[NGapIndex];
         Dec(NPixels, GapItem.Size);
+      end;
     end;
 
     if NPixels<0 then
