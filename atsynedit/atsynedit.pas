@@ -2374,6 +2374,41 @@ begin
   end;
 end;
 
+function _GapsSizeForOneLine(
+  AStrings: TATStrings;
+  AGaps: TATGaps;
+  AEditorIndex: integer;
+  ALineIndex: integer): integer;
+var
+  StItem: PATStringItem;
+  GapItem: TATGapItem;
+  iGap, iLine: integer;
+  bHidden: boolean;
+begin
+  Result:= 0;
+  for iGap:= 0 to AGaps.Count-1 do
+  begin
+    GapItem:= AGaps.Items[iGap];
+    iLine:= GapItem.LineIndex;
+    if iLine=ALineIndex then
+    begin
+      if iLine=-1 then //very top gap has LineIndex=-1
+        bHidden:= false
+      else
+      begin
+        if not AStrings.IsIndexValid(iLine) then Break;
+        StItem:= AStrings.GetItemPtr(iLine);
+        if AEditorIndex=0 then
+          bHidden:= StItem^.Ex.Hidden_0
+        else
+          bHidden:= StItem^.Ex.Hidden_1;
+      end;
+      if not bHidden then
+        Inc(Result, GapItem.Size);
+    end;
+  end;
+end;
+
 
 { TATMinimapThread }
 
@@ -3909,10 +3944,10 @@ procedure TATSynEdit.DoPaintText(C: TCanvas;
   AWrapIndex: integer);
 var
   RectLine: TRect;
-  GapItemTop, GapItemCur: TATGapItem;
+  GapItem: TATGapItem;
   GutterItem: TATGutterItem;
   WrapItem: TATWrapItem;
-  NLineCount, NFoldRangeWithCaret, NGapIndex, NGapTopCoord: integer;
+  NLineCount, NFoldRangeWithCaret, NGapIndexTop, NGapIndexCurrent, NGapTopCoord: integer;
 begin
   //wrap turned off can cause bad scrollpos, fix it
   with AScrollVert do
@@ -4021,44 +4056,40 @@ begin
     end;
 
     WrapItem:= FWrapInfo[AWrapIndex];
-    GapItemTop:= nil;
-    GapItemCur:= nil;
-    NGapIndex:= -1;
+    GapItem:= nil;
+    NGapIndexTop:= -1;
+    NGapIndexCurrent:= -1;
 
     //consider gap before 1st line
     if (AWrapIndex=0) and AScrollVert.TopGapVisible and (Gaps.SizeOfGapTop>0) then
     begin
-      NGapIndex:= Gaps.Find(-1);
-      if NGapIndex>=0 then
-      begin
-        GapItemTop:= Gaps.Items[NGapIndex];
-        Inc(RectLine.Bottom, GapItemTop.Size);
-      end;
+      NGapIndexTop:= Gaps.Find(-1, 0);
+      Inc(RectLine.Bottom,
+          _GapsSizeForOneLine(Strings, Gaps, EditorIndex, -1));
     end;
 
-    //consider gap for this line
+    //consider gap(s) for this line
     if WrapItem.NFinal=TATWrapItemFinal.Final then
     begin
-      NGapIndex:= Gaps.Find(WrapItem.NLineIndex);
-      if NGapIndex>=0 then
-      begin
-        GapItemCur:= Gaps[NGapIndex];
-        Inc(RectLine.Bottom, GapItemCur.Size);
-      end;
+      NGapIndexCurrent:= Gaps.Find(WrapItem.NLineIndex, 0);
+      Inc(RectLine.Bottom,
+          _GapsSizeForOneLine(Strings, Gaps, EditorIndex, WrapItem.NLineIndex));
     end;
 
     //paint gap before 1st line
-    if Assigned(GapItemTop) then
-    begin
+    if NGapIndexTop>=0 then
+    repeat
+      GapItem:= Gaps[NGapIndexTop];
       DoPaintGap(C,
         Rect(
           RectLine.Left,
           RectLine.Top,
           RectLine.Right,
-          RectLine.Top+GapItemTop.Size),
-        GapItemTop);
-      Inc(RectLine.Top, GapItemTop.Size);
-    end;
+          RectLine.Top+GapItem.Size),
+        GapItem);
+      Inc(RectLine.Top, GapItem.Size);
+      NGapIndexTop:= Gaps.Find(-1, NGapIndexTop+1);
+    until NGapIndexTop<0;
 
     DoPaintLine(C,
       RectLine,
@@ -4068,32 +4099,20 @@ begin
       FParts);
 
     //paint gap(s) after line
-    if Assigned(GapItemCur) then
-    begin
-      NGapTopCoord:= RectLine.Top+ACharSize.Y;
+    NGapTopCoord:= RectLine.Top+ACharSize.Y;
+    if NGapIndexCurrent>=0 then
+    repeat
+      GapItem:= Gaps[NGapIndexCurrent];
       DoPaintGap(C,
         Rect(
           RectLine.Left,
           NGapTopCoord,
           RectLine.Right,
-          NGapTopCoord+GapItemCur.Size),
-        GapItemCur);
-
-      while (NGapIndex+1<Gaps.Count) and (Gaps.Items[NGapIndex+1].LineIndex=WrapItem.NLineIndex) do
-      begin
-        Inc(NGapTopCoord, GapItemCur.Size);
-        GapItemCur:= Gaps.Items[NGapIndex+1];
-        DoPaintGap(C,
-          Rect(
-            RectLine.Left,
-            NGapTopCoord,
-            RectLine.Right,
-            NGapTopCoord+GapItemCur.Size),
-          GapItemCur);
-        Inc(RectLine.Bottom, GapItemCur.Size);
-        Inc(NGapIndex);
-      end;
-    end;
+          NGapTopCoord+GapItem.Size),
+        GapItem);
+      Inc(NGapTopCoord, GapItem.Size);
+      NGapIndexCurrent:= Gaps.Find(WrapItem.NLineIndex, NGapIndexCurrent+1);
+    until NGapIndexCurrent<0;
 
     if AWithGutter then
       DoPaintGutterOfLine(C,

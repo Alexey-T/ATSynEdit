@@ -410,67 +410,39 @@ begin
     Inc(NPixels, ATabHelper.CharSize.Y);
     if NPixels>P.Y then Break;
 
-    //consider gap
+    //consider gap(s)
     WrapItem:= AWrapInfo[NWrapIndex];
+    NGapIndex:= -1;
     if (WrapItem.NFinal=TATWrapItemFinal.Final) and (AGaps.Count>0) then
-    begin
-      NGapIndex:= AGaps.Find(WrapItem.NLineIndex);
-      if NGapIndex>=0 then
+    repeat
+      NGapIndex:= AGaps.Find(WrapItem.NLineIndex, NGapIndex+1);
+      if NGapIndex<0 then Break;
+      GapItem:= AGaps[NGapIndex];
+      Inc(NPixels, GapItem.Size);
+      if NPixels>P.Y then
       begin
-        GapItem:= AGaps[NGapIndex];
-        Inc(NPixels, GapItem.Size);
-        if NPixels>P.Y then
-        begin
-          APosDetails.OnGapItem:= GapItem;
-          APosDetails.OnGapPos.Y:= P.Y - (NPixels-GapItem.Size);
-          NGapObjectWidth:= GapItem.GetObjectWidth;
-          if NGapObjectWidth>0 then
-            APosDetails.OnGapPos.X:= P.X - GetGapBitmapPosLeft(ARect, NGapObjectWidth)
-          else
-            APosDetails.OnGapPos.X:= P.X - ARect.Left;
-
-          case AGapCoordAction of
-            TATEditorGapCoordAction.ToLineEnd:
-              bGapGoesToEnd:= true;
-            TATEditorGapCoordAction.MoveDown:
-              begin
-                if AWrapInfo.IsIndexValid(NWrapIndex+1) then
-                  Inc(NWrapIndex);
-              end;
-          end;
-          Break;
-        end
+        APosDetails.OnGapItem:= GapItem;
+        APosDetails.OnGapPos.Y:= P.Y - (NPixels-GapItem.Size);
+        NGapObjectWidth:= GapItem.GetObjectWidth;
+        if NGapObjectWidth>0 then
+          APosDetails.OnGapPos.X:= P.X - GetGapBitmapPosLeft(ARect, NGapObjectWidth)
         else
-        while (NGapIndex+1<AGaps.Count) and (AGaps[NGapIndex+1].LineIndex=WrapItem.NLineIndex) do
-        begin
-          GapItem:= AGaps[NGapIndex+1];
-          Inc(NGapIndex);
-          Inc(NPixels, GapItem.Size);
-          if NPixels>P.Y then
-          begin
-            APosDetails.OnGapItem:= GapItem;
-            APosDetails.OnGapPos.Y:= P.Y - (NPixels-GapItem.Size);
-            NGapObjectWidth:= GapItem.GetObjectWidth;
-            if NGapObjectWidth>0 then
-              APosDetails.OnGapPos.X:= P.X - GetGapBitmapPosLeft(ARect, NGapObjectWidth)
-            else
-              APosDetails.OnGapPos.X:= P.X - ARect.Left;
+          APosDetails.OnGapPos.X:= P.X - ARect.Left;
 
-            case AGapCoordAction of
-              TATEditorGapCoordAction.ToLineEnd:
-                bGapGoesToEnd:= true;
-              TATEditorGapCoordAction.MoveDown:
-                begin
-                  if AWrapInfo.IsIndexValid(NWrapIndex+1) then
-                    Inc(NWrapIndex);
-                end;
+        case AGapCoordAction of
+          TATEditorGapCoordAction.ToLineEnd:
+            bGapGoesToEnd:= true;
+          TATEditorGapCoordAction.MoveDown:
+            begin
+              if AWrapInfo.IsIndexValid(NWrapIndex+1) then
+                Inc(NWrapIndex);
             end;
-            bDoBreakRepeat:= true;
-            Break;
-          end;
         end;
+
+        bDoBreakRepeat:= true;
+        Break;
       end;
-    end;
+    until false;
 
     if bDoBreakRepeat then Break;
     Inc(NWrapIndex);
@@ -678,8 +650,7 @@ function TATSynEdit.DoScroll_IndentFromBottom(AWrapInfoIndex, AIndentVert: integ
 //index: original vert scroll pos
 //do dec(index), until offset (pixels) from caret to bottom is small enough
 var
-  GapItem: TATGapItem;
-  NPixels, NPixelsNeeded, NWrapIndex, NLineIndex, NCell, NGapIndex: integer;
+  NPixels, NPixelsNeeded, NWrapIndex, NLineIndex, NCell, NGapsSize: integer;
   i: integer;
 begin
   Result:= false;
@@ -709,24 +680,15 @@ begin
     if FWrapInfo[NWrapIndex].NFinal=TATWrapItemFinal.Final then
     begin
       NLineIndex:= FWrapInfo[NWrapIndex].NLineIndex;
-      NGapIndex:= Gaps.Find(NLineIndex);
-      if NGapIndex>=0 then
-      repeat
-        GapItem:= Gaps[NGapIndex];
-        Dec(NPixels, GapItem.Size);
-        Inc(NGapIndex);
-      until (NGapIndex>=Gaps.Count) or (Gaps[NGapIndex].LineIndex<>NLineIndex);
+      NGapsSize:= _GapsSizeForOneLine(Strings, Gaps, EditorIndex, NLineIndex);
+      Dec(NPixels, NGapsSize);
     end;
 
     //support gap before 1st line
     if (NWrapIndex=0) then
     begin
-      NGapIndex:= Gaps.Find(-1);
-      if NGapIndex>=0 then
-      begin
-        GapItem:= Gaps[NGapIndex];
-        Dec(NPixels, GapItem.Size);
-      end;
+      NGapsSize:= _GapsSizeForOneLine(Strings, Gaps, EditorIndex, -1);
+      Dec(NPixels, NGapsSize);
     end;
 
     if NPixels<0 then

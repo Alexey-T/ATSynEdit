@@ -55,7 +55,7 @@ type
     function Add(ALineIndex, ASize: integer; ABitmap: TBitmap; AForm: TCustomForm;
       ATag: integer;
       AColor: TColor=clNone; ADeleteOnDelLine: boolean=true): boolean;
-    function Find(ALineIndex: integer; ATag: integer=-1): integer;
+    function Find(ALineIndex, AFindFromIndex: integer): integer;
     function DeleteForLineRange(ALineFrom, ALineTo: integer): boolean;
     function DeleteWithTag(ATag: integer): boolean;
     property SizeOfGapTop: integer read FSizeOfGapTop;
@@ -206,11 +206,9 @@ function TATGaps.Add(ALineIndex, ASize: integer; ABitmap: TBitmap;
   ADeleteOnDelLine: boolean): boolean;
 var
   Item: TATGapItem;
-  N: integer;
 begin
   Result:= false;
   if (ALineIndex<-1) then exit;
-  //if Find(ALineIndex, -1, N)<>nil then exit;
 
   Item:= TATGapItem.Create;
   Item.LineIndex:= ALineIndex;
@@ -231,18 +229,18 @@ begin
   Result:= true;
 end;
 
-function TATGaps.Find(ALineIndex: integer; ATag: integer=-1): integer;
+function TATGaps.Find(ALineIndex, AFindFromIndex: integer): integer;
 var
   Item: TATGapItem;
   i: integer;
 begin
-  for i:= 0 to FList.Count-1 do
-  begin
-    Item:= Items[i];
-    if (Item.LineIndex=ALineIndex) and
-      ((ATag<0) or (Item.Tag=ATag)) then
-      Exit(i);
-  end;
+  if IsIndexValid(AFindFromIndex) then
+    for i:= AFindFromIndex to FList.Count-1 do
+    begin
+      Item:= Items[i];
+      if Item.LineIndex=ALineIndex then
+        Exit(i);
+    end;
   Result:= -1;
 end;
 
