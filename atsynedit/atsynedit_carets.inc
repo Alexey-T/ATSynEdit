@@ -373,7 +373,7 @@ var
   GapItem: TATGapItem;
   Str: atString;
   NStrLen: SizeInt;
-  bAllowVirtualPos, bGapGoesToEnd: boolean;
+  bAllowVirtualPos, bGapGoesToEnd, bBreakIndexIncrement: boolean;
 begin
   Result.X:= 0;
   Result.Y:= -1;
@@ -416,6 +416,7 @@ begin
       GapItem:= AGaps.Find(WrapItem.NLineIndex, -1, NGapIndex);
       if Assigned(GapItem) then
       begin
+        bBreakIndexIncrement:= false;
         Inc(NPixels, GapItem.Size);
         if NPixels>P.Y then
         begin
@@ -463,13 +464,15 @@ begin
                     Inc(NIndex);
                 end;
             end;
+            bBreakIndexIncrement:= true;
             Break;
           end;
         end;
       end;
     end;
 
-    Inc(NIndex);
+    if not bBreakIndexIncrement then
+      Inc(NIndex);
   until false;
 
   //click above all text
