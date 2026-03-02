@@ -1147,6 +1147,7 @@ type
     function FindUnpairedBracketBackward(const ALine: UnicodeString;
       ALineIndex, AColumn: integer; out ABracketChar: char): integer;
     function GapsSize(ALineFrom, ALineTo: integer): integer;
+    function GapsSize(ALine: integer): integer;
     function GetLineIndentInSpaces(ALine: integer): integer;
     function GetLineIndentInPixels(ALine: integer; const ACharSize: TATEditorCharSize): integer;
     procedure InitClipboardExData(out Data: TATEditorClipboardExData);
@@ -4030,7 +4031,7 @@ begin
     begin
       NGapIndexTop:= Gaps.Find(-1, 0);
       Inc(RectLine.Bottom,
-          GapsSize(-1, -1));
+          GapsSize(-1));
     end;
 
     //consider gap(s) for this line
@@ -4038,7 +4039,7 @@ begin
     begin
       NGapIndexCurrent:= Gaps.Find(WrapItem.NLineIndex, 0);
       Inc(RectLine.Bottom,
-          GapsSize(WrapItem.NLineIndex, WrapItem.NLineIndex));
+          GapsSize(WrapItem.NLineIndex));
     end;
 
     //paint gap before 1st line
@@ -11686,6 +11687,11 @@ end;
 function TATSynEdit.GapsSize(ALineFrom, ALineTo: integer): integer;
 begin
   Result:= _GapsSize(Strings, Gaps, EditorIndex, ALineFrom, ALineTo);
+end;
+
+function TATSynEdit.GapsSize(ALine: integer): integer;
+begin
+  Result:= _GapsSize(Strings, Gaps, EditorIndex, ALine, ALine);
 end;
 
 
