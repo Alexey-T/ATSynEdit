@@ -715,9 +715,7 @@ begin
         GapItem:= Gaps[NGapIndex];
         Dec(NPixels, GapItem.Size);
         Inc(NGapIndex);
-        if (NGapIndex>=Gaps.Count) or (Gaps[NGapIndex].LineIndex<>NLineIndex) then
-          Break;
-      until false;
+      until (NGapIndex>=Gaps.Count) or (Gaps[NGapIndex].LineIndex<>NLineIndex);
     end;
 
     //support gap before 1st line
