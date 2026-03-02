@@ -437,6 +437,34 @@ begin
               end;
           end;
           Break;
+        end
+        else
+        while (NGapIndex+1<AGaps.Count) and (AGaps[NGapIndex+1].LineIndex=WrapItem.NLineIndex) do
+        begin
+          GapItem:= AGaps[NGapIndex+1];
+          Inc(NGapIndex);
+          Inc(NPixels, GapItem.Size);
+          if NPixels>P.Y then
+          begin
+            APosDetails.OnGapItem:= GapItem;
+            APosDetails.OnGapPos.Y:= P.Y - (NPixels-GapItem.Size);
+            NGapObjectWidth:= GapItem.GetObjectWidth;
+            if NGapObjectWidth>0 then
+              APosDetails.OnGapPos.X:= P.X - GetGapBitmapPosLeft(ARect, NGapObjectWidth)
+            else
+              APosDetails.OnGapPos.X:= P.X - ARect.Left;
+
+            case AGapCoordAction of
+              TATEditorGapCoordAction.ToLineEnd:
+                bGapGoesToEnd:= true;
+              TATEditorGapCoordAction.MoveDown:
+                begin
+                  if AWrapInfo.IsIndexValid(NIndex+1) then
+                    Inc(NIndex);
+                end;
+            end;
+            Break;
+          end;
         end;
       end;
     end;
