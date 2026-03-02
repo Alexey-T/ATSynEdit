@@ -2361,7 +2361,7 @@ begin
     if (iLine>=ALineFrom) and (iLine<=ALineTo) then
     begin
       bHidden:= false;
-      //very top gap has LineIndex=-1, it is always visible
+      //gap can be before 1st line, it has LineIndex=-1, it is always visible
       if AStrings.IsIndexValid(iLine) then
       begin
         StItem:= AStrings.GetItemPtr(iLine);
