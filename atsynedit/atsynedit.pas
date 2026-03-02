@@ -2340,7 +2340,7 @@ uses
 {$endif}
 
 
-function _GapsSizeForRange(
+function _GapsSize(
   AStrings: TATStrings;
   AGaps: TATGaps;
   AEditorIndex: integer;
@@ -3135,10 +3135,10 @@ begin
       NPos:= Max(0, FScrollVert.NPos);
       if FWrapInfo.IsIndexValid(NPos) then
         NLineIndex:= FWrapInfo.Data[NPos].NLineIndex;
-      NGapPos:= _GapsSizeForRange(Strings, Gaps, EditorIndex, -1, NLineIndex-1);
+      NGapPos:= _GapsSize(Strings, Gaps, EditorIndex, -1, NLineIndex-1);
     end;
 
-    NGapAll:= _GapsSizeForRange(Strings, Gaps, EditorIndex, -1, MaxInt);
+    NGapAll:= _GapsSize(Strings, Gaps, EditorIndex, -1, MaxInt);
   end;
 
   if not ModeOneLine then
@@ -6820,7 +6820,7 @@ begin
     repeat
       NLineIndex:= AWrapInfo.Data[NPos].NLineIndex - 1;
       NPixels:= APos - NPos* AInfo.CharSizeScaled div ATEditorCharXScale
-        - _GapsSizeForRange(AStrings, AGaps, AEditorIndex, -1, NLineIndex);
+        - _GapsSize(AStrings, AGaps, AEditorIndex, -1, NLineIndex);
       if NPos=0 then Break;
       if NLineIndex=0 then Break;
       if NPixels>=0 then Break;
