@@ -679,7 +679,7 @@ function TATSynEdit.DoScroll_IndentFromBottom(AWrapInfoIndex, AIndentVert: integ
 //do dec(index), until offset (pixels) from caret to bottom is small enough
 var
   GapItem: TATGapItem;
-  NPixels, NPixelsNeeded, NIndex, NCell, NGapIndex: integer;
+  NPixels, NPixelsNeeded, NIndex, NLineIndex, NCell, NGapIndex: integer;
   i: integer;
 begin
   Result:= false;
@@ -705,15 +705,19 @@ begin
 
     Dec(NPixels, NCell);
 
-    //consider gap
+    //consider gap(s)
     if FWrapInfo[NIndex].NFinal=TATWrapItemFinal.Final then
     begin
-      NGapIndex:= Gaps.Find(FWrapInfo[NIndex].NLineIndex);
+      NLineIndex:= FWrapInfo[NIndex].NLineIndex;
+      NGapIndex:= Gaps.Find(NLineIndex);
       if NGapIndex>=0 then
-      begin
+      repeat
         GapItem:= Gaps[NGapIndex];
         Dec(NPixels, GapItem.Size);
-      end;
+        Inc(NGapIndex);
+        if (NGapIndex>=Gaps.Count) or (Gaps[NGapIndex].LineIndex<>NLineIndex) then
+          Break;
+      until false;
     end;
 
     //support gap before 1st line
