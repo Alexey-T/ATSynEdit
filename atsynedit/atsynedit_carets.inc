@@ -370,7 +370,7 @@ var
   NWrapIndex, NIndexDecrement, NPixels: Int64;
   NStrLen: SizeInt;
   NLineLenOriginal, NLineLenTrimmed: integer;
-  NGapObjectWidth, NGapIndex, NGapTopSize, NGapSizePartial: integer;
+  NGapObjectWidth, NGapIndex, NGapSizeTop, NGapSizePartial: integer;
   Str: atString;
   bAllowVirtualPos, bGapGoesToEnd, bDoBreakRepeat: boolean;
 begin
@@ -401,8 +401,8 @@ begin
   //support gap before 1st line
   if (NWrapIndex=0) and AScrollVert.TopGapVisible and (AGaps.Count>0) then
   begin
-    NGapTopSize:= _GapsSizeForOneLine(AStrings, AGaps, AEditorIndex, -1);
-    if P.Y<NGapTopSize then
+    NGapSizeTop:= _GapsSizeForOneLine(AStrings, AGaps, AEditorIndex, -1);
+    if P.Y<NGapSizeTop then
     begin
       NGapIndex:= -1;
       NGapSizePartial:= 0;
@@ -426,7 +426,7 @@ begin
         Inc(NGapSizePartial, GapItem.Size);
       until false;
     end;
-    Inc(NPixels, NGapTopSize);
+    Inc(NPixels, NGapSizeTop);
   end;
 
   repeat
