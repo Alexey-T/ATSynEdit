@@ -2340,12 +2340,11 @@ uses
 {$endif}
 
 
-function _GapsSize(
+function _GapsSizeForRange(
   AStrings: TATStrings;
   AGaps: TATGaps;
   AEditorIndex: integer;
-  ALineFrom, ALineTo: integer;
-  AForAllLines: boolean): integer;
+  ALineFrom, ALineTo: integer): integer;
 var
   StItem: PATStringItem;
   GapItem: TATGapItem;
@@ -2369,7 +2368,7 @@ begin
         bHidden:= StItem^.Ex.Hidden_1;
     end;
     if not bHidden then
-      if AForAllLines or ((GapItem.LineIndex>=ALineFrom) and (GapItem.LineIndex<=ALineTo)) then
+      if (GapItem.LineIndex>=ALineFrom) and (GapItem.LineIndex<=ALineTo) then
         Inc(Result, GapItem.Size);
   end;
 end;
@@ -3136,10 +3135,10 @@ begin
       NPos:= Max(0, FScrollVert.NPos);
       if FWrapInfo.IsIndexValid(NPos) then
         NLineIndex:= FWrapInfo.Data[NPos].NLineIndex;
-      NGapPos:= _GapsSize(Strings, Gaps, EditorIndex, -1, NLineIndex-1, false);
+      NGapPos:= _GapsSizeForRange(Strings, Gaps, EditorIndex, -1, NLineIndex-1);
     end;
 
-    NGapAll:= _GapsSize(Strings, Gaps, EditorIndex, 0, 0, true);
+    NGapAll:= _GapsSizeForRange(Strings, Gaps, EditorIndex, -1, MaxInt);
   end;
 
   if not ModeOneLine then
@@ -6821,7 +6820,7 @@ begin
     repeat
       NLineIndex:= AWrapInfo.Data[NPos].NLineIndex - 1;
       NPixels:= APos - NPos* AInfo.CharSizeScaled div ATEditorCharXScale
-        - _GapsSize(AStrings, AGaps, AEditorIndex, -1, NLineIndex, false);
+        - _GapsSizeForRange(AStrings, AGaps, AEditorIndex, -1, NLineIndex);
       if NPos=0 then Break;
       if NLineIndex=0 then Break;
       if NPixels>=0 then Break;

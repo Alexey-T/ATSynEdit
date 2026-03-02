@@ -323,13 +323,12 @@ begin
     if (AGaps.Count>0) and AWrapInfo.IsIndexValid(NScrolledVert) then
     begin
       NLineIndexTop:= AWrapInfo[NScrolledVert].NLineIndex;
-      Inc(Result.Y, _GapsSize(
+      Inc(Result.Y, _GapsSizeForRange(
         AStrings,
         AGaps,
         AEditorIndex,
         NLineIndexTop, //index of top line
-        P.Y-1, //index of line before caret
-        false
+        P.Y-1 //index of line before caret
         ));
       //consider top gap
       if AScrollVert.TopGapVisible then
