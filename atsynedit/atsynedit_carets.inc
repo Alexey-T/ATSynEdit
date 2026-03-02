@@ -367,7 +367,7 @@ function GenericClientPosToCaretPos(
 var
   CharOffsets: TATIntFixedArray;
   NLineLenOriginal, NLineLenTrimmed: integer;
-  NIndex, NIndexDecrement, NPixels: Int64;
+  NWrapIndex, NIndexDecrement, NPixels: Int64;
   NGapObjectWidth, NGapIndex: integer;
   WrapItem: TATWrapItem;
   GapItem: TATGapItem;
@@ -384,33 +384,33 @@ begin
 
   //find index in WrapInfo for P.Y
   NPixels:= ARect.Top;
-  NIndex:= Max(0, AScrollVert.NPos);
+  NWrapIndex:= Max(0, AScrollVert.NPos);
   bGapGoesToEnd:= false;
 
   //allow to work for arrow-up/ page-up, if caret at top
   if P.Y<ARect.Top then
-    if AWrapInfo.IsIndexValid(NIndex) then
+    if AWrapInfo.IsIndexValid(NWrapIndex) then
     begin
-      //start later loop, but from decremented NIndex
+      //start later loop, but from decremented NWrapIndex
       //todo: this not correct if upper (not visible) lines have gaps...
-      NIndexDecrement:= Min((ARect.Top-P.Y) div ATabHelper.CharSize.Y + 1, NIndex);
-      Dec(NIndex, NIndexDecrement);
+      NIndexDecrement:= Min((ARect.Top-P.Y) div ATabHelper.CharSize.Y + 1, NWrapIndex);
+      Dec(NWrapIndex, NIndexDecrement);
       Dec(NPixels, NIndexDecrement*ATabHelper.CharSize.Y);
     end;
 
   //support gap before 1st line
-  if (NIndex=0) and AScrollVert.TopGapVisible and (AGaps.Count>0) then
+  if (NWrapIndex=0) and AScrollVert.TopGapVisible and (AGaps.Count>0) then
     Inc(NPixels, AGaps.SizeOfGapTop);
 
   repeat
-    if not AWrapInfo.IsIndexValid(NIndex) then
+    if not AWrapInfo.IsIndexValid(NWrapIndex) then
       Break;
 
     Inc(NPixels, ATabHelper.CharSize.Y);
     if NPixels>P.Y then Break;
 
     //consider gap
-    WrapItem:= AWrapInfo[NIndex];
+    WrapItem:= AWrapInfo[NWrapIndex];
     if (WrapItem.NFinal=TATWrapItemFinal.Final) and (AGaps.Count>0) then
     begin
       GapItem:= AGaps.Find(WrapItem.NLineIndex, -1, NGapIndex);
@@ -433,8 +433,8 @@ begin
               bGapGoesToEnd:= true;
             TATEditorGapCoordAction.MoveDown:
               begin
-                if AWrapInfo.IsIndexValid(NIndex+1) then
-                  Inc(NIndex);
+                if AWrapInfo.IsIndexValid(NWrapIndex+1) then
+                  Inc(NWrapIndex);
               end;
           end;
           Break;
@@ -460,8 +460,8 @@ begin
                 bGapGoesToEnd:= true;
               TATEditorGapCoordAction.MoveDown:
                 begin
-                  if AWrapInfo.IsIndexValid(NIndex+1) then
-                    Inc(NIndex);
+                  if AWrapInfo.IsIndexValid(NWrapIndex+1) then
+                    Inc(NWrapIndex);
                 end;
             end;
             bBreakIndexIncrement:= true;
@@ -472,11 +472,11 @@ begin
     end;
 
     if not bBreakIndexIncrement then
-      Inc(NIndex);
+      Inc(NWrapIndex);
   until false;
 
   //click above all text
-  if NIndex<0 then
+  if NWrapIndex<0 then
   begin
     Result.X:= 0;
     Result.Y:= 0;
@@ -484,14 +484,14 @@ begin
   end;
 
   //click below all text
-  if not AWrapInfo.IsIndexValid(NIndex) then
+  if not AWrapInfo.IsIndexValid(NWrapIndex) then
   begin
-    NIndex:= AWrapInfo.Count-1;
+    NWrapIndex:= AWrapInfo.Count-1;
     if AAfterEofUsesLastLen then
     begin
-      if AWrapInfo.IsIndexValid(NIndex) then
+      if AWrapInfo.IsIndexValid(NWrapIndex) then
       begin
-        WrapItem:= AWrapInfo[NIndex];
+        WrapItem:= AWrapInfo[NWrapIndex];
         Result.Y:= WrapItem.NLineIndex;
         Result.X:= WrapItem.NCharIndex+WrapItem.NLength-1;
         if not AStrings.IsIndexValid(Result.Y) then
@@ -503,7 +503,7 @@ begin
   end;
 
   //click in text
-  WrapItem:= AWrapInfo[NIndex];
+  WrapItem:= AWrapInfo[NWrapIndex];
   Result.Y:= WrapItem.NLineIndex;
   if not AStrings.IsIndexValid(Result.Y) then
     exit(Point(-1, -1));
@@ -549,11 +549,11 @@ begin
     //position after end of partially folded line? return position of fold begin
     if APosDetails.EndOfWrappedLine then
     begin
-      NIndex:= AStrings.LinesFoldFrom[Result.Y, AEditorIndex];
-      if NIndex>0 then
+      NWrapIndex:= AStrings.LinesFoldFrom[Result.Y, AEditorIndex];
+      if NWrapIndex>0 then
       begin
         APosDetails.EndOfPartiallyFoldedLine:= true;
-        Result.X:= NIndex-1;
+        Result.X:= NWrapIndex-1;
       end;
     end;
   end;
