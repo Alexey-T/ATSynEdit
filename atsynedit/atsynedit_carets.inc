@@ -409,6 +409,8 @@ begin
     Inc(NPixels, ATabHelper.CharSize.Y);
     if NPixels>P.Y then Break;
 
+    bDisableIndexIncrement:= false;
+
     //consider gap
     WrapItem:= AWrapInfo[NWrapIndex];
     if (WrapItem.NFinal=TATWrapItemFinal.Final) and (AGaps.Count>0) then
@@ -417,7 +419,6 @@ begin
       if NGapIndex>=0 then
       begin
         GapItem:= AGaps[NGapIndex];
-        bDisableIndexIncrement:= false;
         Inc(NPixels, GapItem.Size);
         if NPixels>P.Y then
         begin
