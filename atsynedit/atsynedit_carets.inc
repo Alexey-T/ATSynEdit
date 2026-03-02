@@ -373,7 +373,7 @@ var
   GapItem: TATGapItem;
   Str: atString;
   NStrLen: SizeInt;
-  bAllowVirtualPos, bGapGoesToEnd, bDisableIndexIncrement: boolean;
+  bAllowVirtualPos, bGapGoesToEnd, bDoBreakRepeat: boolean;
 begin
   Result.X:= 0;
   Result.Y:= -1;
@@ -386,6 +386,7 @@ begin
   NPixels:= ARect.Top;
   NWrapIndex:= Max(0, AScrollVert.NPos);
   bGapGoesToEnd:= false;
+  bDoBreakRepeat:= false;
 
   //allow to work for arrow-up/ page-up, if caret at top
   if P.Y<ARect.Top then
@@ -408,8 +409,6 @@ begin
 
     Inc(NPixels, ATabHelper.CharSize.Y);
     if NPixels>P.Y then Break;
-
-    bDisableIndexIncrement:= false;
 
     //consider gap
     WrapItem:= AWrapInfo[NWrapIndex];
@@ -466,15 +465,15 @@ begin
                     Inc(NWrapIndex);
                 end;
             end;
-            bDisableIndexIncrement:= true;
+            bDoBreakRepeat:= true;
             Break;
           end;
         end;
       end;
     end;
 
-    if not bDisableIndexIncrement then
-      Inc(NWrapIndex);
+    if bDoBreakRepeat then Break;
+    Inc(NWrapIndex);
   until false;
 
   //click above all text
