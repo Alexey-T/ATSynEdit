@@ -2363,9 +2363,9 @@ begin
       if not AStrings.IsIndexValid(iLine) then Break;
       StItem:= AStrings.GetItemPtr(iLine);
       if AEditorIndex=0 then
-        bHidden:= StItem^.Ex.Hidden_0
+        bHidden:= StItem^.Ex.Hidden_0 or (StItem^.Ex.FoldFrom_0>0)
       else
-        bHidden:= StItem^.Ex.Hidden_1;
+        bHidden:= StItem^.Ex.Hidden_1 or (StItem^.Ex.FoldFrom_1>0);
     end;
     if not bHidden then
       if (GapItem.LineIndex>=ALineFrom) and (GapItem.LineIndex<=ALineTo) then
@@ -2398,9 +2398,9 @@ begin
         if not AStrings.IsIndexValid(iLine) then Break;
         StItem:= AStrings.GetItemPtr(iLine);
         if AEditorIndex=0 then
-          bHidden:= StItem^.Ex.Hidden_0
+          bHidden:= StItem^.Ex.Hidden_0 or (StItem^.Ex.FoldFrom_0>0)
         else
-          bHidden:= StItem^.Ex.Hidden_1;
+          bHidden:= StItem^.Ex.Hidden_1 or (StItem^.Ex.FoldFrom_1>0);
       end;
       if not bHidden then
         Inc(Result, GapItem.Size);
