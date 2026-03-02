@@ -4061,7 +4061,7 @@ begin
     NGapIndexCurrent:= -1;
 
     //consider gap before 1st line
-    if (AWrapIndex=0) and AScrollVert.TopGapVisible and (Gaps.SizeOfGapTop>0) then
+    if (AWrapIndex=0) and AScrollVert.TopGapVisible and (Gaps.Count>0) then
     begin
       NGapIndexTop:= Gaps.Find(-1, 0);
       Inc(RectLine.Bottom,
@@ -6773,7 +6773,7 @@ begin
   begin
     AInfo.SetZero;
     if bConsiderGaps then
-      if AGaps.SizeOfGapTop>0 then
+      if AGaps.Find(-1, 0)>=0 then
         AInfo.NPos:= -1;
     exit
   end;
@@ -6787,8 +6787,8 @@ begin
   if bConsiderGaps then
   begin
     //for position before line=0
-    NSizeGapTop:= AGaps.SizeOfGapTop;
-    NSizeGap0:= AGaps.SizeOfGap0;
+    NSizeGapTop:= _GapsSizeForOneLine(AStrings, AGaps, AEditorIndex, -1);
+    NSizeGap0:= _GapsSizeForOneLine(AStrings, AGaps, AEditorIndex, 0);
 
     if NSizeGapTop>0 then
       if APos<NSizeGapTop then

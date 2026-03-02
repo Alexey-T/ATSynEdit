@@ -333,7 +333,7 @@ begin
         ));
       //consider top gap
       if AScrollVert.TopGapVisible then
-        Inc(Result.Y, AGaps.SizeOfGapTop);
+        Inc(Result.Y, _GapsSizeForOneLine(AStrings, AGaps, AEditorIndex, -1));
     end;
 
     //coords of corner
@@ -401,7 +401,8 @@ begin
 
   //support gap before 1st line
   if (NWrapIndex=0) and AScrollVert.TopGapVisible and (AGaps.Count>0) then
-    Inc(NPixels, AGaps.SizeOfGapTop);
+    Inc(NPixels,
+        _GapsSizeForOneLine(AStrings, AGaps, AEditorIndex, -1));
 
   repeat
     if not AWrapInfo.IsIndexValid(NWrapIndex) then
