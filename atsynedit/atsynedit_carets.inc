@@ -402,7 +402,7 @@ begin
   if (NWrapIndex=0) and AScrollVert.TopGapVisible and (AGaps.Count>0) then
   begin
     NGapSizeTop:= _GapsSizeForOneLine(AStrings, AGaps, AEditorIndex, -1);
-    if P.Y<NGapSizeTop then
+    if P.Y-ARect.Top<NGapSizeTop then
     begin
       NGapIndex:= -1;
       NGapSizePartial:= 0;
@@ -410,12 +410,12 @@ begin
         NGapIndex:= AGaps.Find(-1, NGapIndex+1);
         if NGapIndex<0 then Break;
         GapItem:= AGaps.Items[NGapIndex];
-        if P.Y<NGapSizePartial+GapItem.Size then
+        if P.Y-ARect.Top<NGapSizePartial+GapItem.Size then
         begin
           Result.X:= 0;
           Result.Y:= 0;
           APosDetails.OnGapItem:= GapItem;
-          APosDetails.OnGapPos.Y:= P.Y-NGapSizePartial;
+          APosDetails.OnGapPos.Y:= P.Y-ARect.Top-NGapSizePartial;
           NGapObjectWidth:= GapItem.GetObjectWidth;
           if NGapObjectWidth>0 then
             APosDetails.OnGapPos.X:= P.X - GetGapBitmapPosLeft(ARect, NGapObjectWidth)
