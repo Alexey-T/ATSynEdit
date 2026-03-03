@@ -52,7 +52,9 @@ type
     procedure Delete(N: integer);
     function Add(ALineIndex, ASize: integer; ABitmap: TBitmap; AForm: TCustomForm;
       ATag: integer;
-      AColor: TColor=clNone; ADeleteOnDelLine: boolean=true): boolean;
+      AColor: TColor=clNone;
+      ADeleteOnDelLine: boolean=true;
+      AAddToTop: boolean=false): boolean;
     function Find(ALineIndex, AFromGapIndex: integer): integer;
     function DeleteForLineRange(ALineFrom, ALineTo: integer): boolean;
     function DeleteWithTag(ATag: integer): boolean;
@@ -189,9 +191,10 @@ end;
 
 function TATGaps.Add(ALineIndex, ASize: integer; ABitmap: TBitmap;
   AForm: TCustomForm; ATag: integer; AColor: TColor;
-  ADeleteOnDelLine: boolean): boolean;
+  ADeleteOnDelLine: boolean; AAddToTop: boolean): boolean;
 var
   Item: TATGapItem;
+  NInsertPos: integer;
 begin
   Result:= false;
   if (ALineIndex<-1) then exit;
@@ -205,7 +208,16 @@ begin
   Item.Color:= AColor;
   Item.DeleteOnDelLine:= ADeleteOnDelLine;
 
-  FList.Add(Item);
+  if AAddToTop then
+  begin
+    NInsertPos:= Find(ALineIndex, 0);
+    if NInsertPos<0 then
+      NInsertPos:= FList.Count;
+    FList.Insert(NInsertPos, Item);
+  end
+  else
+    FList.Add(Item);
+
   Result:= true;
 end;
 
