@@ -6596,6 +6596,9 @@ begin
   if FWrapMode<>TATEditorWrapMode.ModeOff then
     FWrapUpdateNeeded:= true;
 
+  //fixes missed repainting of text after height reduced (CudaText #6221)
+  FLineTopTodo:= 0;
+
   if not FPaintStarted then exit;
   Invalidate;
 end;
