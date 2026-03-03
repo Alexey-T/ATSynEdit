@@ -54,7 +54,7 @@ type
       ATag: integer;
       AColor: TColor=clNone;
       ADeleteOnDelLine: boolean=true;
-      AAddToTop: boolean=false): boolean;
+      AOnTop: boolean=false): boolean;
     function Find(ALineIndex, AFromGapIndex: integer): integer;
     function DeleteForLineRange(ALineFrom, ALineTo: integer): boolean;
     function DeleteWithTag(ATag: integer): boolean;
@@ -191,7 +191,7 @@ end;
 
 function TATGaps.Add(ALineIndex, ASize: integer; ABitmap: TBitmap;
   AForm: TCustomForm; ATag: integer; AColor: TColor;
-  ADeleteOnDelLine: boolean; AAddToTop: boolean): boolean;
+  ADeleteOnDelLine: boolean; AOnTop: boolean): boolean;
 var
   Item: TATGapItem;
   NInsertPos: integer;
@@ -208,7 +208,7 @@ begin
   Item.Color:= AColor;
   Item.DeleteOnDelLine:= ADeleteOnDelLine;
 
-  if AAddToTop then
+  if AOnTop then
   begin
     NInsertPos:= Find(ALineIndex, 0);
     if NInsertPos<0 then
