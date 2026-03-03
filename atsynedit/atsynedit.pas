@@ -6580,7 +6580,7 @@ end;
 
 procedure TATSynEdit.Resize;
 var
-  bHeightIncreased: boolean;
+  bNeedResetLineTop: boolean;
 begin
   inherited;
   if not IsRepaintEnabled then exit;
@@ -6590,11 +6590,13 @@ begin
   if (Width=FLastControlWidth) and
     (Height=FLastControlHeight) then exit;
 
-  bHeightIncreased:= Height>FLastControlHeight;
+  bNeedResetLineTop:=
+    (Height>FLastControlHeight) and
+    (FScrollVert.SmoothPos>=FScrollVert.SmoothPosLast);
   FLastControlWidth:= Width;
   FLastControlHeight:= Height;
 
-  if bHeightIncreased then
+  if bNeedResetLineTop then
     FLineTopTodo:= 0 //fix outdated LineTop after height increased (CudaText #6221)
   else
     FLineTopTodo:= GetLineTop;
