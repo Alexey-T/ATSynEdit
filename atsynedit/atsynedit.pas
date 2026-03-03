@@ -6579,6 +6579,8 @@ begin
 end;
 
 procedure TATSynEdit.Resize;
+var
+  bHeightIncreased: boolean;
 begin
   inherited;
   if not IsRepaintEnabled then exit;
@@ -6587,17 +6589,19 @@ begin
   //and v-scroll-pos is in the middle of this line
   if (Width=FLastControlWidth) and
     (Height=FLastControlHeight) then exit;
+
+  bHeightIncreased:= Height>FLastControlHeight;
   FLastControlWidth:= Width;
   FLastControlHeight:= Height;
 
-  FLineTopTodo:= GetLineTop;
+  if bHeightIncreased then
+    FLineTopTodo:= 0 //fix outdated LineTop after height increased (CudaText #6221)
+  else
+    FLineTopTodo:= GetLineTop;
 
   Include(FPaintFlags, TATEditorInternalFlag.Resize);
   if FWrapMode<>TATEditorWrapMode.ModeOff then
     FWrapUpdateNeeded:= true;
-
-  //fix outdated LineTop after height increased (CudaText #6221)
-  FLineTopTodo:= 0;
 
   if not FPaintStarted then exit;
   Invalidate;
