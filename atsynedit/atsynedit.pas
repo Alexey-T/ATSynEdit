@@ -407,7 +407,6 @@ type
       write NPosInternal;
       //write SetNPos;
     procedure Clear;
-    procedure SetZeroAndOneLine;
     procedure SetZero;
     procedure SetLast;
     function TopGapVisible: boolean; inline;
