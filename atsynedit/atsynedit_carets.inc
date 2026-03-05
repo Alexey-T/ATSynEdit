@@ -739,7 +739,12 @@ var
   NIndex: integer;
 begin
   Result:= false;
-  if ModeOneLine then exit; //fix CudaText #6225
+
+  //fix CudaText #6225
+  //note: bug is still possible if Font.Size is very big and a char don't fit into editor's Height.
+  //but this condition is almost never occurs.
+  //do we need to find the fix?
+  if ModeOneLine then exit;
 
   if ACaretCoordY < FRectMain.Top + AProximity*FCharSize.Y then
   begin
