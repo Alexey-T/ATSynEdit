@@ -407,8 +407,9 @@ type
       write NPosInternal;
       //write SetNPos;
     procedure Clear;
-    procedure SetZero; inline;
-    procedure SetLast; inline;
+    procedure SetZeroAndOneLine;
+    procedure SetZero;
+    procedure SetLast;
     function TopGapVisible: boolean; inline;
     function TotalOffset: Int64;
     class operator =(const A, B: TATEditorScrollInfo): boolean;

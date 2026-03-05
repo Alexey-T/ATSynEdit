@@ -78,6 +78,20 @@ begin
   SmoothPage:= 1;
 end;
 
+procedure TATEditorScrollInfo.SetZeroAndOneLine;
+begin
+  NPos:= 0;
+  NPosLast:= 0;
+  NMax:= 0;
+  NPage:= 1;
+  NPixelOffset:= 0;
+  CharSizeScaled:= 1*ATEditorCharXScale;
+  SmoothPos:= 0;
+  SmoothPosLast:= 0;
+  SmoothMax:= 0;
+  SmoothPage:= 1;
+end;
+
 procedure TATEditorScrollInfo.SetZero;
 begin
   NPos:= 0;

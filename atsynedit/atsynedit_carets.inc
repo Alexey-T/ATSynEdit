@@ -669,9 +669,7 @@ procedure TATSynEdit.DoScroll_IndentFromTop(AWrapInfoIndex, AIndentVert: integer
 begin
   if ModeOneLine then
   begin
-    FScrollVert.NMax:= 0;
-    FScrollVert.NPosLast:= 0;
-    FScrollVert.SetZero;
+    FScrollVert.SetZeroAndOneLine;
     exit
   end;
 
