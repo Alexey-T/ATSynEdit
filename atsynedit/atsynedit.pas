@@ -990,6 +990,7 @@ type
     FOptCaretFixAfterRangeFolded: boolean;
     FOptCaretsMultiToColumnSel: boolean;
     FOptCaretProximityVert: integer;
+    FOptCaretProximityHorz: integer;
     FOptMarkersSize: integer;
     FOptShowScrollHint: boolean;
     FOptTextDuplicationMovesCaretDown: boolean;
@@ -2129,6 +2130,7 @@ type
     property OptCaretFixAfterRangeFolded: boolean read FOptCaretFixAfterRangeFolded write FOptCaretFixAfterRangeFolded default true;
     property OptCaretsMultiToColumnSel: boolean read FOptCaretsMultiToColumnSel write FOptCaretsMultiToColumnSel default cInitCaretsMultiToColumnSel;
     property OptCaretProximityVert: integer read FOptCaretProximityVert write FOptCaretProximityVert default 0;
+    property OptCaretProximityHorz: integer read FOptCaretProximityHorz write FOptCaretProximityHorz default 0;
     property OptMarkersSize: integer read FOptMarkersSize write FOptMarkersSize default cInitMarkerSize;
     property OptGutterVisible: boolean read FOptGutterVisible write FOptGutterVisible default true;
     property OptGutterPlusSize: integer read FOptGutterPlusSize write FOptGutterPlusSize default cInitGutterPlusSize;
@@ -5798,6 +5800,7 @@ begin
   FOptCaretsPrimitiveColumnSelection:= cInitCaretsPrimitiveColumnSelection;
   FOptCaretsMultiToColumnSel:= cInitCaretsMultiToColumnSel;
   FOptCaretProximityVert:= 0;
+  FOptCaretProximityHorz:= 0;
   FOptMarkersSize:= cInitMarkerSize;
   FOptMouseEnableAll:= true;
   FOptMouseEnableNormalSelection:= true;

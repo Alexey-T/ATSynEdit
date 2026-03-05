@@ -828,7 +828,7 @@ begin
   if AllowProximity then
   begin
     NProximityVert:= GetActualProximityVert;
-    NProximityHorz:= 0;
+    NProximityHorz:= FOptCaretProximityHorz;
   end
   else
   begin
