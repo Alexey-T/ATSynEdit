@@ -670,8 +670,9 @@ begin
   if ModeOneLine then
   begin
     FScrollVert.NMax:= 0;
+    FScrollVert.NPosLast:= 0;
     FScrollVert.SetZero;
-    Exit
+    exit
   end;
 
   AIndentVert:= Min(AIndentVert, GetVisibleLines-1);
