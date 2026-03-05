@@ -746,10 +746,15 @@ var
 begin
   Result:= false;
 
+  //not yet inited FRectMain? do exit
+  if FRectMain=cRectEmpty then
+  begin
+    exit;
+  end;
+
   //fix CudaText #6225
-  //note: bug is still possible if Font.Size is very big and a char don't fit into editor's Height.
+  //note: bug is maybe still possible if Font.Size is very big and a char don't fit into editor's Height.
   //but this condition almost never occurs.
-  //do we need to fix it?
   if ModeOneLine then exit;
 
   if ACaretCoordY < FRectMain.Top + AProximity*FCharSize.Y then
