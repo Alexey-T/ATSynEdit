@@ -748,8 +748,8 @@ begin
 
   //fix CudaText #6225
   //note: bug is still possible if Font.Size is very big and a char don't fit into editor's Height.
-  //but this condition is almost never occurs.
-  //do we need to find the fix?
+  //but this condition almost never occurs.
+  //do we need to fix it?
   if ModeOneLine then exit;
 
   if ACaretCoordY < FRectMain.Top + AProximity*FCharSize.Y then
