@@ -739,6 +739,8 @@ var
   NIndex: integer;
 begin
   Result:= false;
+  if ModeOneLine then exit; //fix CudaText #6225
+
   if ACaretCoordY < FRectMain.Top + AProximity*FCharSize.Y then
   begin
     NIndex:= FWrapInfo.FindIndexOfCaretPos(ACaretPos);
