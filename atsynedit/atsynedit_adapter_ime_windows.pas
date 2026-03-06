@@ -219,22 +219,29 @@ var
   cp: PIMECHARPOSITION;
   Pnt: TPoint;
   R: TRect;
+  //compidx: Integer;
+  {pRCS: PRECONVERTSTRING;
+  convstr: atString;
+  convLen, strByteLen, rcSize: Integer;
+  pStr: PWideChar;}
 begin
   Ed:= TATSynEdit(Sender);
   if Ed.Carets.Count=0 then exit;
   Caret:= Ed.Carets[0];
 
-  Pnt.X:= Caret.CoordX;
-  Pnt.Y:= Caret.CoordY;
-  Pnt:= Ed.ClientToScreen(Pnt);
-
   case Msg.wParam of
     IMR_QUERYCHARPOSITION:
       begin
         cp := PIMECHARPOSITION(Msg.lParam);
-        cp^.dwSize := SizeOf(IMECHARPOSITION);
+        if cp=nil then
+          exit;
+        //compidx:=cp^.dwCharPos;
+        //cp^.dwSize := SizeOf(IMECHARPOSITION);
         cp^.cLineHeight := Ed.TextCharSize.Y;
 
+        Pnt.X:= Caret.CoordX;
+        Pnt.Y:= Caret.CoordY;
+        Pnt:= Ed.ClientToScreen(Pnt);
         cp^.pt.x := Pnt.X;
         cp^.pt.y := Pnt.Y;
 
@@ -244,6 +251,43 @@ begin
 
         Msg.Result:= 1;
       end;
+    {IMR_RECONVERTSTRING:
+      begin
+        pRCS:=PRECONVERTSTRING(Msg.lParam);
+        convstr:=Ed.TextCurrentWord;
+        convLen:=Length(convstr);
+        strByteLen:=convLen*sizeof(WideChar);
+        rcSize:=sizeof(RECONVERTSTRING)+strByteLen+sizeof(WideChar);
+        writeln('RECONVERTSTRING '+convstr);
+        if pRCS=nil then
+          Msg.Result:=rcSize
+        else if pRCS^.dwSize<rcSize then
+          Msg.Result:=0
+        else
+        begin
+          pRCS^.dwVersion:=0;
+          pRCS^.dwStrLen:=convLen;
+          pRCS^.dwStrOffset:=sizeof(RECONVERTSTRING);
+          pRCS^.dwCompStrLen:=convLen;
+          pRCS^.dwCompStrOffset:=0;
+          pRCS^.dwTargetStrLen:=convLen;
+          pRCS^.dwTargetStrOffset:=pRCS^.dwCompStrOffset;
+
+          pStr:=PWideChar(pchar(pRCS)+pRCS^.dwStrOffset);
+          system.Move(convstr[1],pStr^,convLen*sizeof(WideChar));
+          pStr[convLen]:=#0;
+
+          Msg.Result:=rcSize;
+        end;
+      end;
+    IMR_CONFIRMRECONVERTSTRING:
+      begin
+        pRCS:=PRECONVERTSTRING(Msg.lParam);
+        if pRCS=nil then
+          Msg.Result:=0
+          else
+          Msg.Result:=1;
+      end;}
   end;
 end;
 
@@ -267,6 +311,7 @@ begin
   position:=0;
   UpdateCompForm(Sender); // initialize composition form
   FSelText:= TATSynEdit(Sender).TextSelected;
+  buffer[0]:=#0;
   Msg.Result:= -1;
 end;
 
@@ -285,19 +330,20 @@ begin
       IMC := ImmGetContext(Ed.Handle);
       try
          ImmGCode:=Msg.wParam;
-          { Insert IME Composition string }
+          { Check the ESCAPE status in the message value. }
           if ImmGCode<>$1b then
           begin
-            { for janpanese IME, process GCS_RESULTSTR and GCS_COMPSTR separately.
-              It comes togetther }
-            { insert result string }
-            if imecode and GCS_RESULTSTR<>0 then
+            { If RESULTSTR and COMPSTR come together,
+              the string of RESULTSTR is first received and processed.
+              Then, it receives COMPSTR and processes it. }
+            { Check whether COMPSTR is not an empty string, receive RESULTSTR, and insert it. }
+            if (buffer[0]<>#0) and (imecode and GCS_RESULTSTR<>0) then
             begin
               len:=ImmGetCompositionStringW(IMC,GCS_RESULTSTR,@buffer[0],sizeof(buffer)-sizeof(WideChar));
               if len>0 then
                 len := len shr 1;
               buffer[len]:=#0;
-              // insert
+              { INSERT RESULTSTR }
               bOverwrite:=Ed.ModeOverwrite and
                           (Length(FSelText)=0);
               Ed.TextInsertAtCarets(buffer, False,
@@ -305,9 +351,10 @@ begin
                                    False);
               FSelText:='';
               HideCompForm;
+              { Empty the string to prevent duplicate insertion. }
               buffer[0]:=#0;
             end;
-            { insert composition string }
+            { COMPSTR processing. }
             if imeCode and GCS_COMPSTR<>0 then begin
               len:=ImmGetCompositionStringW(IMC,GCS_COMPSTR,@buffer[0],sizeof(buffer)-sizeof(WideChar));
               if len>0 then
@@ -349,7 +396,7 @@ begin
             end;
           end else
           begin
-            // escape
+            { Handling when message contains ESCAPE status }
             buffer[0]:=#0;
             Len:= Length(FSelText);
             Ed.TextInsertAtCarets(FSelText, False, False, Len>0);
@@ -367,11 +414,26 @@ procedure TATAdapterWindowsIME.ImeEndComposition(Sender: TObject;
   var Msg: TMessage);
 var
   Ed: TATSynEdit;
-  Len: Integer;
+  bOverwrite: Boolean;
 begin
   Ed:= TATSynEdit(Sender);
   position:=0;
   HideCompForm;
+  { Insert composition string when composition is not complete.
+    Be aware of a bug in which the ENDCOMPOSITION message of
+    the Windows 10 Korean IME is delivered before COMPOSITION RESULTSTR. }
+  if (buffer[0]<>#0) and (Ed.IMELangID = LANG_KOREAN) then
+  begin
+    bOverwrite:=Ed.ModeOverwrite and
+                (Length(FSelText)=0);
+    Ed.TextInsertAtCarets(buffer, False,
+                         bOverwrite,
+                         False);
+    { Empty the string to prevent duplicate insertion. }
+    buffer[0]:=#0;
+    FSelText:='';
+    //Writeln('Insert COMPSTR');
+  end;
   { tweak for emoji window, but don't work currently
     it shows emoji window on previous position.
     but not work good with chinese IME.
