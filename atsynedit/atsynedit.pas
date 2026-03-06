@@ -7193,7 +7193,8 @@ begin
                 exit;
             end;
 
-            DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
+            if not PosDetails.BelowAllText then
+              DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
 
             bUnfoldClickedPos:= (FFoldStyle in cEditorFoldStylesUnfoldOnClick)
               //ignore click on fold-mark, because we handle double-click on it (select entire range)
