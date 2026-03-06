@@ -155,13 +155,7 @@ const
   cCommand_ToggleOverwrite = 300;
   cCommand_ToggleReadOnly = 301;
   cCommand_ToggleWordWrap = 302;
-
   cCommand_ToggleUnprinted = 303;
-  cCommand_ToggleUnprintedSpaces = 304;
-  cCommand_ToggleUnprintedEnds = 305;
-  cCommand_ToggleUnprintedEndDetails = 306;
-  cCommand_ToggleUnprintedSpacesTrailing = 320;
-
   cCommand_ToggleLineNums = 307;
   cCommand_ToggleFolding = 308;
   cCommand_ToggleRuler = 309;

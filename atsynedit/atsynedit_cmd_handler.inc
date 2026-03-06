@@ -596,10 +596,6 @@ begin
     cCommand_ToggleWordWrap:           Result:= DoCommand_ToggleWordWrap(false);
     cCommand_ToggleWordWrapAlt:        Result:= DoCommand_ToggleWordWrap(true);
     cCommand_ToggleUnprinted:          Result:= DoCommand_ToggleUnprinted;
-    cCommand_ToggleUnprintedSpaces:    Result:= DoCommand_ToggleUnprintedSpaces;
-    cCommand_ToggleUnprintedSpacesTrailing: Result:= DoCommand_ToggleUnprintedSpacesTrailing;
-    cCommand_ToggleUnprintedEnds:      Result:= DoCommand_ToggleUnprintedEnds;
-    cCommand_ToggleUnprintedEndDetails: Result:= DoCommand_ToggleUnprintedEndDetails;
     cCommand_ToggleLineNums:           Result:= DoCommand_ToggleLineNums;
     cCommand_ToggleFolding:            Result:= DoCommand_ToggleFolding;
     cCommand_ToggleRuler:              Result:= DoCommand_ToggleRuler;

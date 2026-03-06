@@ -1554,10 +1554,6 @@ type
     function DoCommand_ToggleOverwrite: TATCommandResults;
     function DoCommand_ToggleWordWrap(ALoopAllValues: boolean): TATCommandResults;
     function DoCommand_ToggleUnprinted: TATCommandResults;
-    function DoCommand_ToggleUnprintedSpaces: TATCommandResults;
-    function DoCommand_ToggleUnprintedSpacesTrailing: TATCommandResults;
-    function DoCommand_ToggleUnprintedEnds: TATCommandResults;
-    function DoCommand_ToggleUnprintedEndDetails: TATCommandResults;
     function DoCommand_ToggleLineNums: TATCommandResults;
     function DoCommand_ToggleFolding: TATCommandResults;
     function DoCommand_ToggleRuler: TATCommandResults;

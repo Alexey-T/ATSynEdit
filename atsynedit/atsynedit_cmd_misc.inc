@@ -63,6 +63,7 @@ begin
   Result:= [TATCommandResult.State];
 end;
 
+(*
 function TATSynEdit.DoCommand_ToggleUnprintedSpaces: TATCommandResults;
 begin
   OptUnprintedSpaces:= not OptUnprintedSpaces;
@@ -90,6 +91,7 @@ begin
   Include(ModifiedOptions, TATEditorModifiedOption.UnprintedEndDetails);
   Result:= [TATCommandResult.State];
 end;
+*)
 
 function TATSynEdit.DoCommand_ToggleLineNums: TATCommandResults;
 begin
