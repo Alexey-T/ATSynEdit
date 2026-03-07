@@ -6595,6 +6595,7 @@ begin
     (Height=FLastControlHeight) then exit;
 
   bNeedResetLineTop:=
+    FPaintStarted and //avoid bNeedResetLineTop=True on first showing of 2nd ui-tab in CudaText
     (Height>FLastControlHeight) and
     (FScrollVert.SmoothPos>=FScrollVert.SmoothPosLast);
   FLastControlWidth:= Width;
