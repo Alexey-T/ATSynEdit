@@ -72,8 +72,10 @@ begin
   if imc<>0 then
   begin
     if Success then
+      { Commit composition string as RESULT string}
       ImmNotifyIME(imc, NI_COMPOSITIONSTR, CPS_COMPLETE, 0)
     else
+      { abandon composition string }
       ImmNotifyIME(imc, NI_COMPOSITIONSTR, CPS_CANCEL, 0);
     ImmReleaseContext(Ed.Handle, imc);
   end;
@@ -337,7 +339,7 @@ begin
               the string of RESULTSTR is first received and processed.
               Then, it receives COMPSTR and processes it. }
             { Check whether COMPSTR is not an empty string, receive RESULTSTR, and insert it. }
-            if (buffer[0]<>#0) and (imecode and GCS_RESULTSTR<>0) then
+            if imecode and GCS_RESULTSTR<>0 then
             begin
               len:=ImmGetCompositionStringW(IMC,GCS_RESULTSTR,@buffer[0],sizeof(buffer)-sizeof(WideChar));
               if len>0 then
@@ -414,26 +416,10 @@ procedure TATAdapterWindowsIME.ImeEndComposition(Sender: TObject;
   var Msg: TMessage);
 var
   Ed: TATSynEdit;
-  bOverwrite: Boolean;
 begin
   Ed:= TATSynEdit(Sender);
   position:=0;
   HideCompForm;
-  { Insert composition string when composition is not complete.
-    Be aware of a bug in which the ENDCOMPOSITION message of
-    the Windows 10 Korean IME is delivered before COMPOSITION RESULTSTR. }
-  if (buffer[0]<>#0) and (Ed.IMELangID = LANG_KOREAN) then
-  begin
-    bOverwrite:=Ed.ModeOverwrite and
-                (Length(FSelText)=0);
-    Ed.TextInsertAtCarets(buffer, False,
-                         bOverwrite,
-                         False);
-    { Empty the string to prevent duplicate insertion. }
-    buffer[0]:=#0;
-    FSelText:='';
-    //Writeln('Insert COMPSTR');
-  end;
   { tweak for emoji window, but don't work currently
     it shows emoji window on previous position.
     but not work good with chinese IME.
