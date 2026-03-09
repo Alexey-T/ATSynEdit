@@ -7106,7 +7106,8 @@ begin
   ClearSelRectPoints; //SelRect points will be set in MouseMove
 
   if Assigned(FAdapterIME) then
-    FAdapterIME.Stop(Self, false);
+    { commit composition string as result }
+    FAdapterIME.Stop(Self, True);
 
   if MouseNiceScroll then
   begin
