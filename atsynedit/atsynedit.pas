@@ -6979,6 +6979,12 @@ begin
     (X>=FRectGutter.Right) then
     X:= FRectMain.Left;
 
+  { Since strings may be inserted by the IME, an IME reset must be done first in the mouse handler
+    to avoid problems with character placement within the line. }
+  if Assigned(FAdapterIME) then
+    { commit composition string as result }
+    FAdapterIME.Stop(Self, True);
+
   PosCoord:= ATPoint(X, Y);
 
   if Button=mbRight then
@@ -7104,10 +7110,6 @@ begin
   bClickOnSelection:= false;
 
   ClearSelRectPoints; //SelRect points will be set in MouseMove
-
-  if Assigned(FAdapterIME) then
-    { commit composition string as result }
-    FAdapterIME.Stop(Self, True);
 
   if MouseNiceScroll then
   begin
