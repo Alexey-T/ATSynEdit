@@ -6080,6 +6080,8 @@ end;
 
 procedure TATSynEdit.SetSpacingTop(AValue: integer);
 begin
+  AValue:= Max(AValue, -5);
+  AValue:= Min(AValue, 15);
   if FSpacingTop=AValue then Exit;
   FSpacingTop:= AValue;
   FWrapUpdateNeeded:= true;
@@ -6087,6 +6089,8 @@ end;
 
 procedure TATSynEdit.SetSpacingBottom(AValue: integer);
 begin
+  AValue:= Max(AValue, -5);
+  AValue:= Min(AValue, 15);
   if FSpacingBottom=AValue then Exit;
   FSpacingBottom:= AValue;
   FWrapUpdateNeeded:= true;
