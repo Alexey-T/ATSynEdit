@@ -222,7 +222,7 @@ begin
 
   M.Add(cCommand_TextTrimSpacesRight, 'trim spaces: trailing', [], []);
   M.Add(cCommand_TextTrimSpacesLeft, 'trim spaces: leading', [], []);
-  M.Add(cCommand_TextTrimSpacesAll, 'trim spaces: leading+trailing', [], []);
+  M.Add(cCommand_TextTrimSpacesAll, 'trim spaces: all', [], []);
 
   M.Add(cCommand_RepeatTextCommand, 'repeat last text command', [], []);
 
