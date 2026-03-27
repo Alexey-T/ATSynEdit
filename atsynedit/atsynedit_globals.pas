@@ -416,7 +416,7 @@ initialization
     UnprintedReplaceSpec:= false;
     UnprintedReplaceSpecToCode:= 164;
     CharSizeProportional:= true;
-    CharScaleFullWidth:= 190;
+    CharScaleFullWidth:= 200;
     RenderSpaceBgAtLineEOL:= true;
     RenderSpaceBgAtLineEOL_WidthOnEmpty:= 50;
     SpeedScrollAutoHorz:= 10;
