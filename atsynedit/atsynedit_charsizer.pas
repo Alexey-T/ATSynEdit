@@ -248,7 +248,7 @@ begin
     uw_normal:
       exit;
     uw_fullwidth:
-      exit(ATEditorOptions.CharScaleFullWidth);
+      exit(200);
     uw_space:
       exit;
     uw_combined:
@@ -281,7 +281,7 @@ begin
       exit(GetCharWidth_FromCache(ch));
 
   //for other codes, use full-width size
-  Result:= ATEditorOptions.CharScaleFullWidth;
+  Result:= 200;
 end;
 
 {

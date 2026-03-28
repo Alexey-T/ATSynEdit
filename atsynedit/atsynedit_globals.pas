@@ -101,7 +101,6 @@ type
     UnprintedReplaceSpec: boolean;
     UnprintedReplaceSpecToCode: integer;
     CharSizeProportional: boolean;
-    CharScaleFullWidth: word;
     RenderSpaceBgAtLineEOL: boolean;
     RenderSpaceBgAtLineEOL_WidthOnEmpty: integer;
     SpeedScrollAutoHorz: integer; //auto-scroll (drag out of control): speed x
@@ -416,7 +415,6 @@ initialization
     UnprintedReplaceSpec:= false;
     UnprintedReplaceSpecToCode:= 164;
     CharSizeProportional:= true;
-    CharScaleFullWidth:= 200;
     RenderSpaceBgAtLineEOL:= true;
     RenderSpaceBgAtLineEOL_WidthOnEmpty:= 50;
     SpeedScrollAutoHorz:= 10;
