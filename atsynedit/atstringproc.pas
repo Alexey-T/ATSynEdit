@@ -100,7 +100,7 @@ const
   ATEditorCharXScale = 1024;
 
   //if line is longer - all line chars will be rendered in normal-width (100%) cells
-  //so all CJK chars (width 190%) will overlap by design
+  //so all CJK chars (full width 200%) will overlap by design
   ATEditorMaxFixedArray = 4*1024;
 
 type
