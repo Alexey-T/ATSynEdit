@@ -2156,11 +2156,8 @@ begin
               LinesState[CurIndex]:= CurLineState;
             //force caret to line CurIndex, to fix wrong undo-data after first undo/redo with caret-jump (CudaText #6027)
             if Length(CurCaretsArray)=1 then
-            begin
-              CurCaretsArray[0].Y:= CurIndex;
-              CurCaretsArray[0].Y2:= CurCaretsArray[0].Y;
-              CurCaretsArray[0].X2:= CurCaretsArray[0].X;
-            end;
+              if CurCaretsArray[0].Y2=-1 then //fix CudaText #6249
+                CurCaretsArray[0].Y:= CurIndex;
           end;
         end;
 
@@ -2174,11 +2171,8 @@ begin
               LinesState[CurIndex]:= CurLineState;
             //force caret to line CurIndex, to fix wrong undo-data after first undo/redo with caret-jump (CudaText #6027)
             if Length(CurCaretsArray)=1 then
-            begin
-              CurCaretsArray[0].Y:= CurIndex;
-              CurCaretsArray[0].Y2:= CurCaretsArray[0].Y;
-              CurCaretsArray[0].X2:= CurCaretsArray[0].X;
-            end;
+              if CurCaretsArray[0].Y2=-1 then //fix CudaText #6249
+                CurCaretsArray[0].Y:= CurIndex;
           end;
         end;
 
