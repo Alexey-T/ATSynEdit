@@ -2158,8 +2158,8 @@ begin
             if Length(CurCaretsArray)=1 then
             begin
               CurCaretsArray[0].Y:= CurIndex;
-              CurCaretsArray[0].Y2:= -1;
-              CurCaretsArray[0].X2:= -1;
+              CurCaretsArray[0].Y2:= CurCaretsArray[0].Y;
+              CurCaretsArray[0].X2:= CurCaretsArray[0].X;
             end;
           end;
         end;
@@ -2176,8 +2176,8 @@ begin
             if Length(CurCaretsArray)=1 then
             begin
               CurCaretsArray[0].Y:= CurIndex;
-              CurCaretsArray[0].Y2:= -1;
-              CurCaretsArray[0].X2:= -1;
+              CurCaretsArray[0].Y2:= CurCaretsArray[0].Y;
+              CurCaretsArray[0].X2:= CurCaretsArray[0].X;
             end;
           end;
         end;
