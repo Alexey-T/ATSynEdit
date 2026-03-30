@@ -446,6 +446,7 @@ type
   TATSynEditClickEvent = procedure(Sender: TObject; var AHandled: boolean) of object;
   TATSynEditClickMoveCaretEvent = procedure(Sender: TObject; APrevPnt, ANewPnt: TPoint) of object;
   TATSynEditClickGapEvent = procedure(Sender: TObject; AGapItem: TATGapItem; APos: TPoint) of object;
+  TATSynEditClickBeforeEvent = procedure(Sender: TObject; AX, AY: integer; var AHandled: boolean) of object;
   TATSynEditCommandEvent = procedure(Sender: TObject; ACommand: integer; AInvoke: TATCommandInvoke; const AText: string; var AHandled: boolean) of object;
   TATSynEditCommandAfterEvent = procedure(Sender: TObject; ACommand: integer; const AText: string) of object;
   TATSynEditClickGutterEvent = procedure(Sender: TObject; ABand: integer; ALineNum: integer; var AHandled: boolean) of object;
@@ -764,6 +765,7 @@ type
     FOnClickGap: TATSynEditClickGapEvent;
     FOnClickEndSelect: TATSynEditClickMoveCaretEvent;
     FOnClickLink: TATSynEditClickLinkEvent;
+    FOnClickBefore: TATSynEditClickBeforeEvent;
     FOnIdle: TNotifyEvent;
     FOnChange: TNotifyEvent;
     FOnChangeDetailed: TATSynEditChangeDetailedEvent;
@@ -1982,6 +1984,7 @@ type
     property OnClickEndSelect: TATSynEditClickMoveCaretEvent read FOnClickEndSelect write FOnClickEndSelect;
     property OnClickGap: TATSynEditClickGapEvent read FOnClickGap write FOnClickGap;
     property OnClickLink: TATSynEditClickLinkEvent read FOnClickLink write FOnClickLink;
+    property OnClickBefore: TATSynEditClickBeforeEvent read FOnClickBefore write FOnClickBefore;
     property OnCheckInput: TATSynEditCheckInputEvent read FOnCheckInput write FOnCheckInput;
     property OnIdle: TNotifyEvent read FOnIdle write FOnIdle;
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
@@ -7187,7 +7190,12 @@ begin
           Strings.SetGroupMark;
 
           FSelRect:= cRectEmpty;
-          DoCaretSingleAsIs;
+
+          bClickHandled:= false;
+          if Assigned(FOnClickBefore) then
+            FOnClickBefore(Self, FMouseDownPnt.X, FMouseDownPnt.Y, bClickHandled);
+          if not bClickHandled then
+            DoCaretSingleAsIs;
 
           if Assigned(PosDetails.OnGapItem) then
           begin
@@ -7660,6 +7668,7 @@ var
   nScreenDelta: integer;
   {$endif}
   Caret: TATCaretItem;
+  DX, DY, iCaret: integer;
   //
   procedure UpdatePntText;
   var
@@ -7959,7 +7968,19 @@ begin
                 end
                 else
                 begin
-                  Carets[0].SelectToPoint(PntText.X, PntText.Y);
+                  if Carets.Count > 1 then
+                  begin
+                    // Multi-caret: propagate the drag delta to every caret.
+                    // Each caret extends its selection by the same (DX, DY) offset
+                    // as the primary caret, mirroring exactly what Shift+Arrow already does.
+                    // This works correctly whether the ranges are on the same line or different lines.
+                    DX:= PntText.X - FMouseDownPnt.X;
+                    DY:= PntText.Y - FMouseDownPnt.Y;
+                    for iCaret:= 0 to Carets.Count-1 do
+                      Carets[iCaret].SelectToPoint(Carets[iCaret].PosX + DX, Carets[iCaret].PosY + DY);
+                  end
+                  else
+                    Carets[0].SelectToPoint(PntText.X, PntText.Y);
                   //writeln('Carets[0].SelToPnt: '+inttostr(PntText.X)+':'+inttostr(PntText.Y));
                 end;
               end;
