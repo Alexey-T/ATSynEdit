@@ -725,6 +725,7 @@ type
     FMouseDownWithCtrl: boolean;
     FMouseDownWithAlt: boolean;
     FMouseDownWithShift: boolean;
+    FMouseClickWasHandled: boolean;
     FMouseNiceScrollPos: TATPoint;
     FMouseDragDropping: boolean;
     FMouseDragDroppingReal: boolean;
@@ -7194,6 +7195,7 @@ begin
           bClickHandled:= false;
           if Assigned(FOnClickBefore) then
             FOnClickBefore(Self, FMouseDownPnt.X, FMouseDownPnt.Y, bClickHandled);
+          FMouseClickWasHandled:= bClickHandled;
           if not bClickHandled then
             DoCaretSingleAsIs;
 
@@ -7398,6 +7400,7 @@ begin
   if not OptMouseEnableAll then exit;
   inherited;
   PosCoord:= ATPoint(X, Y);
+  FMouseClickWasHandled:= false;
 
   if FOptShowMouseSelFrame or FMouseDownAndColumnSelection then
     if FMouseDragCoord.X>=0 then
@@ -7496,6 +7499,7 @@ begin
   FMouseDownWithCtrl:= false;
   FMouseDownWithAlt:= false;
   FMouseDownWithShift:= false;
+  FMouseClickWasHandled:= false;
   FMouseDragDropping:= false;
   FMouseDragDroppingReal:= false;
   FMouseDragMinimap:= false;
@@ -7940,7 +7944,8 @@ begin
               begin
                 //normal selection
                 if not bSelectShiftExpanding then //check it to allow expanding of selection by Shift+[mouse drag]
-                  DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
+                  if not FMouseClickWasHandled then
+                    DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
                 //writeln('DoCaretSingle: '+inttostr(FMouseDownPnt.X)+':'+inttostr(FMouseDownPnt.Y));
 
                 if FMouseDownDouble and FOptMouse2ClickDragSelectsWords then
