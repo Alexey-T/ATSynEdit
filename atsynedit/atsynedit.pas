@@ -7220,12 +7220,14 @@ begin
                 exit;
             end;
 
-            {
-            //commented: click below the text must put caret at the text end, like in Sublime
-            if not PosDetails.BelowAllText then
-              DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
-            }
-            DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
+            if not bClickHandled then
+              DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y)
+            else
+            begin
+              //reposition the first caret without removing other carets
+              if Carets.Count > 0 then
+                Carets[0].Change(FMouseDownPnt.X, FMouseDownPnt.Y, -1, -1);
+            end;
 
             bUnfoldClickedPos:= (FFoldStyle in cEditorFoldStylesUnfoldOnClick)
               //ignore click on fold-mark, because we handle double-click on it (select entire range)
