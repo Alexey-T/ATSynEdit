@@ -139,9 +139,9 @@ begin
   M.Add(cCommand_ToggleMinimap, 'toggle show mini-map', [], []);
   M.Add(cCommand_ToggleMicromap, 'toggle show micro-map', [], []);
 
-  M.Add(cCommand_ColSelectWithoutKey_Toggle, 'column selection without key modifier: toggle', [], []);
-  M.Add(cCommand_ColSelectWithoutKey_On, 'column selection without key modifier: on', [], []);
-  M.Add(cCommand_ColSelectWithoutKey_Off, 'column selection without key modifier: off', [], []);
+  M.Add(cCommand_ColSelectWithoutKey_Toggle, 'mouse column selection without key modifier: toggle', [], []);
+  M.Add(cCommand_ColSelectWithoutKey_On, 'mouse column selection without key modifier: on', [], []);
+  M.Add(cCommand_ColSelectWithoutKey_Off, 'mouse column selection without key modifier: off', [], []);
 
   M.Add(cCommand_TextDeleteWordPrev, 'delete word previous', [scXControl+VK_BACK], []);
   M.Add(cCommand_TextDeleteWordNext, 'delete word next', [scXControl+VK_DELETE], []);
