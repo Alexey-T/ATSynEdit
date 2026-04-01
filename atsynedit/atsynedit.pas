@@ -715,6 +715,7 @@ type
     FMouseDragCoord: TATPoint;
     FMouseDownPnt: TPoint;
     FMouseDownPnt_ColumnSelOrigin: TPoint;
+    FMouseDownCaretPositions: array of TPoint;
     FMouseDownAndColumnSelection: boolean;
     FMouseDownGutterLineNumber: integer;
     FMouseDownOnEditingArea: boolean;
@@ -7505,6 +7506,7 @@ begin
   FMouseDragMinimap:= false;
   FMouseDragCoord:= ATPoint(-1, -1);
   FMouseRightClickOnGutterIsHandled:= false;
+  SetLength(FMouseDownCaretPositions, 0);
 
   if Assigned(FTimerScroll) then
     FTimerScroll.Enabled:= false;
@@ -7983,8 +7985,30 @@ begin
                     // This works correctly whether the ranges are on the same line or different lines.
                     DX:= PntText.X - FMouseDownPnt.X;
                     DY:= PntText.Y - FMouseDownPnt.Y;
+                    // Save anchor positions on first MouseMove after click was handled.
+                    // Done here (not in MouseDown) so Python has time to reposition
+                    // secondary carets via on_caret before we snapshot their positions.
+                    if FMouseClickWasHandled and (Length(FMouseDownCaretPositions)=0) then
+                    begin
+                      SetLength(FMouseDownCaretPositions, Carets.Count);
+                      for iCaret:= 0 to Carets.Count-1 do
+                      begin
+                        FMouseDownCaretPositions[iCaret].X:= Carets[iCaret].PosX;
+                        FMouseDownCaretPositions[iCaret].Y:= Carets[iCaret].PosY;
+                      end;
+                    end;
                     for iCaret:= 0 to Carets.Count-1 do
-                      Carets[iCaret].SelectToPoint(Carets[iCaret].PosX + DX, Carets[iCaret].PosY + DY);
+                    begin
+                      // Use saved anchor positions to avoid delta accumulation.
+                      if iCaret < Length(FMouseDownCaretPositions) then
+                        Carets[iCaret].SelectToPoint(
+                          FMouseDownCaretPositions[iCaret].X + DX,
+                          FMouseDownCaretPositions[iCaret].Y + DY)
+                      else
+                        Carets[iCaret].SelectToPoint(
+                          Carets[iCaret].PosX + DX,
+                          Carets[iCaret].PosY + DY);
+                    end;
                   end
                   else
                     Carets[0].SelectToPoint(PntText.X, PntText.Y);
