@@ -177,8 +177,12 @@ begin
 
     TATEditorSelectColumnDirection.AbsEnd:
       begin
-        FSelRectEnd.X:= Strings.LinesLen[FSelRect.Top];
-        FSelRectEnd.Y:= Strings.Count-1;
+        N:= Strings.Count-1;
+        if Strings.IsIndexValid(N) then
+        begin
+          FSelRectEnd.X:= Strings.LinesLen[N];
+          FSelRectEnd.Y:= N;
+        end;
         Result:= [TATCommandResult.KeepColumnSel, TATCommandResult.CaretAny];
       end;
   end;
