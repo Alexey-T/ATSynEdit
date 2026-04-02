@@ -93,7 +93,7 @@ end;
 function TATSynEdit.DoCommand_SelectColumnToDirection(ADir: TATEditorSelectColumnDirection): TATCommandResults;
 var
   N, NPageLines: integer;
-  NLenTotal, NLenNonspace: integer;
+  NLenTotal, NLenNonspace, NIndent: integer;
   bDown, bHadSelection: boolean;
 begin
   Result:= [];
@@ -159,7 +159,17 @@ begin
 
     TATEditorSelectColumnDirection.LineBegin:
       begin
-        FSelRectEnd.X:= 0;
+        DoCalcRangeLineLength(
+          Min(FSelRectBegin.Y, FSelRectEnd.Y),
+          Max(FSelRectBegin.Y, FSelRectEnd.Y),
+          NLenTotal,
+          NLenNonspace,
+          NIndent
+          );
+        if FSelRectEnd.X>0 then
+          FSelRectEnd.X:= 0
+        else
+          FSelRectEnd.X:= NIndent;
         Result:= [TATCommandResult.KeepColumnSel, TATCommandResult.CaretAny];
       end;
 
@@ -169,9 +179,13 @@ begin
           Min(FSelRectBegin.Y, FSelRectEnd.Y),
           Max(FSelRectBegin.Y, FSelRectEnd.Y),
           NLenTotal,
-          NLenNonspace
+          NLenNonspace,
+          NIndent
           );
-        FSelRectEnd.X:= NLenTotal;
+        if FSelRectEnd.X<NLenTotal then
+          FSelRectEnd.X:= NLenTotal
+        else
+          FSelRectEnd.X:= NLenNonspace;
         Result:= [TATCommandResult.KeepColumnSel, TATCommandResult.CaretAny];
       end;
 
@@ -190,7 +204,8 @@ begin
           Min(FSelRectBegin.Y, FSelRectEnd.Y),
           N,
           NLenTotal,
-          NLenNonspace
+          NLenNonspace,
+          NIndent
           );
         FSelRectEnd.X:= NLenTotal;
         FSelRectEnd.Y:= N;
