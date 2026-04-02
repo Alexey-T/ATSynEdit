@@ -185,17 +185,15 @@ begin
     TATEditorSelectColumnDirection.AbsEnd:
       begin
         N:= Strings.Count-1;
-        if Strings.IsIndexValid(N) then
-        begin
-          DoCalcRangeLineLength(
-            Min(FSelRectBegin.Y, FSelRectEnd.Y),
-            N,
-            NLenTotal,
-            NLenNonspace
-            );
-          FSelRectEnd.X:= NLenTotal;
-          FSelRectEnd.Y:= N;
-        end;
+        if N<0 then Exit([]);
+        DoCalcRangeLineLength(
+          Min(FSelRectBegin.Y, FSelRectEnd.Y),
+          N,
+          NLenTotal,
+          NLenNonspace
+          );
+        FSelRectEnd.X:= NLenTotal;
+        FSelRectEnd.Y:= N;
         Result:= [TATCommandResult.KeepColumnSel, TATCommandResult.CaretAny];
       end;
   end;
