@@ -452,7 +452,7 @@ begin
       begin
         OptMouseColumnSelectionWithoutKey:= false;
         if OptKeyColumnSelectionWithoutKey then
-          Result:= DoCommand_SelectColumnToLineEdge(false)
+          Result:= DoCommand_SelectColumnToDirection(TATEditorSelectColumnDirection.LineBegin)
         else
           Result:= DoCommand_KeyHome;
       end;
@@ -464,7 +464,7 @@ begin
       begin
         OptMouseColumnSelectionWithoutKey:= false;
         if OptKeyColumnSelectionWithoutKey then
-          Result:= DoCommand_SelectColumnToLineEdge(true)
+          Result:= DoCommand_SelectColumnToDirection(TATEditorSelectColumnDirection.LineEnd)
         else
           Result:= DoCommand_KeyEnd;
       end;
@@ -499,8 +499,8 @@ begin
     cCommand_ColSelectDown:        Result:= DoCommand_SelectColumnToDirection(TATEditorSelectColumnDirection.Down);
     cCommand_ColSelectPageUp:      Result:= DoCommand_SelectColumnToDirection(TATEditorSelectColumnDirection.PageUp);
     cCommand_ColSelectPageDown:    Result:= DoCommand_SelectColumnToDirection(TATEditorSelectColumnDirection.PageDown);
-    cCommand_ColSelectToLineBegin: Result:= DoCommand_SelectColumnToLineEdge(false);
-    cCommand_ColSelectToLineEnd:   Result:= DoCommand_SelectColumnToLineEdge(true);
+    cCommand_ColSelectToLineBegin: Result:= DoCommand_SelectColumnToDirection(TATEditorSelectColumnDirection.LineBegin);
+    cCommand_ColSelectToLineEnd:   Result:= DoCommand_SelectColumnToDirection(TATEditorSelectColumnDirection.LineEnd);
 
     cCommand_MouseColSelectWithoutKey_On:
       begin

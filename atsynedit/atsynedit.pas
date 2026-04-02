@@ -230,7 +230,9 @@ type
     Up,
     Down,
     PageUp,
-    PageDown
+    PageDown,
+    LineBegin,
+    LineEnd
     );
 
   TATEditorScrollbarsArrowsKind = (
@@ -1535,7 +1537,6 @@ type
     function DoCommand_MoveSelectionUpDown(ADown: boolean): TATCommandResults;
     function DoCommand_TextInsertEmptyAboveBelow(ADown: boolean): TATCommandResults;
     function DoCommand_SelectColumnToDirection(ADir: TATEditorSelectColumnDirection): TATCommandResults;
-    function DoCommand_SelectColumnToLineEdge(AToEnd: boolean): TATCommandResults;
     function DoCommand_SelectFoldingRangeAtCaret: TATCommandResults;
     function DoCommand_RemoveOneCaret(AFirstCaret: boolean): TATCommandResults;
     function DoCommand_TextInsertColumnBlockOnce(const AText: string; AKeepCaret: boolean): TATCommandResults;
