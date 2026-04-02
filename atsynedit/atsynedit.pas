@@ -11786,6 +11786,7 @@ end;
 procedure TATSynEdit.DoCalcRangeLineLength(ALineFrom, ALineTo: integer; out ALenTotal, ALenNonspace: integer);
 var
   St: TATStrings;
+  S: UnicodeString;
   iLine, NLenTotal, NLenNonspace: integer;
 begin
   ALenTotal:= 0;
@@ -11794,10 +11795,14 @@ begin
   St:= Strings;
   for iLine:= ALineFrom to Min(ALineTo, St.Count-1) do
   begin
-    NLenTotal:= St.LinesLen[iLine];
+    S:= St.Lines[iLine];
+    NLenTotal:= Length(S);
     NLenNonspace:= NLenTotal;
-    while (NLenNonspace>0) and IsCharSpace(St.LineCharAt(iLine, NLenNonspace)) do
+    while (NLenNonspace>0) and IsCharSpace(S[NLenNonspace]) do
       Dec(NLenNonspace);
+
+    NLenTotal:= TabHelper.CharPosToColumnPos(iLine, S, NLenTotal);
+    NLenNonspace:= TabHelper.CharPosToColumnPos(iLine, S, NLenNonspace);
 
     if ALenTotal<NLenTotal then
       ALenTotal:= NLenTotal;
