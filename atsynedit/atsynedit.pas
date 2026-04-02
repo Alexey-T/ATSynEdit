@@ -11797,15 +11797,16 @@ begin
   St:= Strings;
   for iLine:= ALineFrom to Min(ALineTo, St.Count-1) do
   begin
-    S:= St.Lines[iLine];
-    NLenTotal:= Length(S);
+    NLenTotal:= St.LinesLen[iLine];
     NLenNonspace:= NLenTotal;
 
-    while (NLenNonspace>0) and IsCharSpace(S[NLenNonspace]) do
-      Dec(NLenNonspace);
-
-    NLenTotal:= TabHelper.CharPosToColumnPos(iLine, S, NLenTotal);
-    NLenNonspace:= TabHelper.CharPosToColumnPos(iLine, S, NLenNonspace);
+    if NLenTotal<=TATEditorOptions.MaxLineLenToCalculateRangeIndents then
+    begin
+      S:= St.Lines[iLine];
+      NLenNonspace:= SGetNonSpaceLength(S);
+      NLenTotal:= TabHelper.CharPosToColumnPos(iLine, S, NLenTotal);
+      NLenNonspace:= TabHelper.CharPosToColumnPos(iLine, S, NLenNonspace);
+    end;
 
     if ALenTotal<NLenTotal then
       ALenTotal:= NLenTotal;
@@ -11825,6 +11826,11 @@ begin
   St:= Strings;
   for iLine:= ALineFrom to Min(ALineTo, St.Count-1) do
   begin
+    if St.LinesLen[iLine]>TATEditorOptions.MaxLineLenToCalculateRangeIndents then
+    begin
+      AIndent:= 0;
+      Exit;
+    end;
     S:= St.Lines[iLine];
     NIndent:= SGetIndentChars(S);
     if AIndent>NIndent then
