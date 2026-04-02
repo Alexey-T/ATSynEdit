@@ -1139,8 +1139,8 @@ type
     FOptDimUnfocusedBack: integer;
 
     //
-    procedure DoCalcRangeLineLength(ALineFrom, ALineTo: integer;
-      out ALenTotal, ALenNonspace, AIndent: integer);
+    procedure DoCalcRangeLineLength(ALineFrom, ALineTo: integer; out ALenTotal, ALenNonspace: integer);
+    procedure DoCalcRangeLineIndent(ALineFrom, ALineTo: integer; out AIndent: integer);
     function DoCalcFoldDeepestRangeContainingCaret: integer;
     function DoCalcForegroundFromAttribs(AX, AY: integer; var AColor: TColor;
       var AFontStyles: TFontStyles): boolean;
@@ -11784,16 +11784,15 @@ begin
   Result:= _GapsSize(Strings, Gaps, EditorIndex, ALine, ALine);
 end;
 
-procedure TATSynEdit.DoCalcRangeLineLength(ALineFrom, ALineTo: integer;
-  out ALenTotal, ALenNonspace, AIndent: integer);
+procedure TATSynEdit.DoCalcRangeLineLength(ALineFrom, ALineTo: integer; out
+  ALenTotal, ALenNonspace: integer);
 var
   St: TATStrings;
   S: UnicodeString;
-  iLine, NLenTotal, NLenNonspace, NIndent: integer;
+  iLine, NLenTotal, NLenNonspace: integer;
 begin
   ALenTotal:= 0;
   ALenNonspace:= 0;
-  AIndent:= 1000;
 
   St:= Strings;
   for iLine:= ALineFrom to Min(ALineTo, St.Count-1) do
@@ -11801,7 +11800,6 @@ begin
     S:= St.Lines[iLine];
     NLenTotal:= Length(S);
     NLenNonspace:= NLenTotal;
-    NIndent:= SGetIndentChars(S);
 
     while (NLenNonspace>0) and IsCharSpace(S[NLenNonspace]) do
       Dec(NLenNonspace);
@@ -11813,6 +11811,22 @@ begin
       ALenTotal:= NLenTotal;
     if ALenNonspace<NLenNonspace then
       ALenNonspace:= NLenNonspace;
+  end;
+end;
+
+procedure TATSynEdit.DoCalcRangeLineIndent(ALineFrom, ALineTo: integer; out AIndent: integer);
+var
+  St: TATStrings;
+  S: UnicodeString;
+  iLine, NIndent: integer;
+begin
+  AIndent:= 1000;
+
+  St:= Strings;
+  for iLine:= ALineFrom to Min(ALineTo, St.Count-1) do
+  begin
+    S:= St.Lines[iLine];
+    NIndent:= SGetIndentChars(S);
     if AIndent>NIndent then
       AIndent:= NIndent;
   end;

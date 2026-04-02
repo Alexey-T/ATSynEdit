@@ -159,11 +159,9 @@ begin
 
     TATEditorSelectColumnDirection.LineBegin:
       begin
-        DoCalcRangeLineLength(
+        DoCalcRangeLineIndent(
           Min(FSelRectBegin.Y, FSelRectEnd.Y),
           Max(FSelRectBegin.Y, FSelRectEnd.Y),
-          NLenTotal,
-          NLenNonspace,
           NIndent
           );
         if FSelRectEnd.X>0 then
@@ -179,8 +177,7 @@ begin
           Min(FSelRectBegin.Y, FSelRectEnd.Y),
           Max(FSelRectBegin.Y, FSelRectEnd.Y),
           NLenTotal,
-          NLenNonspace,
-          NIndent
+          NLenNonspace
           );
         if FSelRectEnd.X<NLenTotal then
           FSelRectEnd.X:= NLenTotal
@@ -204,8 +201,7 @@ begin
           Min(FSelRectBegin.Y, FSelRectEnd.Y),
           N,
           NLenTotal,
-          NLenNonspace,
-          NIndent
+          NLenNonspace
           );
         FSelRectEnd.X:= NLenTotal;
         FSelRectEnd.Y:= N;
