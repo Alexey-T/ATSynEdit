@@ -504,33 +504,57 @@ begin
 
     cCommand_MouseColSelectWithoutKey_On:
       begin
-        OptMouseColumnSelectionWithoutKey:= true;
-        Result:= [TATCommandResult.State];
+        if not OptMouseColumnSelectionWithoutKey then
+        begin
+          OptMouseColumnSelectionWithoutKey:= true;
+          OptKeyColumnSelectionWithoutKey:= false;
+          Result:= [TATCommandResult.State];
+        end
+        else
+          Result:= [];
       end;
     cCommand_MouseColSelectWithoutKey_Off:
       begin
-        OptMouseColumnSelectionWithoutKey:= false;
-        Result:= [TATCommandResult.State];
+        if OptMouseColumnSelectionWithoutKey then
+        begin
+          OptMouseColumnSelectionWithoutKey:= false;
+          Result:= [TATCommandResult.State];
+        end
+        else
+          Result:= [];
       end;
     cCommand_MouseColSelectWithoutKey_Toggle:
       begin
         OptMouseColumnSelectionWithoutKey:= not OptMouseColumnSelectionWithoutKey;
+        OptKeyColumnSelectionWithoutKey:= false;
         Result:= [TATCommandResult.State];
       end;
 
     cCommand_KeyboardColSelectWithoutKey_On:
       begin
-        OptKeyColumnSelectionWithoutKey:= true;
-        Result:= [TATCommandResult.State];
+        if not OptKeyColumnSelectionWithoutKey then
+        begin
+          OptKeyColumnSelectionWithoutKey:= true;
+          OptMouseColumnSelectionWithoutKey:= false;
+          Result:= [TATCommandResult.State];
+        end
+        else
+          Result:= [];
       end;
     cCommand_KeyboardColSelectWithoutKey_Off:
       begin
-        OptKeyColumnSelectionWithoutKey:= false;
-        Result:= [TATCommandResult.State];
+        if OptKeyColumnSelectionWithoutKey then
+        begin
+          OptKeyColumnSelectionWithoutKey:= false;
+          Result:= [TATCommandResult.State];
+        end
+        else
+          Result:= [];
       end;
     cCommand_KeyboardColSelectWithoutKey_Toggle:
       begin
         OptKeyColumnSelectionWithoutKey:= not OptKeyColumnSelectionWithoutKey;
+        OptMouseColumnSelectionWithoutKey:= false;
         Result:= [TATCommandResult.State];
       end;
 
