@@ -1139,6 +1139,7 @@ type
     FOptDimUnfocusedBack: integer;
 
     //
+    procedure DoCalcRangeLineLength(ALineFrom, ALineTo: integer; out ALenTotal, ALenNonspace: integer);
     function DoCalcFoldDeepestRangeContainingCaret: integer;
     function DoCalcForegroundFromAttribs(AX, AY: integer; var AColor: TColor;
       var AFontStyles: TFontStyles): boolean;
@@ -11780,6 +11781,29 @@ end;
 function TATSynEdit.GapsSizeForLine(ALine: integer): integer;
 begin
   Result:= _GapsSize(Strings, Gaps, EditorIndex, ALine, ALine);
+end;
+
+procedure TATSynEdit.DoCalcRangeLineLength(ALineFrom, ALineTo: integer; out ALenTotal, ALenNonspace: integer);
+var
+  St: TATStrings;
+  iLine, NLenTotal, NLenNonspace: integer;
+begin
+  ALenTotal:= 0;
+  ALenNonspace:= 0;
+
+  St:= Strings;
+  for iLine:= ALineFrom to Min(ALineTo, St.Count-1) do
+  begin
+    NLenTotal:= St.LinesLen[iLine];
+    NLenNonspace:= NLenTotal;
+    while (NLenNonspace>0) and IsCharSpace(St.LineCharAt(iLine, NLenNonspace)) do
+      Dec(NLenNonspace);
+
+    if ALenTotal<NLenTotal then
+      ALenTotal:= NLenTotal;
+    if ALenNonspace<NLenNonspace then
+      ALenNonspace:= NLenNonspace;
+  end;
 end;
 
 

@@ -93,6 +93,7 @@ end;
 function TATSynEdit.DoCommand_SelectColumnToDirection(ADir: TATEditorSelectColumnDirection): TATCommandResults;
 var
   N, NPageLines: integer;
+  NLenTotal, NLenNonspace: integer;
   bDown, bHadSelection: boolean;
 begin
   Result:= [];
@@ -164,7 +165,8 @@ begin
 
     TATEditorSelectColumnDirection.LineEnd:
       begin
-        FSelRectEnd.X:= Strings.LinesLen[FSelRect.Top];
+        DoCalcRangeLineLength(FSelRect.Top, FSelRect.Bottom, NLenTotal, NLenNonspace);
+        FSelRectEnd.X:= NLenTotal;
         Result:= [TATCommandResult.KeepColumnSel, TATCommandResult.CaretAny];
       end;
 
@@ -180,7 +182,8 @@ begin
         N:= Strings.Count-1;
         if Strings.IsIndexValid(N) then
         begin
-          FSelRectEnd.X:= Strings.LinesLen[N];
+          DoCalcRangeLineLength(FSelRect.Top, N, NLenTotal, NLenNonspace);
+          FSelRectEnd.X:= NLenTotal;
           FSelRectEnd.Y:= N;
         end;
         Result:= [TATCommandResult.KeepColumnSel, TATCommandResult.CaretAny];
