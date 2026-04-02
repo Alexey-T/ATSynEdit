@@ -165,7 +165,12 @@ begin
 
     TATEditorSelectColumnDirection.LineEnd:
       begin
-        DoCalcRangeLineLength(FSelRect.Top, FSelRect.Bottom, NLenTotal, NLenNonspace);
+        DoCalcRangeLineLength(
+          Min(FSelRectBegin.Y, FSelRectEnd.Y),
+          Max(FSelRectBegin.Y, FSelRectEnd.Y),
+          NLenTotal,
+          NLenNonspace
+          );
         FSelRectEnd.X:= NLenTotal;
         Result:= [TATCommandResult.KeepColumnSel, TATCommandResult.CaretAny];
       end;
@@ -182,7 +187,12 @@ begin
         N:= Strings.Count-1;
         if Strings.IsIndexValid(N) then
         begin
-          DoCalcRangeLineLength(FSelRect.Top, N, NLenTotal, NLenNonspace);
+          DoCalcRangeLineLength(
+            Min(FSelRectBegin.Y, FSelRectEnd.Y),
+            N,
+            NLenTotal,
+            NLenNonspace
+            );
           FSelRectEnd.X:= NLenTotal;
           FSelRectEnd.Y:= N;
         end;
