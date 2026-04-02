@@ -167,6 +167,20 @@ begin
         FSelRectEnd.X:= Strings.LinesLen[FSelRect.Top];
         Result:= [TATCommandResult.KeepColumnSel, TATCommandResult.CaretAny];
       end;
+
+    TATEditorSelectColumnDirection.AbsBegin:
+      begin
+        FSelRectEnd.X:= 0;
+        FSelRectEnd.Y:= 0;
+        Result:= [TATCommandResult.KeepColumnSel, TATCommandResult.CaretAny];
+      end;
+
+    TATEditorSelectColumnDirection.AbsEnd:
+      begin
+        FSelRectEnd.X:= Strings.LinesLen[FSelRect.Top];
+        FSelRectEnd.Y:= Strings.Count-1;
+        Result:= [TATCommandResult.KeepColumnSel, TATCommandResult.CaretAny];
+      end;
   end;
 
   //this makes multi-carets from FSelRectBegin/FSelRectEnd

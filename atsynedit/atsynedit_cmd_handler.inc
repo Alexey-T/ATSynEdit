@@ -594,10 +594,25 @@ begin
     cCommand_SelectWords:              Result:= DoCommand_SelectWords;
     cCommand_SelectLines:              Result:= DoCommand_SelectLines;
 
-    cCommand_GotoTextBegin,
-    cCommand_GotoTextBegin_Sel:        Result:= DoCommand_GotoTextBegin;
-    cCommand_GotoTextEnd,
-    cCommand_GotoTextEnd_Sel:          Result:= DoCommand_GotoTextEnd;
+    cCommand_GotoTextBegin:
+      Result:= DoCommand_GotoTextBegin;
+    cCommand_GotoTextBegin_Sel:
+      begin
+        if OptKeyColumnSelectionWithoutKey then
+          Result:= DoCommand_SelectColumnToDirection(TATEditorSelectColumnDirection.AbsBegin)
+        else
+          Result:= DoCommand_GotoTextBegin;
+      end;
+
+    cCommand_GotoTextEnd:
+      Result:= DoCommand_GotoTextEnd;
+    cCommand_GotoTextEnd_Sel:
+      begin
+        if OptKeyColumnSelectionWithoutKey then
+          Result:= DoCommand_SelectColumnToDirection(TATEditorSelectColumnDirection.AbsEnd)
+        else
+          Result:= DoCommand_GotoTextEnd;
+      end;
 
     cCommand_GotoScreenTop:            Result:= DoCommand_GotoScreenSide(TATCaretScreenSide.Top);
     cCommand_GotoScreenBottom:         Result:= DoCommand_GotoScreenSide(TATCaretScreenSide.Bottom);

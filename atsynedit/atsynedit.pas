@@ -232,7 +232,9 @@ type
     PageUp,
     PageDown,
     LineBegin,
-    LineEnd
+    LineEnd,
+    AbsBegin,
+    AbsEnd
     );
 
   TATEditorScrollbarsArrowsKind = (
