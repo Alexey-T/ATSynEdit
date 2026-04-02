@@ -164,10 +164,10 @@ begin
           Max(FSelRectBegin.Y, FSelRectEnd.Y),
           NIndent
           );
-        if FSelRectEnd.X>0 then
-          FSelRectEnd.X:= 0
+        if (FSelRectEnd.X<>NIndent) and FOptKeyHomeToNonSpace then
+          FSelRectEnd.X:= NIndent
         else
-          FSelRectEnd.X:= NIndent;
+          FSelRectEnd.X:= 0;
         Result:= [TATCommandResult.KeepColumnSel, TATCommandResult.CaretAny];
       end;
 
@@ -179,10 +179,10 @@ begin
           NLenTotal,
           NLenNonspace
           );
-        if FSelRectEnd.X<NLenTotal then
-          FSelRectEnd.X:= NLenTotal
+        if (FSelRectEnd.X<>NLenNonspace) and FOptKeyEndToNonSpace then
+          FSelRectEnd.X:= NLenNonspace
         else
-          FSelRectEnd.X:= NLenNonspace;
+          FSelRectEnd.X:= NLenTotal;
         Result:= [TATCommandResult.KeepColumnSel, TATCommandResult.CaretAny];
       end;
 
