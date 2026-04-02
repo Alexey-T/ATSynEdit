@@ -1086,6 +1086,7 @@ type
     FOptKeyHomeEndNavigateWrapped: boolean;
     FOptKeyTabIndents: boolean;
     FOptKeyTabIndentsVerticalBlock: boolean;
+    FOptKeyColumnSelectionWithoutKey: boolean;
     FOptCopyLinesIfNoSel: boolean;
     FOptCutLinesIfNoSel: boolean;
     FOptCopyColumnBlockAlignedBySpaces: boolean;
@@ -1522,7 +1523,6 @@ type
     procedure DoCommandResults(ACmd: integer; ARes: TATCommandResults);
     function DoCommand_TextInsertAtCarets(const AText: atString; AKeepCaret,
       AOvrMode, ASelectThen, AInsertAtLineStarts: boolean): TATCommandResults;
-    function DoCommand_ColumnSelectWithoutKey(AValue: boolean): TATCommandResults;
     function DoCommand_FoldLevel(ALevel: integer): TATCommandResults;
     function DoCommand_FoldAll: TATCommandResults;
     function DoCommand_FoldUnAll: TATCommandResults;
@@ -2267,6 +2267,7 @@ type
     property OptKeyEndToNonSpace: boolean read FOptKeyEndToNonSpace write FOptKeyEndToNonSpace default true;
     property OptKeyTabIndents: boolean read FOptKeyTabIndents write FOptKeyTabIndents default true;
     property OptKeyTabIndentsVerticalBlock: boolean read FOptKeyTabIndentsVerticalBlock write FOptKeyTabIndentsVerticalBlock default false;
+    property OptKeyColumnSelectionWithoutKey: boolean read FOptKeyColumnSelectionWithoutKey write FOptKeyColumnSelectionWithoutKey default false;
     property OptIndentSize: integer read FOptIndentSize write FOptIndentSize default 2;
              // N>0: use N spaces
              // N<0: use N tabs

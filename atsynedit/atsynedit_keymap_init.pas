@@ -139,9 +139,13 @@ begin
   M.Add(cCommand_ToggleMinimap, 'toggle show mini-map', [], []);
   M.Add(cCommand_ToggleMicromap, 'toggle show micro-map', [], []);
 
-  M.Add(cCommand_ColSelectWithoutKey_Toggle, 'mouse column selection without key modifier: toggle', [], []);
-  M.Add(cCommand_ColSelectWithoutKey_On, 'mouse column selection without key modifier: on', [], []);
-  M.Add(cCommand_ColSelectWithoutKey_Off, 'mouse column selection without key modifier: off', [], []);
+  M.Add(cCommand_MouseColSelectWithoutKey_Toggle, 'mouse column selection, without Alt-key: toggle', [], []);
+  M.Add(cCommand_MouseColSelectWithoutKey_On, 'mouse column selection, without Alt-key: on', [], []);
+  M.Add(cCommand_MouseColSelectWithoutKey_Off, 'mouse column selection, without Alt-key: off', [], []);
+
+  M.Add(cCommand_KeyboardColSelectWithoutKey_Toggle, 'keyboard column selection, without Alt-key: toggle', [], []);
+  M.Add(cCommand_KeyboardColSelectWithoutKey_On, 'keyboard column selection, without Alt-key: on', [], []);
+  M.Add(cCommand_KeyboardColSelectWithoutKey_Off, 'keyboard column selection, without Alt-key: off', [], []);
 
   M.Add(cCommand_TextDeleteWordPrev, 'delete word previous', [scXControl+VK_BACK], []);
   M.Add(cCommand_TextDeleteWordNext, 'delete word next', [scXControl+VK_DELETE], []);

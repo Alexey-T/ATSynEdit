@@ -384,9 +384,4 @@ begin
   Result:= [TATCommandResult.CaretAny];
 end;
 
-function TATSynEdit.DoCommand_ColumnSelectWithoutKey(AValue: boolean): TATCommandResults;
-begin
-  FOptMouseColumnSelectionWithoutKey:= AValue;
-  Result:= [TATCommandResult.State];
-end;
 

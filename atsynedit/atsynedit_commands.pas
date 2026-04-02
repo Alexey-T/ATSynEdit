@@ -55,12 +55,16 @@ const
   cCommand_ColSelectPageUp = 116;
   cCommand_ColSelectPageDown = 117;
 
-  cCommand_ColSelectWithoutKey_On = 130;
-  cCommand_ColSelectWithoutKey_Off = 131;
-  cCommand_ColSelectWithoutKey_Toggle = 132;
+  cCommand_MouseColSelectWithoutKey_On = 130;
+  cCommand_MouseColSelectWithoutKey_Off = 131;
+  cCommand_MouseColSelectWithoutKey_Toggle = 132;
 
   cCommand_RemoveFirstCaret = 135;
   cCommand_RemoveLastCaret = 136;
+
+  cCommand_KeyboardColSelectWithoutKey_On = 137;
+  cCommand_KeyboardColSelectWithoutKey_Off = 138;
+  cCommand_KeyboardColSelectWithoutKey_Toggle = 139;
 
   cCommand_TextInsert = 150;
   cCommand_TextInsertTabChar = 151;
