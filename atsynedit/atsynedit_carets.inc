@@ -24,7 +24,7 @@ begin
 end;
 
 
-procedure TATSynEdit.DoCaretsAddOnColumnBlock(APos1, APos2: TPoint; const ARect: TRect);
+procedure TATSynEdit.DoCaretsAddOnColumnBlock(ALineFrom, ALineTo: integer; const ARect: TRect);
 var
   St: TATStrings;
   bChanged, bCaretAtLeft: boolean;
@@ -34,9 +34,9 @@ begin
   bChanged:= false;
   bCaretAtLeft:= FSelRectBegin.X>FSelRectEnd.X;
 
-  for i:= APos1.Y to APos2.Y do
+  for i:= ALineFrom to ALineTo do
   begin
-    if i=APos1.Y then
+    if i=ALineFrom then
       Carets.Clear;
 
     X1:= St.ColumnPosToCharPos(i, ARect.Right, FTabHelper);

@@ -596,7 +596,7 @@ begin
     SwapInt(Pos1Col.Y, Pos2Col.Y);
 
   if FOptCaretsAddedToColumnSelection then
-    DoCaretsAddOnColumnBlock(Pos1Col, Pos2Col, FSelRect)
+    DoCaretsAddOnColumnBlock(Pos1Col.Y, Pos2Col.Y, FSelRect)
   else
   begin
     //single caret at moving block edge

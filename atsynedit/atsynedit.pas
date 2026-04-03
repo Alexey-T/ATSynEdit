@@ -1207,7 +1207,7 @@ type
       AProximity, AIndentVert: integer): boolean;
     function DoCaretApplyProximityToHorzEdge(ACaretCoordX: Int64;
       AProximity, AIndentHorz: integer): boolean;
-    procedure DoCaretsAddOnColumnBlock(APos1, APos2: TPoint; const ARect: TRect);
+    procedure DoCaretsAddOnColumnBlock(ALineFrom, ALineTo: integer; const ARect: TRect);
     procedure DoCaretsFixForSurrogatePairs(AMoveRight: boolean);
     function DoCaretsKeepOnScreen(ADirection: TATEditorDirection): boolean;
     procedure DoCaretsAssign(NewCarets: TATCarets);
