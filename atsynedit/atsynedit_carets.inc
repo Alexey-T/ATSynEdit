@@ -27,24 +27,29 @@ end;
 procedure TATSynEdit.DoCaretsAddOnColumnBlock(APos1, APos2: TPoint; const ARect: TRect);
 var
   St: TATStrings;
-  bChanged: boolean;
-  i: integer;
+  bChanged, bCaretAtLeft: boolean;
+  i, X1, X2: integer;
 begin
   St:= Strings;
   bChanged:= false;
+  bCaretAtLeft:= FSelRectBegin.X>FSelRectEnd.X;
+
   for i:= APos1.Y to APos2.Y do
   begin
     if i=APos1.Y then
       Carets.Clear;
-    Carets.Add(
-      St.ColumnPosToCharPos(i, ARect.Right, FTabHelper),
-      i,
-      St.ColumnPosToCharPos(i, ARect.Left, FTabHelper),
-      i,
-      false{AWithEvent}
-      );
+
+    X1:= St.ColumnPosToCharPos(i, ARect.Right, FTabHelper);
+    X2:= St.ColumnPosToCharPos(i, ARect.Left, FTabHelper);
+
+    //avoid carets always at the right side
+    if bCaretAtLeft then
+      SwapInt(X1, X2);
+
+    Carets.Add(X1, i, X2, i, false{AWithEvent});
     bChanged:= true;
   end;
+
   if bChanged then
     Carets.DoChanged;
 end;
