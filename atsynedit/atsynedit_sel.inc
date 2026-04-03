@@ -599,7 +599,12 @@ begin
   if FOptCaretsAddedToColumnSelection then
   begin
     bCaretAtLeft:= FSelRectBegin.X>FSelRectEnd.X;
-    DoCaretsAddOnColumnBlock(Pos1Col.Y, Pos2Col.Y, FSelRect, bCaretAtLeft);
+    DoCaretsAddOnColumnBlock(
+      Pos1Col.Y,
+      Pos2Col.Y,
+      FSelRect.Left,
+      FSelRect.Right,
+      bCaretAtLeft);
   end
   else
   begin
