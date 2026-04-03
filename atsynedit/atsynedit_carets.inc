@@ -34,11 +34,16 @@ begin
   St:= Strings;
   bChanged:= false;
 
+  i:= St.Count-1;
+  if i<0 then exit;
+  ALineFrom:= Min(ALineFrom, i);
+  ALineTo:= Min(ALineTo, i);
+  if ALineFrom>ALineTo then exit;
+
+  Carets.Clear;
+
   for i:= ALineFrom to ALineTo do
   begin
-    if i=ALineFrom then
-      Carets.Clear;
-
     X1:= St.ColumnPosToCharPos(i, AColTo, FTabHelper);
     X2:= St.ColumnPosToCharPos(i, AColFrom, FTabHelper);
     if ACaretAtLeft then
