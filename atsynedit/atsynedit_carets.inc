@@ -24,15 +24,15 @@ begin
 end;
 
 
-procedure TATSynEdit.DoCaretsAddOnColumnBlock(ALineFrom, ALineTo: integer; const ARect: TRect);
+procedure TATSynEdit.DoCaretsAddOnColumnBlock(ALineFrom, ALineTo: integer;
+  const ARect: TRect; ACaretAtLeft: boolean);
 var
   St: TATStrings;
-  bChanged, bCaretAtLeft: boolean;
+  bChanged: boolean;
   i, X1, X2: integer;
 begin
   St:= Strings;
   bChanged:= false;
-  bCaretAtLeft:= FSelRectBegin.X>FSelRectEnd.X;
 
   for i:= ALineFrom to ALineTo do
   begin
@@ -41,9 +41,7 @@ begin
 
     X1:= St.ColumnPosToCharPos(i, ARect.Right, FTabHelper);
     X2:= St.ColumnPosToCharPos(i, ARect.Left, FTabHelper);
-
-    //avoid carets always at the right side
-    if bCaretAtLeft then
+    if ACaretAtLeft then
       SwapInt(X1, X2);
 
     Carets.Add(X1, i, X2, i, false{AWithEvent});
