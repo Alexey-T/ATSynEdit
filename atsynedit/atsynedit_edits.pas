@@ -41,7 +41,7 @@ type
 
   TATComboEdit = class(TATEdit)
   public const
-    cInitMicromapScapePerColumn = 550;
+    cInitComboboxScalePerColumn = 550;
   private
     FItems: TStringList;
     FItemIndex: integer;
@@ -176,7 +176,7 @@ begin
 
   OptMicromapVisible:= true;
   OptComboboxShowX:= true;
-  OptMicromapScalePerColumn:= cInitMicromapScapePerColumn;
+  OptMicromapScalePerColumn:= cInitComboboxScalePerColumn;
   Micromap.Columns:= nil;
   Micromap.ColumnAdd(0, 100, clNone);
 
