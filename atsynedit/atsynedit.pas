@@ -788,6 +788,7 @@ type
     FOnDrawGap: TATSynEditDrawGapEvent;
     FOnDrawLine: TATSynEditDrawLineEvent;
     FOnDrawMicromap: TATSynEditDrawRectEvent;
+    FOnDrawEditorBefore: TATSynEditDrawRectEvent;
     FOnDrawEditor: TATSynEditDrawRectEvent;
     FOnDrawRuler: TATSynEditDrawRulerEvent;
     FOnCommand: TATSynEditCommandEvent;
@@ -2012,6 +2013,7 @@ type
     property OnDrawLine: TATSynEditDrawLineEvent read FOnDrawLine write FOnDrawLine;
     property OnDrawGap: TATSynEditDrawGapEvent read FOnDrawGap write FOnDrawGap;
     property OnDrawMicromap: TATSynEditDrawRectEvent read FOnDrawMicromap write FOnDrawMicromap;
+    property OnDrawEditorBefore: TATSynEditDrawRectEvent read FOnDrawEditorBefore write FOnDrawEditorBefore;
     property OnDrawEditor: TATSynEditDrawRectEvent read FOnDrawEditor write FOnDrawEditor;
     property OnDrawRuler: TATSynEditDrawRulerEvent read FOnDrawRuler write FOnDrawRuler;
     property OnCalcCaretsCoords: TNotifyEvent read FOnCalcCaretsCoords write FOnCalcCaretsCoords;
@@ -3699,8 +3701,8 @@ begin
     {$endif}
   end;
 
-  if Assigned(FOnDrawEditor) then
-    FOnDrawEditor(Self, C, FRectMain);
+  if Assigned(FOnDrawEditorBefore) then
+    FOnDrawEditorBefore(Self, C, FRectMain);
 
   UpdateLinksAttribs(ALineFrom);
   DoPaintText(C, FRectMain, FCharSize, FOptGutterVisible, FScrollHorz, FScrollVert, NWrapIndex);
@@ -3715,6 +3717,9 @@ begin
     if not bRulerHandled then
       DoPaintRuler(C);
   end;
+
+  if Assigned(FOnDrawEditor) then
+    FOnDrawEditor(Self, C, FRectMain);
 
   if FMicromapVisible and not FMicromapOnScrollbar then
     DoPaintMicromap(C);
