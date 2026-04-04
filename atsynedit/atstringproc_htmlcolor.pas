@@ -21,13 +21,13 @@ type
     class function IsCodeWord(ch: word): boolean;
     class function IsCodeSpace(ch: word): boolean; inline;
     class function HexCodeToInt(ch: word): integer;
-    class procedure SkipSpaces(const S: TStr; var N: integer);
-    class procedure SkipComma(const S: TStr; var N: integer);
-    class procedure SkipCommaOrSlash(const S: TStr; var N: integer);
-    class function SkipInt(const S: TStr; var N: integer): integer;
-    class function SkipIntMaybeInPercents(const S: TStr; var N: integer): integer;
-    class function SkipIntWithPercent(const S: TStr; var N: integer): integer;
-    class function SkipFloat(const S: TStr; var N: integer;
+    class procedure SkipSpaces(const S: TStr; var N: SizeInt); inline;
+    class procedure SkipComma(const S: TStr; var N: SizeInt); inline;
+    class procedure SkipCommaOrSlash(const S: TStr; var N: SizeInt); inline;
+    class function SkipInt(const S: TStr; var N: SizeInt): integer;
+    class function SkipIntMaybeInPercents(const S: TStr; var N: SizeInt): integer;
+    class function SkipIntWithPercent(const S: TStr; var N: SizeInt): integer;
+    class function SkipFloat(const S: TStr; var N: SizeInt;
       CalcValue, SkipPercent: boolean; out Ok: boolean): double;
   public
     //convert TColor -> HTML color string #rrggbb
@@ -35,9 +35,9 @@ type
     //convert string which starts with HTML color token #rgb, #rrggbb -> TColor, get len of color-string
     class function ParseTokenRGB(S: TPChar; out Len: integer; Default: TColor): TColor;
     //parses 'rgb(10,20,30)' and 'rgba(10,20,30,0.5)'
-    class function ParseFunctionRGB(const S: TStr; FromPos: integer; out LenOfColor: integer): TColor;
+    class function ParseFunctionRGB(const S: TStr; FromPos: SizeInt; out LenOfColor: integer): TColor;
     //parses 'hsl(0,50%,100%)' and 'hsla(0,50%,100%,0.5)
-    class function ParseFunctionHSL(const S: TStr; FromPos: integer; out LenOfColor: integer): TColor;
+    class function ParseFunctionHSL(const S: TStr; FromPos: SizeInt; out LenOfColor: integer): TColor;
   end;
 
 type
@@ -121,7 +121,8 @@ begin
   Result[7]:= SHexDigits[Lo(b)];
 end;
 
-class function TATHtmlColorParser.ParseTokenRGB(S: TPChar; out Len: integer; Default: TColor): TColor;
+class function TATHtmlColorParser.ParseTokenRGB(S: TPChar; out Len: integer;
+  Default: TColor): TColor;
 var
   N1, N2, N3: integer;
   ch: word;
@@ -175,25 +176,25 @@ begin
 end;
 
 
-class procedure TATHtmlColorParser.SkipSpaces(const S: TStr; var N: integer); inline;
+class procedure TATHtmlColorParser.SkipSpaces(const S: TStr; var N: SizeInt);
 begin
   while (N<=Length(S)) and IsCodeSpace(ord(S[N])) do
     Inc(N);
 end;
 
-class procedure TATHtmlColorParser.SkipComma(const S: TStr; var N: integer); inline;
+class procedure TATHtmlColorParser.SkipComma(const S: TStr; var N: SizeInt);
 begin
   if S[N]=',' then
     Inc(N);
 end;
 
-class procedure TATHtmlColorParser.SkipCommaOrSlash(const S: TStr; var N: integer); inline;
+class procedure TATHtmlColorParser.SkipCommaOrSlash(const S: TStr; var N: SizeInt);
 begin
   if (S[N]=',') or (S[N]='/') then
     Inc(N);
 end;
 
-class function TATHtmlColorParser.SkipInt(const S: TStr; var N: integer): integer;
+class function TATHtmlColorParser.SkipInt(const S: TStr; var N: SizeInt): integer;
 begin
   Result:= -1;
   SkipSpaces(S, N);
@@ -207,7 +208,7 @@ begin
   SkipSpaces(S, N);
 end;
 
-class function TATHtmlColorParser.SkipIntMaybeInPercents(const S: TStr; var N: integer): integer;
+class function TATHtmlColorParser.SkipIntMaybeInPercents(const S: TStr; var N: SizeInt): integer;
 begin
   Result:= SkipInt(S, N);
   if N>Length(S) then exit(-1);
@@ -219,7 +220,7 @@ begin
   SkipSpaces(S, N);
 end;
 
-class function TATHtmlColorParser.SkipIntWithPercent(const S: TStr; var N: integer): integer;
+class function TATHtmlColorParser.SkipIntWithPercent(const S: TStr; var N: SizeInt): integer;
 begin
   Result:= SkipInt(S, N);
   if N>Length(S) then exit(-1);
@@ -231,11 +232,11 @@ begin
 end;
 
 
-class function TATHtmlColorParser.SkipFloat(const S: TStr; var N: integer;
+class function TATHtmlColorParser.SkipFloat(const S: TStr; var N: SizeInt;
   CalcValue, SkipPercent: boolean; out Ok: boolean): double;
 var
   Buf: string;
-  NEnd: integer;
+  NEnd: SizeInt;
 begin
   Ok:= false;
   Result:= 0.0;
@@ -270,14 +271,13 @@ begin
 end;
 
 
-class function TATHtmlColorParser.ParseFunctionRGB(const S: TStr; FromPos: integer; out LenOfColor: integer): TColor;
+class function TATHtmlColorParser.ParseFunctionRGB(const S: TStr;
+  FromPos: SizeInt; out LenOfColor: integer): TColor;
 var
-  NLen: integer;
-var
+  NLen, N: SizeInt;
   Val1, Val2, Val3: integer;
   ValAlpha: double;
   bAlpha, bOk: boolean;
-  N: integer;
 begin
   Result:= clNone;
   LenOfColor:= 0;
@@ -335,16 +335,16 @@ begin
 end;
 
 
-class function TATHtmlColorParser.ParseFunctionHSL(const S: TStr; FromPos: integer; out LenOfColor: integer): TColor;
+class function TATHtmlColorParser.ParseFunctionHSL(const S: TStr;
+  FromPos: SizeInt; out LenOfColor: integer): TColor;
 const
   cMaxDegrees=1500.0;
 var
-  NLen: integer;
+  NLen, N: SizeInt;
   ValAngle: double;
   Val2, Val3: integer;
   ValAlpha: double;
   bAlpha, bOk: boolean;
-  N: integer;
 begin
   Result:= clNone;
   LenOfColor:= 0;

@@ -3699,6 +3699,9 @@ begin
     {$endif}
   end;
 
+  if Assigned(FOnDrawEditor) then
+    FOnDrawEditor(Self, C, FRectMain);
+
   UpdateLinksAttribs(ALineFrom);
   DoPaintText(C, FRectMain, FCharSize, FOptGutterVisible, FScrollHorz, FScrollVert, NWrapIndex);
   DoPaintMargins(C);
@@ -3712,9 +3715,6 @@ begin
     if not bRulerHandled then
       DoPaintRuler(C);
   end;
-
-  if Assigned(FOnDrawEditor) then
-    FOnDrawEditor(Self, C, FRectMain);
 
   if FMicromapVisible and not FMicromapOnScrollbar then
     DoPaintMicromap(C);
