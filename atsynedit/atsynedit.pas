@@ -930,6 +930,8 @@ type
     FFoldingAsStringTodo: string;
 
     //these options are implemented in CudaText, they are dummy here
+    FOptUnderlineHtmlColor: boolean;
+    FOptUnderlineHtmlColorSize: integer;
     FOptThemed: boolean;
     FOptAutoPairForMultiCarets: boolean;
     FOptAutoPairChars: UnicodeString;
@@ -1635,7 +1637,6 @@ type
     Colors: TATEditorColors;
     TagString: string; //to store plugin specific data in CudaText
     ModifiedOptions: TATEditorModifiedOptions;
-    EventDrawLine_Needed: boolean;
     EventCaretSlow_Filter: string; //for CudaText
     EventCaretSlow_WithSel: boolean; //for CudaText
     {$ifdef WINDOWS}
@@ -2043,6 +2044,8 @@ type
     property WantReturns: boolean read FWantReturns write FWantReturns default true;
 
     //options
+    property OptUnderlineHtmlColor: boolean read FOptUnderlineHtmlColor write FOptUnderlineHtmlColor default false;
+    property OptUnderlineHtmlColorSize: integer read FOptUnderlineHtmlColorSize write FOptUnderlineHtmlColorSize default 3;
     property OptThemed: boolean read FOptThemed write FOptThemed default false;
     property OptAutoPairForMultiCarets: boolean read FOptAutoPairForMultiCarets write FOptAutoPairForMultiCarets default cInitAutoPairForMultiCarets;
     property OptAutoPairChars: UnicodeString read FOptAutoPairChars write FOptAutoPairChars stored false;
@@ -5584,6 +5587,9 @@ begin
   FOptMaskChar:= cInitMaskChar;
   FOptMaskCharUsed:= false;
   FOptIdleInterval:= cInitIdleInterval;
+
+  FOptUnderlineHtmlColor:= false;
+  FOptUnderlineHtmlColorSize:= 3;
 
   FOptAutoPairForMultiCarets:= cInitAutoPairForMultiCarets;
   FOptAutoPairChars:= '([{';
