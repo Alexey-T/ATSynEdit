@@ -33,7 +33,7 @@ type
     //convert TColor -> HTML color string #rrggbb
     class function ColorToHtmlString(Color: TColor): string;
     //convert string which starts with HTML color token #rgb, #rrggbb -> TColor, get len of color-string
-    class function ParseTokenRGB(S: TPChar; out Len: integer; Default: TColor): TColor;
+    class function ParseTokenRGB(S: TPChar; out LenOfColor: integer; DefaultColor: TColor): TColor;
     //parses 'rgb(10,20,30)' and 'rgba(10,20,30,0.5)'
     class function ParseFunctionRGB(const S: TStr; FromPos: SizeInt; out LenOfColor: integer): TColor;
     //parses 'hsl(0,50%,100%)' and 'hsla(0,50%,100%,0.5)
@@ -121,34 +121,34 @@ begin
   Result[7]:= SHexDigits[Lo(b)];
 end;
 
-class function TATHtmlColorParser.ParseTokenRGB(S: TPChar; out Len: integer;
-  Default: TColor): TColor;
+class function TATHtmlColorParser.ParseTokenRGB(S: TPChar; out LenOfColor: integer;
+  DefaultColor: TColor): TColor;
 var
   N1, N2, N3: integer;
   ch: word;
 begin
-  Result:= Default;
+  Result:= DefaultColor;
+  LenOfColor:= 0;
   if S=nil then Exit;
 
   if S^='#' then
     Inc(S);
 
   //must handle string longer than needed, with additional chars
-  Len:= 0;
   repeat
-    ch:= ord(S[Len]);
+    ch:= ord(S[LenOfColor]);
     if ch=0 then Break;
     if not IsCodeHexDigit(ch) then
       if IsCodeWord(ch) then
         Exit
       else
         Break;
-    Inc(Len);
-    if Len>8 then Exit;
+    Inc(LenOfColor);
+    if LenOfColor>8 then Exit;
   until false;
 
   //allow #rgb, #rgba, #rrggbb, #rrggbbaa (ignore alpha value)
-  case Len of
+  case LenOfColor of
     6, 8:
       begin
         N1:= HexCodeToInt(ord(S[0]))*16 + HexCodeToInt(ord(S[1]));
@@ -166,12 +166,12 @@ begin
   end;
 
   //some chars after '#rrggbb' must break the parsing, e.g. for this case: "#add-some-value"
-  ch:= ord(S[Len]);
+  ch:= ord(S[LenOfColor]);
   case ch of
     ord('-'),
     ord('+'),
     ord('$'):
-      Result:= Default;
+      Result:= DefaultColor;
   end;
 end;
 
