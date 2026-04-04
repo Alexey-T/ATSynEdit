@@ -57,6 +57,7 @@ type
     MaxVisibleColumns = 500;
     MaxLineLenToCalculateAutoIndent = 200;
     MaxLineLenToCalculateRangeIndents = 1000;
+    MaxLineLenToUnderlineHtmlColors = 500;
     GutterShift2ndIconRightByPercents = 50;
 
     GutterTagBookmarks = 1;

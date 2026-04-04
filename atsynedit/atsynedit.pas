@@ -1634,6 +1634,7 @@ type
     Colors: TATEditorColors;
     TagString: string; //to store plugin specific data in CudaText
     ModifiedOptions: TATEditorModifiedOptions;
+    EventDrawLine_Needed: boolean;
     EventCaretSlow_Filter: string; //for CudaText
     EventCaretSlow_WithSel: boolean; //for CudaText
     {$ifdef WINDOWS}
