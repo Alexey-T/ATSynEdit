@@ -29,27 +29,27 @@ procedure TATSynEdit.DoCaretsAddOnColumnBlock(ALineFrom, ALineTo, AColFrom, ACol
 var
   St: TATStrings;
   bChanged: boolean;
-  i, X1, X2: integer;
+  Y, X1, X2: integer;
 begin
   St:= Strings;
   bChanged:= false;
 
-  i:= St.Count-1;
-  if i<0 then exit;
-  ALineFrom:= Min(ALineFrom, i);
-  ALineTo:= Min(ALineTo, i);
+  Y:= St.Count-1;
+  if Y<0 then exit;
+  ALineFrom:= Min(ALineFrom, Y);
+  ALineTo:= Min(ALineTo, Y);
   if ALineFrom>ALineTo then exit;
 
   Carets.Clear;
 
-  for i:= ALineFrom to ALineTo do
+  for Y:= ALineFrom to ALineTo do
   begin
-    X1:= St.ColumnPosToCharPos(i, AColTo, FTabHelper);
-    X2:= St.ColumnPosToCharPos(i, AColFrom, FTabHelper);
+    X1:= St.ColumnPosToCharPos(Y, AColTo, FTabHelper);
+    X2:= St.ColumnPosToCharPos(Y, AColFrom, FTabHelper);
     if ACaretAtLeft then
       SwapInt(X1, X2);
 
-    Carets.Add(X1, i, X2, i, false{AWithEvent});
+    Carets.Add(X1, Y, X2, Y, false{AWithEvent});
     bChanged:= true;
   end;
 
