@@ -1889,6 +1889,7 @@ type
     function DoGetMarkedLines(out ALine1, ALine2: integer): boolean;
     function DoGetLinkAtPos(AX, AY: integer): atString;
     function DoGetGapRect(AIndex: integer; out ARect: TRect): boolean;
+    procedure EditingDone; override;
 
   protected
     IsRepaintEnabled: boolean;
@@ -11040,6 +11041,13 @@ begin
   if ARect.Top>=FRectMain.Bottom then exit;
 
   Result:= true;
+end;
+
+procedure TATSynEdit.EditingDone;
+begin
+  if Assigned(FAdapterIME) then
+    FAdapterIME.Stop(Self,True);
+  inherited EditingDone;
 end;
 
 procedure TATSynEdit.SetFontItalic(AValue: TFont);
