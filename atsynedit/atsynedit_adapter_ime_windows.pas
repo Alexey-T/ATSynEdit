@@ -342,8 +342,9 @@ begin
             if imecode and GCS_RESULTSTR<>0 then
             begin
               len:=ImmGetCompositionStringW(IMC,GCS_RESULTSTR,@buffer[0],sizeof(buffer)-sizeof(WideChar));
-              if len>0 then
-                len := len shr 1;
+              if len<0 then
+                len:=0;
+              len := len shr 1;
               buffer[len]:=#0;
               { INSERT RESULTSTR }
               bOverwrite:=Ed.ModeOverwrite and
@@ -359,10 +360,12 @@ begin
             { COMPSTR processing. }
             if imeCode and GCS_COMPSTR<>0 then begin
               len:=ImmGetCompositionStringW(IMC,GCS_COMPSTR,@buffer[0],sizeof(buffer)-sizeof(WideChar));
-              if len>0 then
-                len := len shr 1
-                else
-                  HideCompForm;
+              if len<=0 then
+              begin
+                len:=0;
+                HideCompForm;
+              end;
+              len := len shr 1;
               buffer[len]:=#0;
               { Position change when pressing left right move on candidate composition window.
                 It need to virtual caret for this. The best idea is add composition modaless form for IME. }
