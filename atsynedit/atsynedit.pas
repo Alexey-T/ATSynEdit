@@ -8545,7 +8545,7 @@ procedure TATSynEdit.DoPaintCaretShape(C: TCanvas; ARect: TRect;
   ACaret: TATCaretItem; ACaretShape: TATCaretShape);
 var
   NCoordX, NCoordY: Int64;
-  ColorXor: Longint;
+  ColorXor: TColor;
 begin
   ColorXor:= Colors.Caret;
   if ColorXor=clNone then
