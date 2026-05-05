@@ -8545,21 +8545,27 @@ procedure TATSynEdit.DoPaintCaretShape(C: TCanvas; ARect: TRect;
   ACaret: TATCaretItem; ACaretShape: TATCaretShape);
 var
   NCoordX, NCoordY: Int64;
+  ColorXor: Longint;
 begin
+  ColorXor:= Colors.Caret;
+  if ColorXor=clNone then
+    ColorXor:= Colors.TextFont;
+  ColorXor:= ColorXor xor Colors.TextBG;
+
   if not FCaretBlinkEnabled and ACaretShape.IsNarrow then
   begin
-    C.Brush.Color:= (not (Colors.Caret xor Colors.TextBG)) and $ffffff;
+    C.Brush.Color:= (not ColorXor) and $ffffff;
     C.FillRect(ARect);
     exit;
   end;
 
   if ACaretShape.EmptyInside then
   begin
-    CanvasInvertRectEmptyInside(C, ARect, Colors.Caret xor Colors.TextBG);
+    CanvasInvertRectEmptyInside(C, ARect, ColorXor);
     exit;
   end;
 
-  CanvasInvertRect(C, ARect, Colors.Caret xor Colors.TextBG);
+  CanvasInvertRect(C, ARect, ColorXor);
 
   if ATEditorOptions.CaretTextOverInvertedRect and not ACaretShape.IsNarrow then
   begin
