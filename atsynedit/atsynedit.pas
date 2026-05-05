@@ -862,6 +862,7 @@ type
     FColorGutterFoldBG: TColor;
     FColorRulerBG: TColor;
     FColorCollapseMarkBG: TColor;
+    FColorCaretXor: TColor;
     FRulerHeight: integer;
     FNumbersIndent: integer;
     FRectMain,
@@ -6338,6 +6339,11 @@ begin
   FColorRulerBG:= Colors.RulerBG;
   FColorCollapseMarkBG:= Colors.CollapseMarkBG;
 
+  FColorCaretXor:= Colors.Caret;
+  if FColorCaretXor=clNone then
+    FColorCaretXor:= Colors.TextFont;
+  FColorCaretXor:= FColorCaretXor xor Colors.TextBG;
+
   if Enabled then
   begin
     if FOptDimUnfocusedBack<>0 then
@@ -8545,27 +8551,24 @@ procedure TATSynEdit.DoPaintCaretShape(C: TCanvas; ARect: TRect;
   ACaret: TATCaretItem; ACaretShape: TATCaretShape);
 var
   NCoordX, NCoordY: Int64;
-  ColorXor: TColor;
 begin
-  ColorXor:= Colors.Caret;
-  if ColorXor=clNone then
-    ColorXor:= Colors.TextFont;
-  ColorXor:= ColorXor xor Colors.TextBG;
-
   if not FCaretBlinkEnabled and ACaretShape.IsNarrow then
   begin
-    C.Brush.Color:= (not ColorXor) and $ffffff;
+    if Colors.Caret<>clNone then
+      C.Brush.Color:= Colors.Caret
+    else
+      C.Brush.Color:= Colors.TextFont;
     C.FillRect(ARect);
     exit;
   end;
 
   if ACaretShape.EmptyInside then
   begin
-    CanvasInvertRectEmptyInside(C, ARect, ColorXor);
+    CanvasInvertRectEmptyInside(C, ARect, FColorCaretXor);
     exit;
   end;
 
-  CanvasInvertRect(C, ARect, ColorXor);
+  CanvasInvertRect(C, ARect, FColorCaretXor);
 
   if ATEditorOptions.CaretTextOverInvertedRect and not ACaretShape.IsNarrow then
   begin
@@ -8650,7 +8653,7 @@ begin
         RectCaretOld:= Caret.OldRect;
         if RectCaretOld.Width>0 then
         begin
-          CanvasInvertRect(C, RectCaretOld, Colors.Caret xor Colors.TextBG);
+          CanvasInvertRect(C, RectCaretOld, FColorCaretXor);
           if AWithInvalidate then
           begin
             {$ifdef darwin}
