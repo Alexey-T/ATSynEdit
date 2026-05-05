@@ -80,7 +80,7 @@ begin
   TextSelBG:= clNavy;
   TextDisabledFont:= clGray;
   TextDisabledBG:= $f0f0f0;
-  Caret:= clBlack;
+  Caret:= clNone;
   Markers:= $0000c0;
   DragDropMarker:= Markers;
   GutterFont:= clGray;
