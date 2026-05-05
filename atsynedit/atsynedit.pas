@@ -8555,11 +8555,11 @@ begin
 
   if ACaretShape.EmptyInside then
   begin
-    CanvasInvertRectEmptyInside(C, ARect, Colors.Caret);
+    CanvasInvertRectEmptyInside(C, ARect, Colors.Caret xor Colors.TextBG);
     exit;
   end;
 
-  CanvasInvertRect(C, ARect, Colors.Caret);
+  CanvasInvertRect(C, ARect, Colors.Caret xor Colors.TextBG);
 
   if ATEditorOptions.CaretTextOverInvertedRect and not ACaretShape.IsNarrow then
   begin
@@ -8644,7 +8644,7 @@ begin
         RectCaretOld:= Caret.OldRect;
         if RectCaretOld.Width>0 then
         begin
-          CanvasInvertRect(C, RectCaretOld, Colors.Caret);
+          CanvasInvertRect(C, RectCaretOld, Colors.Caret xor Colors.TextBG);
           if AWithInvalidate then
           begin
             {$ifdef darwin}
