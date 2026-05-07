@@ -304,6 +304,17 @@ type
     );
 
 const
+  cEditorMouseActionStr: array[TATEditorMouseAction] of string = (
+    'None',
+    'ClickSimple',
+    'ClickRight',
+    'ClickAndSelNormalBlock',
+    'ClickAndSelVerticalBlock',
+    'ClickMiddle',
+    'MakeCaret',
+    'MakeCaretsColumn'
+    );
+
   cEditorFoldStylesUnfoldOnClick = [
     TATEditorFoldStyle.HereWithDots,
     TATEditorFoldStyle.HereWithTruncatedText,
@@ -7069,6 +7080,11 @@ begin
   FMouseDownWithAlt:= ssAlt in Shift;
   FMouseDownWithShift:= ssShift in Shift;
   ActionId:= EditorMouseActionId(FMouseActions, Shift);
+
+  {$ifndef windows}
+  //if ActionId<>TATEditorMouseAction.None then
+  //  Writeln('Mouse: ', cEditorMouseActionStr[ActionId]);
+  {$endif}
 
   if FMinimapVisible and ATPointInRect(FRectMinimap, PosCoord) then
   begin
