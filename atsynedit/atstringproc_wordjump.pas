@@ -152,6 +152,20 @@ begin
 
     TATWordJump.Prev:
       begin
+        if (n>0) and (n<Length(s)) and (GroupOfChar(s[n], ANonWordChars)=TCharGroup.Spaces) then
+        begin
+          //if we are after space, which is after non-space, decrease by 2 and jump to group start;
+          //like Sublime & VSCode
+          if (n>1) and (GroupOfChar(s[n-1], ANonWordChars)<>TCharGroup.Spaces) then
+          begin
+            Dec(n, 2); Home(n);
+          end
+          else
+          begin
+            Dec(n); Home(n);
+          end;
+        end
+        else
         //if we at word middle, jump to word start
         if (n>0) and (n<Length(s)) and (GroupOfChar(s[n], ANonWordChars)=GroupOfChar(s[n+1], ANonWordChars)) then
           Home(n)
