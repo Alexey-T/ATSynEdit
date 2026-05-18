@@ -144,9 +144,12 @@ begin
   SetLength(M, 25);
 
   Add(TATEditorMouseAction.ClickSimple, [ssLeft]);
-  Add(TATEditorMouseAction.ClickSimple, [ssLeft, ssMeta]); //like VSCode
   Add(TATEditorMouseAction.ClickRight, [ssRight]);
-  Add(TATEditorMouseAction.ClickRight, [ssRight, ssMeta]); //like VSCode
+  if ssXControl<>ssMeta then
+  begin
+    Add(TATEditorMouseAction.ClickSimple, [ssLeft, ssMeta]);
+    Add(TATEditorMouseAction.ClickRight, [ssRight, ssMeta]);
+  end;
   Add(TATEditorMouseAction.ClickAndSelNormalBlock, [ssLeft, ssShift]);
   Add(TATEditorMouseAction.ClickAndSelVerticalBlock, [ssLeft, ssAlt, ssShift]);
 
