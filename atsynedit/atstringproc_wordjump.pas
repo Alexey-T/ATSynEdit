@@ -80,6 +80,7 @@ function SFindWordOffset(const S: atString; AOffset: integer;
 var
   GroupOfChar: TCharGroupFunction;
   //------------
+  // Increase n at least once, stop when it reaches the beginning of a different char-group
   procedure Next(var n: integer);
   var gr: TCharGroup;
   begin
@@ -90,6 +91,8 @@ var
       (n>=Length(s)) or (GroupOfChar(s[n+1], ANonWordChars)<>gr);
   end;
   //------------
+  // Move n lefter to the beginning of the current group
+  // (don't move if already at the beginning)
   procedure Home(var n: integer);
   var gr: TCharGroup;
   begin
@@ -99,6 +102,7 @@ var
       Dec(n);
   end;
   //------------
+  // Do Next(n), and allow BigJump: if we are on space-group - jump to next group
   procedure JumpToNext(var n: integer);
   begin
     Next(n);
@@ -107,6 +111,7 @@ var
         Next(n);
   end;
   //------------
+  // If n at the word-group, increase it after the group's end
   procedure JumpToEnd(var n: integer);
   begin
     while (n<Length(S)) and (GroupOfChar(S[n+1], ANonWordChars)=TCharGroup.Word) do
