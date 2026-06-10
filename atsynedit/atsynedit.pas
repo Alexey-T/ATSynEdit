@@ -579,8 +579,8 @@ type
     cInitTabSize = 8;
     cInitNumbersStyle = TATEditorNumbersStyle.Each5th;
     cInitNumbersIndentPercents = 60;
-    cInitBitmapWidth = 1000;
-    cInitBitmapHeight = 800;
+    cInitBitmapWidth = 400;
+    cInitBitmapHeight = 30;
     cInitGutterPlusSize = 4;
     cInitGutterWidthBookmarks = 16;
     cInitGutterWidthNumbers = 10;
