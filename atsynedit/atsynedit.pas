@@ -368,7 +368,7 @@ type
     ScrolledHorz, //flag "horizontal scroll _position_ is changed"
     RepaintNeeded, //last paint changes some state, so repainting is needed
     ScrollEventNeeded, //last paint detected that OnScroll event must be fired
-    Resize
+    Resize //component was resized after last Paint call
     );
   TATEditorInternalFlags = set of TATEditorInternalFlag;
 
@@ -1855,6 +1855,7 @@ type
     property PopupMicromap: TPopupMenu read FMenuMicromap write FMenuMicromap;
     property PopupRuler: TPopupMenu read FMenuRuler write FMenuRuler;
     //misc
+    procedure DoDeallocateHeavyBitmap;
     function GetVisibleLines: integer;
     function GetVisibleColumns: integer;
     function GetVisibleLinesMinimap: integer;
@@ -11881,6 +11882,16 @@ begin
     NIndent:= SGetIndentChars(S);
     if AIndent>NIndent then
       AIndent:= NIndent;
+  end;
+end;
+
+procedure TATSynEdit.DoDeallocateHeavyBitmap;
+begin
+  if Assigned(FBitmap) and (FBitmap.Width>1) then
+  begin
+    FBitmap.SetSize(1, 1);
+    Include(FPaintFlags, TATEditorInternalFlag.Bitmap);
+    Include(FPaintFlags, TATEditorInternalFlag.Resize);
   end;
 end;
 
