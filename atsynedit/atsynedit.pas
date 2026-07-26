@@ -380,6 +380,8 @@ type
 
   TATEditorModifiedOption = (
     WordWrap,
+    TabSize,
+    TabSpaces,
     MinimapVisible,
     MicromapVisible,
     RulerVisible,
