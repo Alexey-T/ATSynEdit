@@ -401,7 +401,8 @@ type
     UnprintedWraps,
     SavingTrimSpaces,
     SavingTrimFinalEmptyLines,
-    SavingForceFinalEol
+    SavingForceFinalEol,
+    Margin
     );
   TATEditorModifiedOptions = set of TATEditorModifiedOption;
 
