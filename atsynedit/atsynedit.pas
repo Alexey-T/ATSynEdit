@@ -581,7 +581,7 @@ type
     cInitShowCurLineMinimal = true;
     cInitShowCurLineOnlyFocused = false;
     cInitShowCurLineIfWithoutSel = false;
-    cInitMarginRight = 80;
+    cInitMarginRight = 2000;
     cInitTabSize = 8;
     cInitNumbersStyle = TATEditorNumbersStyle.Each5th;
     cInitNumbersIndentPercents = 60;
@@ -6205,7 +6205,7 @@ begin
     OptScrollStyleHorz:= TATEditorScrollbarStyle.Hide;
     OptScrollStyleVert:= TATEditorScrollbarStyle.Hide;
     //OptMouseDragDrop:= false;
-    OptMarginRight:= 1000;
+    OptMarginRight:= 2000;
     OptUndoLimit:= 200;
 
     DoCaretSingle(0, 0);
