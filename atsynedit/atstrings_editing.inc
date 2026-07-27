@@ -114,6 +114,7 @@ var
 begin
   Result:= false;
   if not IsIndexValid(ALineFrom) then exit;
+  if ALineFrom>ALineTo then exit;
   Result:= true;
 
   BeginUndoGroup;
