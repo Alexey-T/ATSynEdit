@@ -365,7 +365,8 @@ begin
     if ADown and (NWrapIndex=WrapInfo.Count-1) then
     begin
       if FOptKeyUpDownAllowToEdge then
-        Caret.PosX:= St.LinesLen[St.Count-1];
+        if St.Count>0 then
+          Caret.PosX:= St.LinesLen[St.Count-1];
       Continue;
     end;
 
