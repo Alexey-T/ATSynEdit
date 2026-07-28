@@ -125,7 +125,8 @@ begin
     LineBlockDelete(ALineFrom, Min(ALineTo, Count-1)); //too big ALineTo allowed
     LineBlockInsert(ALineFrom, ANewLines);
 
-    if IsLastLineFake then
+    if IsLastLineFake and
+         not ((Count=1) and (LinesLen[0]=0)) then //document becomes empty?
       if bDeleteWithLastLine or
          //fake line maybe appeared if we insert block until file end. delete fake line.
          (not bHadFakeLine and (Count>1)) then
