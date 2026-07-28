@@ -314,6 +314,7 @@ const
     (TATEditorGapCoordAction.Ignore, TATEditorGapCoordAction.MoveDown);
 begin
   St:= Strings;
+  if St.Count=0 then exit([]);
 
   //Carets[i].Coord* may be not calculated yet (Carets[i] is out of visible area),
   //but we need Coord* here, so call UpdateCaretsCoords
