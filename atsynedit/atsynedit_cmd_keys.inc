@@ -474,6 +474,9 @@ function TATSynEdit.DoCommand_ScrollToBeginOrEnd(AToBegin: boolean;
 var
   St: TATStrings;
 begin
+  St:= Strings;
+  if St.Count=0 then exit([]);
+
   DoScrollToBeginOrEnd(AToBegin);
   Result:= [TATCommandResult.Scroll];
 
@@ -481,7 +484,6 @@ begin
     if (Carets.Count=1) and (not Carets.IsSelection) then //keeping caret works bad with multi-carets
     begin
       Include(Result, TATCommandResult.CaretAny);
-      St:= Strings;
       if AToBegin then
       begin
         DoCaretSingle(0, 0);

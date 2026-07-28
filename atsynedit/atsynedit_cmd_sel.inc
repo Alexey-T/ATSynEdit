@@ -42,6 +42,7 @@ begin
   St:= Strings;
   bDown:= ALineDelta>0;
   YMax:= St.Count-1;
+  if YMax<0 then exit;
 
   if not bDown then
   begin

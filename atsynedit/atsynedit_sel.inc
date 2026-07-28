@@ -281,6 +281,12 @@ procedure TATSynEdit.DoSelect_ExtendSelectionByLine(AUp: boolean);
     PosLast: TPoint;
   begin
     NLastLine:= Strings.Count-1;
+    if NLastLine<0 then
+    begin
+      ResX:= 0;
+      ResY:= 0;
+    end
+    else
     if Y<NLastLine then
     begin
       ResX:= 0;

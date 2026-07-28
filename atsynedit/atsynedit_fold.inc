@@ -30,6 +30,7 @@ var
   N: integer;
 begin
   Result:= ALine;
+  if Result<0 then exit(0);
   N:= Result;
   St:= Strings;
   while IsLineFolded(N) and St.IsIndexValid(N) do
@@ -277,6 +278,8 @@ var
 begin
   St:= Strings;
   NMaxLine:= St.Count-1;
+  if NMaxLine<0 then exit;
+
   for iRange:= 0 to Fold.Count-1 do
   begin
     R:= Fold.ItemPtr(iRange);
