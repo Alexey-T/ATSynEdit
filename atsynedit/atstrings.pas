@@ -281,8 +281,6 @@ type
     function GetUndoCount: integer;
     function GetUndoEmpty: boolean;
     function GetUndoLimit: integer;
-    function IsLastFakeLineUnneeded: boolean;
-    function IsSavingWithSignature: boolean;
     procedure SetCaretsArray(const L: TATPointPairArray);
     procedure SetCaretsArray2(const L: TATPointPairArray);
     procedure SetMarkersArray(const L: TATMarkerMarkerArray);
@@ -387,6 +385,8 @@ type
     property GutterDecor1: TATGutterDecor read FGutterDecor1 write FGutterDecor1;
     property GutterDecor2: TATGutterDecor read FGutterDecor2 write FGutterDecor2;
     property CommandCode: integer read FCommandCode write FCommandCode; //Affects UndoList/RedoList's items ACommandCode field
+    function IsLastFakeLineUnneeded: boolean;
+    function IsSavingWithSignature: boolean;
     //actions
     procedure ActionDeleteFakeLine;
     procedure ActionDeleteFakeLineAndFinalEol;
