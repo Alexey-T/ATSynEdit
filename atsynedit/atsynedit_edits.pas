@@ -151,6 +151,10 @@ begin
   OptShowMouseSelFrame:= false;
   OptMouseWheelZooms:= false;
 
+  //CudaText user asked to not copy LF-char by Ctrl+C in input fields with empty selection, like it is in Notepad++/Codium/browers
+  OptCopyLinesIfNoSel:= false;
+  OptCutLinesIfNoSel:= false;
+
   Height:= 26;
 
   IsRepaintEnabled:= true;
