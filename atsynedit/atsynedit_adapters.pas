@@ -22,6 +22,7 @@ type
     FDynamicHiliteMaxLines: integer;
     FDynamicHiliteSupportedInCurrentSyntax: boolean;
     FImplementsDataReady: boolean;
+    FHasTreeHelper: boolean;
   public
     constructor Create(AOwner: TComponent); override;
     //
@@ -73,6 +74,8 @@ type
     //get '' for none lexer; get name with suffix 'Name ^' for lite lexers of CudaText
 
     property ImplementsDataReady: boolean read FImplementsDataReady write FImplementsDataReady;
+    property HasTreeHelper: boolean read FHasTreeHelper write FHasTreeHelper;
+
     function IsDataReady: boolean; virtual;
     function IsDataReadyPartially: boolean; virtual;
     //return False to prevent Minimap repainting (avoid Minimap flicker during typing)
