@@ -93,7 +93,7 @@ begin
   CompForm.Font:=ed.Font;
   if ed.Carets.Count>0 then begin
     Caret:=ed.Carets[0];
-    CompPos:=ed.CaretPosToClientPos(Point(Caret.PosX,Caret.PosY));
+    CompPos:=ed.CaretPosToClientPos(Caret.AsPoint);
     //range checks are needed, if caret is out of visible area
     CompForm.Left:=Min(ed.Width-CompForm.Width, Max(0, CompPos.X));
     CompForm.Top:=Min(ed.Height-CompForm.Height, Max(0, CompPos.Y));

@@ -192,8 +192,8 @@ begin
       StrSpaces:= StringOfCharW(' ', FOptTabSize - Caret.PosX mod FOptTabSize);
       St.TextInsert(Caret.PosX, Caret.PosY, StrSpaces, AOvrMode, Shift, PosAfter);
       UpdateCaretsAndMarkersOnEditing(iCaret+1,
-        Point(Caret.PosX, Caret.PosY),
-        Point(Caret.PosX, Caret.PosY),
+        Caret.AsPoint,
+        Caret.AsPoint,
         Shift,
         PosAfter);
 
@@ -404,8 +404,8 @@ begin
 
     St.TextDeleteLeft(Caret.PosX, Caret.PosY, NDeleteLen, Shift, PosAfter, FOptKeyBackspaceGoesToPrevLine, bChangeOne);
     UpdateCaretsAndMarkersOnEditing(iCaret+1,
-      Point(Caret.PosX, Caret.PosY),
-      Point(Caret.PosX, Caret.PosY),
+      Caret.AsPoint,
+      Caret.AsPoint,
       Shift,
       PosAfter);
     Caret.PosX:= PosAfter.X;
@@ -589,7 +589,7 @@ begin
     end;
 
     UpdateCaretsAndMarkersOnEditing(iCaret+1,
-      Point(Caret.PosX, Caret.PosY),
+      Caret.AsPoint,
       PosEnd,
       Shift,
       PosAfter);
@@ -684,8 +684,8 @@ begin
     end;
 
     UpdateCaretsAndMarkersOnEditing(iCaret+1,
-      Point(Caret.PosX, Caret.PosY),
-      Point(Caret.PosX, Caret.PosY),
+      Caret.AsPoint,
+      Caret.AsPoint,
       Point(Shift.X+NShiftX, Shift.Y+NShiftY),
       PosAfter);
     Caret.PosX:= PosAfter.X+NShiftX;
@@ -839,8 +839,8 @@ begin
       end;
 
       UpdateCaretsAndMarkersOnEditing(iCaret+1,
-        Point(Caret.PosX, Caret.PosY),
-        Point(Caret.PosX, Caret.PosY),
+        Caret.AsPoint,
+        Caret.AsPoint,
         Point(0, Line2-Line1+1),
         Point(0, 0));
 
@@ -1031,7 +1031,7 @@ begin
     end;
 
     UpdateCaretsAndMarkersOnEditing(iCaret+1,
-      Point(Caret.PosX, Caret.PosY),
+      Caret.AsPoint,
       Point(Caret.PosX+NLen, Caret.PosY),
       Shift,
       PosAfter);
@@ -1501,10 +1501,10 @@ begin
 
   UpdateMarkersOnDeleting(0, 0, Caret.PosX, Caret.PosY);
   UpdateCaretsAndMarkersOnEditing(0,
-    Point(Caret.PosX, Caret.PosY),
-    Point(Caret.PosX, Caret.PosY),
+    Caret.AsPoint,
+    Caret.AsPoint,
     Point(-Caret.PosX, -Caret.PosY),
-    Point(Caret.PosX, Caret.PosY));
+    Caret.AsPoint);
 
   //move caret to beginning
   DoCaretSingle(0, 0);

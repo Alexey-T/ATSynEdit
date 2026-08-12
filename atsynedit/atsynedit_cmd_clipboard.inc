@@ -250,8 +250,7 @@ begin
   end;
 
   //show popup at the caret position, like Sublime
-  with Carets[0] do
-    PntText:= Point(PosX, PosY);
+  PntText:= Carets[0].AsPoint;
   if not Strings.IsIndexValid(PntText.Y) then
   begin
     PntText.X:= 0;

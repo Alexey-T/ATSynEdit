@@ -8,7 +8,7 @@ begin
   Caret:= Carets[0];
   InitMarkers;
   FMarkers.Add(
-    Point(Caret.PosX, Caret.PosY),
+    Caret.AsPoint,
     Point(0, 0),
     TATMarkerTags.Init(0, 0)
     );

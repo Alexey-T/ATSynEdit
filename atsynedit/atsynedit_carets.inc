@@ -184,7 +184,7 @@ begin
 
     if not IsPosFolded(Caret.PosX, Caret.PosY) then
     begin
-      PntCoord:= CaretPosToClientPos(Point(Caret.PosX, Caret.PosY));
+      PntCoord:= CaretPosToClientPos(Caret.AsPoint);
       Caret.CoordX:= PntCoord.X;
       Caret.CoordY:= PntCoord.Y;
     end;

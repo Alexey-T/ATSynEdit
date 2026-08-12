@@ -7544,7 +7544,7 @@ begin
       if EndY>=0 then
       begin
         if Assigned(FOnClickEndSelect) then
-          FOnClickEndSelect(Self, Point(EndX, EndY), Point(PosX, PosY));
+          FOnClickEndSelect(Self, AsPointEnd, AsPoint);
       end
       //else: simple mouse click
     end;
@@ -9537,9 +9537,8 @@ var
   PntCoord: TATPoint;
 begin
   if Carets.Count=0 then
-    begin Result:= 0; Exit end;
-  with Carets[0] do
-    P:= Point(PosX, PosY);
+    Exit(0);
+  P:= Carets[0].AsPoint;
   PntCoord:= CaretPosToClientPos(P);
   Result:= (PntCoord.Y-FRectMain.Top) div FCharSize.Y;
 end;

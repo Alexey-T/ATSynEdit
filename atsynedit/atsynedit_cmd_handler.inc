@@ -8,7 +8,7 @@ var
 begin
   if Carets.Count=0 then exit;
   Caret:= Carets[0];
-  PntA:= CaretPosToClientPos(Point(Caret.PosX, Caret.PosY));
+  PntA:= CaretPosToClientPos(Caret.AsPoint);
   //caret out of screen? don't show menu.
   if PntA.Y<0 then exit;
   if PntA.Y>Height then exit;
@@ -312,7 +312,7 @@ begin
       begin
         Caret:= Carets[0];
         if DoCaretApplyProximityToVertEdge(
-             Point(Caret.PosX, Caret.PosY),
+             Caret.AsPoint,
              Caret.CoordY,
              NProximityVert,
              NProximityVert) then
@@ -323,7 +323,7 @@ begin
       begin
         Caret:= Carets[Carets.Count-1];
         if DoCaretApplyProximityToVertEdge(
-             Point(Caret.PosX, Caret.PosY),
+             Caret.AsPoint,
              Caret.CoordY,
              NProximityVert,
              NProximityVert) then

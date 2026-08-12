@@ -78,7 +78,7 @@ begin
 
   // save caret pos
   caret:= getSuitableCaret();
-  _IntermediateTextBeginPos:= Point( caret.PosX, caret.PosY );
+  _IntermediateTextBeginPos:= caret.AsPoint;
 
   // need to eat some chars, such as DeadKeys
   if params.eatAmount<>0 then

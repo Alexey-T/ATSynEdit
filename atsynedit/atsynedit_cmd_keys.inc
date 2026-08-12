@@ -26,7 +26,7 @@ begin
 
     if FOptKeyHomeEndNavigateWrapped and (FWrapMode<>TATEditorWrapMode.ModeOff) then
     begin
-      NWrapIndex:= WrapInfo.FindIndexOfCaretPos(Point(Caret.PosX, Caret.PosY));
+      NWrapIndex:= WrapInfo.FindIndexOfCaretPos(Caret.AsPoint);
       if NWrapIndex>=0 then
       begin
         WrapItem:= WrapInfo[NWrapIndex];
@@ -87,7 +87,7 @@ begin
 
     if FOptKeyHomeEndNavigateWrapped and (FWrapMode<>TATEditorWrapMode.ModeOff) then
     begin
-      NWrapIndex:= WrapInfo.FindIndexOfCaretPos(Point(Caret.PosX, Caret.PosY));
+      NWrapIndex:= WrapInfo.FindIndexOfCaretPos(Caret.AsPoint);
       if NWrapIndex>=0 then
       begin
         WrapItem:= WrapInfo[NWrapIndex];
@@ -352,7 +352,7 @@ begin
 
     //prevent any action if caret on first line (arrow up) / last line (arrow down)
     //this allows to avoid jump to end of last line (arrow down)
-    NWrapIndex:= WrapInfo.FindIndexOfCaretPos(Point(Caret.PosX, Caret.PosY));
+    NWrapIndex:= WrapInfo.FindIndexOfCaretPos(Caret.AsPoint);
 
     //caret is on 1st line. jump to very begin?
     if (not ADown) and (NWrapIndex=0) then

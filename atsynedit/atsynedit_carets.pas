@@ -1143,8 +1143,7 @@ begin
       N:= IndexOfLeftRight(false);
   end;
   if IsIndexValid(N) then
-    with Items[N] do
-      Result:= Point(PosX, PosY);
+    Result:= Items[N].AsPoint;
 end;
 
 function TATCarets.IsJoinNeeded(AIndex1, AIndex2: integer;
