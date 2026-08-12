@@ -64,7 +64,7 @@ type
     MicromapMode: TATMarkerMicromapMode;
 
     //used in Attribs list, tag of micromap-column
-    TagEx: byte;
+    TagEx: int8;
 
     class operator=(const A, B: TATMarkerItem): boolean;
     function SelContains(AX, AY: integer): boolean;
