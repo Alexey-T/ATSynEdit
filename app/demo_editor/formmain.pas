@@ -703,7 +703,7 @@ begin
   begin
     Caret:= ed.Carets[0];
     ed.Markers.Add(
-      Point(Caret.PosX, Caret.PosY),
+      Caret.AsPoint,
       Point(0, 0),
       TATMarkerTags.Init(0, 0)
       );
