@@ -50,6 +50,9 @@ type
   { TATCaretItem }
 
   TATCaretItem = class
+  private
+    function GetAsPoint: TPoint;
+    function GetAsPointEnd: TPoint;
   public
     PosX, PosY, //caret text position
     EndX, EndY: integer; //end of selection, or (-1,-1) if no selection
@@ -61,6 +64,8 @@ type
     CharColor: TColor;
     CharStyles: TFontStyles;
     DoubleClickRange: TATCaretItem_DblClickRange; //must be filled only when selection is made by double-click (and like it)
+    property AsPoint: TPoint read GetAsPoint;
+    property AsPointEnd: TPoint read GetAsPointEnd;
     procedure SelectNone;
     procedure SelectToPoint(AX, AY: integer);
     procedure SelectToPoint_ByShiftClick(AX, AY: integer);
@@ -663,6 +668,18 @@ begin
   end
   else
     Result:= false;
+end;
+
+function TATCaretItem.GetAsPoint: TPoint;
+begin
+  Result.X:= PosX;
+  Result.Y:= PosY;
+end;
+
+function TATCaretItem.GetAsPointEnd: TPoint;
+begin
+  Result.X:= EndX;
+  Result.Y:= EndY;
 end;
 
 procedure TATCaretItem.SelectNone;
