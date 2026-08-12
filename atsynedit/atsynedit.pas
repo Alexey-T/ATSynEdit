@@ -3098,7 +3098,7 @@ begin
       Caret:= Carets[0];
       if Caret.PosX>0 then
         DoShowPos(
-          Point(Caret.PosX, Caret.PosY),
+          Caret.AsPoint,
           FOptScrollIndentCaretHorz,
           FOptScrollIndentCaretVert,
           true,
@@ -7211,7 +7211,7 @@ begin
         FMouseDownPnt_ColumnSelOrigin:= FMouseDownPnt
       else
       if (FMouseDownPnt_ColumnSelOrigin.Y=-1) and (Carets.Count>0) then
-        FMouseDownPnt_ColumnSelOrigin:= Point(Carets[0].PosX, Carets[0].PosY);
+        FMouseDownPnt_ColumnSelOrigin:= Carets[0].AsPoint;
     end
     else
       FMouseDownPnt_ColumnSelOrigin:= Point(-1, -1);
@@ -7319,7 +7319,7 @@ begin
             DoSelect_None;
 
             if Assigned(FOnClickMoveCaret) then
-              FOnClickMoveCaret(Self, Point(Carets[0].PosX, Carets[0].PosY), FMouseDownPnt);
+              FOnClickMoveCaret(Self, Carets[0].AsPoint, FMouseDownPnt);
           end;
         end;
 
@@ -7344,7 +7344,7 @@ begin
                 )
             else
               DoSelect_ColumnBlock_FromPoints(
-                Point(Carets[0].PosX, Carets[0].PosY),
+                Carets[0].AsPoint,
                 FMouseDownPnt
                 );
           end;
@@ -7396,7 +7396,7 @@ begin
                 Caret.Change(0, Caret.PosY, -1, -1);
             end;
 
-            DoSelect_LineRange(PosTextClicked.Y, Point(Caret.PosX, Caret.PosY));
+            DoSelect_LineRange(PosTextClicked.Y, Caret.AsPoint);
           end;
         end;
     end;
