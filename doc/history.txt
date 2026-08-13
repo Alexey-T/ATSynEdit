@@ -1,5 +1,5 @@
 2026.08.13
-* change: replaced prop OptMicromapScalePerColumn (default 50) with OptMicromapWidthInAvgChars (default 200)
+* change: replaced prop OptMicromapScalePerColumn (default 50) with OptMicromapWidthInAvgChars (default 150)
 
 2026.06.24
 + add: new define "AT_IME" in atsynedit_defines.inc, it is now global enable-flag for IME (Input Method Editor) additional code for all OS/widgetsets
