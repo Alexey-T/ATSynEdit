@@ -1815,6 +1815,9 @@ type
     procedure BookmarkSetForLineEx(ALine, ABmKind: integer;
       const AHint: string; AAutoDelete: TATBookmarkAutoDelete; AShowInList: boolean; ATag: integer;
       ABookmarksObj: TATBookmarks);
+    procedure BookmarkAppendEx(ALine, ABmKind: integer;
+      const AHint: string; AAutoDelete: TATBookmarkAutoDelete; AShowInList: boolean; ATag: integer;
+      ABookmarksObj: TATBookmarks);
     procedure BookmarkSetForLine(ALine, ABmKind: integer;
       const AHint: string; AAutoDelete: TATBookmarkAutoDelete; AShowInList: boolean; ATag: integer);
     procedure BookmarkSetForLine_2(ALine, ABmKind: integer;

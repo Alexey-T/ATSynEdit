@@ -28,6 +28,26 @@ begin
   Update;
 end;
 
+procedure TATSynEdit.BookmarkAppendEx(ALine, ABmKind: integer;
+  const AHint: string; AAutoDelete: TATBookmarkAutoDelete; AShowInList: boolean; ATag: integer;
+  ABookmarksObj: TATBookmarks);
+var
+  Data: TATBookmarkData;
+begin
+  //no check to run faster
+  //if not Strings.IsIndexValid(ALine) then exit;
+
+  Data:= Default(TATBookmarkData);
+  Data.LineNum:= ALine;
+  Data.Kind:= ABmKind;
+  if AHint<>'' then
+    Data.Hint:= StrNew(PChar(AHint));
+  Data.AutoDelete:= AAutoDelete;
+  Data.ShowInBookmarkList:= AShowInList;
+  Data.Tag:= ATag;
+  ABookmarksObj.Append(Data);
+end;
+
 procedure TATSynEdit.BookmarkSetForLine(ALine, ABmKind: integer;
   const AHint: string; AAutoDelete: TATBookmarkAutoDelete;
   AShowInList: boolean; ATag: integer);

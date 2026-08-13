@@ -72,6 +72,7 @@ type
     function IsIndexValid(N: integer): boolean;
     property ItemPtr[N: integer]: PATBookmarkItem read GetItemPtr; default;
     procedure Add(const AData: TATBookmarkData; AToggle: boolean=false);
+    procedure Append(const AData: TATBookmarkData);
     function Find(ALineNum: integer): integer;
     function FindNearest(ALineNum: integer; out AExactMatch: boolean): integer;
     function FindHintForLine(ALineNum: integer): string;
@@ -189,6 +190,15 @@ end;
 function TATBookmarks.IsIndexValid(N: integer): boolean; inline;
 begin
   Result:= (N>=0) and (N<FList.Count);
+end;
+
+procedure TATBookmarks.Append(const AData: TATBookmarkData);
+var
+  Item: TATBookmarkItem;
+begin
+  Item:= Default(TATBookmarkItem);
+  Item.Assign(AData);
+  FList.Add(Item);
 end;
 
 procedure TATBookmarks.Add(const AData: TATBookmarkData; AToggle: boolean=false);
