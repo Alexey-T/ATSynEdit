@@ -1,4 +1,5 @@
 2026.08.13
++ add: prop OptMicromapAtLeft
 * change: replaced prop OptMicromapScalePerColumn (default 50) with OptMicromapWidthInAvgChars (default 150)
 
 2026.06.24

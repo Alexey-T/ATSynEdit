@@ -33,6 +33,7 @@ type
     bOpt: TButton;
     btnStop: TButton;
     bClearLog: TButton;
+    chkMicromapLeft: TCheckBox;
     chkMouseColSelect: TCheckBox;
     chkSmoothScroll: TCheckBox;
     chkMinimapTooltip: TCheckBox;
@@ -135,6 +136,7 @@ type
     procedure bGotoClick(Sender: TObject);
     procedure btnMarkerClick(Sender: TObject);
     procedure btnStopClick(Sender: TObject);
+    procedure chkMicromapLeftChange(Sender: TObject);
     procedure chkMinimapLeftChange(Sender: TObject);
     procedure chkMinimapTooltipChange(Sender: TObject);
     procedure chkMouseColSelectChange(Sender: TObject);
@@ -517,6 +519,7 @@ begin
   chkMinimap.Checked:= ed.OptMinimapVisible;
   chkMinimapLeft.Checked:= ed.OptMinimapAtLeft;
   chkMicromap.Checked:= ed.OptMicromapVisible;
+  chkMicromapLeft.Checked:= ed.OptMicromapAtLeft;
   chkTabSpaces.Checked:= ed.OptTabSpaces;
   chkNewScroll.Checked:= ed.OptScrollbarsNew;
   edFontsize.Value:= ed.Font.Size;
@@ -1345,6 +1348,13 @@ procedure TfmMain.chkMicromapChange(Sender: TObject);
 begin
   if wait then Exit;
   ed.OptMicromapVisible:= chkMicromap.Checked;
+  ed.Update;
+end;
+
+procedure TfmMain.chkMicromapLeftChange(Sender: TObject);
+begin
+  if wait then Exit;
+  ed.OptMicromapAtLeft:= chkMicromapLeft.Checked;
   ed.Update;
 end;
 

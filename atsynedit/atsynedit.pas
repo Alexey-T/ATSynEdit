@@ -927,6 +927,7 @@ type
     FMinimapDragImmediately: boolean;
     FMicromap: TATMicromap;
     FMicromapVisible: boolean;
+    FMicromapAtLeft: boolean;
     FMicromapWidthInAvgChars: integer;
     FMicromapOnScrollbar: boolean;
     FMicromapLineStates: boolean;
@@ -2239,6 +2240,7 @@ type
     property OptMinimapHiliteLinesWithSelection: boolean read FMinimapHiliteLinesWithSelection write FMinimapHiliteLinesWithSelection default true;
     property OptMinimapDragImmediately: boolean read FMinimapDragImmediately write FMinimapDragImmediately default false;
     property OptMicromapVisible: boolean read FMicromapVisible write SetMicromapVisible default cInitMicromapVisible;
+    property OptMicromapAtLeft: boolean read FMicromapAtLeft write FMicromapAtLeft default false;
     property OptMicromapWidthInAvgChars: integer read FMicromapWidthInAvgChars write FMicromapWidthInAvgChars default cInitMicromapWidthInAvgChars;
     property OptMicromapOnScrollbar: boolean read FMicromapOnScrollbar write FMicromapOnScrollbar default cInitMicromapOnScrollbar;
     property OptMicromapLineStates: boolean read FMicromapLineStates write FMicromapLineStates default true;
@@ -2377,7 +2379,7 @@ uses
   Math,
   StrUtils,
   {$ifdef LCLGTK2}
-  Gtk2Globals,
+  //Gtk2Globals,
   {$endif}
   {$ifdef LCLCOCOA}
   CocoaPrivate,
@@ -3360,11 +3362,12 @@ end;
 
 procedure TATSynEdit.GetRectMain(out R: TRect);
 begin
-  R.Left:= FRectGutter.Left + FTextOffset.X;
+  R.Left:= FRectGutter.Left + FTextOffset.X
+    + IfThen(FMicromapVisible and not FMicromapOnScrollbar and FMicromapAtLeft, FRectMicromap.Width);
   R.Top:= FTextOffset.Y;
   R.Right:= ClientWidth
     - IfThen(FMinimapVisible and not FMinimapAtLeft, FMinimapWidth)
-    - IfThen(FMicromapVisible and not FMicromapOnScrollbar, FRectMicromap.Width);
+    - IfThen(FMicromapVisible and not FMicromapOnScrollbar and not FMicromapAtLeft, FRectMicromap.Width);
   R.Bottom:= ClientHeight;
 
   FRectMainVisible:= R;
@@ -3387,12 +3390,14 @@ begin
   if FMinimapAtLeft then
   begin
     R.Left:= 0;
+    if FMicromapVisible and not FMicromapOnScrollbar and FMicromapAtLeft then
+      Inc(R.Left, FRectMicromap.Width);
     R.Right:= R.Left+FMinimapWidth;
   end
   else
   begin
     R.Right:= ClientWidth;
-    if FMicromapVisible and not FMicromapOnScrollbar then
+    if FMicromapVisible and not FMicromapOnScrollbar and not FMicromapAtLeft then
       Dec(R.Right, FRectMicromap.Width);
     R.Left:= R.Right-FMinimapWidth;
   end;
@@ -3431,8 +3436,16 @@ begin
   begin
     R.Top:= 0;
     R.Bottom:= ClientHeight;
-    R.Right:= ClientWidth;
-    R.Left:= R.Right-NWidth;
+    if FMicromapAtLeft then
+    begin
+      R.Left:= 0;
+      R.Right:= R.Left+NWidth;
+    end
+    else
+    begin
+      R.Right:= ClientWidth;
+      R.Left:= R.Right-NWidth;
+    end;
   end;
 end;
 
