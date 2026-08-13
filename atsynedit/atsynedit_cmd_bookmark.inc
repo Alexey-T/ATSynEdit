@@ -18,7 +18,8 @@ begin
   Data:= Default(TATBookmarkData);
   Data.LineNum:= ALine;
   Data.Kind:= ABmKind;
-  Data.Hint:= StrNew(PChar(AHint));
+  if AHint<>'' then
+    Data.Hint:= StrNew(PChar(AHint));
   Data.AutoDelete:= AAutoDelete;
   Data.ShowInBookmarkList:= AShowInList;
   Data.Tag:= ATag;
