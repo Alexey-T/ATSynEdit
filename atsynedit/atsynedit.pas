@@ -577,7 +577,7 @@ type
     cInitMinimapTooltipHeight = 6;
     cInitMinimapTooltipWidthPercents = 60;
     cInitMicromapVisible = false;
-    cInitMicromapWidthInAvgChars = 200;
+    cInitMicromapWidthInAvgChars = 150;
     cInitMicromapOnScrollbar = false;
     cInitMicromapBookmarks = false;
     cInitShowMouseSelFrame = true;
