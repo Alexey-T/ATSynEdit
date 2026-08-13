@@ -196,6 +196,13 @@ begin
 end;
 
 procedure TATBookmarks.Append(const AData: TATBookmarkData);
+{
+Action doesn't do these:
+- Search for already existing bookmark for the same line index
+- Sorting of internal bookmarks list
+- Firing of event about bookmarks change
+- Rapainting of editor
+}
 var
   Item: TATBookmarkItem;
 begin
