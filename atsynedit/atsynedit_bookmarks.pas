@@ -119,7 +119,10 @@ begin
   Data.ShowInBookmarkList:= AData.ShowInBookmarkList;
   if Data.Hint<>nil then
     StrDispose(Data.Hint);
-  Data.Hint:= StrNew(AData.Hint);
+  if AData.Hint<>nil then
+    Data.Hint:= StrNew(AData.Hint)
+  else
+    Data.Hint:= nil;
 end;
 
 { TATBookmarks }
