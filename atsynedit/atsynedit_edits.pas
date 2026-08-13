@@ -181,7 +181,7 @@ begin
 
   OptMicromapVisible:= true;
   OptComboboxShowX:= true;
-  OptMicromapScalePerColumn:= cInitComboboxButtonsScale;
+  OptMicromapWidthInAvgChars:= cInitComboboxButtonsScale;
   Micromap.Columns:= nil;
   Micromap.ColumnAdd(0, 100, clNone);
 
