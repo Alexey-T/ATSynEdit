@@ -3362,8 +3362,7 @@ end;
 
 procedure TATSynEdit.GetRectMain(out R: TRect);
 begin
-  R.Left:= FRectGutter.Left + FTextOffset.X
-    + IfThen(FMicromapVisible and not FMicromapOnScrollbar and FMicromapAtLeft, FRectMicromap.Width);
+  R.Left:= FRectGutter.Left + FTextOffset.X;
   R.Top:= FTextOffset.Y;
   R.Right:= ClientWidth
     - IfThen(FMinimapVisible and not FMinimapAtLeft, FMinimapWidth)
@@ -3451,7 +3450,8 @@ end;
 
 procedure TATSynEdit.GetRectGutter(out R: TRect);
 begin
-  R.Left:= IfThen(FMinimapVisible and FMinimapAtLeft, FMinimapWidth);
+  R.Left:= IfThen(FMinimapVisible and FMinimapAtLeft, FMinimapWidth)
+    + IfThen(FMicromapVisible and not FMicromapOnScrollbar and FMicromapAtLeft, FRectMicromap.Width);
   R.Top:= IfThen(FOptRulerVisible, FRulerHeight);
   R.Right:= R.Left + FGutter.Width;
   R.Bottom:= ClientHeight;
