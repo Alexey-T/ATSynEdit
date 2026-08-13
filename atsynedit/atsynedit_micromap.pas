@@ -68,9 +68,9 @@ end;
 function TATMicromap.ColumnAdd(ATag: integer; AWidthUnits: integer; AColor: TColor): boolean;
 begin
   Result:=
-    (ATag>=-128) and (ATag<127) and //tag will be stored in int8 type
+    (ATag>=-128) and (ATag<=127) and //tag is stored in int8 type
     (ColumnFromTag(ATag)<0) and
-    (AWidthUnits>0);
+    (AWidthUnits>0) and (AWidthUnits<=1000);
   if Result then
   begin
     SetLength(Columns, Length(Columns)+1);
