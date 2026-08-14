@@ -30,7 +30,8 @@ begin
 end;
 
 procedure TATSynEdit.BookmarkAppendEx(ALine, ABmKind: integer;
-  const AHint: string; AAutoDelete: TATBookmarkAutoDelete; AShowInList: boolean; ATag: integer;
+  const AHint: string; AAutoDelete: TATBookmarkAutoDelete;
+  AShowInList: boolean; ATag: integer;
   ABookmarksObj: TATBookmarks);
 var
   Data: TATBookmarkData;
@@ -44,8 +45,6 @@ begin
   Data.ShowInBookmarkList:= AShowInList;
   Data.Tag:= ATag;
   ABookmarksObj.Append(Data);
-
-  ModifiedBookmarks:= true;
 end;
 
 procedure TATSynEdit.BookmarkSetForLine(ALine, ABmKind: integer;

@@ -209,6 +209,8 @@ begin
   Item:= Default(TATBookmarkItem);
   Item.Assign(AData);
   FList.Add(Item);
+
+  Modified:= true;
 end;
 
 procedure TATBookmarks.Add(const AData: TATBookmarkData; AToggle: boolean=false);
@@ -247,6 +249,8 @@ begin
       FList.Insert(N, Item);
     end;
   end;
+
+  Modified:= true;
 end;
 
 procedure TATBookmarks.DeleteDups;
