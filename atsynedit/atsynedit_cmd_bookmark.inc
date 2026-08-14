@@ -35,9 +35,6 @@ procedure TATSynEdit.BookmarkAppendEx(ALine, ABmKind: integer;
 var
   Data: TATBookmarkData;
 begin
-  //no check to run faster
-  //if not Strings.IsIndexValid(ALine) then exit;
-
   Data:= Default(TATBookmarkData);
   Data.LineNum:= ALine;
   Data.Kind:= ABmKind;
@@ -47,6 +44,8 @@ begin
   Data.ShowInBookmarkList:= AShowInList;
   Data.Tag:= ATag;
   ABookmarksObj.Append(Data);
+
+  ModifiedBookmarks:= true;
 end;
 
 procedure TATSynEdit.BookmarkSetForLine(ALine, ABmKind: integer;
