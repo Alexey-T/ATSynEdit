@@ -21,6 +21,7 @@ type
     class function IsCodeWord(ch: word): boolean;
     class function IsCodeSpace(ch: word): boolean; inline;
     class function HexCodeToInt(ch: word): integer;
+    class function ParseAngleUnit(const S: TStr; var N: SizeInt; var ValAngle: double): boolean;
     class procedure SkipSpaces(const S: TStr; var N: SizeInt); inline;
     class procedure SkipComma(const S: TStr; var N: SizeInt); inline;
     class procedure SkipCommaOrSlash(const S: TStr; var N: SizeInt); inline;
@@ -334,6 +335,37 @@ begin
   LenOfColor:= N-FromPos+1;
 end;
 
+class function TATHtmlColorParser.ParseAngleUnit(const S: TStr; var N: SizeInt;
+  var ValAngle: double): boolean;
+begin
+  Result:= true;
+  if (S[N]='d') and (S[N+1]='e') and (S[N+2]='g') then
+  begin
+    Inc(N, 3);
+    if IsCodeWord(Ord(S[N])) then exit(false);
+  end
+  else
+  if (S[N]='r') and (S[N+1]='a') and (S[N+2]='d') then
+  begin
+    ValAngle:= ValAngle*(360.0/2/Pi);
+    Inc(N, 3);
+    if IsCodeWord(Ord(S[N])) then exit(false);;
+  end
+  else
+  if (S[N]='g') and (S[N+1]='r') and (S[N+2]='a') and (S[N+3]='d') then
+  begin
+    ValAngle:= ValAngle*(360.0/400.0);
+    Inc(N, 4);
+    if IsCodeWord(Ord(S[N])) then exit(false);;
+  end
+  else
+  if (S[N]='t') and (S[N+1]='u') and (S[N+2]='r') and (S[N+3]='n') then
+  begin
+    ValAngle:= ValAngle*360.0;
+    Inc(N, 4);
+    if IsCodeWord(Ord(S[N])) then exit(false);;
+  end;
+end;
 
 class function TATHtmlColorParser.ParseFunctionHSL(const S: TStr;
   FromPos: SizeInt; out LenOfColor: integer): TColor;
@@ -373,34 +405,7 @@ begin
   if not bOk then exit;
   if N>NLen then exit;
   if N+4<=NLen then
-  begin
-    if (S[N]='d') and (S[N+1]='e') and (S[N+2]='g') then
-    begin
-      Inc(N, 3);
-      if IsCodeWord(Ord(S[N])) then exit;
-    end
-    else
-    if (S[N]='r') and (S[N+1]='a') and (S[N+2]='d') then
-    begin
-      ValAngle:= ValAngle*(360.0/2/Pi);
-      Inc(N, 3);
-      if IsCodeWord(Ord(S[N])) then exit;
-    end
-    else
-    if (S[N]='g') and (S[N+1]='r') and (S[N+2]='a') and (S[N+3]='d') then
-    begin
-      ValAngle:= ValAngle*(360.0/400.0);
-      Inc(N, 4);
-      if IsCodeWord(Ord(S[N])) then exit;
-    end
-    else
-    if (S[N]='t') and (S[N+1]='u') and (S[N+2]='r') and (S[N+3]='n') then
-    begin
-      ValAngle:= ValAngle*360.0;
-      Inc(N, 4);
-      if IsCodeWord(Ord(S[N])) then exit;
-    end;
-  end;
+    if not ParseAngleUnit(S, N, ValAngle) then exit;
   if ValAngle>cMaxDegrees then exit;
   if ValAngle<-cMaxDegrees then exit;
   while ValAngle<0.0 do
