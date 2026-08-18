@@ -337,6 +337,12 @@ end;
 
 class function TATHtmlColorParser.ParseAngleUnit(const S: TStr; var N: SizeInt;
   var ValAngle: double): boolean;
+{
+Supports units: 'deg', 'rad', 'grad', 'turn'.
+If any of units are found in S at position N, it multiplies ValAngle (in degrees)
+by corresponding factor (for 'deg' is doesn't multiply),
+and increases N by the length of unit-string.
+}
 begin
   Result:= true;
   if (S[N]='d') and (S[N+1]='e') and (S[N+2]='g') then
