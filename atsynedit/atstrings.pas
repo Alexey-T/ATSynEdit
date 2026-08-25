@@ -415,7 +415,7 @@ type
     property SaveSignWide: boolean read FSaveSignWide write FSaveSignWide;
     //text
     property ReadOnly: boolean read FReadOnly write FReadOnly;
-    function TextString_Unicode(AMaxLen: SizeInt=0): UnicodeString;
+    function TextString_Unicode(AMaxLen: SizeInt=0; AIgnoreLineEnds: boolean=true): UnicodeString;
     procedure TextInsert(AX, AY: SizeInt; const AText: atString; AOverwrite: boolean;
       out AShift, APosAfter: TPoint);
     procedure TextAppend(const AText: atString; out AShift, APosAfter: TPoint);
@@ -1279,14 +1279,13 @@ begin
 end;
 
 
-function TATStrings.TextString_Unicode(AMaxLen: SizeInt=0): UnicodeString;
+function TATStrings.TextString_Unicode(AMaxLen: SizeInt=0; AIgnoreLineEnds: boolean=true): UnicodeString;
 const
-  LenEol = 1;
-  CharEol = #10;
+  cEndLengths: array[TATLineEnds] of SizeInt = (1, 2, 1, 1);
 var
-  Len, LastIndex, i: SizeInt;
   Item: PATStringItem;
   Ptr: pointer;
+  Len, LenEol, LastIndex, i: SizeInt;
   bFinalEol: boolean;
 begin
   Result:= '';
@@ -1297,6 +1296,10 @@ begin
   for i:= 0 to LastIndex-1 do
   begin
     Item:= FList.GetItem(i);
+    if AIgnoreLineEnds then
+      LenEol:= 1
+    else
+      LenEol:= cEndLengths[Item^.LineEnds];
     Inc(Len, Item^.CharLen+LenEol);
   end;
 
@@ -1305,7 +1308,13 @@ begin
 
   bFinalEol:= LinesEnds[LastIndex]<>TATLineEnds.None;
   if bFinalEol then
+  begin
+    if AIgnoreLineEnds then
+      LenEol:= 1
+    else
+      LenEol:= cEndLengths[Item^.LineEnds];
     Inc(Len, LenEol);
+  end;
 
   if Len=0 then Exit;
 
@@ -1328,7 +1337,27 @@ begin
     //copy eol
     if bFinalEol or (i<LastIndex) then
     begin
-      PWideChar(Ptr)^:= CharEol;
+      if AIgnoreLineEnds then
+      begin
+        LenEol:= 1;
+        PWideChar(Ptr)^:= #10
+      end
+      else
+      begin
+        LenEol:= cEndLengths[Item^.LineEnds];
+        case Item^.LineEnds of
+          TATLineEnds.None,
+          TATLineEnds.Unix:
+            PWideChar(Ptr)^:= #10;
+          TATLineEnds.Windows:
+            begin
+              PWideChar(Ptr)^:= #13;
+              PWideChar(Ptr+2)^:= #10;
+            end;
+          TATLineEnds.Mac:
+            PWideChar(Ptr)^:= #13;
+        end;
+      end;
       Inc(Ptr, LenEol*2);
     end;
   end;
