@@ -9,7 +9,7 @@ unit ATSynEdit_CanvasProc;
 {$ScopedEnums on}
 
 {$I atsynedit_defines.inc}
-{$if defined(LCLGtk2)}
+{$if defined(LCLGtk2) or defined(LCLGtk3)}
   {$define USE_CAIRO}
 {$endif}
 
@@ -164,7 +164,12 @@ implementation
 uses
   Math,
   {$ifdef USE_CAIRO}
-  ATSynEdit_CanvasProc_Cairo,
+    {$if defined(LCLGtk2)}
+    ATSynEdit_CanvasProc_Cairo,
+    {$endif}
+    {$if defined(LCLGtk3)}
+    ATSynEdit_CanvasProc_Cairo_Gtk3,
+    {$endif}
   {$endif}
   LCLType,
   LCLIntf;
