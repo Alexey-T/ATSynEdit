@@ -1,4 +1,5 @@
 {
+Copyright (c) 2026 Alexey Torgashin (uvviewsoft.com)
 License: MPL 2.0 or LGPL
 }
 
@@ -9,22 +10,19 @@ unit ATSynEdit_CanvasProc_Cairo_Gtk3;
 interface
 
 uses
-  LCLType,
-  LCLIntf,
-  Types,
-  SysUtils,
   Graphics;
 
-  procedure CairoTextOut(ACanvas: TCanvas; AX, AY: Integer; AStr: PChar);
+procedure CairoTextOut(ACanvas: TCanvas; AX, AY: Integer; AStr: PChar);
 
 implementation
 
 uses
-  //gdk3,
+  SysUtils,
+  LCLType,
+  LCLIntf,
   Gtk3Objects, // Contains TGtk3DeviceContext
   Cairo,
   Lazcairo1,
-  glib2,
   Math;
 
 var
