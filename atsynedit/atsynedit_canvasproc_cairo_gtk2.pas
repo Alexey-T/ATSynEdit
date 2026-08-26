@@ -1,20 +1,3 @@
-﻿////////////////////////////////////////////////////////////////////////////////
-//
-//  ****************************************************************************
-//  * Project   : Hex Viewer Project
-//  * Unit Name : FWHexView.Cairo.pas
-//  * Purpose   : Speeding up text output with the Cairo library
-//  * Author    : Alexander (Rouse_) Bagel
-//  * Copyright : © Fangorn Wizards Lab 1998 - 2025.
-//  * Version   : 2.0.14
-//  * Home Page : http://rouse.drkb.ru
-//  * Home Blog : http://alexander-bagel.blogspot.ru
-//  ****************************************************************************
-//  * Latest Release : https://github.com/AlexanderBagel/FWHexView/releases
-//  * Latest Source  : https://github.com/AlexanderBagel/FWHexView
-//  ****************************************************************************
-//
-
 {
 License: MPL 2.0 or LGPL
 }
@@ -26,6 +9,10 @@ unit ATSynEdit_CanvasProc_Cairo_Gtk2;
 interface
 
 uses
+  LCLType,
+  LCLIntf,
+  Types,
+  SysUtils,
   Graphics;
 
 procedure CairoTextOut(ACanvas: TCanvas; AX, AY: Integer; AStr: PChar);
@@ -33,10 +20,6 @@ procedure CairoTextOut(ACanvas: TCanvas; AX, AY: Integer; AStr: PChar);
 implementation
 
 uses
-  SysUtils,
-  Types,
-  LCLType,
-  LCLIntf,
   gdk2,
   Gtk2Def,
   Cairo,
@@ -49,12 +32,32 @@ var
 type
   ECairoException = class(Exception);
 
-  TCairoColor = record
-    R, G, B, A: Double;
+  // Cache key for font state and context matrix.
+  TFontKey = record
+    Name: string;
+    Height: Integer;
+    Bold: Boolean;
+    Italic: Boolean;
+    mxx, mxy, myx, myy, mx0, my0: Double;
   end;
 
-  PCairoClusterArray = ^TCairoClusterArray;
-  TCairoClusterArray = array[0..0] of cairo_text_cluster_t;
+  // Cached scaled font and baseline.
+  TCachedFont = record
+    Key: TFontKey;
+    SFont: Pcairo_scaled_font_t;
+    Baseline: Integer;
+  end;
+
+const
+  MaxCachedFonts = 64;
+
+var
+  CachedFonts: array[0..MaxCachedFonts - 1] of TCachedFont;
+  CachedCount: Integer;
+
+  DefaultFontInited: Boolean;
+  DefaultFontName: string;
+  DefaultFontHeight: Integer;
 
 function cairo_create_context(DC: HDC): pcairo_t;
 var
@@ -63,9 +66,13 @@ var
 begin
   Ctx := TGtkDeviceContext(DC);
   Result := gdk_cairo_create(Ctx.Drawable);
+
   if Result = nil then
     raise ECairoException.Create('Cannot create cairo context');
-  if Ctx.WindowExt <> Ctx.ViewPortExt then
+
+  // Preserve LCL mapping if it is active.
+  if (Ctx.WindowExt.X <> 0) and (Ctx.WindowExt.Y <> 0) and
+     (Ctx.WindowExt <> Ctx.ViewPortExt) then
   begin
     Matrix.xx := Ctx.ViewPortExt.X / Ctx.WindowExt.X;
     Matrix.yy := Ctx.ViewPortExt.Y / Ctx.WindowExt.Y;
@@ -77,50 +84,82 @@ begin
   end;
 end;
 
-procedure cairo_set_font(ACairo: pcairo_t; AFont: TFont);
+procedure EnsureDefaultFont;
 var
   ADefFont: TFontData;
-  LSlant: cairo_font_slant_t;
-  LWeight: cairo_font_weight_t;
 begin
-  if fsItalic in AFont.Style then
-    LSlant := CAIRO_FONT_SLANT_ITALIC
-  else
-    LSlant := CAIRO_FONT_SLANT_NORMAL;
+  if not DefaultFontInited then
+  begin
+    ADefFont := GetFontData(GetStockObject(DEFAULT_GUI_FONT));
+    DefaultFontName := string(ADefFont.Name);
+    DefaultFontHeight := Abs(ADefFont.Height);
 
-  if fsBold in AFont.Style then
-    LWeight := CAIRO_FONT_WEIGHT_BOLD
-  else
-    LWeight := CAIRO_FONT_WEIGHT_NORMAL;
+    if DefaultFontHeight <= 0 then
+      DefaultFontHeight := 10;
 
-  ADefFont := GetFontData(GetStockObject(DEFAULT_GUI_FONT));
+    DefaultFontInited := True;
+  end;
+end;
 
-  if AFont.IsDefault then
-    cairo_select_font_face(ACairo, PChar(string(ADefFont.Name)), LSlant, LWeight)
+procedure MakeFontKey(AFont: TFont; const Matrix: cairo_matrix_t; out Key: TFontKey);
+begin
+  Key.Bold := fsBold in AFont.Style;
+  Key.Italic := fsItalic in AFont.Style;
+
+  if AFont.IsDefault or (AFont.Name = '') then
+  begin
+    EnsureDefaultFont;
+    Key.Name := DefaultFontName;
+  end
   else
-    cairo_select_font_face(ACairo, PChar(AFont.Name), LSlant, LWeight);
+    Key.Name := AFont.Name;
 
   if AFont.Height = 0 then
-    cairo_set_font_size(ACairo, ADefFont.Height)
+  begin
+    EnsureDefaultFont;
+    Key.Height := DefaultFontHeight;
+  end
   else
-    cairo_set_font_size(ACairo, Abs(AFont.Height));
+    Key.Height := Abs(AFont.Height);
+
+  if Key.Height <= 0 then
+    Key.Height := 10;
+
+  Key.mxx := Matrix.xx;
+  Key.mxy := Matrix.xy;
+  Key.myx := Matrix.yx;
+  Key.myy := Matrix.yy;
+  Key.mx0 := Matrix.x0;
+  Key.my0 := Matrix.y0;
 end;
 
-function cairo_get_color(AColor: TColor): TCairoColor;
+function SameFontKey(const A, B: TFontKey): Boolean;
 begin
-  AColor := ColorToRGB(AColor);
-  Result.R := CairoColors[GetRValue(AColor)];
-  Result.G := CairoColors[GetGValue(AColor)];
-  Result.B := CairoColors[GetBValue(AColor)];
-  Result.A := 1.0;
+  Result :=
+    (A.Height = B.Height) and
+    (A.Bold = B.Bold) and
+    (A.Italic = B.Italic) and
+    (CompareText(A.Name, B.Name) = 0) and
+    (A.mxx = B.mxx) and
+    (A.mxy = B.mxy) and
+    (A.myx = B.myx) and
+    (A.myy = B.myy) and
+    (A.mx0 = B.mx0) and
+    (A.my0 = B.my0);
 end;
 
-procedure cairo_set_source_color(ACairo: pcairo_t; const AColor: TCairoColor);
+function FindCachedFont(const Key: TFontKey): Integer;
+var
+  i: Integer;
 begin
-  cairo_set_source_rgba(ACairo, AColor.R, AColor.G, AColor.B, AColor.A);
+  for i := 0 to CachedCount - 1 do
+    if SameFontKey(CachedFonts[i].Key, Key) then
+      Exit(i);
+
+  Result := -1;
 end;
 
-function cairo_font_baseline(AFont: Pcairo_scaled_font_t): Integer;
+function GetScaledFontBaseline(AFont: Pcairo_scaled_font_t): Integer;
 var
   extents: cairo_font_extents_t;
 begin
@@ -128,95 +167,105 @@ begin
   Result := Ceil(extents.height - extents.descent);
 end;
 
-type
-  TCairoContext = record
-    Context: pcairo_t;
-    Font: Pcairo_scaled_font_t;
-    Size: Integer;
-    Glyphs: Pcairo_glyph_t;
-    GlyphsLen: LongInt;
-    Clusters: PCairoClusterArray;
-    ClustersLen: LongInt;
-    InvalidGlyphsPresent: Boolean;
-  end;
-
-procedure ReleaseCairoContext(var AContext: TCairoContext);
+procedure ApplyFontToContext(ct: pcairo_t; const Key: TFontKey);
+var
+  LSlant: cairo_font_slant_t;
+  LWeight: cairo_font_weight_t;
 begin
-  cairo_glyph_free(AContext.Glyphs);
-  cairo_text_cluster_free(pcairo_text_cluster_t(AContext.Clusters));
-  cairo_destroy(AContext.Context);
+  if Key.Italic then
+    LSlant := CAIRO_FONT_SLANT_ITALIC
+  else
+    LSlant := CAIRO_FONT_SLANT_NORMAL;
+
+  if Key.Bold then
+    LWeight := CAIRO_FONT_WEIGHT_BOLD
+  else
+    LWeight := CAIRO_FONT_WEIGHT_NORMAL;
+
+  cairo_select_font_face(ct, PChar(Key.Name), LSlant, LWeight);
+  cairo_set_font_size(ct, Key.Height);
 end;
 
-function CreateCairoContext(ACanvas: TCanvas; Str: PChar;
-  Count, X, Y: Integer; out AContext: TCairoContext): Boolean;
-var
-  cluster_flags: cairo_text_cluster_flags_t;
-  glyphs: Pcairo_glyph_t;
-  I, A: Integer;
+procedure AddCachedFont(const Key: TFontKey; SFont: Pcairo_scaled_font_t;
+  Baseline: Integer);
 begin
-  AContext := Default(TCairoContext);
-  AContext.Context := cairo_create_context(ACanvas.Handle);
-  cairo_set_font(AContext.Context, ACanvas.Font);
-  cairo_set_source_color(AContext.Context, cairo_get_color(ACanvas.Font.Color));
-  AContext.Font := cairo_get_scaled_font(AContext.Context);
-  AContext.Size := ACanvas.Font.Size;
-  Result := cairo_scaled_font_text_to_glyphs(AContext.Font,
-    X, Y + cairo_font_baseline(AContext.Font),
-    Str, Count, @AContext.Glyphs, @AContext.GlyphsLen, @AContext.Clusters,
-    @AContext.ClustersLen, @cluster_flags) = CAIRO_STATUS_SUCCESS;
-  if not Result then
-  begin
-    ReleaseCairoContext(AContext);
+  if CachedCount >= MaxCachedFonts then
     Exit;
-  end;
-  glyphs := AContext.Glyphs;
-  for I := 0 to AContext.ClustersLen - 1 do
-    for A := 0 to AContext.Clusters^[I].num_glyphs - 1 do
-    begin
-      if glyphs^.index = 0 then
-      begin
-        AContext.InvalidGlyphsPresent := True;
-        Break;
-      end;
-      Inc(glyphs);
-    end;
+
+  CachedFonts[CachedCount].Key := Key;
+  CachedFonts[CachedCount].SFont := cairo_scaled_font_reference(SFont);
+  CachedFonts[CachedCount].Baseline := Baseline;
+
+  Inc(CachedCount);
+end;
+
+procedure SetSourceColor(ct: pcairo_t; AColor: TColor);
+var
+  RGBColor: TColor;
+begin
+  RGBColor := ColorToRGB(AColor);
+
+  cairo_set_source_rgba(
+    ct,
+    CairoColors[GetRValue(RGBColor)],
+    CairoColors[GetGValue(RGBColor)],
+    CairoColors[GetBValue(RGBColor)],
+    1.0
+  );
 end;
 
 procedure CairoTextOut(ACanvas: TCanvas; AX, AY: Integer; AStr: PChar);
 var
   ct: pcairo_t;
+  m: cairo_matrix_t;
+  Key: TFontKey;
+  idx: Integer;
   sfont: Pcairo_scaled_font_t;
-  x, y: Integer;
+  baseline: Integer;
 begin
   ct := cairo_create_context(ACanvas.Handle);
   try
-    cairo_set_font(ct, ACanvas.Font);
-    cairo_set_source_color(ct, cairo_get_color(ACanvas.Font.Color));
-    sfont := cairo_get_scaled_font(ct);
-    x := AX;
-    y := AY + cairo_font_baseline(sfont);
-    {
-    if Flags and DT_NOCLIP = 0 then
+    cairo_get_matrix(ct, @m);
+    MakeFontKey(ACanvas.Font, m, Key);
+
+    idx := FindCachedFont(Key);
+
+    if idx >= 0 then
     begin
-      cairo_rectangle(ct, ARect.Left, ARect.Top, ARect.Width + 1, ARect.Height);
-      cairo_clip(ct);
+      // Fast path: reuse already created scaled font.
+      cairo_set_scaled_font(ct, CachedFonts[idx].SFont);
+      baseline := CachedFonts[idx].Baseline;
+    end
+    else
+    begin
+      // Slow path: create font state for this context and cache it.
+      ApplyFontToContext(ct, Key);
+
+      sfont := cairo_get_scaled_font(ct);
+      baseline := GetScaledFontBaseline(sfont);
+
+      AddCachedFont(Key, sfont, baseline);
     end;
-    }
-    cairo_move_to(ct, x, y);
+
+    // Color must be set every time because a new Cairo context is used.
+    SetSourceColor(ct, ACanvas.Font.Color);
+
+    cairo_move_to(ct, AX, AY + baseline);
     cairo_show_text(ct, AStr);
   finally
     cairo_destroy(ct);
   end;
 end;
 
-
 var
   I: Integer;
 
 initialization
-
   for I := 0 to 255 do
     CairoColors[I] := I / 255;
 
-end.
+finalization
+  for I := 0 to CachedCount - 1 do
+    cairo_scaled_font_destroy(CachedFonts[I].SFont);
 
+end.
