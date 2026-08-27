@@ -33,6 +33,11 @@ uses
   Gdk2,
   Gtk2Def,
   {$endif}
+  {$ifdef LCLQt5}
+  Qt5,
+  QtObjects,
+  QtWidgets,
+  {$endif}
   Classes;
 
 {$ifdef LCLWin32}
@@ -222,7 +227,62 @@ begin
 end;
 {$endif}
 
-{$if not defined(LCLWin32) and not defined(LCLGtk2) and not defined(LCLGtk3)}
+{$IFDEF LCLQt5}
+procedure CanvasInvertRect(C: TCanvas; const R: TRect; AColor: TColor);
+var
+  DC: TQtDeviceContext;
+  Painter: QPainterH;
+  QColorObj: QColorH;
+  QBrushObj: QBrushH;
+  QRectFObj: QRectFH; // <-- Изменено на QRectFH
+  Col: TColor;
+  RedVal, GreenVal, BlueVal: Byte;
+begin
+  // 1. Базовая проверка
+  if (C = nil) or (C.Handle = 0) then Exit;
+
+  // 2. Получаем низкоуровневый Painter
+  DC := TQtDeviceContext(C.Handle);
+  Painter := DC.Widget;
+  if Painter = nil then Exit;
+
+  // 3. Разбираем TColor на компоненты
+  Col := ColorToRGB(AColor);
+  RedVal   := Col and $FF;
+  GreenVal := (Col shr 8) and $FF;
+  BlueVal  := (Col shr 16) and $FF;
+
+  // 4. Создаем ВАЛИДНЫЙ C++ объект QColor
+  QColorObj := QColor_Create();
+  QColor_setRgb(QColorObj, RedVal, GreenVal, BlueVal, 255);
+
+  // 5. Создаем кисть (приводим к PQColor для удовлетворения строгой типизации FPC)
+  QBrushObj := QBrush_Create(PQColor(QColorObj), QtSolidPattern);
+
+  // 6. Создаем QRectF (Floating-point rect), так как биндинг требует QRectFH
+  // FPC автоматически преобразует Integer в qreal (Double) при вызове
+  QRectFObj := QRectF_create(R.Left, R.Top, R.Width, R.Height);
+
+  // 7. Рисуем
+  QPainter_save(Painter);
+  try
+    // Режим XOR обеспечивает классическую побитовую инверсию пикселей
+    QPainter_setCompositionMode(Painter, QPainterCompositionMode_Xor);
+
+    // Вызываем перегрузку, принимающую QRectFH и QBrushH
+    QPainter_fillRect(Painter, QRectFObj, QBrushObj);
+  finally
+    QPainter_restore(Painter);
+  end;
+
+  // 8. Освобождаем память C++ объектов (используем QRectF_destroy!)
+  QRectF_destroy(QRectFObj);
+  QBrush_Destroy(QBrushObj);
+  QColor_Destroy(QColorObj);
+end;
+{$endif}
+
+{$if not defined(LCLWin32) and not defined(LCLGtk2) and not defined(LCLGtk3) and not defined(LCLQt5)}
 procedure CanvasInvertRect(C: TCanvas; const R: TRect; AColor: TColor);
 var
   X: integer;
