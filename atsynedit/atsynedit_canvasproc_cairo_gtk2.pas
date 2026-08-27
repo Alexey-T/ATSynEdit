@@ -1,4 +1,5 @@
 {
+Copyright (c) 2026 Alexey Torgashin (uvviewsoft.com)
 License: MPL 2.0 or LGPL
 }
 
