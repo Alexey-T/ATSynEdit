@@ -12,7 +12,7 @@ interface
 uses
   Graphics;
 
-procedure NativeTextOut(ACanvas: TCanvas; AX, AY: Integer; AStr: PChar);
+procedure NativeTextOut(ACanvas: TCanvas; AX, AY: Integer; const AStr: string);
 
 implementation
 
@@ -45,7 +45,7 @@ var
   LastFontItalic: Boolean = False;
   LastBaseline: Integer = 0;
 
-procedure NativeTextOut(ACanvas: TCanvas; AX, AY: Integer; AStr: PChar);
+procedure NativeTextOut(ACanvas: TCanvas; AX, AY: Integer; const AStr: string);
 var
   ct: pcairo_t;
   Ctx: TGtk3DeviceContext;
@@ -137,7 +137,7 @@ begin
     // LCL GTK3 changes the source in pcr during operations such as FillRect,
     // for example when painting the selection background.
     // If this call were skipped, text could be painted with the background color.
-    AColor := ColorToRGB(ACanvas.Font.Color);
+    AColor := ACanvas.Font.Color;
     C.R := CairoColors[GetRValue(AColor)];
     C.G := CairoColors[GetGValue(AColor)];
     C.B := CairoColors[GetBValue(AColor)];
@@ -148,7 +148,7 @@ begin
     y := AY + LastBaseline;
 
     cairo_move_to(ct, x, y);
-    cairo_show_text(ct, AStr);
+    cairo_show_text(ct, PChar(AStr));
   finally
     if OwnsContext then
       cairo_destroy(ct);

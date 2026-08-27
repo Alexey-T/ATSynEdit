@@ -12,7 +12,7 @@ interface
 uses
   Graphics;
 
-procedure NativeTextOut(ACanvas: TCanvas; AX, AY: Integer; AStr: PChar);
+procedure NativeTextOut(ACanvas: TCanvas; AX, AY: Integer; const AStr: string);
 
 implementation
 
@@ -215,7 +215,7 @@ begin
   );
 end;
 
-procedure NativeTextOut(ACanvas: TCanvas; AX, AY: Integer; AStr: PChar);
+procedure NativeTextOut(ACanvas: TCanvas; AX, AY: Integer; const AStr: string);
 var
   ct: pcairo_t;
   m: cairo_matrix_t;
@@ -252,7 +252,7 @@ begin
     SetSourceColor(ct, ACanvas.Font.Color);
 
     cairo_move_to(ct, AX, AY + baseline);
-    cairo_show_text(ct, AStr);
+    cairo_show_text(ct, PChar(AStr));
   finally
     cairo_destroy(ct);
   end;
