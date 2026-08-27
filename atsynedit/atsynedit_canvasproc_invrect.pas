@@ -21,6 +21,10 @@ uses
   Gtk3Objects,
   Cairo,
   {$endif}
+  {$ifdef LCLGtk2}
+  Gdk2,
+  Gtk2Def,
+  {$endif}
   Classes;
 
 procedure CanvasInvertRect_ByPixels(C: TCanvas; const R: TRect; AColor: TColor);
@@ -85,7 +89,90 @@ begin
   cairo_stroke(cr);
   cairo_restore(cr);
 end;
-{$else}
+{$endif}
+
+{$ifdef LCLGtk2}
+procedure CanvasInvertRect(C: TCanvas; const R: TRect; AColor: TColor);
+var
+  DC: TGtkDeviceContext;
+  gc: PGdkGC;
+  drawable: PGdkDrawable;
+  col: TGdkColor;
+  colormap: PGdkColormap;
+  W, H: Integer;
+begin
+  if not Assigned(C) or (C.Handle = 0) then Exit;
+
+  W := R.Right - R.Left;
+  H := R.Bottom - R.Top;
+  if (W <= 0) or (H <= 0) then Exit;
+
+  DC := TGtkDeviceContext(C.Handle);
+  drawable := DC.Drawable;
+  gc := DC.GC;
+  if (drawable = nil) or (gc = nil) then Exit;
+
+  // Use WHITE for XOR to get pure inversion: result = ~background
+  col.red   := $FFFF;
+  col.green := $FFFF;
+  col.blue  := $FFFF;
+
+  // Allocate color through colormap for correct pixel value on any visual
+  colormap := gdk_drawable_get_colormap(drawable);
+  if colormap <> nil then
+    gdk_colormap_alloc_color(colormap, @col, False, True);
+
+  gdk_gc_set_function(gc, GDK_XOR);
+  gdk_gc_set_foreground(gc, @col);
+
+  gdk_draw_rectangle(drawable, gc, 1, R.Left, R.Top, W, H);
+
+  gdk_gc_set_function(gc, GDK_COPY);
+end;
+
+procedure CanvasInvertRectEmptyInside(C: TCanvas; const R: TRect; AColor: TColor);
+var
+  DC: TGtkDeviceContext;
+  gc: PGdkGC;
+  drawable: PGdkDrawable;
+  col: TGdkColor;
+  colormap: PGdkColormap;
+  W, H: Integer;
+begin
+  if not Assigned(C) or (C.Handle = 0) then Exit;
+
+  W := R.Right - R.Left;
+  H := R.Bottom - R.Top;
+  if (W <= 0) or (H <= 0) then Exit;
+
+  DC := TGtkDeviceContext(C.Handle);
+  drawable := DC.Drawable;
+  gc := DC.GC;
+  if (drawable = nil) or (gc = nil) then Exit;
+
+  // Use WHITE for XOR to get pure inversion: result = ~background
+  col.red   := $FFFF;
+  col.green := $FFFF;
+  col.blue  := $FFFF;
+
+  // Allocate color through colormap for correct pixel value on any visual
+  colormap := gdk_drawable_get_colormap(drawable);
+  if colormap <> nil then
+    gdk_colormap_alloc_color(colormap, @col, False, True);
+
+  gdk_gc_set_function(gc, GDK_XOR);
+  gdk_gc_set_foreground(gc, @col);
+
+  // filled = 0 → only the outline, 1-pixel wide by default
+  // Use W-1, H-1 so the stroke lands exactly within R (GDK's outline
+  // rectangle includes both endpoints, unlike the filled variant)
+  gdk_draw_rectangle(drawable, gc, 0, R.Left, R.Top, W - 1, H - 1);
+
+  gdk_gc_set_function(gc, GDK_COPY);
+end;
+{$endif}
+
+{$if not defined(LCLGtk2) and not defined(LCLGtk3)}
 procedure CanvasInvertRect(C: TCanvas; const R: TRect; AColor: TColor);
 var
   X: integer;
@@ -127,7 +214,9 @@ begin
   C.AntialiasingMode:= OldAntialias;
   C.Rectangle(0, 0, 0, 0); //apply pen
 end;
+{$endif}
 
+{$if not defined(LCLGtk2) and not defined(LCLGtk3)}
 procedure CanvasInvertRectEmptyInside(C: TCanvas; const R: TRect; AColor: TColor);
 var
   {$ifdef FPC}
