@@ -46,7 +46,7 @@ begin
   cr := Cairo.pcairo_t(TGtk3DeviceContext(C.Handle).pcr);
   if cr = nil then Exit;
 
-  rgb := ColorToRGB(AColor);
+  rgb := AColor; //ColorToRGB(AColor);
   cRed   := (rgb and $FF) / 255;
   cGreen := ((rgb shr 8) and $FF) / 255;
   cBlue  := ((rgb shr 16) and $FF) / 255;
@@ -70,7 +70,7 @@ begin
   cr := Cairo.Pcairo_t(TGtk3DeviceContext(C.Handle).pcr);
   if cr = nil then Exit;
 
-  rgb := ColorToRGB(AColor);
+  rgb := AColor; //ColorToRGB(AColor);
   cRed   := (rgb and $FF) / 255;
   cGreen := ((rgb shr 8) and $FF) / 255;
   cBlue  := ((rgb shr 16) and $FF) / 255;
