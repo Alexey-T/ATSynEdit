@@ -22,6 +22,9 @@ procedure CanvasInvertRectEmptyInside(C: TCanvas; const R: TRect; AColor: TColor
 implementation
 
 uses
+  {$ifdef LCLWIN32}
+  Windows,
+  {$endif}
   {$ifdef LCLGtk3}
   Gtk3Objects,
   Cairo,
@@ -42,6 +45,59 @@ begin
     for i:= R.Left to R.Right-1 do
       C.Pixels[i, j]:= C.Pixels[i, j] xor NValue;
 end;
+
+{$ifdef LCLWin32}
+procedure CanvasInvertRect_SuperFastIgnoringColor(C: TCanvas; const R: TRect; AColor: TColor);
+var
+  DC: HDC;
+begin
+  if not Assigned(C) then Exit;
+  DC := HDC(C.Handle);
+  if DC = 0 then Exit;
+  Windows.InvertRect(DC, R);
+end;
+
+procedure CanvasInvertRectEmptyInside(C: TCanvas; const R: TRect; AColor: TColor);
+var
+  DC: HDC;
+  W, H: Integer;
+begin
+  if not Assigned(C) then Exit;
+  DC := HDC(C.Handle);
+  if DC = 0 then Exit;
+  W := R.Right - R.Left;
+  H := R.Bottom - R.Top;
+  if (W <= 0) or (H <= 0) then Exit;
+  // Top edge
+  PatBlt(DC, R.Left, R.Top, W, 1, PATINVERT);
+  // Bottom edge
+  PatBlt(DC, R.Left, R.Bottom - 1, W, 1, PATINVERT);
+  if H > 2 then
+  begin
+    // Left edge (без углов)
+    PatBlt(DC, R.Left, R.Top + 1, 1, H - 2, PATINVERT);
+    // Right edge (без углов)
+    PatBlt(DC, R.Right - 1, R.Top + 1, 1, H - 2, PATINVERT);
+  end;
+end;
+
+procedure CanvasInvertRect(C: TCanvas; const R: TRect; AColor: TColor);
+var
+  DC: HDC;
+  OldBrush: HGDIOBJ;
+begin
+  if not Assigned(C) then Exit;
+  DC := HDC(C.Handle);
+  if DC = 0 then Exit;
+  // SetDCBrushColor — does not create brush object, only changes color in DC.
+  // much faster than CreateSolidBrush/DeleteObject.
+  SetDCBrushColor(DC, ColorToRGB(AColor));
+  OldBrush := SelectObject(DC, GetStockObject(DC_BRUSH));
+  // PATINVERT: result = pixel XOR brush_color
+  PatBlt(DC, R.Left, R.Top, R.Right - R.Left, R.Bottom - R.Top, PATINVERT);
+  SelectObject(DC, OldBrush);
+end;
+{$endif}
 
 {$ifdef LCLGtk3}
 procedure CanvasInvertRect(C: TCanvas; const R: TRect; AColor: TColor);
@@ -177,7 +233,7 @@ begin
 end;
 {$endif}
 
-{$if not defined(LCLGtk2) and not defined(LCLGtk3)}
+{$if not defined(LCLWin32) and not defined(LCLGtk2) and not defined(LCLGtk3)}
 procedure CanvasInvertRect(C: TCanvas; const R: TRect; AColor: TColor);
 var
   X: integer;
@@ -221,7 +277,7 @@ begin
 end;
 {$endif}
 
-{$if not defined(LCLGtk2) and not defined(LCLGtk3)}
+{$if not defined(LCLWin32) and not defined(LCLGtk2) and not defined(LCLGtk3)}
 procedure CanvasInvertRectEmptyInside(C: TCanvas; const R: TRect; AColor: TColor);
 var
   {$ifdef FPC}
