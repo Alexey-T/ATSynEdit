@@ -16,6 +16,9 @@ procedure CanvasFillRect(C: TCanvas; const R: TRect; AColor: TColor);
 implementation
 
 uses
+  {$ifdef LCLWin32}
+  Windows,
+  {$endif}
   {$ifdef LCLGtk2}
   Gdk2,
   Gtk2Def,
@@ -78,6 +81,39 @@ begin
 
   cairo_rectangle(Cr, R.Left, R.Top, R.Width, R.Height);
   cairo_fill(Cr);
+end;
+{$endif}
+
+{$ifdef LCLWin32}
+{$define HAS_F}
+procedure CanvasFillRect(C: TCanvas; const R: TRect; AColor: TColor);
+var
+  DC: HDC;
+  OldBrush: HGDIOBJ;
+  OldBrushColor: COLORREF;
+  W, H: Integer;
+begin
+  if (C.Handle = 0) then Exit;
+
+  W := R.Width;
+  H := R.Height;
+  if (W <= 0) or (H <= 0) then Exit;
+
+  DC := HDC(C.Handle);
+
+  // using stock brush DC_BRUSH is faster than do everytime CreateSolidBrush/DeleteObject.
+  OldBrush := SelectObject(DC, GetStockObject(DC_BRUSH));
+  if OldBrush = 0 then Exit;
+
+  try
+    OldBrushColor := SetDCBrushColor(DC, AColor);
+
+    PatBlt(DC, R.Left, R.Top, W, H, PATCOPY);
+
+    SetDCBrushColor(DC, OldBrushColor);
+  finally
+    SelectObject(DC, OldBrush);
+  end;
 end;
 {$endif}
 

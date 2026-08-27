@@ -87,7 +87,7 @@ begin
   if DC = 0 then Exit;
   // SetDCBrushColor — does not create brush object, only changes color in DC.
   // much faster than CreateSolidBrush/DeleteObject.
-  SetDCBrushColor(DC, ColorToRGB(AColor));
+  SetDCBrushColor(DC, AColor);
   OldBrush := SelectObject(DC, GetStockObject(DC_BRUSH));
   // PATINVERT: result = pixel XOR brush_color
   PatBlt(DC, R.Left, R.Top, R.Right - R.Left, R.Bottom - R.Top, PATINVERT);
