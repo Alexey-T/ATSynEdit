@@ -43,7 +43,7 @@ var
 begin
   if not Assigned(C) or (C.Handle = 0) then Exit;
 
-  cr := Cairo.pcairo_t(TGtk3DeviceContext(C.Handle).pcr);
+  cr := pcairo_t(TGtk3DeviceContext(C.Handle).pcr);
   if cr = nil then Exit;
 
   rgb := AColor; //ColorToRGB(AColor);
@@ -67,7 +67,7 @@ var
 begin
   if not Assigned(C) or (C.Handle = 0) then Exit;
 
-  cr := Cairo.Pcairo_t(TGtk3DeviceContext(C.Handle).pcr);
+  cr := Pcairo_t(TGtk3DeviceContext(C.Handle).pcr);
   if cr = nil then Exit;
 
   rgb := AColor; //ColorToRGB(AColor);
