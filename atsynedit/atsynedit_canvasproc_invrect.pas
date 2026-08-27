@@ -97,12 +97,6 @@ var
   OldEndCap: TPenEndCap;
   {$endif}
 begin
-  if ATCanvasPrimitives_InvertByPixels then
-  begin
-    CanvasInvertRect_ByPixels(C, R, AColor);
-    exit;
-  end;
-
   OldAntialias:= C.AntialiasingMode;
   OldMode:= C.Pen.Mode;
   OldStyle:= C.Pen.Style;
@@ -144,6 +138,7 @@ var
   OldPenWidth: integer;
   OldBrushStyle: TBrushStyle;
 begin
+  {
   if ATCanvasPrimitives_InvertByPixels then
   begin
     CanvasInvertRect_ByPixels(C, Rect(R.Left, R.Top, R.Right, R.Top+1), AColor);
@@ -152,6 +147,7 @@ begin
     CanvasInvertRect_ByPixels(C, Rect(R.Left, R.Bottom-1, R.Right, R.Bottom), AColor);
     exit;
   end;
+  }
 
   {$ifdef FPC}
   OldAntialias:= C.AntialiasingMode;

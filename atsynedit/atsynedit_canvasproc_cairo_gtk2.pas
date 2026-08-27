@@ -9,10 +9,6 @@ unit ATSynEdit_CanvasProc_Cairo_Gtk2;
 interface
 
 uses
-  LCLType,
-  LCLIntf,
-  Types,
-  SysUtils,
   Graphics;
 
 procedure CairoTextOut(ACanvas: TCanvas; AX, AY: Integer; AStr: PChar);
@@ -20,6 +16,10 @@ procedure CairoTextOut(ACanvas: TCanvas; AX, AY: Integer; AStr: PChar);
 implementation
 
 uses
+  SysUtils,
+  LCLType,
+  LCLIntf,
+  Types,
   gdk2,
   Gtk2Def,
   Cairo,
