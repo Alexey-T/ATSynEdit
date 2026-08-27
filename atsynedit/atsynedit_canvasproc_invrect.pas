@@ -6,6 +6,11 @@ unit ATSynEdit_CanvasProc_InvRect;
 
 {$mode objfpc}{$H+}
 
+{
+Code for gtk3 makes CudaText rendering faster by ~1.5 times.
+Code for gtk2: only little faster.
+}
+
 interface
 
 uses
