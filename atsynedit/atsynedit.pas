@@ -4566,21 +4566,21 @@ begin
       if ATEditorOptions.RenderSpaceBgAtLineEOL then
       begin
         CanvasFillRect(C, Rect(
-          CoordAfterText.X,
-          CoordAfterText.Y,
-          CoordAfterText.X+ACharSize.XScaled div ATEditorCharXScale,
-          CoordAfterText.Y+ACharSize.Y),
-        Colors.TextSelBG); 
+            CoordAfterText.X,
+            CoordAfterText.Y,
+            CoordAfterText.X+ACharSize.XScaled div ATEditorCharXScale,
+            CoordAfterText.Y+ACharSize.Y),
+          Colors.TextSelBG);
       end
       else
       if NLineLen=0 then
       begin
         CanvasFillRect(C, Rect(
-          CoordAfterText.X,
-          CoordAfterText.Y,
-          CoordAfterText.X+ACharSize.XScaled div ATEditorCharXScale * ATEditorOptions.RenderSpaceBgAtLineEOL_WidthOnEmpty div 100,
-          CoordAfterText.Y+ACharSize.Y),
-        Colors.TextSelBG);  
+            CoordAfterText.X,
+            CoordAfterText.Y,
+            CoordAfterText.X+ACharSize.XScaled div ATEditorCharXScale * ATEditorOptions.RenderSpaceBgAtLineEOL_WidthOnEmpty div 100,
+            CoordAfterText.Y+ACharSize.Y),
+          Colors.TextSelBG);
       end
     end;
 
@@ -4948,8 +4948,7 @@ begin
   Inc(ARect.Top, FSpacingTopEdge);
 
   //paint area over scrolled text
-  CanvasFillRect(C,
-    Rect(
+  CanvasFillRect(C, Rect(
       FRectGutter.Left,
       ARect.Top,
       FRectGutter.Right,
@@ -5248,9 +5247,7 @@ var
 begin
   NColor:= AGap.Color;
   if NColor<>clNone then
-  begin
     CanvasFillRect(C, ARect, NColor);
-  end;
 
   if Assigned(AGap.Bitmap) then
   begin
@@ -8884,10 +8881,10 @@ begin
         NRight:= NLeft+(RangeTo-RangeFrom)*ACharSize.XScaled div ATEditorCharXScale;
 
       CanvasFillRect(C, Rect(
-        Max(AVisRect.Left, NLeft),
-        APointText.Y,
-        Min(AVisRect.Right, NRight),
-        APointText.Y+ACharSize.Y),
+          Max(AVisRect.Left, NLeft),
+          APointText.Y,
+          Min(AVisRect.Right, NRight),
+          APointText.Y+ACharSize.Y),
         Colors.TextSelBG
         );
     end;
@@ -10105,9 +10102,7 @@ procedure TATSynEdit.DoPaintGutterDecor(C: TCanvas; ALine: integer; const ARect:
     else
     //fill cell background
     if Decor.Data.TextColor<>clNone then
-    begin
       CanvasFillRect(C, ARect, Decor.Data.TextColor);
-    end;
   end;
   //
 var
