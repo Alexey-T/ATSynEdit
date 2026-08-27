@@ -20,6 +20,7 @@ uses
   ATSynEdit_Micromap, atsynedit_unicodedata, ATSynEdit_LinkCache, 
   ATSynEdit_CharSizeArray, ATSynEdit_LineParts, ATStringProc_Separator, 
   ATStringProc_UTF8Decode, ATSynEdit_Globals, ATSynEdit_ClipRecents, 
+  ATSynEdit_CanvasProc_InvRect, ATSynEdit_CanvasProc_FillRect, 
   LazarusPackageIntf;
 
 implementation

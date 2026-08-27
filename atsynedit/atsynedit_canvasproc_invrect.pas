@@ -51,6 +51,7 @@ begin
   Windows.InvertRect(DC, R);
 end;
 
+{$define HAS_INV2}
 procedure CanvasInvertRectEmptyInside(C: TCanvas; const R: TRect; AColor: TColor);
 var
   DC: HDC;
@@ -75,6 +76,7 @@ begin
   end;
 end;
 
+{$define HAS_INV}
 procedure CanvasInvertRect(C: TCanvas; const R: TRect; AColor: TColor);
 var
   DC: HDC;
@@ -94,6 +96,7 @@ end;
 {$endif}
 
 {$ifdef LCLGtk3}
+{$define HAS_INV}
 procedure CanvasInvertRect(C: TCanvas; const R: TRect; AColor: TColor);
 var
   cr: Pcairo_t;
@@ -118,6 +121,7 @@ begin
   cairo_restore(cr);
 end;
 
+{$define HAS_INV2}
 procedure CanvasInvertRectEmptyInside(C: TCanvas; const R: TRect; AColor: TColor);
 var
   cr: Pcairo_t;
@@ -147,6 +151,7 @@ end;
 {$endif}
 
 {$ifdef LCLGtk2}
+{$define HAS_INV}
 procedure CanvasInvertRect(C: TCanvas; const R: TRect; AColor: TColor);
 var
   DC: TGtkDeviceContext;
@@ -185,6 +190,7 @@ begin
   gdk_gc_set_function(gc, GDK_COPY);
 end;
 
+{$define HAS_INV2}
 procedure CanvasInvertRectEmptyInside(C: TCanvas; const R: TRect; AColor: TColor);
 var
   DC: TGtkDeviceContext;
@@ -228,6 +234,7 @@ end;
 {$endif}
 
 {$IFDEF LCLQt5}
+{$define HAS_INV}
 procedure CanvasInvertRect(C: TCanvas; const R: TRect; AColor: TColor);
 var
   DC: TQtDeviceContext;
@@ -262,6 +269,7 @@ begin
   QColor_Destroy(QColorObj);
 end;
 
+{$define HAS_INV2}
 procedure CanvasInvertRectEmptyInside(C: TCanvas; const R: TRect; AColor: TColor);
 var
   DC: TQtDeviceContext;
@@ -305,7 +313,10 @@ begin
 end;
 {$endif}
 
-{$if not defined(LCLWin32) and not defined(LCLGtk2) and not defined(LCLGtk3) and not defined(LCLQt5)}
+//----------------------------------------
+// Generic slow implementation
+
+{$ifndef HAS_INV}
 procedure CanvasInvertRect(C: TCanvas; const R: TRect; AColor: TColor);
 var
   X: integer;
@@ -341,7 +352,7 @@ begin
 end;
 {$endif}
 
-{$if not defined(LCLWin32) and not defined(LCLGtk2) and not defined(LCLGtk3) and not defined(LCLQt5)}
+{$ifndef HAS_INV2}
 procedure CanvasInvertRectEmptyInside(C: TCanvas; const R: TRect; AColor: TColor);
 var
   OldAntialias: TAntialiasingMode;

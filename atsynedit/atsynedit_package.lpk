@@ -197,6 +197,14 @@
         <Filename Value="atsynedit_cliprecents.pas"/>
         <UnitName Value="ATSynEdit_ClipRecents"/>
       </Item>
+      <Item>
+        <Filename Value="atsynedit_canvasproc_invrect.pas"/>
+        <UnitName Value="ATSynEdit_CanvasProc_InvRect"/>
+      </Item>
+      <Item>
+        <Filename Value="atsynedit_canvasproc_fillrect.pas"/>
+        <UnitName Value="ATSynEdit_CanvasProc_FillRect"/>
+      </Item>
     </Files>
     <RequiredPkgs>
       <Item>
