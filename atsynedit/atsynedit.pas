@@ -58,6 +58,7 @@ uses
   ATSynEdit_Keymap,
   ATSynEdit_LineParts,
   ATSynEdit_CanvasProc,
+  ATSynEdit_CanvasProc_InvRect,
   ATSynEdit_Carets,
   ATSynEdit_Markers,
   ATSynEdit_Gutter,
