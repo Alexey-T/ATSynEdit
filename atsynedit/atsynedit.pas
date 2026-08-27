@@ -59,6 +59,7 @@ uses
   ATSynEdit_LineParts,
   ATSynEdit_CanvasProc,
   ATSynEdit_CanvasProc_InvRect,
+  ATSynEdit_CanvasProc_FillRect,
   ATSynEdit_Carets,
   ATSynEdit_Markers,
   ATSynEdit_Gutter,
@@ -2471,7 +2472,7 @@ begin
   C.Pen.Color:= Colors.RulerFont;
   C.Brush.Color:= FColorRulerBG;
 
-  C.FillRect(FRectRuler);
+  CanvasFillRect(C, FRectRuler, FColorRulerBG);
 
   NCharWidthScaled:= FCharSize.XScaled * FOptRulerFontSizePercents div 100;
 
@@ -3718,8 +3719,7 @@ var
   NWrapIndex, NWrapIndexDummy: integer;
   bRulerHandled: boolean;
 begin
-  C.Brush.Color:= FColorBG;
-  C.FillRect(0, 0, Width, Height); //avoid FClientW here to fill entire area
+  CanvasFillRect(C, Rect(0, 0, Width, Height), FColorBG); //avoid FClientW here to fill entire area
 
   //update WrapInfo before MinimapThread start
   UpdateWrapInfo;
@@ -3963,13 +3963,15 @@ procedure TATSynEdit.DoPaintGutterBandBG(C: TCanvas; AColor: TColor;
 begin
   if not AEntireHeight then
   begin
-    C.Brush.Color:= AColor;
-    C.FillRect(AX1, AY1, AX2, AY2);
+    CanvasFillRect(C,
+      Rect(AX1, AY1, AX2, AY2),
+      AColor);
   end
   else
   begin
-    C.Brush.Color:= AColor;
-    C.FillRect(AX1, FRectGutter.Top, AX2, FRectGutter.Bottom);
+    CanvasFillRect(C,
+      Rect(AX1, FRectGutter.Top, AX2, FRectGutter.Bottom),
+      AColor);
   end;
 end;
 
@@ -3991,8 +3993,7 @@ begin
   with AScrollVert do
     NPos:= Min(NPos, NPosLast);
 
-  C.Brush.Color:= FColorBG;
-  C.FillRect(ARect);
+  CanvasFillRect(C, ARect, FColorBG);
 
   if Assigned(FFoldedMarkList) then
     FFoldedMarkList.Clear;
@@ -4004,8 +4005,7 @@ begin
     FColorOfStates[TATLineState.Added]:= Colors.StateAdded;
     FColorOfStates[TATLineState.Saved]:= Colors.StateSaved;
 
-    C.Brush.Color:= FColorGutterBG;
-    C.FillRect(FRectGutter);
+    CanvasFillRect(C, FRectGutter, FColorGutterBG);
 
     //paint some bands, for full height coloring
     GutterItem:= FGutter[FGutterBandFolding];
@@ -4224,13 +4224,13 @@ procedure TATSynEdit.DoPaintLine(C: TCanvas;
   //
   procedure FillOneLine(AFillColor: TColor);
   begin
-    C.Brush.Style:= bsSolid;
-    C.Brush.Color:= AFillColor;
-    C.FillRect(
-      ARectLine.Left,
-      ARectLine.Top+FSpacingTopEdge1,
-      ARectLine.Right,
-      ARectLine.Bottom+FSpacingTopEdge1
+    CanvasFillRect(C,
+      Rect(
+        ARectLine.Left,
+        ARectLine.Top+FSpacingTopEdge1,
+        ARectLine.Right,
+        ARectLine.Bottom+FSpacingTopEdge1),
+      AFillColor
       );
   end;
   //
@@ -4565,22 +4565,22 @@ begin
     begin
       if ATEditorOptions.RenderSpaceBgAtLineEOL then
       begin
-        C.Brush.Color:= Colors.TextSelBG;
-        C.FillRect(
+        CanvasFillRect(C, Rect(
           CoordAfterText.X,
           CoordAfterText.Y,
           CoordAfterText.X+ACharSize.XScaled div ATEditorCharXScale,
-          CoordAfterText.Y+ACharSize.Y);
+          CoordAfterText.Y+ACharSize.Y),
+        Colors.TextSelBG); 
       end
       else
       if NLineLen=0 then
       begin
-        C.Brush.Color:= Colors.TextSelBG;
-        C.FillRect(
+        CanvasFillRect(C, Rect(
           CoordAfterText.X,
           CoordAfterText.Y,
           CoordAfterText.X+ACharSize.XScaled div ATEditorCharXScale * ATEditorOptions.RenderSpaceBgAtLineEOL_WidthOnEmpty div 100,
-          CoordAfterText.Y+ACharSize.Y);
+          CoordAfterText.Y+ACharSize.Y),
+        Colors.TextSelBG);  
       end
     end;
 
@@ -4948,8 +4948,14 @@ begin
   Inc(ARect.Top, FSpacingTopEdge);
 
   //paint area over scrolled text
-  C.Brush.Color:= FColorGutterBG;
-  C.FillRect(FRectGutter.Left, ARect.Top, FRectGutter.Right, ARect.Bottom);
+  CanvasFillRect(C,
+    Rect(
+      FRectGutter.Left,
+      ARect.Top,
+      FRectGutter.Right,
+      ARect.Bottom),
+    FColorGutterBG
+    );
 
   //gutter band: number
   GutterItem:= FGutter[FGutterBandNumbers];
@@ -5231,11 +5237,7 @@ begin
   if Assigned(FOnDrawMicromap) then
     FOnDrawMicromap(Self, C, FRectMicromap)
   else
-  begin
-    C.Brush.Color:= clCream;
-    C.Brush.Style:= bsSolid;
-    C.FillRect(FRectMicromap);
-  end;
+    CanvasFillRect(C, FRectMicromap, clCream);
 end;
 
 
@@ -5247,8 +5249,7 @@ begin
   NColor:= AGap.Color;
   if NColor<>clNone then
   begin
-    C.Brush.Color:= NColor;
-    C.FillRect(ARect);
+    CanvasFillRect(C, ARect, NColor);
   end;
 
   if Assigned(AGap.Bitmap) then
@@ -6492,8 +6493,10 @@ var
   NValue: integer;
   Bmp: TGraphic;
 begin
-  C.Brush.Color:= Colors.TextBG;
-  C.FillRect(Rect(0, 0, Width, Height));
+  CanvasFillRect(C,
+    Rect(0, 0, Width, Height),
+    Colors.TextBG
+    );
 
   if Strings.ProgressKind<>TATStringsProgressKind.Saving then
     Bmp:= ATEditorBitmaps.BitmapWait
@@ -6505,18 +6508,18 @@ begin
   if NValue>0 then
   begin
     C.Pen.Color:= Colors.TextSelBG;
-    C.Brush.Color:= Colors.TextSelBG;
     C.FrameRect(
       cRectX,
       cRectY,
       cRectX + cRectWidth,
       cRectY + cRectHeight
       );
-    C.FillRect(
+    CanvasFillRect(C, Rect(
       cRectX,
       cRectY,
       cRectX + cRectWidth * NValue div 100,
-      cRectY + cRectHeight
+      cRectY + cRectHeight),
+      Colors.TextSelBG
       );
   end;
 end;
@@ -8614,14 +8617,15 @@ procedure TATSynEdit.DoPaintCaretShape(C: TCanvas; ARect: TRect;
   ACaret: TATCaretItem; ACaretShape: TATCaretShape);
 var
   NCoordX, NCoordY: Int64;
+  NBgColor: TColor;
 begin
   if not FCaretBlinkEnabled and ACaretShape.IsNarrow then
   begin
     if Colors.Caret<>clNone then
-      C.Brush.Color:= Colors.Caret
+      NBgColor:= Colors.Caret
     else
-      C.Brush.Color:= Colors.TextFont;
-    C.FillRect(ARect);
+      NBgColor:= Colors.TextFont;
+    CanvasFillRect(C, ARect, NBgColor);
     exit;
   end;
 
@@ -8771,8 +8775,7 @@ begin
   R.Top:= PntCoord.Y;
   R.Bottom:= R.Top + FCharSize.Y; //100% height
 
-  C.Brush.Color:= Colors.DragDropMarker;
-  C.FillRect(R);
+  CanvasFillRect(C, R, Colors.DragDropMarker);
 end;
 
 procedure TATSynEdit.TimerBlinkDisable;
@@ -8806,8 +8809,7 @@ begin
   RBack:= Rect(0, 0, AIndentSize*ACharSize.XScaled div ATEditorCharXScale, ACharSize.Y);
   OffsetRect(RBack, ARect.Left-AScrollPos*ACharSize.XScaled div ATEditorCharXScale, ACoordY);
 
-  C.Brush.Color:= AColorBG;
-  C.FillRect(RBack);
+  CanvasFillRect(C, RBack, AColorBG);
   }
 
   for i:= 0 to AIndentSize-1 do
@@ -8845,12 +8847,12 @@ begin
       NLeft:= Max(NLeft, APointText.X+ALineWidth);
       if (NLeft<NRight) then
       begin
-        C.Brush.Color:= Colors.TextSelBG;
-        C.FillRect(
-          NLeft,
-          APointLeft.Y,
-          NRight,
-          APointLeft.Y+ACharSize.Y);
+        CanvasFillRect(C, Rect(
+            NLeft,
+            APointLeft.Y,
+            NRight,
+            APointLeft.Y+ACharSize.Y),
+          Colors.TextSelBG);
       end;
     end;
   end
@@ -8881,24 +8883,25 @@ begin
       else
         NRight:= NLeft+(RangeTo-RangeFrom)*ACharSize.XScaled div ATEditorCharXScale;
 
-      C.Brush.Color:= Colors.TextSelBG;
-      C.FillRect(
+      CanvasFillRect(C, Rect(
         Max(AVisRect.Left, NLeft),
         APointText.Y,
         Min(AVisRect.Right, NRight),
-        APointText.Y+ACharSize.Y
+        APointText.Y+ACharSize.Y),
+        Colors.TextSelBG
         );
     end;
   {
   if FOptShowFullSel then
     if AEolSelected then
     begin
-      C.Brush.Color:= Colors.TextSelBG;
-      C.FillRect(
+      CanvasFillRect(C, Rect(
         APointText.X,
         APointText.Y,
         AVisRect.Right,
-        APointText.Y+ACharSize.Y);
+        APointText.Y+ACharSize.Y),
+        Colors.TextSelBG
+        );
     end;
     }
   end;
@@ -8934,13 +8937,12 @@ procedure TATSynEdit.DoPaintGutterNumber(C: TCanvas; ALineIndex, ACoordTop: inte
         P.X:= (ABand.Left+ABand.Right) div 2;
     end;
 
-    C.Brush.Color:= C.Font.Color;
-    C.Brush.Style:= bsSolid;
-    C.FillRect(
+    CanvasFillRect(C, Rect(
       P.X - W div 2,
       P.Y,
       P.X - W div 2 + W,
-      P.Y + H
+      P.Y + H),
+      C.Font.Color
       );
   end;
   //
@@ -10104,9 +10106,7 @@ procedure TATSynEdit.DoPaintGutterDecor(C: TCanvas; ALine: integer; const ARect:
     //fill cell background
     if Decor.Data.TextColor<>clNone then
     begin
-      C.Brush.Style:= bsSolid;
-      C.Brush.Color:= Decor.Data.TextColor;
-      C.FillRect(ARect);
+      CanvasFillRect(C, ARect, Decor.Data.TextColor);
     end;
   end;
   //
@@ -10403,8 +10403,7 @@ begin
         R.Left:= Max(R.Left, FRectMain.Left);
         R.Right:= Min(R.Right, FRectMain.Right);
 
-        C.Brush.Color:= Colors.Markers;
-        C.FillRect(R);
+        CanvasFillRect(C, R, Colors.Markers);
       end;
     end;
   end;
@@ -10836,8 +10835,7 @@ var
   ChSize: TSize;
 begin
   St:= Strings;
-  C.Brush.Color:= AColorBG;
-  C.FillRect(ARect);
+  CanvasFillRect(C, ARect, AColorBG);
 
   TextOutProps:= Default(TATCanvasTextOutProps);
 

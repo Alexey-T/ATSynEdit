@@ -269,7 +269,8 @@ implementation
 uses
   Types, Math,
   LCLType, LCLProc,
-  atsynedit_commands;
+  ATSynEdit_CanvasProc_FillRect,
+  ATSynEdit_Commands;
 
 {$R *.lfm}
 
@@ -279,9 +280,7 @@ const
 
 procedure DoPaintGap(C: TCanvas; R: TRect; ALine: integer);
 begin
-  C.Brush.Color:= clMoneyGreen;
-  C.Pen.Color:= C.Brush.Color;
-  C.FillRect(R);
+  CanvasFillRect(C, R, clMoneyGreen);
   C.Font.Size:= 9;
   C.Font.Color:= clGray;
   C.TextOut(R.Left+20, R.Top+1, 'gap for line '+IntToStr(ALine));
@@ -597,12 +596,10 @@ var
 begin
   for i:= 0 to High(ed.Micromap.Columns) do
   begin
-    C.Brush.Style:= bsSolid;
-    C.Brush.Color:= ed.Micromap.Columns[i].NColor;
     R:= ARect;
     R.Left:= ARect.Left+ed.Micromap.Columns[i].NLeft;
     R.Right:= ARect.Left+ed.Micromap.Columns[i].NRight;
-    C.FillRect(R);
+    CanvasFillRect(C, R, ed.Micromap.Columns[i].NColor);
   end;
 end;
 

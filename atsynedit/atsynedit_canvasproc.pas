@@ -26,6 +26,7 @@ uses
   ATCanvasPrimitives,
   ATStringProc,
   ATStrings,
+  ATSynEdit_CanvasProc_FillRect,
   ATSynEdit_Globals,
   ATSynEdit_LineParts,
   ATSynEdit_CharSizer;
@@ -293,15 +294,15 @@ begin
   //  b) to fill inter-line 1px area
 
   {$ifdef USE_CAIRO}
-  Canvas.Brush.Style:= bsSolid;
   if Dx=nil then
   begin
-    Canvas.FillRect(Rect^);
+    CanvasFillRect(Canvas, Rect^, Canvas.Brush.Color);
     CairoTextOut(Canvas, X, Y, PChar(Str));
     Result:= true;
   end
   else
   begin
+    Canvas.Brush.Style:= bsSolid; //2026.08: needed?
     {
     //CairoExtTextOut yet cannot render CJK chars, so it's disabled
     Result:= CairoExtTextOut(Canvas, Rect^.Left, Rect^.Top, 0, Rect, PChar(Str), Length(Str), Dx);
@@ -309,6 +310,7 @@ begin
     Result:= ExtTextOut(Canvas.Handle, X, Y, {ETO_CLIPPED or} ETO_OPAQUE, Rect, PChar(Str), Length(Str), Dx);
   end;
   {$else}
+  Canvas.Brush.Style:= bsSolid; //2026.08: needed?
   Result:= ExtTextOut(Canvas.Handle, X, Y, {ETO_CLIPPED or} ETO_OPAQUE, Rect, PChar(Str), Length(Str), Dx);
   {$endif}
 end;
@@ -372,8 +374,7 @@ begin
   R.Top:= (ARect.Top+ARect.Bottom) div 2 - NSize div 2;
   R.Right:= R.Left + NSize;
   R.Bottom:= R.Top + NSize;
-  C.Brush.Color:= AFontColor;
-  C.FillRect(R);
+  CanvasFillRect(C, R, AFontColor);
 end;
 
 procedure DoPaintUnprintedChar(
@@ -583,8 +584,7 @@ begin
   C.Pen.Color:= AColorFont;
   if AColorBg<>clNone then
   begin
-    C.Brush.Color:= AColorBg;
-    C.FillRect(X-1, Y-1, X+W+2, Y+H+2);
+    CanvasFillRect(C, Rect(X-1, Y-1, X+W+2, Y+H+2), AColorBg);
   end;
 
   case AChar of
@@ -1202,7 +1202,7 @@ begin
         C.Brush.Color:= PrevColor;
       end;
 
-      C.FillRect(PartRect);
+      CanvasFillRect(C, PartRect, C.Brush.Color);
     end;
 
     //next, process non-space parts
