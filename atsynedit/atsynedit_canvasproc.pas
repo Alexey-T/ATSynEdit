@@ -1117,7 +1117,7 @@ begin
   //no need to clear DxUTF8
   FillChar(bPartsSpaces, SizeOf(bPartsSpaces), 0);
 
-  if AProps.SuperFast or AProps.HasAsciiNoTabs then
+  if AProps.SuperFast or (AProps.HasAsciiNoTabs and not ATEditorOptions.TextoutNeedsOffsets) then
   begin
     ListInt.Len:= NLen;
     Dx.Len:= NLen;
