@@ -19,7 +19,7 @@
 License: MPL 2.0 or LGPL
 }
 
-unit ATSynEdit_CanvasProc_Cairo_Gtk2;
+unit ATSynEdit_CanvasProc_Text_Gtk2_Old;
 
 {$mode Delphi}{$H+}
 

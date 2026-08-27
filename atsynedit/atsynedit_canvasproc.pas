@@ -166,10 +166,10 @@ uses
   Math,
   {$ifdef USE_CAIRO}
     {$if defined(LCLGtk2)}
-    ATSynEdit_CanvasProc_Cairo_Gtk2,
+    ATSynEdit_CanvasProc_Text_Gtk2,
     {$endif}
     {$if defined(LCLGtk3)}
-    ATSynEdit_CanvasProc_Cairo_Gtk3,
+    ATSynEdit_CanvasProc_Text_Gtk3,
     {$endif}
   {$endif}
   LCLType,

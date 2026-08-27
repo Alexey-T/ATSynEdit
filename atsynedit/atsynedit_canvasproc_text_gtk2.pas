@@ -3,7 +3,7 @@ Copyright (c) 2026 Alexey Torgashin (uvviewsoft.com)
 License: MPL 2.0 or LGPL
 }
 
-unit ATSynEdit_CanvasProc_Cairo_Gtk2;
+unit ATSynEdit_CanvasProc_Text_Gtk2;
 
 {$mode Delphi}{$H+}
 
