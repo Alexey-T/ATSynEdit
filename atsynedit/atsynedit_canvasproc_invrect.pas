@@ -41,6 +41,9 @@ uses
   Classes;
 
 {$ifdef LCLWin32}
+const
+  DC_BRUSH   = 18; // missed in Windows unit of FPC 3.2.2
+
 procedure CanvasInvertRect_SuperFastIgnoringColor(C: TCanvas; const R: TRect; AColor: TColor);
 var
   DC: HDC;
@@ -90,7 +93,7 @@ begin
   SetDCBrushColor(DC, AColor);
   OldBrush := SelectObject(DC, GetStockObject(DC_BRUSH));
   // PATINVERT: result = pixel XOR brush_color
-  PatBlt(DC, R.Left, R.Top, R.Right - R.Left, R.Bottom - R.Top, PATINVERT);
+  PatBlt(DC, R.Left, R.Top, R.Width, R.Height, PATINVERT);
   SelectObject(DC, OldBrush);
 end;
 {$endif}
