@@ -12,7 +12,7 @@ interface
 uses
   Graphics;
 
-procedure CairoTextOut(ACanvas: TCanvas; AX, AY: Integer; AStr: PChar);
+procedure NativeTextOut(ACanvas: TCanvas; AX, AY: Integer; AStr: PChar);
 
 implementation
 
@@ -45,7 +45,7 @@ var
   LastFontItalic: Boolean = False;
   LastBaseline: Integer = 0;
 
-procedure CairoTextOut(ACanvas: TCanvas; AX, AY: Integer; AStr: PChar);
+procedure NativeTextOut(ACanvas: TCanvas; AX, AY: Integer; AStr: PChar);
 var
   ct: pcairo_t;
   Ctx: TGtk3DeviceContext;

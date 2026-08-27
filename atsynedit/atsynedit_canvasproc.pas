@@ -297,7 +297,7 @@ begin
   if Dx=nil then
   begin
     CanvasFillRect(Canvas, Rect^, Canvas.Brush.Color);
-    CairoTextOut(Canvas, X, Y, PChar(Str));
+    NativeTextOut(Canvas, X, Y, PChar(Str));
     Result:= true;
   end
   else
@@ -323,7 +323,7 @@ begin
   Windows.TextOutA(C.Handle, X, Y, PChar(S), Length(S));
   {$else}
     {$ifdef USE_CAIRO}
-    CairoTextOut(C, X, Y, PChar(S));
+    NativeTextOut(C, X, Y, PChar(S));
     {$else}
     LCLIntf.TextOut(C.Handle, X, Y, PChar(S), Length(S));
     {$endif}
@@ -340,7 +340,7 @@ begin
   {$else}
   Buf:= UTF8Encode(S);
     {$ifdef USE_CAIRO}
-    CairoTextOut(C, X, Y, PChar(Buf));
+    NativeTextOut(C, X, Y, PChar(Buf));
     {$else}
     LCLIntf.TextOut(C.Handle, X, Y, PChar(Buf), Length(Buf));
     {$endif}
@@ -354,7 +354,7 @@ begin
   Windows.TextOutA(C.Handle, X, Y, Buf, Len);
   {$else}
     {$ifdef USE_CAIRO}
-    CairoTextOut(C, X, Y, Buf);
+    NativeTextOut(C, X, Y, Buf);
     {$else}
     LCLIntf.TextOut(C.Handle, X, Y, Buf, Len);
     {$endif}

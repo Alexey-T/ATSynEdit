@@ -12,7 +12,7 @@ interface
 uses
   Graphics;
 
-procedure CairoTextOut(ACanvas: TCanvas; AX, AY: Integer; AStr: PChar);
+procedure NativeTextOut(ACanvas: TCanvas; AX, AY: Integer; AStr: PChar);
 
 implementation
 
@@ -215,7 +215,7 @@ begin
   );
 end;
 
-procedure CairoTextOut(ACanvas: TCanvas; AX, AY: Integer; AStr: PChar);
+procedure NativeTextOut(ACanvas: TCanvas; AX, AY: Integer; AStr: PChar);
 var
   ct: pcairo_t;
   m: cairo_matrix_t;
