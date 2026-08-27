@@ -261,6 +261,48 @@ begin
   QBrush_Destroy(QBrushObj);
   QColor_Destroy(QColorObj);
 end;
+
+procedure CanvasInvertRectEmptyInside(C: TCanvas; const R: TRect; AColor: TColor);
+var
+  DC: TQtDeviceContext;
+  Painter: QPainterH;
+  QColorObj: QColorH;
+  QPenObj: QPenH;
+begin
+  if (C = nil) or (C.Handle = 0) then Exit;
+
+  DC := TQtDeviceContext(C.Handle);
+  Painter := DC.Widget;
+  if Painter = nil then Exit;
+
+  // classic inversion, so white color
+  QColorObj := QColor_Create();
+  QColor_setRgb(QColorObj, 255, 255, 255, 255);
+
+  QPenObj := QPen_Create(PQColor(QColorObj));
+  QPen_setWidth(QPenObj, 1);
+
+  QPainter_save(Painter);
+  try
+    QPainter_setCompositionMode(Painter, QPainterCompositionMode_Difference);
+    QPainter_setPen(Painter, QPenObj);
+    QPainter_setRenderHint(Painter, QPainterAntialiasing, False);
+
+    // top line
+    QPainter_drawLine(Painter, R.Left, R.Top, R.Right - 1, R.Top);
+    // bottom line
+    QPainter_drawLine(Painter, R.Left, R.Bottom - 1, R.Right - 1, R.Bottom - 1);
+    // left line
+    QPainter_drawLine(Painter, R.Left, R.Top + 1, R.Left, R.Bottom - 2);
+    // right line
+    QPainter_drawLine(Painter, R.Right - 1, R.Top + 1, R.Right - 1, R.Bottom - 2);
+  finally
+    QPainter_restore(Painter);
+  end;
+
+  QPen_Destroy(QPenObj);
+  QColor_Destroy(QColorObj);
+end;
 {$endif}
 
 {$if not defined(LCLWin32) and not defined(LCLGtk2) and not defined(LCLGtk3) and not defined(LCLQt5)}
@@ -299,7 +341,7 @@ begin
 end;
 {$endif}
 
-{$if not defined(LCLWin32) and not defined(LCLGtk2) and not defined(LCLGtk3)}
+{$if not defined(LCLWin32) and not defined(LCLGtk2) and not defined(LCLGtk3) and not defined(LCLQt5)}
 procedure CanvasInvertRectEmptyInside(C: TCanvas; const R: TRect; AColor: TColor);
 var
   OldAntialias: TAntialiasingMode;
