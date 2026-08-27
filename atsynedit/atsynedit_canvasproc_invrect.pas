@@ -63,9 +63,9 @@ begin
   PatBlt(DC, R.Left, R.Bottom - 1, W, 1, PATINVERT);
   if H > 2 then
   begin
-    // Left edge (без углов)
+    // Left edge (w/o edges)
     PatBlt(DC, R.Left, R.Top + 1, 1, H - 2, PATINVERT);
-    // Right edge (без углов)
+    // Right edge (w/o edges)
     PatBlt(DC, R.Right - 1, R.Top + 1, 1, H - 2, PATINVERT);
   end;
 end;
