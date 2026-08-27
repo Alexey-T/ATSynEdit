@@ -230,13 +230,12 @@ var
   OldMode: TPenMode;
   OldStyle: TPenStyle;
   OldWidth: integer;
-  {$ifdef FPC}
   OldEndCap: TPenEndCap;
-  {$endif}
 begin
   OldAntialias:= C.AntialiasingMode;
   OldMode:= C.Pen.Mode;
   OldStyle:= C.Pen.Style;
+  OldEndCap:= C.Pen.EndCap;
   OldWidth:= C.Pen.Width;
 
   X:= (R.Left+R.Right) div 2;
@@ -244,20 +243,13 @@ begin
   C.Pen.Style:= psSolid;
   C.Pen.Color:= AColor;
   C.AntialiasingMode:= amOff;
-
-  {$ifdef FPC}
-  OldEndCap:= C.Pen.EndCap;
   C.Pen.EndCap:= pecFlat;
-  {$endif}
-
   C.Pen.Width:= R.Width;
 
   C.MoveTo(X, R.Top);
   C.LineTo(X, R.Bottom);
 
-  {$ifdef FPC}
   C.Pen.EndCap:= OldEndCap;
-  {$endif}
   C.Pen.Width:= OldWidth;
   C.Pen.Style:= OldStyle;
   C.Pen.Mode:= OldMode;
@@ -269,28 +261,13 @@ end;
 {$if not defined(LCLWin32) and not defined(LCLGtk2) and not defined(LCLGtk3)}
 procedure CanvasInvertRectEmptyInside(C: TCanvas; const R: TRect; AColor: TColor);
 var
-  {$ifdef FPC}
   OldAntialias: TAntialiasingMode;
-  {$endif}
   OldPenMode: TPenMode;
   OldPenStyle: TPenStyle;
   OldPenWidth: integer;
   OldBrushStyle: TBrushStyle;
 begin
-  {
-  if ATCanvasPrimitives_InvertByPixels then
-  begin
-    CanvasInvertRect_ByPixels(C, Rect(R.Left, R.Top, R.Right, R.Top+1), AColor);
-    CanvasInvertRect_ByPixels(C, Rect(R.Left, R.Top+1, R.Left+1, R.Bottom-1), AColor);
-    CanvasInvertRect_ByPixels(C, Rect(R.Right-1, R.Top+1, R.Right, R.Bottom-1), AColor);
-    CanvasInvertRect_ByPixels(C, Rect(R.Left, R.Bottom-1, R.Right, R.Bottom), AColor);
-    exit;
-  end;
-  }
-
-  {$ifdef FPC}
   OldAntialias:= C.AntialiasingMode;
-  {$endif}
   OldPenMode:= C.Pen.Mode;
   OldPenStyle:= C.Pen.Style;
   OldPenWidth:= C.Pen.Width;
@@ -299,9 +276,7 @@ begin
   C.Pen.Mode:= {$ifdef darwin} pmNot {$else} pmXor {$endif};
   C.Pen.Style:= psSolid;
   C.Pen.Color:= AColor;
-  {$ifdef FPC}
   C.AntialiasingMode:= amOff;
-  {$endif}
   C.Pen.Width:= 1;
   C.Brush.Style:= bsClear;
 
@@ -311,12 +286,9 @@ begin
   C.Pen.Width:= OldPenWidth;
   C.Pen.Style:= OldPenStyle;
   C.Pen.Mode:= OldPenMode;
-  {$ifdef FPC}
   C.AntialiasingMode:= OldAntialias;
-  {$endif}
   C.Rectangle(0, 0, 0, 0); //apply pen
 end;
 {$endif}
-
 
 end.
