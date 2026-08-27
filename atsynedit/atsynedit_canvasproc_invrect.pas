@@ -22,7 +22,7 @@ procedure CanvasInvertRectEmptyInside(C: TCanvas; const R: TRect; AColor: TColor
 implementation
 
 uses
-  {$ifdef LCLWIN32}
+  {$ifdef LCLWin32}
   Windows,
   {$endif}
   {$ifdef LCLGtk3}
@@ -34,17 +34,6 @@ uses
   Gtk2Def,
   {$endif}
   Classes;
-
-procedure CanvasInvertRect_ByPixels(C: TCanvas; const R: TRect; AColor: TColor);
-var
-  NValue: Longint;
-  i, j: integer;
-begin
-  NValue:= not AColor and $ffffff;
-  for j:= R.Top to R.Bottom-1 do
-    for i:= R.Left to R.Right-1 do
-      C.Pixels[i, j]:= C.Pixels[i, j] xor NValue;
-end;
 
 {$ifdef LCLWin32}
 procedure CanvasInvertRect_SuperFastIgnoringColor(C: TCanvas; const R: TRect; AColor: TColor);
