@@ -134,17 +134,10 @@ var
   DC: TQtDeviceContext;
   P: QPainterH;
   Col: TQColor;
-  W, H: Integer;
 begin
-  if not Assigned(C) or (C.Handle = 0) then Exit;
-
-  W := R.Width;
-  H := R.Height;
-  if (W <= 0) or (H <= 0) then Exit;
+  if (C.Handle = 0) then Exit;
 
   DC := TQtDeviceContext(C.Handle);
-  if DC = nil then Exit;
-
   P := DC.Widget;
   if P = nil then Exit;
 
@@ -156,7 +149,7 @@ begin
   Col.b         := Word(((AColor shr 16) and $FF) * $101);
   Col.Pad       := 0;
 
-  QPainter_fillRect(P, R.Left, R.Top, W, H, PQColor(@Col));
+  QPainter_fillRect(P, @R, @Col);
 end;
 {$endif}
 
