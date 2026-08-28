@@ -114,7 +114,7 @@ var
   S: string;
   charLast, charPrev: char;
   bHadFakeLine, bDeleteWithLastLine: boolean;
-  NLastIndex, i: integer;
+  i: integer;
 begin
   Result:= false;
   if not IsIndexValid(ALineFrom) then exit;
@@ -165,12 +165,9 @@ begin
     LineBlockDelete(ALineFrom, Min(ALineTo, Count-1)); //too big ALineTo allowed
     LineBlockInsert(ALineFrom, ANewLines);
 
-    NLastIndex:= Count-1;
-    for i:= ALineFrom to ALineFrom+Length(EndsArray)-1 do
-    begin
-      if i>=NLastIndex then Break;
+    //don't touch the index=Count-1
+    for i:= ALineFrom to Min(ALineFrom+Length(EndsArray)-1, Count-2) do
       LinesEnds[i]:= EndsArray[i-ALineFrom];
-    end;
 
     if IsLastLineFake and
          not ((Count=1) and (LinesLen[0]=0)) then //document becomes empty?
