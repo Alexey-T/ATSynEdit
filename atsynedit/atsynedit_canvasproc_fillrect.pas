@@ -37,6 +37,9 @@ uses
   {$endif}
   LCLType;
 
+const
+  INV255: Double = 1.0/255.0;
+
 {$ifdef LCLGtk2}
 {$define HAS_F}
 procedure CanvasFillRect(C: TCanvas; const R: TRect; AColor: TColor);
@@ -83,9 +86,9 @@ begin
   if cr = nil then Exit;
 
   cairo_set_source_rgb(Cr,
-    (AColor and $FF) / 255.0,
-    ((AColor shr 8) and $FF) / 255.0,
-    ((AColor shr 16) and $FF) / 255.0);
+    (AColor and $FF) * INV255,
+    ((AColor shr 8) and $FF) * INV255,
+    ((AColor shr 16) and $FF) * INV255);
 
   cairo_rectangle(Cr, R.Left, R.Top, R.Width, R.Height);
   cairo_fill(Cr);
