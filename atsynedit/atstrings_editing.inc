@@ -110,12 +110,52 @@ end;
 function TATStrings.TextReplaceLines_UTF8(ALineFrom, ALineTo: SizeInt;
   ANewLines: TStringList): boolean;
 var
+  EndsArray: array of TATLineEnds;
+  S: string;
+  charLast, charPrev: char;
   bHadFakeLine, bDeleteWithLastLine: boolean;
+  NLastIndex, i: integer;
 begin
   Result:= false;
   if not IsIndexValid(ALineFrom) then exit;
   if ALineFrom>ALineTo then exit;
   Result:= true;
+
+  SetLength(EndsArray, ANewLines.Count);
+  for i:= 0 to ANewLines.Count-1 do
+  begin
+    S:= ANewLines[i];
+    if S='' then
+      EndsArray[i]:= Endings
+    else
+    begin
+      charLast:= S[Length(S)];
+      if Length(S)>1 then
+        charPrev:= S[Length(S)-1]
+      else
+        charPrev:= #0;
+      if (charLast=#10) and (charPrev=#13) then
+      begin
+        EndsArray[i]:= TATLineEnds.Windows;
+        SetLength(S, Length(S)-2);
+        ANewLines[i]:= S;
+      end
+      else if charLast=#10 then
+      begin
+        EndsArray[i]:= TATLineEnds.Unix;
+        SetLength(S, Length(S)-1);
+        ANewLines[i]:= S;
+      end
+      else if charLast=#13 then
+      begin
+        EndsArray[i]:= TATLineEnds.Mac;
+        SetLength(S, Length(S)-1);
+        ANewLines[i]:= S;
+      end
+      else
+        EndsArray[i]:= Endings;
+    end;
+  end;
 
   BeginUndoGroup;
   try
@@ -124,6 +164,13 @@ begin
 
     LineBlockDelete(ALineFrom, Min(ALineTo, Count-1)); //too big ALineTo allowed
     LineBlockInsert(ALineFrom, ANewLines);
+
+    NLastIndex:= Count-1;
+    for i:= ALineFrom to ALineFrom+Length(EndsArray)-1 do
+    begin
+      if i>=NLastIndex then Break;
+      LinesEnds[i]:= EndsArray[i-ALineFrom];
+    end;
 
     if IsLastLineFake and
          not ((Count=1) and (LinesLen[0]=0)) then //document becomes empty?
