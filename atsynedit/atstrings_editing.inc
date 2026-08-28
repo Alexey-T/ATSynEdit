@@ -113,20 +113,21 @@ var
   EndsArray: array of TATLineEnds;
   S: string;
   charLast, charPrev: char;
-  bHadFakeLine, bDeleteWithLastLine: boolean;
-  i: integer;
+  bHadFakeLine, bDeleteWithLastLine, bKeepFinalEol: boolean;
+  NLastInserted, i: integer;
 begin
   Result:= false;
   if not IsIndexValid(ALineFrom) then exit;
   if ALineFrom>ALineTo then exit;
   Result:= true;
 
+  //parse line-endings; TATLineEnds.None marks "no explicit EOL in the item"
   SetLength(EndsArray, ANewLines.Count);
   for i:= 0 to ANewLines.Count-1 do
   begin
     S:= ANewLines[i];
     if S='' then
-      EndsArray[i]:= Endings
+      EndsArray[i]:= TATLineEnds.None
     else
     begin
       charLast:= S[Length(S)];
@@ -153,7 +154,7 @@ begin
         ANewLines[i]:= S;
       end
       else
-        EndsArray[i]:= Endings;
+        EndsArray[i]:= TATLineEnds.None;
     end;
   end;
 
@@ -161,14 +162,33 @@ begin
   try
     bHadFakeLine:= IsLastLineFake;
     bDeleteWithLastLine:= ALineTo>=Count-1;
+    //we replace to the end of doc, and last item has explicit EOL:
+    //document must get final EOL, like after loading of file; CudaText #6432
+    bKeepFinalEol:= bDeleteWithLastLine and
+      (Length(EndsArray)>0) and
+      (EndsArray[High(EndsArray)]<>TATLineEnds.None);
 
     LineBlockDelete(ALineFrom, Min(ALineTo, Count-1)); //too big ALineTo allowed
     LineBlockInsert(ALineFrom, ANewLines);
 
-    //don't touch the index=Count-1
-    for i:= ALineFrom to Min(ALineFrom+Length(EndsArray)-1, Count-2) do
-      LinesEnds[i]:= EndsArray[i-ALineFrom];
+    //set line-endings of inserted lines, except doc's last line;
+    //items w/o explicit EOL give default Endings
+    NLastInserted:= ALineFrom+Length(EndsArray)-1;
+    for i:= ALineFrom to Min(NLastInserted, Count-2) do
+      if EndsArray[i-ALineFrom]<>TATLineEnds.None then
+        LinesEnds[i]:= EndsArray[i-ALineFrom]
+      else
+        LinesEnds[i]:= Endings;
 
+    if bKeepFinalEol then
+    begin
+      //last item had EOL: keep it as final EOL of document;
+      //normalized state is "last line with EOL" + fake line, like on file loading
+      if (NLastInserted>=0) and (NLastInserted<=Count-1) then
+        LinesEnds[NLastInserted]:= EndsArray[High(EndsArray)];
+      ActionAddFakeLineIfNeeded;
+    end
+    else
     if IsLastLineFake and
          not ((Count=1) and (LinesLen[0]=0)) then //document becomes empty?
       if bDeleteWithLastLine or
