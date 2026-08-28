@@ -28,7 +28,10 @@ lib/
 backup/
 project?
 demo
-demo_*
+demo_gtk2
+demo_gtk3
+demo_qt5
+demo_qt6
 lex_lib_demo
 test_loop
 link*.res
