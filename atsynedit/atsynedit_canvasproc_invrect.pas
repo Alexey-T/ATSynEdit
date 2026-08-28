@@ -40,6 +40,9 @@ uses
   {$endif}
   Classes;
 
+const
+  INV255: Double = 1.0/255.0;
+
 {$ifdef LCLWin32}
 const
   DC_BRUSH   = 18; // missed in Windows unit of FPC 3.2.2
@@ -103,23 +106,20 @@ end;
 procedure CanvasInvertRect(C: TCanvas; const R: TRect; AColor: TColor);
 var
   cr: Pcairo_t;
-  rgb: LongInt;
-  cRed, cGreen, cBlue: Double;
 begin
-  if not Assigned(C) or (C.Handle = 0) then Exit;
+  if (C.Handle = 0) then Exit;
 
   cr := pcairo_t(TGtk3DeviceContext(C.Handle).pcr);
   if cr = nil then Exit;
 
-  rgb := AColor; //ColorToRGB(AColor);
-  cRed   := (rgb and $FF) / 255;
-  cGreen := ((rgb shr 8) and $FF) / 255;
-  cBlue  := ((rgb shr 16) and $FF) / 255;
-
   cairo_save(cr);
   cairo_set_operator(cr, CAIRO_OPERATOR_DIFFERENCE);
-  cairo_set_source_rgb(cr, cRed, cGreen, cBlue);
-  cairo_rectangle(cr, R.Left, R.Top, R.Right - R.Left, R.Bottom - R.Top);
+  cairo_set_source_rgb(cr,
+    (AColor and $FF) * INV255,
+    ((AColor shr 8) and $FF) * INV255,
+    ((AColor shr 16) and $FF) * INV255
+    );
+  cairo_rectangle(cr, R.Left, R.Top, R.Width, R.Height);
   cairo_fill(cr);
   cairo_restore(cr);
 end;
@@ -128,22 +128,20 @@ end;
 procedure CanvasInvertRectEmptyInside(C: TCanvas; const R: TRect; AColor: TColor);
 var
   cr: Pcairo_t;
-  rgb: LongInt;
-  cRed, cGreen, cBlue: Double;
 begin
-  if not Assigned(C) or (C.Handle = 0) then Exit;
+  if (C.Handle = 0) then Exit;
 
   cr := Pcairo_t(TGtk3DeviceContext(C.Handle).pcr);
   if cr = nil then Exit;
 
-  rgb := AColor; //ColorToRGB(AColor);
-  cRed   := (rgb and $FF) / 255;
-  cGreen := ((rgb shr 8) and $FF) / 255;
-  cBlue  := ((rgb shr 16) and $FF) / 255;
-
   cairo_save(cr);
   cairo_set_operator(cr, CAIRO_OPERATOR_DIFFERENCE);
-  cairo_set_source_rgb(cr, cRed, cGreen, cBlue);
+  cairo_set_source_rgb(cr,
+    (AColor and $FF) * INV255,
+    ((AColor shr 8) and $FF) * INV255,
+    ((AColor shr 16) and $FF) * INV255
+    );
+
   // offset 0.5 aligns line to grid
   cairo_set_line_width(cr, 1.0);
   cairo_rectangle(cr, R.Left + 0.5, R.Top + 0.5,
