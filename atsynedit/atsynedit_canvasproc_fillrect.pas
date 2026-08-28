@@ -27,6 +27,10 @@ uses
   Gtk3Objects,
   Cairo,
   {$endif}
+  {$ifdef LCLQt5}
+  Qt5,
+  QtObjects,
+  {$endif}
   {$ifdef LCLQt6}
   Qt6,
   QtObjects,
@@ -118,6 +122,41 @@ begin
   finally
     SelectObject(DC, OldBrush);
   end;
+end;
+{$endif}
+
+{$ifdef LCLQt5}
+{$define HAS_F}
+procedure CanvasFillRect(C: TCanvas; const R: TRect; AColor: TColor);
+const
+  QColor_Spec_Rgb = 1; // QColor::Rgb
+var
+  DC: TQtDeviceContext;
+  P: QPainterH;
+  Col: TQColor;
+  W, H: Integer;
+begin
+  if not Assigned(C) or (C.Handle = 0) then Exit;
+
+  W := R.Width;
+  H := R.Height;
+  if (W <= 0) or (H <= 0) then Exit;
+
+  DC := TQtDeviceContext(C.Handle);
+  if DC = nil then Exit;
+
+  P := DC.Widget;
+  if P = nil then Exit;
+
+  // channels are 16-bit: 0..65535, so 0..255 -> * 257.
+  Col.ColorSpec := QColor_Spec_Rgb;
+  Col.Alpha     := 65535;
+  Col.r         := Word((AColor and $FF) * $101);
+  Col.g         := Word(((AColor shr 8) and $FF) * $101);
+  Col.b         := Word(((AColor shr 16) and $FF) * $101);
+  Col.Pad       := 0;
+
+  QPainter_fillRect(P, R.Left, R.Top, W, H, PQColor(@Col));
 end;
 {$endif}
 
