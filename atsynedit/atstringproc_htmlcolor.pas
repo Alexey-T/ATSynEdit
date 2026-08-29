@@ -121,6 +121,7 @@ end;
 class function TATHtmlColorParser.ParseTokenRGB(S: TPChar; out LenOfColor: integer;
   DefaultColor: TColor): TColor;
 var
+  P: TPChar;
   N1, N2, N3: integer;
   ch: word;
 begin
@@ -132,17 +133,20 @@ begin
     Inc(S);
 
   //must handle string longer than needed, with additional chars
-  repeat
-    ch:= ord(S[LenOfColor]);
+  P:= S;
+  while True do
+  begin
+    ch:= Word(P^);
     if ch=0 then Break;
     if not IsCodeHexDigit(ch) then
       if IsCodeWord(ch) then
         Exit
       else
         Break;
+    if LenOfColor=8 then Exit;
+    Inc(P);
     Inc(LenOfColor);
-    if LenOfColor>8 then Exit;
-  until false;
+  end;
 
   //allow #rgb, #rgba, #rrggbb, #rrggbbaa (ignore alpha value)
   case LenOfColor of
