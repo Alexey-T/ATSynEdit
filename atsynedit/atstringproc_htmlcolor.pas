@@ -343,6 +343,7 @@ begin
     SkipCommaOrSlash(S, N);
     ValAlpha:= SkipFloat(S, N, false{CalcValue}, true, bOk);
     //if ValAlpha<0 then exit; //CalcValue=False so ValAlpha is always 0.0
+    if not bOk then exit;
   end;
 
   if S[N]<>')' then exit;
