@@ -245,6 +245,8 @@ begin
   SkipSpaces(S, N);
   NEnd:= N;
   bNeg:= false;
+
+  if NEnd>Length(S) then Exit;
   if S[NEnd]='-' then
   begin
     bNeg:= true;
@@ -282,7 +284,7 @@ begin
   Ok:= true;
   N:= NEnd;
   SkipSpaces(S, N);
-  if SkipPercent and (S[N]='%') then
+  if SkipPercent and (N<=Length(S)) and (S[N]='%') then
   begin
     Inc(N);
     SkipSpaces(S, N);
