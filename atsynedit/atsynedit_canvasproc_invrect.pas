@@ -192,11 +192,10 @@ var
   col: TGdkColor;
   W, H: Integer;
 begin
-  if not Assigned(C) or (C.Handle = 0) then Exit;
+  if (C.Handle = 0) then Exit;
 
-  W := R.Right - R.Left;
-  H := R.Bottom - R.Top;
-  if (W <= 0) or (H <= 0) then Exit;
+  W := R.Width;
+  H := R.Height;
 
   DC := TGtkDeviceContext(C.Handle);
   drawable := DC.Drawable;
@@ -208,11 +207,9 @@ begin
   col.green := $FFFF;
   col.blue  := $FFFF;
 
-  // Modern approach available since GDK 2.8 (2005). Avoids slow colormap allocation.
+  // Modern approach available since GDK 2.8. Avoids slow colormap allocation.
   gdk_gc_set_rgb_fg_color(gc, @col);
-
   gdk_gc_set_function(gc, GDK_XOR);
-  gdk_gc_set_foreground(gc, @col);
 
   // filled = 0 → only the outline, 1-pixel wide by default
   // Use W-1, H-1 so the stroke lands exactly within R (GDK's outline
