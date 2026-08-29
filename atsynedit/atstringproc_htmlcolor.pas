@@ -361,21 +361,21 @@ begin
   begin
     ValAngle:= ValAngle*(360.0/2/Pi);
     Inc(N, 3);
-    if IsCodeWord(Ord(S[N])) then exit(false);;
+    if IsCodeWord(Ord(S[N])) then exit(false);
   end
   else
   if (S[N]='g') and (S[N+1]='r') and (S[N+2]='a') and (S[N+3]='d') then
   begin
     ValAngle:= ValAngle*(360.0/400.0);
     Inc(N, 4);
-    if IsCodeWord(Ord(S[N])) then exit(false);;
+    if IsCodeWord(Ord(S[N])) then exit(false);
   end
   else
   if (S[N]='t') and (S[N+1]='u') and (S[N+2]='r') and (S[N+3]='n') then
   begin
     ValAngle:= ValAngle*360.0;
     Inc(N, 4);
-    if IsCodeWord(Ord(S[N])) then exit(false);;
+    if IsCodeWord(Ord(S[N])) then exit(false);
   end;
 end;
 
