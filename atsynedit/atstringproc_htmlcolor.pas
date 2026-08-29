@@ -197,12 +197,12 @@ end;
 
 class function TATHtmlColorParser.SkipInt(const S: TStr; var N: SizeInt): integer;
 begin
-  Result:= -1;
   SkipSpaces(S, N);
+  if (N>Length(S)) or not IsCodeDigit(ord(S[N])) then
+    Exit(-1);
+  Result:= 0;
   while (N<=Length(S)) and IsCodeDigit(ord(S[N])) do
   begin
-    if Result=-1 then
-      Result:= 0;
     Result:= Result*10 + ord(S[N]) - ord('0');
     Inc(N);
   end;
