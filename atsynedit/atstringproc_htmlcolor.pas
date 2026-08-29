@@ -332,7 +332,7 @@ begin
   begin
     SkipCommaOrSlash(S, N);
     ValAlpha:= SkipFloat(S, N, false{CalcValue}, true, bOk);
-    //if ValAlpha<0 then exit;
+    //if ValAlpha<0 then exit; //CalcValue=False so ValAlpha is always 0.0
   end;
 
   if S[N]<>')' then exit;
@@ -443,8 +443,8 @@ begin
   if bAlpha and (S[N]<>')') then
   begin
     SkipCommaOrSlash(S, N);
-    ValAlpha:= SkipFloat(S, N, false, true, bOk);
-    if ValAlpha<0 then exit;
+    ValAlpha:= SkipFloat(S, N, false{CalcValue}, true, bOk);
+    //if ValAlpha<0 then exit; //CalcValue=False so ValAlpha is always 0.0
   end;
   if S[N]<>')' then exit;
 
