@@ -162,8 +162,7 @@ begin
   S:= ItemText;
   if S<>'' then
   begin
-    //replace CR and LF chars, to not corrupt UndoData saved to a file
-    UniqueString(S);
+    //replace CR LF chars, to not corrupt undo-data saved to a file, then loaded from a file
     for i:= 1 to Length(S) do
       if (S[i]=#10) or (S[i]=#13) then
         S[i]:= ' ';
