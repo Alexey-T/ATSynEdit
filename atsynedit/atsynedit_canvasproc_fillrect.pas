@@ -38,7 +38,7 @@ uses
   LCLType;
 
 const
-  INV255: Double = 1.0/255.0;
+  INV255 = Double(1.0/255.0);
 
 {$ifdef LCLGtk2}
 {$define HAS_F}

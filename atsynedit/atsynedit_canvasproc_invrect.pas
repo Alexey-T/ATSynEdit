@@ -41,7 +41,7 @@ uses
   Classes;
 
 const
-  INV255: Double = 1.0/255.0;
+  INV255 = Double(1.0/255.0);
 
 {$ifdef LCLWin32}
 const
