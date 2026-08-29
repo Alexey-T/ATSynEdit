@@ -9,8 +9,8 @@ unit ATSynEdit_CanvasProc_FillRect;
 interface
 
 uses
-  Graphics, Types;  
-  
+  Graphics, Types;
+
 procedure CanvasFillRect(C: TCanvas; const R: TRect; AColor: TColor);
 
 implementation
@@ -34,6 +34,9 @@ uses
   {$ifdef LCLQt6}
   Qt6,
   QtObjects,
+  {$endif}
+  {$ifdef LCLCocoa}
+  CocoaAll,
   {$endif}
   LCLType;
 
@@ -181,6 +184,41 @@ begin
   Col.Pad       := 0;
 
   QPainter_fillRect(P, R.Left, R.Top, R.Width, R.Height, @Col);
+end;
+{$endif}
+
+{$ifdef LCLCocoa__FROM_AI_NOT_TESTED}
+{$define HAS_F}
+procedure CanvasFillRect(C: TCanvas; const R: TRect; AColor: TColor);
+var
+  NSCtx: NSGraphicsContext;
+  CG: CGContextRef;
+begin
+  if (C.Handle = 0) then Exit;
+
+  if (R.Width <= 0) or (R.Height <= 0) then Exit;
+
+  NSCtx := NSGraphicsContext(C.Handle);
+  if NSCtx = nil then Exit;
+
+  CG := NSCtx.CGContext;
+  if CG = nil then Exit;
+
+  CGContextSaveGState(CG);
+  try
+    CGContextSetRGBFillColor(CG,
+      (AColor and $FF) * INV255,
+      ((AColor shr 8) and $FF) * INV255,
+      ((AColor shr 16) and $FF) * INV255,
+      1.0); // Alpha = 1.0 (opaque)
+
+    // CGContextFillRect uses float coordinates.
+    // Passing R.Width and R.Height strictly limits the drawing
+    // so the right and bottom pixels of TRect are NOT touched.
+    CGContextFillRect(CG, CGRectMake(R.Left, R.Top, R.Width, R.Height));
+  finally
+    CGContextRestoreGState(CG);
+  end;
 end;
 {$endif}
 
