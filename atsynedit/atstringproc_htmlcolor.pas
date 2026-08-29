@@ -29,7 +29,7 @@ type
     class function SkipIntMaybeInPercents(const S: TStr; var N: SizeInt): integer;
     class function SkipIntWithPercent(const S: TStr; var N: SizeInt): integer;
     class function SkipFloat(const S: TStr; var N: SizeInt;
-      CalcValue, SkipPercent: boolean; out Ok: boolean): double;
+      ACalcValue, ASkipPercent: boolean; out AOk: boolean): double;
   public
     //convert TColor -> HTML color string #rrggbb
     class function ColorToHtmlString(Color: TColor): string;
@@ -234,13 +234,13 @@ end;
 
 
 class function TATHtmlColorParser.SkipFloat(const S: TStr; var N: SizeInt;
-  CalcValue, SkipPercent: boolean; out Ok: boolean): double;
+  ACalcValue, ASkipPercent: boolean; out AOk: boolean): double;
 var
   NEnd: SizeInt;
   Pow: double;
-  bNeg, HasDigit: boolean;
+  bNeg, bHasDigit: boolean;
 begin
-  Ok:= false;
+  AOk:= false;
   Result:= 0.0;
   SkipSpaces(S, N);
   NEnd:= N;
@@ -253,12 +253,12 @@ begin
     Inc(NEnd);
   end;
 
-  HasDigit:= false;
+  bHasDigit:= false;
   while (NEnd<=Length(S)) and IsCodeDigit(ord(S[NEnd])) do
   begin
-    if CalcValue then
+    if ACalcValue then
       Result:= Result*10.0 + (ord(S[NEnd]) - ord('0'));
-    HasDigit:= true;
+    bHasDigit:= true;
     Inc(NEnd);
   end;
 
@@ -268,23 +268,23 @@ begin
     Pow:= 0.1;
     while (NEnd<=Length(S)) and IsCodeDigit(ord(S[NEnd])) do
     begin
-      if CalcValue then
+      if ACalcValue then
         Result:= Result + (ord(S[NEnd]) - ord('0')) * Pow;
       Pow:= Pow * 0.1;
-      HasDigit:= true;
+      bHasDigit:= true;
       Inc(NEnd);
     end;
   end;
 
-  if not HasDigit then Exit;
+  if not bHasDigit then Exit;
 
-  if CalcValue and bNeg then
+  if ACalcValue and bNeg then
     Result:= -Result;
 
-  Ok:= true;
+  AOk:= true;
   N:= NEnd;
   SkipSpaces(S, N);
-  if SkipPercent and (N<=Length(S)) and (S[N]='%') then
+  if ASkipPercent and (N<=Length(S)) and (S[N]='%') then
   begin
     Inc(N);
     SkipSpaces(S, N);
