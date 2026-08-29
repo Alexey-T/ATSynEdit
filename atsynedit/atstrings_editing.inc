@@ -155,6 +155,9 @@ begin
       end
       else
         EndsArray[i]:= TATLineEnds.None;
+
+      //don't allow CR LF chars, except at the line ends
+      if SStringHasEol(S) then exit(false);
     end;
   end;
 
