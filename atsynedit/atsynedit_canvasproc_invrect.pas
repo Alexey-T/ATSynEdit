@@ -45,34 +45,29 @@ const
 
 {$ifdef LCLWin32}
 const
-  DC_BRUSH   = 18; // missed in Windows unit of FPC 3.2.2
-
-procedure CanvasInvertRect_SuperFastIgnoringColor(C: TCanvas; const R: TRect; AColor: TColor);
-var
-  DC: HDC;
-begin
-  if not Assigned(C) then Exit;
-  DC := HDC(C.Handle);
-  if DC = 0 then Exit;
-  Windows.InvertRect(DC, R);
-end;
+  DC_BRUSH   = 18; // missed in Windows unit of old FPC
 
 {$define HAS_INV2}
 procedure CanvasInvertRectEmptyInside(C: TCanvas; const R: TRect; AColor: TColor);
 var
   DC: HDC;
+  OldBrush: HGDIOBJ;
   W, H: Integer;
 begin
-  if not Assigned(C) then Exit;
   DC := HDC(C.Handle);
   if DC = 0 then Exit;
+
   W := R.Right - R.Left;
   H := R.Bottom - R.Top;
-  if (W <= 0) or (H <= 0) then Exit;
+
+  SetDCBrushColor(DC, AColor);
+  OldBrush := SelectObject(DC, GetStockObject(DC_BRUSH));
+
   // Top edge
   PatBlt(DC, R.Left, R.Top, W, 1, PATINVERT);
   // Bottom edge
   PatBlt(DC, R.Left, R.Bottom - 1, W, 1, PATINVERT);
+
   if H > 2 then
   begin
     // Left edge (w/o edges)
@@ -80,6 +75,8 @@ begin
     // Right edge (w/o edges)
     PatBlt(DC, R.Right - 1, R.Top + 1, 1, H - 2, PATINVERT);
   end;
+
+  SelectObject(DC, OldBrush);
 end;
 
 {$define HAS_INV}
@@ -91,12 +88,15 @@ begin
   if not Assigned(C) then Exit;
   DC := HDC(C.Handle);
   if DC = 0 then Exit;
+
   // SetDCBrushColor — does not create brush object, only changes color in DC.
   // much faster than CreateSolidBrush/DeleteObject.
   SetDCBrushColor(DC, AColor);
   OldBrush := SelectObject(DC, GetStockObject(DC_BRUSH));
+
   // PATINVERT: result = pixel XOR brush_color
   PatBlt(DC, R.Left, R.Top, R.Width, R.Height, PATINVERT);
+
   SelectObject(DC, OldBrush);
 end;
 {$endif}
