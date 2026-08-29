@@ -171,10 +171,9 @@ begin
   gc := DC.GC;
   if (drawable = nil) or (gc = nil) then Exit;
 
-  // Use WHITE for XOR to get pure inversion: result = ~background
-  col.red   := $FFFF;
-  col.green := $FFFF;
-  col.blue  := $FFFF;
+  col.red   := Red(AColor) * $101;   // 0..255 -> 0..65535
+  col.green := Green(AColor) * $101;
+  col.blue  := Blue(AColor) * $101;
 
   // Modern approach available since GDK 2.8. Avoids slow colormap allocation.
   gdk_gc_set_rgb_fg_color(gc, @col);
@@ -202,10 +201,9 @@ begin
   gc := DC.GC;
   if (drawable = nil) or (gc = nil) then Exit;
 
-  // Use WHITE for XOR to get pure inversion: result = ~background
-  col.red   := $FFFF;
-  col.green := $FFFF;
-  col.blue  := $FFFF;
+  col.red   := Red(AColor) * $101;   // 0..255 -> 0..65535
+  col.green := Green(AColor) * $101;
+  col.blue  := Blue(AColor) * $101;
 
   // Modern approach available since GDK 2.8. Avoids slow colormap allocation.
   gdk_gc_set_rgb_fg_color(gc, @col);
