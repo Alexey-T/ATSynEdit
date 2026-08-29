@@ -17,10 +17,10 @@ type
   generic TATHtmlColorParser<TStr, TPChar> = class
   private
     class function IsCodeDigit(ch: word): boolean; inline;
-    class function IsCodeHexDigit(ch: word): boolean;
+    class function IsCodeHexDigit(ch: word): boolean; inline;
     class function IsCodeWord(ch: word): boolean;
     class function IsCodeSpace(ch: word): boolean; inline;
-    class function HexCodeToInt(ch: word): integer;
+    class function HexCodeToInt(ch: word): integer; inline;
     class function ParseAngleUnit(const S: TStr; var N: SizeInt; var ValAngle: double): boolean;
     class procedure SkipSpaces(const S: TStr; var N: SizeInt); inline;
     class procedure SkipComma(const S: TStr; var N: SizeInt); inline;
@@ -57,14 +57,7 @@ end;
 
 class function TATHtmlColorParser.IsCodeHexDigit(ch: word): boolean;
 begin
-  case ch of
-    ord('0')..ord('9'),
-    ord('a')..ord('f'),
-    ord('A')..ord('F'):
-      Result:= true
-    else
-      Result:= false;
-  end;
+  Result:= HexCodeToInt(ch) <> $FF;
 end;
 
 class function TATHtmlColorParser.IsCodeWord(ch: word): boolean;
@@ -86,17 +79,33 @@ begin
 end;
 
 class function TATHtmlColorParser.HexCodeToInt(ch: word): integer;
+const
+  // Lookup table for hex digits.
+  // For '0'..'9','a'..'f','A'..'F' stores value 0..15,
+  // for other characters - $FF (mark "not a hex digit").
+  cHexVal: array[0..255] of byte = (
+    $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF, // 00-0F
+    $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF, // 10-1F
+    $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF, // 20-2F
+    $00,$01,$02,$03,$04,$05,$06,$07,$08,$09,$FF,$FF,$FF,$FF,$FF,$FF, // 30-3F  '0'..'9'
+    $FF,$0A,$0B,$0C,$0D,$0E,$0F,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF, // 40-4F  'A'..'F'
+    $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF, // 50-5F
+    $FF,$0A,$0B,$0C,$0D,$0E,$0F,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF, // 60-6F  'a'..'f'
+    $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF, // 70-7F
+    $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF, // 80-8F
+    $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF, // 90-9F
+    $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF, // A0-AF
+    $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF, // B0-BF
+    $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF, // C0-CF
+    $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF, // D0-DF
+    $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF, // E0-EF
+    $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF  // F0-FF
+  );
 begin
-  case ch of
-    ord('0')..ord('9'):
-      Result:= Ord(ch)-Ord('0');
-    ord('a')..ord('f'):
-      Result:= Ord(ch)-Ord('a')+10;
-    ord('A')..ord('F'):
-      Result:= Ord(ch)-Ord('A')+10;
-    else
-      Result:= 0;
-  end;
+  if ch <= $FF then
+    Result:= cHexVal[ch]
+  else
+    Result:= $FF;
 end;
 
 class function TATHtmlColorParser.ColorToHtmlString(Color: TColor): string;
@@ -469,4 +478,3 @@ end;
 
 
 end.
-
