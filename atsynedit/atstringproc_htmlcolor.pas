@@ -291,7 +291,6 @@ begin
 
   NLen:= Length(S);
   N:= FromPos;
-  bAlpha:= false;
 
   if N+9>NLen then exit;
   if S[N]<>'r' then exit;
@@ -301,10 +300,7 @@ begin
   if S[N]<>'b' then exit;
   Inc(N);
   if S[N]='a' then
-  begin
-    bAlpha:= true;
     Inc(N);
-  end;
   if S[N]<>'(' then exit;
   Inc(N);
 
@@ -331,8 +327,8 @@ begin
   if bAlpha then
   begin
     SkipCommaOrSlash(S, N);
-    ValAlpha:= SkipFloat(S, N, false, true, bOk);
-    if ValAlpha<0 then exit;
+    ValAlpha:= SkipFloat(S, N, false{CalcValue}, true, bOk);
+    //if ValAlpha<0 then exit;
   end;
 
   if S[N]<>')' then exit;
