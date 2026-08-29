@@ -160,13 +160,10 @@ var
   i: SizeInt;
 begin
   S:= ItemText;
-  if S<>'' then
-  begin
-    //replace CR LF chars, to not corrupt undo-data saved to a file, then loaded from a file
-    for i:= 1 to Length(S) do
-      if (S[i]=#10) or (S[i]=#13) then
-        S[i]:= ' ';
-  end;
+  //replace CR LF chars, to not corrupt undo-data saved to a file, then loaded from a file
+  for i:= 1 to Length(S) do
+    if (S[i]=#10) or (S[i]=#13) then
+      S[i]:= ' ';
 
   Result:=
     IntToStr(Ord(ItemAction))+PartSep+
