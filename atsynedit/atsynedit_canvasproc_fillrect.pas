@@ -204,7 +204,10 @@ begin
   CG := NSCtx.CGContext;
   if CG = nil then Exit;
 
-  CGContextSaveGState(CG);
+  // note by Z.ai: on Cocoa, saving/restoring of context is heavy op.
+  // better to avoid it. so they are commented yet.
+
+  // CGContextSaveGState(CG);
   try
     CGContextSetRGBFillColor(CG,
       (AColor and $FF) * INV255,
@@ -217,7 +220,7 @@ begin
     // so the right and bottom pixels of TRect are NOT touched.
     CGContextFillRect(CG, CGRectMake(R.Left, R.Top, R.Width, R.Height));
   finally
-    CGContextRestoreGState(CG);
+    // CGContextRestoreGState(CG);
   end;
 end;
 {$endif}
