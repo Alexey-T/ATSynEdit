@@ -236,39 +236,49 @@ end;
 class function TATHtmlColorParser.SkipFloat(const S: TStr; var N: SizeInt;
   CalcValue, SkipPercent: boolean; out Ok: boolean): double;
 var
-  Buf: string;
   NEnd: SizeInt;
+  Pow: double;
+  Neg, HasDigit: boolean;
 begin
   Ok:= false;
   Result:= 0.0;
   SkipSpaces(S, N);
   NEnd:= N;
+  Neg:= false;
+  if S[NEnd]='-' then begin Neg:= true; Inc(NEnd); end;
 
-  if S[NEnd]='-' then
-    Inc(NEnd);
-  while (NEnd<=Length(S)) and (IsCodeDigit(ord(S[NEnd])) or (S[NEnd]='.')) do
-    Inc(NEnd);
-
-  if CalcValue then
+  HasDigit:= false;
+  while (NEnd<=Length(S)) and IsCodeDigit(ord(S[NEnd])) do
   begin
-    Buf:= Copy(S, N, NEnd-N);
-    if Buf='' then exit;
-    if Buf[1]='.' then
-      Insert('0', Buf, 1);
-    Ok:= TryStrToFloat(Buf, Result);
-  end
-  else
-    Ok:= true;
+    if CalcValue then Result:= Result*10.0 + ord(S[NEnd]) - ord('0');
+    HasDigit:= true;
+    Inc(NEnd);
+  end;
 
+  if (NEnd<=Length(S)) and (S[NEnd]='.') then
+  begin
+    Inc(NEnd);
+    Pow:= 0.1;
+    while (NEnd<=Length(S)) and IsCodeDigit(ord(S[NEnd])) do
+    begin
+      if CalcValue then Result:= Result + (ord(S[NEnd]) - ord('0')) * Pow;
+      Pow:= Pow * 0.1;
+      HasDigit:= true;
+      Inc(NEnd);
+    end;
+  end;
+
+  if not HasDigit then Exit;
+
+  if CalcValue and Neg then Result:= -Result;
+  Ok:= true;
   N:= NEnd;
   SkipSpaces(S, N);
-
-  if SkipPercent then
-    if S[N]='%' then
-    begin
-      Inc(N);
-      SkipSpaces(S, N);
-    end;
+  if SkipPercent and (S[N]='%') then
+  begin
+    Inc(N);
+    SkipSpaces(S, N);
+  end;
 end;
 
 
