@@ -155,7 +155,20 @@ uses
 
 function TATUndoItem.GetAsString: string;
 //if more data will be needed here, add it to 'carets' item after MarkersSep=#1 separator
+var
+  S: UnicodeString;
+  i: SizeInt;
 begin
+  S:= ItemText;
+  if S<>'' then
+  begin
+    //replace CR and LF chars, to not corrupt UndoData saved to a file
+    UniqueString(S);
+    for i:= 1 to Length(S) do
+      if (S[i]=#10) or (S[i]=#13) then
+        S[i]:= ' ';
+  end;
+
   Result:=
     IntToStr(Ord(ItemAction))+PartSep+
     IntToStr(ItemIndex)+PartSep+
@@ -170,7 +183,7 @@ begin
       MarkerArrayToString(ItemMarkers2)+PartSep+
     IntToStr(Ord(ItemSoftMark))+PartSep+
     IntToStr(Ord(ItemHardMark))+PartSep+
-    UTF8Encode(ItemText);
+    UTF8Encode(S);
 end;
 
 procedure TATUndoItem.SetAsString(const AValue: string);
