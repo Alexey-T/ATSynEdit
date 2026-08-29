@@ -111,15 +111,66 @@ function TATStrings.TextReplaceLines_UTF8(ALineFrom, ALineTo: SizeInt;
   ANewLines: TStringList): boolean;
 var
   EndsArray: array of TATLineEnds;
+  List: TStringList;
   S: string;
   charLast, charPrev: char;
   bHadFakeLine, bDeleteWithLastLine, bKeepFinalEol: boolean;
-  NLastInserted, i: integer;
+  NLastInserted, i, NStart, NEnd: integer;
 begin
   Result:= false;
   if not IsIndexValid(ALineFrom) then exit;
   if ALineFrom>ALineTo then exit;
   Result:= true;
+
+  //split items by EOL chars, like on file loading; CudaText #6432:
+  //EOL chars inside item give additional lines; EOL mark at the end of item
+  //is handled below. Before this fix, inner EOL chars were stored in line
+  //text, were painted as unprintable glyphs (x0D/x0A) and gave additional
+  //lines only after file reload
+  List:= TStringList.Create;
+  try
+    for i:= 0 to ANewLines.Count-1 do
+    begin
+      S:= ANewLines[i];
+      if S='' then
+      begin
+        List.Add('');
+        Continue;
+      end;
+      NStart:= 1;
+      while NStart<=Length(S) do
+      begin
+        NEnd:= NStart;
+        while (NEnd<=Length(S)) and (S[NEnd]<>#13) and (S[NEnd]<>#10) do
+          Inc(NEnd);
+        if NEnd>Length(S) then
+        begin
+          List.Add(Copy(S, NStart, Length(S))); //tail w/o EOL
+          Break;
+        end;
+        if (S[NEnd]=#13) and (NEnd<Length(S)) and (S[NEnd+1]=#10) then
+        begin
+          List.Add(Copy(S, NStart, NEnd-NStart+2)); //part with CRLF
+          NStart:= NEnd+2;
+        end
+        else
+        begin
+          List.Add(Copy(S, NStart, NEnd-NStart+1)); //part with LF or CR
+          NStart:= NEnd+1;
+        end;
+      end;
+    end;
+    //rebuild list only when some EOLs were found inside items;
+    //callers which use ANewLines.Count (eg CudaText's caret shift)
+    //must see the count of resulting lines, not of passed items
+    if List.Count<>ANewLines.Count then
+    begin
+      ANewLines.Clear;
+      ANewLines.AddStrings(List);
+    end;
+  finally
+    List.Free;
+  end;
 
   //parse line-endings; TATLineEnds.None marks "no explicit EOL in the item"
   SetLength(EndsArray, ANewLines.Count);
