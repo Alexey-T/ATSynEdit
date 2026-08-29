@@ -238,19 +238,24 @@ class function TATHtmlColorParser.SkipFloat(const S: TStr; var N: SizeInt;
 var
   NEnd: SizeInt;
   Pow: double;
-  Neg, HasDigit: boolean;
+  bNeg, HasDigit: boolean;
 begin
   Ok:= false;
   Result:= 0.0;
   SkipSpaces(S, N);
   NEnd:= N;
-  Neg:= false;
-  if S[NEnd]='-' then begin Neg:= true; Inc(NEnd); end;
+  bNeg:= false;
+  if S[NEnd]='-' then
+  begin
+    bNeg:= true;
+    Inc(NEnd);
+  end;
 
   HasDigit:= false;
   while (NEnd<=Length(S)) and IsCodeDigit(ord(S[NEnd])) do
   begin
-    if CalcValue then Result:= Result*10.0 + ord(S[NEnd]) - ord('0');
+    if CalcValue then
+      Result:= Result*10.0 + (ord(S[NEnd]) - ord('0'));
     HasDigit:= true;
     Inc(NEnd);
   end;
@@ -261,7 +266,8 @@ begin
     Pow:= 0.1;
     while (NEnd<=Length(S)) and IsCodeDigit(ord(S[NEnd])) do
     begin
-      if CalcValue then Result:= Result + (ord(S[NEnd]) - ord('0')) * Pow;
+      if CalcValue then
+        Result:= Result + (ord(S[NEnd]) - ord('0')) * Pow;
       Pow:= Pow * 0.1;
       HasDigit:= true;
       Inc(NEnd);
@@ -270,7 +276,9 @@ begin
 
   if not HasDigit then Exit;
 
-  if CalcValue and Neg then Result:= -Result;
+  if CalcValue and bNeg then
+    Result:= -Result;
+
   Ok:= true;
   N:= NEnd;
   SkipSpaces(S, N);
