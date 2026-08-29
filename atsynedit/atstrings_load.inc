@@ -503,11 +503,15 @@ var
           end;
         TATCharEnding.Ending13:
           begin
-            if AFoundPos+CharSize<BufSize then
-              if _GetBufferEnding(Buf, AFoundPos+CharSize, FEncoding)=TATCharEnding.Ending10 then
-                AEnding:= TATLineEnds.Windows
-              else
-                AEnding:= TATLineEnds.Mac;
+            //if CR is the last char of buffer, it cannot be part of CRLF pair,
+            //so it's a Mac-style line ending (fixes loss of trailing CR on load/save)
+            if AFoundPos+CharSize>=BufSize then
+              AEnding:= TATLineEnds.Mac
+            else
+            if _GetBufferEnding(Buf, AFoundPos+CharSize, FEncoding)=TATCharEnding.Ending10 then
+              AEnding:= TATLineEnds.Windows
+            else
+              AEnding:= TATLineEnds.Mac;
             exit
           end;
       end;
