@@ -171,14 +171,16 @@ begin
   gc := DC.GC;
   if (drawable = nil) or (gc = nil) then Exit;
 
-  col.red   := Red(AColor) * $101;   // 0..255 -> 0..65535
+  col.red   := Red(AColor) * $101;
   col.green := Green(AColor) * $101;
   col.blue  := Blue(AColor) * $101;
 
-  // Modern approach available since GDK 2.8. Avoids slow colormap allocation.
+  // gdk_gc_set_fill(gc, GDK_SOLID); // not needed yet
   gdk_gc_set_rgb_fg_color(gc, @col);
   gdk_gc_set_function(gc, GDK_XOR);
+  
   gdk_draw_rectangle(drawable, gc, 1, R.Left, R.Top, W, H);
+  
   gdk_gc_set_function(gc, GDK_COPY);
 end;
 
@@ -201,17 +203,16 @@ begin
   gc := DC.GC;
   if (drawable = nil) or (gc = nil) then Exit;
 
-  col.red   := Red(AColor) * $101;   // 0..255 -> 0..65535
+  col.red   := Red(AColor) * $101;
   col.green := Green(AColor) * $101;
   col.blue  := Blue(AColor) * $101;
 
-  // Modern approach available since GDK 2.8. Avoids slow colormap allocation.
+  gdk_gc_set_line_attributes(gc, 1, GDK_LINE_SOLID, GDK_CAP_NOT_LAST, GDK_JOIN_MITER);
   gdk_gc_set_rgb_fg_color(gc, @col);
   gdk_gc_set_function(gc, GDK_XOR);
 
   // filled = 0 → only the outline, 1-pixel wide by default
-  // Use W-1, H-1 so the stroke lands exactly within R (GDK's outline
-  // rectangle includes both endpoints, unlike the filled variant)
+  // Use W-1, H-1 so the stroke lands exactly within R
   gdk_draw_rectangle(drawable, gc, 0, R.Left, R.Top, W - 1, H - 1);
 
   gdk_gc_set_function(gc, GDK_COPY);
