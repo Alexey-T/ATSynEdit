@@ -44,6 +44,7 @@ var
   LastFontBold: Boolean = False;
   LastFontItalic: Boolean = False;
   LastBaseline: Integer = 0;
+  LastCt: pcairo_t = nil;
 
 procedure NativeTextOut(ACanvas: TCanvas; AX, AY: Integer; const AStr: string);
 var
@@ -87,10 +88,13 @@ begin
     FontChanged := (ACanvas.Font.Name <> LastFontName) or
                    (ACanvas.Font.Height <> LastFontSize) or
                    (IsBold <> LastFontBold) or
-                   (IsItalic <> LastFontItalic);
+                   (IsItalic <> LastFontItalic) or
+                   (ct <> LastCt);
 
     if FontChanged then
     begin
+      LastCt := ct;
+
       if IsItalic then
         LSlant := CAIRO_FONT_SLANT_ITALIC
       else
