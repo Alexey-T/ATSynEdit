@@ -32,6 +32,15 @@ type
   end;
 
 type
+  TATGapSortedRec = record
+    LineIndex: integer;
+    SumSize: integer;
+    CumSize: Int64;
+  end;
+
+function _CompareGapItemsByLine(Item1, Item2: Pointer): Integer;
+
+type
   TATGapDeleteEvent = procedure(Sender: TObject; ALineIndex: integer) of object;
 
 type
@@ -41,6 +50,9 @@ type
   private
     FList: TFPList;
     FOnDelete: TATGapDeleteEvent;
+    FSorted: array of TATGapSortedRec;
+    FSortedValid: boolean;
+    FTotalSizeAll: Int64;
     function GetItem(N: integer): TATGapItem;
   public
     constructor Create; virtual;
@@ -59,6 +71,16 @@ type
     function DeleteForLineRange(ALineFrom, ALineTo: integer): boolean;
     function DeleteWithTag(ATag: integer): boolean;
     procedure Update(AChange: TATLineChangeKind; ALine, AItemCount: integer);
+    procedure EnsureSortedIndex;
+    function SortedLowerBound(ALineIndex: integer): integer;
+    function SortedUpperBound(ALineIndex: integer): integer;
+    function TotalSizeAll: Int64;
+    function CumSizeBefore(ALineIndex: integer): Int64;
+    function CumSizeUpTo(ALineIndex: integer): Int64;
+    function SizeOfLineAll(ALineIndex: integer): integer;
+    function SortedCount: integer;
+    function SortedLineIndex(N: integer): integer;
+    function SortedSumSize(N: integer): integer;
     property OnDelete: TATGapDeleteEvent read FOnDelete write FOnDelete;
   end;
 
@@ -66,6 +88,17 @@ function GetGapBitmapPosLeft(const ARect: TRect; AObjectWidth: integer): integer
 
 
 implementation
+
+function _CompareGapItemsByLine(Item1, Item2: Pointer): Integer;
+var
+  Obj1, Obj2: TATGapItem;
+begin
+  Obj1:= TATGapItem(Item1);
+  Obj2:= TATGapItem(Item2);
+  if Obj1.LineIndex<Obj2.LineIndex then exit(-1);
+  if Obj1.LineIndex>Obj2.LineIndex then exit(1);
+  Result:= 0;
+end;
 
 function GetGapBitmapPosLeft(const ARect: TRect; AObjectWidth: integer): integer;
 begin
@@ -106,6 +139,7 @@ constructor TATGaps.Create;
 begin
   inherited;
   FList:= TFPList.Create;
+  FSortedValid:= false;
 end;
 
 destructor TATGaps.Destroy;
@@ -126,6 +160,7 @@ begin
     TObject(FList[i]).Free;
   end;
   FList.Clear;
+  FSortedValid:= false;
 end;
 
 function TATGaps.Count: integer; inline;
@@ -151,6 +186,7 @@ begin
   if Assigned(FOnDelete) then
     FOnDelete(Self, Item.LineIndex);
 
+  FSortedValid:= false;
   Item.Free;
   FList.Delete(N);
 end;
@@ -218,6 +254,7 @@ begin
   else
     FList.Add(Item);
 
+  FSortedValid:= false;
   Result:= true;
 end;
 
@@ -244,6 +281,7 @@ begin
       end;
     TATLineChangeKind.Added:
       begin
+        FSortedValid:= false;
         for i:= 0 to Count-1 do
         begin
           Item:= Items[i];
@@ -257,6 +295,7 @@ begin
       end;
     TATLineChangeKind.Deleted:
       begin
+        FSortedValid:= false;
         for i:= Count-1 downto 0 do
         begin
           Item:= Items[i];
@@ -273,6 +312,132 @@ begin
   end;
 end;
 
+
+procedure TATGaps.EnsureSortedIndex;
+var
+  TmpList: TFPList;
+  Item: TATGapItem;
+  i, j: integer;
+begin
+  if FSortedValid then exit;
+  FSortedValid:= true;
+  SetLength(FSorted, 0);
+  FTotalSizeAll:= 0;
+  if FList.Count=0 then exit;
+
+  TmpList:= TFPList.Create;
+  try
+    for i:= 0 to FList.Count-1 do
+      TmpList.Add(FList[i]);
+    TmpList.Sort(@_CompareGapItemsByLine);
+
+    SetLength(FSorted, TmpList.Count);
+    j:= -1;
+    for i:= 0 to TmpList.Count-1 do
+    begin
+      Item:= TATGapItem(TmpList[i]);
+      if (j<0) or (FSorted[j].LineIndex<>Item.LineIndex) then
+      begin
+        Inc(j);
+        FSorted[j].LineIndex:= Item.LineIndex;
+        FSorted[j].SumSize:= 0;
+        FSorted[j].CumSize:= FTotalSizeAll;
+      end;
+      FSorted[j].SumSize:= FSorted[j].SumSize+Item.Size;
+      FTotalSizeAll:= FTotalSizeAll+Item.Size;
+    end;
+    SetLength(FSorted, j+1);
+  finally
+    FreeAndNil(TmpList);
+  end;
+end;
+
+function TATGaps.SortedLowerBound(ALineIndex: integer): integer;
+var
+  L, R, M: integer;
+begin
+  L:= 0;
+  R:= Length(FSorted);
+  while L<R do
+  begin
+    M:= (L+R) div 2;
+    if FSorted[M].LineIndex<ALineIndex then
+      L:= M+1
+    else
+      R:= M;
+  end;
+  Result:= L;
+end;
+
+function TATGaps.SortedUpperBound(ALineIndex: integer): integer;
+var
+  L, R, M: integer;
+begin
+  L:= 0;
+  R:= Length(FSorted);
+  while L<R do
+  begin
+    M:= (L+R) div 2;
+    if FSorted[M].LineIndex<=ALineIndex then
+      L:= M+1
+    else
+      R:= M;
+  end;
+  Result:= L;
+end;
+
+function TATGaps.TotalSizeAll: Int64;
+begin
+  EnsureSortedIndex;
+  Result:= FTotalSizeAll;
+end;
+
+function TATGaps.CumSizeBefore(ALineIndex: integer): Int64;
+var N: integer;
+begin
+  EnsureSortedIndex;
+  N:= SortedLowerBound(ALineIndex);
+  if N<Length(FSorted) then Result:= FSorted[N].CumSize
+  else Result:= FTotalSizeAll;
+end;
+
+function TATGaps.CumSizeUpTo(ALineIndex: integer): Int64;
+var N: integer;
+begin
+  EnsureSortedIndex;
+  N:= SortedUpperBound(ALineIndex);
+  if N<Length(FSorted) then Result:= FSorted[N].CumSize
+  else Result:= FTotalSizeAll;
+end;
+
+function TATGaps.SizeOfLineAll(ALineIndex: integer): integer;
+var N: integer;
+begin
+  Result:= 0;
+  if FList.Count=0 then exit;
+  EnsureSortedIndex;
+  N:= SortedLowerBound(ALineIndex);
+  if (N<Length(FSorted)) and (FSorted[N].LineIndex=ALineIndex) then
+    Result:= FSorted[N].SumSize;
+end;
+
+function TATGaps.SortedCount: integer;
+begin
+  EnsureSortedIndex;
+  Result:= Length(FSorted);
+end;
+
+function TATGaps.SortedLineIndex(N: integer): integer;
+begin
+  EnsureSortedIndex;
+  Result:= FSorted[N].LineIndex;
+end;
+
+function TATGaps.SortedSumSize(N: integer): integer;
+begin
+  EnsureSortedIndex;
+  Result:= FSorted[N].SumSize;
+end;
 
 end.
 

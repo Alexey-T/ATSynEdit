@@ -2407,31 +2407,30 @@ function _GapsSize(
   AEditorIndex: integer;
   ALineFrom, ALineTo: integer): integer;
 var
-  GapItem: TATGapItem;
   StItem: PATStringItem;
-  iGap, iLine: integer;
+  iSorted, iLine: integer;
   bHidden: boolean;
 begin
   Result:= 0;
-  for iGap:= 0 to AGaps.Count-1 do
+  if AGaps.Count=0 then exit;
+  if ALineFrom>ALineTo then exit;
+
+  AGaps.EnsureSortedIndex;
+  for iSorted:= AGaps.SortedLowerBound(ALineFrom) to AGaps.SortedUpperBound(ALineTo)-1 do
   begin
-    GapItem:= AGaps.Items[iGap];
-    iLine:= GapItem.LineIndex;
-    if (iLine>=ALineFrom) and (iLine<=ALineTo) then
+    iLine:= AGaps.SortedLineIndex(iSorted);
+    bHidden:= false;
+    //gap can be before 1st line, it has LineIndex=-1, it is always visible
+    if AStrings.IsIndexValid(iLine) then
     begin
-      bHidden:= false;
-      //gap can be before 1st line, it has LineIndex=-1, it is always visible
-      if AStrings.IsIndexValid(iLine) then
-      begin
-        StItem:= AStrings.GetItemPtr(iLine);
-        if AEditorIndex=0 then
-          bHidden:= StItem^.Ex.Hidden_0 or (StItem^.Ex.FoldFrom_0>0)
-        else
-          bHidden:= StItem^.Ex.Hidden_1 or (StItem^.Ex.FoldFrom_1>0);
-      end;
-      if not bHidden then
-        Inc(Result, GapItem.Size);
+      StItem:= AStrings.GetItemPtr(iLine);
+      if AEditorIndex=0 then
+        bHidden:= StItem^.Ex.Hidden_0 or (StItem^.Ex.FoldFrom_0>0)
+      else
+        bHidden:= StItem^.Ex.Hidden_1 or (StItem^.Ex.FoldFrom_1>0);
     end;
+    if not bHidden then
+      Inc(Result, AGaps.SortedSumSize(iSorted));
   end;
 end;
 
@@ -6831,6 +6830,8 @@ procedure _UpdateScrollInfoFromSmoothPos(
 //Note: for vertical bar, NPos=-1 means than we are before the first line, over top gap
 var
   NPos, NPixels, NLineIndex: Int64;
+  NLineIndex2: Int64;
+  NGapsCum: Int64;
   NSizeGapTop, NSizeGap0: Int64;
   bConsiderGaps: boolean;
 begin
@@ -6886,14 +6887,23 @@ begin
     NPos:= Min(AInfo.NPos, AWrapInfo.Count-1);
     NPixels:= AInfo.NPixelOffset;
 
+    NLineIndex:= AWrapInfo.Data[NPos].NLineIndex - 1;
+    NGapsCum:= _GapsSize(AStrings, AGaps, AEditorIndex, -1, NLineIndex);
+
     repeat
-      NLineIndex:= AWrapInfo.Data[NPos].NLineIndex - 1;
       NPixels:= APos - NPos* AInfo.CharSizeScaled div ATEditorCharXScale
-        - _GapsSize(AStrings, AGaps, AEditorIndex, -1, NLineIndex);
+        - NGapsCum;
       if NPos=0 then Break;
       if NLineIndex=0 then Break;
       if NPixels>=0 then Break;
       Dec(NPos);
+      NLineIndex2:= AWrapInfo.Data[NPos].NLineIndex - 1;
+      if NLineIndex2<NLineIndex then
+      begin
+        NGapsCum:= NGapsCum - _GapsSize(AStrings, AGaps, AEditorIndex,
+          NLineIndex2+1, NLineIndex);
+        NLineIndex:= NLineIndex2;
+      end;
     until false;
 
     AInfo.NPos:= NPos;
