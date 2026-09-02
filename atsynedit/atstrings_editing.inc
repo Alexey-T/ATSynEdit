@@ -690,6 +690,8 @@ var
   bFast: boolean;
   i, NDone: SizeInt;
 begin
+  if FReadOnly or FOneLine then exit;
+
   FChangeBlockActive:= true;
   DoOnChangeBlock(
     0, ALineFrom,
@@ -698,7 +700,7 @@ begin
     ANewLines);
 
   {
-  2025.12: optimized insert of big block.
+  2026.09: optimized insert of big block.
   Old code inserted lines in reverse order, at same index, so every line
   called FList.Insert() which shifts the list tail - it's O(N^2) list-moves
   for N lines (e.g. ~1 hour for 1M lines, CudaText perf issue with
@@ -709,9 +711,7 @@ begin
   document and identical undo/redo results.
   Edge cases (readonly/one-line/index at end) use old per-line code.
   }
-  bFast:= (ANewLines.Count>0) and
-    (not FReadOnly) and
-    (not FOneLine) and
+  bFast:= (ANewLines.Count>1) and
     IsIndexValid(ALineFrom);
 
   if bFast then
