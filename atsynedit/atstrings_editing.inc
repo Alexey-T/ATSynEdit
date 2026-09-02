@@ -687,7 +687,8 @@ end;
 
 procedure TATStrings.LineBlockInsert(ALineFrom: SizeInt; ANewLines: TStringList);
 var
-  i: SizeInt;
+  bFast: boolean;
+  i, NDone: SizeInt;
 begin
   FChangeBlockActive:= true;
   DoOnChangeBlock(
@@ -696,8 +697,48 @@ begin
     TATBlockChangeKind.InsertLines,
     ANewLines);
 
-  for i:= ANewLines.Count-1 downto 0 do
-    LineInsert(ALineFrom, UTF8Decode(ANewLines[i]), false{AWithEvent});
+  {
+  2025.12: optimized insert of big block.
+  Old code inserted lines in reverse order, at same index, so every line
+  called FList.Insert() which shifts the list tail - it's O(N^2) list-moves
+  for N lines (e.g. ~1 hour for 1M lines, CudaText perf issue with
+  ed.replace_lines). New code opens all list-slots with a single
+  memory-move (TATStringItemList.InsertRange) and fills slots in forward
+  order - O(N) list-moves. Undo-items are the same as before
+  (TATEditAction.Insert, one per line): both old/new order give identical
+  document and identical undo/redo results.
+  Edge cases (readonly/one-line/index at end) use old per-line code.
+  }
+  bFast:= (ANewLines.Count>0) and
+    (not FReadOnly) and
+    (not FOneLine) and
+    IsIndexValid(ALineFrom);
+
+  if bFast then
+  begin
+    FList.InsertRange(ALineFrom, ANewLines.Count);
+    NDone:= 0;
+    try
+      for i:= 0 to ANewLines.Count-1 do
+      begin
+        //undo-item index is ALineFrom for all lines (like old code made),
+        //list-slot index grows
+        LineInsertToSlot(ALineFrom, ALineFrom+i, UTF8Decode(ANewLines[i]));
+        Inc(NDone);
+      end;
+    except
+      //keep list consistent on exception: slots, which were not filled,
+      //must be removed; already filled lines (and their undo-items) remain,
+      //like old per-line code would leave on exception
+      if NDone<ANewLines.Count then
+        FList.DeleteRange(ALineFrom+NDone, ALineFrom+ANewLines.Count-1);
+      raise;
+    end;
+  end
+  else
+    for i:= ANewLines.Count-1 downto 0 do
+      LineInsert(ALineFrom, UTF8Decode(ANewLines[i]), false{AWithEvent});
+
   FChangeBlockActive:= false;
 
   DoEventLog(ALineFrom);

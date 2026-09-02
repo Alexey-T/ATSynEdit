@@ -148,6 +148,7 @@ type
     constructor Create;
     function GetItem(AIndex: SizeInt): PATStringItem;
     procedure Deref(Item: Pointer); override; overload;
+    procedure InsertRange(AIndex, ACount: SizeInt);
     procedure SortRange(L, R: SizeInt; Compare: TFPSListCompareFunc);
   end;
 
@@ -310,6 +311,7 @@ type
       out ALineIndexFailed: integer): boolean;
     procedure AddUpdatesAction(ALineIndex: integer; AAction: TATEditAction);
     procedure UpdateModified;
+    procedure LineInsertToSlot(AIndexForUndoItem, AIndexForLine: SizeInt; const AString: atString);
   public
     CaretsAfterLastEdition: TATPointPairArray;
     EditingActive: boolean;
@@ -1011,6 +1013,39 @@ begin
   PATStringItem(Item)^.Buf:= '';
 end;
 
+procedure TATStringItemList.InsertRange(AIndex, ACount: SizeInt);
+{
+Opens ACount empty slots at AIndex, with a single memory-move of the list tail.
+Slots are zeroed = empty items (nil string, no line-ending), like TFPSList.Insert
+leaves its inserted slot. Made for TATStrings.LineBlockInsert: it allows to insert
+a big block of lines with O(N) list work, instead of calling TFPSList.Insert()
+per line, which shifts the list tail on every call and gives O(N^2) time
+(e.g. hours for 1M lines, CudaText performance issue).
+}
+var
+  Ptr: PByte;
+begin
+  if ACount<=0 then Exit;
+  if (AIndex<0) or (AIndex>Count) then
+    RaiseIndexError(AIndex);
+
+  if Count+ACount>Capacity then
+    Capacity:= Count+ACount;
+
+  if AIndex<Count then
+  begin
+    Ptr:= PByte(InternalItems[AIndex]);
+    //move list tail to the right; region after Count is zeroed by SetCapacity,
+    //so it's safe to move to (Ptr+ACount*ItemSize)
+    System.Move(Ptr^, (Ptr+Int64(ACount)*ItemSize)^, Int64(Count-AIndex)*ItemSize);
+    //zero opened slots: empty TATStringItem (nil string), like Insert() does
+    System.FillChar(Ptr^, Int64(ACount)*ItemSize, 0);
+  end;
+  //note: for AIndex=Count (append) slots are already zeroed: list keeps
+  //"ending filled with zeros" invariant (see comments in ATSynEdit_fgl)
+  Inc(FCount, ACount);
+end;
+
 procedure TATStringItemList.SortRange(L, R: SizeInt; Compare: TFPSListCompareFunc);
 begin
   QuickSort(L, R, Compare);
@@ -1613,6 +1648,27 @@ begin
   Item.Init(AString, AEnd);
   FList.Insert(ALineIndex, @Item);
   FillChar(Item, SizeOf(Item), 0);
+end;
+
+procedure TATStrings.LineInsertToSlot(AIndexForUndoItem, AIndexForLine: SizeInt; const AString: atString);
+{
+Same as LineInsertRaw(), but it does NOT call FList.Insert():
+the list-slot at AIndexForLine must be already opened (zeroed) by
+TATStringItemList.InsertRange(). FReadOnly/IsFilled are not checked here,
+caller (LineBlockInsert) checks them once. AEnd is FEndings, like
+LineInsert/LineInsertEx pass to LineInsertRaw.
+Undo-item gets AIndexForUndoItem (=index of block start, same for all lines
+of block) - it gives undo-items exactly like old LineBlockInsert code made
+(Insert@AIndexForUndoItem per line), so undo/redo sequences are identical.
+}
+var
+  Item: PATStringItem;
+begin
+  UpdateModified;
+  AddUndoItem(TATEditAction.Insert, AIndexForUndoItem, '', TATLineEnds.None, TATLineState.None, FCommandCode);
+
+  Item:= FList.GetItem(AIndexForLine);
+  Item^.Init(AString, FEndings);
 end;
 
 procedure TATStrings.LineInsertEx(ALineIndex: SizeInt; const AString: atString; AEnd: TATLineEnds;
