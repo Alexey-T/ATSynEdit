@@ -6503,19 +6503,19 @@ begin
   NValue:= Strings.ProgressValue;
   if NValue>0 then
   begin
-    C.Pen.Color:= Colors.TextSelBG;
-    C.FrameRect(
-      cRectX,
-      cRectY,
-      cRectX + cRectWidth,
-      cRectY + cRectHeight
-      );
     CanvasFillRect(C, Rect(
       cRectX,
       cRectY,
-      cRectX + cRectWidth * NValue div 100,
+      cRectX + cRectWidth,
       cRectY + cRectHeight),
       Colors.TextSelBG
+      );
+    CanvasFillRect(C, Rect(
+      cRectX+1 + cRectWidth * NValue div 100,
+      cRectY+1,
+      cRectX-1 + cRectWidth,
+      cRectY-1 + cRectHeight),
+      Colors.TextBG
       );
   end;
 end;
