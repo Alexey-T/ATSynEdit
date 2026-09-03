@@ -6506,15 +6506,15 @@ begin
     CanvasFillRect(C, Rect(
       cRectX,
       cRectY,
-      cRectX + cRectWidth,
+      cRectX + cRectWidth + 1,
       cRectY + cRectHeight),
       Colors.TextSelBG
       );
     CanvasFillRect(C, Rect(
-      cRectX+1 + cRectWidth * NValue div 100,
-      cRectY+1,
-      cRectX-1 + cRectWidth,
-      cRectY-1 + cRectHeight),
+      cRectX + 1 + cRectWidth * NValue div 100,
+      cRectY + 1,
+      cRectX + cRectWidth,
+      cRectY - 1 + cRectHeight),
       Colors.TextBG
       );
   end;
