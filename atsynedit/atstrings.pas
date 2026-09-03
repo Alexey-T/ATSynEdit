@@ -304,17 +304,19 @@ type
     procedure SetRedoAsString(const AValue: string);
     procedure SetUndoAsString(const AValue: string);
     procedure SetUndoLimit(AValue: integer);
-    function UndoSingle(ACurList: TATUndoList; out ASoftMarked, AHardMarked,
+    procedure UndoSingle_Begin(ACurList: TATUndoList; AAction: TATEditAction;
+      ACommandCode: integer; ASoftMarked, AHardMarked, AWithoutPause: boolean;
+      const ACarets: TATPointPairArray;
+      out AEnableEventAfter: boolean; out AEventX, AEventY: SizeInt);
+    procedure UndoSingle_End(ACurList: TATUndoList; ADeleteLast,
+      AEnableEventAfter: boolean; AEventX, AEventY: SizeInt);
+    function UndoSingle(ACurList: TATUndoList; AGrouped: boolean;
+      out ASoftMarked, AHardMarked,
       AHardMarkedNext, AUnmodifiedNext: boolean;
       out ACommandCode: integer;
       out ATickCount: QWord;
       out ALineIndexFailed: integer): boolean;
     function UndoCountRun(ACurList: TATUndoList; AAction: TATEditAction; ALineIndex: SizeInt): SizeInt;
-    function UndoSingleSmart(ACurList: TATUndoList; AGroupged: boolean;
-      out ASoftMarked, AHardMarked, AHardMarkedNext, AUnmodifiedNext: boolean;
-      out ACommandCode: integer;
-      out ATickCount: QWord;
-      out ALineIndexFailed: integer): boolean;
     function UndoRunInserts(ACurList: TATUndoList; ALineIndex, ACount: SizeInt;
       out ASoftMarked, AHardMarked, AHardMarkedNext, AUnmodifiedNext: boolean;
       out ACommandCode: integer;
@@ -2109,7 +2111,78 @@ begin
     end;
 end;
 
-function TATStrings.UndoSingle(ACurList: TATUndoList;
+procedure TATStrings.UndoSingle_Begin(ACurList: TATUndoList; AAction: TATEditAction;
+  ACommandCode: integer; ASoftMarked, AHardMarked, AWithoutPause: boolean;
+  const ACarets: TATPointPairArray;
+  out AEnableEventAfter: boolean; out AEventX, AEventY: SizeInt);
+var
+  bEnableEventBefore, bBlockEventBefore: boolean;
+begin
+  CommandCode:= ACommandCode;
+  ACurList.Locked:= true;
+
+  case AAction of
+    TATEditAction.Change,
+    TATEditAction.Delete,
+    TATEditAction.Insert:
+      AEnableEventAfter:= ASoftMarked or AHardMarked;
+    TATEditAction.CaretJump:
+      AEnableEventAfter:= true;
+    else
+      AEnableEventAfter:= false;
+  end;
+
+  if Length(ACarets)>0 then
+  begin
+    AEventX:= ACarets[0].X;
+    AEventY:= ACarets[0].Y;
+  end
+  else
+  begin
+    AEventX:= -1;
+    AEventY:= -1;
+  end;
+
+  bEnableEventBefore:= (AEventY>=0) and (AEventY<>FLastUndoY);
+  FLastUndoY:= AEventY;
+
+  //fixing issue #3427, flag nnnAfter must be false if nnnBefore=false
+  if not bEnableEventBefore then
+    AEnableEventAfter:= false;
+
+  if AWithoutPause then
+  begin
+    bEnableEventBefore:= false;
+    AEnableEventAfter:= false;
+  end;
+
+  if bEnableEventBefore then
+    if Assigned(FOnUndoBefore) then
+    begin
+      bBlockEventBefore:= false;
+      FOnUndoBefore(Self, AEventX, AEventY, bBlockEventBefore);
+      if bBlockEventBefore then
+        AEnableEventAfter:= false;
+    end;
+end;
+
+procedure TATStrings.UndoSingle_End(ACurList: TATUndoList; ADeleteLast,
+  AEnableEventAfter: boolean; AEventX, AEventY: SizeInt);
+begin
+  ACurList.Locked:= false;
+  if ADeleteLast then
+    ACurList.DeleteLast;
+  ActionDeleteDupFakeLines;
+
+  if AEnableEventAfter then
+    if Assigned(FOnUndoAfter) then
+      FOnUndoAfter(Self, AEventX, AEventY);
+
+  CommandCode:= 0;
+end;
+
+
+function TATStrings.UndoSingle(ACurList: TATUndoList; AGrouped: boolean;
   out ASoftMarked, AHardMarked, AHardMarkedNext, AUnmodifiedNext: boolean;
   out ACommandCode: integer;
   out ATickCount: QWord;
@@ -2130,9 +2203,7 @@ var
   NCurCount, NStringsCount: SizeInt;
   NEventX, NEventY: SizeInt;
   bWithoutPause,
-  bEnableEventBefore,
-  bEnableEventAfter,
-  bBlockEventBefore: boolean;
+  bEnableEventAfter: boolean;
 begin
   Result:= true;
   ASoftMarked:= true;
@@ -2144,6 +2215,31 @@ begin
   ALineIndexFailed:= -1;
   if FReadOnly then Exit;
   if ACurList=nil then Exit;
+
+  //Performance path for large runs produced by block insert/delete operations.
+  //Keep this decision inside UndoSingle so there is only one normal undo entry point.
+  if AGrouped and (not FReadOnly) and (not FOneLine) then
+  begin
+    CurItem:= ACurList.Last;
+    if (CurItem<>nil) and (CurItem.ItemIndex>=0) and
+       (CurItem.ItemIndex<Count) then
+    begin
+      CurIndex:= CurItem.ItemIndex;
+      NCurCount:= UndoCountRun(ACurList, CurItem.ItemAction, CurIndex);
+      if NCurCount>=ATStrings_MinUndoRunCount then
+        case CurItem.ItemAction of
+          TATEditAction.Insert:
+            if CurIndex+NCurCount<=Count then
+              Exit(UndoRunInserts(ACurList, CurIndex, NCurCount,
+                ASoftMarked, AHardMarked, AHardMarkedNext, AUnmodifiedNext,
+                ACommandCode, ATickCount, ALineIndexFailed));
+          TATEditAction.Delete:
+            Exit(UndoRunDeletes(ACurList, CurIndex, NCurCount,
+              ASoftMarked, AHardMarked, AHardMarkedNext, AUnmodifiedNext,
+              ACommandCode, ATickCount, ALineIndexFailed));
+        end;
+    end;
+  end;
 
   CurItem:= ACurList.Last;
   if CurItem=nil then Exit;
@@ -2183,62 +2279,14 @@ begin
   CommandCode:= ACommandCode;
 
   CurItem:= nil;
-  ACurList.Locked:= true;
 
   if ACurList=FUndoList then
     OtherList:= FRedoList
   else
     OtherList:= FUndoList;
 
-  case CurAction of
-    TATEditAction.Change,
-    TATEditAction.Delete,
-    TATEditAction.Insert:
-      begin
-        bEnableEventAfter:= ASoftMarked or AHardMarked;
-      end;
-    TATEditAction.CaretJump:
-      begin
-        bEnableEventAfter:= true;
-      end;
-    else
-      begin
-        bEnableEventAfter:= false;
-      end;
-  end;
-
-  if Length(CurCaretsArray)>0 then
-  begin
-    NEventX:= CurCaretsArray[0].X;
-    NEventY:= CurCaretsArray[0].Y; //CurIndex is 0 for CaretJump
-  end
-  else
-  begin
-    NEventX:= -1;
-    NEventY:= -1;
-  end;
-
-  bEnableEventBefore:= (NEventY>=0) and (NEventY<>FLastUndoY);
-  FLastUndoY:= NEventY;
-
-  //fixing issue #3427, flag nnnAfter must be false if nnnBefore=false
-  if not bEnableEventBefore then
-    bEnableEventAfter:= false;
-
-  if bWithoutPause then
-  begin
-    bEnableEventBefore:= false;
-    bEnableEventAfter:= false;
-  end;
-
-  if bEnableEventBefore then
-    if Assigned(FOnUndoBefore) then
-    begin
-      bBlockEventBefore:= false;
-      FOnUndoBefore(Self, NEventX, NEventY, bBlockEventBefore);
-      if bBlockEventBefore then
-        bEnableEventAfter:= false;
-    end;
+  UndoSingle_Begin(ACurList, CurAction, ACommandCode, ASoftMarked, AHardMarked,
+    bWithoutPause, CurCaretsArray, bEnableEventAfter, NEventX, NEventY);
 
   try
     case CurAction of
@@ -2384,16 +2432,7 @@ begin
     end;
 
   finally
-    ACurList.Locked:= false;
-    if Result then
-      ACurList.DeleteLast;
-    ActionDeleteDupFakeLines;
-
-    if bEnableEventAfter then
-      if Assigned(FOnUndoAfter) then
-        FOnUndoAfter(Self, NEventX, NEventY);
-
-    CommandCode:= 0;
+    UndoSingle_End(ACurList, Result, bEnableEventAfter, NEventX, NEventY);
   end;
 end;
 
@@ -2420,59 +2459,6 @@ begin
     Inc(Result);
     if Item.ItemSoftMark then Break;
   end;
-end;
-
-function TATStrings.UndoSingleSmart(ACurList: TATUndoList; AGroupged: boolean;
-  out ASoftMarked, AHardMarked, AHardMarkedNext, AUnmodifiedNext: boolean;
-  out ACommandCode: integer;
-  out ATickCount: QWord;
-  out ALineIndexFailed: integer): boolean;
-{
-2026.09: performance fix (CudaText: Undo took 40-60 sec after ed.replace_lines
-with 300K lines). Detects runs of trailing undo-items, all Insert or all Delete,
-with same line index (such runs are created by LineBlockInsert and by
-UndoRunInserts in the 'other' list). For such runs, calls bulk functions
-UndoRunInserts/UndoRunDeletes, which give O(n) instead of O(n^2).
-For all other cases, calls UndoSingle(), so behavior is not changed.
-}
-var
-  Item: TATUndoItem;
-  N, M, k: SizeInt;
-begin
-  if AGroupged and
-     (not FReadOnly) and
-     (not FOneLine) and
-     Assigned(ACurList) then
-  begin
-    N:= ACurList.Count;
-    if N>0 then
-    begin
-      Item:= ACurList.Items[N-1];
-      if (Item<>nil) and
-         (Item.ItemIndex>=0) and
-         (Item.ItemIndex<Count) then
-      begin
-        k:= Item.ItemIndex;
-        M:= UndoCountRun(ACurList, Item.ItemAction, k);
-        if M>=ATStrings_MinUndoRunCount then
-          case Item.ItemAction of
-            TATEditAction.Insert:
-              if k+M<=Count then
-                Exit(UndoRunInserts(ACurList, k, M,
-                  ASoftMarked, AHardMarked, AHardMarkedNext, AUnmodifiedNext,
-                  ACommandCode, ATickCount, ALineIndexFailed));
-            TATEditAction.Delete:
-              Exit(UndoRunDeletes(ACurList, k, M,
-                ASoftMarked, AHardMarked, AHardMarkedNext, AUnmodifiedNext,
-                ACommandCode, ATickCount, ALineIndexFailed));
-          end;
-      end;
-    end;
-  end;
-
-  Result:= UndoSingle(ACurList,
-    ASoftMarked, AHardMarked, AHardMarkedNext, AUnmodifiedNext,
-    ACommandCode, ATickCount, ALineIndexFailed);
 end;
 
 function TATStrings.UndoRunInserts(ACurList: TATUndoList; ALineIndex, ACount: SizeInt;
@@ -2504,7 +2490,7 @@ var
   OtherList: TATUndoList;
   ItemData: PATStringItem;
   NEventX, NEventY: SizeInt;
-  bWithoutPause, bEnableEventAfter, bEnableEventBefore, bBlockEventBefore: boolean;
+  bWithoutPause, bEnableEventAfter: boolean;
   bCurHardMarked, bCurHardMarkedNext, bCurUnmodifiedNext: boolean;
   j, N, NRunCount: SizeInt;
 begin
@@ -2563,45 +2549,9 @@ begin
     CurAttribsArray:= CurItem.ItemAttribs;
     bWithoutPause:= IsCommandToUndoInOneStep(ACommandCode);
 
-    //affect Redo list's items ACommandCode
-    CommandCode:= ACommandCode;
-
-    ACurList.Locked:= true;
-
-    bEnableEventAfter:= ASoftMarked or AHardMarked;
-
-    if Length(CurCaretsArray)>0 then
-    begin
-      NEventX:= CurCaretsArray[0].X;
-      NEventY:= CurCaretsArray[0].Y;
-    end
-    else
-    begin
-      NEventX:= -1;
-      NEventY:= -1;
-    end;
-
-    bEnableEventBefore:= (NEventY>=0) and (NEventY<>FLastUndoY);
-    FLastUndoY:= NEventY;
-
-    //fixing issue #3427, flag nnnAfter must be false if nnnBefore=false
-    if not bEnableEventBefore then
-      bEnableEventAfter:= false;
-
-    if bWithoutPause then
-    begin
-      bEnableEventBefore:= false;
-      bEnableEventAfter:= false;
-    end;
-
-    if bEnableEventBefore then
-      if Assigned(FOnUndoBefore) then
-      begin
-        bBlockEventBefore:= false;
-        FOnUndoBefore(Self, NEventX, NEventY, bBlockEventBefore);
-        if bBlockEventBefore then
-          bEnableEventAfter:= false;
-      end;
+    UndoSingle_Begin(ACurList, CurItem.ItemAction, ACommandCode,
+      ASoftMarked, AHardMarked, bWithoutPause, CurCaretsArray,
+      bEnableEventAfter, NEventX, NEventY);
 
     try
       //same as UndoSingle() for TATEditAction.Insert:
@@ -2623,15 +2573,7 @@ begin
       SetMarkersArray2(CurMarkersArray2);
       SetAttribsArray(CurAttribsArray);
     finally
-      ACurList.Locked:= false;
-      ACurList.DeleteLast;
-      ActionDeleteDupFakeLines;
-
-      if bEnableEventAfter then
-        if Assigned(FOnUndoAfter) then
-          FOnUndoAfter(Self, NEventX, NEventY);
-
-      CommandCode:= 0;
+      UndoSingle_End(ACurList, true, bEnableEventAfter, NEventX, NEventY);
     end;
 
     //same as UndoOrRedo() loop does after each UndoSingle() call
@@ -2686,55 +2628,15 @@ begin
   CurAttribsArray:= CurItem.ItemAttribs;
   bWithoutPause:= IsCommandToUndoInOneStep(ACommandCode);
 
-  CommandCode:= ACommandCode;
-  ACurList.Locked:= true;
-
-  bEnableEventAfter:= ASoftMarked or AHardMarked;
-
-  if Length(CurCaretsArray)>0 then
-  begin
-    NEventX:= CurCaretsArray[0].X;
-    NEventY:= CurCaretsArray[0].Y;
-  end
-  else
-  begin
-    NEventX:= -1;
-    NEventY:= -1;
-  end;
-
-  bEnableEventBefore:= (NEventY>=0) and (NEventY<>FLastUndoY);
-  FLastUndoY:= NEventY;
-
-  if not bEnableEventBefore then
-    bEnableEventAfter:= false;
-
-  if bWithoutPause then
-  begin
-    bEnableEventBefore:= false;
-    bEnableEventAfter:= false;
-  end;
-
-  if bEnableEventBefore then
-    if Assigned(FOnUndoBefore) then
-    begin
-      bBlockEventBefore:= false;
-      FOnUndoBefore(Self, NEventX, NEventY, bBlockEventBefore);
-      if bBlockEventBefore then
-        bEnableEventAfter:= false;
-    end;
+  UndoSingle_Begin(ACurList, CurItem.ItemAction, ACommandCode,
+    ASoftMarked, AHardMarked, bWithoutPause, CurCaretsArray,
+    bEnableEventAfter, NEventX, NEventY);
 
   try
     //no line deletion: too long line found
   finally
-    ACurList.Locked:= false;
     //no DeleteLast(): item is not undone
-    ActionDeleteDupFakeLines;
-
-    if bEnableEventAfter then
-      if Assigned(FOnUndoAfter) then
-        FOnUndoAfter(Self, NEventX, NEventY);
-
-    CommandCode:= 0;
+    UndoSingle_End(ACurList, false, bEnableEventAfter, NEventX, NEventY);
   end;
 end;
 
@@ -2764,7 +2666,7 @@ var
   Item: TATStringItem;
   PItem: PATStringItem;
   NEventX, NEventY: SizeInt;
-  bWithoutPause, bEnableEventAfter, bEnableEventBefore, bBlockEventBefore: boolean;
+  bWithoutPause, bEnableEventAfter: boolean;
   bCurHardMarked, bCurHardMarkedNext, bCurUnmodifiedNext: boolean;
   j, N: SizeInt;
 begin
@@ -2819,45 +2721,9 @@ begin
     CurAttribsArray:= CurItem.ItemAttribs;
     bWithoutPause:= IsCommandToUndoInOneStep(ACommandCode);
 
-    //affect Redo list's items ACommandCode
-    CommandCode:= ACommandCode;
-
-    ACurList.Locked:= true;
-
-    bEnableEventAfter:= ASoftMarked or AHardMarked;
-
-    if Length(CurCaretsArray)>0 then
-    begin
-      NEventX:= CurCaretsArray[0].X;
-      NEventY:= CurCaretsArray[0].Y;
-    end
-    else
-    begin
-      NEventX:= -1;
-      NEventY:= -1;
-    end;
-
-    bEnableEventBefore:= (NEventY>=0) and (NEventY<>FLastUndoY);
-    FLastUndoY:= NEventY;
-
-    //fixing issue #3427, flag nnnAfter must be false if nnnBefore=false
-    if not bEnableEventBefore then
-      bEnableEventAfter:= false;
-
-    if bWithoutPause then
-    begin
-      bEnableEventBefore:= false;
-      bEnableEventAfter:= false;
-    end;
-
-    if bEnableEventBefore then
-      if Assigned(FOnUndoBefore) then
-      begin
-        bBlockEventBefore:= false;
-        FOnUndoBefore(Self, NEventX, NEventY, bBlockEventBefore);
-        if bBlockEventBefore then
-          bEnableEventAfter:= false;
-      end;
+    UndoSingle_Begin(ACurList, CurItem.ItemAction, ACommandCode,
+      ASoftMarked, AHardMarked, bWithoutPause, CurCaretsArray,
+      bEnableEventAfter, NEventX, NEventY);
 
     try
       //same as UndoSingle() for TATEditAction.Delete:
@@ -2889,15 +2755,7 @@ begin
       SetMarkersArray2(CurMarkersArray2);
       SetAttribsArray(CurAttribsArray);
     finally
-      ACurList.Locked:= false;
-      ACurList.DeleteLast;
-      ActionDeleteDupFakeLines;
-
-      if bEnableEventAfter then
-        if Assigned(FOnUndoAfter) then
-          FOnUndoAfter(Self, NEventX, NEventY);
-
-      CommandCode:= 0;
+      UndoSingle_End(ACurList, true, bEnableEventAfter, NEventX, NEventY);
     end;
 
     //same as UndoOrRedo() loop does after each UndoSingle() call
@@ -3151,7 +3009,7 @@ begin
     if List.Count=0 then Break;
     if List.IsEmpty then Break;
 
-    if not UndoSingleSmart(
+    if not UndoSingle(
              List,
              AGrouped,
              bSoftMarked,
