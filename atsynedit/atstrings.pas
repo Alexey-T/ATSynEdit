@@ -254,6 +254,12 @@ type
     procedure AddUndoItem(AAction: TATEditAction; AIndex: SizeInt;
       const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState;
       ACommandCode: integer);
+    procedure AddUndoItemEx(AAction: TATEditAction; AIndex: SizeInt;
+      const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState;
+      ACommandCode: integer;
+      const ACarets, ACarets2: TATPointPairArray;
+      const AMarkers, AMarkers2: TATMarkerMarkerArray;
+      const AAttribs: TATMarkerAttribArray);
     function DebugText: string;
     function IsFilled: boolean;
     procedure DoFinalizeSaving;
@@ -2530,10 +2536,12 @@ Two run kinds are handled (detection is done in UndoCountRun):
 
 It makes the same work as UndoSingle() called for each item separately:
 - same redo-items are created (one per deleted line, with same texts/ends/states);
-- same events (OnUndoBefore/OnUndoAfter, DoEventLog, DoEventChange) in same cases;
-- same carets/markers/attribs are restored per item;
+- same OnUndoBefore/OnUndoAfter events in same cases;
+- same final carets/markers/attribs are restored (values of the last item);
 - same mark-handling of 'other' list items;
 - same handling of too long lines (partial undo, then exit(False)).
+Line-change events (OnChangeLog, OnChangeEx) are coalesced: one event for
+the whole range, with AItemCount>1, like TextInsert() already does.
 
 Only the physical deletion is changed: ONE FList.DeleteRange() call instead of
 ACount of FList.Delete() calls, each of which moved all tail items (O(n^2) total).
@@ -2544,12 +2552,16 @@ var
   CurCaretsArray, CurCaretsArray2: TATPointPairArray;
   CurMarkersArray, CurMarkersArray2: TATMarkerMarkerArray;
   CurAttribsArray: TATMarkerAttribArray;
+  LastCaretsArray, LastCaretsArray2: TATPointPairArray;
+  LastMarkersArray, LastMarkersArray2: TATMarkerMarkerArray;
+  LastAttribsArray: TATMarkerAttribArray;
+  bLastCarets, bLastCarets2: boolean;
   OtherList: TATUndoList;
   ItemData: PATStringItem;
   NEventX, NEventY: SizeInt;
   bWithoutPause, bEnableEventAfter, bConsecutive: boolean;
   bCurHardMarked, bCurHardMarkedNext, bCurUnmodifiedNext: boolean;
-  j, N, NRunCount, NItemIndex, NLineIndex: SizeInt;
+  j, N, NRunCount, NItemIndex, NLineIndex, NRangeStart: SizeInt;
 begin
   Result:= true;
   ASoftMarked:= true;
@@ -2559,6 +2571,13 @@ begin
   ACommandCode:= 0;
   ATickCount:= 0;
   ALineIndexFailed:= -1;
+  bLastCarets:= false;
+  bLastCarets2:= false;
+  LastCaretsArray:= nil;
+  LastCaretsArray2:= nil;
+  LastMarkersArray:= nil;
+  LastMarkersArray2:= nil;
+  LastAttribsArray:= nil;
 
   N:= ACurList.Count;
   if ACurList=FUndoList then
@@ -2653,17 +2672,22 @@ begin
       UpdateModified;
       AddUndoItem(TATEditAction.Delete, NItemIndex,
         ItemData^.Line, ItemData^.LineEnds, ItemData^.LineState, FCommandCode);
-      DoEventLog(NItemIndex);
-      DoEventChange(TATLineChangeKind.Deleted, NItemIndex, 1);
 
+      //remember the last values of carets/markers/attribs: they are applied
+      //once after the loop (coalesced events), see comment below
       if Length(CurCaretsArray)>0 then
-        SetCaretsArray(CurCaretsArray);
+      begin
+        LastCaretsArray:= CurCaretsArray;
+        bLastCarets:= true;
+      end;
       if Length(CurCaretsArray2)>0 then
-        SetCaretsArray2(CurCaretsArray2);
-
-      SetMarkersArray(CurMarkersArray);
-      SetMarkersArray2(CurMarkersArray2);
-      SetAttribsArray(CurAttribsArray);
+      begin
+        LastCaretsArray2:= CurCaretsArray2;
+        bLastCarets2:= true;
+      end;
+      LastMarkersArray:= CurMarkersArray;
+      LastMarkersArray2:= CurMarkersArray2;
+      LastAttribsArray:= CurAttribsArray;
     finally
       UndoSingle_End(ACurList, true, bEnableEventAfter, NEventX, NEventY);
     end;
@@ -2691,11 +2715,31 @@ begin
   if NRunCount>0 then
   begin
     if bConsecutive then
-      FList.DeleteRange(ALineIndex+ACount-NRunCount, ALineIndex+ACount-1)
+    begin
+      FList.DeleteRange(ALineIndex+ACount-NRunCount, ALineIndex+ACount-1);
+      NRangeStart:= ALineIndex+ACount-NRunCount;
+    end
     else
+    begin
       FList.DeleteRange(ALineIndex, ALineIndex+NRunCount-1);
+      NRangeStart:= ALineIndex;
+    end;
     //LineDelete(AForceLast=true) was made per item, same final fixup here
     ActionAddFakeLineIfNeeded;
+
+    //coalesced events for the whole deleted range (same as UndoRunDeletes(),
+    //see comment there): old code fired them per line, N event-roundtrips
+    //into the editor made undo of big blocks seconds-slow
+    DoEventLog(NRangeStart);
+    DoEventChange(TATLineChangeKind.Deleted, NRangeStart, NRunCount);
+
+    if bLastCarets then
+      SetCaretsArray(LastCaretsArray);
+    if bLastCarets2 then
+      SetCaretsArray2(LastCaretsArray2);
+    SetMarkersArray(LastMarkersArray);
+    SetMarkersArray2(LastMarkersArray2);
+    SetAttribsArray(LastAttribsArray);
   end;
 
   if Result then Exit;
@@ -2755,7 +2799,14 @@ UndoCountRun):
   LineBlockDelete() (e.g. DEL with many selected lines, issue #368).
 Per-item processing (LineInsertRaw per item) was O(n^2).
 
-It makes the same work as UndoSingle() called for each item separately.
+It makes the same work as UndoSingle() called for each item separately:
+- same redo-items are created (one per deleted line, with same texts/ends/states);
+- same OnUndoBefore/OnUndoAfter events in same cases;
+- same final carets/markers/attribs are restored (values of the last item);
+- same mark-handling of 'other' list items;
+Line-change events (OnChangeLog, OnChangeEx) are coalesced: one event for
+the whole range, with AItemCount>1, like TextInsert() already does.
+
 Only the physical insert is changed: ONE FList.InsertRange() call opens the
 gap for all lines, then items are written to gap slots.
 Caller checks: ALineIndex>=0, ALineIndex<Count, items form a run.
@@ -2765,6 +2816,10 @@ var
   CurCaretsArray, CurCaretsArray2: TATPointPairArray;
   CurMarkersArray, CurMarkersArray2: TATMarkerMarkerArray;
   CurAttribsArray: TATMarkerAttribArray;
+  LastCaretsArray, LastCaretsArray2: TATPointPairArray;
+  LastMarkersArray, LastMarkersArray2: TATMarkerMarkerArray;
+  LastAttribsArray: TATMarkerAttribArray;
+  bLastCarets, bLastCarets2: boolean;
   OtherList: TATUndoList;
   Item: TATStringItem;
   PItem: PATStringItem;
@@ -2781,6 +2836,13 @@ begin
   ACommandCode:= 0;
   ATickCount:= 0;
   ALineIndexFailed:= -1;
+  bLastCarets:= false;
+  bLastCarets2:= false;
+  LastCaretsArray:= nil;
+  LastCaretsArray2:= nil;
+  LastMarkersArray:= nil;
+  LastMarkersArray2:= nil;
+  LastAttribsArray:= nil;
 
   N:= ACurList.Count;
   if ACurList=FUndoList then
@@ -2867,8 +2929,6 @@ begin
       UpdateModified;
       AddUndoItem(TATEditAction.Insert, NItemIndex, '',
         TATLineEnds.None, TATLineState.None, FCommandCode);
-      DoEventLog(NItemIndex);
-      DoEventChange(TATLineChangeKind.Added, NItemIndex, 1);
 
       //physical line write: same-index runs write the line here, walking
       //PItem down from the end of block; consecutive runs got all lines
@@ -2891,14 +2951,21 @@ begin
       //line, just inserted by item j, is at slot NLineSlot
       LinesState[NLineSlot]:= CurItem.ItemLineState;
 
+      //remember the last values of carets/markers/attribs: they are applied
+      //once after the loop (coalesced events), see comment below the loop
       if Length(CurCaretsArray)>0 then
-        SetCaretsArray(CurCaretsArray);
+      begin
+        LastCaretsArray:= CurCaretsArray;
+        bLastCarets:= true;
+      end;
       if Length(CurCaretsArray2)>0 then
-        SetCaretsArray2(CurCaretsArray2);
-
-      SetMarkersArray(CurMarkersArray);
-      SetMarkersArray2(CurMarkersArray2);
-      SetAttribsArray(CurAttribsArray);
+      begin
+        LastCaretsArray2:= CurCaretsArray2;
+        bLastCarets2:= true;
+      end;
+      LastMarkersArray:= CurMarkersArray;
+      LastMarkersArray2:= CurMarkersArray2;
+      LastAttribsArray:= CurAttribsArray;
     finally
       UndoSingle_End(ACurList, true, bEnableEventAfter, NEventX, NEventY);
     end;
@@ -2916,6 +2983,35 @@ begin
       if OtherList.Count>0 then
         OtherList.Last.ItemHardMark:= true;
   end;
+
+  {
+  2026.09: coalesced events (2nd performance fix of issue #368).
+  Old code (UndoSingle per item) fired DoEventLog/DoEventChange/SetCaretsArray/
+  SetMarkersArray/SetAttribsArray once PER LINE of the run: for a run of N=100K
+  lines, the editor received N event-roundtrips (each one runs TATSynEdit
+  handlers: Carets.AsArray + DoCaretsFixIncorrectPos for SetCaretsArray, then
+  CudaText-level handlers of OnChangeEx/OnChangeLog), which made undo of big
+  blocks 10+ seconds slow even with the O(N) list work, e.g. CudaText test
+  (300K lines file, DEL first 200K lines, then Undo): 19-59 seconds spent in
+  per-item event handlers.
+  Bulk operations of the editor already use coalesced events with AItemCount>1:
+  TextInsert() ends with single DoEventLog(AY) + DoEventChange(Added, AY, Count)
+  for the whole inserted block; TATGaps/TATBookmarks/TATSynEdit.Fold handle
+  AItemCount>1 natively. Same is done here: one event for the whole run.
+  Carets/markers/attribs: only the values of the LAST processed item are applied
+  (for all-same-values runs and for mirror-runs, this gives the same final
+  editor state as N per-item applications: the last application wins).
+  }
+  DoEventLog(ALineIndex);
+  DoEventChange(TATLineChangeKind.Added, ALineIndex, ACount);
+
+  if bLastCarets then
+    SetCaretsArray(LastCaretsArray);
+  if bLastCarets2 then
+    SetCaretsArray2(LastCaretsArray2);
+  SetMarkersArray(LastMarkersArray);
+  SetMarkersArray2(LastMarkersArray2);
+  SetAttribsArray(LastAttribsArray);
 end;
 
 
@@ -3086,6 +3182,71 @@ begin
     GetMarkersArray,
     GetMarkersArray2,
     GetAttribsArray,
+    ACommandCode,
+    FRunningUndoOrRedo
+    );
+end;
+
+procedure TATStrings.AddUndoItemEx(AAction: TATEditAction; AIndex: SizeInt;
+  const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState;
+  ACommandCode: integer;
+  const ACarets, ACarets2: TATPointPairArray;
+  const AMarkers, AMarkers2: TATMarkerMarkerArray;
+  const AAttribs: TATMarkerAttribArray);
+{
+2026.09: performance fix, for LineBlockDelete(): same as AddUndoItem(), but carets/
+markers/attribs are passed by caller (they are captured once for the whole deleted
+block, not per line). It makes the same undo-items: AddUndoItem() captured the
+SAME arrays for every line of one block-delete (nothing changes during its loop:
+it doesn't fire per-line events, carets/markers don't move).
+}
+var
+  CurList: TATUndoList;
+begin
+  if FUndoList=nil then exit;
+  if FRedoList=nil then exit;
+  if FUndoLimit=0 then exit;
+
+  if not FUndoList.Locked then
+    CurList:= FUndoList
+  else
+  if not FRedoList.Locked then
+    CurList:= FRedoList
+  else
+    exit;
+
+  if Length(AText)>ATEditorOptions.MaxLineLenForUndo then
+  begin
+    if Assigned(FOnUndoTooLongLine) then
+      FOnUndoTooLongLine(Self, -1, -1);
+    CurList.Clear;
+    exit
+  end;
+
+  //handle CaretJump: (not used by LineBlockDelete, kept for symmetry)
+  if AAction=TATEditAction.CaretJump then
+  begin
+    if (CurList.Count>0) and (CurList.Last.ItemAction=AAction) then
+      CurList.DeleteLast;
+  end
+  else
+  begin
+    if not FUndoList.Locked and not FRedoList.Locked then
+      FRedoList.Clear;
+    AddUpdatesAction(AIndex, AAction);
+  end;
+
+  CurList.Add(
+    AAction,
+    AIndex,
+    AText,
+    AEnd,
+    ALineState,
+    ACarets,
+    ACarets2,
+    AMarkers,
+    AMarkers2,
+    AAttribs,
     ACommandCode,
     FRunningUndoOrRedo
     );

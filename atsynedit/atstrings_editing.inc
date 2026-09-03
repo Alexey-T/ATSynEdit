@@ -620,6 +620,9 @@ var
   NCount, i: SizeInt;
   bFast: boolean;
   Item: PATStringItem;
+  CurCarets, CurCarets2: TATPointPairArray;
+  CurMarkers, CurMarkers2: TATMarkerMarkerArray;
+  CurAttribs: TATMarkerAttribArray;
   //CurUndoList: TATUndoList;
   //NNeedUndoCapacity: integer;
 begin
@@ -664,6 +667,11 @@ begin
   original index, text/ends/state), reading them from the intact list,
   then removes all lines with a single FList.DeleteRange() - one memory-move
   of the lines below the block.
+  Carets/markers/attribs are captured once for the whole block, and passed to
+  AddUndoItemEx() per line: old code captured the same values per line (loop
+  fires no events, so editor state doesn't change in it), but each capture was
+  3 event-callbacks into the editor (OnGetCaretsArray allocates an array in
+  TATSynEdit.GetCaretsArray), which dominated the delete time of big blocks.
   Undo/redo results are identical: per-item undo of these items
   (LineInsertRaw at each item's index) is unchanged, and such runs of
   consecutive-index items are optimized too (see UndoCountRun/UndoRun*
@@ -672,13 +680,31 @@ begin
   bFast:= (ALine2-ALine1>0) and (ALine1>=0) and (not FReadOnly);
 
   if bFast then
+  begin
+    //capture once for all undo-items of the block (same values as per-line capture)
+    if FEnabledCaretsInUndo then
+    begin
+      CurCarets:= GetCaretsArray;
+      CurCarets2:= GetCaretsArray2;
+    end
+    else
+    begin
+      CurCarets:= nil;
+      CurCarets2:= nil;
+    end;
+    CurMarkers:= GetMarkersArray;
+    CurMarkers2:= GetMarkersArray2;
+    CurAttribs:= GetAttribsArray;
+
     for i:= ALine2 downto ALine1 do
     begin
       Item:= FList.GetItem(i);
       UpdateModified;
-      AddUndoItem(TATEditAction.Delete, i,
-        Item^.Line, Item^.LineEnds, Item^.LineState, FCommandCode);
+      AddUndoItemEx(TATEditAction.Delete, i,
+        Item^.Line, Item^.LineEnds, Item^.LineState, FCommandCode,
+        CurCarets, CurCarets2, CurMarkers, CurMarkers2, CurAttribs);
     end;
+  end;
   if bFast then
     FList.DeleteRange(ALine1, ALine2)
   else
