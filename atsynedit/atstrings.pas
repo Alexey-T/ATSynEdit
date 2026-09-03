@@ -316,7 +316,8 @@ type
       out ACommandCode: integer;
       out ATickCount: QWord;
       out ALineIndexFailed: integer): boolean;
-    function UndoCountRun(ACurList: TATUndoList; AAction: TATEditAction; ALineIndex: SizeInt): SizeInt;
+    function UndoCountRun(ACurList: TATUndoList; AAction: TATEditAction; ALineIndex: SizeInt;
+      out AIndexMin: SizeInt): SizeInt;
     function UndoRunInserts(ACurList: TATUndoList; ALineIndex, ACount: SizeInt;
       out ASoftMarked, AHardMarked, AHardMarkedNext, AUnmodifiedNext: boolean;
       out ACommandCode: integer;
@@ -2200,7 +2201,7 @@ var
   CurIndex: SizeInt;
   CurText: atString;
   OtherList: TATUndoList;
-  NCurCount, NStringsCount: SizeInt;
+  NCurCount, NStringsCount, NIndexMin: SizeInt;
   NEventX, NEventY: SizeInt;
   bWithoutPause,
   bEnableEventAfter: boolean;
@@ -2225,12 +2226,15 @@ begin
        (CurItem.ItemIndex<Count) then
     begin
       CurIndex:= CurItem.ItemIndex;
-      NCurCount:= UndoCountRun(ACurList, CurItem.ItemAction, CurIndex);
+      NCurCount:= UndoCountRun(ACurList, CurItem.ItemAction, CurIndex, NIndexMin);
       if NCurCount>=ATStrings_MinUndoRunCount then
         case CurItem.ItemAction of
           TATEditAction.Insert:
-            if CurIndex+NCurCount<=Count then
-              Exit(UndoRunInserts(ACurList, CurIndex, NCurCount,
+            //range of lines, which the run deletes, is NIndexMin..NIndexMin+NCurCount-1,
+            //it must exist in the list (for same-index runs NIndexMin=CurIndex,
+            //for consecutive-index runs NIndexMin is the minimal index of run)
+            if NIndexMin+NCurCount<=Count then
+              Exit(UndoRunInserts(ACurList, NIndexMin, NCurCount,
                 ASoftMarked, AHardMarked, AHardMarkedNext, AUnmodifiedNext,
                 ACommandCode, ATickCount, ALineIndexFailed));
           TATEditAction.Delete:
@@ -2437,28 +2441,76 @@ begin
 end;
 
 function TATStrings.UndoCountRun(ACurList: TATUndoList; AAction: TATEditAction;
-  ALineIndex: SizeInt): SizeInt;
+  ALineIndex: SizeInt; out AIndexMin: SizeInt): SizeInt;
 {
 2026.09: performance fix. Counts trailing undo-items in ACurList, which make a "run":
-all items have same action and same line index. Run ends at item with SoftMark:
-that item is undone last, and UndoOrRedo() loop breaks after it,
-so it's included in the run.
+all items have same action, and their line indexes make one of these patterns
+(index of item N-1, which is processed first, is ALineIndex):
+- same index for all items: runs are made by LineBlockInsert()
+  (ed.replace_lines) and by UndoRunInserts();
+- consecutive indexes: for Delete-runs, popped indexes grow by 1
+  (LineBlockDelete pushes items from ALine2 downto ALine1, so they pop
+  in increasing order ALine1, ALine1+1, ...); for Insert-runs, popped
+  indexes decrease by 1 (mirror items re-created on undo of a
+  LineBlockDelete run). Other patterns are not optimized, so classic
+  per-item undo handles them.
+AIndexMin gets the minimal line index of the run: it's the start index of
+the line-range, which the whole run deletes/inserts.
+Run ends at item with SoftMark: that item is undone last, and UndoOrRedo()
+loop breaks after it, so it's included in the run.
 }
 var
   Item: TATUndoItem;
   N: SizeInt;
+  NIndex: SizeInt;
+  bStepKnown: boolean;
+  NStep: SizeInt;
 begin
   Result:= 0;
+  AIndexMin:= ALineIndex;
+  NStep:= 0;
+  bStepKnown:= false;
   N:= ACurList.Count;
   while Result<N do
   begin
     Item:= ACurList.Items[N-1-Result];
     if Item=nil then Break;
     if Item.ItemAction<>AAction then Break;
-    if Item.ItemIndex<>ALineIndex then Break;
+
+    if Result=0 then
+      NIndex:= Item.ItemIndex
+    else
+    if bStepKnown then
+    begin
+      //continue the detected pattern
+      Inc(NIndex, NStep);
+      if Item.ItemIndex<>NIndex then Break;
+    end
+    else
+    begin
+      //2nd item of the run detects the pattern: same index, or +1, or -1
+      if Item.ItemIndex=NIndex then
+        NStep:= 0
+      else
+      if (AAction=TATEditAction.Delete) and (Item.ItemIndex=NIndex+1) then
+        NStep:= 1
+      else
+      if (AAction=TATEditAction.Insert) and (Item.ItemIndex=NIndex-1) then
+        NStep:= -1
+      else
+        Break;
+      bStepKnown:= true;
+      NIndex:= Item.ItemIndex;
+    end;
+
     Inc(Result);
     if Item.ItemSoftMark then Break;
   end;
+
+  if NStep<0 then
+    AIndexMin:= ALineIndex-Result+1
+  else
+    AIndexMin:= ALineIndex;
 end;
 
 function TATStrings.UndoRunInserts(ACurList: TATUndoList; ALineIndex, ACount: SizeInt;
@@ -2468,8 +2520,13 @@ function TATStrings.UndoRunInserts(ACurList: TATUndoList; ALineIndex, ACount: Si
   out ALineIndexFailed: integer): boolean;
 {
 2026.09: performance fix. Undo/redo of a run of ACount undo-items: all are
-TATEditAction.Insert with same ItemIndex=ALineIndex. Such runs are created by
-LineBlockInsert() (called from TextReplaceLines_UTF8, CudaText's ed.replace_lines).
+TATEditAction.Insert, ALineIndex is the minimal ItemIndex of the run.
+Two run kinds are handled (detection is done in UndoCountRun):
+- same ItemIndex for all items: runs are created by LineBlockInsert()
+  (called from TextReplaceLines_UTF8, CudaText's ed.replace_lines);
+- consecutive ItemIndex, popped indexes decrease by 1: mirror items,
+  which LineInsertRaw() re-creates on undo of a LineBlockDelete() run
+  (e.g. redo of DEL with many selected lines, issue #368).
 
 It makes the same work as UndoSingle() called for each item separately:
 - same redo-items are created (one per deleted line, with same texts/ends/states);
@@ -2490,9 +2547,9 @@ var
   OtherList: TATUndoList;
   ItemData: PATStringItem;
   NEventX, NEventY: SizeInt;
-  bWithoutPause, bEnableEventAfter: boolean;
+  bWithoutPause, bEnableEventAfter, bConsecutive: boolean;
   bCurHardMarked, bCurHardMarkedNext, bCurUnmodifiedNext: boolean;
-  j, N, NRunCount: SizeInt;
+  j, N, NRunCount, NItemIndex, NLineIndex: SizeInt;
 begin
   Result:= true;
   ASoftMarked:= true;
@@ -2509,18 +2566,36 @@ begin
   else
     OtherList:= FUndoList;
 
+  //detect the run kind: for same-index runs, the top item's index is ALineIndex;
+  //for consecutive runs, popped indexes decrease by 1, so the top item's index
+  //is ALineIndex+ACount-1 (ACount>=2 is guaranteed by ATStrings_MinUndoRunCount)
+  bConsecutive:= (ACount>=2) and (ACurList.Items[N-1].ItemIndex>ALineIndex);
+
   //pre-scan for too long lines: same check as UndoSingle() does per item.
-  //UndoSingle() for j-th item checks line at index ALineIndex, and lines
-  //0..j-1 are already deleted in it, so it checks line ALineIndex+j here
+  //UndoSingle() checks LinesLen[CurIndex] of each item; for same-index runs,
+  //lines 0..j-1 are already deleted in it, so j-th item checks line ALineIndex+j
+  //here; for consecutive runs, item's line is not shifted by previous deletes
+  //(they are above), so it checks line of item's own index
   NRunCount:= ACount;
   for j:= 0 to ACount-1 do
-    if LinesLen[ALineIndex+j] > ATEditorOptions.MaxLineLenForUndo then
+  begin
+    if bConsecutive then
+      NLineIndex:= ALineIndex+ACount-1-j
+    else
+      NLineIndex:= ALineIndex+j;
+    if LinesLen[NLineIndex] > ATEditorOptions.MaxLineLenForUndo then
     begin
       NRunCount:= j; //only items 0..j-1 are undone, item j will fail
-      ALineIndexFailed:= ALineIndex; //same value which UndoSingle() reports
+      //same value which UndoSingle() reports: CurIndex of failing item,
+      //it equals ALineIndex for same-index runs, item's index for consecutive
+      if bConsecutive then
+        ALineIndexFailed:= NLineIndex
+      else
+        ALineIndexFailed:= ALineIndex;
       Result:= false;
       Break;
     end;
+  end;
 
   for j:= 0 to NRunCount-1 do
   begin
@@ -2556,13 +2631,30 @@ begin
     try
       //same as UndoSingle() for TATEditAction.Insert:
       //  LineDelete(ALineIndex, AForceLast=true)
-      //but physical deletion is deferred to single DeleteRange() below
-      ItemData:= FList.GetItem(ALineIndex+j);
+      //but physical deletion is deferred to single DeleteRange() below.
+      //NItemIndex: index of undo-item re-created for 'other' list, and index
+      //for events: it's the item's CurIndex. NLineIndex: index of line, which
+      //is deleted by this item (and its text/ends are re-created) - for
+      //same-index runs, j-th item deletes line ALineIndex+j (previous lines
+      //are already deleted, so line 'slides' to ALineIndex); for consecutive
+      //runs, j-th item deletes line of its own index (previous deletes are
+      //above it, so it doesn't move)
+      if bConsecutive then
+      begin
+        NItemIndex:= ALineIndex+ACount-1-j;
+        NLineIndex:= NItemIndex;
+      end
+      else
+      begin
+        NItemIndex:= ALineIndex;
+        NLineIndex:= ALineIndex+j;
+      end;
+      ItemData:= FList.GetItem(NLineIndex);
       UpdateModified;
-      AddUndoItem(TATEditAction.Delete, ALineIndex,
+      AddUndoItem(TATEditAction.Delete, NItemIndex,
         ItemData^.Line, ItemData^.LineEnds, ItemData^.LineState, FCommandCode);
-      DoEventLog(ALineIndex);
-      DoEventChange(TATLineChangeKind.Deleted, ALineIndex, 1);
+      DoEventLog(NItemIndex);
+      DoEventChange(TATLineChangeKind.Deleted, NItemIndex, 1);
 
       if Length(CurCaretsArray)>0 then
         SetCaretsArray(CurCaretsArray);
@@ -2591,11 +2683,17 @@ begin
   end;
 
   //physical deletion of all undone lines, in one operation;
-  //same result as per-item LineDelete() calls: they deleted lines
-  //ALineIndex..ALineIndex+NRunCount-1 one by one
+  //same result as per-item LineDelete() calls. For same-index runs, items
+  //0..NRunCount-1 deleted lines ALineIndex..ALineIndex+NRunCount-1; for
+  //consecutive runs, item j deletes line of index ALineIndex+ACount-1-j,
+  //so items 0..NRunCount-1 deleted lines ALineIndex+ACount-NRunCount..
+  //ALineIndex+ACount-1 (top part of the range; full range when no failure)
   if NRunCount>0 then
   begin
-    FList.DeleteRange(ALineIndex, ALineIndex+NRunCount-1);
+    if bConsecutive then
+      FList.DeleteRange(ALineIndex+ACount-NRunCount, ALineIndex+ACount-1)
+    else
+      FList.DeleteRange(ALineIndex, ALineIndex+NRunCount-1);
     //LineDelete(AForceLast=true) was made per item, same final fixup here
     ActionAddFakeLineIfNeeded;
   end;
@@ -2647,10 +2745,15 @@ function TATStrings.UndoRunDeletes(ACurList: TATUndoList; ALineIndex, ACount: Si
   out ALineIndexFailed: integer): boolean;
 {
 2026.09: performance fix. Undo/redo of a run of ACount undo-items: all are
-TATEditAction.Delete with same ItemIndex=ALineIndex. Such runs are created in
-the 'other' undo-list by UndoRunInserts() (one Delete-item per restored line),
-so Redo of ed.replace_lines re-inserts all lines here. Per-item processing
-(lineInsertRaw at same index) was O(n^2).
+TATEditAction.Delete, ALineIndex is the index of the first processed item
+(top item of the run). Two run kinds are handled (detection is done in
+UndoCountRun):
+- same ItemIndex for all items: runs are created in the 'other' undo-list by
+  UndoRunInserts() (one Delete-item per restored line), so Redo of
+  ed.replace_lines re-inserts all lines here;
+- consecutive ItemIndex, popped indexes grow by 1: runs are created by
+  LineBlockDelete() (e.g. DEL with many selected lines, issue #368).
+Per-item processing (LineInsertRaw per item) was O(n^2).
 
 It makes the same work as UndoSingle() called for each item separately.
 Only the physical insert is changed: ONE FList.InsertRange() call opens the
@@ -2666,9 +2769,9 @@ var
   Item: TATStringItem;
   PItem: PATStringItem;
   NEventX, NEventY: SizeInt;
-  bWithoutPause, bEnableEventAfter: boolean;
+  bWithoutPause, bEnableEventAfter, bForwardFill: boolean;
   bCurHardMarked, bCurHardMarkedNext, bCurUnmodifiedNext: boolean;
-  j, N: SizeInt;
+  j, N, NItemIndex, NLineSlot: SizeInt;
 begin
   Result:= true;
   ASoftMarked:= true;
@@ -2685,14 +2788,41 @@ begin
   else
     OtherList:= FUndoList;
 
+  //detect the run kind: for same-index runs, the 2nd processed item (list
+  //index N-2) has index ALineIndex; for consecutive runs, popped indexes
+  //grow by 1, so it has index ALineIndex+1 (ACount>=2 is guaranteed by
+  //ATStrings_MinUndoRunCount)
+  bForwardFill:= (ACount>=2) and (ACurList.Items[N-2].ItemIndex=ALineIndex+1);
+
   //open the gap for all lines at ALineIndex, in one operation;
   //gap slots are zeroed, same as single Insert() zeroes its slot
   FList.InsertRange(ALineIndex, ACount);
 
-  //item processed first (j=0, list index N-1) inserts its line at the END of
-  //block (in per-item processing it was inserted at ALineIndex, and next items
-  //pushed it down), so slot for j-th processed item is ALineIndex+ACount-1-j
-  PItem:= FList.GetItem(ALineIndex+ACount-1);
+  //slot, where j-th processed item (list index N-1-j) inserts its line:
+  //- same-index runs: per-item processing inserted each line at ALineIndex,
+  //  and next items pushed it down, so slot for j-th item is
+  //  ALineIndex+ACount-1-j (fill from the end of block);
+  //- consecutive runs: per-item processing inserted j-th line at its own
+  //  index ALineIndex+j, so slot for j-th item is ALineIndex+j (fill forward).
+  //For consecutive runs we must fill ALL slots here, BEFORE the per-item loop
+  //below: that loop calls ActionDeleteDupFakeLines per item (in UndoSingle_End),
+  //and it must see fully-filled lines - with zeroed (empty) slots near the end
+  //of list, it would wrongly delete them as 'unneeded fake lines'
+  if bForwardFill then
+  begin
+    for j:= 0 to ACount-1 do
+    begin
+      CurItem:= ACurList.Items[N-1-j];
+      //raw copy of record, like FList.Insert() does with CopyItem();
+      //ownership of Item.Buf is transferred to list item, zero local record
+      Item.Init(CurItem.ItemText, CurItem.ItemEnd);
+      PItem:= FList.GetItem(ALineIndex+j);
+      System.Move(Item, PItem^, SizeOf(Item));
+      FillChar(Item, SizeOf(Item), 0);
+    end;
+  end
+  else
+    PItem:= FList.GetItem(ALineIndex+ACount-1);
 
   for j:= 0 to ACount-1 do
   begin
@@ -2727,24 +2857,39 @@ begin
 
     try
       //same as UndoSingle() for TATEditAction.Delete:
-      //  LineInsertRaw(ALineIndex, CurItem.ItemText, CurItem.ItemEnd)
+      //  LineInsertRaw(NItemIndex, CurItem.ItemText, CurItem.ItemEnd)
+      //NItemIndex is the item's own index: ALineIndex for same-index runs,
+      //ALineIndex+j for consecutive runs
+      if bForwardFill then
+        NItemIndex:= ALineIndex+j
+      else
+        NItemIndex:= ALineIndex;
       UpdateModified;
-      AddUndoItem(TATEditAction.Insert, ALineIndex, '',
+      AddUndoItem(TATEditAction.Insert, NItemIndex, '',
         TATLineEnds.None, TATLineState.None, FCommandCode);
-      DoEventLog(ALineIndex);
-      DoEventChange(TATLineChangeKind.Added, ALineIndex, 1);
+      DoEventLog(NItemIndex);
+      DoEventChange(TATLineChangeKind.Added, NItemIndex, 1);
 
-      //raw copy of record, like FList.Insert() does with CopyItem();
-      //ownership of Item.Buf is transferred to list item, zero local record
-      Item.Init(CurItem.ItemText, CurItem.ItemEnd);
-      System.Move(Item, PItem^, SizeOf(Item));
-      FillChar(Item, SizeOf(Item), 0);
-      Dec(PItem);
+      //physical line write: same-index runs write the line here, walking
+      //PItem down from the end of block; consecutive runs got all lines
+      //written above (fill forward), before this per-item loop
+      if bForwardFill then
+        NLineSlot:= ALineIndex+j
+      else
+      begin
+        //raw copy of record, like FList.Insert() does with CopyItem();
+        //ownership of Item.Buf is transferred to list item, zero local record
+        Item.Init(CurItem.ItemText, CurItem.ItemEnd);
+        System.Move(Item, PItem^, SizeOf(Item));
+        FillChar(Item, SizeOf(Item), 0);
+        Dec(PItem);
+        NLineSlot:= ALineIndex+ACount-1-j;
+      end;
 
-      //same as UndoSingle(): if IsIndexValid(ALineIndex) then
-      //  LinesState[ALineIndex]:= CurItem.ItemLineState
-      //line, just inserted by item j, is at slot ALineIndex+ACount-1-j
-      LinesState[ALineIndex+ACount-1-j]:= CurItem.ItemLineState;
+      //same as UndoSingle(): if IsIndexValid(NItemIndex) then
+      //  LinesState[NItemIndex]:= CurItem.ItemLineState
+      //line, just inserted by item j, is at slot NLineSlot
+      LinesState[NLineSlot]:= CurItem.ItemLineState;
 
       if Length(CurCaretsArray)>0 then
         SetCaretsArray(CurCaretsArray);

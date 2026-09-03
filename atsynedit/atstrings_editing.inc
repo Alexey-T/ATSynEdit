@@ -618,6 +618,8 @@ end;
 procedure TATStrings.LineBlockDelete(ALine1, ALine2: SizeInt; AForceLast: boolean = true);
 var
   NCount, i: SizeInt;
+  bFast: boolean;
+  Item: PATStringItem;
   //CurUndoList: TATUndoList;
   //NNeedUndoCapacity: integer;
 begin
@@ -651,13 +653,42 @@ begin
     TATBlockChangeKind.DeleteLines,
     nil);
 
-  //delete slowly with undo; yes, we do it for any count of deleted lines
-  for i:= ALine2 downto ALine1 do
-    LineDelete(i,
-      false{AForceLast},
-      false{WithEvent},
-      true{AWithUndo}
-      );
+  {
+  2026.09: optimized delete of big block (issue #368).
+  Old code called LineDelete() per line: each one called FList.Delete(i),
+  which moved all lines below the block down - O(N_block * N_below)
+  list-moves (slow when the deleted block ends far above the last line,
+  e.g. deleting the first half of a 300K-lines file).
+  New code creates the SAME undo-items, which old code made (action Delete,
+  one per line, pushed in same order ALine2..ALine1, each with its own
+  original index, text/ends/state), reading them from the intact list,
+  then removes all lines with a single FList.DeleteRange() - one memory-move
+  of the lines below the block.
+  Undo/redo results are identical: per-item undo of these items
+  (LineInsertRaw at each item's index) is unchanged, and such runs of
+  consecutive-index items are optimized too (see UndoCountRun/UndoRun*
+  comments in atstrings.pas).
+  }
+  bFast:= (ALine2-ALine1>0) and (ALine1>=0) and (not FReadOnly);
+
+  if bFast then
+    for i:= ALine2 downto ALine1 do
+    begin
+      Item:= FList.GetItem(i);
+      UpdateModified;
+      AddUndoItem(TATEditAction.Delete, i,
+        Item^.Line, Item^.LineEnds, Item^.LineState, FCommandCode);
+    end;
+  if bFast then
+    FList.DeleteRange(ALine1, ALine2)
+  else
+    //delete slowly with undo; yes, we do it for any count of deleted lines
+    for i:= ALine2 downto ALine1 do
+      LineDelete(i,
+        false{AForceLast},
+        false{WithEvent},
+        true{AWithUndo}
+        );
 
   (*
   if (ALine2-ALine1)<FUndoList.MaxCount then
