@@ -47,6 +47,12 @@ var
   ATStrings_PauseForUndoGroup: integer = 700;
   //if pause (in msec) between 2 actions is smaller, actions will be undone as a group
 
+const
+  ATStrings_MinUndoRunCount = 25;
+  //2026.09: performance fix. Minimum count of undo-items, which are undone in one
+  //bulk operation (UndoRun* functions). Runs of smaller size are undone with
+  //usual per-item code, to keep old behavior for typical small edits.
+
 type
   { TATUndoItem }
 
