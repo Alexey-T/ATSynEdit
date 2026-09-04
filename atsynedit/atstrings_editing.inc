@@ -310,6 +310,20 @@ begin
   //----------------------
   //Insert multi-line text
 
+  {
+  2026.09: multi-line TextInsert (paste) is not handled by the incremental
+  WrapInfo update (WrapStruct tracking is marked "complex", so next
+  UpdateWrapInfo() fully recalculates): TextInsert combines several line
+  mutations, and its coalesced event (Added, AY, AShift.Y) is fired after the
+  mutations, while WrapStructRecord() must know structural ops before the
+  physical line moves, to shift edited-line indexes correctly. Paste worked
+  with full WrapInfo recalculation before 2026.09 too (any Insert action
+  disabled the cached update), so this is not a regression.
+  Block-insertions of replace_lines (LineBlockInsert) and undo/redo runs are
+  handled incrementally.
+  }
+  WrapStructInvalidate;
+
   Block:= TATStrings.Create(0); //set UndoLimit=0 to avoid undo in Block
   try
     FChangeBlockActive:= true;
@@ -704,10 +718,21 @@ begin
         Item^.Line, Item^.LineEnds, Item^.LineState, FCommandCode,
         CurCarets, CurCarets2, CurMarkers, CurMarkers2, CurAttribs);
     end;
-  end;
-  if bFast then
+
+    //2026.09: fire event before the physical deletion, like LineDelete() does;
+    //WrapStructRecord() needs the deleted lines to be still present
+    //(it hashes their texts, to reuse wrap-items on undo)
+    DoEventLog(ALine1);
+    DoEventChange(TATLineChangeKind.Deleted, ALine1, ALine2-ALine1+1);
+
     FList.DeleteRange(ALine1, ALine2)
+  end
   else
+  begin
+    //2026.09: event before deletion, same reason as above
+    DoEventLog(ALine1);
+    DoEventChange(TATLineChangeKind.Deleted, ALine1, ALine2-ALine1+1);
+
     //delete slowly with undo; yes, we do it for any count of deleted lines
     for i:= ALine2 downto ALine1 do
       LineDelete(i,
@@ -715,6 +740,7 @@ begin
         false{WithEvent},
         true{AWithUndo}
         );
+  end;
 
   (*
   if (ALine2-ALine1)<FUndoList.MaxCount then
@@ -735,8 +761,6 @@ begin
   if AForceLast then
     ActionAddFakeLineIfNeeded;
 
-  DoEventChange(TATLineChangeKind.Deleted, ALine1, ALine2-ALine1+1);
-  DoEventLog(ALine1);
   Modified:= true;
 
   FChangeBlockActive:= false;
@@ -771,6 +795,13 @@ begin
   bFast:= (ANewLines.Count>1) and
     IsIndexValid(ALineFrom);
 
+  //2026.09: fire event before the physical insertion, like LineInsert() does:
+  //WrapStructRecord() must shift edited-line indexes before lines are moved
+  //(SetLine calls, which caller TextReplaceLines_UTF8 makes after this, must
+  //record edited-line indexes already in the new coordinates)
+  DoEventLog(ALineFrom);
+  DoEventChange(TATLineChangeKind.Added, ALineFrom, ANewLines.Count);
+
   if bFast then
   begin
     FList.InsertRange(ALineFrom, ANewLines.Count);
@@ -797,9 +828,6 @@ begin
       LineInsert(ALineFrom, UTF8Decode(ANewLines[i]), false{AWithEvent});
 
   FChangeBlockActive:= false;
-
-  DoEventLog(ALineFrom);
-  DoEventChange(TATLineChangeKind.Added, ALineFrom, ANewLines.Count);
 end;
 
 

@@ -831,6 +831,7 @@ type
     FOnEnabledUndoRedoChanged: TATSynEditEnabledUndoRedoChanged;
     FOnUndoTooLongLine: TATSynEditUndoTooLongLineEvent;
     FWrapInfo: TATWrapInfo;
+    FWrapUpdateCache: TATWrapUpdateCache; //2026.09: wrap-items of recently deleted lines, restored on undo
     FWrapTemps: TATWrapItems;
     FWrapMode: TATEditorWrapMode;
     FWrapModeOnForMargin: boolean; //on toggling off->on - activate "by window or margin" mode
@@ -2717,7 +2718,9 @@ var
   TempWrapItem: TATWrapItem;
   bUseCachedUpdate: boolean;
   bConsiderFolding: boolean;
+  bParamsChanged: boolean;
   NNewVisibleColumns: integer;
+  NWrapColumnNew: integer;
   NIndentMaximal: integer;
   NLine, NLinesCount, NIndexFrom, NIndexTo: integer;
   i, j: integer;
@@ -2772,20 +2775,90 @@ begin
 
   if not FWrapUpdateNeeded then Exit;
   FWrapUpdateNeeded:= false;
-  FWrapInfo.VisibleColumns:= NNewVisibleColumns;
 
+  //2026.09: detect wrap params change BEFORE overwriting them in FWrapInfo;
+  //with changed params (e.g. window resize, wrap mode change) all wrap-items
+  //must be recalculated, incremental update cannot be used
   case FWrapMode of
     TATEditorWrapMode.ModeOff:
-      FWrapInfo.WrapColumn:= 0;
+      NWrapColumnNew:= 0;
     TATEditorWrapMode.ModeOn:
-      FWrapInfo.WrapColumn:= Max(ATEditorOptions.MinWrapColumn, NNewVisibleColumns-FWrapAddSpace);
+      NWrapColumnNew:= Max(ATEditorOptions.MinWrapColumn, NNewVisibleColumns-FWrapAddSpace);
     TATEditorWrapMode.AtWindowOrMargin:
       begin
         if FMarginRight>=0 then
-          FWrapInfo.WrapColumn:= Max(ATEditorOptions.MinWrapColumn, Min(NNewVisibleColumns-FWrapAddSpace, FMarginRight))
+          NWrapColumnNew:= Max(ATEditorOptions.MinWrapColumn, Min(NNewVisibleColumns-FWrapAddSpace, FMarginRight))
         else
-          FWrapInfo.WrapColumn:= Max(ATEditorOptions.MinWrapColumn, NNewVisibleColumns+FMarginRight);
+          NWrapColumnNew:= Max(ATEditorOptions.MinWrapColumn, NNewVisibleColumns+FMarginRight);
       end;
+  end;
+  bParamsChanged:= (FWrapInfo.VisibleColumns<>NNewVisibleColumns) or
+    (FWrapInfo.WrapColumn<>NWrapColumnNew);
+
+  FWrapInfo.VisibleColumns:= NNewVisibleColumns;
+  FWrapInfo.WrapColumn:= NWrapColumnNew;
+
+  {
+  2026.09: performance fix (word-wrap).
+  1) Incremental update: TATStrings recorded structural line ops
+     (line blocks inserted/deleted) since the previous call, and
+     ATWrapInfo_ApplyStructOps() applies them to WrapInfo with only
+     O(total items) index shifts + wrap calculation for new lines.
+     For UNDO of a big deleted block, wrap-items are restored from
+     FWrapUpdateCache (verified by line text hashes), i.e. no wrap
+     calculation at all. Before this, ANY line Insert/Delete action
+     made the full recalculation of WrapInfo for ALL document lines
+     (AddUpdatesAction() sets EnableCachedWrapinfoUpdate:=false for
+     such actions), e.g. 300K-lines doc: DEL of 200K lines was ~6.4s,
+     UNDO of it was ~19-60s with word-wrap enabled.
+  2) "Nothing changed" skip: FWrapUpdateNeeded can be set by calls
+     which don't change the text (e.g. Update(true) of the undo-pause,
+     DoCommandResults of caret-only commands); when no structural ops
+     and no edited lines are recorded, and line count matches, full
+     recalculation is not needed at all.
+  }
+  if AAllowCachedUpdate and (not bParamsChanged) then
+  begin
+    if (not CurStrings.WrapStructComplex) and
+      (FWrapInfo.StringsPrevCount>=0) and
+      (Length(CurStrings.WrapStructOps)>0) then
+    begin
+      if ATWrapInfo_ApplyStructOps(
+        CurStrings,
+        FWrapInfo,
+        FWrapTemps,
+        CurStrings.WrapStructOps,
+        FWrapUpdateCache,
+        FTabHelper,
+        FEditorIndex,
+        FWrapInfo.WrapColumn,
+        NNewVisibleColumns,
+        NIndentMaximal,
+        FWrapIndented,
+        FOptNonWordChars,
+        bConsiderFolding,
+        FFontProportional) then
+      begin
+        FWrapInfo.StringsPrevCount:= NLinesCount;
+        CurStrings.IndexesOfEditedLines.Clear;
+        CurStrings.EnableCachedWrapinfoUpdate:= true;
+        CurStrings.WrapStructClear;
+        Exit
+      end
+      else
+      begin
+        //cannot apply ops: fall to the full recalculation below
+      end;
+    end
+    else
+    if (not CurStrings.WrapStructComplex) and
+      (Length(CurStrings.WrapStructOps)=0) and
+      (CurStrings.IndexesOfEditedLines.Count=0) and
+      (FWrapInfo.StringsPrevCount=NLinesCount) then
+    begin
+      //nothing changed since the previous WrapInfo update
+      Exit
+    end;
   end;
 
   bUseCachedUpdate:=
@@ -2802,6 +2875,7 @@ begin
   if not bUseCachedUpdate then
   begin
     FWrapInfo.Clear;
+    FWrapUpdateCache.Clear; //2026.09: cached items are not related to the recalculated WrapInfo anymore
     FWrapInfo.SetCapacity(NLinesCount);
     for i:= 0 to NLinesCount-1 do
     begin
@@ -2860,6 +2934,7 @@ begin
   FWrapInfo.StringsPrevCount:= CurStrings.Count;
   CurStrings.IndexesOfEditedLines.Clear;
   CurStrings.EnableCachedWrapinfoUpdate:= true;
+  CurStrings.WrapStructClear; //2026.09: WrapInfo is recalculated/repaired, forget recorded ops
 
   {$ifdef debug_findwrapindex}
   DebugFindWrapIndex;
@@ -2867,114 +2942,12 @@ begin
 end;
 
 
-procedure _CalcWrapInfos(
-  AStrings: TATStrings;
-  ATabHelper: TATStringTabHelper;
-  AEditorIndex: integer;
-  AWrapColumn: integer;
-  AWrapIndented: boolean;
-  AVisibleColumns: integer;
-  const ANonWordChars: atString;
-  ALineIndex: integer;
-  AIndentMaximal: integer;
-  AItems: TATWrapItems;
-  AConsiderFolding: boolean;
-  AFontProportional: boolean);
-var
-  WrapItem: TATWrapItem;
-  WrapItemPtr: PATWrapItem;
-  NLineLen, NPartLen, NFoldFrom: integer;
-  NPartOffset, NIndent, NVisColumns: integer;
-  bInitialItem: boolean;
-  StrPart: UnicodeString;
-begin
-  AItems.Clear;
-
-  //line folded entirely?
-  if AConsiderFolding then
-    if AStrings.LinesHidden[ALineIndex, AEditorIndex] then Exit;
-
-  NLineLen:= AStrings.LinesLen[ALineIndex];
-
-  if NLineLen=0 then
-  begin
-    WrapItem.Init(ALineIndex, 1, 0, 0, TATWrapItemFinal.Final, true);
-    AItems.Add(WrapItem);
-    Exit;
-  end;
-
-  //consider fold, before wordwrap
-  if AConsiderFolding then
-  begin
-    //line folded partially?
-    NFoldFrom:= AStrings.LinesFoldFrom[ALineIndex, AEditorIndex];
-    if NFoldFrom>0 then
-    begin
-      WrapItem.Init(ALineIndex, 1, Min(NLineLen, NFoldFrom-1), 0, TATWrapItemFinal.Collapsed, true);
-      AItems.Add(WrapItem);
-      Exit;
-    end;
-  end;
-
-  //line not wrapped?
-  if (AWrapColumn<ATEditorOptions.MinWrapColumnAbs) then
-  begin
-    WrapItem.Init(ALineIndex, 1, NLineLen, 0, TATWrapItemFinal.Final, true);
-    AItems.Add(WrapItem);
-    Exit;
-  end;
-
-  NVisColumns:= Max(AVisibleColumns, ATEditorOptions.MinWrapColumnAbs);
-  NPartOffset:= 1;
-  NIndent:= 0;
-  bInitialItem:= true;
-
-  repeat
-    if AFontProportional then
-      StrPart:= AStrings.LineSub(ALineIndex, NPartOffset, ATEditorOptions.MaxVisibleColumns)
-    else
-      StrPart:= AStrings.LineSub(ALineIndex, NPartOffset, NVisColumns);
-
-    if StrPart='' then
-    begin
-      if not bInitialItem then
-      begin
-        WrapItemPtr:= AItems._GetItemPtr(AItems.Count-1);
-        WrapItemPtr^.NFinal:= TATWrapItemFinal.Final;
-      end;
-      Break;
-    end;
-
-    NPartLen:= ATabHelper.FindWordWrapOffset(
-      ALineIndex,
-      //very slow to calc for entire line (eg len=70K),
-      //calc for first NVisColumns chars
-      StrPart,
-      Max(AWrapColumn-NIndent, ATEditorOptions.MinWrapColumnAbs),
-      ANonWordChars,
-      AWrapIndented
-      );
-
-    WrapItem.Init(ALineIndex, NPartOffset, NPartLen, NIndent, TATWrapItemFinal.Middle, bInitialItem);
-    AItems.Add(WrapItem);
-    bInitialItem:= false;
-
-    if AWrapIndented then
-      if NPartOffset=1 then
-      begin
-        NIndent:= ATabHelper.GetIndentExpanded(ALineIndex, StrPart);
-        NIndent:= Min(NIndent, AIndentMaximal);
-      end;
-
-    Inc(NPartOffset, NPartLen);
-  until false;
-end;
-
-
 procedure TATSynEdit.DoCalcWrapInfos(ALine: integer; AIndentMaximal: integer; AItems: TATWrapItems;
   AConsiderFolding: boolean);
 begin
-  _CalcWrapInfos(
+  //2026.09: calculation is moved to ATSynEdit_WrapInfo.ATWrapInfo_CalcLine(),
+  //to be usable by the incremental WrapInfo update too
+  ATWrapInfo_CalcLine(
     Strings,
     FTabHelper,
     FEditorIndex,
@@ -5604,6 +5577,8 @@ begin
   FWrapInfo.StringsObj:= FStringsInt;
   FWrapInfo.WrapColumn:= cInitMarginRight;
 
+  FWrapUpdateCache:= TATWrapUpdateCache.Create;
+
   FWrapTemps:= TATWrapItems.Create;
   FWrapUpdateNeeded:= true;
   FWrapMode:= cInitWrapMode;
@@ -5984,6 +5959,7 @@ begin
     FreeAndNil(FAttribs);
   FreeAndNil(FGutter);
   FreeAndNil(FWrapTemps);
+  FreeAndNil(FWrapUpdateCache);
   FreeAndNil(FWrapInfo);
   FreeAndNil(FStringsInt);
   if Assigned(FGutterDecor) then

@@ -210,6 +210,7 @@ var
 begin
   St:= Strings;
   ALineTo:= Min(ALineTo, St.Count-1);
+  St.WrapStructInvalidate; //2026.09: hidden-lines map is changed: WrapInfo must be fully recalculated
 
   for i:= ALineFrom to ALineTo do
   begin
