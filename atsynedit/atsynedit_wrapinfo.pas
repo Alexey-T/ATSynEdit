@@ -127,6 +127,77 @@ type
       AOutItems: TATWrapItems): boolean;
   end;
 
+const
+  //2026.09 (CudaText perf): caps of the memoized wrap-calc cache; when a cap
+  //is exceeded, the whole cache is forgotten (simple bounded-memory policy:
+  //duplicate/blank lines keep hitting, all-distinct-line docs just re-calc)
+  ATWrapCalcCache_MaxEntries = 400*1024;
+  ATWrapCalcCache_MaxItems = 2*1024*1024;
+
+type
+  //2026.09 (CudaText perf): key of one memoized result of ATWrapInfo_CalcLine.
+  //Wrap results of a line are fully determined by the line text (64-bit hash)
+  //and the params below, so a match means the items can be reused as-is
+  //(NLineIndex is re-stamped on copy-out). WordGen (word-class table rebuild
+  //counter) and FontKey (width/font signature set by TATSynEdit.UpdateWrapInfo)
+  //make entries calculated with other font/options never match.
+  TATWrapCacheKey = record
+    LineHash: QWord;
+    WrapColumn: integer;
+    IndentMaximal: integer;
+    PartCap: integer;
+    WordGen: Cardinal;
+    FontKey: QWord;
+    WrapIndented: boolean;
+    FontProportional: boolean;
+  end;
+
+  TATWrapCacheEntry = record
+    Key: TATWrapCacheKey;
+    FirstItem: integer; //index into the item pool
+    ItemCount: integer;
+  end;
+
+  { TATWrapCalcCache }
+
+  {
+  2026.09 (CudaText perf): performance fix (word-wrap). Memoized results of
+  ATWrapInfo_CalcLine, keyed by (line text hash + all wrap params). Documents
+  with many duplicate/blank lines (typical generated logs, test data like
+  N x identical lines) get a full WrapInfo recalculation in a fraction of the
+  per-line calculation cost: hash the line, copy its cached items.
+  The full recalculation itself (window resize, wrap params change, replace
+  of all lines) re-uses entries of the previous recalculation, so the "second
+  hang" after a hidden VisibleColumns change costs ~hashing, not full calc.
+  Same 64-bit-hash verification approach as TATWrapUpdateCache.TryRestore.
+  Bounded memory (see caps above). Main-thread only (like all wrap calc).
+  Disabled (bypassed) when folding is considered or TabHelper.OnCalcTabSize
+  is assigned (line-index-dependent tab stops break content keying).
+  }
+  TATWrapCalcCache = class
+  private
+    FBuckets: array of integer; //count is power of 2; value = index in FEntries, -1 = empty
+    FEntries: array of TATWrapCacheEntry;
+    FEntryCount: integer;
+    FItems: array of TATWrapItem;
+    FItemCount: integer;
+    class function KeysEqual(const A, B: TATWrapCacheKey): boolean; static;
+    class function KeyHash(const AKey: TATWrapCacheKey): QWord; static;
+    procedure GrowBuckets;
+  public
+    constructor Create; virtual;
+    destructor Destroy; override;
+    procedure Clear;
+    function TryGet(const AKey: TATWrapCacheKey; AItems: TATWrapItems): boolean;
+    procedure Add(const AKey: TATWrapCacheKey; const AItems: TATWrapItems);
+    property EntryCount: integer read FEntryCount;
+    property ItemCount: integer read FItemCount;
+  end;
+
+var
+  //2026.09 (CudaText perf): created in unit initialization, main-thread only
+  WrapCalcCache: TATWrapCalcCache = nil;
+
 procedure ATWrapInfo_CalcLine(
   AStrings: TATStrings;
   ATabHelper: TATStringTabHelper;
@@ -608,6 +679,135 @@ begin
 end;
 
 
+{ TATWrapCalcCache }
+
+class function TATWrapCalcCache.KeysEqual(const A, B: TATWrapCacheKey): boolean;
+begin
+  Result:=
+    (A.LineHash=B.LineHash) and
+    (A.WrapColumn=B.WrapColumn) and
+    (A.IndentMaximal=B.IndentMaximal) and
+    (A.PartCap=B.PartCap) and
+    (A.WordGen=B.WordGen) and
+    (A.FontKey=B.FontKey) and
+    (A.WrapIndented=B.WrapIndented) and
+    (A.FontProportional=B.FontProportional);
+end;
+
+class function TATWrapCalcCache.KeyHash(const AKey: TATWrapCacheKey): QWord;
+begin
+  //line hashes are well-mixed already; params are mixed in at distinct bit
+  //positions, and the key is fully compared on probe, so this only needs to
+  //spread entries over buckets
+  Result:= AKey.LineHash xor
+    (QWord(AKey.WrapColumn) shl 13) xor
+    (QWord(AKey.IndentMaximal) shl 31) xor
+    (QWord(AKey.PartCap) shl 7) xor
+    (QWord(AKey.WordGen) shl 43) xor
+    (AKey.FontKey shl 19) xor
+    AKey.FontKey xor
+    (QWord(AKey.WrapIndented) shl 5) xor
+    (QWord(AKey.FontProportional) shl 55);
+end;
+
+constructor TATWrapCalcCache.Create;
+begin
+  inherited Create;
+  SetLength(FBuckets, 1024); //must be power of 2
+  Clear;
+end;
+
+destructor TATWrapCalcCache.Destroy;
+begin
+  inherited Destroy;
+end;
+
+procedure TATWrapCalcCache.Clear;
+var
+  i: integer;
+begin
+  FEntryCount:= 0;
+  FItemCount:= 0;
+  for i:= 0 to High(FBuckets) do
+    FBuckets[i]:= -1;
+  SetLength(FEntries, 0);
+  SetLength(FItems, 0);
+end;
+
+procedure TATWrapCalcCache.GrowBuckets;
+var
+  NBuckets, i, Idx: integer;
+begin
+  NBuckets:= Length(FBuckets)*2;
+  SetLength(FBuckets, NBuckets);
+  for i:= 0 to NBuckets-1 do
+    FBuckets[i]:= -1;
+  for i:= 0 to FEntryCount-1 do
+  begin
+    Idx:= integer(KeyHash(FEntries[i].Key) and QWord(NBuckets-1));
+    while FBuckets[Idx]<>-1 do
+      Idx:= (Idx+1) and (NBuckets-1);
+    FBuckets[Idx]:= i;
+  end;
+end;
+
+function TATWrapCalcCache.TryGet(const AKey: TATWrapCacheKey; AItems: TATWrapItems): boolean;
+var
+  NMask, Idx, N, i: integer;
+begin
+  Result:= false;
+  if Length(FBuckets)=0 then Exit;
+  NMask:= Length(FBuckets)-1;
+  Idx:= integer(KeyHash(AKey) and QWord(NMask));
+  repeat
+    N:= FBuckets[Idx];
+    if N=-1 then Exit; //not found
+    if KeysEqual(FEntries[N].Key, AKey) then
+    begin
+      for i:= 0 to FEntries[N].ItemCount-1 do
+        AItems.Add(FItems[FEntries[N].FirstItem+i]);
+      Exit(true);
+    end;
+    Idx:= (Idx+1) and NMask;
+  until false;
+end;
+
+procedure TATWrapCalcCache.Add(const AKey: TATWrapCacheKey; const AItems: TATWrapItems);
+var
+  NMask, Idx, i: integer;
+begin
+  if AItems.Count=0 then Exit;
+
+  //bounded memory: when caps are exceeded, forget everything (duplicate/
+  //blank lines re-populate it quickly, all-distinct-line docs don't need it)
+  if (FEntryCount>=ATWrapCalcCache_MaxEntries) or
+     (FItemCount+AItems.Count>ATWrapCalcCache_MaxItems) then
+    Clear;
+
+  if FEntryCount*2 >= Length(FBuckets) then
+    GrowBuckets;
+
+  if FItemCount+AItems.Count > Length(FItems) then
+    SetLength(FItems, Max(FItemCount+AItems.Count, Length(FItems)*2));
+  for i:= 0 to AItems.Count-1 do
+    FItems[FItemCount+i]:= AItems[i];
+  Inc(FItemCount, AItems.Count);
+
+  if FEntryCount >= Length(FEntries) then
+    SetLength(FEntries, Max(FEntryCount+1, Length(FEntries)*2));
+  FEntries[FEntryCount].Key:= AKey;
+  FEntries[FEntryCount].FirstItem:= FItemCount-AItems.Count;
+  FEntries[FEntryCount].ItemCount:= AItems.Count;
+  Inc(FEntryCount);
+
+  NMask:= Length(FBuckets)-1;
+  Idx:= integer(KeyHash(AKey) and QWord(NMask));
+  while FBuckets[Idx]<>-1 do
+    Idx:= (Idx+1) and NMask;
+  FBuckets[Idx]:= FEntryCount-1;
+end;
+
+
 { ATWrapInfo_CalcLine }
 
 procedure ATWrapInfo_CalcLine(
@@ -623,13 +823,22 @@ procedure ATWrapInfo_CalcLine(
   AItems: TATWrapItems;
   AConsiderFolding: boolean;
   AFontProportional: boolean);
+const
+  //2026.09 (CudaText perf): stack buffer for one scanned line part; must
+  //cover the part cap: ATEditorOptions.MaxVisibleColumns (proportional
+  //fonts) and any realistic visible-columns count of monospaced fonts
+  //(window wider than ~16K pixels); clamped below for safety
+  cWrapPartBufMax = 2048;
 var
   WrapItem: TATWrapItem;
   WrapItemPtr: PATWrapItem;
   NLineLen, NPartLen, NFoldFrom: integer;
   NPartOffset, NIndent, NVisColumns: integer;
-  bInitialItem: boolean;
-  StrPart: UnicodeString;
+  NPartCap, NBufLen: integer;
+  bInitialItem, bCacheable: boolean;
+  CacheKey: TATWrapCacheKey;
+  i: integer;
+  Buf: array[0..cWrapPartBufMax-1] of WideChar;
 begin
   AItems.Clear;
 
@@ -668,17 +877,57 @@ begin
   end;
 
   NVisColumns:= Max(AVisibleColumns, ATEditorOptions.MinWrapColumnAbs);
+  if AFontProportional then
+    NPartCap:= ATEditorOptions.MaxVisibleColumns
+  else
+    NPartCap:= NVisColumns;
+
+  //2026.09 (CudaText perf): memoized result: wrap-items of a line are fully
+  //determined by the line text + params below, so identical lines (very
+  //typical for generated/test data) skip the whole per-char calculation;
+  //cache is bypassed when folding matters (items depend on fold state) or
+  //when the app installed a per-line-index tab-size callback
+  bCacheable:=
+    (not AConsiderFolding) and
+    (not Assigned(ATabHelper.OnCalcTabSize));
+  if bCacheable then
+  begin
+    CacheKey:= Default(TATWrapCacheKey);
+    CacheKey.LineHash:= AStrings.GetLineHash(ALineIndex);
+    CacheKey.WrapColumn:= AWrapColumn;
+    CacheKey.IndentMaximal:= AIndentMaximal;
+    CacheKey.PartCap:= NPartCap;
+    CacheKey.WordGen:= WrapWordGen;
+    CacheKey.FontKey:= WrapCalcFontKey;
+    CacheKey.WrapIndented:= AWrapIndented;
+    CacheKey.FontProportional:= AFontProportional;
+
+    if WrapCalcCache.TryGet(CacheKey, AItems) then
+    begin
+      //items were calculated for another line index: re-stamp it
+      for i:= 0 to AItems.Count-1 do
+      begin
+        WrapItemPtr:= AItems._GetItemPtr(i);
+        WrapItemPtr^.NLineIndex:= ALineIndex;
+      end;
+      Exit;
+    end;
+  end;
+
+  NPartCap:= Min(NPartCap, cWrapPartBufMax);
+
   NPartOffset:= 1;
   NIndent:= 0;
   bInitialItem:= true;
 
   repeat
-    if AFontProportional then
-      StrPart:= AStrings.LineSub(ALineIndex, NPartOffset, ATEditorOptions.MaxVisibleColumns)
-    else
-      StrPart:= AStrings.LineSub(ALineIndex, NPartOffset, NVisColumns);
+    //2026.09 (CudaText perf): the line part is copied to the stack buffer and
+    //scanned by pointer (LineSubBuf + FindWordWrapOffsetBuf): no UnicodeString
+    //is allocated per part (was: LineSub + string assign per part, which
+    //dominated the wrap calc time of big documents)
+    NBufLen:= AStrings.LineSubBuf(ALineIndex, NPartOffset, NPartCap, @Buf[0]);
 
-    if StrPart='' then
+    if NBufLen=0 then
     begin
       if not bInitialItem then
       begin
@@ -688,11 +937,12 @@ begin
       Break;
     end;
 
-    NPartLen:= ATabHelper.FindWordWrapOffset(
+    NPartLen:= ATabHelper.FindWordWrapOffsetBuf(
       ALineIndex,
       //very slow to calc for entire line (eg len=70K),
       //calc for first NVisColumns chars
-      StrPart,
+      @Buf[0],
+      NBufLen,
       Max(AWrapColumn-NIndent, ATEditorOptions.MinWrapColumnAbs),
       ANonWordChars,
       AWrapIndented
@@ -705,12 +955,15 @@ begin
     if AWrapIndented then
       if NPartOffset=1 then
       begin
-        NIndent:= ATabHelper.GetIndentExpanded(ALineIndex, StrPart);
+        NIndent:= ATabHelper.GetIndentExpandedBuf(ALineIndex, @Buf[0], NBufLen);
         NIndent:= Min(NIndent, AIndentMaximal);
       end;
 
     Inc(NPartOffset, NPartLen);
   until false;
+
+  if bCacheable and (AItems.Count>0) then
+    WrapCalcCache.Add(CacheKey, AItems);
 end;
 
 
@@ -920,6 +1173,16 @@ begin
     FreeAndNil(NewItems);
   end;
 end;
+
+
+initialization
+
+  //2026.09 (CudaText perf): global memoized wrap-calc results (main thread only)
+  WrapCalcCache:= TATWrapCalcCache.Create;
+
+finalization
+
+  FreeAndNil(WrapCalcCache);
 
 
 end.

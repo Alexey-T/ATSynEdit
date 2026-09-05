@@ -1,3 +1,4 @@
+{$GOTO ON} //2026.09: enable goto/label for the tight scan loops below (FPC needs -Sg or this directive; Lazarus lpk passes no -Sg)
 {$ifdef nn}begin end;{$endif}
 
 function IsStreamWithSignature(Stream: TStream; const Sign: string): boolean;

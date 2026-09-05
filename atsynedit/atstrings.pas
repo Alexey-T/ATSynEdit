@@ -161,6 +161,7 @@ type
     property LineEnds: TATLineEnds read GetLineEnds;
     function LineSubLen(AFrom, ALen: SizeInt): SizeInt;
     function LineSub(AFrom, ALen: SizeInt): UnicodeString;
+    function LineSubBuf(AFrom, ALen: SizeInt; ADest: PWideChar): SizeInt;
     procedure LineToBuffer(OtherBuf: PWideChar);
     function CharAt(AIndex: SizeInt): WideChar;
     function CharAt_Fast(AIndex: SizeInt): WideChar; inline; //don't have range checks
@@ -418,6 +419,9 @@ type
     property LinesSeparator[Index: SizeInt]: TATLineSeparator read GetLineSep write SetLineSep;
     function LineSubLen(ALineIndex, APosFrom, ALen: SizeInt): SizeInt;
     function LineSub(ALineIndex, APosFrom, ALen: SizeInt): atString;
+    //2026.09 (CudaText perf): copies a line part into a raw WideChar buffer
+    //(caller-provided, no UnicodeString allocation/refcount), returns copied char count
+    function LineSubBuf(ALineIndex, APosFrom, ALen: SizeInt; ADest: PWideChar): SizeInt;
     function LineCharAt(ALineIndex, ACharIndex: SizeInt): WideChar;
     procedure GetIndentProp(ALineIndex: SizeInt; out ACharCount: SizeInt; out AKind: TATLineIndentKind);
     function LineLenWithoutSpace(ALineIndex: SizeInt): SizeInt;
@@ -928,6 +932,36 @@ begin
     for i:= 1 to ResLen do
       Result[i]:= WideChar(Ord(Buf[i+AFrom-1]));
   end;
+end;
+
+function TATStringItem.LineSubBuf(AFrom, ALen: SizeInt; ADest: PWideChar): SizeInt;
+//2026.09 (CudaText perf): same as LineSub, but copies into a raw WideChar
+//buffer (no UnicodeString allocation); ADest must have space for ALen chars.
+//For non-wide (ASCII) items, bytes are zero-extended to WideChar, like
+//LineSub/CharAt do
+var
+  ResLen, i: SizeInt;
+  Src: PChar;
+  Dst: PWideChar;
+begin
+  Result:= 0;
+  if ADest=nil then exit;
+  ResLen:= LineSubLen(AFrom, ALen);
+  if ResLen=0 then exit;
+  if Ex.Wide then
+    Move(Buf[AFrom*2-1], ADest^, ResLen*2)
+  else
+  begin
+    Src:= @Buf[AFrom];
+    Dst:= ADest;
+    for i:= 1 to ResLen do
+    begin
+      Dst^:= WideChar(Ord(Src^));
+      Inc(Src);
+      Inc(Dst);
+    end;
+  end;
+  Result:= ResLen;
 end;
 
 function TATStringItem.CharAt(AIndex: SizeInt): WideChar;
@@ -1905,6 +1939,15 @@ begin
   if ALen=0 then exit('');
   Item:= GetItemPtr(ALineIndex);
   Result:= Item^.LineSub(APosFrom, ALen);
+end;
+
+function TATStrings.LineSubBuf(ALineIndex, APosFrom, ALen: SizeInt; ADest: PWideChar): SizeInt;
+var
+  Item: PATStringItem;
+begin
+  if (ALen=0) or (ADest=nil) then exit(0);
+  Item:= GetItemPtr(ALineIndex);
+  Result:= Item^.LineSubBuf(APosFrom, ALen, ADest);
 end;
 
 function TATStrings.LineCharAt(ALineIndex, ACharIndex: SizeInt): WideChar;

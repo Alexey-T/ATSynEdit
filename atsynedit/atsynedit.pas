@@ -2722,6 +2722,7 @@ var
   NNewVisibleColumns: integer;
   NWrapColumnNew: integer;
   NIndentMaximal: integer;
+  NFontKey: QWord;
   NLine, NLinesCount, NIndexFrom, NIndexTo: integer;
   i, j: integer;
 begin
@@ -2750,6 +2751,23 @@ begin
     FOptTabSize,
     FFontProportional
     );
+
+  //2026.09 (CudaText perf): signature of all inputs which affect char widths
+  //in the wrap calc (font, tab size, width-related options); it's part of the
+  //key of the memoized wrap-calc cache (ATSynEdit_WrapInfo.WrapCalcCache),
+  //so entries calculated with other font/options never match.
+  //Must be updated when new width-affecting options appear
+  NFontKey:= SCalcHashQword(UTF8Encode(Font.Name));
+  NFontKey:= (NFontKey xor QWord(Cardinal(DoScaleFont(Font.Size)))) * QWord($100000001B3);
+  NFontKey:= (NFontKey xor QWord(Cardinal(FOptTabSize))) * QWord($100000001B3);
+  NFontKey:= (NFontKey xor QWord(Cardinal(Ord(FFontProportional)))) * QWord($100000001B3);
+  NFontKey:= (NFontKey xor QWord(Cardinal(ATEditorOptions.EmojiWidthPercents))) * QWord($100000001B3);
+  NFontKey:= (NFontKey xor QWord(Cardinal(Ord(ATEditorOptions.UnprintedReplaceSpec)))) * QWord($100000001B3);
+  NFontKey:= (NFontKey xor QWord(Cardinal(Ord(ATEditorOptions.CharSizeProportional)))) * QWord($100000001B3);
+  NFontKey:= (NFontKey xor QWord(Cardinal(ATEditorOptions.MaxTabPositionToExpand))) * QWord($100000001B3);
+  NFontKey:= (NFontKey xor QWord(Cardinal(ATEditorOptions.MinWordWrapOffset))) * QWord($100000001B3);
+  NFontKey:= (NFontKey xor QWord(Cardinal(ATEditorOptions.MinWrapColumnAbs))) * QWord($100000001B3);
+  WrapCalcFontKey:= NFontKey;
 
   //virtual mode allows faster usage of WrapInfo
   CurStrings:= Strings;
