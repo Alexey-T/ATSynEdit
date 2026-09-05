@@ -3102,6 +3102,7 @@ var
   NCommandCode, NLineIndexFailed: integer;
   NTickCount: QWord;
   PrevUndoOrRedo: TATEditorRunningUndoOrRedo;
+  i, NCountOther: integer;
 begin
   if not Assigned(FUndoList) then Exit;
   if not Assigned(FRedoList) then Exit;
@@ -3145,6 +3146,14 @@ begin
   }
   FLastUndoY:= -1;
 
+  //init values, which are filled by UndoSingle() below;
+  //needed if repeat-loop exits before any UndoSingle() call,
+  //because code in 'finally' section reads them
+  bSoftMarked:= false;
+  bHardMarked:= false;
+  bHardMarkedNext:= false;
+  bMarkedUnmodified:= false;
+
  try
   repeat
     //better to have this, e.g. for Undo after Ctrl+A, Del
@@ -3153,6 +3162,11 @@ begin
 
     if List.Count=0 then Break;
     if List.IsEmpty then Break;
+
+    //count of items in ListOther, before this undo/redo step;
+    //new mirror-items (added to ListOther by UndoSingle) occupy indexes
+    //NCountOther..ListOther.Count-1
+    NCountOther:= ListOther.Count;
 
     if not UndoSingle(
              List,
@@ -3179,12 +3193,16 @@ begin
       FModified:= false;
 
     //apply Hardmark to ListOther
+    //CudaText issue #6446: one UndoSingle() call can add to ListOther not one
+    //item, but several items, e.g. undoing of Delete-item with CurIndex>=Count
+    //calls LineAddRaw() + ActionFixEolBeforeLast(), which add 'Add'-item and
+    //'ChangeEol'-item. Old code (marked only ListOther.Last) leaved first such
+    //items without hardmark, so next Redo (with AGrouped=false) breaked the
+    //chain of hardmarks and stopped in the middle of the undo-group, giving
+    //wrong text. So we mark here ALL items added by this undo/redo step.
     if bHardMarked then
-      if ListOther.Count>0 then
-      begin
-        ListOther.Last.ItemHardMark:= bHardMarked;
-        //ListOther.Last.ItemSoftMark:= ?? //for redo needed Softmark too but don't know how
-      end;
+      for i:= NCountOther to ListOther.Count-1 do
+        ListOther.Items[i].ItemHardMark:= bHardMarked;
 
     if bHardMarked and bHardMarkedNext and not bSoftMarked then
       Continue;
@@ -3208,7 +3226,13 @@ begin
   FEnabledCaretsInUndo:= true;
 
   //apply SoftMark to ListOther
-  if bSoftMarked and AGrouped then
+  //CudaText issue #6446: condition 'and AGrouped' was wrong here, it leaved
+  //mirror-groups without softmark terminators when option undo_grouped=false,
+  //so Redo worked wrong (stopped inside a group / over-consumed groups).
+  //ListOther.SoftMark affects only the NEXT item, added to ListOther, i.e.
+  //the first mirror-item of the next undone/redone group; that item is
+  //processed last, and it terminates the group - in both grouped/ungrouped modes.
+  if bSoftMarked then
     ListOther.SoftMark:= true;
 
   //to fix this:
