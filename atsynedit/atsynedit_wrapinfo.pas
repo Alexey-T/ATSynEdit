@@ -83,7 +83,7 @@ type
     procedure ReplaceItems(AFrom, ATo: integer; AItems: TATWrapItems);
 
     //2026.09: primitives for the incremental WrapInfo update
-    function FindItemIndexForLineGe(ALine: SizeInt): integer; //first item index with NLineIndex>=ALine; Count when none
+    function FindIndexOfLineNumber(ALine: SizeInt): integer; //first item index with NLineIndex>=ALine; Count when none
     procedure DeleteItems(AFrom, ATo: integer); //remove items [AFrom..ATo], single memory-move
     procedure SpliceItems(AIndex: integer; AItems: TATWrapItems); //insert all AItems at AIndex, single memory-move
     procedure ShiftLineIndexes(AFromItem: integer; ADelta: SizeInt); //Inc(NLineIndex, ADelta) for items [AFromItem..]
@@ -391,7 +391,7 @@ end;
 
 { TATWrapInfo: primitives for the incremental update }
 
-function TATWrapInfo.FindItemIndexForLineGe(ALine: SizeInt): integer;
+function TATWrapInfo.FindIndexOfLineNumber(ALine: SizeInt): integer;
 var
   a, b, m: integer;
 begin
@@ -493,8 +493,8 @@ begin
     Hashes[i]:= AHashes[i];
 
   //copy wrap-items of deleted lines, with cache-local line indexes
-  iFrom:= AWrapInfo.FindItemIndexForLineGe(ADeleteFrom);
-  iTo:= AWrapInfo.FindItemIndexForLineGe(ADeleteFrom+ADeleteCount)-1;
+  iFrom:= AWrapInfo.FindIndexOfLineNumber(ADeleteFrom);
+  iTo:= AWrapInfo.FindIndexOfLineNumber(ADeleteFrom+ADeleteCount)-1;
   if iTo>=iFrom then
     for i:= iFrom to iTo do
     begin
@@ -801,7 +801,7 @@ begin
         TATWrapStructOpKind.Inserted:
           begin
             //shift line indexes of items at/below the insertion point
-            NSplice:= AWrapInfo.FindItemIndexForLineGe(AOps[i].Line);
+            NSplice:= AWrapInfo.FindIndexOfLineNumber(AOps[i].Line);
             AWrapInfo.ShiftLineIndexes(NSplice, AOps[i].Count);
 
             //map "position after this op" of each new line to its position in
@@ -878,8 +878,8 @@ begin
               ; //no cache
 
             //remove items of deleted lines, shift indexes of items below
-            j:= AWrapInfo.FindItemIndexForLineGe(AOps[i].Line);
-            NIndexTo:= AWrapInfo.FindItemIndexForLineGe(AOps[i].Line+AOps[i].Count)-1;
+            j:= AWrapInfo.FindIndexOfLineNumber(AOps[i].Line);
+            NIndexTo:= AWrapInfo.FindIndexOfLineNumber(AOps[i].Line+AOps[i].Count)-1;
             AWrapInfo.DeleteItems(j, NIndexTo);
             AWrapInfo.ShiftLineIndexes(j, -AOps[i].Count);
           end;
