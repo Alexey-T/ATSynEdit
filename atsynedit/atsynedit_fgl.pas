@@ -631,15 +631,6 @@ begin
 end;
 
 procedure TFPSList.InsertRange(AIndex, ACount: Integer);
-{
-2026.09: opens ACount empty slots at AIndex, with a single memory-move of the
-list tail. Slots are zeroed = empty items, like TFPSList.Insert() leaves its
-inserted slot (list keeps 'ending filled with zeros' invariant).
-Same effect as ACount of Insert() calls, but O(Count) list-work instead of
-O(Count*ACount). Made for the incremental WrapInfo update: splicing
-wrap-items of inserted lines into TATWrapItems (also used by
-TATStringItemList.InsertRange logic before).
-}
 var
   Ptr: Pointer;
 begin
