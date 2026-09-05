@@ -641,7 +641,7 @@ wrap-items of inserted lines into TATWrapItems (also used by
 TATStringItemList.InsertRange logic before).
 }
 var
-  Ptr: PByte;
+  Ptr: Pointer;
 begin
   if ACount<=0 then Exit;
   if (AIndex<0) or (AIndex>FCount) then
@@ -652,7 +652,7 @@ begin
 
   if AIndex<FCount then
   begin
-    Ptr:= PByte(InternalItems[AIndex]);
+    Ptr:= InternalItems[AIndex];
     //move list tail to the right; region after Count is zeroed by SetCapacity,
     //so it's safe to move to (Ptr+ACount*ItemSize)
     System.Move(Ptr^, (Ptr+Int64(ACount)*FItemSize)^, Int64(FCount-AIndex)*FItemSize);
