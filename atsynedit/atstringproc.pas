@@ -522,26 +522,60 @@ begin
   Result:= (A.X=B.X) and (A.Y=B.Y);
 end;
 
+var
+  //2026.09: cached word-char classification for FindWordWrapOffset()
+  //_(replaces per-char _IsWord: IsCharCJKText + Pos() + IsCharWord calls,
+  //which dominated the word-wrap calc time of big documents, CudaText perf).
+  //Table is rebuilt when the key (NonWordChars, PunctuationToWrapWithWords)
+  //changes - these are editor options, stable during typical wrap calc.
+  //Main-thread only (like all editor painting code).
+  WrapWordTable: array[0..$FFFF] of boolean;
+  WrapWordKeyNonChars: UnicodeString = '';
+  WrapWordKeyPunct: UnicodeString = '';
+  WrapWordTableValid: boolean = false;
+
+procedure WrapWordTableBuild(const ANonWordChars: UnicodeString);
+var
+  i: integer;
+  SPunct: UnicodeString;
+begin
+  SPunct:= ATEditorOptions.PunctuationToWrapWithWords;
+  if WrapWordTableValid and
+    (WrapWordKeyNonChars=ANonWordChars) and
+    (WrapWordKeyPunct=SPunct) then
+    Exit;
+  WrapWordKeyNonChars:= ANonWordChars;
+  WrapWordKeyPunct:= SPunct;
+  for i:= 0 to $FFFF do
+    if IsCharCJKText(widechar(i)) then
+      WrapWordTable[i]:= false
+    else
+    if Pos(widechar(i), SPunct)>0 then
+      WrapWordTable[i]:= true
+    else
+      WrapWordTable[i]:= IsCharWord(widechar(i), ANonWordChars);
+  WrapWordTableValid:= true;
+end;
+
+function WrapWordChar(ch: widechar): boolean; inline;
+begin
+  Result:= WrapWordTable[Ord(ch)];
+end;
+
 function TATStringTabHelper.FindWordWrapOffset(ALineIndex: integer; const S: atString; AColumns: Int64;
   const ANonWordChars: atString; AWrapIndented: boolean): integer;
   //
   //override IsCharWord to check also commas,dots,quotes
   //to wrap them with wordchars
-  function _IsWord(ch: widechar): boolean;
-  begin
-    if IsCharCJKText(ch) then
-      Result:= false
-    else
-    if Pos(ch, ATEditorOptions.PunctuationToWrapWithWords)>0 then
-      Result:= true
-    else
-      Result:= IsCharWord(ch, ANonWordChars);
-  end;
+  //(old nested _IsWord() is replaced by the cached WrapWordTable lookup,
+  //which gives identical results for the same options)
   //
 var
   N, NMin, NAvg: SizeInt;
   Offsets: TATIntFixedArray;
-  ch, ch_next: widechar;
+  ch: widechar;
+  P: PWideChar;
+  bWordCh, bWordNext: boolean;
 begin
   if S='' then
     Exit(0);
@@ -561,18 +595,35 @@ begin
     Exit(ATEditorOptions.MinWordWrapOffset);
 
   NMin:= SGetIndentChars(S)+1;
+
+  //2026.09: optimized scan (CudaText perf): PWideChar access instead of
+  //indexed S[N] (each indexed read of UnicodeString is a runtime helper call
+  //with range check); classification of a char is done once and reused on
+  //the next loop iteration (as classification of the previous char)
+  WrapWordTableBuild(ANonWordChars);
+  P:= Pointer(S);
+  //0-based pointer access: S[i] = P[i-1]; initial N is in 1..Length(S)-1,
+  //loop keeps N>=1 (Break when N<=NMin, NMin>=1)
+  if N>=1 then
+    bWordCh:= WrapWordChar(P[N-1]) //class of S[N]
+  else
+    bWordCh:= false;
+  bWordNext:= WrapWordChar(P[N]); //class of S[N+1]
   repeat
-    ch:= S[N];
-    ch_next:= S[N+1];
+    ch:= P[N-1]; //S[N]
 
     if (N>NMin) and
-     (IsCharSurrogateLow(ch_next) or //don't wrap inside surrogate pair
-      (IsCharCJKText(ch) and IsCharCJKPunctuation(ch_next)) or //don't wrap between CJK char and CJK punctuation
-      (_IsWord(ch) and _IsWord(ch_next)) or //don't wrap between 2 word-chars
-      (AWrapIndented and IsCharSpace(ch_next)) //space as 2nd char looks bad with Python sources
+     (IsCharSurrogateLow(P[N]) or //don't wrap inside surrogate pair: S[N+1]
+      (IsCharCJKText(ch) and IsCharCJKPunctuation(P[N])) or //don't wrap between CJK char and CJK punctuation
+      (bWordCh and bWordNext) or //don't wrap between 2 word-chars
+      (AWrapIndented and IsCharSpace(P[N])) //space as 2nd char looks bad with Python sources
      )
     then
-      Dec(N)
+    begin
+      Dec(N);
+      bWordNext:= bWordCh;
+      bWordCh:= WrapWordChar(P[N-1]); //class of new S[N]; N>=1 here
+    end
     else
       Break;
   until false;
@@ -584,17 +635,31 @@ begin
 end;
 
 function SGetIndentChars(const S: string): SizeInt;
+var
+  P: PChar;
 begin
+  //2026.09: optimized (CudaText perf): pointer access instead of indexed S[i]
   Result:= 0;
-  while (Result<Length(S)) and IsCharSpace(S[Result+1]) do
+  P:= Pointer(S);
+  while (P<>nil) and (P^<>#0) and IsCharSpace(P^) do
+  begin
     Inc(Result);
+    Inc(P);
+  end;
 end;
 
 function SGetIndentChars(const S: atString): SizeInt;
+var
+  P: PWideChar;
 begin
+  //2026.09: optimized (CudaText perf): pointer access instead of indexed S[i]
   Result:= 0;
-  while (Result<Length(S)) and IsCharSpace(S[Result+1]) do
+  P:= Pointer(S);
+  while (P<>nil) and (P^<>#0) and IsCharSpace(P^) do
+  begin
     Inc(Result);
+    Inc(P);
+  end;
 end;
 
 function SGetTrailingSpaceChars(const S: atString): SizeInt;
@@ -735,11 +800,17 @@ var
   NScalePercents: SizeInt;
   ch: widechar;
   i: SizeInt;
+  P: PWideChar;
+  NSum: Int64;
 begin
-  AInfo:= Default(TATIntFixedArray);
+  //2026.09: don't clear the whole 32Kb record here (was: AInfo:= Default()):
+  //CalcCharOffsets is called ~1.5M times for a wrapped 300K-lines document,
+  //so full-record clearing was several seconds of pure memset; all callers
+  //read only Data[0..Len-1], so clearing Len is enough
+  AInfo.Len:= 0;
   NLen:= Min(Length(S), ATEditorMaxFixedArray);
-  AInfo.Len:= NLen;
   if NLen=0 then Exit;
+  AInfo.Len:= NLen;
 
   if Length(S)>ATEditorMaxFixedArray then
   begin
@@ -750,9 +821,16 @@ begin
 
   NCharsSkipped:= ACharsSkipped;
 
+  //2026.09: optimized loop (CudaText perf): PWideChar access instead of
+  //indexed S[i] (each indexed read of UnicodeString is a runtime helper call
+  //with range check); running sum in local var instead of reading
+  //AInfo.Data[i-2] per char
+  P:= Pointer(S);
+  NSum:= 0;
   for i:= 1 to NLen do
   begin
-    ch:= S[i];
+    ch:= P^;
+    Inc(P);
     Inc(NCharsSkipped);
 
     if IsCharSurrogateAny(ch) then
@@ -772,10 +850,8 @@ begin
       Inc(NCharsSkipped, NTabSize-1);
     end;
 
-    if i=1 then
-      AInfo.Data[i-1]:= Int64(NSize)*NScalePercents
-    else
-      AInfo.Data[i-1]:= AInfo.Data[i-2]+Int64(NSize)*NScalePercents;
+    NSum:= NSum + Int64(NSize)*NScalePercents;
+    AInfo.Data[i-1]:= NSum;
   end;
 end;
 
@@ -786,6 +862,7 @@ var
   NScalePercents: SizeInt;
   ch: WideChar;
   i: SizeInt;
+  P: PWideChar;
 begin
   Result:= 0;
   NLen:= Length(S);
@@ -796,9 +873,14 @@ begin
 
   NCharsSkipped:= ACharsSkipped;
 
+  //2026.09: optimized loop (CudaText perf): PWideChar access instead of
+  //indexed S[i] (each indexed read of UnicodeString is a runtime helper call
+  //with range check)
+  P:= Pointer(S);
   for i:= 1 to NLen do
   begin
-    ch:= S[i];
+    ch:= P^;
+    Inc(P);
     Inc(NCharsSkipped);
 
     if IsCharSurrogateAny(ch) then
