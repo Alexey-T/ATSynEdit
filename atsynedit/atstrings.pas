@@ -3976,28 +3976,11 @@ begin
 end;
 
 function TATStrings.GetLineHash(AIndex: SizeInt): QWord;
-{
-FNV-1a hash of the line's raw buffer bytes. Used only to compare identity of
-lines ("is this line the same text as that deleted line?"), so the encoding
-of the buffer doesn't matter, hashing must be just stable and fast.
-}
 var
   Item: PATStringItem;
-  P: PByte;
-  NLen, i: SizeInt;
 begin
-  Result:= 14695981039346656037;
-  if not IsIndexValid(AIndex) then Exit;
   Item:= FList.GetItem(AIndex);
-  NLen:= Length(Item^.Buf);
-  if NLen=0 then Exit;
-  P:= Pointer(Item^.Buf);
-  for i:= 1 to NLen do
-  begin
-    Result:= Result xor P^;
-    Result:= Result * 1099511628211;
-    Inc(P);
-  end;
+  Result:= SCalcHashQword(Item^.Buf);
 end;
 
 procedure TATStrings.DoOnChangeBlock(AX1, AY1, AX2, AY2: SizeInt;

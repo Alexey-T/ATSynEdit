@@ -279,6 +279,7 @@ procedure SSplitByChar(const S: string; Sep: char; out S1, S2: string);
 procedure SDeleteAndInsert(var AStr: UnicodeString; AFromPos, ACount: SizeInt; const AReplace: UnicodeString);
 procedure SDeleteHtmlTags(var S: string);
 procedure SFixGreekTextAfterCaseConversion(var S: UnicodeString; ALastCharIsWordEdge: boolean);
+function SCalcHashQword(const S: string): QWord;
 
 
 implementation
@@ -1643,6 +1644,29 @@ begin
       exit(true);
   end;
   Result:= false;
+end;
+
+
+function SCalcHashQword(const S: string): QWord;
+{
+FNV-1a hash of the line's raw buffer bytes. Used only to compare identity of
+lines ("is this line the same text as that deleted line?"), so the encoding
+of the buffer doesn't matter, hashing must be just stable and fast.
+}
+var
+  P: PByte;
+  NLen, i: SizeInt;
+begin
+  Result:= 14695981039346656037;
+  NLen:= Length(S);
+  if NLen=0 then Exit;
+  P:= Pointer(S);
+  for i:= 1 to NLen do
+  begin
+    Result:= Result xor P^;
+    Result:= Result * 1099511628211;
+    Inc(P);
+  end;
 end;
 
 end.
