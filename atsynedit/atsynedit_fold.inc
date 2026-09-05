@@ -88,8 +88,9 @@ begin
   RngOuter:= Fold.ItemPtr(ARangeIndex);
   RngOuter^.Folded:= false;
   FWrapUpdateNeeded:= true;
-
+  //2026.09: hidden-lines map is changed: WrapInfo must be fully recalculated
   Strs:= Strings;
+  Strs.WrapStructInvalidate;
   RangeIndexes:= FFold.FindRanges(ARangeIndex, true{OnlyFolded}, true{TopLevel});
 
   //show all lines not in found _folded_ subranges
@@ -133,6 +134,7 @@ begin
   Range:= Fold.ItemPtr(ARangeIndex);
   Range^.Folded:= true;
   FWrapUpdateNeeded:= true;
+  St.WrapStructInvalidate; //2026.09: hidden-lines map is changed: WrapInfo must be fully recalculated
 
   //partially hide first line
   case FFoldStyle of
@@ -279,6 +281,7 @@ begin
   St:= Strings;
   NMaxLine:= St.Count-1;
   if NMaxLine<0 then exit;
+  St.WrapStructInvalidate; //2026.09: hidden-lines map is recalculated: WrapInfo must be fully recalculated too
 
   for iRange:= 0 to Fold.Count-1 do
   begin

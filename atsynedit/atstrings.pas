@@ -62,6 +62,43 @@ type
     InsertColumn
   );
 
+type
+  {
+  2026.09: performance fix (word-wrap). Structural line changes, which were made
+  in TATStrings since the last TATSynEdit.UpdateWrapInfo() call, are recorded
+  here as a short list of simple ops. Wrap-info update can apply these ops
+  incrementally (shift line indexes, recalc wrap only for new lines), instead
+  of the full recalculation of WrapInfo for all editor lines (which is very
+  slow for big documents, e.g. CudaText test: 300K lines, DEL of 200K lines
+  with word-wrap enabled takes ~6 sec, UNDO takes ~60 sec).
+  Ops are recorded in TATStrings.DoEventChange() for events Added/Deleted.
+  Each op is expressed in line indexes of the document state BEFORE the op.
+  Ops list is cleared when editor applies it in UpdateWrapInfo(), or when
+  wrapping falls back to the full recalculation.
+  }
+  TATWrapStructOpKind = (
+    Inserted,
+    Deleted
+    );
+
+  TATWrapStructOp = record
+    Kind: TATWrapStructOpKind;
+    Line: SizeInt; //first line of the range, in coordinates before the op
+    Count: SizeInt; //number of inserted/deleted lines
+    Hashes: array of QWord; //for Kind=Deleted: hash of each deleted line's text
+    HashesAll: boolean; //True when Hashes[] covers all Count lines (enables wrap-cache reuse on undo)
+  end;
+
+  TATWrapStructOpArray = array of TATWrapStructOp;
+
+const
+  ATStrings_MaxWrapStructOps = 8;
+    //if more structural ops are made before UpdateWrapInfo() applies them,
+    //tracking is marked "complex" and full recalculation is used
+  ATStrings_MaxWrapStructHashes = 2*1024*1024;
+    //hard limit of stored deleted-lines hashes (16 MB of QWords); ops with
+    //more deleted lines get HashesAll=False (no wrap-cache reuse for them)
+
 const
   cEncodingSize: array[TATFileEncoding] of integer = (1, 1, 2, 2, 4, 4);
 
@@ -190,6 +227,8 @@ type
     FList: TATStringItemList;
     FIndexesOfEditedLines: TATIntegerList;
     FEnableCachedWrapinfoUpdate: boolean;
+    FWrapStructOps: TATWrapStructOpArray;
+    FWrapStructComplex: boolean;
     FGaps: TATGaps;
     FBookmarks: TATBookmarks;
     FBookmarks2: TATBookmarks;
@@ -254,6 +293,12 @@ type
     procedure AddUndoItem(AAction: TATEditAction; AIndex: SizeInt;
       const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState;
       ACommandCode: integer);
+    procedure AddUndoItemEx(AAction: TATEditAction; AIndex: SizeInt;
+      const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState;
+      ACommandCode: integer;
+      const ACarets, ACarets2: TATPointPairArray;
+      const AMarkers, AMarkers2: TATMarkerMarkerArray;
+      const AAttribs: TATMarkerAttribArray);
     function DebugText: string;
     function IsFilled: boolean;
     procedure DoFinalizeSaving;
@@ -329,6 +374,8 @@ type
       out ATickCount: QWord;
       out ALineIndexFailed: integer): boolean;
     procedure AddUpdatesAction(ALineIndex: integer; AAction: TATEditAction);
+    procedure WrapStructRecord(AKind: TATWrapStructOpKind; ALine, ACount: SizeInt);
+    procedure WrapStructShiftEditedIndexes(AKind: TATWrapStructOpKind; ALine, ACount: SizeInt);
     procedure UpdateModified;
     procedure LineInsertToSlot(AIndexForUndoItem, AIndexForLine: SizeInt; const AString: atString);
   public
@@ -390,6 +437,14 @@ type
     property LoadingFromStream: boolean read FLoadingFromStream write FLoadingFromStream;
     property IndexesOfEditedLines: TATIntegerList read FIndexesOfEditedLines; //list has line indexes of edited lines; UpdateWrapInfo maybe performs cached update
     property EnableCachedWrapinfoUpdate: boolean read FEnableCachedWrapinfoUpdate write FEnableCachedWrapinfoUpdate; //if False, UpdateWrapInfo cached update will be disabled for the next call
+
+    //2026.09: structural line changes since the last UpdateWrapInfo();
+    //used by TATSynEdit.UpdateWrapInfo() for the incremental WrapInfo update
+    property WrapStructOps: TATWrapStructOpArray read FWrapStructOps;
+    property WrapStructComplex: boolean read FWrapStructComplex;
+    procedure WrapStructClear; //forget all recorded ops (used after WrapInfo was fully recalculated, or document was cleared/replaced)
+    procedure WrapStructInvalidate; //mark tracking as complex: next UpdateWrapInfo() must fully recalculate (e.g. folding state was changed)
+    function GetLineHash(AIndex: SizeInt): QWord; //stable hash of line's raw buffer; used to identify restored-on-undo lines
     property Modified: boolean read FModified write SetModified;
     property ModifiedRecent: boolean read FModifiedRecent write FModifiedRecent;
     property ModifiedVersion: Int64 read FModifiedVersion;
@@ -1518,7 +1573,13 @@ end;
 procedure TATStrings.ActionDeleteFakeLine;
 begin
   if IsLastLineFake then
+  begin
     LineDelete(Count-1, false{AForceLast}, false, false);
+    //2026.09: LineDelete is silent here (AWithEvent=false), but wrap-struct
+    //tracking must know about this line deletion: record op directly
+    //(deleted line had index = current Count, in before-op coordinates)
+    WrapStructRecord(TATWrapStructOpKind.Deleted, Count, 1);
+  end;
 end;
 
 procedure TATStrings.ActionDeleteFakeLineAndFinalEol;
@@ -1537,6 +1598,9 @@ begin
   if Count=0 then
   begin
     LineAddRaw('', TATLineEnds.None, false{AWithEvent});
+    //2026.09: record silent line add for wrap-struct tracking
+    //(added line has index = current Count-1, in before-op coordinates)
+    WrapStructRecord(TATWrapStructOpKind.Inserted, Count-1, 1);
     Exit(true);
   end;
 
@@ -1546,6 +1610,8 @@ begin
   if LinesEnds[Count-1]<>TATLineEnds.None then
   begin
     LineAddRaw('', TATLineEnds.None, false{AWithEvent});
+    //2026.09: record silent line add for wrap-struct tracking
+    WrapStructRecord(TATWrapStructOpKind.Inserted, Count-1, 1);
     Exit(true);
   end;
 
@@ -1931,6 +1997,7 @@ begin
   FList.Clear;
   IndexesOfEditedLines.Clear;
   EnableCachedWrapinfoUpdate:= false;
+  WrapStructClear; //document is replaced: all recorded structural ops are not valid
 end;
 
 procedure TATStrings.ClearLineStates(ASaved: boolean; AFrom: SizeInt=-1; ATo: SizeInt=-1);
@@ -2530,10 +2597,12 @@ Two run kinds are handled (detection is done in UndoCountRun):
 
 It makes the same work as UndoSingle() called for each item separately:
 - same redo-items are created (one per deleted line, with same texts/ends/states);
-- same events (OnUndoBefore/OnUndoAfter, DoEventLog, DoEventChange) in same cases;
-- same carets/markers/attribs are restored per item;
+- same OnUndoBefore/OnUndoAfter events in same cases;
+- same final carets/markers/attribs are restored (values of the last item);
 - same mark-handling of 'other' list items;
 - same handling of too long lines (partial undo, then exit(False)).
+Line-change events (OnChangeLog, OnChangeEx) are coalesced: one event for
+the whole range, with AItemCount>1, like TextInsert() already does.
 
 Only the physical deletion is changed: ONE FList.DeleteRange() call instead of
 ACount of FList.Delete() calls, each of which moved all tail items (O(n^2) total).
@@ -2544,12 +2613,16 @@ var
   CurCaretsArray, CurCaretsArray2: TATPointPairArray;
   CurMarkersArray, CurMarkersArray2: TATMarkerMarkerArray;
   CurAttribsArray: TATMarkerAttribArray;
+  LastCaretsArray, LastCaretsArray2: TATPointPairArray;
+  LastMarkersArray, LastMarkersArray2: TATMarkerMarkerArray;
+  LastAttribsArray: TATMarkerAttribArray;
+  bLastCarets, bLastCarets2: boolean;
   OtherList: TATUndoList;
   ItemData: PATStringItem;
   NEventX, NEventY: SizeInt;
   bWithoutPause, bEnableEventAfter, bConsecutive: boolean;
   bCurHardMarked, bCurHardMarkedNext, bCurUnmodifiedNext: boolean;
-  j, N, NRunCount, NItemIndex, NLineIndex: SizeInt;
+  j, N, NRunCount, NItemIndex, NLineIndex, NRangeStart: SizeInt;
 begin
   Result:= true;
   ASoftMarked:= true;
@@ -2559,6 +2632,13 @@ begin
   ACommandCode:= 0;
   ATickCount:= 0;
   ALineIndexFailed:= -1;
+  bLastCarets:= false;
+  bLastCarets2:= false;
+  LastCaretsArray:= nil;
+  LastCaretsArray2:= nil;
+  LastMarkersArray:= nil;
+  LastMarkersArray2:= nil;
+  LastAttribsArray:= nil;
 
   N:= ACurList.Count;
   if ACurList=FUndoList then
@@ -2622,7 +2702,9 @@ begin
     CurMarkersArray:= CurItem.ItemMarkers;
     CurMarkersArray2:= CurItem.ItemMarkers2;
     CurAttribsArray:= CurItem.ItemAttribs;
-    bWithoutPause:= IsCommandToUndoInOneStep(ACommandCode);
+    //2026.09: always disable pause-events for items of a bulk run:
+    //one undo step must not scroll/pause the editor in its middle
+    bWithoutPause:= true;
 
     UndoSingle_Begin(ACurList, CurItem.ItemAction, ACommandCode,
       ASoftMarked, AHardMarked, bWithoutPause, CurCaretsArray,
@@ -2653,17 +2735,22 @@ begin
       UpdateModified;
       AddUndoItem(TATEditAction.Delete, NItemIndex,
         ItemData^.Line, ItemData^.LineEnds, ItemData^.LineState, FCommandCode);
-      DoEventLog(NItemIndex);
-      DoEventChange(TATLineChangeKind.Deleted, NItemIndex, 1);
 
+      //remember the last values of carets/markers/attribs: they are applied
+      //once after the loop (coalesced events), see comment below
       if Length(CurCaretsArray)>0 then
-        SetCaretsArray(CurCaretsArray);
+      begin
+        LastCaretsArray:= CurCaretsArray;
+        bLastCarets:= true;
+      end;
       if Length(CurCaretsArray2)>0 then
-        SetCaretsArray2(CurCaretsArray2);
-
-      SetMarkersArray(CurMarkersArray);
-      SetMarkersArray2(CurMarkersArray2);
-      SetAttribsArray(CurAttribsArray);
+      begin
+        LastCaretsArray2:= CurCaretsArray2;
+        bLastCarets2:= true;
+      end;
+      LastMarkersArray:= CurMarkersArray;
+      LastMarkersArray2:= CurMarkersArray2;
+      LastAttribsArray:= CurAttribsArray;
     finally
       UndoSingle_End(ACurList, true, bEnableEventAfter, NEventX, NEventY);
     end;
@@ -2691,11 +2778,38 @@ begin
   if NRunCount>0 then
   begin
     if bConsecutive then
+    begin
+      NRangeStart:= ALineIndex+ACount-NRunCount;
+    end
+    else
+    begin
+      NRangeStart:= ALineIndex;
+    end;
+
+    //coalesced events for the whole deleted range (same as UndoRunDeletes(),
+    //see comment there): old code fired them per line, N event-roundtrips
+    //into the editor made undo of big blocks seconds-slow.
+    //2026.09: events are fired BEFORE the physical deletion, like LineDelete()
+    //does; WrapStructRecord() needs the deleted lines to be still present
+    //(it hashes their texts, to reuse wrap-items on redo)
+    DoEventLog(NRangeStart);
+    DoEventChange(TATLineChangeKind.Deleted, NRangeStart, NRunCount);
+
+    if bConsecutive then
       FList.DeleteRange(ALineIndex+ACount-NRunCount, ALineIndex+ACount-1)
     else
       FList.DeleteRange(ALineIndex, ALineIndex+NRunCount-1);
+
     //LineDelete(AForceLast=true) was made per item, same final fixup here
     ActionAddFakeLineIfNeeded;
+
+    if bLastCarets then
+      SetCaretsArray(LastCaretsArray);
+    if bLastCarets2 then
+      SetCaretsArray2(LastCaretsArray2);
+    SetMarkersArray(LastMarkersArray);
+    SetMarkersArray2(LastMarkersArray2);
+    SetAttribsArray(LastAttribsArray);
   end;
 
   if Result then Exit;
@@ -2755,7 +2869,14 @@ UndoCountRun):
   LineBlockDelete() (e.g. DEL with many selected lines, issue #368).
 Per-item processing (LineInsertRaw per item) was O(n^2).
 
-It makes the same work as UndoSingle() called for each item separately.
+It makes the same work as UndoSingle() called for each item separately:
+- same redo-items are created (one per deleted line, with same texts/ends/states);
+- same OnUndoBefore/OnUndoAfter events in same cases;
+- same final carets/markers/attribs are restored (values of the last item);
+- same mark-handling of 'other' list items;
+Line-change events (OnChangeLog, OnChangeEx) are coalesced: one event for
+the whole range, with AItemCount>1, like TextInsert() already does.
+
 Only the physical insert is changed: ONE FList.InsertRange() call opens the
 gap for all lines, then items are written to gap slots.
 Caller checks: ALineIndex>=0, ALineIndex<Count, items form a run.
@@ -2765,6 +2886,10 @@ var
   CurCaretsArray, CurCaretsArray2: TATPointPairArray;
   CurMarkersArray, CurMarkersArray2: TATMarkerMarkerArray;
   CurAttribsArray: TATMarkerAttribArray;
+  LastCaretsArray, LastCaretsArray2: TATPointPairArray;
+  LastMarkersArray, LastMarkersArray2: TATMarkerMarkerArray;
+  LastAttribsArray: TATMarkerAttribArray;
+  bLastCarets, bLastCarets2: boolean;
   OtherList: TATUndoList;
   Item: TATStringItem;
   PItem: PATStringItem;
@@ -2781,6 +2906,13 @@ begin
   ACommandCode:= 0;
   ATickCount:= 0;
   ALineIndexFailed:= -1;
+  bLastCarets:= false;
+  bLastCarets2:= false;
+  LastCaretsArray:= nil;
+  LastCaretsArray2:= nil;
+  LastMarkersArray:= nil;
+  LastMarkersArray2:= nil;
+  LastAttribsArray:= nil;
 
   N:= ACurList.Count;
   if ACurList=FUndoList then
@@ -2793,6 +2925,18 @@ begin
   //grow by 1, so it has index ALineIndex+1 (ACount>=2 is guaranteed by
   //ATStrings_MinUndoRunCount)
   bForwardFill:= (ACount>=2) and (ACurList.Items[N-2].ItemIndex=ALineIndex+1);
+
+  //2026.09: coalesced events for the whole run (was at the end of function):
+  //- fired BEFORE the physical insertion, like LineInsert() does:
+  //  WrapStructRecord() must shift edited-line indexes before lines move,
+  //  and fake-line ops (recorded by the per-item loop below) are expressed
+  //  in coordinates, which already include this insertion;
+  //- pause-events (OnUndoBefore/OnUndoAfter) are disabled for all items of
+  //  the run (see bWithoutPause in the loop): a bulk run is one undo step,
+  //  it must not scroll/pause the editor in the middle of it (also, painting
+  //  inside the run needs WrapInfo for a not-yet-complete document state)
+  DoEventLog(ALineIndex);
+  DoEventChange(TATLineChangeKind.Added, ALineIndex, ACount);
 
   //open the gap for all lines at ALineIndex, in one operation;
   //gap slots are zeroed, same as single Insert() zeroes its slot
@@ -2849,7 +2993,9 @@ begin
     CurMarkersArray:= CurItem.ItemMarkers;
     CurMarkersArray2:= CurItem.ItemMarkers2;
     CurAttribsArray:= CurItem.ItemAttribs;
-    bWithoutPause:= IsCommandToUndoInOneStep(ACommandCode);
+    //2026.09: always disable pause-events for items of a bulk run:
+    //one undo step must not scroll/pause the editor in its middle
+    bWithoutPause:= true;
 
     UndoSingle_Begin(ACurList, CurItem.ItemAction, ACommandCode,
       ASoftMarked, AHardMarked, bWithoutPause, CurCaretsArray,
@@ -2867,8 +3013,6 @@ begin
       UpdateModified;
       AddUndoItem(TATEditAction.Insert, NItemIndex, '',
         TATLineEnds.None, TATLineState.None, FCommandCode);
-      DoEventLog(NItemIndex);
-      DoEventChange(TATLineChangeKind.Added, NItemIndex, 1);
 
       //physical line write: same-index runs write the line here, walking
       //PItem down from the end of block; consecutive runs got all lines
@@ -2891,14 +3035,21 @@ begin
       //line, just inserted by item j, is at slot NLineSlot
       LinesState[NLineSlot]:= CurItem.ItemLineState;
 
+      //remember the last values of carets/markers/attribs: they are applied
+      //once after the loop (coalesced events), see comment below the loop
       if Length(CurCaretsArray)>0 then
-        SetCaretsArray(CurCaretsArray);
+      begin
+        LastCaretsArray:= CurCaretsArray;
+        bLastCarets:= true;
+      end;
       if Length(CurCaretsArray2)>0 then
-        SetCaretsArray2(CurCaretsArray2);
-
-      SetMarkersArray(CurMarkersArray);
-      SetMarkersArray2(CurMarkersArray2);
-      SetAttribsArray(CurAttribsArray);
+      begin
+        LastCaretsArray2:= CurCaretsArray2;
+        bLastCarets2:= true;
+      end;
+      LastMarkersArray:= CurMarkersArray;
+      LastMarkersArray2:= CurMarkersArray2;
+      LastAttribsArray:= CurAttribsArray;
     finally
       UndoSingle_End(ACurList, true, bEnableEventAfter, NEventX, NEventY);
     end;
@@ -2916,6 +3067,35 @@ begin
       if OtherList.Count>0 then
         OtherList.Last.ItemHardMark:= true;
   end;
+
+  {
+  2026.09: coalesced events (2nd performance fix of issue #368).
+  Old code (UndoSingle per item) fired DoEventLog/DoEventChange/SetCaretsArray/
+  SetMarkersArray/SetAttribsArray once PER LINE of the run: for a run of N=100K
+  lines, the editor received N event-roundtrips (each one runs TATSynEdit
+  handlers: Carets.AsArray + DoCaretsFixIncorrectPos for SetCaretsArray, then
+  CudaText-level handlers of OnChangeEx/OnChangeLog), which made undo of big
+  blocks 10+ seconds slow even with the O(N) list work, e.g. CudaText test
+  (300K lines file, DEL first 200K lines, then Undo): 19-59 seconds spent in
+  per-item event handlers.
+  Bulk operations of the editor already use coalesced events with AItemCount>1:
+  TextInsert() ends with single DoEventLog(AY) + DoEventChange(Added, AY, Count)
+  for the whole inserted block; TATGaps/TATBookmarks/TATSynEdit.Fold handle
+  AItemCount>1 natively. Same is done here: one event for the whole run
+  (DoEventLog/DoEventChange are fired at the beginning of the function, before
+  the physical insertion - like LineInsert() does).
+  Carets/markers/attribs: only the values of the LAST processed item are applied
+  (for all-same-values runs and for mirror-runs, this gives the same final
+  editor state as N per-item applications: the last application wins).
+  }
+
+  if bLastCarets then
+    SetCaretsArray(LastCaretsArray);
+  if bLastCarets2 then
+    SetCaretsArray2(LastCaretsArray2);
+  SetMarkersArray(LastMarkersArray);
+  SetMarkersArray2(LastMarkersArray2);
+  SetAttribsArray(LastAttribsArray);
 end;
 
 
@@ -3086,6 +3266,71 @@ begin
     GetMarkersArray,
     GetMarkersArray2,
     GetAttribsArray,
+    ACommandCode,
+    FRunningUndoOrRedo
+    );
+end;
+
+procedure TATStrings.AddUndoItemEx(AAction: TATEditAction; AIndex: SizeInt;
+  const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState;
+  ACommandCode: integer;
+  const ACarets, ACarets2: TATPointPairArray;
+  const AMarkers, AMarkers2: TATMarkerMarkerArray;
+  const AAttribs: TATMarkerAttribArray);
+{
+2026.09: performance fix, for LineBlockDelete(): same as AddUndoItem(), but carets/
+markers/attribs are passed by caller (they are captured once for the whole deleted
+block, not per line). It makes the same undo-items: AddUndoItem() captured the
+SAME arrays for every line of one block-delete (nothing changes during its loop:
+it doesn't fire per-line events, carets/markers don't move).
+}
+var
+  CurList: TATUndoList;
+begin
+  if FUndoList=nil then exit;
+  if FRedoList=nil then exit;
+  if FUndoLimit=0 then exit;
+
+  if not FUndoList.Locked then
+    CurList:= FUndoList
+  else
+  if not FRedoList.Locked then
+    CurList:= FRedoList
+  else
+    exit;
+
+  if Length(AText)>ATEditorOptions.MaxLineLenForUndo then
+  begin
+    if Assigned(FOnUndoTooLongLine) then
+      FOnUndoTooLongLine(Self, -1, -1);
+    CurList.Clear;
+    exit
+  end;
+
+  //handle CaretJump: (not used by LineBlockDelete, kept for symmetry)
+  if AAction=TATEditAction.CaretJump then
+  begin
+    if (CurList.Count>0) and (CurList.Last.ItemAction=AAction) then
+      CurList.DeleteLast;
+  end
+  else
+  begin
+    if not FUndoList.Locked and not FRedoList.Locked then
+      FRedoList.Clear;
+    AddUpdatesAction(AIndex, AAction);
+  end;
+
+  CurList.Add(
+    AAction,
+    AIndex,
+    AText,
+    AEnd,
+    ALineState,
+    ACarets,
+    ACarets2,
+    AMarkers,
+    AMarkers2,
+    AAttribs,
     ACommandCode,
     FRunningUndoOrRedo
     );
@@ -3306,9 +3551,19 @@ begin
 end;
 
 procedure TATStrings.ActionDeleteDupFakeLines;
+var
+  NDeleted: SizeInt;
 begin
+  NDeleted:= 0;
   while IsLastFakeLineUnneeded do
+  begin
     LineDelete(Count-1, false, false, false);
+    Inc(NDeleted);
+  end;
+  //2026.09: LineDelete is silent here (AWithEvent=false), record ops directly:
+  //deleted lines had indexes [Count .. Count+NDeleted-1] in before-op coordinates
+  if NDeleted>0 then
+    WrapStructRecord(TATWrapStructOpKind.Deleted, Count, NDeleted);
 end;
 
 function TATStrings.ActionDeleteAllBlanks: boolean;
@@ -3531,6 +3786,220 @@ begin
     IndexesOfEditedLines.Add(ALineIndex);
 end;
 
+
+procedure TATStrings.WrapStructRecord(AKind: TATWrapStructOpKind; ALine, ACount: SizeInt);
+{
+Records one structural line op (made by this event) in the ops list, merging it
+with the last op when possible. Each op has line indexes of the document state
+BEFORE that op, so editor applies ops to WrapInfo in the same order.
+Merge rules (conservative; anything not mergeable marks the tracking complex,
+which makes the next UpdateWrapInfo() use full recalculation - like it always
+worked before 2026.09):
+- "Inserted at Q, M" merges with pending "Inserted at P, K" when new lines
+  continue the same block: Q in [P-1 .. P+K].
+- "Deleted at Q, M" merges with pending "Deleted at P, K" when removed ranges
+  are adjacent in the pending op's "before" coordinates:
+  * Q+M-1 = P-1: adjacent above (e.g. LineBlockDelete's loop from ALine2
+    downto ALine1, or undo of a block-insert run, pops items with
+    decreasing indexes);
+  * Q = P: adjacent below, in current coordinates (e.g. per-item undo of a
+    same-index Insert run, LineDelete at same index);
+  * Q+M-1 < P-1 or Q > P: not adjacent, full recalculation.
+- "Deleted" followed by "Inserted" (e.g. TextReplaceLines) is not merged:
+  full recalculation is used.
+IndexesOfEditedLines entries are shifted here, to keep them valid in the
+coordinates after all ops (entries can be recorded before a structural op).
+Hashes of deleted lines are merged in line order, so undo of the whole block
+can reuse the wrap-items cache.
+}
+var
+  Last: ^TATWrapStructOp;
+  CurHashes: array of QWord;
+  bCurHashesAll: boolean;
+  i: SizeInt;
+  bMerged, bMergeAbove: boolean;
+begin
+  if FWrapStructComplex then Exit;
+
+  //line indexes of edited lines (recorded earlier) must be shifted now
+  WrapStructShiftEditedIndexes(AKind, ALine, ACount);
+
+  if ACount<=0 then Exit;
+
+  //hash texts of deleted lines, to let editor reuse their wrap-items on undo;
+  //lines must be still present: all "Deleted" events are fired before
+  //the physical deletion (LineDelete/LineBlockDelete/UndoRunInserts)
+  bCurHashesAll:= false;
+  if AKind=TATWrapStructOpKind.Deleted then
+    if ACount<=ATStrings_MaxWrapStructHashes then
+    begin
+      SetLength(CurHashes, ACount);
+      bCurHashesAll:= true;
+      for i:= 0 to ACount-1 do
+        if IsIndexValid(ALine+i) then
+          CurHashes[i]:= GetLineHash(ALine+i)
+        else
+        begin
+          SetLength(CurHashes, 0);
+          bCurHashesAll:= false;
+          Break
+        end;
+    end;
+
+  if Length(FWrapStructOps)>0 then
+  begin
+    Last:= @FWrapStructOps[High(FWrapStructOps)];
+    bMerged:= false;
+
+    case AKind of
+      TATWrapStructOpKind.Inserted:
+        if Last^.Kind=TATWrapStructOpKind.Inserted then
+          if (ALine>=Last^.Line-1) and (ALine<=Last^.Line+Last^.Count) then
+          begin
+            if ALine<Last^.Line then
+              Dec(Last^.Line, ACount); //inserted block starts earlier
+            Inc(Last^.Count, ACount);
+            bMerged:= true;
+          end;
+
+      TATWrapStructOpKind.Deleted:
+        if Last^.Kind=TATWrapStructOpKind.Deleted then
+          if (ALine+ACount-1=Last^.Line-1) or (ALine=Last^.Line) then
+          begin
+            bMergeAbove:= ALine+ACount-1=Last^.Line-1;
+            if bMergeAbove then
+              Dec(Last^.Line, ACount); //removed block starts earlier
+            Inc(Last^.Count, ACount);
+            //merge hashes in line order
+            if Last^.HashesAll and bCurHashesAll then
+            begin
+              if bMergeAbove then
+              begin
+                SetLength(Last^.Hashes, Length(Last^.Hashes)+ACount);
+                for i:= High(Last^.Hashes) downto ACount do
+                  Last^.Hashes[i]:= Last^.Hashes[i-ACount];
+                for i:= 0 to ACount-1 do
+                  Last^.Hashes[i]:= CurHashes[i];
+              end
+              else
+              begin
+                SetLength(Last^.Hashes, Length(Last^.Hashes)+ACount);
+                for i:= 0 to ACount-1 do
+                  Last^.Hashes[Length(Last^.Hashes)-ACount+i]:= CurHashes[i];
+              end;
+            end
+            else
+            begin
+              SetLength(Last^.Hashes, 0);
+              Last^.HashesAll:= false;
+            end;
+            bMerged:= true;
+          end;
+    end;
+
+    if bMerged then
+    begin
+      if Length(Last^.Hashes)>ATStrings_MaxWrapStructHashes then
+      begin
+        SetLength(Last^.Hashes, 0);
+        Last^.HashesAll:= false;
+      end;
+      Exit
+    end;
+  end;
+
+  if Length(FWrapStructOps)>=ATStrings_MaxWrapStructOps then
+  begin
+    WrapStructInvalidate;
+    Exit
+  end;
+
+  SetLength(FWrapStructOps, Length(FWrapStructOps)+1);
+  Last:= @FWrapStructOps[High(FWrapStructOps)];
+  FillChar(Last^, SizeOf(Last^), 0);
+  Last^.Kind:= AKind;
+  Last^.Line:= ALine;
+  Last^.Count:= ACount;
+  if bCurHashesAll then
+  begin
+    Last^.Hashes:= CurHashes;
+    Last^.HashesAll:= true;
+  end;
+end;
+
+procedure TATStrings.WrapStructShiftEditedIndexes(AKind: TATWrapStructOpKind; ALine, ACount: SizeInt);
+var
+  List: TATIntegerList;
+  i, N, NWritten: integer;
+begin
+  List:= IndexesOfEditedLines;
+  if not Assigned(List) then Exit;
+  if List.Count=0 then Exit;
+
+  NWritten:= 0;
+  for i:= 0 to List.Count-1 do
+  begin
+    N:= List[i];
+    case AKind of
+      TATWrapStructOpKind.Inserted:
+        if N>=ALine then
+          Inc(N, ACount);
+      TATWrapStructOpKind.Deleted:
+        begin
+          if (N>=ALine) and (N<ALine+ACount) then
+            Continue; //line is deleted
+          if N>=ALine+ACount then
+            Dec(N, ACount);
+        end;
+    end;
+    List[NWritten]:= N;
+    Inc(NWritten);
+  end;
+  while List.Count>NWritten do
+    List.Delete(List.Count-1);
+end;
+
+procedure TATStrings.WrapStructClear;
+var
+  i: integer;
+begin
+  for i:= 0 to High(FWrapStructOps) do
+    SetLength(FWrapStructOps[i].Hashes, 0);
+  FWrapStructOps:= nil;
+  FWrapStructComplex:= false;
+end;
+
+procedure TATStrings.WrapStructInvalidate;
+begin
+  WrapStructClear;
+  FWrapStructComplex:= true;
+end;
+
+function TATStrings.GetLineHash(AIndex: SizeInt): QWord;
+{
+FNV-1a hash of the line's raw buffer bytes. Used only to compare identity of
+lines ("is this line the same text as that deleted line?"), so the encoding
+of the buffer doesn't matter, hashing must be just stable and fast.
+}
+var
+  Item: PATStringItem;
+  P: PByte;
+  NLen, i: SizeInt;
+begin
+  Result:= 14695981039346656037;
+  if not IsIndexValid(AIndex) then Exit;
+  Item:= FList.GetItem(AIndex);
+  NLen:= Length(Item^.Buf);
+  if NLen=0 then Exit;
+  P:= Pointer(Item^.Buf);
+  for i:= 1 to NLen do
+  begin
+    Result:= Result xor P^;
+    Result:= Result * 1099511628211;
+    Inc(P);
+  end;
+end;
+
 procedure TATStrings.DoOnChangeBlock(AX1, AY1, AX2, AY2: SizeInt;
   AChange: TATBlockChangeKind; ABlock: TStringList);
 begin
@@ -3683,6 +4152,28 @@ end;
 procedure TATStrings.DoEventChange(AChange: TATLineChangeKind; ALineIndex, AItemCount: SizeInt);
 begin
   if not FEnabledChangeEvents then exit;
+
+  //2026.09: record structural line changes for the incremental WrapInfo update.
+  //Must be done while affected lines are still present for Kind=Deleted
+  //(all "Deleted" events are fired before the physical deletion).
+  //Edited lines are also indexed here: AddUpdatesAction() indexes them only
+  //when undo items are made (AddUndoItem exits when UndoLimit=0), while the
+  //incremental WrapInfo update needs edited-line indexes in any case.
+  case AChange of
+    TATLineChangeKind.Added:
+      WrapStructRecord(TATWrapStructOpKind.Inserted, ALineIndex, AItemCount);
+    TATLineChangeKind.Deleted:
+      WrapStructRecord(TATWrapStructOpKind.Deleted, ALineIndex, AItemCount);
+    TATLineChangeKind.Edited:
+      if not FWrapStructComplex then
+        if IsIndexValid(ALineIndex) then
+        begin
+          if IndexesOfEditedLines.IndexOf(ALineIndex)<0 then
+            IndexesOfEditedLines.Add(ALineIndex);
+          if IndexesOfEditedLines.Count>ATEditorOptions.MaxUpdatesCountEasy then
+            WrapStructInvalidate;
+        end;
+  end;
 
   FGaps.Update(AChange, ALineIndex, AItemCount);
 

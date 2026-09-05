@@ -72,6 +72,7 @@ type
     procedure Clear;
     procedure Delete(Index: Integer);
     procedure DeleteRange(IndexFrom, IndexTo : Integer);
+    procedure InsertRange(AIndex, ACount: Integer);
     class procedure Error(const Msg: string; Data: PtrInt);
     procedure Exchange(Index1, Index2: Integer);
     function Expand: TFPSList;
@@ -627,6 +628,40 @@ begin
     on the list, and accidentally Deref it too soon.
     See http://bugs.freepascal.org/view.php?id=20005. }
   FillChar(InternalItems[FCount]^, (FCapacity+1-FCount) * FItemSize, #0);
+end;
+
+procedure TFPSList.InsertRange(AIndex, ACount: Integer);
+{
+2026.09: opens ACount empty slots at AIndex, with a single memory-move of the
+list tail. Slots are zeroed = empty items, like TFPSList.Insert() leaves its
+inserted slot (list keeps 'ending filled with zeros' invariant).
+Same effect as ACount of Insert() calls, but O(Count) list-work instead of
+O(Count*ACount). Made for the incremental WrapInfo update: splicing
+wrap-items of inserted lines into TATWrapItems (also used by
+TATStringItemList.InsertRange logic before).
+}
+var
+  Ptr: PByte;
+begin
+  if ACount<=0 then Exit;
+  if (AIndex<0) or (AIndex>FCount) then
+    RaiseIndexError(AIndex);
+
+  if FCount+ACount>FCapacity then
+    SetCapacity(FCount+ACount);
+
+  if AIndex<FCount then
+  begin
+    Ptr:= PByte(InternalItems[AIndex]);
+    //move list tail to the right; region after Count is zeroed by SetCapacity,
+    //so it's safe to move to (Ptr+ACount*ItemSize)
+    System.Move(Ptr^, (Ptr+Int64(ACount)*FItemSize)^, Int64(FCount-AIndex)*FItemSize);
+    //zero opened slots: empty items, like Insert() does
+    System.FillChar(Ptr^, Int64(ACount)*FItemSize, 0);
+  end;
+  //note: for AIndex=Count (append) slots are already zeroed: list keeps
+  //'ending filled with zeros' invariant
+  Inc(FCount, ACount);
 end;
 
 procedure TFPSList.Extract(Item: Pointer; ResultPtr: Pointer);
