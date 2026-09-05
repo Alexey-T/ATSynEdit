@@ -185,7 +185,6 @@ type
     constructor Create;
     function GetItem(AIndex: SizeInt): PATStringItem;
     procedure Deref(Item: Pointer); override; overload;
-    procedure InsertRange(AIndex, ACount: SizeInt);
     procedure SortRange(L, R: SizeInt; Compare: TFPSListCompareFunc);
   end;
 
@@ -1085,39 +1084,6 @@ end;
 procedure TATStringItemList.Deref(Item: Pointer);
 begin
   PATStringItem(Item)^.Buf:= '';
-end;
-
-procedure TATStringItemList.InsertRange(AIndex, ACount: SizeInt);
-{
-Opens ACount empty slots at AIndex, with a single memory-move of the list tail.
-Slots are zeroed = empty items (nil string, no line-ending), like TFPSList.Insert
-leaves its inserted slot. Made for TATStrings.LineBlockInsert: it allows to insert
-a big block of lines with O(N) list work, instead of calling TFPSList.Insert()
-per line, which shifts the list tail on every call and gives O(N^2) time
-(e.g. hours for 1M lines, CudaText performance issue).
-}
-var
-  Ptr: PByte;
-begin
-  if ACount<=0 then Exit;
-  if (AIndex<0) or (AIndex>Count) then
-    RaiseIndexError(AIndex);
-
-  if Count+ACount>Capacity then
-    Capacity:= Count+ACount;
-
-  if AIndex<Count then
-  begin
-    Ptr:= PByte(InternalItems[AIndex]);
-    //move list tail to the right; region after Count is zeroed by SetCapacity,
-    //so it's safe to move to (Ptr+ACount*ItemSize)
-    System.Move(Ptr^, (Ptr+Int64(ACount)*ItemSize)^, Int64(Count-AIndex)*ItemSize);
-    //zero opened slots: empty TATStringItem (nil string), like Insert() does
-    System.FillChar(Ptr^, Int64(ACount)*ItemSize, 0);
-  end;
-  //note: for AIndex=Count (append) slots are already zeroed: list keeps
-  //"ending filled with zeros" invariant (see comments in ATSynEdit_fgl)
-  Inc(FCount, ACount);
 end;
 
 procedure TATStringItemList.SortRange(L, R: SizeInt; Compare: TFPSListCompareFunc);
