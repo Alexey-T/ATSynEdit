@@ -1646,7 +1646,9 @@ begin
   Result:= false;
 end;
 
-
+{$push}
+{$RANGECHECKS OFF}
+{$OVERFLOWCHECKS OFF}
 function SCalcHashQword(const S: string): QWord;
 {
 FNV-1a hash of the line's raw buffer bytes. Used only to compare identity of
@@ -1668,5 +1670,6 @@ begin
     Inc(P);
   end;
 end;
+{$pop}
 
 end.
