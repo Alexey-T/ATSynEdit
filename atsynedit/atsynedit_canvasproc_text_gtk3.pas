@@ -20,6 +20,7 @@ uses
   SysUtils,
   LCLType,
   LCLIntf,
+  Forms,
   Gtk3Objects, // Contains TGtk3DeviceContext
   Cairo,
   Lazcairo1,
@@ -37,14 +38,13 @@ type
 
 var
   // Global variables used to cache font state.
-  // The color/source cannot be cached because LCL may change it between calls,
-  // for example when FillRect paints the selection background.
   LastFontName: string = '';
   LastFontSize: Integer = 0;
   LastFontBold: Boolean = False;
   LastFontItalic: Boolean = False;
   LastBaseline: Integer = 0;
   LastCt: pcairo_t = nil;
+  LastFontMatrix: cairo_matrix_t; // initialised below
 
 procedure NativeTextOut(ACanvas: TCanvas; AX, AY: Integer; const AStr: string);
 var
@@ -60,12 +60,12 @@ var
   extents: cairo_font_extents_t;
   FontChanged: Boolean;
   OwnsContext: Boolean;
+  CurFontMatrix: cairo_matrix_t;
 begin
   Ctx := TGtk3DeviceContext(ACanvas.Handle);
   OwnsContext := False;
 
   // Optimization 1: reuse the existing LCL Cairo context instead of creating a new one.
-  // This avoids expensive cairo_create/cairo_destroy calls for every text chunk.
   ct := Ctx.pcr;
   if ct = nil then
   begin
@@ -78,18 +78,43 @@ begin
       raise ECairoException.Create('Cannot get cairo context');
   end;
 
+  {
+  WriteLn(Format('[DBG] Font.Name=%s Height=%d Size=%d PixelsPerInch=%d ct=%p',
+    [ACanvas.Font.Name, ACanvas.Font.Height, ACanvas.Font.Size,
+     Screen.PixelsPerInch, ct]));
+  }
+
   try
     IsBold := fsBold in ACanvas.Font.Style;
     IsItalic := fsItalic in ACanvas.Font.Style;
 
     // Optimization 2: cache font parameters.
-    // LCL does not modify the Cairo toy-text font face inside pcr,
-    // so caching the font is safe here.
+    // We invalidate the cache when any canvas font property changes
+    // OR the cairo_t pointer changes OR the Cairo font matrix on the
+    // context has been overwritten externally (see fix #2 above).
     FontChanged := (ACanvas.Font.Name <> LastFontName) or
                    (ACanvas.Font.Height <> LastFontSize) or
                    (IsBold <> LastFontBold) or
                    (IsItalic <> LastFontItalic) or
                    (ct <> LastCt);
+
+    // Detect external modification of the Cairo font matrix.
+    // LCL GTK3 may call pango_cairo_update_layout between our calls
+    // (e.g. when painting gutter text or selection via Pango), which
+    // internally calls cairo_set_font_matrix and silently overwrites
+    // the toy-text font size we set.  Without this check the cache
+    // believes the font is still valid and text is drawn at Pango's
+    // (typically smaller) size — visible after window resize when the
+    // paint order or Pango font setup changes.
+    if not FontChanged then
+    begin
+      cairo_get_font_matrix(ct, @CurFontMatrix);
+      if (Abs(CurFontMatrix.xx - LastFontMatrix.xx) > 0.01) or
+         (Abs(CurFontMatrix.yx - LastFontMatrix.yx) > 0.01) or
+         (Abs(CurFontMatrix.xy - LastFontMatrix.xy) > 0.01) or
+         (Abs(CurFontMatrix.yy - LastFontMatrix.yy) > 0.01) then
+        FontChanged := True;
+    end;
 
     if FontChanged then
     begin
@@ -110,7 +135,7 @@ begin
         ADefFont := GetFontData(GetStockObject(DEFAULT_GUI_FONT));
         cairo_select_font_face(ct, PChar(string(ADefFont.Name)), LSlant, LWeight);
         if ACanvas.Font.Height = 0 then
-          cairo_set_font_size(ct, ADefFont.Height)
+          cairo_set_font_size(ct, Abs(ADefFont.Height))          // FIX #1: was ADefFont.Height (negative!)
         else
           cairo_set_font_size(ct, Abs(ACanvas.Font.Height));
         LastFontName := string(ADefFont.Name);
@@ -121,7 +146,7 @@ begin
         if ACanvas.Font.Height = 0 then
         begin
           ADefFont := GetFontData(GetStockObject(DEFAULT_GUI_FONT));
-          cairo_set_font_size(ct, ADefFont.Height);
+          cairo_set_font_size(ct, Abs(ADefFont.Height));         // FIX #1: was ADefFont.Height (negative!)
         end
         else
           cairo_set_font_size(ct, Abs(ACanvas.Font.Height));
@@ -132,15 +157,16 @@ begin
       LastFontBold := IsBold;
       LastFontItalic := IsItalic;
 
+      // Save the font matrix we just set so we can detect external
+      // overwrites on subsequent calls (fix #2).
+      cairo_get_font_matrix(ct, @LastFontMatrix);
+
       // Calculate and cache the font baseline.
       cairo_font_extents(ct, @extents);
       LastBaseline := Ceil(extents.height - extents.descent);
     end;
 
     // Regression fix: the color/source must always be set before drawing.
-    // LCL GTK3 changes the source in pcr during operations such as FillRect,
-    // for example when painting the selection background.
-    // If this call were skipped, text could be painted with the background color.
     AColor := ACanvas.Font.Color;
     C.R := CairoColors[GetRValue(AColor)];
     C.G := CairoColors[GetGValue(AColor)];
@@ -165,5 +191,12 @@ var
 initialization
   for I := 0 to 255 do
     CairoColors[I] := I / 255;
+  // Initialise to identity so the first call never matches stale garbage.
+  LastFontMatrix.xx := 1.0;
+  LastFontMatrix.yx := 0.0;
+  LastFontMatrix.xy := 0.0;
+  LastFontMatrix.yy := 1.0;
+  LastFontMatrix.x0 := 0.0;
+  LastFontMatrix.y0 := 0.0;
 
 end.
