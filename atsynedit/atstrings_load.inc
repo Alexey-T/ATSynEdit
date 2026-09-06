@@ -1,3 +1,4 @@
+{$GOTO ON} //2026.09: enable goto/label for the tight scan loops below (FPC needs -Sg or this directive; Lazarus lpk passes no -Sg)
 {$ifdef nn}begin end;{$endif}
 
 function IsStreamWithSignature(Stream: TStream; const Sign: string): boolean;
@@ -408,6 +409,7 @@ begin
     SetLineState(i, TATLineState.Added);
 end;
 
+{
 type
   TATCharEnding = (
     NotEnding,
@@ -415,49 +417,10 @@ type
     Ending13
     );
 
-function _GetBufferEnding(ABuffer: pointer; APos: SizeInt; AEnc: TATFileEncoding): TATCharEnding; inline;
-var
-  p: PByte absolute ABuffer;
-  Check: byte;
-begin
-  Result:= TATCharEnding.NotEnding;
-  case AEnc of
-    TATFileEncoding.ANSI,
-    TATFileEncoding.UTF8:
-      begin
-        Check:= p[APos];
-      end;
-    TATFileEncoding.UTF16LE:
-      begin
-        if p[APos+1]<>0 then exit;
-        Check:= p[APos];
-      end;
-    TATFileEncoding.UTF16BE:
-      begin
-        if p[APos]<>0 then exit;
-        Check:= p[APos+1];
-      end;
-    TATFileEncoding.UTF32LE:
-      begin
-        if p[APos+3]<>0 then exit;
-        if p[APos+2]<>0 then exit;
-        if p[APos+1]<>0 then exit;
-        Check:= p[APos];
-      end;
-    TATFileEncoding.UTF32BE:
-      begin
-        if p[APos]<>0 then exit;
-        if p[APos+1]<>0 then exit;
-        if p[APos+2]<>0 then exit;
-        Check:= p[APos+3];
-      end;
-  end;
-
-  case Check of
-    10: Result:= TATCharEnding.Ending10;
-    13: Result:= TATCharEnding.Ending13;
-  end;
-end;
+2026.09: _GetBufferEnding() and TATCharEnding are removed: _FindNextEol()
+now uses per-encoding tight scanning loops, which don't need per-char
+EOL classification (see the comment in _FindNextEol).
+}
 
 procedure TATStrings.DoLoadFromStream(Stream: TStream;
   AOptions: TATLoadStreamOptions; out AForcedToANSI: boolean);
@@ -471,51 +434,252 @@ var
   procedure _FindNextEol(AFromPos: SizeInt;
     out AFoundPos: SizeInt;
     out AEnding: TATLineEnds);
+  {
+  2026.09: optimized scanning (CudaText perf: parsing of big files was
+  dominated by per-char _GetBufferEnding() case-dispatch + 'mod' check,
+  e.g. 300MB text ~11s). Now per-encoding tight pointer loops, which give
+  identical EOL detection. OnProgress event now fires when the scan crosses
+  a multiple of ProgressLoadChars (detected per cScanChunk block, so loading
+  of files with huge single lines still shows progress and allows cancel).
+  }
+  const
+    cScanChunk = 4096;
+  label
+    FoundEol;
   var
     bCancel: boolean;
+    p, pLimit, pEnd: PAnsiChar;
+    NNextProgress: Int64;
   begin
     AFoundPos:= AFromPos;
     AEnding:= TATLineEnds.None;
-    repeat
-      if AFoundPos>=BufSize then exit;
+    if AFromPos>=BufSize then exit;
 
-      if (AFoundPos>0) and (AFoundPos mod TATEditorOptions.ProgressLoadChars = 0) then
-      begin
-        FProgressValue:= Int64(AFoundPos)*100 div NStreamSize;
-        if Assigned(FOnProgress) then
+    NNextProgress:=
+      ((Int64(AFromPos) div TATEditorOptions.ProgressLoadChars)+1)*TATEditorOptions.ProgressLoadChars;
+
+    p:= Buf+AFromPos;
+    pEnd:= Buf+BufSize;
+
+    case FEncoding of
+      TATFileEncoding.ANSI,
+      TATFileEncoding.UTF8:
+        repeat
+          pLimit:= p+cScanChunk;
+          if pLimit>pEnd then pLimit:= pEnd;
+          while p<pLimit do
+          begin
+            if (p^=#10) or (p^=#13) then goto FoundEol;
+            Inc(p);
+          end;
+          if p>=pEnd then Break;
+          if (p^=#10) or (p^=#13) then goto FoundEol;
+
+          AFoundPos:= p-Buf;
+          if AFoundPos>=NNextProgress then
+          begin
+            FProgressValue:= Int64(AFoundPos)*100 div NStreamSize;
+            if Assigned(FOnProgress) then
+            begin
+              bCancel:= false;
+              FOnProgress(Self, bCancel);
+              if bCancel then
+                raise EEditorUserStopped.Create('User stopped');
+            end;
+            NNextProgress:=
+              ((Int64(AFoundPos) div TATEditorOptions.ProgressLoadChars)+1)*TATEditorOptions.ProgressLoadChars;
+          end;
+        until false;
+
+      TATFileEncoding.UTF16LE:
+        //EOL is encoded word $000A or $000D (bytes: 0A 00 / 0D 00)
+        repeat
+          pLimit:= p+cScanChunk;
+          if pLimit>pEnd then pLimit:= pEnd;
+          while p+2<=pLimit do
+          begin
+            if ((p^=#10) or (p^=#13)) and ((p+1)^=#0) then goto FoundEol;
+            Inc(p, 2);
+          end;
+          if p+2>pEnd then Break;
+
+          AFoundPos:= p-Buf;
+          if AFoundPos>=NNextProgress then
+          begin
+            FProgressValue:= Int64(AFoundPos)*100 div NStreamSize;
+            if Assigned(FOnProgress) then
+            begin
+              bCancel:= false;
+              FOnProgress(Self, bCancel);
+              if bCancel then
+                raise EEditorUserStopped.Create('User stopped');
+            end;
+            NNextProgress:=
+              ((Int64(AFoundPos) div TATEditorOptions.ProgressLoadChars)+1)*TATEditorOptions.ProgressLoadChars;
+          end;
+        until false;
+
+      TATFileEncoding.UTF16BE:
+        //EOL is encoded word $0A00 or $0D00 (bytes: 00 0A / 00 0D)
+        repeat
+          pLimit:= p+cScanChunk;
+          if pLimit>pEnd then pLimit:= pEnd;
+          while p+2<=pLimit do
+          begin
+            if (p^=#0) and (((p+1)^=#10) or ((p+1)^=#13)) then goto FoundEol;
+            Inc(p, 2);
+          end;
+          if p+2>pEnd then Break;
+
+          AFoundPos:= p-Buf;
+          if AFoundPos>=NNextProgress then
+          begin
+            FProgressValue:= Int64(AFoundPos)*100 div NStreamSize;
+            if Assigned(FOnProgress) then
+            begin
+              bCancel:= false;
+              FOnProgress(Self, bCancel);
+              if bCancel then
+                raise EEditorUserStopped.Create('User stopped');
+            end;
+            NNextProgress:=
+              ((Int64(AFoundPos) div TATEditorOptions.ProgressLoadChars)+1)*TATEditorOptions.ProgressLoadChars;
+          end;
+        until false;
+
+      TATFileEncoding.UTF32LE:
+        //EOL is encoded dword $0000000A/$0000000D (bytes: 0A 00 00 00)
+        repeat
+          pLimit:= p+cScanChunk;
+          if pLimit>pEnd then pLimit:= pEnd;
+          while p+4<=pLimit do
+          begin
+            if ((p^=#10) or (p^=#13)) and
+              ((p+1)^=#0) and ((p+2)^=#0) and ((p+3)^=#0) then goto FoundEol;
+            Inc(p, 4);
+          end;
+          if p+4>pEnd then Break;
+
+          AFoundPos:= p-Buf;
+          if AFoundPos>=NNextProgress then
+          begin
+            FProgressValue:= Int64(AFoundPos)*100 div NStreamSize;
+            if Assigned(FOnProgress) then
+            begin
+              bCancel:= false;
+              FOnProgress(Self, bCancel);
+              if bCancel then
+                raise EEditorUserStopped.Create('User stopped');
+            end;
+            NNextProgress:=
+              ((Int64(AFoundPos) div TATEditorOptions.ProgressLoadChars)+1)*TATEditorOptions.ProgressLoadChars;
+          end;
+        until false;
+
+      TATFileEncoding.UTF32BE:
+        //EOL is encoded dword $0A000000/$0D000000 (bytes: 00 00 00 0A)
+        repeat
+          pLimit:= p+cScanChunk;
+          if pLimit>pEnd then pLimit:= pEnd;
+          while p+4<=pLimit do
+          begin
+            if (p^=#0) and ((p+1)^=#0) and ((p+2)^=#0) and
+              (((p+3)^=#10) or ((p+3)^=#13)) then goto FoundEol;
+            Inc(p, 4);
+          end;
+          if p+4>pEnd then Break;
+
+          AFoundPos:= p-Buf;
+          if AFoundPos>=NNextProgress then
+          begin
+            FProgressValue:= Int64(AFoundPos)*100 div NStreamSize;
+            if Assigned(FOnProgress) then
+            begin
+              bCancel:= false;
+              FOnProgress(Self, bCancel);
+              if bCancel then
+                raise EEditorUserStopped.Create('User stopped');
+            end;
+            NNextProgress:=
+              ((Int64(AFoundPos) div TATEditorOptions.ProgressLoadChars)+1)*TATEditorOptions.ProgressLoadChars;
+          end;
+        until false;
+    end;
+
+    //no EOL till the buffer end
+    AFoundPos:= p-Buf;
+    exit;
+
+  FoundEol:
+    AFoundPos:= p-Buf;
+
+    //detect EOL kind: LF or CR (byte position depends on encoding)
+    case FEncoding of
+      TATFileEncoding.UTF16BE:
+        if (p+1)^=#10 then
         begin
-          bCancel:= false;
-          FOnProgress(Self, bCancel);
-          if bCancel then
-            raise EEditorUserStopped.Create('User stopped');
+          AEnding:= TATLineEnds.Unix;
+          exit;
         end;
-      end;
+      TATFileEncoding.UTF32BE:
+        if (p+3)^=#10 then
+        begin
+          AEnding:= TATLineEnds.Unix;
+          exit;
+        end;
+      else
+        if p^=#10 then
+        begin
+          AEnding:= TATLineEnds.Unix;
+          exit;
+        end;
+    end;
 
-      case _GetBufferEnding(Buf, AFoundPos, FEncoding) of
-        TATCharEnding.NotEnding:
-          begin
-            Inc(AFoundPos, CharSize);
-          end;
-        TATCharEnding.Ending10:
-          begin
-            AEnding:= TATLineEnds.Unix;
-            exit
-          end;
-        TATCharEnding.Ending13:
-          begin
-            //if CR is the last char of buffer, it cannot be part of CRLF pair,
-            //so it's a Mac-style line ending (fixes loss of trailing CR on load/save)
-            if AFoundPos+CharSize>=BufSize then
-              AEnding:= TATLineEnds.Mac
-            else
-            if _GetBufferEnding(Buf, AFoundPos+CharSize, FEncoding)=TATCharEnding.Ending10 then
-              AEnding:= TATLineEnds.Windows
-            else
-              AEnding:= TATLineEnds.Mac;
-            exit
-          end;
-      end;
-    until false;
+    //CR: check if it's CRLF pair
+    //if CR is the last char of buffer, it cannot be part of CRLF pair,
+    //so it's a Mac-style line ending (fixes loss of trailing CR on load/save)
+    if AFoundPos+CharSize>=BufSize then
+    begin
+      AEnding:= TATLineEnds.Mac;
+      exit;
+    end;
+    if AFoundPos+Int64(CharSize)*2>BufSize then
+    begin
+      //next full char doesn't fit into buffer
+      AEnding:= TATLineEnds.Mac;
+      exit;
+    end;
+
+    case FEncoding of
+      TATFileEncoding.ANSI,
+      TATFileEncoding.UTF8:
+        if Buf[AFoundPos+1]=#10 then
+          AEnding:= TATLineEnds.Windows
+        else
+          AEnding:= TATLineEnds.Mac;
+      TATFileEncoding.UTF16LE:
+        if (Buf[AFoundPos+2]=#10) and (Buf[AFoundPos+3]=#0) then
+          AEnding:= TATLineEnds.Windows
+        else
+          AEnding:= TATLineEnds.Mac;
+      TATFileEncoding.UTF16BE:
+        if (Buf[AFoundPos+2]=#0) and (Buf[AFoundPos+3]=#10) then
+          AEnding:= TATLineEnds.Windows
+        else
+          AEnding:= TATLineEnds.Mac;
+      TATFileEncoding.UTF32LE:
+        if (Buf[AFoundPos+4]=#10) and (Buf[AFoundPos+5]=#0) and
+          (Buf[AFoundPos+6]=#0) and (Buf[AFoundPos+7]=#0) then
+          AEnding:= TATLineEnds.Windows
+        else
+          AEnding:= TATLineEnds.Mac;
+      TATFileEncoding.UTF32BE:
+        if (Buf[AFoundPos+4]=#0) and (Buf[AFoundPos+5]=#0) and
+          (Buf[AFoundPos+6]=#0) and (Buf[AFoundPos+7]=#10) then
+          AEnding:= TATLineEnds.Windows
+        else
+          AEnding:= TATLineEnds.Mac;
+    end;
   end;
   //------
   procedure _LoadItems;

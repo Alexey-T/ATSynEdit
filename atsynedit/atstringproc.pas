@@ -179,13 +179,22 @@ type
     function TabsToSpaces_Length(ALineIndex: integer; const S: atString; AMaxLen: SizeInt): SizeInt;
     function SpacesToTabs(ALineIndex: integer; const S: atString): atString;
     function GetIndentExpanded(ALineIndex: integer; const S: atString): integer;
+    //2026.09 (CudaText perf): PWideChar-based variants for the word-wrap calc:
+    //they work directly on a raw char buffer (stack buffer of one line part),
+    //so no UnicodeString is allocated/copied per wrapped line part;
+    //behavior is identical to the atString-based versions
+    function GetIndentExpandedBuf(ALineIndex: integer; P: PatChar; ALen: SizeInt): integer;
     function CharPosToColumnPos(ALineIndex: integer; const S: atString; APos: SizeInt): integer;
     function ColumnPosToCharPos(ALineIndex: integer; const S: atString; AColumn: SizeInt): integer;
     function IndentUnindent(ALineIndex: integer; const Str: atString; ARight: boolean): atString;
     procedure CalcCharOffsets(ALineIndex: integer; const S: atString;
       out AInfo: TATIntFixedArray; ACharsSkipped: SizeInt=0);
+    procedure CalcCharOffsetsBuf(ALineIndex: integer; P: PatChar; ALen: SizeInt;
+      out AInfo: TATIntFixedArray; ACharsSkipped: SizeInt=0);
     function CalcCharOffsetLast(ALineIndex: integer; const S: atString; ACharsSkipped: SizeInt=0): Int64;
     function FindWordWrapOffset(ALineIndex: integer; const S: atString; AColumns: Int64;
+      const ANonWordChars: atString; AWrapIndented: boolean): integer;
+    function FindWordWrapOffsetBuf(ALineIndex: integer; P: PatChar; ALen: SizeInt; AColumns: Int64;
       const ANonWordChars: atString; AWrapIndented: boolean): integer;
     function FindClickedPosition(ALineIndex: integer;
       const Str: atString;
@@ -279,13 +288,15 @@ procedure SSplitByChar(const S: string; Sep: char; out S1, S2: string);
 procedure SDeleteAndInsert(var AStr: UnicodeString; AFromPos, ACount: SizeInt; const AReplace: UnicodeString);
 procedure SDeleteHtmlTags(var S: string);
 procedure SFixGreekTextAfterCaseConversion(var S: UnicodeString; ALastCharIsWordEdge: boolean);
+
 function SCalcHashQword(const S: string): QWord;
 
 
 implementation
 
 uses
-  Dialogs, Math;
+  Dialogs, Math,
+  ATSynEdit_CharSizeArray;
 
 function ATPoint(const X, Y: Int64): TATPoint;
 begin
@@ -522,57 +533,126 @@ begin
   Result:= (A.X=B.X) and (A.Y=B.Y);
 end;
 
+var
+  //2026.09: cached word-char classification for FindWordWrapOffset()
+  //_(replaces per-char _IsWord: IsCharCJKText + Pos() + IsCharWord calls,
+  //which dominated the word-wrap calc time of big documents, CudaText perf).
+  //Table is rebuilt when the key (NonWordChars, PunctuationToWrapWithWords)
+  //changes - these are editor options, stable during typical wrap calc.
+  //Main-thread only (like all editor painting code).
+  WrapWordTable: array[0..$FFFF] of boolean;
+  WrapWordKeyNonChars: UnicodeString = '';
+  WrapWordKeyPunct: UnicodeString = '';
+  WrapWordTableValid: boolean = false;
+
+procedure WrapWordTableBuild(const ANonWordChars: UnicodeString);
+var
+  i: integer;
+  SPunct: UnicodeString;
+begin
+  SPunct:= ATEditorOptions.PunctuationToWrapWithWords;
+  if WrapWordTableValid and
+    (WrapWordKeyNonChars=ANonWordChars) and
+    (WrapWordKeyPunct=SPunct) then
+    Exit;
+  WrapWordKeyNonChars:= ANonWordChars;
+  WrapWordKeyPunct:= SPunct;
+  for i:= 0 to $FFFF do
+    if IsCharCJKText(widechar(i)) then
+      WrapWordTable[i]:= false
+    else
+    if Pos(widechar(i), SPunct)>0 then
+      WrapWordTable[i]:= true
+    else
+      WrapWordTable[i]:= IsCharWord(widechar(i), ANonWordChars);
+  WrapWordTableValid:= true;
+end;
+
+function WrapWordChar(ch: widechar): boolean; inline;
+begin
+  Result:= WrapWordTable[Ord(ch)];
+end;
+
+function SGetIndentCharsBuf(P: PatChar; ALen: SizeInt): SizeInt; inline;
+begin
+  //2026.09 (CudaText perf): pointer-based version of SGetIndentChars(atString)
+  Result:= 0;
+  if P=nil then Exit;
+  while (Result<ALen) and IsCharSpace(P[Result]) do
+    Inc(Result);
+end;
+
 function TATStringTabHelper.FindWordWrapOffset(ALineIndex: integer; const S: atString; AColumns: Int64;
   const ANonWordChars: atString; AWrapIndented: boolean): integer;
-  //
-  //override IsCharWord to check also commas,dots,quotes
-  //to wrap them with wordchars
-  function _IsWord(ch: widechar): boolean;
-  begin
-    if IsCharCJKText(ch) then
-      Result:= false
-    else
-    if Pos(ch, ATEditorOptions.PunctuationToWrapWithWords)>0 then
-      Result:= true
-    else
-      Result:= IsCharWord(ch, ANonWordChars);
-  end;
-  //
+begin
+  //2026.09 (CudaText perf): thin wrapper, all logic is in the PWideChar-based
+  //version (used by the word-wrap calc without per-part string allocations)
+  Result:= FindWordWrapOffsetBuf(ALineIndex, Pointer(S), Length(S), AColumns, ANonWordChars, AWrapIndented);
+end;
+
+function TATStringTabHelper.FindWordWrapOffsetBuf(ALineIndex: integer; P: PatChar; ALen: SizeInt; AColumns: Int64;
+  const ANonWordChars: atString; AWrapIndented: boolean): integer;
+//
+//P points to the first char of the scanned line part, ALen is its length
+//(P[k] corresponds to S[k+1] of the old atString-based version)
+//
+//override IsCharWord to check also commas,dots,quotes
+//to wrap them with wordchars
+//(old nested _IsWord() is replaced by the cached WrapWordTable lookup,
+//which gives identical results for the same options)
+//
 var
   N, NMin, NAvg: SizeInt;
   Offsets: TATIntFixedArray;
-  ch, ch_next: widechar;
+  ch: widechar;
+  bWordCh, bWordNext: boolean;
 begin
-  if S='' then
+  if (P=nil) or (ALen=0) then
     Exit(0);
   if AColumns<ATEditorOptions.MinWordWrapOffset then
     Exit(AColumns);
 
-  CalcCharOffsets(ALineIndex, S, Offsets);
+  CalcCharOffsetsBuf(ALineIndex, P, ALen, Offsets);
 
   if Offsets.Data[Offsets.Len-1]<=AColumns*100 then
-    Exit(Length(S));
+    Exit(ALen);
 
   //NAvg is average wrap offset, we use it if no correct offset found
-  N:= Min(Length(S), ATEditorMaxFixedArray)-1;
+  N:= Min(ALen, ATEditorMaxFixedArray)-1;
   while (N>0) and (Offsets.Data[N]>(AColumns+1)*100) do Dec(N);
   NAvg:= N;
   if NAvg<ATEditorOptions.MinWordWrapOffset then
     Exit(ATEditorOptions.MinWordWrapOffset);
 
-  NMin:= SGetIndentChars(S)+1;
+  NMin:= SGetIndentCharsBuf(P, ALen)+1;
+
+  //2026.09: optimized scan (CudaText perf): PWideChar access instead of
+  //indexed S[N] (each indexed read of UnicodeString is a runtime helper call
+  //with range check); classification of a char is done once and reused on
+  //the next loop iteration (as classification of the previous char)
+  WrapWordTableBuild(ANonWordChars);
+  //0-based pointer access: S[i] = P[i-1]; initial N is in 1..Length(S)-1,
+  //loop keeps N>=1 (Break when N<=NMin, NMin>=1)
+  if N>=1 then
+    bWordCh:= WrapWordChar(P[N-1]) //class of S[N]
+  else
+    bWordCh:= false;
+  bWordNext:= WrapWordChar(P[N]); //class of S[N+1]
   repeat
-    ch:= S[N];
-    ch_next:= S[N+1];
+    ch:= P[N-1]; //S[N]
 
     if (N>NMin) and
-     (IsCharSurrogateLow(ch_next) or //don't wrap inside surrogate pair
-      (IsCharCJKText(ch) and IsCharCJKPunctuation(ch_next)) or //don't wrap between CJK char and CJK punctuation
-      (_IsWord(ch) and _IsWord(ch_next)) or //don't wrap between 2 word-chars
-      (AWrapIndented and IsCharSpace(ch_next)) //space as 2nd char looks bad with Python sources
+     (IsCharSurrogateLow(P[N]) or //don't wrap inside surrogate pair: S[N+1]
+      (IsCharCJKText(ch) and IsCharCJKPunctuation(P[N])) or //don't wrap between CJK char and CJK punctuation
+      (bWordCh and bWordNext) or //don't wrap between 2 word-chars
+      (AWrapIndented and IsCharSpace(P[N])) //space as 2nd char looks bad with Python sources
      )
     then
-      Dec(N)
+    begin
+      Dec(N);
+      bWordNext:= bWordCh;
+      bWordCh:= WrapWordChar(P[N-1]); //class of new S[N]; N>=1 here
+    end
     else
       Break;
   until false;
@@ -584,17 +664,23 @@ begin
 end;
 
 function SGetIndentChars(const S: string): SizeInt;
+var
+  P: PChar;
 begin
+  //2026.09: optimized (CudaText perf): pointer access instead of indexed S[i]
   Result:= 0;
-  while (Result<Length(S)) and IsCharSpace(S[Result+1]) do
+  P:= Pointer(S);
+  while (P<>nil) and (P^<>#0) and IsCharSpace(P^) do
+  begin
     Inc(Result);
+    Inc(P);
+  end;
 end;
 
 function SGetIndentChars(const S: atString): SizeInt;
 begin
-  Result:= 0;
-  while (Result<Length(S)) and IsCharSpace(S[Result+1]) do
-    Inc(Result);
+  //2026.09 (CudaText perf): reuses the pointer-based scan
+  Result:= SGetIndentCharsBuf(Pointer(S), Length(S));
 end;
 
 function SGetTrailingSpaceChars(const S: atString): SizeInt;
@@ -675,14 +761,23 @@ end;
 
 
 function TATStringTabHelper.GetIndentExpanded(ALineIndex: integer; const S: atString): integer;
+begin
+  //2026.09 (CudaText perf): thin wrapper, logic is in the PWideChar-based version
+  Result:= GetIndentExpandedBuf(ALineIndex, Pointer(S), Length(S));
+end;
+
+function TATStringTabHelper.GetIndentExpandedBuf(ALineIndex: integer; P: PatChar; ALen: SizeInt): integer;
 var
   ch: widechar;
   i: SizeInt;
 begin
+  //2026.09 (CudaText perf): pointer-based version, same behavior:
+  //P[k] corresponds to S[k+1] of the atString-based version
   Result:= 0;
-  for i:= 1 to Length(S) do
+  if P=nil then Exit;
+  for i:= 0 to ALen-1 do
   begin
-    ch:= S[i];
+    ch:= P[i];
     if not IsCharSpace(ch) then exit;
     if ch<>#9 then
       Inc(Result)
@@ -730,18 +825,30 @@ end;
 
 procedure TATStringTabHelper.CalcCharOffsets(ALineIndex: integer; const S: atString;
   out AInfo: TATIntFixedArray; ACharsSkipped: SizeInt=0);
+begin
+  //2026.09 (CudaText perf): thin wrapper, logic is in the PWideChar-based version
+  CalcCharOffsetsBuf(ALineIndex, Pointer(S), Length(S), AInfo, ACharsSkipped);
+end;
+
+procedure TATStringTabHelper.CalcCharOffsetsBuf(ALineIndex: integer; P: PatChar; ALen: SizeInt;
+  out AInfo: TATIntFixedArray; ACharsSkipped: SizeInt=0);
 var
   NLen, NSize, NTabSize, NCharsSkipped: SizeInt;
   NScalePercents: SizeInt;
   ch: widechar;
   i: SizeInt;
+  NSum: Int64;
 begin
-  AInfo:= Default(TATIntFixedArray);
-  NLen:= Min(Length(S), ATEditorMaxFixedArray);
+  //2026.09: don't clear the whole 32Kb record here (was: AInfo:= Default()):
+  //CalcCharOffsets is called ~1.5M times for a wrapped 300K-lines document,
+  //so full-record clearing was several seconds of pure memset; all callers
+  //read only Data[0..Len-1], so clearing Len is enough
+  AInfo.Len:= 0;
+  if (P=nil) or (ALen=0) then Exit;
+  NLen:= Min(ALen, ATEditorMaxFixedArray);
   AInfo.Len:= NLen;
-  if NLen=0 then Exit;
 
-  if Length(S)>ATEditorMaxFixedArray then
+  if ALen>ATEditorMaxFixedArray then
   begin
     for i:= 0 to NLen-1 do
       AInfo.Data[i]:= (Int64(i)+1)*100;
@@ -750,13 +857,26 @@ begin
 
   NCharsSkipped:= ACharsSkipped;
 
+  //2026.09: optimized loop (CudaText perf): PWideChar access instead of
+  //indexed S[i] (each indexed read of UnicodeString is a runtime helper call
+  //with range check); running sum in local var instead of reading
+  //AInfo.Data[i-2] per char;
+  //for monospaced fonts, width of 'normal' chars is 100% without calling
+  //CharSizer.GetCharWidth (which was a per-char method call dominating the
+  //wrap calc of big all-ASCII documents) - exactly what GetCharWidth()
+  //returns for FixedSizes[ch]=uw_normal in non-proportional mode
+  NSum:= 0;
   for i:= 1 to NLen do
   begin
-    ch:= S[i];
+    ch:= P^;
+    Inc(P);
     Inc(NCharsSkipped);
 
     if IsCharSurrogateAny(ch) then
       NScalePercents:= ATEditorOptions.EmojiWidthPercents div 2
+    else
+    if (not FontProportional) and (FixedSizes[Ord(ch)]=uw_normal) then
+      NScalePercents:= 100
     else
       NScalePercents:= CharSizer.GetCharWidth(ch);
 
@@ -772,10 +892,8 @@ begin
       Inc(NCharsSkipped, NTabSize-1);
     end;
 
-    if i=1 then
-      AInfo.Data[i-1]:= Int64(NSize)*NScalePercents
-    else
-      AInfo.Data[i-1]:= AInfo.Data[i-2]+Int64(NSize)*NScalePercents;
+    NSum:= NSum + Int64(NSize)*NScalePercents;
+    AInfo.Data[i-1]:= NSum;
   end;
 end;
 
@@ -786,6 +904,7 @@ var
   NScalePercents: SizeInt;
   ch: WideChar;
   i: SizeInt;
+  P: PWideChar;
 begin
   Result:= 0;
   NLen:= Length(S);
@@ -796,14 +915,26 @@ begin
 
   NCharsSkipped:= ACharsSkipped;
 
+  //2026.09: optimized loop (CudaText perf): PWideChar access instead of
+  //indexed S[i] (each indexed read of UnicodeString is a runtime helper call
+  //with range check); for monospaced fonts, width of 'normal' chars is 100%
+  //without the per-char CharSizer.GetCharWidth method call (same trick as
+  //in CalcCharOffsetsBuf)
+  P:= Pointer(S);
   for i:= 1 to NLen do
   begin
-    ch:= S[i];
+    ch:= P^;
+    Inc(P);
     Inc(NCharsSkipped);
 
     if IsCharSurrogateAny(ch) then
     begin
       NScalePercents:= ATEditorOptions.EmojiWidthPercents div 2;
+    end
+    else
+    if (not FontProportional) and (FixedSizes[Ord(ch)]=uw_normal) then
+    begin
+      NScalePercents:= 100;
     end
     else
     begin
@@ -1508,22 +1639,85 @@ begin
 end;
 
 function IsStringWithUnicode(const S: string): boolean;
+{
+2026.09 (CudaText perf): word-at-a-time scan - 8 bytes per iteration instead of
+per-byte loop (it's called per line on the API paths: replace_lines, file load,
+SetLineW/SetLineA classification of big blocks). Gives the same result: any byte
+with high bit set = multi-byte UTF8 sequence. Bytes are read via PQWord only
+after the pointer is 8-aligned (leading bytes handled per-byte), so it's safe
+on all CPUs/OSes.
+}
 var
-  i: SizeInt;
+  P: PByte;
+  NLen: SizeInt;
+  Q: QWord;
 begin
-  for i:= 1 to Length(S) do
-    if Ord(S[i])>=128 then
-      exit(true);
+  NLen:= Length(S);
+  if NLen=0 then exit(false);
+  P:= Pointer(S);
+  //leading unaligned bytes: per-byte
+  while (NLen>0) and ((PtrUInt(P) and 7)<>0) do
+  begin
+    if P^>=128 then exit(true);
+    Inc(P);
+    Dec(NLen);
+  end;
+  //main part: 8 bytes per iteration
+  while NLen>=8 do
+  begin
+    Q:= PQWord(P)^;
+    if (Q and QWord($8080808080808080))<>0 then exit(true);
+    Inc(P, 8);
+    Dec(NLen, 8);
+  end;
+  //tail: per-byte
+  while NLen>0 do
+  begin
+    if P^>=128 then exit(true);
+    Inc(P);
+    Dec(NLen);
+  end;
   Result:= false;
 end;
 
 function IsStringWithUnicode(const S: UnicodeString): boolean;
+{
+2026.09 (CudaText perf): word-at-a-time scan - 4 WideChars per iteration
+instead of per-char loop (used by TATStringItem.SetLineW). Gives the same
+result: any WideChar >=128. Alignment-safe like the 'string' overload.
+}
 var
-  i: SizeInt;
+  P: PWord;
+  NLen: SizeInt;
+  Q: QWord;
 begin
-  for i:= 1 to Length(S) do
-    if Ord(S[i])>=128 then
-      exit(true);
+  NLen:= Length(S);
+  if NLen=0 then exit(false);
+  P:= Pointer(S);
+  //leading unaligned words: per-char
+  while (NLen>0) and ((PtrUInt(P) and 7)<>0) do
+  begin
+    if P^>=128 then exit(true);
+    Inc(P);
+    Dec(NLen);
+  end;
+  //main part: 4 WideChars (8 bytes) per iteration
+  //mask $FF80 per 16-bit lane: char>=128 <=> (lane and $FF80)<>0
+  //(low byte's bit 7, or any bit of the high byte)
+  while NLen>=4 do
+  begin
+    Q:= PQWord(P)^;
+    if (Q and QWord($FF80FF80FF80FF80))<>0 then exit(true);
+    Inc(P, 4);
+    Dec(NLen, 4);
+  end;
+  //tail: per-char
+  while NLen>0 do
+  begin
+    if P^>=128 then exit(true);
+    Inc(P);
+    Dec(NLen);
+  end;
   Result:= false;
 end;
 
@@ -1651,24 +1845,54 @@ end;
 {$OVERFLOWCHECKS OFF}
 function SCalcHashQword(const S: string): QWord;
 {
-FNV-1a hash of the line's raw buffer bytes. Used only to compare identity of
+FNV-1a hash of the line's raw buffer bytes, used only to compare identity of
 lines ("is this line the same text as that deleted line?"), so the encoding
 of the buffer doesn't matter, hashing must be just stable and fast.
+2026.09 (CudaText perf): 8 bytes per iteration, two independent FNV chains
+(one per 4-byte half of each QWord, combined at the end) - about 2x faster
+than the old 1-byte-per-iteration loop on big buffers (callgrind: it was
+~6s of the wrap recalc of a 1M-lines replace_lines). Hash values differ from
+the old version, but the hash is not persisted anywhere - it's only compared
+at runtime, as a part of wrap-cache keys. Alignment-safe: leading bytes
+before an 8-aligned pointer are hashed one-by-one.
 }
 var
   P: PByte;
   NLen, i: SizeInt;
+  H1, H2: QWord;
+  Q: QWord;
 begin
   Result:= 14695981039346656037;
   NLen:= Length(S);
   if NLen=0 then Exit;
   P:= Pointer(S);
-  for i:= 1 to NLen do
+  H1:= Result;
+  H2:= Result;
+  //leading unaligned bytes: per-byte chain H1
+  while (NLen>0) and ((PtrUInt(P) and 7)<>0) do
   begin
-    Result:= Result xor P^;
-    Result:= Result * 1099511628211;
+    H1:= (H1 xor P^) * 1099511628211;
     Inc(P);
+    Dec(NLen);
   end;
+  //main part: 8 bytes per iteration, two 4-byte chains
+  i:= NLen;
+  while i>=8 do
+  begin
+    Q:= PQWord(P)^;
+    H1:= (H1 xor (Q and QWord($FFFFFFFF))) * 1099511628211;
+    H2:= (H2 xor (Q shr 32)) * 1099511628211;
+    Inc(P, 8);
+    Dec(i, 8);
+  end;
+  //tail: per-byte chain H1
+  while i>0 do
+  begin
+    H1:= (H1 xor P^) * 1099511628211;
+    Inc(P);
+    Dec(i);
+  end;
+  Result:= (H1 xor H2) * 1099511628211;
 end;
 {$pop}
 

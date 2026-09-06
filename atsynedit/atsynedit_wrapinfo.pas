@@ -127,6 +127,7 @@ type
       AOutItems: TATWrapItems): boolean;
   end;
 
+
 procedure ATWrapInfo_CalcLine(
   AStrings: TATStrings;
   ATabHelper: TATStringTabHelper;
@@ -623,13 +624,20 @@ procedure ATWrapInfo_CalcLine(
   AItems: TATWrapItems;
   AConsiderFolding: boolean;
   AFontProportional: boolean);
+const
+  //2026.09 (CudaText perf): stack buffer for one scanned line part; must
+  //cover the part cap: ATEditorOptions.MaxVisibleColumns (proportional
+  //fonts) and any realistic visible-columns count of monospaced fonts
+  //(window wider than ~16K pixels); clamped below for safety
+  cWrapPartBufMax = 2048;
 var
   WrapItem: TATWrapItem;
   WrapItemPtr: PATWrapItem;
   NLineLen, NPartLen, NFoldFrom: integer;
   NPartOffset, NIndent, NVisColumns: integer;
+  NPartCap, NBufLen: integer;
   bInitialItem: boolean;
-  StrPart: UnicodeString;
+  Buf: array[0..cWrapPartBufMax-1] of WideChar;
 begin
   AItems.Clear;
 
@@ -668,17 +676,25 @@ begin
   end;
 
   NVisColumns:= Max(AVisibleColumns, ATEditorOptions.MinWrapColumnAbs);
+  if AFontProportional then
+    NPartCap:= ATEditorOptions.MaxVisibleColumns
+  else
+    NPartCap:= NVisColumns;
+
+  NPartCap:= Min(NPartCap, cWrapPartBufMax);
+
   NPartOffset:= 1;
   NIndent:= 0;
   bInitialItem:= true;
 
   repeat
-    if AFontProportional then
-      StrPart:= AStrings.LineSub(ALineIndex, NPartOffset, ATEditorOptions.MaxVisibleColumns)
-    else
-      StrPart:= AStrings.LineSub(ALineIndex, NPartOffset, NVisColumns);
+    //2026.09 (CudaText perf): the line part is copied to the stack buffer and
+    //scanned by pointer (LineSubBuf + FindWordWrapOffsetBuf): no UnicodeString
+    //is allocated per part (was: LineSub + string assign per part, which
+    //dominated the wrap calc time of big documents)
+    NBufLen:= AStrings.LineSubBuf(ALineIndex, NPartOffset, NPartCap, @Buf[0]);
 
-    if StrPart='' then
+    if NBufLen=0 then
     begin
       if not bInitialItem then
       begin
@@ -688,11 +704,12 @@ begin
       Break;
     end;
 
-    NPartLen:= ATabHelper.FindWordWrapOffset(
+    NPartLen:= ATabHelper.FindWordWrapOffsetBuf(
       ALineIndex,
       //very slow to calc for entire line (eg len=70K),
       //calc for first NVisColumns chars
-      StrPart,
+      @Buf[0],
+      NBufLen,
       Max(AWrapColumn-NIndent, ATEditorOptions.MinWrapColumnAbs),
       ANonWordChars,
       AWrapIndented
@@ -705,7 +722,7 @@ begin
     if AWrapIndented then
       if NPartOffset=1 then
       begin
-        NIndent:= ATabHelper.GetIndentExpanded(ALineIndex, StrPart);
+        NIndent:= ATabHelper.GetIndentExpandedBuf(ALineIndex, @Buf[0], NBufLen);
         NIndent:= Min(NIndent, AIndentMaximal);
       end;
 

@@ -770,6 +770,10 @@ procedure TATStrings.LineBlockInsert(ALineFrom: SizeInt; ANewLines: TStringList)
 var
   bFast: boolean;
   i, NDone: SizeInt;
+  CurCarets, CurCarets2: TATPointPairArray;
+  CurMarkers, CurMarkers2: TATMarkerMarkerArray;
+  CurAttribs: TATMarkerAttribArray;
+  CurUndoList: TATUndoList;
 begin
   if FReadOnly or FOneLine then exit;
 
@@ -805,13 +809,50 @@ begin
   if bFast then
   begin
     FList.InsertRange(ALineFrom, ANewLines.Count);
+
+    {
+    2026.09 (CudaText perf): capture carets/markers/attribs once for all
+    undo-items of the block (loop fires no events, so the same values are
+    captured per line) - like LineBlockDelete() does. Per-line capture made
+    5 editor callbacks per line (OnGetCaretsArray allocates an array),
+    ~0.9s of 1M-lines replace_lines in callgrind.
+    Also pre-reserve the undo-list capacity: without it, 1M items grew the
+    list with re-allocation+memory-move on every growth step
+    (~2.5s in callgrind: SetCapacity/Expand/CopyItem).
+    }
+    if FEnabledCaretsInUndo then
+    begin
+      CurCarets:= GetCaretsArray;
+      CurCarets2:= GetCaretsArray2;
+    end
+    else
+    begin
+      CurCarets:= nil;
+      CurCarets2:= nil;
+    end;
+    CurMarkers:= GetMarkersArray;
+    CurMarkers2:= GetMarkersArray2;
+    CurAttribs:= GetAttribsArray;
+
+    if not FUndoList.Locked then
+      CurUndoList:= FUndoList
+    else
+    if not FRedoList.Locked then
+      CurUndoList:= FRedoList
+    else
+      CurUndoList:= nil;
+    if (CurUndoList<>nil) and (ANewLines.Count>=1000) then
+      if CurUndoList.Capacity < CurUndoList.Count+ANewLines.Count then
+        CurUndoList.Capacity:= CurUndoList.Count+ANewLines.Count;
+
     NDone:= 0;
     try
       for i:= 0 to ANewLines.Count-1 do
       begin
         //undo-item index is ALineFrom for all lines (like old code made),
         //list-slot index grows
-        LineInsertToSlot(ALineFrom, ALineFrom+i, UTF8Decode(ANewLines[i]));
+        LineInsertToSlotUtf8(ALineFrom, ALineFrom+i, ANewLines[i],
+          CurCarets, CurCarets2, CurMarkers, CurMarkers2, CurAttribs);
         Inc(NDone);
       end;
     except
