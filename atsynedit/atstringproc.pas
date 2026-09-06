@@ -288,14 +288,6 @@ procedure SSplitByChar(const S: string; Sep: char; out S1, S2: string);
 procedure SDeleteAndInsert(var AStr: UnicodeString; AFromPos, ACount: SizeInt; const AReplace: UnicodeString);
 procedure SDeleteHtmlTags(var S: string);
 procedure SFixGreekTextAfterCaseConversion(var S: UnicodeString; ALastCharIsWordEdge: boolean);
-var
-  //2026.09 (CudaText perf): support for the memoized wrap-calc cache
-  //(ATSynEdit_WrapInfo.TATWrapCalcCache). WrapWordGen is bumped on each
-  //rebuild of WrapWordTable (word-class options changed), WrapCalcFontKey
-  //is the width/font signature set by TATSynEdit.UpdateWrapInfo(); both are
-  //part of the cache key, so stale entries never match. Main-thread only.
-  WrapWordGen: Cardinal = 0;
-  WrapCalcFontKey: QWord = 0;
 
 function SCalcHashQword(const S: string): QWord;
 
@@ -574,9 +566,6 @@ begin
     else
       WrapWordTable[i]:= IsCharWord(widechar(i), ANonWordChars);
   WrapWordTableValid:= true;
-  //2026.09 (CudaText perf): new word-classification -> memoized wrap results
-  //of the previous classification are not valid anymore
-  Inc(WrapWordGen);
 end;
 
 function WrapWordChar(ch: widechar): boolean; inline;
