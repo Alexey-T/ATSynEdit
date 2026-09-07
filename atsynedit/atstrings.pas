@@ -2870,16 +2870,38 @@ begin
     //2026.09: events are fired BEFORE the physical deletion, like LineDelete()
     //does; WrapStructRecord() needs the deleted lines to be still present
     //(it hashes their texts, to reuse wrap-items on redo)
-    DoEventLog(NRangeStart);
-    DoEventChange(TATLineChangeKind.Deleted, NRangeStart, NRunCount);
+    //
+    //2026.09 FIX (fatal bug after Sep 2, 2026): physical delete and fake-line
+    //fixup must run with ACurList LOCKED, exactly like per-item processing did
+    //(LineDelete(...,AForceLast=true) was called inside UndoSingle, with the
+    //list locked). When the run's deletion empties the document (or the new
+    //last line has an EOL), ActionAddFakeLineIfNeeded calls LineAddRaw ->
+    //AddUndoItem(Add,...). With both undo-lists UNLOCKED (as it was here),
+    //AddUndoItem did two fatal things:
+    //  1) cleared FRedoList/other-list ('if not FUndoList.Locked and not
+    //     FRedoList.Locked then FRedoList.Clear'), destroying ALL mirror-items
+    //     just created by the loop above -> after Undo, Redo had no items and
+    //     the document became EMPTY (data loss, e.g. replace_lines of 25+
+    //     lines + Undo + Redo gave empty text);
+    //  2) added the Add-item to the WRONG list (current list, being consumed,
+    //     instead of the other list).
+    //With the lock held, AddUndoItem routes the mirror Add-item to the other
+    //list and never clears it - same as classic per-item undo.
+    ACurList.Locked:= true;
+    try
+      DoEventLog(NRangeStart);
+      DoEventChange(TATLineChangeKind.Deleted, NRangeStart, NRunCount);
 
-    if bConsecutive then
-      FList.DeleteRange(ALineIndex+ACount-NRunCount, ALineIndex+ACount-1)
-    else
-      FList.DeleteRange(ALineIndex, ALineIndex+NRunCount-1);
+      if bConsecutive then
+        FList.DeleteRange(ALineIndex+ACount-NRunCount, ALineIndex+ACount-1)
+      else
+        FList.DeleteRange(ALineIndex, ALineIndex+NRunCount-1);
 
-    //LineDelete(AForceLast=true) was made per item, same final fixup here
-    ActionAddFakeLineIfNeeded;
+      //LineDelete(AForceLast=true) was made per item, same final fixup here
+      ActionAddFakeLineIfNeeded;
+    finally
+      ACurList.Locked:= false;
+    end;
 
     if bLastCarets then
       SetCaretsArray(LastCaretsArray);
@@ -3013,38 +3035,49 @@ begin
   //  the run (see bWithoutPause in the loop): a bulk run is one undo step,
   //  it must not scroll/pause the editor in the middle of it (also, painting
   //  inside the run needs WrapInfo for a not-yet-complete document state)
-  DoEventLog(ALineIndex);
-  DoEventChange(TATLineChangeKind.Added, ALineIndex, ACount);
+  //
+  //2026.09 FIX: same lock discipline as per-item processing (UndoSingle ran
+  //LineInsertRaw fully inside the locked region). Nothing here calls
+  //AddUndoItem, but a re-entrant edit from an event handler (plugin editing
+  //the document inside an OnChange event) must not clear the other undo-list
+  //and must not push its undo-item into the list being consumed.
+  ACurList.Locked:= true;
+  try
+    DoEventLog(ALineIndex);
+    DoEventChange(TATLineChangeKind.Added, ALineIndex, ACount);
 
-  //open the gap for all lines at ALineIndex, in one operation;
-  //gap slots are zeroed, same as single Insert() zeroes its slot
-  FList.InsertRange(ALineIndex, ACount);
+    //open the gap for all lines at ALineIndex, in one operation;
+    //gap slots are zeroed, same as single Insert() zeroes its slot
+    FList.InsertRange(ALineIndex, ACount);
 
-  //slot, where j-th processed item (list index N-1-j) inserts its line:
-  //- same-index runs: per-item processing inserted each line at ALineIndex,
-  //  and next items pushed it down, so slot for j-th item is
-  //  ALineIndex+ACount-1-j (fill from the end of block);
-  //- consecutive runs: per-item processing inserted j-th line at its own
-  //  index ALineIndex+j, so slot for j-th item is ALineIndex+j (fill forward).
-  //For consecutive runs we must fill ALL slots here, BEFORE the per-item loop
-  //below: that loop calls ActionDeleteDupFakeLines per item (in UndoSingle_End),
-  //and it must see fully-filled lines - with zeroed (empty) slots near the end
-  //of list, it would wrongly delete them as 'unneeded fake lines'
-  if bForwardFill then
-  begin
-    for j:= 0 to ACount-1 do
+    //slot, where j-th processed item (list index N-1-j) inserts its line:
+    //- same-index runs: per-item processing inserted each line at ALineIndex,
+    //  and next items pushed it down, so slot for j-th item is
+    //  ALineIndex+ACount-1-j (fill from the end of block);
+    //- consecutive runs: per-item processing inserted j-th line at its own
+    //  index ALineIndex+j, so slot for j-th item is ALineIndex+j (fill forward).
+    //For consecutive runs we must fill ALL slots here, BEFORE the per-item loop
+    //below: that loop calls ActionDeleteDupFakeLines per item (in UndoSingle_End),
+    //and it must see fully-filled lines - with zeroed (empty) slots near the end
+    //of list, it would wrongly delete them as 'unneeded fake lines'
+    if bForwardFill then
     begin
-      CurItem:= ACurList.Items[N-1-j];
-      //raw copy of record, like FList.Insert() does with CopyItem();
-      //ownership of Item.Buf is transferred to list item, zero local record
-      Item.Init(CurItem.ItemText, CurItem.ItemEnd);
-      PItem:= FList.GetItem(ALineIndex+j);
-      System.Move(Item, PItem^, SizeOf(Item));
-      FillChar(Item, SizeOf(Item), 0);
-    end;
-  end
-  else
-    PItem:= FList.GetItem(ALineIndex+ACount-1);
+      for j:= 0 to ACount-1 do
+      begin
+        CurItem:= ACurList.Items[N-1-j];
+        //raw copy of record, like FList.Insert() does with CopyItem();
+        //ownership of Item.Buf is transferred to list item, zero local record
+        Item.Init(CurItem.ItemText, CurItem.ItemEnd);
+        PItem:= FList.GetItem(ALineIndex+j);
+        System.Move(Item, PItem^, SizeOf(Item));
+        FillChar(Item, SizeOf(Item), 0);
+      end;
+    end
+    else
+      PItem:= FList.GetItem(ALineIndex+ACount-1);
+  finally
+    ACurList.Locked:= false;
+  end;
 
   for j:= 0 to ACount-1 do
   begin
