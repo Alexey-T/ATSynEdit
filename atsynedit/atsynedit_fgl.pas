@@ -646,9 +646,9 @@ begin
     Ptr:= InternalItems[AIndex];
     //move list tail to the right; region after Count is zeroed by SetCapacity,
     //so it's safe to move to (Ptr+ACount*ItemSize)
-    System.Move(Ptr^, (Ptr+Int64(ACount)*FItemSize)^, Int64(FCount-AIndex)*FItemSize);
+    System.Move(Ptr^, (Ptr+SizeInt(ACount)*FItemSize)^, SizeInt(FCount-AIndex)*FItemSize);
     //zero opened slots: empty items, like Insert() does
-    System.FillChar(Ptr^, Int64(ACount)*FItemSize, 0);
+    System.FillChar(Ptr^, SizeInt(ACount)*FItemSize, 0);
   end;
   //note: for AIndex=Count (append) slots are already zeroed: list keeps
   //'ending filled with zeros' invariant
