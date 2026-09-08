@@ -549,7 +549,7 @@ type
     cInitUndoMaxCarets = 4000;
     cInitUndoIndentVert = 15;
     cInitUndoIndentHorz = 20;
-    cInitUndoPause = 300;
+    cInitUndoPause = 0;
     cInitUndoPause2 = 1000;
     cInitUndoPauseHighlightLine = true;
     cInitUndoForCaretJump = true;
