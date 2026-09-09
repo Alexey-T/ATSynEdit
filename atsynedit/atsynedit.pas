@@ -1258,8 +1258,8 @@ type
     procedure DoMinimapDrag(APosY: integer);
     procedure DoStringsOnChangeLog(Sender: TObject; ALine: SizeInt);
     procedure DoStringsOnProgress(Sender: TObject; var ACancel: boolean);
-    procedure DoStringsOnUndoAfter(Sender: TObject; AX, AY: SizeInt);
-    procedure DoStringsOnUndoBefore(Sender: TObject; AX, AY: SizeInt; var ABlockEvent: boolean);
+    //procedure DoStringsOnUndoAfter(Sender: TObject; AX, AY: SizeInt);
+    //procedure DoStringsOnUndoBefore(Sender: TObject; AX, AY: SizeInt; var ABlockEvent: boolean);
     procedure DoStringsOnUndoTooLongLine(Sender: TObject; AX, AY: SizeInt);
     procedure DoScroll_SetPos(var AScrollInfo: TATEditorScrollInfo; APos: integer);
     procedure DoScroll_LineTop(ALine: integer; AUpdate: boolean);
@@ -5560,8 +5560,9 @@ begin
   FStringsInt.OnProgress:= @DoStringsOnProgress;
   FStringsInt.OnChangeEx:= @DoStringsOnChangeEx;
   FStringsInt.OnChangeLog:= @DoStringsOnChangeLog;
-  FStringsInt.OnUndoBefore:= @DoStringsOnUndoBefore;
-  FStringsInt.OnUndoAfter:= @DoStringsOnUndoAfter;
+  //2026.09: disabled because OptUndoPause actually don't work
+  //FStringsInt.OnUndoBefore:= @DoStringsOnUndoBefore;
+  //FStringsInt.OnUndoAfter:= @DoStringsOnUndoAfter;
   FStringsInt.OnUndoTooLongLine:= @DoStringsOnUndoTooLongLine;
   FStringsInt.OnUnfoldLine:= @DoStringsOnUnfoldLine;
 
@@ -11576,6 +11577,7 @@ begin
   end;
 end;
 
+(*
 procedure TATSynEdit.DoStringsOnUndoBefore(Sender: TObject; AX, AY: SizeInt;
   var ABlockEvent: boolean);
 var
@@ -11629,7 +11631,8 @@ begin
   if FOptUndoPauseHighlightLine then
     OptShowCurLine:= OldOption;
 end;
-
+*)
+(*
 procedure TATSynEdit.DoStringsOnUndoAfter(Sender: TObject; AX, AY: SizeInt);
 var
   OldOption: boolean;
@@ -11649,6 +11652,7 @@ begin
   if FOptUndoPauseHighlightLine then
     OptShowCurLine:= OldOption;
 end;
+*)
 
 procedure TATSynEdit.DoStringsOnUndoTooLongLine(Sender: TObject; AX, AY: SizeInt);
 begin
