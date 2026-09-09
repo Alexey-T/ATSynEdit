@@ -11578,6 +11578,8 @@ begin
 end;
 
 (*
+//2026.09: OnUndoBefore/OnUndoAfter handlers disabled because OptUndoPause actually don't work
+
 procedure TATSynEdit.DoStringsOnUndoBefore(Sender: TObject; AX, AY: SizeInt;
   var ABlockEvent: boolean);
 var
