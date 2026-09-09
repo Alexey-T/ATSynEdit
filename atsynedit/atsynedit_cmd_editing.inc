@@ -1364,12 +1364,12 @@ begin
   if AUndo then
   begin
     if St.UndoEmpty then Exit;
-    bLock:= (GetUndoCount>0) and (OptUndoPause>0);
+    bLock:= false; //(GetUndoCount>0) and (OptUndoPause>0);
   end
   else
   begin
     if St.RedoEmpty then Exit;
-    bLock:= (GetRedoCount>0) and (OptUndoPause>0);
+    bLock:= false; //(GetRedoCount>0) and (OptUndoPause>0);
   end;
 
   if bLock then

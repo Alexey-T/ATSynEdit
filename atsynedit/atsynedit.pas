@@ -998,9 +998,9 @@ type
     FOptUndoMaxCarets: integer;
     FOptUndoIndentVert: integer;
     FOptUndoIndentHorz: integer;
-    FOptUndoPause: integer;
-    FOptUndoPause2: integer;
-    FOptUndoPauseHighlightLine: boolean;
+    //FOptUndoPause: integer;
+    //FOptUndoPause2: integer;
+    //FOptUndoPauseHighlightLine: boolean;
     FOptUndoForCaretJump: boolean;
     FOptScrollbarsNew: boolean;
     FOptScrollbarHorizontalAddSpace: integer;
@@ -2335,9 +2335,9 @@ type
     property OptUndoMaxCarets: integer read FOptUndoMaxCarets write FOptUndoMaxCarets default cInitUndoMaxCarets;
     property OptUndoIndentVert: integer read FOptUndoIndentVert write FOptUndoIndentVert default cInitUndoIndentVert;
     property OptUndoIndentHorz: integer read FOptUndoIndentHorz write FOptUndoIndentHorz default cInitUndoIndentHorz;
-    property OptUndoPause: integer read FOptUndoPause write FOptUndoPause default cInitUndoPause;
-    property OptUndoPause2: integer read FOptUndoPause2 write FOptUndoPause2 default cInitUndoPause2;
-    property OptUndoPauseHighlightLine: boolean read FOptUndoPauseHighlightLine write FOptUndoPauseHighlightLine default cInitUndoPauseHighlightLine;
+    //property OptUndoPause: integer read FOptUndoPause write FOptUndoPause default cInitUndoPause;
+    //property OptUndoPause2: integer read FOptUndoPause2 write FOptUndoPause2 default cInitUndoPause2;
+    //property OptUndoPauseHighlightLine: boolean read FOptUndoPauseHighlightLine write FOptUndoPauseHighlightLine default cInitUndoPauseHighlightLine;
     property OptUndoForCaretJump: boolean read FOptUndoForCaretJump write FOptUndoForCaretJump default cInitUndoForCaretJump;
     property OptUndoForMarkers: boolean read GetUndoForMarkers write SetUndoForMarkers default true;
     property OptUndoForAttribs: boolean read GetUndoForAttribs write SetUndoForAttribs default true;
@@ -5544,9 +5544,9 @@ begin
   FOptUndoIndentHorz:= cInitUndoIndentHorz;
   FOptUndoMaxCarets:= cInitUndoMaxCarets;
   FOptUndoGrouped:= true;
-  FOptUndoPause:= cInitUndoPause;
-  FOptUndoPause2:= cInitUndoPause2;
-  FOptUndoPauseHighlightLine:= cInitUndoPauseHighlightLine;
+  //FOptUndoPause:= cInitUndoPause;
+  //FOptUndoPause2:= cInitUndoPause2;
+  //FOptUndoPauseHighlightLine:= cInitUndoPauseHighlightLine;
   FOptUndoForCaretJump:= cInitUndoForCaretJump;
 
   FStringsExternal:= nil;

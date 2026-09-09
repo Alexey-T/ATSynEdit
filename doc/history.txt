@@ -1,3 +1,6 @@
+2026.09.09
+* change: removed prop OptUndoPause* (they didn't work good anyway)
+
 2026.08.13
 + add: prop OptMicromapAtLeft
 * change: replaced prop OptMicromapScalePerColumn (default 50) with OptMicromapWidthInAvgChars (default 150)
