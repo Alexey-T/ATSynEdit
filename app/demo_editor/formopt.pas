@@ -167,22 +167,22 @@ type
     ListCol: TListBox;
     PageControl1: TPageControl;
     edCaretWidthNormal: TSpinEdit;
-    TabSheet1: TTabSheet;
-    TabSheet10: TTabSheet;
-    TabSheet11: TTabSheet;
-    TabSheet2: TTabSheet;
-    TabSheet3: TTabSheet;
-    TabSheet4: TTabSheet;
-    TabSheet5: TTabSheet;
-    TabSheet6: TTabSheet;
-    TabSheet7: TTabSheet;
-    TabSheet8: TTabSheet;
-    TabSheet9: TTabSheet;
+    TabSheetShow: TTabSheet;
+    TabSheetRuler: TTabSheet;
+    TabSheetActions: TTabSheet;
+    TabSheetGutter: TTabSheet;
+    TabSheetMouse: TTabSheet;
+    TabSheetCarets: TTabSheet;
+    TabSheetKeys: TTabSheet;
+    TabSheetUndo: TTabSheet;
+    TabSheetMinimap: TTabSheet;
+    TabSheetUnprinted: TTabSheet;
+    TabSheetGutterCols: TTabSheet;
     procedure bColDownClick(Sender: TObject);
     procedure bColUpClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure TabSheet1ContextPopup(Sender: TObject; MousePos: TPoint;
+    procedure TabSheetShowContextPopup(Sender: TObject; MousePos: TPoint;
       var Handled: Boolean);
   private
     { private declarations }
@@ -352,7 +352,7 @@ begin
 
     //undo
     edUndoLimit.Value:= ed.OptUndoLimit;
-    edUndoPause.Value:= ed.OptUndoPause;
+    //edUndoPause.Value:= ed.OptUndoPause;
     chkUndoGrp.Checked:= ed.OptUndoGrouped;
     chkUndoAfterSave.Checked:= ed.OptUndoAfterSave;
     chkUndoForCrt.Checked:= ed.OptUndoForCaretJump;
@@ -491,7 +491,7 @@ begin
 
       //undo
       ed.OptUndoLimit:= edUndoLimit.Value;
-      ed.OptUndoPause:= edUndoPause.Value;
+      //ed.OptUndoPause:= edUndoPause.Value;
       ed.OptUndoGrouped:= chkUndoGrp.Checked;
       ed.OptUndoAfterSave:= chkUndoAfterSave.Checked;
       ed.OptUndoForCaretJump:= chkUndoForCrt.Checked;
@@ -520,7 +520,7 @@ begin
   PageControl1.ActivePageIndex:= 0;
 end;
 
-procedure TfmOpt.TabSheet1ContextPopup(Sender: TObject; MousePos: TPoint;
+procedure TfmOpt.TabSheetShowContextPopup(Sender: TObject; MousePos: TPoint;
   var Handled: Boolean);
 begin
 
