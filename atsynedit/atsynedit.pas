@@ -2744,6 +2744,27 @@ begin
   if FRectMain.Width=0 then
     UpdateInitialVars(Canvas);
 
+  //2026.09.10 fix (word-wrap + OS-native scrollbars):
+  //When "scrollbar_themed"=false (OptScrollbarsNew=false), editor uses
+  //OS-native scrollbar, which takes ~16px of the client area WHEN IT APPEARS
+  //(at the end of DoPaint, in UpdateScrollbarVert). This changes
+  //GetVisibleColumns(), so the full wrap recalculation runs a second time
+  //for the whole document -- doubling the file-open time for word-wrapped
+  //huge files (1M lines: 7.9s -> 14.5s). Themed scrollbars (child controls)
+  //don't have the problem: GetClientSizes() always reserves their width.
+  //Fix: for big documents, show the vertical OS-scrollbar BEFORE the wrap
+  //calculation, so the wrap uses the final client width from the start.
+  if (not FOptScrollbarsNew) and
+    (not ShowOsBarVert) and
+    (not ModeOneLine) and
+    (FOptScrollStyleVert<>TATEditorScrollbarStyle.Hide) and
+    (FWrapMode<>TATEditorWrapMode.ModeOff) and
+    (Strings.Count>GetVisibleLines) then
+  begin
+    ShowOsBarVert:= true;
+    UpdateInitialVars(Canvas); //refresh FClientW/H, FRect* for reduced client area
+  end;
+
   FCharSizer.Init(
     Font.Name,
     DoScaleFont(Font.Size),
