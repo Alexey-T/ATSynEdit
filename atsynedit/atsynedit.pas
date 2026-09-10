@@ -3286,7 +3286,9 @@ begin
   begin
     si:= Default(TScrollInfo);
     si.cbSize:= SizeOf(si);
-    si.fMask:= SIF_ALL or SIF_DISABLENOSCROLL; //flag SIF_DISABLENOSCROLL don't work on Windows, why
+    //flag SIF_DISABLENOSCROLL sometimes don't work on Windows
+    //here is solution https://stackoverflow.com/questions/66325027/scroll-bar-doesnt-become-visible-despite-sif-disablenoscroll
+    si.fMask:= SIF_ALL or SIF_DISABLENOSCROLL;
     si.nMin:= 0;
     si.nMax:= FScrollVert.SmoothMax;
     si.nPage:= FScrollVert.SmoothPage;
