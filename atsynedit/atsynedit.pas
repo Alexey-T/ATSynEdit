@@ -6029,10 +6029,17 @@ procedure TATSynEdit.GetClientSizes(out W, H: integer);
 begin
   W:= Width;
   H:= Height;
-  if ModeOneLine then exit;
 
-  if FOptScrollbarsNew then //better check this instead of FScrollbarVert.Visible
+  if ModeOneLine then
   begin
+    if W<1 then W:= 1;
+    if H<1 then H:= 1;
+    exit;
+  end;
+
+  if FOptScrollbarsNew then
+  begin
+    //custom vert bar is always visible
     Dec(W, FScrollbarVert.Width);
     if FScrollbarHorz.Visible then
       Dec(H, FScrollbarHorz.Height);
