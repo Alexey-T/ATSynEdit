@@ -6032,28 +6032,22 @@ begin
   W:= Width;
   H:= Height;
 
-  if ModeOneLine then
+  if not ModeOneLine then
   begin
-    if W<1 then W:= 1;
-    if H<1 then H:= 1;
-    exit;
-  end;
-
-  if FOptScrollbarsNew then
-  begin
-    //custom vert bar is always visible
-    Dec(W, FScrollbarVert.Width);
-    if FScrollbarHorz.Visible then
-      Dec(H, FScrollbarHorz.Height);
-  end
-  else
-  begin
-    //W:= inherited ClientWidth;
-    //H:= inherited ClientHeight;
-    if ShowOsBarVert then
-      Dec(W, GetSystemMetrics(SM_CXVSCROLL));
-    if ShowOsBarHorz then
-      Dec(H, GetSystemMetrics(SM_CYHSCROLL));
+    if FOptScrollbarsNew then
+    begin
+      //custom vert bar is always visible
+      Dec(W, FScrollbarVert.Width);
+      if FScrollbarHorz.Visible then
+        Dec(H, FScrollbarHorz.Height);
+    end
+    else
+    begin
+      if ShowOsBarVert then
+        Dec(W, GetSystemMetrics(SM_CXVSCROLL));
+      if ShowOsBarHorz then
+        Dec(H, GetSystemMetrics(SM_CYHSCROLL));
+    end;
   end;
 
   if W<1 then W:= 1;
