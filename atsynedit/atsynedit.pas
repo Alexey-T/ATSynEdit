@@ -3286,7 +3286,7 @@ begin
   begin
     si:= Default(TScrollInfo);
     si.cbSize:= SizeOf(si);
-    si.fMask:= SIF_ALL; //or SIF_DISABLENOSCROLL; //todo -- DisableNoScroll doesnt work(Win)
+    si.fMask:= SIF_ALL or SIF_DISABLENOSCROLL; //flag SIF_DISABLENOSCROLL don't work on Windows, why
     si.nMin:= 0;
     si.nMax:= FScrollVert.SmoothMax;
     si.nPage:= FScrollVert.SmoothPage;
