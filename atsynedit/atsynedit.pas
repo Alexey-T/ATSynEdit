@@ -3293,7 +3293,7 @@ begin
     si.nMax:= FScrollVert.SmoothMax;
     si.nPage:= FScrollVert.SmoothPage;
     si.nPos:= FScrollVert.SmoothPos;
-    if si.nMax=0 then
+    if si.nMax=0 then //in this case vert-bar on Gtk2 looks not nice
       si.nMax:= si.nPage;
     SetScrollInfo(Handle, SB_VERT, si, True);
   end;
