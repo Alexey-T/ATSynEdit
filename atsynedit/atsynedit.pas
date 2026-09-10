@@ -6039,8 +6039,12 @@ begin
   end
   else
   begin
-    W:= inherited ClientWidth;
-    H:= inherited ClientHeight;
+    //W:= inherited ClientWidth;
+    //H:= inherited ClientHeight;
+    if ShowOsBarVert then
+      Dec(W, GetSystemMetrics(SM_CXVSCROLL));
+    if ShowOsBarHorz then
+      Dec(H, GetSystemMetrics(SM_CYHSCROLL));
   end;
 
   if W<1 then W:= 1;
