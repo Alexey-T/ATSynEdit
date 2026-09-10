@@ -3292,9 +3292,9 @@ begin
     si.nMin:= 0;
     si.nMax:= FScrollVert.SmoothMax;
     si.nPage:= FScrollVert.SmoothPage;
-    //if FOptScrollbarsNew then
-    //  si.nPage:= si.nMax+1;
     si.nPos:= FScrollVert.SmoothPos;
+    if si.nMax=0 then
+      si.nMax:= si.nPage;
     SetScrollInfo(Handle, SB_VERT, si, True);
   end;
 
