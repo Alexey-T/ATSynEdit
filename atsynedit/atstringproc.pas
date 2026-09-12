@@ -1278,12 +1278,50 @@ begin
     L.Delete(L.Count-1);
 end;
 
-function SStringHasEol(const S: atString): boolean;
+
+function SStringHasEol(const S: UnicodeString): boolean;
+{
+2026.09.12 (CudaText perf): same SWAR idea adapted to UTF-16:
+4 WideChars (8 bytes) per iteration instead of two Pos() passes.
+Zero-*word* detection per 16-bit lane for both #0010 and #000D.
+Lane constants are symmetric, so the code is endian-safe.
+}
+var
+  P: PWord;
+  NLen: SizeInt; // in WideChars
+  Q, X: QWord;
 begin
-  Result:=
-    (Pos(#10, S)>0) or
-    (Pos(#13, S)>0);
+  NLen:= Length(S);
+  if NLen=0 then exit(false);
+  P:= Pointer(S);
+  //leading unaligned WideChars: per-char
+  while (NLen>0) and ((PtrUInt(P) and 7)<>0) do
+  begin
+    if (P^=10) or (P^=13) then exit(true);
+    Inc(P);
+    Dec(NLen);
+  end;
+  //main part: 4 WideChars per iteration, SWAR zero-word test for #0010 and #000D
+  while NLen>=4 do
+  begin
+    Q:= PQWord(P)^;
+    X:= Q xor QWord($000A000A000A000A);
+    if (((X-QWord($0001000100010001)) and (not X) and QWord($8000800080008000))<>0) then exit(true);
+    X:= Q xor QWord($000D000D000D000D);
+    if (((X-QWord($0001000100010001)) and (not X) and QWord($8000800080008000))<>0) then exit(true);
+    Inc(P, 4);
+    Dec(NLen, 4);
+  end;
+  //tail: per-char
+  while NLen>0 do
+  begin
+    if (P^=10) or (P^=13) then exit(true);
+    Inc(P);
+    Dec(NLen);
+  end;
+  Result:= false;
 end;
+
 
 function SStringHasEol(const S: string): boolean;
 {
