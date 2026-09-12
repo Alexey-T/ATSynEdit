@@ -139,6 +139,19 @@ type
       const AAttribs: TATMarkerAttribArray;
       ACommandCode: integer;
       AUndoOrRedo: TATEditorRunningUndoOrRedo);
+    //2026.09.12 (CudaText perf): bulk version of Add() for the N identical
+    //placeholder undo-items of a block-insert (LineBlockInsertEnds): one
+    //TATEditAction.Insert item per line, same index, empty text, same arrays.
+    //Creates exactly the items N sequential Add() calls would create (same
+    //fields, same order); the tick is sampled every 1024 items - sequential
+    //Add() samples per item, but items of one command differ only when a
+    //pause >= ATStrings_PauseForUndoGroup occurs mid-run, which the periodic
+    //sampling preserves (within 1024 items)
+    procedure AddInsertRun(AIndex: integer; ACount: SizeInt;
+      ACommandCode: integer;
+      const ACarets, ACarets2: TATPointPairArray;
+      const AMarkers, AMarkers2: TATMarkerMarkerArray;
+      const AAttribs: TATMarkerAttribArray);
     procedure AddUnmodifiedMark;
     function DebugText: string;
     function IsEmpty: boolean;
@@ -460,6 +473,105 @@ begin
   //CudaText issue #3084
   while (NGlobalCounter-Items[0].ItemGlobalCounter)>MaxCount do
     Delete(0);
+end;
+
+
+procedure TATUndoList.AddInsertRun(AIndex: integer; ACount: SizeInt;
+  ACommandCode: integer;
+  const ACarets, ACarets2: TATPointPairArray;
+  const AMarkers, AMarkers2: TATMarkerMarkerArray;
+  const AAttribs: TATMarkerAttribArray);
+{
+2026.09.12 (CudaText perf): see the interface comment. Mirrors the statements
+of Add() for the Insert-placeholder case (empty text, NotUndoRedo):
+- command-mark counter: computed once (Add() reads Last.ItemGlobalCounter
+  before each item, but items of this run share the counter, so the value
+  stays the same);
+- FSoftMark/FHardMark: read per item like Add() does; FSoftMark turns false
+  after the first item, exactly like sequential Add() calls;
+- GetTickCount64: sampled per 1024 items (see interface comment);
+- duplicate-change check of Add() never applies (action=Insert);
+- MaxCount trimming: run once at the end (all items share the counter).
+}
+var
+  Item: TATUndoItem;
+  NGlobalCounter: DWord;
+  NCounterFirst, NCounterRest: DWord;
+  NewTick: QWord;
+  i: SizeInt;
+begin
+  if FLocked then Exit;
+  if FMaxCount=0 then Exit;
+  if ACount<=0 then Exit;
+
+  //command-mark counter, mirroring sequential Add() exactly:
+  //- list not empty: all items get Last.Counter (+1 when the mark is set,
+  //  consumed by the first Add);
+  //- list empty: item 1 gets 0 and does NOT consume the mark (Add() reads
+  //  the counter only when bNotEmpty), item 2 consumes it -> items 2..N
+  //  get 1 (0 when no mark)
+  if Count>0 then
+  begin
+    NGlobalCounter:= Last.ItemGlobalCounter;
+    if FNewCommandMark then
+    begin
+      FNewCommandMark:= false;
+      Inc(NGlobalCounter);
+    end;
+    NCounterFirst:= NGlobalCounter;
+    NCounterRest:= NGlobalCounter;
+  end
+  else
+  begin
+    NCounterFirst:= 0;
+    if FNewCommandMark then
+    begin
+      FNewCommandMark:= false;
+      NCounterRest:= 1;
+    end
+    else
+      NCounterRest:= 0;
+  end;
+
+  if Capacity < Count+ACount then
+    Capacity:= Count+ACount;
+
+  NewTick:= GetTickCount64;
+  if (FLastTick>0) and (NewTick-FLastTick>=ATStrings_PauseForUndoGroup) then
+    FSoftMark:= true;
+  FLastTick:= NewTick;
+
+  for i:= 1 to ACount do
+  begin
+    if (i>1) and ((i and 1023)=0) then
+    begin
+      //periodic tick sampling: a long pause inside the loop must set the
+      //soft mark, like per-item Add() would do
+      NewTick:= GetTickCount64;
+      if NewTick-FLastTick>=ATStrings_PauseForUndoGroup then
+      begin
+        FSoftMark:= true;
+        FLastTick:= NewTick;
+      end;
+    end;
+    if i=1 then
+      NGlobalCounter:= NCounterFirst
+    else
+      NGlobalCounter:= NCounterRest;
+    Item:= TATUndoItem.Create(TATEditAction.Insert, AIndex, '', TATLineEnds.None,
+      TATLineState.None, FSoftMark, FHardMark,
+      ACarets, ACarets2, AMarkers, AMarkers2, AAttribs,
+      ACommandCode, NewTick);
+    Item.ItemGlobalCounter:= NGlobalCounter;
+    FList.Add(Item);
+    FSoftMark:= false;
+  end;
+
+  //support MaxCount _actions_ in the list, intead of MaxCount simple items
+  //CudaText issue #3084
+  if Count>0 then
+    while (NGlobalCounter-Items[0].ItemGlobalCounter)>MaxCount do
+      Delete(0);
 end;
 
 

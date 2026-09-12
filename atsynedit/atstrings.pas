@@ -393,9 +393,15 @@ type
     //for pure-ASCII lines) and undo-item's carets/markers/attribs arrays are
     //passed by caller (captured once for the whole block-insert loop)
     procedure LineInsertToSlotUtf8(AIndexForUndoItem, AIndexForLine: SizeInt; const AString: string;
+      AEnd: TATLineEnds;
       const ACarets, ACarets2: TATPointPairArray;
       const AMarkers, AMarkers2: TATMarkerMarkerArray;
       const AAttribs: TATMarkerAttribArray);
+    //2026.09.12 (CudaText perf): slot-fill part of LineInsertToSlotUtf8,
+    //WITHOUT the undo-item creation - used by LineBlockInsertEnds, which
+    //creates all placeholder undo-items with one TATUndoList.AddInsertRun()
+    //call before the fill loop
+    procedure LineFillSlotUtf8(AIndexForLine: SizeInt; const AString: string; AEnd: TATLineEnds);
   public
     CaretsAfterLastEdition: TATPointPairArray;
     EditingActive: boolean;
@@ -445,11 +451,27 @@ type
     //2026.09 (CudaText perf): copies a line part into a raw WideChar buffer
     //(caller-provided, no UnicodeString allocation/refcount), returns copied char count
     function LineSubBuf(ALineIndex, APosFrom, ALen: SizeInt; ADest: PWideChar): SizeInt;
+    //2026.09.12 (CudaText perf): direct read access to the raw ANSI buffer
+    //of an ASCII-stored line (Ex.Wide=false: all bytes <128, chars=bytes),
+    //for the word-wrap calculation's raw-byte fast path (ATWrapInfo_CalcLine
+    //-> FindWordWrapOffsetBytes): skips the per-part byte-to-WideChar
+    //conversion. Returns False for wide-stored lines (P=nil, NLen=0).
+    //Valid until the next modification of TATStrings (the wrap calc makes none)
+    function LineBytesPtr(ALineIndex: SizeInt; out P: PByte; out NLen: SizeInt): boolean;
     function LineCharAt(ALineIndex, ACharIndex: SizeInt): WideChar;
     procedure GetIndentProp(ALineIndex: SizeInt; out ACharCount: SizeInt; out AKind: TATLineIndentKind);
     function LineLenWithoutSpace(ALineIndex: SizeInt): SizeInt;
     procedure LineBlockDelete(ALine1, ALine2: SizeInt; AForceLast: boolean = true);
     procedure LineBlockInsert(ALineFrom: SizeInt; ANewLines: TStringList);
+    //2026.09.12 (CudaText perf): like LineBlockInsert, but lines are created
+    //with their final line-endings (AEnds[k], None = document's Endings), so
+    //the caller's LinesEnds[] fixup loop becomes a no-op - TextReplaceLines_
+    //UTF8 made a ChangeEol undo-item per line when the parsed endings differed
+    //from Endings (~1.3s per 1M lines). Undo-items are identical (one Insert
+    //placeholder per line), no ChangeEol items are needed: undoing deletes the
+    //lines wholesale (mirror-items capture final text+endings at undo time)
+    procedure LineBlockInsertEnds(ALineFrom: SizeInt; ANewLines: TStringList;
+      const AEnds: array of TATLineEnds);
     function ColumnPosToCharPos(AIndex: SizeInt; AX: SizeInt; ATabHelper: TATStringTabHelper): SizeInt;
     function CharPosToColumnPos(AIndex: SizeInt; AX: SizeInt; ATabHelper: TATStringTabHelper): SizeInt;
     function GetItemPtr(AIndex: SizeInt): PATStringItem;
@@ -1853,12 +1875,13 @@ begin
 end;
 
 procedure TATStrings.LineInsertToSlotUtf8(AIndexForUndoItem, AIndexForLine: SizeInt; const AString: string;
+  AEnd: TATLineEnds;
   const ACarets, ACarets2: TATPointPairArray;
   const AMarkers, AMarkers2: TATMarkerMarkerArray;
   const AAttribs: TATMarkerAttribArray);
 {
 2026.09 (CudaText perf): variant of LineInsertToSlot() for LineBlockInsert's
-fast path. Two changes (undo-items and document content are the same as
+fast path. Changes (undo-items and document content are the same as
 LineInsertToSlot gives):
 - input string is UTF8, like the caller's TStringList items: pure-ASCII lines
   (IsStringWithUnicode=false) skip UTF8Decode+SetLineW and go to
@@ -1868,6 +1891,12 @@ LineInsertToSlot gives):
 - carets/markers/attribs arrays are captured once for the whole
   block-insert loop (the loop fires no events, so they are the same for every
   line) and passed to AddUndoItemEx(), like LineBlockDelete() does.
+2026.09.12 (CudaText perf): AEnd param - the line's FINAL line-ending is set
+//by Init() directly (was: FEndings + caller's per-line LinesEnds[] fixup,
+//which made a ChangeEol undo-item per line when endings differed).
+//Item state is identical: Init sets Ends:=AEnd, State:=Added, Updated:=true;
+//the old fixup's SetLineEnd changed Ends and called LineStateToChanged()
+//(no-op for Added lines, see #2617) + Updated:=true - same visible state.
 }
 var
   Item: PATStringItem;
@@ -1879,9 +1908,26 @@ begin
   Item:= FList.GetItem(AIndexForLine);
   if not IsStringWithUnicode(AString) then
     //pure ASCII: direct store, no UTF8Decode/UnicodeString round-trip
-    Item^.Init(AString, FEndings, false{AllowBadCharsOfLen1})
+    Item^.Init(AString, AEnd, false{AllowBadCharsOfLen1})
   else
-    Item^.Init(UTF8Decode(AString), FEndings);
+    Item^.Init(UTF8Decode(AString), AEnd);
+end;
+
+procedure TATStrings.LineFillSlotUtf8(AIndexForLine: SizeInt; const AString: string; AEnd: TATLineEnds);
+//2026.09.12 (CudaText perf): the fill part of LineInsertToSlotUtf8 (without
+//AddUndoItemEx): UpdateModified + GetItem + Init with the final line-ending.
+//The undo-items for the whole block are created in advance by
+//LineBlockInsertEnds via TATUndoList.AddInsertRun()
+var
+  Item: PATStringItem;
+begin
+  UpdateModified;
+  Item:= FList.GetItem(AIndexForLine);
+  if not IsStringWithUnicode(AString) then
+    //pure ASCII: direct store, no UTF8Decode/UnicodeString round-trip
+    Item^.Init(AString, AEnd, false{AllowBadCharsOfLen1})
+  else
+    Item^.Init(UTF8Decode(AString), AEnd);
 end;
 
 procedure TATStrings.LineInsertEx(ALineIndex: SizeInt; const AString: atString; AEnd: TATLineEnds;
@@ -2076,6 +2122,23 @@ begin
   if (ALen=0) or (ADest=nil) then exit(0);
   Item:= GetItemPtr(ALineIndex);
   Result:= Item^.LineSubBuf(APosFrom, ALen, ADest);
+end;
+
+function TATStrings.LineBytesPtr(ALineIndex: SizeInt; out P: PByte; out NLen: SizeInt): boolean;
+//2026.09.12 (CudaText perf): see the interface comment. LineSubLen is not
+//needed: for ASCII-stored items chars=bytes, so the buffer length IS the
+//line length
+var
+  ItemPtr: PATStringItem;
+begin
+  P:= nil;
+  NLen:= 0;
+  if not IsIndexValid(ALineIndex) then exit(false);
+  ItemPtr:= FList.GetItem(ALineIndex);
+  if ItemPtr^.Ex.Wide then exit(false);
+  P:= Pointer(ItemPtr^.Buf);
+  NLen:= Length(ItemPtr^.Buf);
+  Result:= P<>nil;
 end;
 
 function TATStrings.LineCharAt(ALineIndex, ACharIndex: SizeInt): WideChar;

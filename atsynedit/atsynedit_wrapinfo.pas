@@ -728,6 +728,10 @@ var
   NPartCap, NBufLen: integer;
   bInitialItem: boolean;
   Buf: array[0..cWrapPartBufMax-1] of WideChar;
+  //2026.09.12 (CudaText perf): raw-ASCII fast path state
+  PLineBytes: PByte;
+  NLineBytes: SizeInt;
+  NRest, NIndentLen: integer;
 begin
   //2026.09.12 (CudaText perf): SetCount(0) instead of Clear(): Clear() also
   //does SetCapacity(0), which FREES the item buffer, so the per-line call of
@@ -780,37 +784,77 @@ begin
 
   NPartCap:= Min(NPartCap, cWrapPartBufMax);
 
+  //2026.09.12 (CudaText perf): raw-ASCII fast path - for ASCII-stored lines
+  //(Ex.Wide=false: chars=bytes, all bytes <128) the word-wrap scan works
+  //directly on the line's ANSI buffer (FindWordWrapOffsetBytes), skipping
+  //the per-part byte-to-WideChar conversion (TATStringItem.LineSubBuf,
+  //~0.2s per 1M lines x 500 chars on the reference machine). Wide-stored
+  //lines, proportional fonts and non-printable-ASCII parts (tab/controls)
+  //use the original PWideChar path - results are identical in all cases
+  PLineBytes:= nil;
+  NLineBytes:= 0;
+  if not AFontProportional then
+    AStrings.LineBytesPtr(ALineIndex, PLineBytes, NLineBytes);
+
   NPartOffset:= 1;
   NIndent:= 0;
   bInitialItem:= true;
+  NBufLen:= 0; //filled by the PWideChar path only (indent source check)
 
   repeat
     //2026.09 (CudaText perf): the line part is copied to the stack buffer and
     //scanned by pointer (LineSubBuf + FindWordWrapOffsetBuf): no UnicodeString
     //is allocated per part (was: LineSub + string assign per part, which
     //dominated the wrap calc time of big documents)
-    NBufLen:= AStrings.LineSubBuf(ALineIndex, NPartOffset, NPartCap, @Buf[0]);
-
-    if NBufLen=0 then
+    //2026.09.12: ASCII-stored lines skip the conversion - the raw bytes are
+    //scanned in place; FindWordWrapOffsetBytes returns -1 when the part is
+    //not pure printable ASCII, then the PWideChar path runs for this part
+    NPartLen:= -1;
+    if PLineBytes<>nil then
     begin
-      if not bInitialItem then
+      NRest:= NLineBytes-(NPartOffset-1);
+      if NRest<=0 then
       begin
-        WrapItemPtr:= AItems._GetItemPtr(AItems.Count-1);
-        WrapItemPtr^.NFinal:= TATWrapItemFinal.Final;
+        if not bInitialItem then
+        begin
+          WrapItemPtr:= AItems._GetItemPtr(AItems.Count-1);
+          WrapItemPtr^.NFinal:= TATWrapItemFinal.Final;
+        end;
+        Break;
       end;
-      Break;
+      NPartLen:= ATabHelper.FindWordWrapOffsetBytes(
+        PLineBytes+(NPartOffset-1),
+        Min(NPartCap, NRest),
+        Max(AWrapColumn-NIndent, ATEditorOptions.MinWrapColumnAbs),
+        ANonWordChars,
+        AWrapIndented);
     end;
 
-    NPartLen:= ATabHelper.FindWordWrapOffsetBuf(
-      ALineIndex,
-      //very slow to calc for entire line (eg len=70K),
-      //calc for first NVisColumns chars
-      @Buf[0],
-      NBufLen,
-      Max(AWrapColumn-NIndent, ATEditorOptions.MinWrapColumnAbs),
-      ANonWordChars,
-      AWrapIndented
-      );
+    if NPartLen<0 then
+    begin
+      NBufLen:= AStrings.LineSubBuf(ALineIndex, NPartOffset, NPartCap, @Buf[0]);
+
+      if NBufLen=0 then
+      begin
+        if not bInitialItem then
+        begin
+          WrapItemPtr:= AItems._GetItemPtr(AItems.Count-1);
+          WrapItemPtr^.NFinal:= TATWrapItemFinal.Final;
+        end;
+        Break;
+      end;
+
+      NPartLen:= ATabHelper.FindWordWrapOffsetBuf(
+        ALineIndex,
+        //very slow to calc for entire line (eg len=70K),
+        //calc for first NVisColumns chars
+        @Buf[0],
+        NBufLen,
+        Max(AWrapColumn-NIndent, ATEditorOptions.MinWrapColumnAbs),
+        ANonWordChars,
+        AWrapIndented
+        );
+    end;
 
     WrapItem.Init(ALineIndex, NPartOffset, NPartLen, NIndent, TATWrapItemFinal.Middle, bInitialItem);
     AItems.Add(WrapItem);
@@ -819,7 +863,18 @@ begin
     if AWrapIndented then
       if NPartOffset=1 then
       begin
-        NIndent:= ATabHelper.GetIndentExpandedBuf(ALineIndex, @Buf[0], NBufLen);
+        if NBufLen>0 then
+          NIndent:= ATabHelper.GetIndentExpandedBuf(ALineIndex, @Buf[0], NBufLen)
+        else
+        begin
+          //part 1 used the raw-ASCII path: count leading #32 bytes of the
+          //same char range (GetIndentExpandedBuf's tab branch cannot run:
+          //tab is not accepted by the byte path, so IsCharSpace = #32 only)
+          NIndent:= 0;
+          NIndentLen:= Min(NPartCap, NLineBytes);
+          while (NIndent<NIndentLen) and (PLineBytes[NIndent]=32) do
+            Inc(NIndent);
+        end;
         NIndent:= Min(NIndent, AIndentMaximal);
       end;
 
