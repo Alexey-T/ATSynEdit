@@ -1404,14 +1404,88 @@ begin
   Result:= AColumn - size + Length(S);
 end;
 
-function SStringHasTab(const S: atString): boolean;
+function SStringHasTab(const S: UnicodeString): boolean;
+{
+2026.09.12 (CudaText perf): same SWAR idea adapted to UTF-16:
+4 WideChars (8 bytes) per iteration instead of a Pos() pass.
+Zero-*word* detection per 16-bit lane for single char #0009.
+Lane constants are symmetric, so the code is endian-safe.
+It's called by TATStringTabHelper.ColumnPosToCharPos (caret/column
+mapping on every caret move), IndentUnindent, and CudaText's
+EditorConvertTabsToSpaces (per line, whole document).
+}
+var
+  P: PWord;
+  NLen: SizeInt; // in WideChars
+  Q, X: QWord;
 begin
-  Result:= Pos(#9, S)>0;
+  NLen:= Length(S);
+  if NLen=0 then exit(false);
+  P:= Pointer(S);
+  //leading unaligned WideChars: per-char
+  while (NLen>0) and ((PtrUInt(P) and 7)<>0) do
+  begin
+    if P^=9 then exit(true);
+    Inc(P);
+    Dec(NLen);
+  end;
+  //main part: 4 WideChars per iteration, SWAR zero-word test for #0009
+  while NLen>=4 do
+  begin
+    Q:= PQWord(P)^;
+    X:= Q xor QWord($0009000900090009);
+    if (((X-QWord($0001000100010001)) and (not X) and QWord($8000800080008000))<>0) then exit(true);
+    Inc(P, 4);
+    Dec(NLen, 4);
+  end;
+  //tail: per-char
+  while NLen>0 do
+  begin
+    if P^=9 then exit(true);
+    Inc(P);
+    Dec(NLen);
+  end;
+  Result:= false;
 end;
 
 function SStringHasTab(const S: string): boolean;
+{
+2026.09.12 (CudaText perf): word-at-a-time scan - 8 bytes per iteration instead
+of a Pos() pass. Same result: any byte #9. No in-tree callers, kept for API
+symmetry with the other SStringHas* helpers.
+}
+var
+  P: PByte;
+  NLen: SizeInt;
+  Q, X: QWord;
 begin
-  Result:= Pos(#9, S)>0;
+  NLen:= Length(S);
+  if NLen=0 then exit(false);
+  P:= Pointer(S);
+  //leading unaligned bytes: per-byte
+  while (NLen>0) and ((PtrUInt(P) and 7)<>0) do
+  begin
+    if P^=9 then exit(true);
+    Inc(P);
+    Dec(NLen);
+  end;
+  //main part: 8 bytes per iteration, SWAR zero-byte detection for #9
+  while NLen>=8 do
+  begin
+    Q:= PQWord(P)^;
+    X:= Q xor QWord($0909090909090909);
+    if (((X-QWord($0101010101010101)) and (not X) and QWord($8080808080808080))<>0) then exit(true);
+    Inc(P, 8);
+    Dec(NLen, 8);
+  end;
+  //tail: per-byte
+  while NLen>0 do
+  begin
+    if P^=9 then exit(true);
+    Inc(P);
+    Dec(NLen);
+  end;
+  Result:= false;
 end;
 
 
