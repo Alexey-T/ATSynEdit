@@ -401,9 +401,12 @@ begin
   end;
 end;
 
-function IsCharSpace(ch: widechar): boolean;
+function IsCharSpace(ch: widechar): boolean; inline;
 begin
-  Result:= IsCharUnicodeSpace(ch);
+  //2026.09.11 (CudaText perf): inlined body of IsCharUnicodeSpace() (same
+  //FixedSizes lookup, no cross-unit call): this function is called per char
+  //in the word-wrap scan of SGetIndentCharsBuf()/FindWordWrapOffsetBuf()
+  Result:= FixedSizes[Ord(ch)]=uw_space;
 end;
 
 function IsCharSpace(ch: char): boolean;
@@ -423,7 +426,7 @@ begin
   Result:= Pos(ch, '.,;:''"/\-+*=()[]{}<>?!@#$%^&|~`')>0;
 end;
 
-function IsCharSurrogateAny(ch: widechar): boolean;
+function IsCharSurrogateAny(ch: widechar): boolean; inline;
 begin
   Result:= (ch>=#$D800) and (ch<=#$DFFF);
 end;
@@ -433,7 +436,7 @@ begin
   Result:= (ch>=#$D800) and (ch<=#$DBFF);
 end;
 
-function IsCharSurrogateLow(ch: widechar): boolean;
+function IsCharSurrogateLow(ch: widechar): boolean; inline;
 begin
   Result:= (ch>=#$DC00) and (ch<=#$DFFF);
 end;
@@ -606,20 +609,70 @@ var
   Offsets: TATIntFixedArray;
   ch: widechar;
   bWordCh, bWordNext: boolean;
+  i: SizeInt;
+  NClass: byte;
+  bCheckWidth, bAllWidth: boolean;
 begin
   if (P=nil) or (ALen=0) then
     Exit(0);
   if AColumns<ATEditorOptions.MinWordWrapOffset then
     Exit(AColumns);
 
-  CalcCharOffsetsBuf(ALineIndex, P, ALen, Offsets);
+  //2026.09.11 (CudaText perf): forward scan of the line part detects the
+  //frequent case when ALL chars have the fixed width of 1 column (100
+  //percents), i.e. CalcCharOffsetsBuf() would fill Offsets.Data[k]=(k+1)*100
+  //for them (exactly what it fills for parts longer than ATEditorMaxFixedArray).
+  //It happens for monospaced fonts (not FontProportional) when all chars are
+  //of FixedSizes classes uw_normal/uw_space, without tab-chars (checked by
+  //the scan below); for parts longer than ATEditorMaxFixedArray it's always so
+  //(CalcCharOffsetsBuf fills uniform values for them regardless of the font).
+  //Then the wrap candidates are calculated arithmetically, without building
+  //the 32Kb Offsets array per line part, which dominated the wrap calc time
+  //of big documents (CudaText test: 1M lines x 500 random hex chars).
+  //Mixed parts (with tabs/CJK/fullwidth chars) and proportional fonts fall
+  //back to the original code, results are identical in all cases.
+  bCheckWidth:= (not FontProportional) and (ALen<=ATEditorMaxFixedArray);
+  bAllWidth:= (ALen>ATEditorMaxFixedArray);
 
-  if Offsets.Data[Offsets.Len-1]<=AColumns*100 then
-    Exit(ALen);
+  if bCheckWidth then
+  begin
+    i:= 0;
+    while i<ALen do
+    begin
+      ch:= P[i];
+      NClass:= FixedSizes[Ord(ch)];
+      if (NClass<>uw_normal) and
+        ((NClass<>uw_space) or (ch=#9)) then
+      begin
+        bAllWidth:= false;
+        Break;
+      end;
+      Inc(i);
+    end;
+  end;
 
-  //NAvg is average wrap offset, we use it if no correct offset found
-  N:= Min(ALen, ATEditorMaxFixedArray)-1;
-  while (N>0) and (Offsets.Data[N]>(AColumns+1)*100) do Dec(N);
+  if bAllWidth then
+  begin
+    //offsets of the whole part are (k+1)*100
+    if Min(ALen, ATEditorMaxFixedArray)<=AColumns then
+      Exit(ALen);
+    //NAvg is average wrap offset, we use it if no correct offset found
+    N:= Min(ALen, ATEditorMaxFixedArray)-1;
+    if N>AColumns then
+      N:= SizeInt(AColumns); //AColumns<N<=ATEditorMaxFixedArray here, fits SizeInt
+  end
+  else
+  begin
+    CalcCharOffsetsBuf(ALineIndex, P, ALen, Offsets);
+
+    if Offsets.Data[Offsets.Len-1]<=AColumns*100 then
+      Exit(ALen);
+
+    //NAvg is average wrap offset, we use it if no correct offset found
+    N:= Min(ALen, ATEditorMaxFixedArray)-1;
+    while (N>0) and (Offsets.Data[N]>(AColumns+1)*100) do Dec(N);
+  end;
+
   NAvg:= N;
   if NAvg<ATEditorOptions.MinWordWrapOffset then
     Exit(ATEditorOptions.MinWordWrapOffset);
@@ -630,21 +683,22 @@ begin
   //indexed S[N] (each indexed read of UnicodeString is a runtime helper call
   //with range check); classification of a char is done once and reused on
   //the next loop iteration (as classification of the previous char)
-  WrapWordTableBuild(ANonWordChars);
+  //2026.09.11: test of 2 word-chars is placed first (2 cached booleans,
+  //cheaper than IsCharSurrogateLow/IsCharCJKText calls), operands are pure
+  //so the order gives identical results
   //0-based pointer access: S[i] = P[i-1]; initial N is in 1..Length(S)-1,
   //loop keeps N>=1 (Break when N<=NMin, NMin>=1)
+  WrapWordTableBuild(ANonWordChars);
   if N>=1 then
     bWordCh:= WrapWordChar(P[N-1]) //class of S[N]
   else
     bWordCh:= false;
   bWordNext:= WrapWordChar(P[N]); //class of S[N+1]
   repeat
-    ch:= P[N-1]; //S[N]
-
     if (N>NMin) and
-     (IsCharSurrogateLow(P[N]) or //don't wrap inside surrogate pair: S[N+1]
-      (IsCharCJKText(ch) and IsCharCJKPunctuation(P[N])) or //don't wrap between CJK char and CJK punctuation
-      (bWordCh and bWordNext) or //don't wrap between 2 word-chars
+     ((bWordCh and bWordNext) or //don't wrap between 2 word-chars
+      IsCharSurrogateLow(P[N]) or //don't wrap inside surrogate pair: S[N+1]
+      (IsCharCJKText(P[N-1]) and IsCharCJKPunctuation(P[N])) or //don't wrap between CJK char and CJK punctuation
       (AWrapIndented and IsCharSpace(P[N])) //space as 2nd char looks bad with Python sources
      )
     then

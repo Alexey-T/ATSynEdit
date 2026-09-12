@@ -75,6 +75,12 @@ type
     function IsIndexUniqueForLine(AIndex: integer): boolean;
     property Data[AIndex: integer]: TATWrapItem read GetData; default;
     procedure Add(const AData: TATWrapItem);
+    //2026.09.11 (CudaText perf): bulk add of all items (used by the full
+    //recalculation of WrapInfo): one capacity check + one memory-move per
+    //line, instead of the per-item Add() chain (3 nested calls + virtual
+    //CopyItem per item), which dominated the wrap-items storing for big
+    //wrapped documents; growth policy repeats TFPSList.Expand()
+    procedure AddItems(AItems: TATWrapItems);
     procedure Delete(AIndex: integer);
     procedure Insert(AIndex: integer; const AItem: TATWrapItem);
     procedure FindIndexesOfLineNumber(ALineNum: SizeInt; out AFrom, ATo: integer);
@@ -282,6 +288,42 @@ procedure TATWrapInfo.Add(const AData: TATWrapItem);
 begin
   if FVirtualMode then exit;
   FList.Add(AData);
+end;
+
+procedure TATWrapInfo.AddItems(AItems: TATWrapItems);
+var
+  N, NCount, NCapy: integer;
+begin
+  if FVirtualMode then exit;
+  N:= AItems.Count;
+  if N=0 then exit;
+
+  NCount:= FList.Count;
+  if NCount+N > FList.Capacity then
+  begin
+    //grow like TFPSList.Expand() does (+25% etc), but enough for all N items
+    NCapy:= FList.Capacity;
+    if NCapy>127 then
+      Inc(NCapy, NCapy shr 2)
+    else
+    if NCapy>8 then
+      Inc(NCapy, 16)
+    else
+    if NCapy>3 then
+      Inc(NCapy, 8)
+    else
+      Inc(NCapy, 4);
+    if NCapy < NCount+N then
+      NCapy:= NCount+N;
+    if NCapy>MaxListSize then
+      NCapy:= MaxListSize;
+    FList.Capacity:= NCapy;
+  end;
+
+  //Count grows first (SetCount zero-fills the new slots, keeping the list
+  //invariant "items after Count are zeroed"), then all items are moved at once
+  FList.Count:= NCount+N;
+  System.Move(AItems._GetItemPtr(0)^, FList._GetItemPtr(NCount)^, N*SizeOf(TATWrapItem));
 end;
 
 procedure TATWrapInfo.Delete(AIndex: integer);

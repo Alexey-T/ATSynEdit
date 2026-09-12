@@ -966,7 +966,7 @@ function TATStringItem.LineSubBuf(AFrom, ALen: SizeInt; ADest: PWideChar): SizeI
 //For non-wide (ASCII) items, bytes are zero-extended to WideChar, like
 //LineSub/CharAt do
 var
-  ResLen, i: SizeInt;
+  ResLen: SizeInt;
   Src: PChar;
   Dst: PWideChar;
 begin
@@ -974,20 +974,34 @@ begin
   if ADest=nil then exit;
   ResLen:= LineSubLen(AFrom, ALen);
   if ResLen=0 then exit;
+  Result:= ResLen;
   if Ex.Wide then
     Move(Buf[AFrom*2-1], ADest^, ResLen*2)
   else
   begin
+    //2026.09.11 (CudaText perf): zero-extension of bytes is unrolled by 4
+    //(same stores, but 4x less loop overhead); it's the per-line-part work
+    //of the word-wrap calculation for ASCII documents
     Src:= @Buf[AFrom];
     Dst:= ADest;
-    for i:= 1 to ResLen do
+    while ResLen>=4 do
     begin
-      Dst^:= WideChar(Ord(Src^));
+      Dst[0]:= WideChar(Ord(Src[0]));
+      Dst[1]:= WideChar(Ord(Src[1]));
+      Dst[2]:= WideChar(Ord(Src[2]));
+      Dst[3]:= WideChar(Ord(Src[3]));
+      Inc(Src, 4);
+      Inc(Dst, 4);
+      Dec(ResLen, 4);
+    end;
+    while ResLen>0 do
+    begin
+      Dst[0]:= WideChar(Ord(Src[0]));
       Inc(Src);
       Inc(Dst);
+      Dec(ResLen);
     end;
   end;
-  Result:= ResLen;
 end;
 
 function TATStringItem.CharAt(AIndex: SizeInt): WideChar;
