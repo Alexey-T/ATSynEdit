@@ -335,7 +335,10 @@ begin
       TmpList.Add(FList[i]);
     TmpList.Sort(@_CompareGapItemsByLine);
 
-    SetLength(FSorted, TmpList.Count);
+    //allow FSorted to have bigger length, we will set the exact length after the loop
+    if Length(FSorted)<TmpList.Count then
+      SetLength(FSorted, TmpList.Count);
+
     j:= -1;
     for i:= 0 to TmpList.Count-1 do
     begin
@@ -350,6 +353,7 @@ begin
       FSorted[j].SumSize:= FSorted[j].SumSize+Item.Size;
       FTotalSizeAll:= FTotalSizeAll+Item.Size;
     end;
+    //set the exact length
     SetLength(FSorted, j+1);
   finally
     FreeAndNil(TmpList);
