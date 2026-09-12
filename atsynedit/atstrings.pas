@@ -4062,6 +4062,7 @@ begin
   //hash texts of deleted lines, to let editor reuse their wrap-items on undo;
   //lines must be still present: all "Deleted" events are fired before
   //the physical deletion (LineDelete/LineBlockDelete/UndoRunInserts)
+  CurHashes:= nil;
   bCurHashesAll:= false;
   if AKind=TATWrapStructOpKind.Deleted then
     if ACount<=ATStrings_MaxWrapStructHashes then
