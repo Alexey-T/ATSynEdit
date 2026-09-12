@@ -321,12 +321,16 @@ var
 begin
   if FSortedValid then exit;
   FSortedValid:= true;
-  SetLength(FSorted, 0);
   FTotalSizeAll:= 0;
-  if FList.Count=0 then exit;
+  if FList.Count=0 then
+  begin
+    FSorted:= nil;
+    exit;
+  end;
 
   TmpList:= TFPList.Create;
   try
+    TmpList.Capacity:= FList.Count;
     for i:= 0 to FList.Count-1 do
       TmpList.Add(FList[i]);
     TmpList.Sort(@_CompareGapItemsByLine);
