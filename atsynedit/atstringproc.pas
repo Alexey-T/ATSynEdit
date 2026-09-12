@@ -1377,34 +1377,6 @@ begin
 end;
 
 
-(*
-function SStringHasAsciiAndNoTabs(const S: atString): boolean;
-var
-  code, i: SizeInt;
-begin
-  for i:= 1 to Length(S) do
-  begin
-    code:= Ord(S[i]);
-    if (code<32) or (code>=127) then
-      exit(false);
-  end;
-  Result:= true;
-end;
-
-function SStringHasAsciiAndNoTabs(const S: string): boolean;
-var
-  code, i: SizeInt;
-begin
-  for i:= 1 to Length(S) do
-  begin
-    code:= Ord(S[i]);
-    if (code<32) or (code>=127) then
-      exit(false);
-  end;
-  Result:= true;
-end;
-*)
-
 function TATStringTabHelper.IndentUnindent(ALineIndex: integer; const Str: atString;
   ARight: boolean): atString;
 var
