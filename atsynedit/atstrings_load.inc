@@ -447,18 +447,6 @@ DoFinalizeLoading exactly like LoadFromStream() does.
     SetLineState(i, TATLineState.Added);
 end;
 
-{
-type
-  TATCharEnding = (
-    NotEnding,
-    Ending10,
-    Ending13
-    );
-
-2026.09: _GetBufferEnding() and TATCharEnding are removed: _FindNextEol()
-now uses per-encoding tight scanning loops, which don't need per-char
-EOL classification (see the comment in _FindNextEol).
-}
 
 procedure TATStrings.ParseBuffer(ABuf: PAnsiChar; ABufSize, AStreamSize: Int64;
   ACharSize: SizeInt; AOptions: TATLoadStreamOptions; AFirePreProgress: boolean;
