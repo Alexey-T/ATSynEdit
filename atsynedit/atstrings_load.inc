@@ -35,10 +35,10 @@ loop was the dominating cost of parsing big files (500MB file: ~1.4s of
 ~3.9s total, Very Sleepy callgrind).
 }
 const
-  cOnes: QWord = $0101010101010101;
-  cHigh: QWord = $8080808080808080;
-  cCharLF: QWord = $0A0A0A0A0A0A0A0A;
-  cCharCR: QWord = $0D0D0D0D0D0D0D0D;
+  cOnes: QWord = QWord($0101010101010101);
+  cHigh: QWord = QWord($8080808080808080);
+  cCharLF: QWord = QWord($0A0A0A0A0A0A0A0A);
+  cCharCR: QWord = QWord($0D0D0D0D0D0D0D0D);
 var
   T1, T2: QWord;
 begin
@@ -479,7 +479,7 @@ var
   }
   const
     cScanChunk = 4096;
-    cHighBits: QWord = $8080808080808080;
+    cHighBits: QWord = QWord($8080808080808080);
   label
     FoundEol;
   var
