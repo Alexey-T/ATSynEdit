@@ -611,7 +611,7 @@ var
   bWordCh, bWordNext: boolean;
   i: SizeInt;
   NClass: byte;
-  bCheckWidth, bAllWidth: boolean;
+  bCheckWidth, bAllWidth, bAllWordChars: boolean;
 begin
   if (P=nil) or (ALen=0) then
     Exit(0);
@@ -631,11 +631,30 @@ begin
   //of big documents (CudaText test: 1M lines x 500 random hex chars).
   //Mixed parts (with tabs/CJK/fullwidth chars) and proportional fonts fall
   //back to the original code, results are identical in all cases.
+  //
+  //2026.09.12 fix (CudaText perf): the scan MUST set bAllWidth:=true on
+  //success. It was initialized to (ALen>ATEditorMaxFixedArray), which is
+  //false for all parts <=4096 chars, and the scan below only assigned
+  //false - so the arithmetic path was DEAD CODE for every part of the wrap
+  //calc (parts are capped by NPartCap<=2048 chars), and CalcCharOffsetsBuf
+  //still built the 32Kb Offsets array for every line part. Profile of
+  //CudaText set_text_all (1M lines x 500 hex chars, wrap on): UPDATEWRAPINFO
+  //18.0s, of which CALCCHAROFFSETSBUF 10.1s - all of it avoidable by the
+  //already-verified arithmetic path.
+  //The scan also detects parts consisting entirely of word-chars (no
+  //spaces/punctuation-mix/CJK): for such parts the backward word-boundary
+  //scan below provably ends at N<=NMin and returns NAvg, so it is skipped
+  //(typical for hex/base64/URL-like corpora without any spaces).
   bCheckWidth:= (not FontProportional) and (ALen<=ATEditorMaxFixedArray);
   bAllWidth:= (ALen>ATEditorMaxFixedArray);
+  bAllWordChars:= false;
+
+  WrapWordTableBuild(ANonWordChars);
 
   if bCheckWidth then
   begin
+    bAllWidth:= true;
+    bAllWordChars:= true;
     i:= 0;
     while i<ALen do
     begin
@@ -647,8 +666,12 @@ begin
         bAllWidth:= false;
         Break;
       end;
+      if not WrapWordChar(ch) then
+        bAllWordChars:= false;
       Inc(i);
     end;
+    if not bAllWidth then
+      bAllWordChars:= false; //scan stopped early: word-char info is partial
   end;
 
   if bAllWidth then
@@ -677,6 +700,13 @@ begin
   if NAvg<ATEditorOptions.MinWordWrapOffset then
     Exit(ATEditorOptions.MinWordWrapOffset);
 
+  //2026.09.12 (CudaText perf): if all chars of the part are word-chars,
+  //then every position of the backward scan below satisfies its first
+  //continue-condition (bWordCh and bWordNext), so the scan always runs
+  //down to N<=NMin and the result is NAvg - skip it entirely
+  if bAllWordChars then
+    Exit(NAvg);
+
   NMin:= SGetIndentCharsBuf(P, ALen)+1;
 
   //2026.09: optimized scan (CudaText perf): PWideChar access instead of
@@ -688,7 +718,6 @@ begin
   //so the order gives identical results
   //0-based pointer access: S[i] = P[i-1]; initial N is in 1..Length(S)-1,
   //loop keeps N>=1 (Break when N<=NMin, NMin>=1)
-  WrapWordTableBuild(ANonWordChars);
   if N>=1 then
     bWordCh:= WrapWordChar(P[N-1]) //class of S[N]
   else
