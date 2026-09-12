@@ -169,6 +169,11 @@ type
     function HasAsciiNoTabs: boolean;
     procedure Init(const S: string; AEnd: TATLineEnds; AllowBadCharsOfLen1: boolean);
     procedure Init(const S: UnicodeString; AEnd: TATLineEnds);
+    //2026.09.11 (CudaText perf): Init() for a line which the caller has already
+    //checked to be pure ASCII (byte<128), it skips the IsStringWithUnicode()
+    //re-scan in SetLineA(); used by the loading code, which scans buffer bytes
+    //for EOL chars anyway
+    procedure InitAscii(const S: string; AEnd: TATLineEnds);
     procedure LineStateToChanged;
     procedure LineStateToSaved; inline;
     procedure LineStateToNone; inline;
@@ -341,6 +346,12 @@ type
     procedure SetLineState(AIndex: SizeInt; AValue: TATLineState);
     procedure SetLineUpdated(AIndex: SizeInt; AValue: boolean);
     procedure DoLoadFromStream(Stream: TStream; AOptions: TATLoadStreamOptions; out AForcedToANSI: boolean);
+    //2026.09.11 (CudaText perf): the buffer-parsing core split from DoLoadFromStream:
+    //line scanning + items creation + UTF8-to-ANSI fallback + progress events.
+    //Lets LoadFromString() parse the string data in-place, without copying the
+    //whole text into TMemoryStream + GetMem buffer (2x memcpy of the full text)
+    procedure ParseBuffer(ABuf: PAnsiChar; ABufSize, AStreamSize: Int64; ACharSize: SizeInt;
+      AOptions: TATLoadStreamOptions; AFirePreProgress: boolean; out AForcedToANSI: boolean);
     procedure DoDetectEndings;
     procedure DoFinalizeLoading;
     procedure ClearLineStates(ASaved: boolean; AFrom: SizeInt=-1; ATo: SizeInt=-1);
@@ -400,6 +411,11 @@ type
     function IsPosFolded(AX, AY, AIndexClient: SizeInt): boolean;
     function IsSizeBig(const ALimit: SizeInt): boolean;
     procedure LineAddRaw_NoUndo(const S: string; AEnd: TATLineEnds; AllowBadCharsOfLen1: boolean);
+    //2026.09.11 (CudaText perf): LineAddRaw_NoUndo() for a line which the caller
+    //has already checked to be pure ASCII (byte<128): skips the
+    //IsStringWithUnicode() re-scan, which was a notable cost when loading
+    //big ASCII files (a full extra pass over all buffer bytes)
+    procedure LineAddRaw_NoUndoAscii(const S: string; AEnd: TATLineEnds);
     procedure LineAddRaw_NoUndo(const S: UnicodeString; AEnd: TATLineEnds);
     procedure LineAddRaw(const AString: atString; AEnd: TATLineEnds; AWithEvent: boolean=true);
     procedure LineAdd(const AString: atString);
@@ -900,6 +916,35 @@ procedure TATStringItem.Init(const S: UnicodeString; AEnd: TATLineEnds);
 begin
   FillChar(Ex, SizeOf(Ex), 0);
   SetLineW(S);
+
+  Ex.Ends:= TATBits2(AEnd);
+  Ex.State:= TATBits2(TATLineState.Added);
+  Ex.Updated:= true;
+end;
+
+procedure TATStringItem.InitAscii(const S: string; AEnd: TATLineEnds);
+//2026.09.11 (CudaText perf): same as Init(S, AEnd, false) minus the
+//IsStringWithUnicode() scan: caller guarantees all bytes of S are <128
+//(the loading EOL scan checks buffer bytes for it), so SetLineA() takes
+//the non-Wide 'Buf:=S' branch anyway. Skips one full extra pass over
+//all chars of loaded files.
+var
+  NLen: SizeInt;
+begin
+  FillChar(Ex, SizeOf(Ex), 0);
+
+  //SetLineA(S, false) with the known-pure-ASCII shortcut
+  LineStateToChanged;
+  Ex.HasTab:= 0; //cFlagUnknown
+  Ex.HasAsciiNoTabs:= 0; //cFlagUnknown
+  Ex.Updated:= true;
+
+  NLen:= Length(S);
+  if NLen>=MaxInt-1 then
+    raise EEditorTooLongLine.Create('Storing too long line: 0x'+IntToHex(NLen, 8));
+
+  Ex.Wide:= false;
+  Buf:= S;
 
   Ex.Ends:= TATBits2(AEnd);
   Ex.State:= TATBits2(TATLineState.Added);
@@ -4241,6 +4286,18 @@ var
   Item: TATStringItem;
 begin
   Item.Init(S, AEnd);
+  Item.Ex.State:= TATBits2(TATLineState.Added);
+  FList.Add(@Item);
+  FillChar(Item, SizeOf(Item), 0);
+end;
+
+procedure TATStrings.LineAddRaw_NoUndoAscii(const S: string; AEnd: TATLineEnds);
+//2026.09.11 (CudaText perf): LineAddRaw_NoUndo() for a caller-checked
+//pure-ASCII line, see TATStringItem.InitAscii
+var
+  Item: TATStringItem;
+begin
+  Item.InitAscii(S, AEnd);
   Item.Ex.State:= TATBits2(TATLineState.Added);
   FList.Add(@Item);
   FillChar(Item, SizeOf(Item), 0);
