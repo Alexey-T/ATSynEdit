@@ -770,8 +770,11 @@ var
     SA, SUtf8: string;
     SWide: UnicodeString;
     SQuad: UCS4String;
+    NProgressCounter: integer;
+    bCancel: boolean;
   begin
     NStart:= 0;
+    NProgressCounter:= 0;
 
     FProgressKind:= TATStringsProgressKind.Loading;
     FProgressValue:= 0;
@@ -791,6 +794,20 @@ var
       begin
         Clear(false);
         Break;
+      end;
+
+      Inc(NProgressCounter);
+      if NProgressCounter=80000 then
+      begin
+        NProgressCounter:= 0;
+        FProgressValue:= Int64(NEnd)*100 div NStreamSize;
+        if Assigned(FOnProgress) then
+        begin
+          bCancel:= false;
+          FOnProgress(Self, bCancel);
+          if bCancel then
+            raise EEditorUserStopped.Create('User stopped');
+        end;
       end;
 
       if Len=0 then
