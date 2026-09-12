@@ -196,6 +196,15 @@ type
       const ANonWordChars: atString; AWrapIndented: boolean): integer;
     function FindWordWrapOffsetBuf(ALineIndex: integer; P: PatChar; ALen: SizeInt; AColumns: Int64;
       const ANonWordChars: atString; AWrapIndented: boolean): integer;
+    //2026.09.12 (CudaText perf): raw-ASCII fast path of FindWordWrapOffsetBuf:
+    //P points to the raw ANSI bytes of an ASCII-stored line part (TATStrings
+    //items with Ex.Wide=false never contain bytes >=128), no WideChar
+    //conversion buffer is needed. Returns the same value as
+    //FindWordWrapOffsetBuf would return for the zero-extended buffer, or -1
+    //when the part is not pure printable ASCII (tab/control/8-bit byte):
+    //caller must then use the PWideChar version
+    function FindWordWrapOffsetBytes(P: PByte; ALen: SizeInt; AColumns: Int64;
+      const ANonWordChars: atString; AWrapIndented: boolean): integer;
     function FindClickedPosition(ALineIndex: integer;
       const Str: atString;
       const StrLen: SizeInt;
@@ -401,9 +410,12 @@ begin
   end;
 end;
 
-function IsCharSpace(ch: widechar): boolean;
+function IsCharSpace(ch: widechar): boolean; inline;
 begin
-  Result:= IsCharUnicodeSpace(ch);
+  //2026.09.11 (CudaText perf): inlined body of IsCharUnicodeSpace() (same
+  //FixedSizes lookup, no cross-unit call): this function is called per char
+  //in the word-wrap scan of SGetIndentCharsBuf()/FindWordWrapOffsetBuf()
+  Result:= FixedSizes[Ord(ch)]=uw_space;
 end;
 
 function IsCharSpace(ch: char): boolean;
@@ -423,7 +435,7 @@ begin
   Result:= Pos(ch, '.,;:''"/\-+*=()[]{}<>?!@#$%^&|~`')>0;
 end;
 
-function IsCharSurrogateAny(ch: widechar): boolean;
+function IsCharSurrogateAny(ch: widechar): boolean; inline;
 begin
   Result:= (ch>=#$D800) and (ch<=#$DFFF);
 end;
@@ -433,7 +445,7 @@ begin
   Result:= (ch>=#$D800) and (ch<=#$DBFF);
 end;
 
-function IsCharSurrogateLow(ch: widechar): boolean;
+function IsCharSurrogateLow(ch: widechar): boolean; inline;
 begin
   Result:= (ch>=#$DC00) and (ch<=#$DFFF);
 end;
@@ -551,6 +563,14 @@ var
   SPunct: UnicodeString;
 begin
   SPunct:= ATEditorOptions.PunctuationToWrapWithWords;
+  //2026.09.12 (CudaText perf): pointer equality of the same string instance
+  //(editors pass their constant FOptNonWordChars; the stored keys hold
+  //references, so a stored key's address cannot be reused by another string)
+  //skips the full content comparison, which ran for every wrapped line part
+  if WrapWordTableValid and
+    (Pointer(WrapWordKeyNonChars)=Pointer(ANonWordChars)) and
+    (Pointer(WrapWordKeyPunct)=Pointer(SPunct)) then
+    Exit;
   if WrapWordTableValid and
     (WrapWordKeyNonChars=ANonWordChars) and
     (WrapWordKeyPunct=SPunct) then
@@ -606,23 +626,110 @@ var
   Offsets: TATIntFixedArray;
   ch: widechar;
   bWordCh, bWordNext: boolean;
+  i: SizeInt;
+  NClass: byte;
+  bCheckWidth, bAllWidth, bAllWordChars: boolean;
 begin
   if (P=nil) or (ALen=0) then
     Exit(0);
   if AColumns<ATEditorOptions.MinWordWrapOffset then
     Exit(AColumns);
 
-  CalcCharOffsetsBuf(ALineIndex, P, ALen, Offsets);
+  //2026.09.11 (CudaText perf): forward scan of the line part detects the
+  //frequent case when ALL chars have the fixed width of 1 column (100
+  //percents), i.e. CalcCharOffsetsBuf() would fill Offsets.Data[k]=(k+1)*100
+  //for them (exactly what it fills for parts longer than ATEditorMaxFixedArray).
+  //It happens for monospaced fonts (not FontProportional) when all chars are
+  //of FixedSizes classes uw_normal/uw_space, without tab-chars (checked by
+  //the scan below); for parts longer than ATEditorMaxFixedArray it's always so
+  //(CalcCharOffsetsBuf fills uniform values for them regardless of the font).
+  //Then the wrap candidates are calculated arithmetically, without building
+  //the 32Kb Offsets array per line part, which dominated the wrap calc time
+  //of big documents (CudaText test: 1M lines x 500 random hex chars).
+  //Mixed parts (with tabs/CJK/fullwidth chars) and proportional fonts fall
+  //back to the original code, results are identical in all cases.
+  //
+  //2026.09.12 fix (CudaText perf): the scan MUST set bAllWidth:=true on
+  //success. It was initialized to (ALen>ATEditorMaxFixedArray), which is
+  //false for all parts <=4096 chars, and the scan below only assigned
+  //false - so the arithmetic path was DEAD CODE for every part of the wrap
+  //calc (parts are capped by NPartCap<=2048 chars), and CalcCharOffsetsBuf
+  //still built the 32Kb Offsets array for every line part. Profile of
+  //CudaText set_text_all (1M lines x 500 hex chars, wrap on): UPDATEWRAPINFO
+  //18.0s, of which CALCCHAROFFSETSBUF 10.1s - all of it avoidable by the
+  //already-verified arithmetic path.
+  //The scan also detects parts consisting entirely of word-chars (no
+  //spaces/punctuation-mix/CJK): for such parts the backward word-boundary
+  //scan below provably ends at N<=NMin and returns NAvg, so it is skipped
+  //(typical for hex/base64/URL-like corpora without any spaces).
+  bCheckWidth:= (not FontProportional) and (ALen<=ATEditorMaxFixedArray);
+  bAllWidth:= (ALen>ATEditorMaxFixedArray);
+  bAllWordChars:= false;
 
-  if Offsets.Data[Offsets.Len-1]<=AColumns*100 then
-    Exit(ALen);
+  WrapWordTableBuild(ANonWordChars);
 
-  //NAvg is average wrap offset, we use it if no correct offset found
-  N:= Min(ALen, ATEditorMaxFixedArray)-1;
-  while (N>0) and (Offsets.Data[N]>(AColumns+1)*100) do Dec(N);
+  if bCheckWidth then
+  begin
+    bAllWidth:= true;
+    bAllWordChars:= true;
+    i:= 0;
+    while i<ALen do
+    begin
+      ch:= P[i];
+      //2026.09.12 (CudaText perf): printable ASCII (space..tilde) is always
+      //of fixed 1-column width (uw_normal, and space is non-tab uw_space),
+      //so the FixedSizes lookup is only needed for other chars; this halved
+      //the scan time of the word-wrap calc for hex/base64-like corpora
+      if (ch<#32) or (ch>#126) then
+      begin
+        NClass:= FixedSizes[Ord(ch)];
+        if (NClass<>uw_normal) and
+          ((NClass<>uw_space) or (ch=#9)) then
+        begin
+          bAllWidth:= false;
+          Break;
+        end;
+      end;
+      if not WrapWordChar(ch) then
+        bAllWordChars:= false;
+      Inc(i);
+    end;
+    if not bAllWidth then
+      bAllWordChars:= false; //scan stopped early: word-char info is partial
+  end;
+
+  if bAllWidth then
+  begin
+    //offsets of the whole part are (k+1)*100
+    if Min(ALen, ATEditorMaxFixedArray)<=AColumns then
+      Exit(ALen);
+    //NAvg is average wrap offset, we use it if no correct offset found
+    N:= Min(ALen, ATEditorMaxFixedArray)-1;
+    if N>AColumns then
+      N:= SizeInt(AColumns); //AColumns<N<=ATEditorMaxFixedArray here, fits SizeInt
+  end
+  else
+  begin
+    CalcCharOffsetsBuf(ALineIndex, P, ALen, Offsets);
+
+    if Offsets.Data[Offsets.Len-1]<=AColumns*100 then
+      Exit(ALen);
+
+    //NAvg is average wrap offset, we use it if no correct offset found
+    N:= Min(ALen, ATEditorMaxFixedArray)-1;
+    while (N>0) and (Offsets.Data[N]>(AColumns+1)*100) do Dec(N);
+  end;
+
   NAvg:= N;
   if NAvg<ATEditorOptions.MinWordWrapOffset then
     Exit(ATEditorOptions.MinWordWrapOffset);
+
+  //2026.09.12 (CudaText perf): if all chars of the part are word-chars,
+  //then every position of the backward scan below satisfies its first
+  //continue-condition (bWordCh and bWordNext), so the scan always runs
+  //down to N<=NMin and the result is NAvg - skip it entirely
+  if bAllWordChars then
+    Exit(NAvg);
 
   NMin:= SGetIndentCharsBuf(P, ALen)+1;
 
@@ -630,7 +737,9 @@ begin
   //indexed S[N] (each indexed read of UnicodeString is a runtime helper call
   //with range check); classification of a char is done once and reused on
   //the next loop iteration (as classification of the previous char)
-  WrapWordTableBuild(ANonWordChars);
+  //2026.09.11: test of 2 word-chars is placed first (2 cached booleans,
+  //cheaper than IsCharSurrogateLow/IsCharCJKText calls), operands are pure
+  //so the order gives identical results
   //0-based pointer access: S[i] = P[i-1]; initial N is in 1..Length(S)-1,
   //loop keeps N>=1 (Break when N<=NMin, NMin>=1)
   if N>=1 then
@@ -639,12 +748,10 @@ begin
     bWordCh:= false;
   bWordNext:= WrapWordChar(P[N]); //class of S[N+1]
   repeat
-    ch:= P[N-1]; //S[N]
-
     if (N>NMin) and
-     (IsCharSurrogateLow(P[N]) or //don't wrap inside surrogate pair: S[N+1]
-      (IsCharCJKText(ch) and IsCharCJKPunctuation(P[N])) or //don't wrap between CJK char and CJK punctuation
-      (bWordCh and bWordNext) or //don't wrap between 2 word-chars
+     ((bWordCh and bWordNext) or //don't wrap between 2 word-chars
+      IsCharSurrogateLow(P[N]) or //don't wrap inside surrogate pair: S[N+1]
+      (IsCharCJKText(P[N-1]) and IsCharCJKPunctuation(P[N])) or //don't wrap between CJK char and CJK punctuation
       (AWrapIndented and IsCharSpace(P[N])) //space as 2nd char looks bad with Python sources
      )
     then
@@ -652,6 +759,108 @@ begin
       Dec(N);
       bWordNext:= bWordCh;
       bWordCh:= WrapWordChar(P[N-1]); //class of new S[N]; N>=1 here
+    end
+    else
+      Break;
+  until false;
+
+  if N>NMin then
+    Result:= N
+  else
+    Result:= NAvg;
+end;
+
+function TATStringTabHelper.FindWordWrapOffsetBytes(P: PByte; ALen: SizeInt; AColumns: Int64;
+  const ANonWordChars: atString; AWrapIndented: boolean): integer;
+{
+2026.09.12 (CudaText perf): raw-ASCII variant of FindWordWrapOffsetBuf for
+the word-wrap calculation (ATWrapInfo_CalcLine). It works on the raw ANSI
+bytes of ASCII-stored TATStrings items (Ex.Wide=false: all bytes <128), so
+the per-part byte-to-WideChar conversion (TATStringItem.LineSubBuf, ~0.2s
+per 1M lines x 500 chars on the reference machine) is skipped entirely, and
+the scan reads 1 byte per char instead of 2.
+
+Behavior: returns the same offset as FindWordWrapOffsetBuf would give for
+the zero-extended WideChar buffer, or -1 if the part contains a byte outside
+#printable-ASCII #32..#126 (tab, control char, or -defensively- a byte >=128,
+which cannot occur in ASCII-stored items): caller falls back to the PWideChar
+version then. For bytes in #32..#126:
+- all are of fixed 1-column width (uw_normal, and #32 is non-tab uw_space),
+  exactly what the width scan of FindWordWrapOffsetBuf verifies;
+- surrogate/CJK conditions of the backward scan are never true, so only the
+  word-glue test and the wrap-indented space test remain;
+- IsCharSpace() is true only for #32 (FixedSizes: #9/#32/#A0.. are uw_space,
+  of which only #32 is in the accepted byte range), so the indent scan counts
+  leading #32 bytes, like SGetIndentCharsBuf does for the wide buffer.
+}
+var
+  N, NMin, NAvg: SizeInt;
+  b: byte;
+  bWordCh, bWordNext, bAllWordChars: boolean;
+  i: SizeInt;
+begin
+  Result:= -1;
+  if (P=nil) or (ALen=0) then
+    Exit(0);
+  if AColumns<ATEditorOptions.MinWordWrapOffset then
+    Exit(AColumns);
+
+  WrapWordTableBuild(ANonWordChars);
+
+  //one scan: verify all bytes are printable ASCII (else -1 = fallback;
+  //such bytes are all of fixed 1-column width), and detect the all-word-chars
+  //case (to skip the backward scan)
+  bAllWordChars:= true;
+  i:= 0;
+  while i<ALen do
+  begin
+    b:= P[i];
+    if (b<32) or (b>126) then
+      Exit(-1);
+    if not WrapWordTable[b] then
+      bAllWordChars:= false;
+    Inc(i);
+  end;
+
+  //offsets of the whole part are (k+1)*1
+  if Min(ALen, ATEditorMaxFixedArray)<=AColumns then
+    Exit(ALen);
+
+  N:= Min(ALen, ATEditorMaxFixedArray)-1;
+  if N>AColumns then
+    N:= SizeInt(AColumns);
+
+  NAvg:= N;
+  if NAvg<ATEditorOptions.MinWordWrapOffset then
+    Exit(ATEditorOptions.MinWordWrapOffset);
+
+  if bAllWordChars then
+    Exit(NAvg);
+
+  //indent chars of the part: leading #32 bytes (see comment above)
+  NMin:= 0;
+  while (NMin<ALen) and (P[NMin]=32) do
+    Inc(NMin);
+  Inc(NMin);
+
+  //backward word-boundary scan, byte version: only the word-glue test and
+  //the wrap-indented space test apply (surrogate/CJK are impossible here);
+  //0-based access: P[i] = wide-buffer P[i]
+  if N>=1 then
+    bWordCh:= WrapWordTable[P[N-1]]
+  else
+    bWordCh:= false;
+  bWordNext:= WrapWordTable[P[N]];
+  repeat
+    if (N>NMin) and
+     ((bWordCh and bWordNext) or //don't wrap between 2 word-chars
+      (AWrapIndented and (P[N]=32)) //space as 2nd char looks bad with Python sources
+     )
+    then
+    begin
+      Dec(N);
+      bWordNext:= bWordCh;
+      bWordCh:= WrapWordTable[P[N-1]]; //N>=1 here
     end
     else
       Break;
@@ -1077,10 +1286,47 @@ begin
 end;
 
 function SStringHasEol(const S: string): boolean;
+{
+2026.09.12 (CudaText perf): word-at-a-time scan - 8 bytes per iteration instead
+of two Pos() calls (two full passes over the line). Same result: any byte
+#10 or #13. It's called per line by TATStrings.TextReplaceLines_UTF8 (the
+parse loop of CudaText's ed.replace_lines: 1M lines x 500 chars gave
+~0.4s in the user's callgrind for the two Pos passes).
+}
+var
+  P: PByte;
+  NLen: SizeInt;
+  Q, X: QWord;
 begin
-  Result:=
-    (Pos(#10, S)>0) or
-    (Pos(#13, S)>0);
+  NLen:= Length(S);
+  if NLen=0 then exit(false);
+  P:= Pointer(S);
+  //leading unaligned bytes: per-byte
+  while (NLen>0) and ((PtrUInt(P) and 7)<>0) do
+  begin
+    if (P^=10) or (P^=13) then exit(true);
+    Inc(P);
+    Dec(NLen);
+  end;
+  //main part: 8 bytes per iteration, SWAR zero-byte detection for both #10 and #13
+  while NLen>=8 do
+  begin
+    Q:= PQWord(P)^;
+    X:= Q xor QWord($0A0A0A0A0A0A0A0A);
+    if (((X-QWord($0101010101010101)) and (not X) and QWord($8080808080808080))<>0) then exit(true);
+    X:= Q xor QWord($0D0D0D0D0D0D0D0D);
+    if (((X-QWord($0101010101010101)) and (not X) and QWord($8080808080808080))<>0) then exit(true);
+    Inc(P, 8);
+    Dec(NLen, 8);
+  end;
+  //tail: per-byte
+  while NLen>0 do
+  begin
+    if (P^=10) or (P^=13) then exit(true);
+    Inc(P);
+    Dec(NLen);
+  end;
+  Result:= false;
 end;
 
 function TATStringTabHelper.SpacesToTabs(ALineIndex: integer; const S: atString): atString;

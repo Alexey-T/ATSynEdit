@@ -75,6 +75,20 @@ type
     function IsIndexUniqueForLine(AIndex: integer): boolean;
     property Data[AIndex: integer]: TATWrapItem read GetData; default;
     procedure Add(const AData: TATWrapItem);
+    //2026.09.11 (CudaText perf): bulk add of all items (used by the full
+    //recalculation of WrapInfo): one capacity check + one memory-move per
+    //line, instead of the per-item Add() chain (3 nested calls + virtual
+    //CopyItem per item), which dominated the wrap-items storing for big
+    //wrapped documents; growth policy repeats TFPSList.Expand()
+    procedure AddItems(AItems: TATWrapItems);
+    //2026.09.12 (CudaText perf): buffer-friendly reset for the full
+    //recalculation: keeps the item buffer when it's big enough for the new
+    //document (Clear() frees it, then the refill re-allocs it through dozens
+    //of ReallocMem growth steps, copying ~4x the final item data)
+    procedure PrepareRecalc(AHintCapacity: SizeInt);
+    //2026.09.12: restores the list invariant "items after Count are zeroed"
+    //(stale items of the previous recalculation may remain in the tail)
+    procedure FinishRecalc;
     procedure Delete(AIndex: integer);
     procedure Insert(AIndex: integer; const AItem: TATWrapItem);
     procedure FindIndexesOfLineNumber(ALineNum: SizeInt; out AFrom, ATo: integer);
@@ -282,6 +296,82 @@ procedure TATWrapInfo.Add(const AData: TATWrapItem);
 begin
   if FVirtualMode then exit;
   FList.Add(AData);
+end;
+
+procedure TATWrapInfo.AddItems(AItems: TATWrapItems);
+var
+  N, NCount, NCapy: integer;
+begin
+  if FVirtualMode then exit;
+  N:= AItems.Count;
+  if N=0 then exit;
+
+  NCount:= FList.Count;
+  if NCount+N > FList.Capacity then
+  begin
+    //grow like TFPSList.Expand() does (+25% etc), but enough for all N items
+    NCapy:= FList.Capacity;
+    if NCapy>127 then
+      Inc(NCapy, NCapy shr 2)
+    else
+    if NCapy>8 then
+      Inc(NCapy, 16)
+    else
+    if NCapy>3 then
+      Inc(NCapy, 8)
+    else
+      Inc(NCapy, 4);
+    if NCapy < NCount+N then
+      NCapy:= NCount+N;
+    if NCapy>MaxListSize then
+      NCapy:= MaxListSize;
+    FList.Capacity:= NCapy;
+  end;
+
+  //2026.09.12 (CudaText perf): items are moved BEFORE growing Count, and
+  //Count grows via SetCountFast() without the zero-fill: SetCount()
+  //zero-filled the new slots which are fully overwritten right after, i.e.
+  //every wrap item was written twice (for a 1M-lines word-wrapped document
+  //that is ~170Mb of useless memory writes per full WrapInfo recalculation).
+  //Slots after Count stay zeroed (SetCapacity zero-fills new capacity), so
+  //the list invariant is kept
+  FList.SetCountFast(NCount+N);
+  System.Move(AItems._GetItemPtr(0)^, FList.ItemPtrRaw(NCount)^, N*SizeOf(TATWrapItem));
+end;
+
+procedure TATWrapInfo.PrepareRecalc(AHintCapacity: SizeInt);
+begin
+  if FVirtualMode then exit;
+  if AHintCapacity > MaxListSize then
+    AHintCapacity:= MaxListSize;
+  if AHintCapacity < 0 then
+    AHintCapacity:= 0;
+  //2026.09.12 (CudaText perf): don't free the item buffer here: the old code
+  //called Clear() (which frees the buffer) and the following AddItems() loop
+  //re-allocated it through dozens of ReallocMem growth steps, copying about
+  //4x of the final item data (for 1M word-wrapped lines: ~700Mb of extra
+  //memory copying + page-faulting of fresh pages on Windows). Keeping the
+  //buffer makes the repeated full recalculation (window resize, wrap-mode
+  //toggle) allocation-free. Buffer is trimmed only when the new document
+  //is much smaller (4x) than the buffer, to not hold huge unused memory
+  FList.SetCountFast(0);
+  if FList.Capacity < AHintCapacity then
+    FList.Capacity:= AHintCapacity
+  else
+  if FList.Capacity > AHintCapacity*4 + 1024 then
+    FList.Capacity:= AHintCapacity;
+end;
+
+procedure TATWrapInfo.FinishRecalc;
+var
+  NTail: SizeInt;
+begin
+  if FVirtualMode then exit;
+  //restore the list invariant "items after Count are zeroed": the buffer is
+  //reused, so the tail can contain stale items of the previous recalculation
+  NTail:= FList.Capacity - FList.Count + 1; //+1: the temp slot after Capacity
+  if NTail>0 then
+    FillChar(FList.ItemPtrRaw(FList.Count)^, NTail*SizeOf(TATWrapItem), 0);
 end;
 
 procedure TATWrapInfo.Delete(AIndex: integer);
@@ -638,8 +728,19 @@ var
   NPartCap, NBufLen: integer;
   bInitialItem: boolean;
   Buf: array[0..cWrapPartBufMax-1] of WideChar;
+  //2026.09.12 (CudaText perf): raw-ASCII fast path state
+  PLineBytes: PByte;
+  NLineBytes: SizeInt;
+  NRest, NIndentLen: integer;
 begin
-  AItems.Clear;
+  //2026.09.12 (CudaText perf): SetCount(0) instead of Clear(): Clear() also
+  //does SetCapacity(0), which FREES the item buffer, so the per-line call of
+  //ATWrapInfo_CalcLine() from the full WrapInfo recalculation made the temp
+  //list re-allocate its buffer on EVERY document line (1M lines: ~0.5 sec of
+  //pure heap churn). SetCount(0) keeps Capacity; TATWrapItem is an unmanaged
+  //record, so stale bytes after Count cannot harm (Deref is a no-op, and
+  //nothing reads items beyond Count)
+  AItems.SetCountFast(0);
 
   //line folded entirely?
   if AConsiderFolding then
@@ -683,37 +784,77 @@ begin
 
   NPartCap:= Min(NPartCap, cWrapPartBufMax);
 
+  //2026.09.12 (CudaText perf): raw-ASCII fast path - for ASCII-stored lines
+  //(Ex.Wide=false: chars=bytes, all bytes <128) the word-wrap scan works
+  //directly on the line's ANSI buffer (FindWordWrapOffsetBytes), skipping
+  //the per-part byte-to-WideChar conversion (TATStringItem.LineSubBuf,
+  //~0.2s per 1M lines x 500 chars on the reference machine). Wide-stored
+  //lines, proportional fonts and non-printable-ASCII parts (tab/controls)
+  //use the original PWideChar path - results are identical in all cases
+  PLineBytes:= nil;
+  NLineBytes:= 0;
+  if not AFontProportional then
+    AStrings.LineBytesPtr(ALineIndex, PLineBytes, NLineBytes);
+
   NPartOffset:= 1;
   NIndent:= 0;
   bInitialItem:= true;
+  NBufLen:= 0; //filled by the PWideChar path only (indent source check)
 
   repeat
     //2026.09 (CudaText perf): the line part is copied to the stack buffer and
     //scanned by pointer (LineSubBuf + FindWordWrapOffsetBuf): no UnicodeString
     //is allocated per part (was: LineSub + string assign per part, which
     //dominated the wrap calc time of big documents)
-    NBufLen:= AStrings.LineSubBuf(ALineIndex, NPartOffset, NPartCap, @Buf[0]);
-
-    if NBufLen=0 then
+    //2026.09.12: ASCII-stored lines skip the conversion - the raw bytes are
+    //scanned in place; FindWordWrapOffsetBytes returns -1 when the part is
+    //not pure printable ASCII, then the PWideChar path runs for this part
+    NPartLen:= -1;
+    if PLineBytes<>nil then
     begin
-      if not bInitialItem then
+      NRest:= NLineBytes-(NPartOffset-1);
+      if NRest<=0 then
       begin
-        WrapItemPtr:= AItems._GetItemPtr(AItems.Count-1);
-        WrapItemPtr^.NFinal:= TATWrapItemFinal.Final;
+        if not bInitialItem then
+        begin
+          WrapItemPtr:= AItems._GetItemPtr(AItems.Count-1);
+          WrapItemPtr^.NFinal:= TATWrapItemFinal.Final;
+        end;
+        Break;
       end;
-      Break;
+      NPartLen:= ATabHelper.FindWordWrapOffsetBytes(
+        PLineBytes+(NPartOffset-1),
+        Min(NPartCap, NRest),
+        Max(AWrapColumn-NIndent, ATEditorOptions.MinWrapColumnAbs),
+        ANonWordChars,
+        AWrapIndented);
     end;
 
-    NPartLen:= ATabHelper.FindWordWrapOffsetBuf(
-      ALineIndex,
-      //very slow to calc for entire line (eg len=70K),
-      //calc for first NVisColumns chars
-      @Buf[0],
-      NBufLen,
-      Max(AWrapColumn-NIndent, ATEditorOptions.MinWrapColumnAbs),
-      ANonWordChars,
-      AWrapIndented
-      );
+    if NPartLen<0 then
+    begin
+      NBufLen:= AStrings.LineSubBuf(ALineIndex, NPartOffset, NPartCap, @Buf[0]);
+
+      if NBufLen=0 then
+      begin
+        if not bInitialItem then
+        begin
+          WrapItemPtr:= AItems._GetItemPtr(AItems.Count-1);
+          WrapItemPtr^.NFinal:= TATWrapItemFinal.Final;
+        end;
+        Break;
+      end;
+
+      NPartLen:= ATabHelper.FindWordWrapOffsetBuf(
+        ALineIndex,
+        //very slow to calc for entire line (eg len=70K),
+        //calc for first NVisColumns chars
+        @Buf[0],
+        NBufLen,
+        Max(AWrapColumn-NIndent, ATEditorOptions.MinWrapColumnAbs),
+        ANonWordChars,
+        AWrapIndented
+        );
+    end;
 
     WrapItem.Init(ALineIndex, NPartOffset, NPartLen, NIndent, TATWrapItemFinal.Middle, bInitialItem);
     AItems.Add(WrapItem);
@@ -722,7 +863,18 @@ begin
     if AWrapIndented then
       if NPartOffset=1 then
       begin
-        NIndent:= ATabHelper.GetIndentExpandedBuf(ALineIndex, @Buf[0], NBufLen);
+        if NBufLen>0 then
+          NIndent:= ATabHelper.GetIndentExpandedBuf(ALineIndex, @Buf[0], NBufLen)
+        else
+        begin
+          //part 1 used the raw-ASCII path: count leading #32 bytes of the
+          //same char range (GetIndentExpandedBuf's tab branch cannot run:
+          //tab is not accepted by the byte path, so IsCharSpace = #32 only)
+          NIndent:= 0;
+          NIndentLen:= Min(NPartCap, NLineBytes);
+          while (NIndent<NIndentLen) and (PLineBytes[NIndent]=32) do
+            Inc(NIndent);
+        end;
         NIndent:= Min(NIndent, AIndentMaximal);
       end;
 
