@@ -123,6 +123,7 @@ function _WidestrWidth(C: TCanvas; S: WideChar): integer; inline;
 var
   Size: TSize;
 begin
+  Size:= Default(TSize);
   Windows.GetTextExtentPointW(C.Handle, @S, 1{Len}, Size);
   Result:= Size.cx;
 end;
