@@ -122,6 +122,7 @@ begin
   Result:= true;
 
   //parse line-endings; TATLineEnds.None marks "no explicit EOL in the item"
+  EndsArray:= nil;
   SetLength(EndsArray, ANewLines.Count);
   for i:= 0 to ANewLines.Count-1 do
   begin
