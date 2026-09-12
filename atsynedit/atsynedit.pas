@@ -2724,6 +2724,7 @@ var
   NIndentMaximal: integer;
   NLine, NLinesCount, NIndexFrom, NIndexTo: integer;
   i: integer;
+  NHint: SizeInt;
 begin
   //method can be called before 1st paint,
   //so TCanvas.TextWidth (TATSynEdit.UpdateCharSize) will give exception "Control has no parent window"
@@ -2917,15 +2918,34 @@ begin
 
   if not bUseCachedUpdate then
   begin
-    FWrapInfo.Clear;
     FWrapUpdateCache.Clear; //2026.09: cached items are not related to the recalculated WrapInfo anymore
-    FWrapInfo.SetCapacity(NLinesCount);
+    //2026.09.12 (CudaText perf): PrepareRecalc keeps the previous item buffer
+    //(Clear freed it, then AddItems re-allocated it through ~50 ReallocMem
+    //steps copying ~4x of the final data), and pre-sizes it with a good
+    //estimate of the final item count: about (line length div wrap-column)+1
+    //items per line, which is exact for space-less texts (e.g. hex/base64)
+    //and a close lower bound for word-wrapped texts (AddItems still grows
+    //the buffer when the estimate is exceeded)
+    if NWrapColumnNew>0 then
+    begin
+      NHint:= 0;
+      for i:= 0 to NLinesCount-1 do
+        Inc(NHint, CurStrings.LinesLen[i] div NWrapColumnNew + 1);
+    end
+    else
+      //wrap is off (reachable when VirtualMode is not set: doc with folds,
+      //or 1-2 lines): one item per line
+      NHint:= NLinesCount;
+    FWrapInfo.PrepareRecalc(NHint);
     for i:= 0 to NLinesCount-1 do
     begin
       DoCalcWrapInfos(i, NIndentMaximal, FWrapTemps, bConsiderFolding);
       //2026.09.11 (CudaText perf): bulk add of the line's items
       FWrapInfo.AddItems(FWrapTemps);
     end;
+    //2026.09.12: zero the buffer tail, keeping the "items after Count are
+    //zeroed" invariant of the reused buffer
+    FWrapInfo.FinishRecalc;
     FWrapTemps.Clear;
   end
   else

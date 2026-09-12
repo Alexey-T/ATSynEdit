@@ -81,6 +81,14 @@ type
     //CopyItem per item), which dominated the wrap-items storing for big
     //wrapped documents; growth policy repeats TFPSList.Expand()
     procedure AddItems(AItems: TATWrapItems);
+    //2026.09.12 (CudaText perf): buffer-friendly reset for the full
+    //recalculation: keeps the item buffer when it's big enough for the new
+    //document (Clear() frees it, then the refill re-allocs it through dozens
+    //of ReallocMem growth steps, copying ~4x the final item data)
+    procedure PrepareRecalc(AHintCapacity: SizeInt);
+    //2026.09.12: restores the list invariant "items after Count are zeroed"
+    //(stale items of the previous recalculation may remain in the tail)
+    procedure FinishRecalc;
     procedure Delete(AIndex: integer);
     procedure Insert(AIndex: integer; const AItem: TATWrapItem);
     procedure FindIndexesOfLineNumber(ALineNum: SizeInt; out AFrom, ATo: integer);
@@ -320,10 +328,50 @@ begin
     FList.Capacity:= NCapy;
   end;
 
-  //Count grows first (SetCount zero-fills the new slots, keeping the list
-  //invariant "items after Count are zeroed"), then all items are moved at once
-  FList.Count:= NCount+N;
-  System.Move(AItems._GetItemPtr(0)^, FList._GetItemPtr(NCount)^, N*SizeOf(TATWrapItem));
+  //2026.09.12 (CudaText perf): items are moved BEFORE growing Count, and
+  //Count grows via SetCountFast() without the zero-fill: SetCount()
+  //zero-filled the new slots which are fully overwritten right after, i.e.
+  //every wrap item was written twice (for a 1M-lines word-wrapped document
+  //that is ~170Mb of useless memory writes per full WrapInfo recalculation).
+  //Slots after Count stay zeroed (SetCapacity zero-fills new capacity), so
+  //the list invariant is kept
+  FList.SetCountFast(NCount+N);
+  System.Move(AItems._GetItemPtr(0)^, FList.ItemPtrRaw(NCount)^, N*SizeOf(TATWrapItem));
+end;
+
+procedure TATWrapInfo.PrepareRecalc(AHintCapacity: SizeInt);
+begin
+  if FVirtualMode then exit;
+  if AHintCapacity > MaxListSize then
+    AHintCapacity:= MaxListSize;
+  if AHintCapacity < 0 then
+    AHintCapacity:= 0;
+  //2026.09.12 (CudaText perf): don't free the item buffer here: the old code
+  //called Clear() (which frees the buffer) and the following AddItems() loop
+  //re-allocated it through dozens of ReallocMem growth steps, copying about
+  //4x of the final item data (for 1M word-wrapped lines: ~700Mb of extra
+  //memory copying + page-faulting of fresh pages on Windows). Keeping the
+  //buffer makes the repeated full recalculation (window resize, wrap-mode
+  //toggle) allocation-free. Buffer is trimmed only when the new document
+  //is much smaller (4x) than the buffer, to not hold huge unused memory
+  FList.SetCountFast(0);
+  if FList.Capacity < AHintCapacity then
+    FList.Capacity:= AHintCapacity
+  else
+  if FList.Capacity > AHintCapacity*4 + 1024 then
+    FList.Capacity:= AHintCapacity;
+end;
+
+procedure TATWrapInfo.FinishRecalc;
+var
+  NTail: SizeInt;
+begin
+  if FVirtualMode then exit;
+  //restore the list invariant "items after Count are zeroed": the buffer is
+  //reused, so the tail can contain stale items of the previous recalculation
+  NTail:= FList.Capacity - FList.Count + 1; //+1: the temp slot after Capacity
+  if NTail>0 then
+    FillChar(FList.ItemPtrRaw(FList.Count)^, NTail*SizeOf(TATWrapItem), 0);
 end;
 
 procedure TATWrapInfo.Delete(AIndex: integer);
@@ -681,7 +729,14 @@ var
   bInitialItem: boolean;
   Buf: array[0..cWrapPartBufMax-1] of WideChar;
 begin
-  AItems.Clear;
+  //2026.09.12 (CudaText perf): SetCount(0) instead of Clear(): Clear() also
+  //does SetCapacity(0), which FREES the item buffer, so the per-line call of
+  //ATWrapInfo_CalcLine() from the full WrapInfo recalculation made the temp
+  //list re-allocate its buffer on EVERY document line (1M lines: ~0.5 sec of
+  //pure heap churn). SetCount(0) keeps Capacity; TATWrapItem is an unmanaged
+  //record, so stale bytes after Count cannot harm (Deref is a no-op, and
+  //nothing reads items beyond Count)
+  AItems.SetCountFast(0);
 
   //line folded entirely?
   if AConsiderFolding then

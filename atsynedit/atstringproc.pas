@@ -554,6 +554,14 @@ var
   SPunct: UnicodeString;
 begin
   SPunct:= ATEditorOptions.PunctuationToWrapWithWords;
+  //2026.09.12 (CudaText perf): pointer equality of the same string instance
+  //(editors pass their constant FOptNonWordChars; the stored keys hold
+  //references, so a stored key's address cannot be reused by another string)
+  //skips the full content comparison, which ran for every wrapped line part
+  if WrapWordTableValid and
+    (Pointer(WrapWordKeyNonChars)=Pointer(ANonWordChars)) and
+    (Pointer(WrapWordKeyPunct)=Pointer(SPunct)) then
+    Exit;
   if WrapWordTableValid and
     (WrapWordKeyNonChars=ANonWordChars) and
     (WrapWordKeyPunct=SPunct) then
@@ -659,12 +667,19 @@ begin
     while i<ALen do
     begin
       ch:= P[i];
-      NClass:= FixedSizes[Ord(ch)];
-      if (NClass<>uw_normal) and
-        ((NClass<>uw_space) or (ch=#9)) then
+      //2026.09.12 (CudaText perf): printable ASCII (space..tilde) is always
+      //of fixed 1-column width (uw_normal, and space is non-tab uw_space),
+      //so the FixedSizes lookup is only needed for other chars; this halved
+      //the scan time of the word-wrap calc for hex/base64-like corpora
+      if (ch<#32) or (ch>#126) then
       begin
-        bAllWidth:= false;
-        Break;
+        NClass:= FixedSizes[Ord(ch)];
+        if (NClass<>uw_normal) and
+          ((NClass<>uw_space) or (ch=#9)) then
+        begin
+          bAllWidth:= false;
+          Break;
+        end;
       end;
       if not WrapWordChar(ch) then
         bAllWordChars:= false;
