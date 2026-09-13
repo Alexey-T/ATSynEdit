@@ -355,6 +355,10 @@ begin
 
   FWrapUpdateNeeded:= true;
 
+  //overrides False which was set from AddUndoItem for Delete-action;
+  //this is needed to keep the command time O(1) instead of O(lines_count)
+  St.EnableCachedWrapinfoUpdate:= true;
+
   Result:= [TATCommandResult.Text, TATCommandResult.CaretTop];
 end;
 
