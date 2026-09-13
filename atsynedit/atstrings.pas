@@ -2068,7 +2068,7 @@ end;
 procedure TATStrings.LineMove(AIndexFrom, AIndexTo: SizeInt; AWithUndo: boolean=true);
 var
   ItemFrom, ItemTo: PATStringItem;
-  NLineMin: SizeInt;
+  NLineMin, NLineMax, i: SizeInt;
 begin
   UpdateModified;
 
@@ -2092,10 +2092,12 @@ begin
   ActionAddFakeLineIfNeeded;
   Modified:= true;
 
-  FIndexesOfEditedLines.Add(AIndexFrom);
-  FIndexesOfEditedLines.Add(AIndexTo);
-
   NLineMin:= Min(AIndexFrom, AIndexTo);
+  NLineMax:= Max(AIndexFrom, AIndexTo);
+
+  for i:= NLineMin to NLineMax do
+    FIndexesOfEditedLines.Add(i);
+
   DoEventLog(NLineMin);
 end;
 
