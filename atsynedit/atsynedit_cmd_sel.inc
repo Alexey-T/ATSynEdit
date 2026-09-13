@@ -353,7 +353,7 @@ begin
     St.EnabledBookmarksUpdate:= true;
   end;
 
-  UpdateWrapInfo(true, false); //2026.09: avoid cached WrapInfo to remain
+  FWrapUpdateNeeded:= true;
 
   Result:= [TATCommandResult.Text, TATCommandResult.CaretTop];
 end;

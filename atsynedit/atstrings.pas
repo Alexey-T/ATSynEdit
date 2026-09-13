@@ -2092,6 +2092,9 @@ begin
   ActionAddFakeLineIfNeeded;
   Modified:= true;
 
+  FIndexesOfEditedLines.Add(AIndexFrom);
+  FIndexesOfEditedLines.Add(AIndexTo);
+
   NLineMin:= Min(AIndexFrom, AIndexTo);
   DoEventLog(NLineMin);
 end;
