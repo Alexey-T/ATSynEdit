@@ -2723,8 +2723,8 @@ var
   NWrapColumnNew: integer;
   NIndentMaximal: integer;
   NLine, NLinesCount, NIndexFrom, NIndexTo: integer;
-  i: integer;
   NHint: SizeInt;
+  i: integer;
 begin
   //method can be called before 1st paint,
   //so TCanvas.TextWidth (TATSynEdit.UpdateCharSize) will give exception "Control has no parent window"
@@ -2740,10 +2740,6 @@ begin
   if not HandleAllocated then
     if FWrapMode<>TATEditorWrapMode.ModeOff then
       exit;
-
-  //must init FRect* if called before first paint (wrapped items need it)
-  if FRectMain.Width=0 then
-    UpdateInitialVars(Canvas);
 
   //2026.09.10 fix (word-wrap + OS-native scrollbars):
   //When "scrollbar_themed"=false (OptScrollbarsNew=false), editor uses
@@ -2761,32 +2757,13 @@ begin
     (FOptScrollStyleVert<>TATEditorScrollbarStyle.Hide) and
     (FWrapMode<>TATEditorWrapMode.ModeOff) and
     (Strings.Count>GetVisibleLines) then
-  begin
     ShowOsBarVert:= true;
-    UpdateInitialVars(Canvas); //refresh FClientW/H, FRect* for reduced client area
-  end;
 
-  //2026.09.11 fix (word-wrap + gutter autosize):
-  //Same problem as above, but with the "numbers" gutter band: its width is
-  //autosized by Strings.Count (OptNumbersAutosize, e.g. 2 digits for a small
-  //doc -> 7 digits for 1M lines). When the whole text is replaced by the API
-  //(CudaText: ed.set_text_all), this method ran the full wrap calculation
-  //with the STALE layout (FRectMain of the previous small document), then the
-  //first paint called UpdateInitialVars() -> gutter band became wider ->
-  //GetVisibleColumns() changed -> the full wrap recalculation ran a SECOND
-  //time for the whole document. That doubled the set_text_all time for
-  //word-wrapped huge files (CudaText test, 1M lines x 500 chars: set_text_all
-  //~25 sec + first paint ~26 sec, both dominated by the wrap calc).
-  //Fix: when the line count changed since the previous WrapInfo update,
-  //refresh the layout BEFORE reading GetVisibleColumns(), so the calculation
-  //uses the final gutter width; the first paint then sees the same columns
-  //and the "nothing changed" early-exit skips the recalculation.
-  if FOptNumbersAutosize and
-    (FWrapMode<>TATEditorWrapMode.ModeOff) and
-    (Strings.Count<>FWrapInfo.StringsPrevCount) then
-  begin
-    UpdateInitialVars(Canvas); //refresh gutter width, FRect* for the new line count
-  end;
+  //refresh FClientW/H, FRect* for reduced client area.
+  //we must do it in several cases:
+  //- when FRectMain.Width is 0 (first paint)
+  //- when gutter numbers autosize is on, and new text is loaded via Python API ed.set_text_all
+  UpdateInitialVars(Canvas);
 
   FCharSizer.Init(
     Font.Name,
