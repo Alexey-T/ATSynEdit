@@ -2741,6 +2741,10 @@ begin
     if FWrapMode<>TATEditorWrapMode.ModeOff then
       exit;
 
+  //first paint
+  if FRectMain.Width=0 then
+    UpdateInitialVars(Canvas);
+
   //2026.09.10 fix (word-wrap + OS-native scrollbars):
   //When "scrollbar_themed"=false (OptScrollbarsNew=false), editor uses
   //OS-native scrollbar, which takes ~16px of the client area WHEN IT APPEARS
@@ -2759,9 +2763,8 @@ begin
     (Strings.Count>GetVisibleLines) then
     ShowOsBarVert:= true;
 
-  //refresh FClientW/H, FRect* for reduced client area.
-  //we must do it in several cases:
-  //- when FRectMain.Width is 0 (first paint)
+  //we must update FClientW / FRect* in several cases:
+  //- when ShowOsBarVert just shown the vert scrollbar
   //- when gutter numbers autosize is on, and new text is loaded via Python API ed.set_text_all
   UpdateInitialVars(Canvas);
 
