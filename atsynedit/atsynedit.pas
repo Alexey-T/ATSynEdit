@@ -6050,6 +6050,10 @@ begin
   {$endif}
 end;
 
+var
+  _SysScrollbarDpi: integer = 0;
+  _SysScrollbarWidth: integer = 0;
+
 procedure TATSynEdit.GetClientSizes(out W, H: integer);
 begin
   W:= Width;
@@ -6066,10 +6070,15 @@ begin
     end
     else
     begin
+      if (_SysScrollbarWidth=0) or (_SysScrollbarDpi<>Screen.PixelsPerInch) then
+      begin
+        _SysScrollbarDpi:= Screen.PixelsPerInch;
+        _SysScrollbarWidth:= GetSystemMetrics(SM_CXVSCROLL);
+      end;
       if ShowOsBarVert then
-        Dec(W, GetSystemMetrics(SM_CXVSCROLL));
+        Dec(W, _SysScrollbarWidth);
       if ShowOsBarHorz then
-        Dec(H, GetSystemMetrics(SM_CYHSCROLL));
+        Dec(H, _SysScrollbarWidth);
     end;
   end;
 
