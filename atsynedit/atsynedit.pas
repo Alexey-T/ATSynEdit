@@ -406,7 +406,8 @@ type
     SavingTrimSpaces,
     SavingTrimFinalEmptyLines,
     SavingForceFinalEol,
-    Margin
+    Margin,
+    ModernScrollbar
     );
   TATEditorModifiedOptions = set of TATEditorModifiedOption;
 
