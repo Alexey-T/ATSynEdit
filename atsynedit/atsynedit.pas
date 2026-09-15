@@ -6059,8 +6059,8 @@ begin
   begin
     if FOptScrollbarsNew then
     begin
-      //custom vert bar is always visible
-      Dec(W, FScrollbarVert.Width);
+      if FScrollbarVert.Visible then
+        Dec(W, FScrollbarVert.Width);
       if FScrollbarHorz.Visible then
         Dec(H, FScrollbarHorz.Height);
     end
