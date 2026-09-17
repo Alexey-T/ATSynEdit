@@ -4927,21 +4927,20 @@ end;
 
 
 procedure TATSynEdit.DoPaintGutterBookmarkStdIcon(C: TCanvas; ARect: TRect);
-const
-  cY = 1;
-  cX = 4;
 var
-  dx: integer;
+  dx, x, y: integer;
 begin
   C.Brush.Color:= Colors.BookmarkIcon;
   C.Pen.Color:= Colors.BookmarkIcon;
 
-  dx:= Min(TextCharSize.Y-cY*2, ARect.Width) div 2-1;
+  dx:= Min(TextCharSize.Y-2, ARect.Width) div 2-1;
+  x:= ARect.Left+4;
+  y:= ARect.Top+1;
 
   C.Polygon([
-    Point(ARect.Left+cX,    ARect.Top+cY),
-    Point(ARect.Left+cX+dx, ARect.Top+cY+dx),
-    Point(ARect.Left+cX,    ARect.Top+cY+2*dx)
+    Point(x,    y),
+    Point(x+dx, y+dx),
+    Point(x,    y+2*dx)
     ]);
 end;
 
