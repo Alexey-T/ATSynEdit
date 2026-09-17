@@ -2383,6 +2383,27 @@ begin
     end;
 end;
 
+procedure UniqueCaretsArray(var Ar: TATPointPairArray);
+{
+2026.09.18 (CudaText #6480): makes a unique copy of a carets-array, which is
+shared with undo-items (undo-items share carets/markers/attribs arrays now,
+see TATUndoItem.Create). Must be called before any in-place modification of
+an array, which was read from TATUndoItem.ItemCarets (or from an array passed
+to TATUndoList.Add). For markers/attribs arrays no such helper is needed:
+nothing modifies them in-place (SetLength() gives copy-on-write for shared
+dynamic arrays, verified on FPC 3.2.2).
+}
+var
+  Tmp: TATPointPairArray;
+  i: SizeInt;
+begin
+  if Ar=nil then exit;
+  SetLength(Tmp, Length(Ar));
+  for i:= 0 to High(Ar) do
+    Tmp[i]:= Ar[i];
+  Ar:= Tmp;
+end;
+
 procedure TATStrings.UndoSingle_Begin(ACurList: TATUndoList; AAction: TATEditAction;
   ACommandCode: integer; ASoftMarked, AHardMarked, AWithoutPause: boolean;
   const ACarets: TATPointPairArray;
@@ -2581,7 +2602,13 @@ begin
             //force caret to line CurIndex, to fix wrong undo-data after first undo/redo with caret-jump (CudaText #6027)
             if Length(CurCaretsArray)=1 then
               if CurCaretsArray[0].Y2=-1 then //fix CudaText #6249
+              begin
+                //2026.09.18 (CudaText #6480): array can be shared with other undo-items
+                //(undo-items share carets/markers/attribs arrays now), make a unique copy
+                //before the in-place modification
+                UniqueCaretsArray(CurCaretsArray);
                 CurCaretsArray[0].Y:= CurIndex;
+              end;
           end;
         end;
 
@@ -2596,7 +2623,13 @@ begin
             //force caret to line CurIndex, to fix wrong undo-data after first undo/redo with caret-jump (CudaText #6027)
             if Length(CurCaretsArray)=1 then
               if CurCaretsArray[0].Y2=-1 then //fix CudaText #6249
+              begin
+                //2026.09.18 (CudaText #6480): array can be shared with other undo-items
+                //(undo-items share carets/markers/attribs arrays now), make a unique copy
+                //before the in-place modification
+                UniqueCaretsArray(CurCaretsArray);
                 CurCaretsArray[0].Y:= CurIndex;
+              end;
           end;
         end;
 

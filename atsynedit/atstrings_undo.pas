@@ -170,6 +170,52 @@ implementation
 uses
   Math, Dialogs;
 
+function SameCaretsArrays(const A, B: TATPointPairArray): boolean;
+var
+  i: SizeInt;
+begin
+  if Pointer(A)=Pointer(B) then exit(true);
+  if Length(A)<>Length(B) then exit(false);
+  for i:= 0 to High(A) do
+    if (A[i].X<>B[i].X) or (A[i].Y<>B[i].Y) or
+      (A[i].X2<>B[i].X2) or (A[i].Y2<>B[i].Y2) then
+      exit(false);
+  Result:= true;
+end;
+
+function SameMarkersArrays(const A, B: TATMarkerMarkerArray): boolean;
+var
+  i: SizeInt;
+begin
+  if Pointer(A)=Pointer(B) then exit(true);
+  if Length(A)<>Length(B) then exit(false);
+  for i:= 0 to High(A) do
+    if (A[i].Tag<>B[i].Tag) or (A[i].TagEx<>B[i].TagEx) or
+      (A[i].PosX<>B[i].PosX) or (A[i].PosY<>B[i].PosY) or
+      (A[i].SelX<>B[i].SelX) or (A[i].SelY<>B[i].SelY) or
+      (A[i].MicromapMode<>B[i].MicromapMode) then
+      exit(false);
+  Result:= true;
+end;
+
+function SameAttribsArrays(const A, B: TATMarkerAttribArray): boolean;
+var
+  i: SizeInt;
+begin
+  if Pointer(A)=Pointer(B) then exit(true);
+  if Length(A)<>Length(B) then exit(false);
+  for i:= 0 to High(A) do
+    if (A[i].Tag<>B[i].Tag) or (A[i].TagEx<>B[i].TagEx) or
+      (A[i].PosX<>B[i].PosX) or (A[i].PosY<>B[i].PosY) or
+      (A[i].SelX<>B[i].SelX) or (A[i].ColorFont<>B[i].ColorFont) or
+      (A[i].ColorBG<>B[i].ColorBG) or (A[i].ColorBorder<>B[i].ColorBorder) or
+      (A[i].FontStyles<>B[i].FontStyles) or (A[i].BorderLeft<>B[i].BorderLeft) or
+      (A[i].BorderRight<>B[i].BorderRight) or (A[i].BorderUp<>B[i].BorderUp) or
+      (A[i].BorderDown<>B[i].BorderDown) or (A[i].MicromapMode<>B[i].MicromapMode) then
+      exit(false);
+  Result:= true;
+end;
+
 { TATUndoItem }
 
 function TATUndoItem.GetAsString: string;
@@ -271,6 +317,9 @@ begin
   ItemText:= D.ItemText;
   ItemCarets:= D.ItemCarets;
   ItemCarets2:= D.ItemCarets2;
+  ItemMarkers:= D.ItemMarkers;
+  ItemMarkers2:= D.ItemMarkers2;
+  ItemAttribs:= D.ItemAttribs;
   ItemSoftMark:= D.ItemSoftMark;
   ItemHardMark:= D.ItemHardMark;
   ItemCommandCode:= D.ItemCommandCode;
@@ -287,8 +336,6 @@ constructor TATUndoItem.Create(AAction: TATEditAction; AIndex: integer;
   const AAttribs: TATMarkerAttribArray;
   ACommandCode: integer;
   const ATickCount: QWord);
-var
-  i: integer;
 begin
   ItemAction:= AAction;
   ItemIndex:= AIndex;
@@ -301,25 +348,26 @@ begin
   ItemTickCount:= ATickCount;
   ItemGlobalCounter:= 0;
 
-  SetLength(ItemCarets, Length(ACarets));
-  for i:= 0 to High(ACarets) do
-    ItemCarets[i]:= ACarets[i];
-
-  SetLength(ItemCarets2, Length(ACarets2));
-  for i:= 0 to High(ACarets2) do
-    ItemCarets2[i]:= ACarets2[i];
-
-  SetLength(ItemMarkers, Length(AMarkers));
-  for i:= 0 to High(AMarkers) do
-    ItemMarkers[i]:= AMarkers[i];
-
-  SetLength(ItemMarkers2, Length(AMarkers2));
-  for i:= 0 to High(AMarkers2) do
-    ItemMarkers2[i]:= AMarkers2[i];
-
-  SetLength(ItemAttribs, Length(AAttribs));
-  for i:= 0 to High(AAttribs) do
-    ItemAttribs[i]:= AAttribs[i];
+  //2026.09.18 (CudaText #6480): don't copy arrays to every undo-item, share them.
+  //Dynamic arrays are refcounted: all items created from one captured array
+  //(block operations capture carets/markers/attribs once for the whole block)
+  //share the same memory now. Old code copied all 5 arrays into every item,
+  //so a block-edit of N lines with M markers/attribs in the editor
+  //allocated O(N*M) RAM: e.g. select-all + one typed char with 10K attribs
+  //in a 500-lines doc took ~300 MB, with 2K lines ~1.2 GB (issue #6480).
+  //Undo/redo results are the same: all consumers of these arrays
+  //(undo/redo code, AsString serialization) only read them; the few places
+  //which modify a carets-array of an item in-place make a unique copy first
+  //(UniqueCaretsArray in ATStrings.UndoSingle), and SetLength() gives
+  //copy-on-write for shared dynarrays (verified on FPC 3.2.2).
+  //TATUndoList.Add() additionally detects the "fresh capture of unchanged
+  //state" case (per-line AddUndoItem callers) and shares the previous
+  //item's arrays, so RAM is O(markers) per command, not O(items*markers).
+  ItemCarets:= ACarets;
+  ItemCarets2:= ACarets2;
+  ItemMarkers:= AMarkers;
+  ItemMarkers2:= AMarkers2;
+  ItemAttribs:= AAttribs;
 end;
 
 constructor TATUndoItem.CreateEmpty;
@@ -409,7 +457,10 @@ procedure TATUndoList.Add(AAction: TATEditAction; AIndex: integer;
   ACommandCode: integer;
   AUndoOrRedo: TATEditorRunningUndoOrRedo);
 var
-  Item: TATUndoItem;
+  Item, PrevItem: TATUndoItem;
+  CaretsToStore, Carets2ToStore: TATPointPairArray;
+  MarkersToStore, Markers2ToStore: TATMarkerMarkerArray;
+  AttribsToStore: TATMarkerAttribArray;
   NewTick: QWord;
   NGlobalCounter: DWord;
   bNotEmpty: boolean;
@@ -441,6 +492,47 @@ begin
         Exit;
   end;
 
+  //2026.09.18 (CudaText #6480): when the captured carets/markers/attribs equal
+  //the ones of the last item, share the last item's arrays instead of storing
+  //another copy. TATUndoItem.Create() shares arrays by reference, but callers
+  //like AddUndoItem() capture FRESH arrays on every call: without this block,
+  //a loop of N per-line AddUndoItem() calls with unchanged editor state stored
+  //N copies of the marker/attrib arrays (O(N*M) RAM, issue #6480). Comparison
+  //is by pointer first, then by content (early exit on first difference), so
+  //it's cheaper than the allocation+copy it replaces.
+  if bNotEmpty then
+  begin
+    PrevItem:= Last;
+    if SameCaretsArrays(ACarets, PrevItem.ItemCarets) then
+      CaretsToStore:= PrevItem.ItemCarets
+    else
+      CaretsToStore:= ACarets;
+    if SameCaretsArrays(ACarets2, PrevItem.ItemCarets2) then
+      Carets2ToStore:= PrevItem.ItemCarets2
+    else
+      Carets2ToStore:= ACarets2;
+    if SameMarkersArrays(AMarkers, PrevItem.ItemMarkers) then
+      MarkersToStore:= PrevItem.ItemMarkers
+    else
+      MarkersToStore:= AMarkers;
+    if SameMarkersArrays(AMarkers2, PrevItem.ItemMarkers2) then
+      Markers2ToStore:= PrevItem.ItemMarkers2
+    else
+      Markers2ToStore:= AMarkers2;
+    if SameAttribsArrays(AAttribs, PrevItem.ItemAttribs) then
+      AttribsToStore:= PrevItem.ItemAttribs
+    else
+      AttribsToStore:= AAttribs;
+  end
+  else
+  begin
+    CaretsToStore:= ACarets;
+    Carets2ToStore:= ACarets2;
+    MarkersToStore:= AMarkers;
+    Markers2ToStore:= AMarkers2;
+    AttribsToStore:= AAttribs;
+  end;
+
   //don't save TickCount if we are running Undo/Redo
   if AUndoOrRedo=TATEditorRunningUndoOrRedo.NotUndoRedo then
   begin
@@ -457,11 +549,11 @@ begin
 
   Item:= TATUndoItem.Create(AAction, AIndex, AText, AEnd, ALineState,
                             FSoftMark, FHardMark,
-                            ACarets,
-                            ACarets2,
-                            AMarkers,
-                            AMarkers2,
-                            AAttribs,
+                            CaretsToStore,
+                            Carets2ToStore,
+                            MarkersToStore,
+                            Markers2ToStore,
+                            AttribsToStore,
                             ACommandCode,
                             NewTick);
   Item.ItemGlobalCounter:= NGlobalCounter;
@@ -494,7 +586,10 @@ of Add() for the Insert-placeholder case (empty text, NotUndoRedo):
 - MaxCount trimming: run once at the end (all items share the counter).
 }
 var
-  Item: TATUndoItem;
+  Item, PrevItem: TATUndoItem;
+  CaretsToStore, Carets2ToStore: TATPointPairArray;
+  MarkersToStore, Markers2ToStore: TATMarkerMarkerArray;
+  AttribsToStore: TATMarkerAttribArray;
   NGlobalCounter: DWord;
   NCounterFirst, NCounterRest: DWord;
   NewTick: QWord;
@@ -536,6 +631,44 @@ begin
   if Capacity < Count+ACount then
     Capacity:= Count+ACount;
 
+  //2026.09.18 (CudaText #6480): same array-dedup as Add() does, against the
+  //last existing item: caller captured fresh arrays, but if editor state
+  //didn't change since the last command, share the last item's arrays.
+  //All ACount items of the run share the arrays between themselves anyway
+  //(TATUndoItem.Create shares by reference).
+  if Count>0 then
+  begin
+    PrevItem:= Last;
+    if SameCaretsArrays(ACarets, PrevItem.ItemCarets) then
+      CaretsToStore:= PrevItem.ItemCarets
+    else
+      CaretsToStore:= ACarets;
+    if SameCaretsArrays(ACarets2, PrevItem.ItemCarets2) then
+      Carets2ToStore:= PrevItem.ItemCarets2
+    else
+      Carets2ToStore:= ACarets2;
+    if SameMarkersArrays(AMarkers, PrevItem.ItemMarkers) then
+      MarkersToStore:= PrevItem.ItemMarkers
+    else
+      MarkersToStore:= AMarkers;
+    if SameMarkersArrays(AMarkers2, PrevItem.ItemMarkers2) then
+      Markers2ToStore:= PrevItem.ItemMarkers2
+    else
+      Markers2ToStore:= AMarkers2;
+    if SameAttribsArrays(AAttribs, PrevItem.ItemAttribs) then
+      AttribsToStore:= PrevItem.ItemAttribs
+    else
+      AttribsToStore:= AAttribs;
+  end
+  else
+  begin
+    CaretsToStore:= ACarets;
+    Carets2ToStore:= ACarets2;
+    MarkersToStore:= AMarkers;
+    Markers2ToStore:= AMarkers2;
+    AttribsToStore:= AAttribs;
+  end;
+
   NewTick:= GetTickCount64;
   if (FLastTick>0) and (NewTick-FLastTick>=ATStrings_PauseForUndoGroup) then
     FSoftMark:= true;
@@ -560,7 +693,7 @@ begin
       NGlobalCounter:= NCounterRest;
     Item:= TATUndoItem.Create(TATEditAction.Insert, AIndex, '', TATLineEnds.None,
       TATLineState.None, FSoftMark, FHardMark,
-      ACarets, ACarets2, AMarkers, AMarkers2, AAttribs,
+      CaretsToStore, Carets2ToStore, MarkersToStore, Markers2ToStore, AttribsToStore,
       ACommandCode, NewTick);
     Item.ItemGlobalCounter:= NGlobalCounter;
     FList.Add(Item);
