@@ -92,19 +92,7 @@ type
       const AAttribs: TATMarkerAttribArray;
       ACommandCode: integer;
       const ATickCount: QWord;
-      AShareArrays: boolean = false); virtual;
-      //AShareArrays (2026.09, CudaText issue #6480): instead of copying carets/
-      //markers/attribs arrays element-by-element, items SHARE the passed arrays
-      //(FPC dynamic arrays are reference-counted, last owner frees the data).
-      //It's used only by bulk paths, which create many items with IDENTICAL
-      //arrays (captured once for the whole run): undo-items of LineBlockDelete(),
-      //LineBlockInsertEnds(), mirror-items of UndoRunInserts()/UndoRunDeletes().
-      //Sharing is invisible to all code: item array-fields are read-only after
-      //creation (AsString serialization, Set*Array restore on undo), and the only
-      //in-place write (ActionAddJumpToUndo: SetLength+write) goes through
-      //SetLength, which makes a unique copy for shared arrays. Old code copied
-      //M markers/attribs per item: for N-item runs it was O(N*M) time and RAM
-      //(60K lines with 30K attribs = minutes of Undo, ~100 GB of memory traffic).
+      AShareArrays: boolean); virtual;
     constructor CreateEmpty;
     procedure Assign(const D: TATUndoItem);
     property AsString: string read GetAsString write SetAsString;
@@ -639,8 +627,8 @@ begin
     Markers, //2nd markers
     Attribs,
     0,
-    0
-    );
+    0,
+    true);
   FList.Add(Item);
 end;
 
