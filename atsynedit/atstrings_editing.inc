@@ -700,6 +700,13 @@ begin
   (LineInsertRaw at each item's index) is unchanged, and such runs of
   consecutive-index items are optimized too (see UndoCountRun/UndoRun*
   comments in atstrings.pas).
+  2026.09 (issue #385): only the 1st saved undo-item of the block (loop's
+  first iteration, i=ALine2) stores the captured arrays; all other items are
+  added with AArraysDisabled=True, so undo/redo of them doesn't touch the
+  current carets/markers/attribs. All items of one block-delete captured the
+  same values (the loop is eventless), so applying them once - on undo of
+  the 1st item - gives the same final editor state as before. RAM usage drops
+  from O(N_items*M_markers) to O(M_markers).
   }
   bFast:= (ALine2-ALine1>0) and (ALine1>=0) and (not FReadOnly);
 
@@ -724,9 +731,17 @@ begin
     begin
       Item:= FList.GetItem(i);
       UpdateModified;
-      AddUndoItemEx(TATEditAction.Delete, i,
-        Item^.Line, Item^.LineEnds, Item^.LineState, FCommandCode,
-        CurCarets, CurCarets2, CurMarkers, CurMarkers2, CurAttribs);
+      //2026.09 (issue #385): 1st saved undo-item stores the real arrays,
+      //all other items of the block get AArraysDisabled=True
+      if i=ALine2 then
+        AddUndoItemEx(TATEditAction.Delete, i,
+          Item^.Line, Item^.LineEnds, Item^.LineState, FCommandCode,
+          CurCarets, CurCarets2, CurMarkers, CurMarkers2, CurAttribs)
+      else
+        AddUndoItemEx(TATEditAction.Delete, i,
+          Item^.Line, Item^.LineEnds, Item^.LineState, FCommandCode,
+          nil, nil, nil, nil, nil,
+          true{AArraysDisabled, issue #385});
     end;
 
     //2026.09: fire event before the physical deletion, like LineDelete() does;

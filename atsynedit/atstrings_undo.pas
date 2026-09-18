@@ -60,6 +60,10 @@ type
   private
     const PartSep = #9; //separators for AsString property
     const MarkersSep = #1;
+    const ArraysDisabledSpec = '-';
+      //2026.09 (issue #385): spec value of serialized undo-data, which marks all
+      //carets/markers arrays of the item as disabled; normal serialization never
+      //produces this char for those parts (arrays are digits/commas/semicolons)
     function GetAsString: string;
     procedure SetAsString(const AValue: string);
   public
@@ -83,6 +87,15 @@ type
     ItemAttribs: TATMarkerAttribArray; //attributes
     ItemSoftMark: boolean; //undo soft-mark. logic is described in ATSynEdit Wiki page
     ItemHardMark: boolean; //undo hard-mark
+    ItemArraysDisabled: boolean;
+      //2026.09 (issue #385): True = all carets/markers/attribs arrays of this item are
+      //disabled: they must be empty (nil) here, and undo/redo must not apply them,
+      //i.e. must NOT touch the current carets/markers/attribs of the editor.
+      //Bulk code (which saves many undo-items with identical captured arrays) stores
+      //real arrays only in the 1st created undo-item of the bulk run; all other items
+      //of the run get this flag. It gives big RAM saving for big runs, e.g. 10K items
+      //with M live markers/attribs keep only one O(M) copy instead of one per item.
+      //Serializer writes this state as ArraysDisabledSpec char, see GetAsString().
 
     constructor Create(AAction: TATEditAction; AIndex: integer;
       const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState;
@@ -92,7 +105,11 @@ type
       const AAttribs: TATMarkerAttribArray;
       ACommandCode: integer;
       const ATickCount: QWord;
-      AShareArrays: boolean); virtual;
+      AShareArrays: boolean;
+      AArraysDisabled: boolean = false); virtual;
+      //AArraysDisabled (2026.09, issue #385): True = created item has empty (nil)
+      //carets/markers/attribs arrays with ItemArraysDisabled=True, passed arrays are
+      //ignored. Used by bulk paths for all items except the 1st one of a bulk run.
     constructor CreateEmpty;
     procedure Assign(const D: TATUndoItem);
     property AsString: string read GetAsString write SetAsString;
@@ -140,8 +157,10 @@ type
       const AAttribs: TATMarkerAttribArray;
       ACommandCode: integer;
       AUndoOrRedo: TATEditorRunningUndoOrRedo;
-      AShareArrays: boolean = false);
+      AShareArrays: boolean = false;
+      AArraysDisabled: boolean = false);
       //AShareArrays: passed to TATUndoItem.Create(), see its comment
+      //AArraysDisabled (issue #385): passed to TATUndoItem.Create(), see its comment
     //2026.09.12 (CudaText perf): bulk version of Add() for the N identical
     //placeholder undo-items of a block-insert (LineBlockInsertEnds): one
     //TATEditAction.Insert item per line, same index, empty text, same arrays.
@@ -179,6 +198,7 @@ function TATUndoItem.GetAsString: string;
 //if more data will be needed here, add it to 'carets' item after MarkersSep=#1 separator
 var
   S: UnicodeString;
+  SCarets, SCarets2, SMarkers, SMarkers2: string;
   i: SizeInt;
 begin
   S:= ItemText;
@@ -187,18 +207,35 @@ begin
     if (S[i]=#10) or (S[i]=#13) then
       S[i]:= ' ';
 
+  //2026.09 (issue #385): disabled arrays are written as spec char '-',
+  //SetAsString() treats it as empty arrays and sets ItemArraysDisabled
+  if ItemArraysDisabled then
+  begin
+    SCarets:= ArraysDisabledSpec;
+    SCarets2:= ArraysDisabledSpec;
+    SMarkers:= ArraysDisabledSpec;
+    SMarkers2:= ArraysDisabledSpec;
+  end
+  else
+  begin
+    SCarets:= PointPairArrayToString(ItemCarets);
+    SCarets2:= PointPairArrayToString(ItemCarets2);
+    SMarkers:= MarkerArrayToString(ItemMarkers);
+    SMarkers2:= MarkerArrayToString(ItemMarkers2);
+  end;
+
   Result:=
     IntToStr(Ord(ItemAction))+PartSep+
     IntToStr(ItemIndex)+PartSep+
     IntToStr(Ord(ItemEnd))+PartSep+
     IntToStr(Ord(ItemLineState))+PartSep+
-    PointPairArrayToString(ItemCarets)+MarkersSep+
-      MarkerArrayToString(ItemMarkers)+MarkersSep+
+    SCarets+MarkersSep+
+      SMarkers+MarkersSep+
       IntToStr(ItemGlobalCounter)+MarkersSep+
       IntToStr(ItemTickCount)+MarkersSep+
       IntToStr(ItemCommandCode)+MarkersSep+
-      PointPairArrayToString(ItemCarets2)+MarkersSep+
-      MarkerArrayToString(ItemMarkers2)+PartSep+
+      SCarets2+MarkersSep+
+      SMarkers2+PartSep+
     IntToStr(Ord(ItemSoftMark))+PartSep+
     IntToStr(Ord(ItemHardMark))+PartSep+
     UTF8Encode(S);
@@ -211,6 +248,8 @@ var
   N: integer;
 begin
   Sep.Init(AValue, PartSep);
+
+  ItemArraysDisabled:= false;
 
   Sep.GetItemInt(N, 0);
   ItemAction:= TATEditAction(N);
@@ -230,9 +269,21 @@ begin
   Sep2.Init(S, MarkersSep);
   //a) carets
   Sep2.GetItemStr(SubItem);
-  StringToPointPairArray(ItemCarets, SubItem);
+  if SubItem=ArraysDisabledSpec then
+  begin
+    ItemCarets:= nil;
+    ItemArraysDisabled:= true; //see comment in GetAsString()
+  end
+  else
+    StringToPointPairArray(ItemCarets, SubItem);
   //b) markers
   Sep2.GetItemStr(SubItem);
+  if SubItem=ArraysDisabledSpec then
+  begin
+    ItemMarkers:= nil;
+    ItemArraysDisabled:= true;
+  end
+  else
   if SubItem<>'' then
     StringToMarkerArray(ItemMarkers, SubItem)
   else
@@ -246,9 +297,21 @@ begin
   Sep2.GetItemInt(ItemCommandCode, 0);
   //f) carets2
   Sep2.GetItemStr(SubItem);
-  StringToPointPairArray(ItemCarets2, SubItem);
+  if SubItem=ArraysDisabledSpec then
+  begin
+    ItemCarets2:= nil;
+    ItemArraysDisabled:= true;
+  end
+  else
+    StringToPointPairArray(ItemCarets2, SubItem);
   //g) markers2
   Sep2.GetItemStr(SubItem);
+  if SubItem=ArraysDisabledSpec then
+  begin
+    ItemMarkers2:= nil;
+    ItemArraysDisabled:= true;
+  end
+  else
   if SubItem<>'' then
     StringToMarkerArray(ItemMarkers2, SubItem)
   else
@@ -276,6 +339,7 @@ begin
   ItemCarets2:= D.ItemCarets2;
   ItemSoftMark:= D.ItemSoftMark;
   ItemHardMark:= D.ItemHardMark;
+  ItemArraysDisabled:= D.ItemArraysDisabled;
   ItemCommandCode:= D.ItemCommandCode;
   ItemTickCount:= D.ItemTickCount;
   ItemGlobalCounter:= D.ItemGlobalCounter;
@@ -290,7 +354,8 @@ constructor TATUndoItem.Create(AAction: TATEditAction; AIndex: integer;
   const AAttribs: TATMarkerAttribArray;
   ACommandCode: integer;
   const ATickCount: QWord;
-  AShareArrays: boolean);
+  AShareArrays: boolean;
+  AArraysDisabled: boolean);
 begin
   ItemAction:= AAction;
   ItemIndex:= AIndex;
@@ -302,7 +367,19 @@ begin
   ItemCommandCode:= ACommandCode;
   ItemTickCount:= ATickCount;
   ItemGlobalCounter:= 0;
+  ItemArraysDisabled:= AArraysDisabled;
 
+  if AArraysDisabled then
+  begin
+    //2026.09 (issue #385): all arrays must be empty in a disabled item;
+    //passed arrays are ignored, so callers may pass any values
+    ItemCarets:= nil;
+    ItemCarets2:= nil;
+    ItemMarkers:= nil;
+    ItemMarkers2:= nil;
+    ItemAttribs:= nil;
+  end
+  else
   if AShareArrays then
   begin
     ItemCarets:= ACarets;
@@ -407,7 +484,8 @@ procedure TATUndoList.Add(AAction: TATEditAction; AIndex: integer;
   const AAttribs: TATMarkerAttribArray;
   ACommandCode: integer;
   AUndoOrRedo: TATEditorRunningUndoOrRedo;
-  AShareArrays: boolean);
+  AShareArrays: boolean;
+  AArraysDisabled: boolean);
 var
   Item: TATUndoItem;
   NewTick: QWord;
@@ -464,7 +542,8 @@ begin
                             AAttribs,
                             ACommandCode,
                             NewTick,
-                            AShareArrays);
+                            AShareArrays,
+                            AArraysDisabled);
   Item.ItemGlobalCounter:= NGlobalCounter;
 
   FList.Add(Item);
@@ -563,7 +642,8 @@ begin
       TATLineState.None, FSoftMark, FHardMark,
       ACarets, ACarets2, AMarkers, AMarkers2, AAttribs,
       ACommandCode, NewTick,
-      true{AShareArrays, all items of the run share the same captured arrays});
+      true{AShareArrays, all items of the run share the same captured arrays},
+      (i>1){AArraysDisabled, issue #385: real arrays are stored only in the 1st item of the run});
     Item.ItemGlobalCounter:= NGlobalCounter;
     FList.Add(Item);
     FSoftMark:= false;

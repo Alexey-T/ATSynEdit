@@ -303,7 +303,8 @@ type
       ACommandCode: integer;
       const ACarets, ACarets2: TATPointPairArray;
       const AMarkers, AMarkers2: TATMarkerMarkerArray;
-      const AAttribs: TATMarkerAttribArray);
+      const AAttribs: TATMarkerAttribArray;
+      AArraysDisabled: boolean = false);
     function DebugText: string;
     function IsFilled: boolean;
     procedure DoFinalizeSaving;
@@ -2475,6 +2476,7 @@ var
   NCurCount, NStringsCount, NIndexMin: SizeInt;
   NEventX, NEventY: SizeInt;
   bWithoutPause,
+  bArraysDisabled,
   bEnableEventAfter: boolean;
 begin
   Result:= true;
@@ -2533,6 +2535,7 @@ begin
   CurMarkersArray:= CurItem.ItemMarkers;
   CurMarkersArray2:= CurItem.ItemMarkers2;
   CurAttribsArray:= CurItem.ItemAttribs;
+  bArraysDisabled:= CurItem.ItemArraysDisabled;
   ACommandCode:= CurItem.ItemCommandCode;
   ASoftMarked:= CurItem.ItemSoftMark;
   AHardMarked:= CurItem.ItemHardMark;
@@ -2621,7 +2624,9 @@ begin
             LineAddRaw(CurText, CurLineEnd);
             ActionFixEolBeforeLast;
             //fixing CudaText #6097
-            if Length(CurCaretsArray)=0 then
+            //2026.09 (issue #385): don't create the fake caret for items with
+            //disabled arrays: such item must not touch the current carets
+            if (Length(CurCaretsArray)=0) and (not bArraysDisabled) then
             begin
               SetLength(CurCaretsArray, 1);
               CurCaretsArray[0].X:= 0;
@@ -2694,16 +2699,22 @@ begin
         end;
     end;
 
-    if Length(CurCaretsArray)>0 then
-      SetCaretsArray(CurCaretsArray);
-    if Length(CurCaretsArray2)>0 then
-      SetCaretsArray2(CurCaretsArray2);
-
-    if CurAction<>TATEditAction.CaretJump then
+    //2026.09 (issue #385): items with disabled arrays must NOT touch the current
+    //carets/markers/attribs, so all Set*Array() calls are skipped for them
+    //(SetMarkersArray(nil)/SetAttribsArray(nil) would clear the current state)
+    if not bArraysDisabled then
     begin
-      SetMarkersArray(CurMarkersArray);
-      SetMarkersArray2(CurMarkersArray2);
-      SetAttribsArray(CurAttribsArray);
+      if Length(CurCaretsArray)>0 then
+        SetCaretsArray(CurCaretsArray);
+      if Length(CurCaretsArray2)>0 then
+        SetCaretsArray2(CurCaretsArray2);
+
+      if CurAction<>TATEditAction.CaretJump then
+      begin
+        SetMarkersArray(CurMarkersArray);
+        SetMarkersArray2(CurMarkersArray2);
+        SetAttribsArray(CurAttribsArray);
+      end;
     end;
 
   finally
@@ -2825,6 +2836,7 @@ var
   RunAttribs: TATMarkerAttribArray;
   bLastCarets, bLastCarets2: boolean;
   bFirstMirror: boolean;
+  bArraysDisabled, bRunArrays: boolean;
   OtherList: TATUndoList;
   ItemData: PATStringItem;
   NEventX, NEventY: SizeInt;
@@ -2911,6 +2923,10 @@ begin
   RunMarkers2:= GetMarkersArray2;
   RunAttribs:= GetAttribsArray;
   bFirstMirror:= true;
+  //2026.09 (issue #385): True, if any processed undo-item had non-disabled arrays;
+  //when all processed items had ItemArraysDisabled, the final Set*Array() calls
+  //must be skipped (they must not touch the current carets/markers/attribs)
+  bRunArrays:= false;
 
   for j:= 0 to NRunCount-1 do
   begin
@@ -2937,6 +2953,7 @@ begin
     CurMarkersArray:= CurItem.ItemMarkers;
     CurMarkersArray2:= CurItem.ItemMarkers2;
     CurAttribsArray:= CurItem.ItemAttribs;
+    bArraysDisabled:= CurItem.ItemArraysDisabled;
     //2026.09: always disable pause-events for items of a bulk run:
     //one undo step must not scroll/pause the editor in its middle
     bWithoutPause:= true;
@@ -2968,6 +2985,9 @@ begin
       end;
       ItemData:= FList.GetItem(NLineIndex);
       UpdateModified;
+      //2026.09 (issue #385): only the 1st created mirror-item stores the captured
+      //arrays; other mirror-items get AArraysDisabled=True (empty arrays, not
+      //applied on undo/redo), which gives the big RAM saving for huge runs
       if bFirstMirror then
       begin
         bFirstMirror:= false;
@@ -2978,23 +2998,32 @@ begin
       else
         AddUndoItemEx(TATEditAction.Delete, NItemIndex,
           ItemData^.Line, ItemData^.LineEnds, ItemData^.LineState, FCommandCode,
-          nil, nil, RunMarkers, RunMarkers2, RunAttribs);
+          nil, nil, nil, nil, nil,
+          true{AArraysDisabled, issue #385});
 
       //remember the last values of carets/markers/attribs: they are applied
-      //once after the loop (coalesced events), see comment below
-      if Length(CurCaretsArray)>0 then
+      //once after the loop (coalesced events), see comment below.
+      //2026.09 (issue #385): items with disabled arrays don't contribute here:
+      //their empty arrays must not clear the collected values. The run is
+      //processed from the last-created item down to the 1st-created one, which
+      //is the only item with real arrays, so it gives the final values
+      if not bArraysDisabled then
       begin
-        LastCaretsArray:= CurCaretsArray;
-        bLastCarets:= true;
+        bRunArrays:= true;
+        if Length(CurCaretsArray)>0 then
+        begin
+          LastCaretsArray:= CurCaretsArray;
+          bLastCarets:= true;
+        end;
+        if Length(CurCaretsArray2)>0 then
+        begin
+          LastCaretsArray2:= CurCaretsArray2;
+          bLastCarets2:= true;
+        end;
+        LastMarkersArray:= CurMarkersArray;
+        LastMarkersArray2:= CurMarkersArray2;
+        LastAttribsArray:= CurAttribsArray;
       end;
-      if Length(CurCaretsArray2)>0 then
-      begin
-        LastCaretsArray2:= CurCaretsArray2;
-        bLastCarets2:= true;
-      end;
-      LastMarkersArray:= CurMarkersArray;
-      LastMarkersArray2:= CurMarkersArray2;
-      LastAttribsArray:= CurAttribsArray;
     finally
       UndoSingle_End(ACurList, true, bEnableEventAfter, NEventX, NEventY);
     end;
@@ -3069,13 +3098,18 @@ begin
       ACurList.Locked:= false;
     end;
 
-    if bLastCarets then
-      SetCaretsArray(LastCaretsArray);
-    if bLastCarets2 then
-      SetCaretsArray2(LastCaretsArray2);
-    SetMarkersArray(LastMarkersArray);
-    SetMarkersArray2(LastMarkersArray2);
-    SetAttribsArray(LastAttribsArray);
+    //2026.09 (issue #385): if no processed item had arrays (all had them disabled),
+    //don't touch the current carets/markers/attribs at all
+    if bRunArrays then
+    begin
+      if bLastCarets then
+        SetCaretsArray(LastCaretsArray);
+      if bLastCarets2 then
+        SetCaretsArray2(LastCaretsArray2);
+      SetMarkersArray(LastMarkersArray);
+      SetMarkersArray2(LastMarkersArray2);
+      SetAttribsArray(LastAttribsArray);
+    end;
   end;
 
   if Result then Exit;
@@ -3160,6 +3194,7 @@ var
   RunAttribs: TATMarkerAttribArray;
   bLastCarets, bLastCarets2: boolean;
   bFirstMirror: boolean;
+  bArraysDisabled, bRunArrays: boolean;
   OtherList: TATUndoList;
   Item: TATStringItem;
   PItem: PATStringItem;
@@ -3179,6 +3214,10 @@ begin
   bLastCarets:= false;
   bLastCarets2:= false;
   bFirstMirror:= true;
+  //2026.09 (issue #385): True, if any processed undo-item had non-disabled arrays;
+  //when all processed items had ItemArraysDisabled, the final Set*Array() calls
+  //must be skipped (they must not touch the current carets/markers/attribs)
+  bRunArrays:= false;
   LastCaretsArray:= nil;
   LastCaretsArray2:= nil;
   LastMarkersArray:= nil;
@@ -3302,6 +3341,7 @@ begin
     CurMarkersArray:= CurItem.ItemMarkers;
     CurMarkersArray2:= CurItem.ItemMarkers2;
     CurAttribsArray:= CurItem.ItemAttribs;
+    bArraysDisabled:= CurItem.ItemArraysDisabled;
     //2026.09: always disable pause-events for items of a bulk run:
     //one undo step must not scroll/pause the editor in its middle
     bWithoutPause:= true;
@@ -3320,6 +3360,9 @@ begin
       else
         NItemIndex:= ALineIndex;
       UpdateModified;
+      //2026.09 (issue #385): only the 1st created mirror-item stores the captured
+      //arrays; other mirror-items get AArraysDisabled=True (empty arrays, not
+      //applied on undo/redo), which gives the big RAM saving for huge runs
       if bFirstMirror then
       begin
         bFirstMirror:= false;
@@ -3330,7 +3373,8 @@ begin
       else
         AddUndoItemEx(TATEditAction.Insert, NItemIndex, '',
           TATLineEnds.None, TATLineState.None, FCommandCode,
-          nil, nil, RunMarkers, RunMarkers2, RunAttribs);
+          nil, nil, nil, nil, nil,
+          true{AArraysDisabled, issue #385});
 
       //physical line write: same-index runs write the line here, walking
       //PItem down from the end of block; consecutive runs got all lines
@@ -3354,20 +3398,28 @@ begin
       LinesState[NLineSlot]:= CurItem.ItemLineState;
 
       //remember the last values of carets/markers/attribs: they are applied
-      //once after the loop (coalesced events), see comment below the loop
-      if Length(CurCaretsArray)>0 then
+      //once after the loop (coalesced events), see comment below the loop.
+      //2026.09 (issue #385): items with disabled arrays don't contribute here:
+      //their empty arrays must not clear the collected values. The run is
+      //processed from the last-created item down to the 1st-created one, which
+      //is the only item with real arrays, so it gives the final values
+      if not bArraysDisabled then
       begin
-        LastCaretsArray:= CurCaretsArray;
-        bLastCarets:= true;
+        bRunArrays:= true;
+        if Length(CurCaretsArray)>0 then
+        begin
+          LastCaretsArray:= CurCaretsArray;
+          bLastCarets:= true;
+        end;
+        if Length(CurCaretsArray2)>0 then
+        begin
+          LastCaretsArray2:= CurCaretsArray2;
+          bLastCarets2:= true;
+        end;
+        LastMarkersArray:= CurMarkersArray;
+        LastMarkersArray2:= CurMarkersArray2;
+        LastAttribsArray:= CurAttribsArray;
       end;
-      if Length(CurCaretsArray2)>0 then
-      begin
-        LastCaretsArray2:= CurCaretsArray2;
-        bLastCarets2:= true;
-      end;
-      LastMarkersArray:= CurMarkersArray;
-      LastMarkersArray2:= CurMarkersArray2;
-      LastAttribsArray:= CurAttribsArray;
     finally
       UndoSingle_End(ACurList, true, bEnableEventAfter, NEventX, NEventY);
     end;
@@ -3405,15 +3457,21 @@ begin
   Carets/markers/attribs: only the values of the LAST processed item are applied
   (for all-same-values runs and for mirror-runs, this gives the same final
   editor state as N per-item applications: the last application wins).
+  2026.09 (issue #385): items with disabled arrays don't contribute their
+  (empty) values; if ALL processed items had them disabled, Set*Array() calls
+  are skipped, to not touch the current carets/markers/attribs.
   }
 
-  if bLastCarets then
-    SetCaretsArray(LastCaretsArray);
-  if bLastCarets2 then
-    SetCaretsArray2(LastCaretsArray2);
-  SetMarkersArray(LastMarkersArray);
-  SetMarkersArray2(LastMarkersArray2);
-  SetAttribsArray(LastAttribsArray);
+  if bRunArrays then
+  begin
+    if bLastCarets then
+      SetCaretsArray(LastCaretsArray);
+    if bLastCarets2 then
+      SetCaretsArray2(LastCaretsArray2);
+    SetMarkersArray(LastMarkersArray);
+    SetMarkersArray2(LastMarkersArray2);
+    SetAttribsArray(LastAttribsArray);
+  end;
 end;
 
 
@@ -3594,7 +3652,8 @@ procedure TATStrings.AddUndoItemEx(AAction: TATEditAction; AIndex: SizeInt;
   ACommandCode: integer;
   const ACarets, ACarets2: TATPointPairArray;
   const AMarkers, AMarkers2: TATMarkerMarkerArray;
-  const AAttribs: TATMarkerAttribArray);
+  const AAttribs: TATMarkerAttribArray;
+  AArraysDisabled: boolean);
 {
 2026.09: performance fix, for LineBlockDelete(): same as AddUndoItem(), but carets/
 markers/attribs are passed by caller (they are captured once for the whole deleted
@@ -3607,6 +3666,11 @@ For a block of N lines with M markers/attribs, per-item copies made it O(N*M)
 time and RAM. Sharing is safe: all callers pass arrays which are constant for
 the whole call-run, and undo-items never mutate their arrays after creation
 (see comment at TATUndoItem.Create).
+2026.09 (issue #385): AArraysDisabled=True creates the item with empty (nil)
+arrays and ItemArraysDisabled=True: undo/redo of such item must not touch the
+current carets/markers/attribs. Bulk callers (LineBlockDelete, mirror-items of
+UndoRunInserts/UndoRunDeletes) store real arrays only in the 1st saved item of
+the bulk run, all other items are created with AArraysDisabled=True.
 }
 var
   CurList: TATUndoList;
@@ -3657,7 +3721,8 @@ begin
     AAttribs,
     ACommandCode,
     FRunningUndoOrRedo,
-    true{AShareArrays: see comment above}
+    true{AShareArrays: see comment above},
+    AArraysDisabled
     );
 end;
 
