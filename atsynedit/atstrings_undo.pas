@@ -291,8 +291,6 @@ constructor TATUndoItem.Create(AAction: TATEditAction; AIndex: integer;
   ACommandCode: integer;
   const ATickCount: QWord;
   AShareArrays: boolean);
-var
-  i: integer;
 begin
   ItemAction:= AAction;
   ItemIndex:= AIndex;
@@ -307,8 +305,6 @@ begin
 
   if AShareArrays then
   begin
-    //2026.09 (CudaText issue #6480): share the arrays, don't copy them.
-    //Safe for identical-array bulk runs: see the interface comment of Create().
     ItemCarets:= ACarets;
     ItemCarets2:= ACarets2;
     ItemMarkers:= AMarkers;
@@ -317,25 +313,11 @@ begin
   end
   else
   begin
-    SetLength(ItemCarets, Length(ACarets));
-    for i:= 0 to High(ACarets) do
-      ItemCarets[i]:= ACarets[i];
-
-    SetLength(ItemCarets2, Length(ACarets2));
-    for i:= 0 to High(ACarets2) do
-      ItemCarets2[i]:= ACarets2[i];
-
-    SetLength(ItemMarkers, Length(AMarkers));
-    for i:= 0 to High(AMarkers) do
-      ItemMarkers[i]:= AMarkers[i];
-
-    SetLength(ItemMarkers2, Length(AMarkers2));
-    for i:= 0 to High(AMarkers2) do
-      ItemMarkers2[i]:= AMarkers2[i];
-
-    SetLength(ItemAttribs, Length(AAttribs));
-    for i:= 0 to High(AAttribs) do
-      ItemAttribs[i]:= AAttribs[i];
+    ItemCarets:= Copy(ACarets);
+    ItemCarets2:= Copy(ACarets2);
+    ItemMarkers:= Copy(AMarkers);
+    ItemMarkers2:= Copy(AMarkers2);
+    ItemAttribs:= Copy(AAttribs);
   end;
 end;
 
