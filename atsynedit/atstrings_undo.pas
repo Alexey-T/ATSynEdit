@@ -580,20 +580,17 @@ end;
 procedure TATUndoList.AddUnmodifiedMark;
 var
   Item: TATUndoItem;
-  TempCarets: TATPointPairArray;
-  TempMarkers: TATMarkerMarkerArray;
-  TempAttribs: TATMarkerAttribArray;
+  TempCarets: TATPointPairArray = nil;
+  TempMarkers: TATMarkerMarkerArray = nil;
+  TempAttribs: TATMarkerAttribArray = nil;
 begin
-  //if FLocked then exit; //on load file called with Locked=true
+  ////on load file called with Locked=true
+  //if FLocked then exit;
 
-  //don't do two marks
+  //don't make two ClearModified items
   Item:= Last;
   if Assigned(Item) then
     if Item.ItemAction=TATEditAction.ClearModified then exit;
-
-  TempCarets:= nil;
-  TempMarkers:= nil;
-  TempAttribs:= nil;
 
   Item:= TATUndoItem.Create(
     TATEditAction.ClearModified,
@@ -604,9 +601,9 @@ begin
     false,
     false,
     TempCarets,
-    TempCarets, //2nd TempCarets
+    TempCarets, //2nd carets
     TempMarkers,
-    TempMarkers, //2nd TempMarkers
+    TempMarkers, //2nd markers
     TempAttribs,
     0,
     0,
