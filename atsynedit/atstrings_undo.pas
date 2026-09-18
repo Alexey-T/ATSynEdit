@@ -91,7 +91,20 @@ type
       const AMarkers, AMarkers2: TATMarkerMarkerArray;
       const AAttribs: TATMarkerAttribArray;
       ACommandCode: integer;
-      const ATickCount: QWord); virtual;
+      const ATickCount: QWord;
+      AShareArrays: boolean = false); virtual;
+      //AShareArrays (2026.09, CudaText issue #6480): instead of copying carets/
+      //markers/attribs arrays element-by-element, items SHARE the passed arrays
+      //(FPC dynamic arrays are reference-counted, last owner frees the data).
+      //It's used only by bulk paths, which create many items with IDENTICAL
+      //arrays (captured once for the whole run): undo-items of LineBlockDelete(),
+      //LineBlockInsertEnds(), mirror-items of UndoRunInserts()/UndoRunDeletes().
+      //Sharing is invisible to all code: item array-fields are read-only after
+      //creation (AsString serialization, Set*Array restore on undo), and the only
+      //in-place write (ActionAddJumpToUndo: SetLength+write) goes through
+      //SetLength, which makes a unique copy for shared arrays. Old code copied
+      //M markers/attribs per item: for N-item runs it was O(N*M) time and RAM
+      //(60K lines with 30K attribs = minutes of Undo, ~100 GB of memory traffic).
     constructor CreateEmpty;
     procedure Assign(const D: TATUndoItem);
     property AsString: string read GetAsString write SetAsString;
@@ -138,7 +151,9 @@ type
       const AMarkers, AMarkers2: TATMarkerMarkerArray;
       const AAttribs: TATMarkerAttribArray;
       ACommandCode: integer;
-      AUndoOrRedo: TATEditorRunningUndoOrRedo);
+      AUndoOrRedo: TATEditorRunningUndoOrRedo;
+      AShareArrays: boolean = false);
+      //AShareArrays: passed to TATUndoItem.Create(), see its comment
     //2026.09.12 (CudaText perf): bulk version of Add() for the N identical
     //placeholder undo-items of a block-insert (LineBlockInsertEnds): one
     //TATEditAction.Insert item per line, same index, empty text, same arrays.
@@ -286,7 +301,8 @@ constructor TATUndoItem.Create(AAction: TATEditAction; AIndex: integer;
   const AMarkers, AMarkers2: TATMarkerMarkerArray;
   const AAttribs: TATMarkerAttribArray;
   ACommandCode: integer;
-  const ATickCount: QWord);
+  const ATickCount: QWord;
+  AShareArrays: boolean);
 var
   i: integer;
 begin
@@ -301,25 +317,38 @@ begin
   ItemTickCount:= ATickCount;
   ItemGlobalCounter:= 0;
 
-  SetLength(ItemCarets, Length(ACarets));
-  for i:= 0 to High(ACarets) do
-    ItemCarets[i]:= ACarets[i];
+  if AShareArrays then
+  begin
+    //2026.09 (CudaText issue #6480): share the arrays, don't copy them.
+    //Safe for identical-array bulk runs: see the interface comment of Create().
+    ItemCarets:= ACarets;
+    ItemCarets2:= ACarets2;
+    ItemMarkers:= AMarkers;
+    ItemMarkers2:= AMarkers2;
+    ItemAttribs:= AAttribs;
+  end
+  else
+  begin
+    SetLength(ItemCarets, Length(ACarets));
+    for i:= 0 to High(ACarets) do
+      ItemCarets[i]:= ACarets[i];
 
-  SetLength(ItemCarets2, Length(ACarets2));
-  for i:= 0 to High(ACarets2) do
-    ItemCarets2[i]:= ACarets2[i];
+    SetLength(ItemCarets2, Length(ACarets2));
+    for i:= 0 to High(ACarets2) do
+      ItemCarets2[i]:= ACarets2[i];
 
-  SetLength(ItemMarkers, Length(AMarkers));
-  for i:= 0 to High(AMarkers) do
-    ItemMarkers[i]:= AMarkers[i];
+    SetLength(ItemMarkers, Length(AMarkers));
+    for i:= 0 to High(AMarkers) do
+      ItemMarkers[i]:= AMarkers[i];
 
-  SetLength(ItemMarkers2, Length(AMarkers2));
-  for i:= 0 to High(AMarkers2) do
-    ItemMarkers2[i]:= AMarkers2[i];
+    SetLength(ItemMarkers2, Length(AMarkers2));
+    for i:= 0 to High(AMarkers2) do
+      ItemMarkers2[i]:= AMarkers2[i];
 
-  SetLength(ItemAttribs, Length(AAttribs));
-  for i:= 0 to High(AAttribs) do
-    ItemAttribs[i]:= AAttribs[i];
+    SetLength(ItemAttribs, Length(AAttribs));
+    for i:= 0 to High(AAttribs) do
+      ItemAttribs[i]:= AAttribs[i];
+  end;
 end;
 
 constructor TATUndoItem.CreateEmpty;
@@ -407,7 +436,8 @@ procedure TATUndoList.Add(AAction: TATEditAction; AIndex: integer;
   const AMarkers, AMarkers2: TATMarkerMarkerArray;
   const AAttribs: TATMarkerAttribArray;
   ACommandCode: integer;
-  AUndoOrRedo: TATEditorRunningUndoOrRedo);
+  AUndoOrRedo: TATEditorRunningUndoOrRedo;
+  AShareArrays: boolean);
 var
   Item: TATUndoItem;
   NewTick: QWord;
@@ -463,7 +493,8 @@ begin
                             AMarkers2,
                             AAttribs,
                             ACommandCode,
-                            NewTick);
+                            NewTick,
+                            AShareArrays);
   Item.ItemGlobalCounter:= NGlobalCounter;
 
   FList.Add(Item);
@@ -561,7 +592,8 @@ begin
     Item:= TATUndoItem.Create(TATEditAction.Insert, AIndex, '', TATLineEnds.None,
       TATLineState.None, FSoftMark, FHardMark,
       ACarets, ACarets2, AMarkers, AMarkers2, AAttribs,
-      ACommandCode, NewTick);
+      ACommandCode, NewTick,
+      true{AShareArrays, all items of the run share the same captured arrays});
     Item.ItemGlobalCounter:= NGlobalCounter;
     FList.Add(Item);
     FSoftMark:= false;

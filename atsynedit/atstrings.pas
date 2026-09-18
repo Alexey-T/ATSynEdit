@@ -2820,7 +2820,11 @@ var
   LastCaretsArray, LastCaretsArray2: TATPointPairArray;
   LastMarkersArray, LastMarkersArray2: TATMarkerMarkerArray;
   LastAttribsArray: TATMarkerAttribArray;
+  RunCarets, RunCarets2: TATPointPairArray;
+  RunMarkers, RunMarkers2: TATMarkerMarkerArray;
+  RunAttribs: TATMarkerAttribArray;
   bLastCarets, bLastCarets2: boolean;
+  bFirstMirror: boolean;
   OtherList: TATUndoList;
   ItemData: PATStringItem;
   NEventX, NEventY: SizeInt;
@@ -2881,6 +2885,33 @@ begin
     end;
   end;
 
+  {
+  2026.09 (CudaText issue #6480): capture carets/markers/attribs ONCE for all
+  mirror-items of the run. The loop below fires no events (bWithoutPause=true
+  for all items, DoEventChange is fired once after the loop), and Set*Array()
+  are called only after the loop, so per-item AddUndoItem() captured the SAME
+  values ACount times: with M live attribs/markers, it was O(ACount*M) time and
+  RAM (60K lines with 30K attribs = minutes of Undo, ~100 GB of memory
+  traffic). AddUndoItemEx() passes the arrays to all items, which SHARE them.
+  Carets: only the first mirror item gets them - after it, OtherList is not
+  empty anymore, and the loop sets FEnabledCaretsInUndo to false, exactly like
+  per-item AddUndoItem() behaved.
+  }
+  if FEnabledCaretsInUndo then
+  begin
+    RunCarets:= GetCaretsArray;
+    RunCarets2:= GetCaretsArray2;
+  end
+  else
+  begin
+    RunCarets:= nil;
+    RunCarets2:= nil;
+  end;
+  RunMarkers:= GetMarkersArray;
+  RunMarkers2:= GetMarkersArray2;
+  RunAttribs:= GetAttribsArray;
+  bFirstMirror:= true;
+
   for j:= 0 to NRunCount-1 do
   begin
     CurItem:= ACurList.Items[N-1-j];
@@ -2937,8 +2968,17 @@ begin
       end;
       ItemData:= FList.GetItem(NLineIndex);
       UpdateModified;
-      AddUndoItem(TATEditAction.Delete, NItemIndex,
-        ItemData^.Line, ItemData^.LineEnds, ItemData^.LineState, FCommandCode);
+      if bFirstMirror then
+      begin
+        bFirstMirror:= false;
+        AddUndoItemEx(TATEditAction.Delete, NItemIndex,
+          ItemData^.Line, ItemData^.LineEnds, ItemData^.LineState, FCommandCode,
+          RunCarets, RunCarets2, RunMarkers, RunMarkers2, RunAttribs);
+      end
+      else
+        AddUndoItemEx(TATEditAction.Delete, NItemIndex,
+          ItemData^.Line, ItemData^.LineEnds, ItemData^.LineState, FCommandCode,
+          nil, nil, RunMarkers, RunMarkers2, RunAttribs);
 
       //remember the last values of carets/markers/attribs: they are applied
       //once after the loop (coalesced events), see comment below
@@ -3115,7 +3155,11 @@ var
   LastCaretsArray, LastCaretsArray2: TATPointPairArray;
   LastMarkersArray, LastMarkersArray2: TATMarkerMarkerArray;
   LastAttribsArray: TATMarkerAttribArray;
+  RunCarets, RunCarets2: TATPointPairArray;
+  RunMarkers, RunMarkers2: TATMarkerMarkerArray;
+  RunAttribs: TATMarkerAttribArray;
   bLastCarets, bLastCarets2: boolean;
+  bFirstMirror: boolean;
   OtherList: TATUndoList;
   Item: TATStringItem;
   PItem: PATStringItem;
@@ -3134,11 +3178,17 @@ begin
   ALineIndexFailed:= -1;
   bLastCarets:= false;
   bLastCarets2:= false;
+  bFirstMirror:= true;
   LastCaretsArray:= nil;
   LastCaretsArray2:= nil;
   LastMarkersArray:= nil;
   LastMarkersArray2:= nil;
   LastAttribsArray:= nil;
+  RunCarets:= nil;
+  RunCarets2:= nil;
+  RunMarkers:= nil;
+  RunMarkers2:= nil;
+  RunAttribs:= nil;
 
   N:= ACurList.Count;
   if ACurList=FUndoList then
@@ -3205,6 +3255,28 @@ begin
     ACurList.Locked:= false;
   end;
 
+  {
+  2026.09 (CudaText issue #6480): capture carets/markers/attribs ONCE for all
+  mirror-items of the run. The loop below fires no events (bWithoutPause=true
+  for all items, DoEventChange was fired once above, before the loop,
+  ActionDeleteDupFakeLines is silent), and Set*Array() are called only after
+  the loop, so per-item AddUndoItem() captured the SAME values ACount times:
+  with M live attribs/markers, it was O(ACount*M) time and RAM (60K lines with
+  30K attribs = minutes of Undo, ~100 GB of memory traffic). AddUndoItemEx()
+  passes the arrays to all items, which SHARE them.
+  Carets: only the first mirror item gets them - after it, OtherList is not
+  empty anymore, and the loop sets FEnabledCaretsInUndo to false, exactly like
+  per-item AddUndoItem() behaved.
+  }
+  if FEnabledCaretsInUndo then
+  begin
+    RunCarets:= GetCaretsArray;
+    RunCarets2:= GetCaretsArray2;
+  end;
+  RunMarkers:= GetMarkersArray;
+  RunMarkers2:= GetMarkersArray2;
+  RunAttribs:= GetAttribsArray;
+
   for j:= 0 to ACount-1 do
   begin
     CurItem:= ACurList.Items[N-1-j];
@@ -3248,8 +3320,17 @@ begin
       else
         NItemIndex:= ALineIndex;
       UpdateModified;
-      AddUndoItem(TATEditAction.Insert, NItemIndex, '',
-        TATLineEnds.None, TATLineState.None, FCommandCode);
+      if bFirstMirror then
+      begin
+        bFirstMirror:= false;
+        AddUndoItemEx(TATEditAction.Insert, NItemIndex, '',
+          TATLineEnds.None, TATLineState.None, FCommandCode,
+          RunCarets, RunCarets2, RunMarkers, RunMarkers2, RunAttribs);
+      end
+      else
+        AddUndoItemEx(TATEditAction.Insert, NItemIndex, '',
+          TATLineEnds.None, TATLineState.None, FCommandCode,
+          nil, nil, RunMarkers, RunMarkers2, RunAttribs);
 
       //physical line write: same-index runs write the line here, walking
       //PItem down from the end of block; consecutive runs got all lines
@@ -3520,6 +3601,12 @@ markers/attribs are passed by caller (they are captured once for the whole delet
 block, not per line). It makes the same undo-items: AddUndoItem() captured the
 SAME arrays for every line of one block-delete (nothing changes during its loop:
 it doesn't fire per-line events, carets/markers don't move).
+2026.09 (CudaText issue #6480): created items SHARE the passed arrays
+(AShareArrays=true of TATUndoList.Add), instead of copying them per item.
+For a block of N lines with M markers/attribs, per-item copies made it O(N*M)
+time and RAM. Sharing is safe: all callers pass arrays which are constant for
+the whole call-run, and undo-items never mutate their arrays after creation
+(see comment at TATUndoItem.Create).
 }
 var
   CurList: TATUndoList;
@@ -3569,7 +3656,8 @@ begin
     AMarkers2,
     AAttribs,
     ACommandCode,
-    FRunningUndoOrRedo
+    FRunningUndoOrRedo,
+    true{AShareArrays: see comment above}
     );
 end;
 
