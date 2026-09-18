@@ -1,3 +1,6 @@
+2026.09.18
+* change: changed signature of OnDrawBookmarkIcon
+
 2026.09.09
 * change: removed prop OptUndoPause* (they didn't work good anyway)
 
