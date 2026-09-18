@@ -105,7 +105,6 @@ type
       const AAttribs: TATMarkerAttribArray;
       ACommandCode: integer;
       const ATickCount: QWord;
-      AShareArrays: boolean;
       AArraysDisabled: boolean = false); virtual;
       //AArraysDisabled (2026.09, issue #385): True = created item has empty (nil)
       //carets/markers/attribs arrays with ItemArraysDisabled=True, passed arrays are
@@ -150,6 +149,7 @@ type
     procedure DeleteLast;
     procedure DeleteUnmodifiedMarks;
     procedure DeleteTrailingCaretJumps;
+
     procedure Add(AAction: TATEditAction; AIndex: integer; const AText: atString;
       AEnd: TATLineEnds; ALineState: TATLineState;
       const ACarets, ACarets2: TATPointPairArray;
@@ -157,10 +157,8 @@ type
       const AAttribs: TATMarkerAttribArray;
       ACommandCode: integer;
       AUndoOrRedo: TATEditorRunningUndoOrRedo;
-      AShareArrays: boolean = false;
       AArraysDisabled: boolean = false);
-      //AShareArrays: passed to TATUndoItem.Create(), see its comment
-      //AArraysDisabled (issue #385): passed to TATUndoItem.Create(), see its comment
+
     //2026.09.12 (CudaText perf): bulk version of Add() for the N identical
     //placeholder undo-items of a block-insert (LineBlockInsertEnds): one
     //TATEditAction.Insert item per line, same index, empty text, same arrays.
@@ -174,6 +172,7 @@ type
       const ACarets, ACarets2: TATPointPairArray;
       const AMarkers, AMarkers2: TATMarkerMarkerArray;
       const AAttribs: TATMarkerAttribArray);
+
     procedure AddUnmodifiedMark;
     function DebugText: string;
     function IsEmpty: boolean;
@@ -354,7 +353,6 @@ constructor TATUndoItem.Create(AAction: TATEditAction; AIndex: integer;
   const AAttribs: TATMarkerAttribArray;
   ACommandCode: integer;
   const ATickCount: QWord;
-  AShareArrays: boolean;
   AArraysDisabled: boolean);
 begin
   ItemAction:= AAction;
@@ -380,6 +378,7 @@ begin
     ItemAttribs:= nil;
   end
   else
+  {
   if AShareArrays then
   begin
     ItemCarets:= ACarets;
@@ -389,6 +388,7 @@ begin
     ItemAttribs:= AAttribs;
   end
   else
+  }
   begin
     ItemCarets:= Copy(ACarets);
     ItemCarets2:= Copy(ACarets2);
@@ -484,7 +484,6 @@ procedure TATUndoList.Add(AAction: TATEditAction; AIndex: integer;
   const AAttribs: TATMarkerAttribArray;
   ACommandCode: integer;
   AUndoOrRedo: TATEditorRunningUndoOrRedo;
-  AShareArrays: boolean;
   AArraysDisabled: boolean);
 var
   Item: TATUndoItem;
@@ -542,7 +541,6 @@ begin
                             AAttribs,
                             ACommandCode,
                             NewTick,
-                            AShareArrays,
                             AArraysDisabled);
   Item.ItemGlobalCounter:= NGlobalCounter;
 
@@ -642,7 +640,6 @@ begin
       TATLineState.None, FSoftMark, FHardMark,
       ACarets, ACarets2, AMarkers, AMarkers2, AAttribs,
       ACommandCode, NewTick,
-      true{AShareArrays, all items of the run share the same captured arrays},
       (i>1){AArraysDisabled, issue #385: real arrays are stored only in the 1st item of the run});
     Item.ItemGlobalCounter:= NGlobalCounter;
     FList.Add(Item);

@@ -3721,7 +3721,6 @@ begin
     AAttribs,
     ACommandCode,
     FRunningUndoOrRedo,
-    true{AShareArrays: see comment above},
     AArraysDisabled
     );
 end;
