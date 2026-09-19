@@ -201,13 +201,13 @@ var
   i: SizeInt;
 begin
   S:= ItemText;
-  //replace CR LF chars, to not corrupt undo-data saved to a file, then loaded from a file
-  for i:= 1 to Length(S) do
-    if (S[i]=#10) or (S[i]=#13) then
-      S[i]:= ' ';
 
-  //2026.09 (issue #385): disabled arrays are written as spec char '-',
-  //SetAsString() treats it as empty arrays and sets ItemArraysDisabled
+  //replace CR LF chars, to not corrupt undo-data saved to a file, then loaded from a file
+  if SStringHasEol(S) then
+    for i:= 1 to Length(S) do
+      if (S[i]=#10) or (S[i]=#13) then
+        S[i]:= ' ';
+
   if ItemArraysDisabled then
   begin
     SCarets:= ArraysDisabledSpec;
@@ -271,7 +271,7 @@ begin
   if SubItem=ArraysDisabledSpec then
   begin
     ItemCarets:= nil;
-    ItemArraysDisabled:= true; //see comment in GetAsString()
+    ItemArraysDisabled:= true;
   end
   else
     StringToPointPairArray(ItemCarets, SubItem);
@@ -322,7 +322,7 @@ begin
   Sep.GetItemStr(S);
   ItemHardMark:= S='1';
 
-  //use Sep.GetRect for last item, because line can contain tab-chars
+  //use Sep.GetRest for last item, because line can contain tab-chars
   Sep.GetRest(S);
   ItemText:= UTF8Decode(S);
 end;
