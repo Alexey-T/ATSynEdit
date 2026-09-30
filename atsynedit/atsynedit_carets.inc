@@ -879,6 +879,15 @@ begin
   begin
     if APlaceCaret then
       DoCaretSingle(APos.X, APos.Y, APosEnd.X, APosEnd.Y);
+    //don't lose the requested caret-scroll: defer it to the 1st paint via
+    //FLineTopTodo (same mechanism as property LineTop on not-inited control).
+    //Without it, commands which run on a not-yet-painted editor
+    //(e.g. CudaText Python API calls from console/plugin on a just-opened tab:
+    //Undo/Redo, goto-line, etc) don't scroll at all, and the 1st paint doesn't
+    //fix the scroll, so the caret can remain off-screen (e.g. big vertical
+    //Gap pushes the caret line below the visible page).
+    if APos.Y>0 then
+      FLineTopTodo:= APos.Y;
     exit;
   end;
 
