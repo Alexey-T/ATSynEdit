@@ -674,6 +674,10 @@ begin
 end;
 
 procedure TATSynEdit.DoScroll_IndentFromTop(AWrapInfoIndex, AIndentVert: integer); inline;
+//AWrapInfoIndex: wrap-index of caret line
+var
+  NTarget, NWrapIndex, NGapsSize: integer;
+  NPixels: Int64;
 begin
   if ModeOneLine then
   begin
@@ -682,7 +686,47 @@ begin
   end;
 
   AIndentVert:= Min(AIndentVert, GetVisibleLines-1);
-  FScrollVert.NPos:= Max(0, AWrapInfoIndex-AIndentVert);
+  NTarget:= Max(0, AWrapInfoIndex-AIndentVert);
+
+  //fix for big vertical Gaps:
+  //'NTarget' is calculated by line indexes only, so Gaps between 'NTarget' and
+  //the caret line (each Gap has big pixel height) can keep the caret line
+  //below the visible page, e.g. after Undo/Redo with option find_indent_vert<0
+  //(CudaText maps it to OptUndoIndentVert) or after API set_caret().
+  //Walk the scroll pos down (toward the caret line) until the caret line
+  //fits into the page. Same gap-aware walk as in DoScroll_IndentFromBottom().
+  if (Gaps.Count>0) and (NTarget<AWrapInfoIndex) and (FRectMain.Height>0) then
+  begin
+    //NPixels: distance from page top to bottom of caret line
+    NPixels:= FCharSize.Y;
+    NWrapIndex:= AWrapInfoIndex;
+    while NWrapIndex>NTarget do
+    begin
+      Dec(NWrapIndex);
+      Inc(NPixels, FCharSize.Y);
+
+      //consider gap(s)
+      if FWrapInfo[NWrapIndex].NFinal=TATWrapItemFinal.Final then
+      begin
+        NGapsSize:= GapsSizeForLine(FWrapInfo[NWrapIndex].NLineIndex);
+        Inc(NPixels, NGapsSize);
+      end;
+
+      //support gap before 1st line
+      if (NWrapIndex=0) then
+      begin
+        NGapsSize:= GapsSizeForLine(-1);
+        Inc(NPixels, NGapsSize);
+      end;
+
+      if NPixels>FRectMain.Height then Break;
+    end;
+    //didn't reach the wanted 'NTarget': use the closest position which fits
+    if NWrapIndex>NTarget then
+      NTarget:= NWrapIndex+1;
+  end;
+
+  FScrollVert.NPos:= NTarget;
   FScrollVert.NPixelOffset:= 0;
 end;
 
