@@ -162,7 +162,7 @@ begin
       cairo_get_font_matrix(ct, @LastFontMatrix);
 
       // Calculate and cache the font baseline.
-      cairo_font_extents(ct, @extents);
+      Cairo.cairo_font_extents(Cairo.Pcairo_t(ct), @extents);
       LastBaseline := Ceil(extents.height - extents.descent);
     end;
 
