@@ -110,10 +110,27 @@ type
   end;
 
 type
+  { TATImeInline }
+
+  //Describes IME composition string, which editor must paint inline
+  //(inserted into the line at caret position, following text is moved to the right).
+  //Document text is not changed.
+  TATImeInline = record
+    LineIndex: integer; //line index in Strings
+    CharIndex: integer; //0-based char index in the line, where composition starts
+    Text: UnicodeString; //composition string
+    CursorPos: integer; //IME cursor position inside Text, 0..Length(Text)
+    Attrs: array of byte; //per-char IME attributes (ATTR_INPUT=0, ATTR_TARGET_CONVERTED=1,
+                          //ATTR_CONVERTED=2, ATTR_TARGET_NOTCONVERTED=3, ATTR_INPUT_ERROR=4)
+  end;
+
+type
   { TATAdapterIME }
 
   TATAdapterIME = class
   public
+    function GetInlineComposition(out AInfo: TATImeInline): boolean; virtual;
+    //returns True if the editor must paint composition string inline
     procedure Stop(Sender: TObject; Success: boolean); virtual;
     procedure ImeRequest(Sender: TObject; var Msg: TMessage); virtual;
     procedure ImeNotify(Sender: TObject; var Msg: TMessage); virtual;
@@ -136,6 +153,12 @@ type
 implementation
 
 { TATAdapterIME }
+
+function TATAdapterIME.GetInlineComposition(out AInfo: TATImeInline): boolean;
+begin
+  AInfo:= Default(TATImeInline);
+  Result:= false;
+end;
 
 procedure TATAdapterIME.Stop(Sender: TObject; Success: boolean);
 begin
