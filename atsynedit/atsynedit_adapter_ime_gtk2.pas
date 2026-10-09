@@ -16,10 +16,18 @@ type
     buffer: UnicodeString;
     position: Integer;
     CompForm: TForm;
+    FUseCompForm: Boolean; //True: legacy separate window, False (default): inline painting in editor
+    FPreedit: UnicodeString; //preedit string, painted inline by the editor (not used if FUseCompForm)
+    FLineIndex, FCharIndex: Integer; //where the preedit starts
     procedure CompFormPaint(Sender: TObject);
     procedure UpdateCompForm(Sender: TObject);
     procedure HideCompForm;
+    procedure SyncInlinePos(Sender: TObject);
+    procedure UpdateInlinePreedit(Sender: TObject);
+    procedure HideComposition(Sender: TObject);
   public
+    function GetInlineComposition(out AInfo: TATImeInline): Boolean; override;
+    property UseCompForm: Boolean read FUseCompForm write FUseCompForm;
     procedure Stop(Sender: TObject; Success: boolean); override;
     procedure ImeEnter(Sender: TObject); override;
     procedure ImeExit(Sender: TObject); override;
@@ -112,10 +120,66 @@ begin
     CompForm.Hide;
 end;
 
+procedure TATAdapterGTK2IME.SyncInlinePos(Sender: TObject);
+var
+  Ed: TATSynEdit;
+begin
+  Ed:= TATSynEdit(Sender);
+  if Ed.Carets.Count>0 then
+  begin
+    FLineIndex:= Ed.Carets[0].PosY;
+    FCharIndex:= Ed.Carets[0].PosX;
+  end;
+end;
+
+procedure TATAdapterGTK2IME.UpdateInlinePreedit(Sender: TObject);
+//the preedit string (in buffer) is painted by the editor, inserted into the text of the caret line
+var
+  Ed: TATSynEdit;
+  Pnt: TATPoint;
+begin
+  Ed:= TATSynEdit(Sender);
+  FPreedit:= buffer;
+  if (FPreedit<>'') and (Ed.Carets.Count>0) then
+  begin
+    SyncInlinePos(Sender);
+    //long preedit: keep the end of it visible
+    Ed.DoImeInlineScrollToCaret(FPreedit, Length(FPreedit));
+    //candidate window of IM is placed after the preedit
+    Pnt:= Ed.CaretPosToClientPos(Ed.Carets[0].AsPoint);
+    IM_Context_Set_Cursor_Pos(Pnt.X+Ed.GetImeInlineTextWidth(FPreedit), Pnt.Y+Ed.TextCharSize.Y);
+  end;
+  Ed.Update(false, true);
+end;
+
+procedure TATAdapterGTK2IME.HideComposition(Sender: TObject);
+begin
+  HideCompForm;
+  if FPreedit<>'' then
+  begin
+    FPreedit:= '';
+    TATSynEdit(Sender).Update(false, true);
+  end;
+end;
+
+function TATAdapterGTK2IME.GetInlineComposition(out AInfo: TATImeInline): Boolean;
+begin
+  AInfo:= Default(TATImeInline);
+  Result:= (not FUseCompForm) and (FPreedit<>'');
+  if not Result then exit;
+  AInfo.LineIndex:= FLineIndex;
+  AInfo.CharIndex:= FCharIndex;
+  AInfo.Text:= FPreedit;
+  //GTK2 does not report the cursor position in the preedit: the caret is at the end.
+  //Attrs are not reported too, they are zeros: ATTR_INPUT
+  AInfo.CursorPos:= Length(FPreedit);
+  SetLength(AInfo.Attrs, Length(FPreedit));
+end;
+
 procedure TATAdapterGTK2IME.Stop(Sender: TObject; Success: boolean);
 begin
   ResetDefaultIMContext;
-  HideCompForm;
+  HideComposition(Sender);
   inherited Stop(Sender, Success);
 end;
 
@@ -137,14 +201,14 @@ end;
 
 procedure TATAdapterGTK2IME.ImeExit(Sender: TObject);
 begin
-  HideCompForm;
+  HideComposition(Sender);
 end;
 
 procedure TATAdapterGTK2IME.ImeKillFocus(Sender: TObject);
 begin
   inherited ImeKillFocus(Sender);
   //ResetDefaultIMContext; //commented to fix CudaText issue #5682
-  HideCompForm;
+  HideComposition(Sender);
 end;
 
 procedure TATAdapterGTK2IME.GTK2IMComposition(Sender: TObject;
@@ -162,7 +226,10 @@ begin
     if Message.WParam and GTK_IM_FLAG_START <> 0 then
     begin
       position:=0;
-      UpdateCompForm(Ed);  // initialize composition form
+      if FUseCompForm then
+        UpdateCompForm(Ed)  // initialize composition form
+      else
+        SyncInlinePos(Ed);
     end;
     if (Message.WParam and (GTK_IM_FLAG_START or GTK_IM_FLAG_PREEDIT))<>0 then
     begin
@@ -186,7 +253,12 @@ begin
       bOverwrite:=Ed.ModeOverwrite and (Length(FIMSelText)=0);
       // preedit
       if Message.WParam and GTK_IM_FLAG_PREEDIT<>0 then
-        UpdateCompForm(Ed);
+      begin
+        if FUseCompForm then
+          UpdateCompForm(Ed)
+        else
+          UpdateInlinePreedit(Ed);
+      end;
       // commit
       if len>0 then
       begin
@@ -194,16 +266,16 @@ begin
         begin
           Ed.TextInsertAtCarets(buffer, False, bOverwrite, False);
           FIMSelText:='';
-          HideCompForm;
+          HideComposition(Ed);
         end;
       end else
-        HideCompForm;
+        HideComposition(Ed);
     end;
     // end composition
     // To Do : skip insert saved selection after commit with ibus.
     if (Message.WParam and GTK_IM_FLAG_END<>0) then
     begin
-      HideCompForm;
+      HideComposition(Ed);
       if FIMSelText<>'' then
         Ed.TextInsertAtCarets(FIMSelText, False, False, False);
     end;

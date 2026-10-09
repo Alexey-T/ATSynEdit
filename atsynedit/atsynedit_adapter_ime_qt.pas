@@ -16,10 +16,18 @@ type
     buffer: UnicodeString;
     position: Integer;
     CompForm: TForm;
+    FUseCompForm: Boolean; //True: legacy separate window, False (default): inline painting in editor
+    FPreedit: UnicodeString; //preedit string, painted inline by the editor (not used if FUseCompForm)
+    FLineIndex, FCharIndex: Integer; //where the preedit starts
     procedure CompFormPaint(Sender: TObject);
     procedure UpdateCompForm(Sender: TObject);
     procedure HideCompForm;
+    procedure SyncInlinePos(Sender: TObject);
+    procedure UpdateInlinePreedit(Sender: TObject);
+    procedure HideComposition(Sender: TObject);
   public
+    function GetInlineComposition(out AInfo: TATImeInline): Boolean; override;
+    property UseCompForm: Boolean read FUseCompForm write FUseCompForm;
     procedure Stop(Sender: TObject; Success: boolean); override;
     procedure ImeExit(Sender: TObject); override;
     procedure ImeKillFocus(Sender: TObject); override;
@@ -111,21 +119,73 @@ begin
     CompForm.Hide;
 end;
 
-procedure TATAdapterQTIME.Stop(Sender: TObject; Success: boolean);
+procedure TATAdapterQTIME.SyncInlinePos(Sender: TObject);
+var
+  Ed: TATSynEdit;
+begin
+  Ed:= TATSynEdit(Sender);
+  if Ed.Carets.Count>0 then
+  begin
+    FLineIndex:= Ed.Carets[0].PosY;
+    FCharIndex:= Ed.Carets[0].PosX;
+  end;
+end;
+
+procedure TATAdapterQTIME.UpdateInlinePreedit(Sender: TObject);
+//the preedit string (in buffer) is painted by the editor, inserted into the text of the caret line
+var
+  Ed: TATSynEdit;
+begin
+  Ed:= TATSynEdit(Sender);
+  FPreedit:= buffer;
+  if (FPreedit<>'') and (Ed.Carets.Count>0) then
+  begin
+    SyncInlinePos(Sender);
+    //long preedit: keep the end of it visible
+    Ed.DoImeInlineScrollToCaret(FPreedit, Length(FPreedit));
+  end;
+  Ed.Update(false, true);
+end;
+
+procedure TATAdapterQTIME.HideComposition(Sender: TObject);
 begin
   HideCompForm;
+  if FPreedit<>'' then
+  begin
+    FPreedit:= '';
+    TATSynEdit(Sender).Update(false, true);
+  end;
+end;
+
+function TATAdapterQTIME.GetInlineComposition(out AInfo: TATImeInline): Boolean;
+begin
+  AInfo:= Default(TATImeInline);
+  Result:= (not FUseCompForm) and (FPreedit<>'');
+  if not Result then exit;
+  AInfo.LineIndex:= FLineIndex;
+  AInfo.CharIndex:= FCharIndex;
+  AInfo.Text:= FPreedit;
+  //Qt does not report the cursor position in the preedit: the caret is at the end.
+  //Attrs are not reported too, they are zeros: ATTR_INPUT
+  AInfo.CursorPos:= Length(FPreedit);
+  SetLength(AInfo.Attrs, Length(FPreedit));
+end;
+
+procedure TATAdapterQTIME.Stop(Sender: TObject; Success: boolean);
+begin
+  HideComposition(Sender);
   inherited Stop(Sender, Success);
 end;
 
 procedure TATAdapterQTIME.ImeExit(Sender: TObject);
 begin
-  HideCompForm;
+  HideComposition(Sender);
 end;
 
 procedure TATAdapterQTIME.ImeKillFocus(Sender: TObject);
 begin
   inherited ImeKillFocus(Sender);
-  HideCompForm;
+  HideComposition(Sender);
 end;
 
 procedure TATAdapterQTIME.QTIMComposition(Sender: TObject;
@@ -143,10 +203,14 @@ begin
     if Message.WParam and GTK_IM_FLAG_START <> 0 then
     begin
       position:=0;
-      UpdateCompForm(Ed);  // initialize composition form
+      if FUseCompForm then
+        UpdateCompForm(Ed)  // initialize composition form
+      else
+        SyncInlinePos(Ed);
     end;
-    if (Message.WParam and (GTK_IM_FLAG_START or GTK_IM_FLAG_PREEDIT))<>0 then
-      UpdateCompForm(Ed);
+    if FUseCompForm then
+      if (Message.WParam and (GTK_IM_FLAG_START or GTK_IM_FLAG_PREEDIT))<>0 then
+        UpdateCompForm(Ed);
     // valid string at composition & commit
     if Message.WParam and (GTK_IM_FLAG_COMMIT or GTK_IM_FLAG_PREEDIT)<>0 then
     begin
@@ -157,23 +221,28 @@ begin
       len:=Length(buffer);
       // preedit
       if Message.WParam and GTK_IM_FLAG_PREEDIT<>0 then
-        UpdateCompForm(Ed);
+      begin
+        if FUseCompForm then
+          UpdateCompForm(Ed)
+        else
+          UpdateInlinePreedit(Ed);
+      end;
       // commit
       if len>0 then
       begin
         if Message.WParam and GTK_IM_FLAG_COMMIT<>0 then
         begin
           FIMSelText:='';
-          HideCompForm;
+          HideComposition(Ed);
         end;
       end else
-        HideCompForm;
+        HideComposition(Ed);
     end;
     // end composition
     // To Do : skip insert saved selection after commit with ibus.
     if (Message.WParam and GTK_IM_FLAG_END<>0) then
     begin
-      HideCompForm;
+      HideComposition(Ed);
       if FIMSelText<>'' then
         Ed.TextInsertAtCarets(FIMSelText, False, False, False);
     end;
@@ -185,6 +254,7 @@ procedure TATAdapterQTIME.QTIMQueryCaretPos(Sender: TObject;
 var
   Ed: TATSynEdit;
   Caret: TATCaretItem;
+  Pnt: TATPoint;
 begin
   if Message.WParam=0 then
   begin
@@ -192,8 +262,19 @@ begin
     if Ed.Carets.Count>0 then
     begin
       Caret:=Ed.Carets[0];
-      PPoint(Message.LParam)^.X:=Caret.CoordX;
-      PPoint(Message.LParam)^.Y:=Caret.CoordY;
+      if FUseCompForm or (FPreedit='') then
+      begin
+        PPoint(Message.LParam)^.X:=Caret.CoordX;
+        PPoint(Message.LParam)^.Y:=Caret.CoordY;
+      end
+      else
+      begin
+        //inline preedit: the position is at the end of the preedit
+        //(Caret.CoordX/Y are updated on paint only, so use the current scroll position)
+        Pnt:=Ed.CaretPosToClientPos(Caret.AsPoint);
+        PPoint(Message.LParam)^.X:=Pnt.X+Ed.GetImeInlineTextWidth(FPreedit);
+        PPoint(Message.LParam)^.Y:=Pnt.Y;
+      end;
     end;
   end;
 end;
