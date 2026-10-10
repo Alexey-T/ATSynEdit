@@ -20,6 +20,11 @@ uses
     ATSynEdit_Adapter_IME_Windows,
     {$endif}
   {$endif}
+  {$ifdef LCLGTK3}
+    {$ifdef AT_IME}
+    ATSynEdit_Adapter_ime_gtk3,
+    {$endif}
+  {$endif}
   {$ifdef LCLGTK2}
     {$ifdef AT_IME}
     ATSynEdit_Adapter_ime_gtk2,
@@ -1979,7 +1984,7 @@ type
     {$endif}
     {$endif}
 
-    {$ifdef LCLGTK2}
+    {$if defined(LCLGTK2) or defined(LCLGTK3)}
     {$ifdef AT_IME}
     procedure WM_GTK_IM_COMPOSITION(var Msg: TLMessage); message LM_IM_COMPOSITION;
     {$endif}
@@ -2397,7 +2402,7 @@ uses
   Math,
   StrUtils,
   {$ifdef LCLGTK2}
-  //Gtk2Globals,
+  Gtk2Globals,
   {$endif}
   {$ifdef LCLCOCOA}
   CocoaPrivate,
@@ -4741,20 +4746,53 @@ begin
   Result:= false;
   if FOptMaskCharUsed or (FAdapterIME=nil) then exit;
   if not FAdapterIME.GetInlineComposition(FImeInline) then exit;
+  {$ifdef ATSYNEDIT_IME_DEBUG}
+  if FImeInline.LineIndex=AWrapItem.NLineIndex then
+    WriteLn(StdErr, 'IME inline: comp line=', FImeInline.LineIndex, ' char=', FImeInline.CharIndex,
+      ' text="', UTF8Encode(FImeInline.Text), '" | wrapitem charindex=', AWrapItem.NCharIndex,
+      ' len=', AWrapItem.NLength, ' final=', Ord(AWrapItem.NFinal),
+      ' | skipped=', ACharsSkipped, ' painted text len=', Length(AText));
+  {$endif}
   if (FImeInline.LineIndex<>AWrapItem.NLineIndex) or
-    not IsWrapItemWithCaret(AWrapItem) then exit;
+    not IsWrapItemWithCaret(AWrapItem) then
+  begin
+    {$ifdef ATSYNEDIT_IME_DEBUG}
+    if FImeInline.LineIndex=AWrapItem.NLineIndex then
+      WriteLn(StdErr, 'IME inline: NOT applied: IsWrapItemWithCaret=false');
+    {$endif}
+    exit;
+  end;
   //DoCalcLineHilite does not support the case: all chars of non-empty line are scrolled out
-  if (AWrapItem.NLength>0) and (ACharsSkipped>=AWrapItem.NLength) then exit;
+  if (AWrapItem.NLength>0) and (ACharsSkipped>=AWrapItem.NLength) then
+  begin
+    {$ifdef ATSYNEDIT_IME_DEBUG}
+    WriteLn(StdErr, 'IME inline: NOT applied: all chars of the line are scrolled out');
+    {$endif}
+    exit;
+  end;
 
   NPos:= FImeInline.CharIndex-(AWrapItem.NCharIndex-1)-ACharsSkipped;
-  if NPos<0 then exit;
+  if NPos<0 then
+  begin
+    {$ifdef ATSYNEDIT_IME_DEBUG}
+    WriteLn(StdErr, 'IME inline: NOT applied: NPos<0, NPos=', NPos);
+    {$endif}
+    exit;
+  end;
   if NPos>Length(AText) then
   begin
     //caret is after the line end (virtual caret): composition is painted after spaces.
     //AText must hold the whole rest of the line (it must not be cut by the visible width)
     if (AWrapItem.NFinal<>TATWrapItemFinal.Final) or
       (NPos>ATEditorOptions.MaxCharsForOutput) or
-      (Length(AText)<AWrapItem.NLength-ACharsSkipped) then exit;
+      (Length(AText)<AWrapItem.NLength-ACharsSkipped) then
+    begin
+      {$ifdef ATSYNEDIT_IME_DEBUG}
+      WriteLn(StdErr, 'IME inline: NOT applied: virtual caret conditions failed, NPos=', NPos,
+        ' final=', Ord(AWrapItem.NFinal), ' MaxCharsForOutput=', ATEditorOptions.MaxCharsForOutput);
+      {$endif}
+      exit;
+    end;
     NPad:= NPos-Length(AText);
     AText:= AText+StringOfCharW(' ', NPad);
   end;
@@ -4766,6 +4804,9 @@ begin
     AScrollHorz.NMax,
     ACharsSkipped + FTabHelper.CalcCharOffsetLast(AWrapItem.NLineIndex, AText) div 100 +
       FOptScrollbarHorizontalAddSpace);
+  {$ifdef ATSYNEDIT_IME_DEBUG}
+  WriteLn(StdErr, 'IME inline: applied, NPos=', NPos, ' painted text len=', Length(AText));
+  {$endif}
   Result:= true;
 end;
 
@@ -5684,6 +5725,12 @@ begin
   {$ifdef LCLGTK2}
     {$ifdef AT_IME}
     FAdapterIME:= TATAdapterGTK2IME.Create;
+    {$endif}
+  {$endif}
+
+  {$ifdef LCLGTK3}
+    {$ifdef AT_IME}
+    FAdapterIME:= TATAdapterGTK3IME.Create;
     {$endif}
   {$endif}
 
@@ -10395,7 +10442,7 @@ end;
 {$endif}
 {$endif}
 
-{$ifdef LCLGTK2}
+{$if defined(LCLGTK2) or defined(LCLGTK3)}
 {$ifdef AT_IME}
 procedure TATSynEdit.WM_GTK_IM_COMPOSITION(var Msg: TLMessage);
 begin

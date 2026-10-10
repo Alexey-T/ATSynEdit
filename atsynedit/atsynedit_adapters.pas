@@ -140,7 +140,7 @@ type
     procedure ImeEnter(Sender: TObject); virtual;
     procedure ImeExit(Sender: TObject); virtual;
     procedure ImeKillFocus(Sender: TObject); virtual;
-    {$ifdef LCLGTK2}
+    {$if defined(LCLGTK2) or defined(LCLGTK3)}
     procedure GTK2IMComposition(Sender: TObject; var Message: TLMessage); virtual;
     {$endif}
     {$if defined(LCLQT5) or defined(LCLQT6) or defined(LCLQT)}
@@ -220,7 +220,7 @@ end;
 
 {$endif}
 
-{$ifdef LCLGTK2}
+{$if defined(LCLGTK2) or defined(LCLGTK3)}
 procedure TATAdapterIME.GTK2IMComposition(Sender: TObject;
   var Message: TLMessage);
 begin

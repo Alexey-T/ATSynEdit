@@ -1,4 +1,4 @@
-unit atsynedit_adapter_ime_gtk2;
+unit atsynedit_adapter_ime_gtk3;
 
 interface
 
@@ -8,9 +8,9 @@ uses
   ATSynEdit_Adapters;
 
 type
-  { TATAdapterGTK2IME }
+  { TATAdapterGTK3IME }
 
-  TATAdapterGTK2IME = class(TATAdapterIME)
+  TATAdapterGTK3IME = class(TATAdapterIME)
   private
     FIMSelText: UnicodeString;
     buffer: UnicodeString;
@@ -44,14 +44,14 @@ uses
   Classes,
   Controls,
   Graphics,
-  Gtk2Globals,
+  gtk3int,
   ATStringProc,
   ATSynEdit,
   ATSynEdit_Carets;
 
-{ TATAdapterGTK2IME }
+{ TATAdapterGTK3IME }
 
-procedure TATAdapterGTK2IME.CompFormPaint(Sender: TObject);
+procedure TATAdapterGTK3IME.CompFormPaint(Sender: TObject);
 var
   tm, cm: TSize;
   s: UnicodeString;
@@ -79,7 +79,7 @@ begin
   CompForm.Canvas.Line(cm.cx+1,0,cm.cx+1,cm.cy+2);
 end;
 
-procedure TATAdapterGTK2IME.UpdateCompForm(Sender: TObject);
+procedure TATAdapterGTK3IME.UpdateCompForm(Sender: TObject);
 var
   ed: TATSynEdit;
   CompPos: TATPoint;
@@ -114,13 +114,13 @@ begin
   CompForm.Invalidate;
 end;
 
-procedure TATAdapterGTK2IME.HideCompForm;
+procedure TATAdapterGTK3IME.HideCompForm;
 begin
   if Assigned(CompForm) then
     CompForm.Hide;
 end;
 
-procedure TATAdapterGTK2IME.SyncInlinePos(Sender: TObject);
+procedure TATAdapterGTK3IME.SyncInlinePos(Sender: TObject);
 var
   Ed: TATSynEdit;
 begin
@@ -132,7 +132,7 @@ begin
   end;
 end;
 
-procedure TATAdapterGTK2IME.UpdateInlinePreedit(Sender: TObject);
+procedure TATAdapterGTK3IME.UpdateInlinePreedit(Sender: TObject);
 //the preedit string (in buffer) is painted by the editor, inserted into the text of the caret line
 var
   Ed: TATSynEdit;
@@ -152,7 +152,7 @@ begin
   Ed.Update(false, true);
 end;
 
-procedure TATAdapterGTK2IME.HideComposition(Sender: TObject);
+procedure TATAdapterGTK3IME.HideComposition(Sender: TObject);
 begin
   HideCompForm;
   if FPreedit<>'' then
@@ -162,7 +162,7 @@ begin
   end;
 end;
 
-function TATAdapterGTK2IME.GetInlineComposition(out AInfo: TATImeInline): Boolean;
+function TATAdapterGTK3IME.GetInlineComposition(out AInfo: TATImeInline): Boolean;
 begin
   AInfo:= Default(TATImeInline);
   Result:= (not FUseCompForm) and (FPreedit<>'');
@@ -176,14 +176,14 @@ begin
   SetLength(AInfo.Attrs, Length(FPreedit));
 end;
 
-procedure TATAdapterGTK2IME.Stop(Sender: TObject; Success: boolean);
+procedure TATAdapterGTK3IME.Stop(Sender: TObject; Success: boolean);
 begin
   ResetDefaultIMContext;
   HideComposition(Sender);
   inherited Stop(Sender, Success);
 end;
 
-procedure TATAdapterGTK2IME.ImeEnter(Sender: TObject);
+procedure TATAdapterGTK3IME.ImeEnter(Sender: TObject);
 var
   Ed: TATSynEdit;
   Caret: TATCaretItem;
@@ -199,19 +199,18 @@ begin
   end;
 end;
 
-procedure TATAdapterGTK2IME.ImeExit(Sender: TObject);
+procedure TATAdapterGTK3IME.ImeExit(Sender: TObject);
 begin
   HideComposition(Sender);
 end;
 
-procedure TATAdapterGTK2IME.ImeKillFocus(Sender: TObject);
+procedure TATAdapterGTK3IME.ImeKillFocus(Sender: TObject);
 begin
   inherited ImeKillFocus(Sender);
-  //ResetDefaultIMContext; //commented to fix CudaText issue #5682
   HideComposition(Sender);
 end;
 
-procedure TATAdapterGTK2IME.GTK2IMComposition(Sender: TObject;
+procedure TATAdapterGTK3IME.GTK2IMComposition(Sender: TObject;
   var Message: TLMessage);
 var
   len: Integer;
@@ -246,9 +245,6 @@ begin
       begin
         Caret:= Ed.Carets[0];
         IM_Context_Set_Cursor_Pos(Caret.CoordX,Caret.CoordY+Ed.TextCharSize.Y);
-        // if symbol IM_Context_Set_Cursor_Pos cannot be compiled, you need to open IDE dialog
-        // "Tools / Configure 'Build Lazarus'", and there enable the define: WITH_GTK2_IM;
-        // then recompile the IDE.
       end;
     end;
     // valid string at composition & commit
