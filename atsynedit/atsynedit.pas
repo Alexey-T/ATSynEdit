@@ -20,7 +20,7 @@ uses
     ATSynEdit_Adapter_IME_Windows,
     {$endif}
   {$endif}
-  {$ifdef LCLGTK2}
+  {$if defined(LCLGTK2) or defined(LCLGTK3)}
     {$ifdef AT_IME}
     ATSynEdit_Adapter_ime_gtk2,
     {$endif}
@@ -697,6 +697,8 @@ type
     FCarets: TATCarets;
     FCaretShowEnabled: boolean;
     FCaretShown: boolean;
+    FImeGapPos: integer; //IME gap in the painted text of the line, see DoImeGapInsert
+    FImeGapCells: integer;
     FCaretBlinkEnabled: boolean;
     FCaretBlinkTime: integer;
     FCaretShapeNormal: TATCaretShape;
@@ -1362,6 +1364,8 @@ type
       var AScrollHorz: TATEditorScrollInfo;
       const AWrapIndex: integer;
       var ATempParts: TATLineParts);
+    function DoImeGapInsert(const AWrapItem: TATWrapItem; ACharsSkipped: Int64;
+      var AText: atString; var AScrollHorz: TATEditorScrollInfo): boolean;
     procedure DoPaintMinimapLine(ARectLine: TRect;
       const ACharSize: TATEditorCharSize;
       var AScrollHorz: TATEditorScrollInfo;
@@ -1965,7 +1969,7 @@ type
     {$endif}
     {$endif}
 
-    {$ifdef LCLGTK2}
+    {$if defined(LCLGTK2) or defined(LCLGTK3)}
     {$ifdef AT_IME}
     procedure WM_GTK_IM_COMPOSITION(var Msg: TLMessage); message LM_IM_COMPOSITION;
     {$endif}
@@ -4276,6 +4280,7 @@ var
   bTrimmedNonSpaces: boolean;
   bUseColorOfCurrentLine,
   bUseColorOfCurrentLine2: boolean;
+  bImeGap: boolean;
 begin
   St:= Strings;
   bHiliteLinesWithSelection:= false;
@@ -4360,6 +4365,7 @@ begin
   LineSeparator:= St.LinesSeparator[NLinesIndex];
   bLineWithCaret:= IsLineWithCaret(NLinesIndex, FOptShowCurLineIfWithoutSel);
   bLineEolSelected:= IsPosSelected(WrapItem.NCharIndex-1+WrapItem.NLength, WrapItem.NLineIndex);
+  bImeGap:= DoImeGapInsert(WrapItem, NOutputCharsSkipped, StrOutput, AScrollHorz);
 
   //horz scrollbar max: is calculated here, to make variable horz bar
   //vert scrollbar max: is calculated in UpdateScrollbars
@@ -4465,6 +4471,9 @@ begin
       if NDimValue>0 then //-1: no ranges found, 0: no effect
         DoPartsDim(ATempParts, NDimValue, FColorBG);
     end;
+
+    if bImeGap then
+      DoPartsInsertGap(ATempParts, FImeGapPos, FImeGapCells, Colors.TextFont, NColorEntire);
 
     //adapter may return ColorAfterEol, paint it
     if FOptShowFullHilite then
@@ -4705,6 +4714,47 @@ function TATSynEdit.GetLineIndentInPixels(ALine: integer; const ACharSize: TATEd
 begin
   Result:= GetLineIndentInSpaces(ALine)
     * ACharSize.XScaled*ACharSize.XSpacePercents div ATEditorCharXScale div 100;
+end;
+
+function TATSynEdit.DoImeGapInsert(const AWrapItem: TATWrapItem; ACharsSkipped: Int64;
+  var AText: atString; var AScrollHorz: TATEditorScrollInfo): boolean;
+//The IME adapter paints the composition string in a separate window (see TATAdapterIME.GetImeGap).
+//Here the blank cells are inserted into AText (painted text of the wrap item) at the caret,
+//so the text after the caret is moved to the right, and it is not covered by the window.
+//AText is a part of the line, it starts from the char ACharsSkipped (horz scroll).
+//If True is returned, DoPartsInsertGap must be called after the parts of the line are calculated.
+var
+  NLine, NChar, NCells, NPos: integer;
+begin
+  Result:= false;
+  if FOptMaskCharUsed or (FAdapterIME=nil) then exit;
+  if not FAdapterIME.GetImeGap(NLine, NChar, NCells) then exit;
+  if (NLine<>AWrapItem.NLineIndex) or
+    not IsWrapItemWithCaret(AWrapItem) then exit;
+  //DoCalcLineHilite does not support the case: all chars of non-empty line are scrolled out
+  if (AWrapItem.NLength>0) and (ACharsSkipped>=AWrapItem.NLength) then exit;
+
+  NPos:= NChar-(AWrapItem.NCharIndex-1)-ACharsSkipped;
+  if NPos<0 then exit;
+  if NPos>Length(AText) then
+  begin
+    //caret is after the line end (virtual caret): the gap is made after spaces.
+    //AText must hold the whole rest of the line (it must not be cut by the visible width)
+    if (AWrapItem.NFinal<>TATWrapItemFinal.Final) or
+      (NPos>ATEditorOptions.MaxCharsForOutput) or
+      (Length(AText)<AWrapItem.NLength-ACharsSkipped) then exit;
+    AText:= AText+StringOfCharW(' ', NPos-Length(AText));
+  end;
+  Insert(StringOfCharW(' ', NCells), AText, NPos+1);
+  FImeGapPos:= NPos;
+  FImeGapCells:= NCells;
+
+  //horz scrollbar must include the gap
+  AScrollHorz.NMax:= Max(
+    AScrollHorz.NMax,
+    ACharsSkipped + FTabHelper.CalcCharOffsetLast(AWrapItem.NLineIndex, AText) div 100 +
+      FOptScrollbarHorizontalAddSpace);
+  Result:= true;
 end;
 
 procedure TATSynEdit.DoPaintFoldingUnderline(C: TCanvas;
@@ -5543,7 +5593,7 @@ begin
     {$endif}
   {$endif}
 
-  {$ifdef LCLGTK2}
+  {$if defined(LCLGTK2) or defined(LCLGTK3)}
     {$ifdef AT_IME}
     FAdapterIME:= TATAdapterGTK2IME.Create;
     {$endif}
@@ -10248,7 +10298,7 @@ end;
 {$endif}
 {$endif}
 
-{$ifdef LCLGTK2}
+{$if defined(LCLGTK2) or defined(LCLGTK3)}
 {$ifdef AT_IME}
 procedure TATSynEdit.WM_GTK_IM_COMPOSITION(var Msg: TLMessage);
 begin

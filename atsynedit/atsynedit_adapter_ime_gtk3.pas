@@ -1,4 +1,4 @@
-unit atsynedit_adapter_ime_gtk2;
+unit atsynedit_adapter_ime_gtk3;
 
 interface
 
@@ -8,9 +8,9 @@ uses
   ATSynEdit_Adapters;
 
 type
-  { TATAdapterGTK2IME }
+  { TATAdapterGTK3IME }
 
-  TATAdapterGTK2IME = class(TATAdapterIME)
+  TATAdapterGTK3IME = class(TATAdapterIME)
   private
     FIMSelText: UnicodeString;
     buffer: UnicodeString;
@@ -38,19 +38,14 @@ uses
   Classes,
   Controls,
   Graphics,
-  {$ifdef LCLGTK2}
-  Gtk2Globals,
-  {$endif}
-  {$ifdef LCLGTK3}
   gtk3int,
-  {$endif}
   ATStringProc,
   ATSynEdit,
   ATSynEdit_Carets;
 
-{ TATAdapterGTK2IME }
+{ TATAdapterGTK3IME }
 
-procedure TATAdapterGTK2IME.CompFormPaint(Sender: TObject);
+procedure TATAdapterGTK3IME.CompFormPaint(Sender: TObject);
 var
   tm, cm: TSize;
   s: UnicodeString;
@@ -78,7 +73,7 @@ begin
   CompForm.Canvas.Line(cm.cx+1,0,cm.cx+1,cm.cy+2);
 end;
 
-procedure TATAdapterGTK2IME.UpdateCompForm(Sender: TObject);
+procedure TATAdapterGTK3IME.UpdateCompForm(Sender: TObject);
 var
   ed: TATSynEdit;
   CompPos: TATPoint;
@@ -131,7 +126,7 @@ begin
   ed.Invalidate;
 end;
 
-function TATAdapterGTK2IME.GetImeGap(out ALineIndex, ACharIndex, ACells: integer): boolean;
+function TATAdapterGTK3IME.GetImeGap(out ALineIndex, ACharIndex, ACells: integer): boolean;
 begin
   ALineIndex:= FGapLine;
   ACharIndex:= FGapChar;
@@ -139,7 +134,7 @@ begin
   Result:= Assigned(CompForm) and CompForm.Visible and (FGapLine>=0) and (FGapCells>0);
 end;
 
-procedure TATAdapterGTK2IME.HideCompForm;
+procedure TATAdapterGTK3IME.HideCompForm;
 begin
   if Assigned(CompForm) then
     if CompForm.Visible then
@@ -151,14 +146,14 @@ begin
     end;
 end;
 
-procedure TATAdapterGTK2IME.Stop(Sender: TObject; Success: boolean);
+procedure TATAdapterGTK3IME.Stop(Sender: TObject; Success: boolean);
 begin
   ResetDefaultIMContext;
   HideCompForm;
   inherited Stop(Sender, Success);
 end;
 
-procedure TATAdapterGTK2IME.ImeEnter(Sender: TObject);
+procedure TATAdapterGTK3IME.ImeEnter(Sender: TObject);
 var
   Ed: TATSynEdit;
   Caret: TATCaretItem;
@@ -174,19 +169,19 @@ begin
   end;
 end;
 
-procedure TATAdapterGTK2IME.ImeExit(Sender: TObject);
+procedure TATAdapterGTK3IME.ImeExit(Sender: TObject);
 begin
   HideCompForm;
 end;
 
-procedure TATAdapterGTK2IME.ImeKillFocus(Sender: TObject);
+procedure TATAdapterGTK3IME.ImeKillFocus(Sender: TObject);
 begin
   inherited ImeKillFocus(Sender);
   //ResetDefaultIMContext; //commented to fix CudaText issue #5682
   HideCompForm;
 end;
 
-procedure TATAdapterGTK2IME.GTK2IMComposition(Sender: TObject;
+procedure TATAdapterGTK3IME.GTK2IMComposition(Sender: TObject;
   var Message: TLMessage);
 var
   len: Integer;

@@ -29,12 +29,14 @@ type
     //attrsize: Integer;
     //attrbuf: array[0..255] of Byte;
     CompForm: TForm;
+    FGapLine, FGapChar, FGapCells: Integer; //the gap, which the editor makes under CompForm
     procedure CompFormPaint(Sender: TObject);
     procedure UpdateCandidatePos(Sender: TObject);
     procedure UpdateCompForm(Sender: TObject);
     procedure HideCompForm;
     procedure CaretTimerTick(Sender: TObject);
   public
+    function GetImeGap(out ALineIndex, ACharIndex, ACells: integer): boolean; override;
     procedure Stop(Sender: TObject; Success: boolean); override;
     procedure ImeRequest(Sender: TObject; var Msg: TMessage); override;
     procedure ImeNotify(Sender: TObject; var Msg: TMessage); override;
@@ -162,6 +164,7 @@ var
   CompPos: TATPoint;
   Caret: TATCaretItem;
   CharWidth: Integer;
+  tm: TSize;
 begin
   ed:=TATSynEdit(Sender);
   if not Assigned(CompForm) then begin
@@ -193,25 +196,54 @@ begin
   CaretTimer.Enabled:=ed.OptCaretBlinkEnabled;
   CaretTimer.Interval:=ed.OptCaretBlinkTime;
 
+  //size of the form must be set here (not in CompFormPaint): the editor needs it to make the gap
+  tm:=CompForm.Canvas.TextExtent(buffer);
+  CompForm.Width:=tm.cx+CaretWidth;
+  CompForm.Height:=CaretHeight;
+
   if ed.Carets.Count>0 then begin
     Caret:=ed.Carets[0];
+    FGapLine:=Caret.PosY;
+    FGapChar:=Caret.PosX;
     CompPos:=ed.CaretPosToClientPos(Caret.AsPoint);
     //range checks are needed, if caret is out of visible area
     CompForm.Left:=Min(ed.Width-CompForm.Width, Max(0, CompPos.X));
     CompForm.Top:=Min(ed.Height-CompForm.Height, Max(0, CompPos.Y));
   end else begin
+    FGapLine:=-1;
     CompForm.Left:=0;
     CompForm.Top:=0;
   end;
 
+  //number of blank cells under the form: the editor makes the gap, see TATAdapterIME.GetImeGap
+  FGapCells:= (Int64(CompForm.Width)*ATEditorCharXScale + ed.TextCharSize.XScaled - 1)
+    div ed.TextCharSize.XScaled;
+
   CompForm.Show;
   CompForm.Invalidate;
+  //the editor must be repainted, to make the gap
+  //ed.Update(false, true);
+  ed.Invalidate;
+end;
+
+function TATAdapterWindowsIME.GetImeGap(out ALineIndex, ACharIndex, ACells: integer): boolean;
+begin
+  ALineIndex:= FGapLine;
+  ACharIndex:= FGapChar;
+  ACells:= FGapCells;
+  Result:= Assigned(CompForm) and CompForm.Visible and (FGapLine>=0) and (FGapCells>0);
 end;
 
 procedure TATAdapterWindowsIME.HideCompForm;
 begin
   if Assigned(CompForm) then
-    CompForm.Hide;
+    if CompForm.Visible then
+    begin
+      CompForm.Hide;
+      //repaint the editor, to remove the gap under the form
+      //(CompForm.Parent as TATSynEdit).Update(false, true);
+      (CompForm.Parent as TATSynEdit).Invalidate;
+    end;
 end;
 
 procedure TATAdapterWindowsIME.ImeRequest(Sender: TObject; var Msg: TMessage);
@@ -311,9 +343,9 @@ procedure TATAdapterWindowsIME.ImeStartComposition(Sender: TObject;
   var Msg: TMessage);
 begin
   position:=0;
+  buffer[0]:=#0;
   UpdateCompForm(Sender); // initialize composition form
   FSelText:= TATSynEdit(Sender).TextSelected;
-  buffer[0]:=#0;
   Msg.Result:= -1;
 end;
 

@@ -114,6 +114,11 @@ type
 
   TATAdapterIME = class
   public
+    //Is used if the IME composition string is painted by the adapter in a separate window (form)
+    //over the editor. Returns True, if the window is shown now. Then the editor makes a gap
+    //of ACells blank cells at the caret position (in the line ALineIndex, before the char ACharIndex),
+    //so the window covers the gap and not the text of the editor.
+    function GetImeGap(out ALineIndex, ACharIndex, ACells: integer): boolean; virtual;
     procedure Stop(Sender: TObject; Success: boolean); virtual;
     procedure ImeRequest(Sender: TObject; var Msg: TMessage); virtual;
     procedure ImeNotify(Sender: TObject; var Msg: TMessage); virtual;
@@ -123,7 +128,7 @@ type
     procedure ImeEnter(Sender: TObject); virtual;
     procedure ImeExit(Sender: TObject); virtual;
     procedure ImeKillFocus(Sender: TObject); virtual;
-    {$ifdef LCLGTK2}
+    {$if defined(LCLGTK2) or defined(LCLGTK3)}
     procedure GTK2IMComposition(Sender: TObject; var Message: TLMessage); virtual;
     {$endif}
     {$if defined(LCLQT5) or defined(LCLQT6) or defined(LCLQT)}
@@ -136,6 +141,14 @@ type
 implementation
 
 { TATAdapterIME }
+
+function TATAdapterIME.GetImeGap(out ALineIndex, ACharIndex, ACells: integer): boolean;
+begin
+  ALineIndex:= 0;
+  ACharIndex:= 0;
+  ACells:= 0;
+  Result:= false;
+end;
 
 procedure TATAdapterIME.Stop(Sender: TObject; Success: boolean);
 begin
@@ -197,7 +210,7 @@ end;
 
 {$endif}
 
-{$ifdef LCLGTK2}
+{$if defined(LCLGTK2) or defined(LCLGTK3)}
 procedure TATAdapterIME.GTK2IMComposition(Sender: TObject;
   var Message: TLMessage);
 begin
