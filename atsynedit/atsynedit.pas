@@ -20,12 +20,7 @@ uses
     ATSynEdit_Adapter_IME_Windows,
     {$endif}
   {$endif}
-  {$ifdef LCLGTK3}
-    {$ifdef AT_IME}
-    ATSynEdit_Adapter_ime_gtk3,
-    {$endif}
-  {$endif}
-  {$ifdef LCLGTK2}
+  {$if defined(LCLGTK2) or defined(LCLGTK3)}
     {$ifdef AT_IME}
     ATSynEdit_Adapter_ime_gtk2,
     {$endif}
@@ -702,10 +697,8 @@ type
     FCarets: TATCarets;
     FCaretShowEnabled: boolean;
     FCaretShown: boolean;
-    FImeInline: TATImeInline; //IME composition, painted inline (see DoImeInlineInsert)
-    FImePos: integer; //position of the composition inside of the painted text of the line
-    FImeInlineActive: boolean; //IME composition was painted inline on this repaint
-    FImeCaretX: integer; //client X of the IME caret (inside of the inline composition)
+    FImeGapPos: integer; //IME gap in the painted text of the line, see DoImeGapInsert
+    FImeGapCells: integer;
     FCaretBlinkEnabled: boolean;
     FCaretBlinkTime: integer;
     FCaretShapeNormal: TATCaretShape;
@@ -1371,13 +1364,8 @@ type
       var AScrollHorz: TATEditorScrollInfo;
       const AWrapIndex: integer;
       var ATempParts: TATLineParts);
-    function DoImeInlineInsert(const AWrapItem: TATWrapItem; ACharsSkipped: Int64;
+    function DoImeGapInsert(const AWrapItem: TATWrapItem; ACharsSkipped: Int64;
       var AText: atString; var AScrollHorz: TATEditorScrollInfo): boolean;
-    procedure DoImeInlineParts(ALineIndex, AOriginX: integer; const ACharSize: TATEditorCharSize;
-      ACellPercentsSkipped: Int64; AColorBG: TColor; const AText: atString;
-      var AParts: TATLineParts);
-    function DoCalcImeInlineCaretX(AOriginX: integer; ALineIndex, ACellsSkipped: integer;
-      const ATextToCaret: atString; const ACharSize: TATEditorCharSize): integer;
     procedure DoPaintMinimapLine(ARectLine: TRect;
       const ACharSize: TATEditorCharSize;
       var AScrollHorz: TATEditorScrollInfo;
@@ -1832,9 +1820,6 @@ type
       AAllowProcessMsg: boolean=true;
       AAllowUpdate: boolean=true;
       AAllowProximity: boolean=true);
-    //IME inline composition (used by IME adapters)
-    function GetImeInlineTextWidth(const AText: atString): integer;
-    function DoImeInlineScrollToCaret(const AText: atString; ACursorPos: integer): boolean;
     //bookmarks
     procedure BookmarkSetForLineEx(ALine, ABmKind: integer;
       const AHint: string; AAutoDelete: TATBookmarkAutoDelete; AShowInList: boolean; ATag: integer;
@@ -2402,7 +2387,7 @@ uses
   Math,
   StrUtils,
   {$ifdef LCLGTK2}
-  Gtk2Globals,
+  //Gtk2Globals,
   {$endif}
   {$ifdef LCLCOCOA}
   CocoaPrivate,
@@ -4295,7 +4280,7 @@ var
   bTrimmedNonSpaces: boolean;
   bUseColorOfCurrentLine,
   bUseColorOfCurrentLine2: boolean;
-  bImeApplied: boolean;
+  bImeGap: boolean;
 begin
   St:= Strings;
   bHiliteLinesWithSelection:= false;
@@ -4380,7 +4365,7 @@ begin
   LineSeparator:= St.LinesSeparator[NLinesIndex];
   bLineWithCaret:= IsLineWithCaret(NLinesIndex, FOptShowCurLineIfWithoutSel);
   bLineEolSelected:= IsPosSelected(WrapItem.NCharIndex-1+WrapItem.NLength, WrapItem.NLineIndex);
-  bImeApplied:= DoImeInlineInsert(WrapItem, NOutputCharsSkipped, StrOutput, AScrollHorz);
+  bImeGap:= DoImeGapInsert(WrapItem, NOutputCharsSkipped, StrOutput, AScrollHorz);
 
   //horz scrollbar max: is calculated here, to make variable horz bar
   //vert scrollbar max: is calculated in UpdateScrollbars
@@ -4487,9 +4472,8 @@ begin
         DoPartsDim(ATempParts, NDimValue, FColorBG);
     end;
 
-    if bImeApplied then
-      DoImeInlineParts(NLinesIndex, CurrPointText.X, ACharSize, NOutputCellPercentsSkipped,
-        NColorEntire, StrOutput, ATempParts);
+    if bImeGap then
+      DoPartsInsertGap(ATempParts, FImeGapPos, FImeGapCells, Colors.TextFont, NColorEntire);
 
     //adapter may return ColorAfterEol, paint it
     if FOptShowFullHilite then
@@ -4510,9 +4494,7 @@ begin
       SetLength(StrOutput, NCount);
 
     TextOutProps.Editor:= Self;
-    //the line in document can be ASCII-only, but the painted text has IME composition
-    TextOutProps.HasAsciiNoTabs:= not FFontProportional and St.LinesHasAsciiNoTabs[NLinesIndex] and
-      not bImeApplied;
+    TextOutProps.HasAsciiNoTabs:= not FFontProportional and St.LinesHasAsciiNoTabs[NLinesIndex];
     TextOutProps.SuperFast:= bLineHuge;
     TextOutProps.TabHelper:= FTabHelper;
     TextOutProps.LineIndex:= NLinesIndex;
@@ -4734,156 +4716,45 @@ begin
     * ACharSize.XScaled*ACharSize.XSpacePercents div ATEditorCharXScale div 100;
 end;
 
-function TATSynEdit.DoImeInlineInsert(const AWrapItem: TATWrapItem; ACharsSkipped: Int64;
+function TATSynEdit.DoImeGapInsert(const AWrapItem: TATWrapItem; ACharsSkipped: Int64;
   var AText: atString; var AScrollHorz: TATEditorScrollInfo): boolean;
-//IME composition is painted inline: it is inserted into AText (painted text of the wrap item),
-//so the text after the caret is moved to the right. Document is not changed.
+//The IME adapter paints the composition string in a separate window (see TATAdapterIME.GetImeGap).
+//Here the blank cells are inserted into AText (painted text of the wrap item) at the caret,
+//so the text after the caret is moved to the right, and it is not covered by the window.
 //AText is a part of the line, it starts from the char ACharsSkipped (horz scroll).
-//If True is returned, DoImeInlineParts must be called after the parts of the line are calculated.
+//If True is returned, DoPartsInsertGap must be called after the parts of the line are calculated.
 var
-  NPos, NPad: integer;
+  NLine, NChar, NCells, NPos: integer;
 begin
   Result:= false;
   if FOptMaskCharUsed or (FAdapterIME=nil) then exit;
-  if not FAdapterIME.GetInlineComposition(FImeInline) then exit;
-  {$ifdef ATSYNEDIT_IME_DEBUG}
-  if FImeInline.LineIndex=AWrapItem.NLineIndex then
-    WriteLn(StdErr, 'IME inline: comp line=', FImeInline.LineIndex, ' char=', FImeInline.CharIndex,
-      ' text="', UTF8Encode(FImeInline.Text), '" | wrapitem charindex=', AWrapItem.NCharIndex,
-      ' len=', AWrapItem.NLength, ' final=', Ord(AWrapItem.NFinal),
-      ' | skipped=', ACharsSkipped, ' painted text len=', Length(AText));
-  {$endif}
-  if (FImeInline.LineIndex<>AWrapItem.NLineIndex) or
-    not IsWrapItemWithCaret(AWrapItem) then
-  begin
-    {$ifdef ATSYNEDIT_IME_DEBUG}
-    if FImeInline.LineIndex=AWrapItem.NLineIndex then
-      WriteLn(StdErr, 'IME inline: NOT applied: IsWrapItemWithCaret=false');
-    {$endif}
-    exit;
-  end;
+  if not FAdapterIME.GetImeGap(NLine, NChar, NCells) then exit;
+  if (NLine<>AWrapItem.NLineIndex) or
+    not IsWrapItemWithCaret(AWrapItem) then exit;
   //DoCalcLineHilite does not support the case: all chars of non-empty line are scrolled out
-  if (AWrapItem.NLength>0) and (ACharsSkipped>=AWrapItem.NLength) then
-  begin
-    {$ifdef ATSYNEDIT_IME_DEBUG}
-    WriteLn(StdErr, 'IME inline: NOT applied: all chars of the line are scrolled out');
-    {$endif}
-    exit;
-  end;
+  if (AWrapItem.NLength>0) and (ACharsSkipped>=AWrapItem.NLength) then exit;
 
-  NPos:= FImeInline.CharIndex-(AWrapItem.NCharIndex-1)-ACharsSkipped;
-  if NPos<0 then
-  begin
-    {$ifdef ATSYNEDIT_IME_DEBUG}
-    WriteLn(StdErr, 'IME inline: NOT applied: NPos<0, NPos=', NPos);
-    {$endif}
-    exit;
-  end;
+  NPos:= NChar-(AWrapItem.NCharIndex-1)-ACharsSkipped;
+  if NPos<0 then exit;
   if NPos>Length(AText) then
   begin
-    //caret is after the line end (virtual caret): composition is painted after spaces.
+    //caret is after the line end (virtual caret): the gap is made after spaces.
     //AText must hold the whole rest of the line (it must not be cut by the visible width)
     if (AWrapItem.NFinal<>TATWrapItemFinal.Final) or
       (NPos>ATEditorOptions.MaxCharsForOutput) or
-      (Length(AText)<AWrapItem.NLength-ACharsSkipped) then
-    begin
-      {$ifdef ATSYNEDIT_IME_DEBUG}
-      WriteLn(StdErr, 'IME inline: NOT applied: virtual caret conditions failed, NPos=', NPos,
-        ' final=', Ord(AWrapItem.NFinal), ' MaxCharsForOutput=', ATEditorOptions.MaxCharsForOutput);
-      {$endif}
-      exit;
-    end;
-    NPad:= NPos-Length(AText);
-    AText:= AText+StringOfCharW(' ', NPad);
+      (Length(AText)<AWrapItem.NLength-ACharsSkipped) then exit;
+    AText:= AText+StringOfCharW(' ', NPos-Length(AText));
   end;
-  Insert(FImeInline.Text, AText, NPos+1);
-  FImePos:= NPos;
+  Insert(StringOfCharW(' ', NCells), AText, NPos+1);
+  FImeGapPos:= NPos;
+  FImeGapCells:= NCells;
 
-  //horz scrollbar must include the composition
+  //horz scrollbar must include the gap
   AScrollHorz.NMax:= Max(
     AScrollHorz.NMax,
     ACharsSkipped + FTabHelper.CalcCharOffsetLast(AWrapItem.NLineIndex, AText) div 100 +
       FOptScrollbarHorizontalAddSpace);
-  {$ifdef ATSYNEDIT_IME_DEBUG}
-  WriteLn(StdErr, 'IME inline: applied, NPos=', NPos, ' painted text len=', Length(AText));
-  {$endif}
   Result:= true;
-end;
-
-procedure TATSynEdit.DoImeInlineParts(ALineIndex, AOriginX: integer;
-  const ACharSize: TATEditorCharSize; ACellPercentsSkipped: Int64; AColorBG: TColor;
-  const AText: atString; var AParts: TATLineParts);
-//AText is the text with composition, inserted by DoImeInlineInsert.
-//Makes the gap in the parts, decorates the composition and calculates the IME caret position.
-var
-  NLen: integer;
-begin
-  NLen:= Length(FImeInline.Text);
-  if DoPartsInsertGap(AParts, FImePos, NLen, Colors.TextFont, AColorBG) then
-    DoPartsMarkImeInline(AParts, FImePos, NLen, FImeInline.Attrs,
-      Colors.TextFont, Colors.TextSelBG, Colors.TextSelFont, true);
-
-  FImeCaretX:= DoCalcImeInlineCaretX(
-    AOriginX,
-    ALineIndex,
-    ACellPercentsSkipped div 100,
-    Copy(AText, 1, FImePos+Min(FImeInline.CursorPos, NLen)),
-    ACharSize);
-  FImeInlineActive:= true;
-end;
-
-function TATSynEdit.DoCalcImeInlineCaretX(AOriginX: integer; ALineIndex, ACellsSkipped: integer;
-  const ATextToCaret: atString; const ACharSize: TATEditorCharSize): integer;
-//returns client X of the position after ATextToCaret, which is painted starting from AOriginX
-var
-  Offsets: TATIntFixedArray;
-begin
-  Result:= AOriginX;
-  if ATextToCaret='' then exit;
-  FTabHelper.CalcCharOffsets(ALineIndex, ATextToCaret, Offsets, ACellsSkipped);
-  if Offsets.Len>0 then
-    Inc(Result, Offsets.Data[Offsets.Len-1] * ACharSize.XScaled div 100 div ATEditorCharXScale);
-end;
-
-function TATSynEdit.GetImeInlineTextWidth(const AText: atString): integer;
-//width in pixels of AText (composition string, no tabs), as the editor paints it:
-//uses the same char-cells calculation as painting (CJK chars are 2 cells etc)
-var
-  Offsets: TATIntFixedArray;
-  NLine: integer;
-begin
-  Result:= 0;
-  if AText='' then exit;
-  if Carets.Count>0 then
-    NLine:= Carets[0].PosY
-  else
-    NLine:= 0;
-  FTabHelper.CalcCharOffsets(NLine, AText, Offsets, 0);
-  if Offsets.Len>0 then
-    Result:= Offsets.Data[Offsets.Len-1] * FCharSize.XScaled div 100 div ATEditorCharXScale;
-end;
-
-function TATSynEdit.DoImeInlineScrollToCaret(const AText: atString; ACursorPos: integer): boolean;
-//Scrolls horizontally, so that the position ACursorPos inside of the IME composition string
-//(painted inline at the first caret) is visible. Returns True if scrolled.
-var
-  Coord: TATPoint;
-  NX: Int64;
-begin
-  Result:= false;
-  if Carets.Count=0 then exit;
-  if FWrapMode<>TATEditorWrapMode.ModeOff then exit; //no horz scrolling in wrapped mode
-  if ACursorPos<0 then ACursorPos:= 0;
-  if ACursorPos>Length(AText) then ACursorPos:= Length(AText);
-
-  Coord:= CaretPosToClientPos(Carets[0].AsPoint);
-  NX:= Coord.X + GetImeInlineTextWidth(Copy(AText, 1, ACursorPos));
-
-  if DoCaretApplyProximityToHorzEdge(NX, 0, FOptScrollIndentCaretHorz) then
-  begin
-    Result:= true;
-    UpdateScrollbars(true);
-  end;
 end;
 
 procedure TATSynEdit.DoPaintFoldingUnderline(C: TCanvas;
@@ -5722,15 +5593,9 @@ begin
     {$endif}
   {$endif}
 
-  {$ifdef LCLGTK2}
+  {$if defined(LCLGTK2) or defined(LCLGTK3)}
     {$ifdef AT_IME}
     FAdapterIME:= TATAdapterGTK2IME.Create;
-    {$endif}
-  {$endif}
-
-  {$ifdef LCLGTK3}
-    {$ifdef AT_IME}
-    FAdapterIME:= TATAdapterGTK3IME.Create;
     {$endif}
   {$endif}
 
@@ -6653,7 +6518,6 @@ begin
     FAdapterIsDataReady:= true;
 
   UpdateGapForms(true);
-  FImeInlineActive:= false;
   DoPaintMain(C, ALineFrom);
   UpdateGapForms(false);
   UpdateCaretsCoords(false, true);
@@ -8869,8 +8733,7 @@ begin
 
   CanvasInvertRect(C, ARect, FColorCaretXor);
 
-  if ATEditorOptions.CaretTextOverInvertedRect and not ACaretShape.IsNarrow and
-    not FImeInlineActive then
+  if ATEditorOptions.CaretTextOverInvertedRect and not ACaretShape.IsNarrow then
   begin
     if (ACaret.CharAtCaret<>#0) and (ACaret.CharColor<>clNone) and not IsCharUnicodeSpace(ACaret.CharAtCaret) then
     begin
@@ -8934,13 +8797,6 @@ begin
     R.Top:= Caret.CoordY;
     R.Right:= R.Left+NCharWidth;
     R.Bottom:= R.Top+FCharSize.Y;
-
-    //IME inline composition: caret is inside of the composition text
-    if FImeInlineActive and (iCaret=0) then
-    begin
-      R.Left:= FImeCaretX;
-      R.Right:= R.Left+NCharWidth;
-    end;
 
     if FMinimapTooltipVisible and FMinimapTooltipEnabled and (FRectMinimapTooltip.Width>0) then
       if (R.Left>=FRectMinimapTooltip.Left) and

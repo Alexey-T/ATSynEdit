@@ -110,27 +110,15 @@ type
   end;
 
 type
-  { TATImeInline }
-
-  //Describes IME composition string, which editor must paint inline
-  //(inserted into the line at caret position, following text is moved to the right).
-  //Document text is not changed.
-  TATImeInline = record
-    LineIndex: integer; //line index in Strings
-    CharIndex: integer; //0-based char index in the line, where composition starts
-    Text: UnicodeString; //composition string
-    CursorPos: integer; //IME cursor position inside Text, 0..Length(Text)
-    Attrs: array of byte; //per-char IME attributes (ATTR_INPUT=0, ATTR_TARGET_CONVERTED=1,
-                          //ATTR_CONVERTED=2, ATTR_TARGET_NOTCONVERTED=3, ATTR_INPUT_ERROR=4)
-  end;
-
-type
   { TATAdapterIME }
 
   TATAdapterIME = class
   public
-    function GetInlineComposition(out AInfo: TATImeInline): boolean; virtual;
-    //returns True if the editor must paint composition string inline
+    //Is used if the IME composition string is painted by the adapter in a separate window (form)
+    //over the editor. Returns True, if the window is shown now. Then the editor makes a gap
+    //of ACells blank cells at the caret position (in the line ALineIndex, before the char ACharIndex),
+    //so the window covers the gap and not the text of the editor.
+    function GetImeGap(out ALineIndex, ACharIndex, ACells: integer): boolean; virtual;
     procedure Stop(Sender: TObject; Success: boolean); virtual;
     procedure ImeRequest(Sender: TObject; var Msg: TMessage); virtual;
     procedure ImeNotify(Sender: TObject; var Msg: TMessage); virtual;
@@ -154,9 +142,11 @@ implementation
 
 { TATAdapterIME }
 
-function TATAdapterIME.GetInlineComposition(out AInfo: TATImeInline): boolean;
+function TATAdapterIME.GetImeGap(out ALineIndex, ACharIndex, ACells: integer): boolean;
 begin
-  AInfo:= Default(TATImeInline);
+  ALineIndex:= 0;
+  ACharIndex:= 0;
+  ACells:= 0;
   Result:= false;
 end;
 

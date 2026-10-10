@@ -65,12 +65,9 @@ function DoPartsShow(var P: TATLineParts): string;
 procedure DoPartsDim(var P: TATLineParts; ADimLevel255: integer; AColorBG: TColor);
 procedure DoPartsCutFromOffset(var P: TATLineParts; AOffset: integer);
 
-//IME inline composition support
+//IME: makes the blank gap in the parts, see TATAdapterIME.GetImeGap
 function DoPartsInsertGap(var P: TATLineParts; APos, ALen: integer;
   ADefaultFontColor, ADefaultBG: TColor): boolean;
-procedure DoPartsMarkImeInline(var P: TATLineParts; APos, ALen: integer;
-  const AAttrs: array of byte;
-  AColorUnderline, AColorTargetBG, AColorTargetFont: TColor; AMainText: boolean);
 
 function ColorBlend(c1, c2: Longint; A: Longint): Longint;
 function ColorBlendHalf(c1, c2: Longint): Longint;
@@ -530,52 +527,6 @@ begin
   P[iGap]:= Gap;
   Result:= true;
 end;
-
-procedure DoPartsMarkImeInline(var P: TATLineParts; APos, ALen: integer;
-  const AAttrs: array of byte;
-  AColorUnderline, AColorTargetBG, AColorTargetFont: TColor; AMainText: boolean);
-//Decorates the gap made by DoPartsInsertGap: underline for all chars,
-//highlight for "target" clauses. One part per run of equal attributes.
-  //
-  function AttrAt(n: integer): byte;
-  begin
-    if n<=High(AAttrs) then
-      Result:= AAttrs[n]
-    else
-      Result:= 0;
-  end;
-  //
-var
-  i, iStart: integer;
-  NAttr: byte;
-  Part: TATLinePart;
-begin
-  i:= 0;
-  while i<ALen do
-  begin
-    iStart:= i;
-    NAttr:= AttrAt(i);
-    while (i<ALen) and (AttrAt(i)=NAttr) do
-      Inc(i);
-
-    InitLinePart(Part);
-    Part.Offset:= APos+iStart;
-    Part.Len:= i-iStart;
-    Part.ColorBorder:= AColorUnderline;
-    if (NAttr=1) or (NAttr=3) then //ATTR_TARGET_CONVERTED, ATTR_TARGET_NOTCONVERTED
-    begin
-      Part.ColorFont:= AColorTargetFont;
-      Part.ColorBG:= AColorTargetBG;
-      Part.BorderDown:= TATLineStyle.Solid2px;
-    end
-    else
-      Part.BorderDown:= TATLineStyle.Solid;
-
-    //ColorFont=clNone: DoPartInsert takes the font color of the left part
-    DoPartInsert(P, Part, false, AMainText);
-  end;
-end;
-
 
 function ConvertFontStylesToInteger(Styles: TFontStyles): integer;
 begin
