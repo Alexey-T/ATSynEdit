@@ -26,8 +26,8 @@ type
     CaretVisible: Boolean;
     CaretTimer: TTimer;
     //clbuffer: array[0..256] of longint;
-    //attrsize: Integer;
-    //attrbuf: array[0..255] of Byte;
+    attrsize: Integer;                        { count of valid items in attrbuf }
+    attrbuf: array[0..256] of Byte;           { ATTR_* of the chars of buffer, from GCS_COMPATTR }
     CompForm: TForm;
     FGapLine, FGapChar, FGapCells: Integer; //the gap, which the editor makes under CompForm
     procedure CompFormPaint(Sender: TObject);
@@ -59,6 +59,12 @@ uses
 
 const
   MaxImeBufSize = 256;
+  //IME composition attributes (GCS_COMPATTR), values are the same as ATTR_* in imm.h
+  cAttrInput = 0;
+  cAttrTargetConverted = 1;
+  cAttrConverted = 2;
+  cAttrTargetNotConverted = 3;
+  cAttrInputError = 4;
 
 // declated here, because FPC 3.3 trunk has typo in declaration
 function ImmGetCandidateWindow(imc: HIMC; par1: DWORD; lpCandidate: LPCANDIDATEFORM): LongBool; stdcall ; external 'imm32' name 'ImmGetCandidateWindow';
@@ -89,14 +95,104 @@ var
   tm, cm: TSize;
   s: UnicodeString;
   i: Integer;
+  //
+  function AttrAt(n: Integer): Byte;
+  begin
+    if (n>=0) and (n<attrsize) then
+      Result:=attrbuf[n]
+    else
+      Result:=cAttrInput;
+  end;
+  //
+  procedure DrawCompText;
+  var
+    sAll, sPart: UnicodeString;
+    i, n, iFrom, x, w, y, k, NThick: Integer; //own 'i': for-loop counter must be local
+    NAttr: Byte;
+    bMulti: Boolean;
+    clText: TColor;
+  begin
+    sAll:=PWideChar(@buffer[0]);
+    n:=Length(sAll);
+    if n=0 then exit;
+    //Several clauses (Japanese, Chinese): the clause which is converted now (cAttrTargetConverted)
+    //is highlighted. If all chars have the same attribute (Korean, one clause), a highlight
+    //would hide the usual look, so the target is drawn with a thick underline only.
+    bMulti:=false;
+    for i:=1 to n-1 do
+      if AttrAt(i)<>AttrAt(0) then
+      begin
+        bMulti:=true;
+        Break;
+      end;
+    clText:=CompForm.Canvas.Font.Color;
+    x:=0;
+    i:=0;
+    while i<n do
+    begin
+      iFrom:=i;
+      NAttr:=AttrAt(i);
+      while (i<n) and (AttrAt(i)=NAttr) do
+        Inc(i);
+      sPart:=Copy(sAll, iFrom+1, i-iFrom);
+      w:=CompForm.Canvas.TextExtent(UTF8Encode(sPart)).cx;
+
+      CompForm.Canvas.Brush.Style:=bsSolid;
+      if bMulti and (NAttr=cAttrTargetConverted) then
+      begin
+        CompForm.Canvas.Brush.Color:=clHighlight;
+        CompForm.Canvas.Font.Color:=clHighlightText;
+      end
+      else
+      begin
+        CompForm.Canvas.Brush.Color:=CompForm.Color;
+        CompForm.Canvas.Font.Color:=clText;
+      end;
+      CompForm.Canvas.TextOut(x,0,UTF8Encode(sPart));
+
+      //underline
+      NThick:=1;
+      CompForm.Canvas.Pen.Mode:=pmCopy;
+      CompForm.Canvas.Pen.Color:=clText;
+      CompForm.Canvas.Pen.Style:=psSolid;
+      case NAttr of
+        cAttrInput:
+          CompForm.Canvas.Pen.Style:=psDot;
+        cAttrTargetConverted:
+          if bMulti then
+            NThick:=0
+          else
+            NThick:=2;
+        cAttrConverted:
+          ;
+        cAttrTargetNotConverted:
+          NThick:=2;
+        cAttrInputError:
+          begin
+            CompForm.Canvas.Pen.Style:=psDash;
+            CompForm.Canvas.Pen.Color:=clRed;
+          end;
+      else
+        NThick:=0;
+      end;
+      y:=CompForm.Height-1;
+      for k:=0 to NThick-1 do
+        CompForm.Canvas.Line(x, y-k, x+w, y-k);
+
+      Inc(x, w);
+    end;
+    CompForm.Canvas.Font.Color:=clText;
+    CompForm.Canvas.Pen.Style:=psSolid;
+  end;
+  //
 begin
   if not Assigned(CompForm) then
     exit;
-  // draw text
   tm:=CompForm.Canvas.TextExtent(buffer);
   CompForm.Width:=tm.cx+CaretWidth;
   CompForm.Height:=CaretHeight;
-  CompForm.Canvas.TextOut(0,0,buffer);
+  // draw text with the attributes of the chars (ATTR_*)
+  DrawCompText;
   // draw IME Caret
   if CaretVisible then
   begin
@@ -399,6 +495,15 @@ begin
               end;
               len := len shr 1;
               buffer[len]:=#0;
+              { attributes of the chars (target clause, converted, ...), they are drawn in CompFormPaint }
+              if (imeCode and GCS_COMPATTR<>0) and (len>0) then
+              begin
+                attrsize:=ImmGetCompositionStringW(IMC, GCS_COMPATTR, @attrbuf[0], sizeof(attrbuf));
+                if attrsize<0 then
+                  attrsize:=0;
+              end
+              else
+                attrsize:=0;
               { Position change when pressing left right move on candidate composition window.
                 It need to virtual caret for this. The best idea is add composition modaless form for IME. }
               if imeCode and GCS_CURSORPOS<>0 then begin
