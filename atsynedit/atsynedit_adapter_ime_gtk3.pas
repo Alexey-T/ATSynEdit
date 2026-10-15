@@ -230,7 +230,7 @@ begin
           Ed.TextInsertAtCarets(buffer, False, bOverwrite, False);
           FIMSelText:='';
           HideCompForm;
-          Message.Result:=0;
+          Message.Result:=-1;
         end;
       end else
         HideCompForm;
