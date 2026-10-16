@@ -1908,7 +1908,7 @@ type
     procedure DoSelect_ColumnBlock_FromPoints(APosChar1, APosChar2: TPoint;
       AUpdateSelRectPoints: boolean=true);
     procedure DoSelect_ColumnBlock_FromPointsColumns(P1, P2: TPoint);
-    procedure DoSelect_ColumnBlock_Primitive(ACaretPos1, ACaretPos2: TPoint);
+    function DoSelect_ColumnBlock_Primitive(ACaretPos1, ACaretPos2: TPoint): boolean;
     procedure DoSelect_ColumnBlock_CopyToStringArray(const ASelRect: TRect; var Ar: TATUnicodeStringArray);
     procedure DoSelect_ColumnBlock_InsertFromStringArray(ATextPos: TPoint; const Ar: TATUnicodeStringArray);
     procedure DoScrollToBeginOrEnd(AToBegin: boolean);

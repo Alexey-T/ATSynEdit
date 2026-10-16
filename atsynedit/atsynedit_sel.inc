@@ -490,7 +490,7 @@ begin
     Carets[iCaret].SelectNone;
 end;
 
-procedure TATSynEdit.DoSelect_ColumnBlock_Primitive(ACaretPos1, ACaretPos2: TPoint);
+function TATSynEdit.DoSelect_ColumnBlock_Primitive(ACaretPos1, ACaretPos2: TPoint): boolean;
 var
   Coord1, Coord2: TATPoint;
   LineCoord1, LineCoord2: TPoint;
@@ -498,6 +498,15 @@ var
   Y, YMin, YMax: Int64;
   NPosX, NPosY, NEndX, NEndY: integer;
 begin
+  Result:= true;
+
+  //if line is wrapped, avoid any work in this func:
+  //'primitive selection' should not be placed on _wrapped_ line;
+  //this allows to fix https://github.com/Alexey-T/CudaText/issues/6512
+  for NPosY:= ACaretPos1.Y to ACaretPos2.Y do
+    if FWrapInfo.IsLineHasWrappedParts(NPosY) then
+      exit(false);
+
   Coord1:= CaretPosToClientPos(ACaretPos1);
   Coord2:= CaretPosToClientPos(ACaretPos2);
   YMin:= Min(Coord1.Y, Coord2.Y);
@@ -528,6 +537,7 @@ begin
     NPosY:= LineCoord2.Y;
     NEndX:= LineCoord1.X;
     NEndY:= LineCoord1.Y;
+
     //avoid empty selection
     if (NPosX=NEndX) and (NPosY=NEndY) then
     begin
@@ -587,12 +597,13 @@ begin
   end;
 
   if FOptCaretsPrimitiveColumnSelection then
-  begin
-    DoSelect_ColumnBlock_Primitive(APosChar1, APosChar2);
-    UpdateSelRectFromPoints(Pos1Col, Pos2Col);
-    //DebugSelRect; //debug
-    exit;
-  end;
+    if DoSelect_ColumnBlock_Primitive(APosChar1, APosChar2) then
+       //check func result, to avoid 'primitive selection' on wrapped line
+    begin
+      UpdateSelRectFromPoints(Pos1Col, Pos2Col);
+      //DebugSelRect; //debug
+      exit;
+    end;
 
   //setting SelRect must be first, it's used later
   UpdateSelRectFromPoints(Pos1Col, Pos2Col);
