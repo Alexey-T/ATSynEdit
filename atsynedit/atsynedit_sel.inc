@@ -504,7 +504,7 @@ begin
   //'primitive selection' should not be placed on _wrapped_ line;
   //this allows to fix https://github.com/Alexey-T/CudaText/issues/6512
   for NPosY:= ACaretPos1.Y to ACaretPos2.Y do
-    if FWrapInfo.IsLineHasWrappedParts(NPosY) then
+    if FWrapInfo.IsLineHavingWrappedParts(NPosY) then
       exit(false);
 
   Coord1:= CaretPosToClientPos(ACaretPos1);

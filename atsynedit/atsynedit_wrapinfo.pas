@@ -73,7 +73,7 @@ type
     function Count: integer;
     function IsIndexValid(AIndex: integer): boolean; inline;
     function IsIndexUniqueForLine(AIndex: integer): boolean;
-    function IsLineHasWrappedParts(ALineNum: SizeInt): boolean;
+    function IsLineHavingWrappedParts(ALineNum: SizeInt): boolean;
     property Data[AIndex: integer]: TATWrapItem read GetData; default;
     procedure Add(const AData: TATWrapItem);
     //2026.09.11 (CudaText perf): bulk add of all items (used by the full
@@ -401,7 +401,7 @@ begin
     FList.Insert(AIndex, AItem);
 end;
 
-function TATWrapInfo.IsLineHasWrappedParts(ALineNum: SizeInt): boolean;
+function TATWrapInfo.IsLineHavingWrappedParts(ALineNum: SizeInt): boolean;
 var
   NFrom, NTo: integer;
 begin
