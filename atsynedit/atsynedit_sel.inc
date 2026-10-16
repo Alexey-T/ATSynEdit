@@ -496,15 +496,16 @@ var
   LineCoord1, LineCoord2: TPoint;
   Details: TATEditorPosDetails;
   Y, YMin, YMax: Int64;
-  NPosX, NPosY, NEndX, NEndY: integer;
+  NPosX, NPosY, NEndX, NEndY, j: integer;
 begin
   Result:= true;
 
   //if line is wrapped, avoid any work in this func:
   //'primitive selection' should not be placed on _wrapped_ line;
   //this allows to fix https://github.com/Alexey-T/CudaText/issues/6512
-  for NPosY:= ACaretPos1.Y to ACaretPos2.Y do
-    if FWrapInfo.IsLineHavingWrappedParts(NPosY) then
+  for j:= Min(ACaretPos1.Y, ACaretPos2.Y) to
+          Max(ACaretPos1.Y, ACaretPos2.Y) do
+    if FWrapInfo.IsLineHavingWrappedParts(j) then
       exit(false);
 
   Coord1:= CaretPosToClientPos(ACaretPos1);
