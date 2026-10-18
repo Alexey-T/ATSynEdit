@@ -6110,7 +6110,6 @@ begin
   try
     FFileName:= '';
     Strings.LoadFromFile(AFilename, AOptions);
-    UpdateWrapInfo(true, false); //force WrapInfo update, needed to fix CudaText #6548
     FFileName:= AFileName;
   finally
     EndUpdate;
