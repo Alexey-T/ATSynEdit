@@ -2798,6 +2798,13 @@ begin
     (FWrapInfo.VisibleColumns<>NNewVisibleColumns) then
     FWrapUpdateNeeded:= true;
 
+  //fixing Reload-command leaves empty WrapInfo, CudaText #6548
+  if FWrapInfo.Count=0 then
+  begin
+    FWrapUpdateNeeded:= true;
+    AAllowCachedUpdate:= false;
+  end;
+
   if not FWrapUpdateNeeded then Exit;
   FWrapUpdateNeeded:= false;
 
