@@ -422,6 +422,9 @@ var
   Ed: TATSynEdit;
   Caret: TATCaretItem;
 begin
+  //since 2026.10, last Lazarus changes need that Message.Result is -1 to avoid duplication of Ru chars
+  Message.Result:=-1;
+  
   Ed:= TATSynEdit(Sender);
 
   if (not Ed.ModeReadOnly) then
