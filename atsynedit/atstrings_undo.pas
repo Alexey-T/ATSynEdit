@@ -82,6 +82,12 @@ type
     ItemLineState: TATLineState; //line-state of that editor line
     ItemCarets: TATPointPairArray; //carets
     ItemCarets2: TATPointPairArray; //carets for 'paired' editor (one frame in CudaText has 2 editors)
+    ItemCaretsPost: TATPointPairArray; //2026.10 (CudaText #6249): carets AFTER the edit-command finished,
+                                        //like 'afterCursorState' of VS Code editStack. Populated when the command
+                                        //finishes (TATStrings.ActionSaveLastEditionPos), used on undo to fix up
+                                        //mirror-items, so Redo restores the post-edit carets (caret after the
+                                        //change, no selection) instead of carets captured at undo-time.
+    ItemCaretsPost2: TATPointPairArray; //2026.10 (CudaText #6249): same, for 'paired' editor
     ItemMarkers: TATMarkerMarkerArray; //markers; also reused for caret pos for CaretJump action
     ItemMarkers2: TATMarkerMarkerArray; //markers for 'paired' editor
     ItemAttribs: TATMarkerAttribArray; //attributes
@@ -198,6 +204,7 @@ function TATUndoItem.GetAsString: string;
 var
   S: UnicodeString;
   SCarets, SCarets2, SMarkers, SMarkers2: string;
+  SPostCarets, SPostCarets2: string;
   i: SizeInt;
 begin
   S:= ItemText;
@@ -214,6 +221,8 @@ begin
     SCarets2:= ArraysDisabledSpec;
     SMarkers:= ArraysDisabledSpec;
     SMarkers2:= ArraysDisabledSpec;
+    SPostCarets:= ArraysDisabledSpec;
+    SPostCarets2:= ArraysDisabledSpec;
   end
   else
   begin
@@ -221,6 +230,8 @@ begin
     SCarets2:= PointPairArrayToString(ItemCarets2);
     SMarkers:= MarkerArrayToString(ItemMarkers);
     SMarkers2:= MarkerArrayToString(ItemMarkers2);
+    SPostCarets:= PointPairArrayToString(ItemCaretsPost);
+    SPostCarets2:= PointPairArrayToString(ItemCaretsPost2);
   end;
 
   Result:=
@@ -234,7 +245,11 @@ begin
       IntToStr(ItemTickCount)+MarkersSep+
       IntToStr(ItemCommandCode)+MarkersSep+
       SCarets2+MarkersSep+
-      SMarkers2+PartSep+
+      SMarkers2+MarkersSep+
+      //2026.10 (CudaText #6249): 2 additional parts, written AFTER the known 7 parts;
+      //readers of the old format ignore them, writer of old format omits them
+      SPostCarets+MarkersSep+
+      SPostCarets2+PartSep+
     IntToStr(Ord(ItemSoftMark))+PartSep+
     IntToStr(Ord(ItemHardMark))+PartSep+
     UTF8Encode(S);
@@ -315,6 +330,17 @@ begin
     StringToMarkerArray(ItemMarkers2, SubItem)
   else
     ItemMarkers2:= nil;
+  //h) post-carets (2026.10, CudaText #6249): absent in old undo-data -> nil,
+  //then Redo uses the old behavior (carets captured at undo-time)
+  ItemCaretsPost:= nil;
+  if Sep2.GetItemStr(SubItem) then
+    if (SubItem<>ArraysDisabledSpec) and (SubItem<>'') then
+      StringToPointPairArray(ItemCaretsPost, SubItem);
+  //i) post-carets2
+  ItemCaretsPost2:= nil;
+  if Sep2.GetItemStr(SubItem) then
+    if (SubItem<>ArraysDisabledSpec) and (SubItem<>'') then
+      StringToPointPairArray(ItemCaretsPost2, SubItem);
 
   Sep.GetItemStr(S);
   ItemSoftMark:= S='1';
@@ -336,6 +362,8 @@ begin
   ItemText:= D.ItemText;
   ItemCarets:= D.ItemCarets;
   ItemCarets2:= D.ItemCarets2;
+  ItemCaretsPost:= D.ItemCaretsPost;
+  ItemCaretsPost2:= D.ItemCaretsPost2;
   ItemSoftMark:= D.ItemSoftMark;
   ItemHardMark:= D.ItemHardMark;
   ItemArraysDisabled:= D.ItemArraysDisabled;
