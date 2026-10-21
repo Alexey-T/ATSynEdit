@@ -2733,8 +2733,7 @@ begin
     //(beforeCursorState), so the next swap (Redo of this mirror creates a
     //mirror-back item) restores it on Undo deterministically.
     //Skipped for CaretJump/ClearModified (no post-state, keep old behavior) and
-    //for items with disabled arrays (issue #385) or without captured carets
-    //(RAM-optimized mirrors of multi-caret runs, #6097 part-3).
+    //for items with disabled arrays (issue #385).
     if not (CurAction in [TATEditAction.CaretJump, TATEditAction.ClearModified]) then
       for i:= NOtherCountBefore to OtherList.Count-1 do
       begin
@@ -2746,13 +2745,34 @@ begin
           if Length(CurPostCaretsArray)>0 then
             CurItem.ItemCarets:= Copy(CurPostCaretsArray);
           CurItem.ItemCaretsPost:= Copy(CurCaretsArray);
-        end;
+        end
+        else
+        //2026.10 (CudaText #6027, 'eaten' undo steps): mirror-items WITHOUT
+        //captured carets (all mirrors added after the 1st item of this
+        //undo/redo step, when EnabledCaretsInUndo=False, CudaText #6097 part-3)
+        //must still get the before-state (source's ItemCarets) in
+        //ItemCaretsPost. On the next direction swap, such mirror is the 1st
+        //processed item of its mirror-group, and the terminator-mirror of THAT
+        //pass takes its ItemCarets from this ItemCaretsPost. Without it, that
+        //terminator keeps the stale carets captured at redo/undo time, so
+        //after Redo-then-Undo cycles, undoing a multi-item command (e.g. paste)
+        //restored a wrong caret line: text was correctly undone, but the caret
+        //jumped elsewhere - the step was never visible, like 2 undos in 1 click.
+        //Shared array (no Copy) is safe: ItemCaretsPost is never modified in
+        //place, and the source item is freed right after this undo-step, the
+        //dynarray refcount keeps the data alive - same sharing which
+        //StorePostCaretsInUndoItems() and UndoRun*() already rely on.
+        if Length(CurCaretsArray)>0 then
+          CurItem.ItemCaretsPost:= CurCaretsArray;
         if Length(CurItem.ItemCarets2)>0 then
         begin
           if Length(CurPostCaretsArray2)>0 then
             CurItem.ItemCarets2:= Copy(CurPostCaretsArray2);
           CurItem.ItemCaretsPost2:= Copy(CurCaretsArray2);
-        end;
+        end
+        else
+        if Length(CurCaretsArray2)>0 then
+          CurItem.ItemCaretsPost2:= CurCaretsArray2;
       end;
 
     //2026.09 (issue #385): items with disabled arrays must NOT touch the current
