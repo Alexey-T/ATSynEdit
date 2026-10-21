@@ -256,8 +256,8 @@ type
     destructor Destroy; override;
     procedure Clear;
     //
-    property MatchEdPos: TPoint read FMatchEdPos;
-    property MatchEdEnd: TPoint read FMatchEdEnd;
+    property MatchEdPos: TPoint read FMatchEdPos write FMatchEdPos;
+    property MatchEdEnd: TPoint read FMatchEdEnd write FMatchEdEnd;
     property MatchEdPosAfterRep: TPoint read FMatchEdPosAfterRep;
     property MaxLineLen: integer read FMaxLineLen write FMaxLineLen;
     property VirtualCaretsAsString: string read FVirtualCaretsAsString write SetVirtualCaretsAsString;
