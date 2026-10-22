@@ -287,6 +287,11 @@ type
     FEnabledBookmarksUpdate: boolean;
     FEnabledChangeEvents: boolean;
     FEnabledCaretsInUndo: boolean;
+    FCountAtPostCaretsUpdate: integer;
+      //2026.10 (CudaText #6249): count of FUndoList items, when post-carets were
+      //stored into trailing items last time (in StorePostCaretsInUndoItems from
+      //ActionSaveLastEditionPos). Items at indexes >= this value were added after
+      //that, i.e. they belong to the just-finished command, and get ItemCaretsPost.
     FLoadingForcedANSI: boolean;
     FLoadingFromStream: boolean;
     FLastUndoY: SizeInt;
@@ -295,6 +300,9 @@ type
     function Compare_AscNoCase(Key1, Key2: Pointer): Integer;
     function Compare_Desc(Key1, Key2: Pointer): Integer;
     function Compare_DescNoCase(Key1, Key2: Pointer): Integer;
+    procedure StorePostCaretsInUndoItems(const ACarets: TATPointPairArray);
+      //2026.10 (CudaText #6249): stores 'carets after command' into undo-items,
+      //which the just-finished command added (VS Code 'afterCursorState')
     procedure AddUndoItem(AAction: TATEditAction; AIndex: SizeInt;
       const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState;
       ACommandCode: integer);
@@ -1606,6 +1614,7 @@ begin
   FEnabledBookmarksUpdate:= true;
   FEnabledChangeEvents:= true;
   FEnabledCaretsInUndo:= true;
+  FCountAtPostCaretsUpdate:= 0;
 
   FEncoding:= TATFileEncoding.UTF8;
   FEncodingDetect:= true;
@@ -2263,6 +2272,10 @@ end;
 procedure TATStrings.SetUndoAsString(const AValue: string);
 begin
   FUndoList.AsString:= AValue;
+  //2026.10 (CudaText #6249): restored items already have their post-carets from
+  //the serialized data (or none, for old-format data); don't let the next
+  //StorePostCaretsInUndoItems() call overwrite them with a new command's carets
+  FCountAtPostCaretsUpdate:= FUndoList.Count;
 end;
 
 procedure TATStrings.SetUndoLimit(AValue: integer);
@@ -2467,6 +2480,8 @@ var
   CurLineState: TATLineState;
   CurCaretsArray: TATPointPairArray;
   CurCaretsArray2: TATPointPairArray;
+  CurPostCaretsArray: TATPointPairArray;
+  CurPostCaretsArray2: TATPointPairArray;
   CurMarkersArray: TATMarkerMarkerArray;
   CurMarkersArray2: TATMarkerMarkerArray;
   CurAttribsArray: TATMarkerAttribArray;
@@ -2475,6 +2490,8 @@ var
   OtherList: TATUndoList;
   NCurCount, NStringsCount, NIndexMin: SizeInt;
   NEventX, NEventY: SizeInt;
+  NOtherCountBefore: integer;
+  i: integer;
   bWithoutPause,
   bArraysDisabled,
   bEnableEventAfter: boolean;
@@ -2532,6 +2549,8 @@ begin
   CurLineState:= CurItem.ItemLineState;
   CurCaretsArray:= CurItem.ItemCarets;
   CurCaretsArray2:= CurItem.ItemCarets2;
+  CurPostCaretsArray:= CurItem.ItemCaretsPost;
+  CurPostCaretsArray2:= CurItem.ItemCaretsPost2;
   CurMarkersArray:= CurItem.ItemMarkers;
   CurMarkersArray2:= CurItem.ItemMarkers2;
   CurAttribsArray:= CurItem.ItemAttribs;
@@ -2562,6 +2581,10 @@ begin
     OtherList:= FRedoList
   else
     OtherList:= FUndoList;
+
+  //2026.10 (CudaText #6249): remember which mirror-items this undo-step creates
+  //in OtherList (edit-ops below add them), to fix up their carets afterwards
+  NOtherCountBefore:= OtherList.Count;
 
   UndoSingle_Begin(ACurList, CurAction, ACommandCode, ASoftMarked, AHardMarked,
     bWithoutPause, CurCaretsArray, bEnableEventAfter, NEventX, NEventY);
@@ -2699,6 +2722,59 @@ begin
         end;
     end;
 
+    //2026.10 (CudaText #6249, VS Code-like redo): fix up carets of mirror-items,
+    //which this undo-step just created in OtherList. Mirror-item carets were
+    //captured from the CURRENT editor state (before this undo-step restored its
+    //own carets), for multi-step undo runs they are stale (e.g. selection
+    //restored by the previous undo-step), which gave 'redoes the selection too'
+    //behavior. VS Code instead restores afterCursorState on Redo: carets as they
+    //were AFTER the edit-command finished, stored in ItemCaretsPost of the
+    //undone item. Also mirror gets ItemCaretsPost = source's ItemCarets
+    //(beforeCursorState), so the next swap (Redo of this mirror creates a
+    //mirror-back item) restores it on Undo deterministically.
+    //Skipped for CaretJump/ClearModified (no post-state, keep old behavior) and
+    //for items with disabled arrays (issue #385).
+    if not (CurAction in [TATEditAction.CaretJump, TATEditAction.ClearModified]) then
+      for i:= NOtherCountBefore to OtherList.Count-1 do
+      begin
+        CurItem:= OtherList.Items[i];
+        if CurItem=nil then Continue;
+        if CurItem.ItemArraysDisabled then Continue;
+        if Length(CurItem.ItemCarets)>0 then
+        begin
+          if Length(CurPostCaretsArray)>0 then
+            CurItem.ItemCarets:= Copy(CurPostCaretsArray);
+          CurItem.ItemCaretsPost:= Copy(CurCaretsArray);
+        end
+        else
+        //2026.10 (CudaText #6027, 'eaten' undo steps): mirror-items WITHOUT
+        //captured carets (all mirrors added after the 1st item of this
+        //undo/redo step, when EnabledCaretsInUndo=False, CudaText #6097 part-3)
+        //must still get the before-state (source's ItemCarets) in
+        //ItemCaretsPost. On the next direction swap, such mirror is the 1st
+        //processed item of its mirror-group, and the terminator-mirror of THAT
+        //pass takes its ItemCarets from this ItemCaretsPost. Without it, that
+        //terminator keeps the stale carets captured at redo/undo time, so
+        //after Redo-then-Undo cycles, undoing a multi-item command (e.g. paste)
+        //restored a wrong caret line: text was correctly undone, but the caret
+        //jumped elsewhere - the step was never visible, like 2 undos in 1 click.
+        //Shared array (no Copy) is safe: ItemCaretsPost is never modified in
+        //place, and the source item is freed right after this undo-step, the
+        //dynarray refcount keeps the data alive - same sharing which
+        //StorePostCaretsInUndoItems() and UndoRun*() already rely on.
+        if Length(CurCaretsArray)>0 then
+          CurItem.ItemCaretsPost:= CurCaretsArray;
+        if Length(CurItem.ItemCarets2)>0 then
+        begin
+          if Length(CurPostCaretsArray2)>0 then
+            CurItem.ItemCarets2:= Copy(CurPostCaretsArray2);
+          CurItem.ItemCaretsPost2:= Copy(CurCaretsArray2);
+        end
+        else
+        if Length(CurCaretsArray2)>0 then
+          CurItem.ItemCaretsPost2:= CurCaretsArray2;
+      end;
+
     //2026.09 (issue #385): items with disabled arrays must NOT touch the current
     //carets/markers/attribs, so all Set*Array() calls are skipped for them
     //(SetMarkersArray(nil)/SetAttribsArray(nil) would clear the current state)
@@ -2832,6 +2908,7 @@ var
   LastMarkersArray, LastMarkersArray2: TATMarkerMarkerArray;
   LastAttribsArray: TATMarkerAttribArray;
   RunCarets, RunCarets2: TATPointPairArray;
+  RunPostCarets, RunPostCarets2: TATPointPairArray;
   RunMarkers, RunMarkers2: TATMarkerMarkerArray;
   RunAttribs: TATMarkerAttribArray;
   bLastCarets, bLastCarets2: boolean;
@@ -2843,6 +2920,7 @@ var
   bWithoutPause, bEnableEventAfter, bConsecutive: boolean;
   bCurHardMarked, bCurHardMarkedNext, bCurUnmodifiedNext: boolean;
   j, N, NRunCount, NItemIndex, NLineIndex, NRangeStart: SizeInt;
+  NOtherCountBefore: integer;
 begin
   Result:= true;
   ASoftMarked:= true;
@@ -2854,6 +2932,8 @@ begin
   ALineIndexFailed:= -1;
   bLastCarets:= false;
   bLastCarets2:= false;
+  RunPostCarets:= nil;
+  RunPostCarets2:= nil;
   LastCaretsArray:= nil;
   LastCaretsArray2:= nil;
   LastMarkersArray:= nil;
@@ -2913,12 +2993,30 @@ begin
   begin
     RunCarets:= GetCaretsArray;
     RunCarets2:= GetCaretsArray2;
+    //2026.10 (CudaText #6249, VS Code-like redo): prefer the post-edit carets
+    //(afterCursorState) stored in the run's source item with real arrays
+    //(first item of the run, index N-ACount); mirrors then restore them on Redo,
+    //instead of the carets captured at undo-time
+    if N-ACount>=0 then
+    begin
+      CurItem:= ACurList.Items[N-ACount];
+      if (CurItem<>nil) and (not CurItem.ItemArraysDisabled) then
+      begin
+        if Length(CurItem.ItemCaretsPost)>0 then
+          RunCarets:= CurItem.ItemCaretsPost;
+        if Length(CurItem.ItemCaretsPost2)>0 then
+          RunCarets2:= CurItem.ItemCaretsPost2;
+        RunPostCarets:= CurItem.ItemCarets;
+        RunPostCarets2:= CurItem.ItemCarets2;
+      end;
+    end;
   end
   else
   begin
     RunCarets:= nil;
     RunCarets2:= nil;
   end;
+  NOtherCountBefore:= OtherList.Count;
   RunMarkers:= GetMarkersArray;
   RunMarkers2:= GetMarkersArray2;
   RunAttribs:= GetAttribsArray;
@@ -3040,6 +3138,23 @@ begin
     if bCurHardMarked then
       if OtherList.Count>0 then
         OtherList.Last.ItemHardMark:= true;
+  end;
+
+  //2026.10 (CudaText #6249, VS Code-like redo): store the before-state carets
+  //in the 1st created mirror-item (the only one with real arrays), so the next
+  //Redo of this mirror-run transfers them to its mirror-back items, and Undo
+  //of that run restores the pre-edit carets deterministically
+  if (NOtherCountBefore<OtherList.Count) and
+     ((Length(RunPostCarets)>0) or (Length(RunPostCarets2)>0)) then
+  begin
+    CurItem:= OtherList.Items[NOtherCountBefore];
+    if (CurItem<>nil) and (not CurItem.ItemArraysDisabled) then
+    begin
+      if Length(RunPostCarets)>0 then
+        CurItem.ItemCaretsPost:= RunPostCarets;
+      if Length(RunPostCarets2)>0 then
+        CurItem.ItemCaretsPost2:= RunPostCarets2;
+    end;
   end;
 
   //physical deletion of all undone lines, in one operation;
@@ -3190,6 +3305,7 @@ var
   LastMarkersArray, LastMarkersArray2: TATMarkerMarkerArray;
   LastAttribsArray: TATMarkerAttribArray;
   RunCarets, RunCarets2: TATPointPairArray;
+  RunPostCarets, RunPostCarets2: TATPointPairArray;
   RunMarkers, RunMarkers2: TATMarkerMarkerArray;
   RunAttribs: TATMarkerAttribArray;
   bLastCarets, bLastCarets2: boolean;
@@ -3202,6 +3318,7 @@ var
   bWithoutPause, bEnableEventAfter, bForwardFill: boolean;
   bCurHardMarked, bCurHardMarkedNext, bCurUnmodifiedNext: boolean;
   j, N, NItemIndex, NLineSlot: SizeInt;
+  NOtherCountBefore: integer;
 begin
   Result:= true;
   ASoftMarked:= true;
@@ -3225,6 +3342,8 @@ begin
   LastAttribsArray:= nil;
   RunCarets:= nil;
   RunCarets2:= nil;
+  RunPostCarets:= nil;
+  RunPostCarets2:= nil;
   RunMarkers:= nil;
   RunMarkers2:= nil;
   RunAttribs:= nil;
@@ -3311,7 +3430,25 @@ begin
   begin
     RunCarets:= GetCaretsArray;
     RunCarets2:= GetCaretsArray2;
+    //2026.10 (CudaText #6249, VS Code-like redo): prefer the post-edit carets
+    //(afterCursorState) stored in the run's source item with real arrays
+    //(first item of the run, index N-ACount); mirrors then restore them on Redo,
+    //instead of the carets captured at undo-time
+    if N-ACount>=0 then
+    begin
+      CurItem:= ACurList.Items[N-ACount];
+      if (CurItem<>nil) and (not CurItem.ItemArraysDisabled) then
+      begin
+        if Length(CurItem.ItemCaretsPost)>0 then
+          RunCarets:= CurItem.ItemCaretsPost;
+        if Length(CurItem.ItemCaretsPost2)>0 then
+          RunCarets2:= CurItem.ItemCaretsPost2;
+        RunPostCarets:= CurItem.ItemCarets;
+        RunPostCarets2:= CurItem.ItemCarets2;
+      end;
+    end;
   end;
+  NOtherCountBefore:= OtherList.Count;
   RunMarkers:= GetMarkersArray;
   RunMarkers2:= GetMarkersArray2;
   RunAttribs:= GetAttribsArray;
@@ -3436,6 +3573,23 @@ begin
     if bCurHardMarked then
       if OtherList.Count>0 then
         OtherList.Last.ItemHardMark:= true;
+  end;
+
+  //2026.10 (CudaText #6249, VS Code-like redo): store the before-state carets
+  //in the 1st created mirror-item (the only one with real arrays), so the next
+  //Redo of this mirror-run transfers them to its mirror-back items, and Undo
+  //of that run restores the pre-edit carets deterministically
+  if (NOtherCountBefore<OtherList.Count) and
+     ((Length(RunPostCarets)>0) or (Length(RunPostCarets2)>0)) then
+  begin
+    CurItem:= OtherList.Items[NOtherCountBefore];
+    if (CurItem<>nil) and (not CurItem.ItemArraysDisabled) then
+    begin
+      if Length(RunPostCarets)>0 then
+        CurItem.ItemCaretsPost:= RunPostCarets;
+      if Length(RunPostCarets2)>0 then
+        CurItem.ItemCaretsPost2:= RunPostCarets2;
+    end;
   end;
 
   {
@@ -3897,6 +4051,8 @@ begin
     FRedoList.Locked:= ALocked;
   end;
 
+  FCountAtPostCaretsUpdate:= 0;
+
   if Assigned(IndexesOfEditedLines) then
   begin
     IndexesOfEditedLines.Clear;
@@ -3931,6 +4087,68 @@ begin
 
   if Length(Ar)>0 then
     CaretsAfterLastEdition:= Ar;
+
+  //2026.10 (CudaText #6249): store post-edit carets (VS Code 'afterCursorState')
+  //into undo-items, which the just-finished command added to FUndoList
+  StorePostCaretsInUndoItems(Ar);
+end;
+
+procedure TATStrings.StorePostCaretsInUndoItems(const ACarets: TATPointPairArray);
+{
+2026.10 (CudaText #6249): VS Code-like undo/redo of carets.
+VS Code editStack keeps 2 cursor states per undo element: beforeCursorState
+(restored on Undo) and afterCursorState (restored on Redo). ATSynEdit had only
+the first one (ItemCarets, captured when the edit starts). This method stores
+the second one: carets AFTER the edit-command finished, captured in
+ActionSaveLastEditionPos, i.e. exactly after TATSynEdit.DoCommandResults
+saved CaretsAfterLastEdition. Stored into all undo-items, which were added to
+FUndoList since the previous call (FCountAtPostCaretsUpdate), i.e. items of the
+just-finished command. All items share ONE copy of the array (refcounted), RAM
+overhead is one array per command.
+Skipping after an Undo-command happens automatically: undo consumes FUndoList
+items and adds none, so the update-range below is empty; after a Redo-command
+the range covers the newly created mirror-items, which get the correct
+post-state (carets after the redone change).
+}
+var
+  Ar2: TATPointPairArray;
+  ArPost: TATPointPairArray;
+  ArPost2: TATPointPairArray;
+  Item: TATUndoItem;
+  i: integer;
+begin
+  if not Assigned(FUndoList) then Exit;
+
+  if Length(ACarets)=0 then
+  begin
+    FCountAtPostCaretsUpdate:= FUndoList.Count;
+    Exit;
+  end;
+
+  if FCountAtPostCaretsUpdate > FUndoList.Count then
+    FCountAtPostCaretsUpdate:= FUndoList.Count;
+
+  //private copies: CaretsAfterLastEdition keeps its own array, which must not
+  //be shared with undo-items (undo code adjusts CurCaretsArray[0].Y in place,
+  //see the #6027/#6249 fix in UndoSingle)
+  ArPost:= Copy(ACarets);
+  Ar2:= GetCaretsArray2;
+  if Length(Ar2)>0 then
+    ArPost2:= Copy(Ar2)
+  else
+    ArPost2:= nil;
+
+  for i:= FCountAtPostCaretsUpdate to FUndoList.Count-1 do
+  begin
+    Item:= FUndoList.Items[i];
+    if Item=nil then Continue;
+    //issue #385: items with disabled arrays must keep all arrays empty
+    if Item.ItemArraysDisabled then Continue;
+    Item.ItemCaretsPost:= ArPost;
+    Item.ItemCaretsPost2:= ArPost2;
+  end;
+
+  FCountAtPostCaretsUpdate:= FUndoList.Count;
 end;
 
 procedure TATStrings.ActionGotoLastEditionPos;
