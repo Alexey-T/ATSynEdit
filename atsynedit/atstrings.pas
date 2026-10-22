@@ -252,6 +252,7 @@ type
     FModified: boolean;
     FModifiedRecent: boolean;
     FModifiedVersion: Int64;
+    FInstanceId: QWord;
     FSaveSignUtf8: boolean;
     FSaveSignWide: boolean;
     FReadOnly: boolean;
@@ -505,6 +506,9 @@ type
     property Modified: boolean read FModified write SetModified;
     property ModifiedRecent: boolean read FModifiedRecent write FModifiedRecent;
     property ModifiedVersion: Int64 read FModifiedVersion;
+    //unique id of this TATStrings object; unlike the object pointer it's never
+    //recycled, so caches can safely detect 'document was replaced by another one'
+    property InstanceId: QWord read FInstanceId;
     property OneLine: boolean read FOneLine write FOneLine;
     property ProgressValue: SizeInt read FProgressValue write FProgressValue;
     property ProgressKind: TATStringsProgressKind read FProgressKind write FProgressKind;
@@ -629,6 +633,10 @@ uses
   LCLVersion,
   Math,
   ATStringProc_Separator;
+
+var
+  //counter for TATStrings.InstanceId (atomic: instances can be created on background threads)
+  GATStringsInstanceId: LongInt = 0;
 
 const
   cSignUTF8: string = #$EF#$BB#$BF;
@@ -1625,6 +1633,7 @@ begin
   FModified:= false;
   FModifiedRecent:= false;
   FModifiedVersion:= 0;
+  FInstanceId:= QWord(InterLockedIncrement(GATStringsInstanceId));
   FChangeBlockActive:= false;
 
   FSaveSignUtf8:= true;
@@ -2200,6 +2209,10 @@ end;
 
 procedure TATStrings.Clear(AWithEvent: boolean);
 begin
+  //content is fully replaced here (loaders/Reopen/etc), so bump the
+  //content version: caches (e.g. Finder's list of all matches) must be invalidated
+  Inc(FModifiedVersion);
+
   ClearUndo(FUndoList.Locked);
 
   if AWithEvent then

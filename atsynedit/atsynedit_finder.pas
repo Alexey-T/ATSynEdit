@@ -55,6 +55,15 @@ type
   TATFinderResults = class(specialize TFPGList<TATFinderResult>)
   protected
     procedure Deref(Item: Pointer); override;
+  public
+    //list must be filled in the document order (like DoAction_FindAll does):
+    //items sorted by PosBegin (Y, then X)
+    function IsSortedByPos: boolean;
+    //binary search; list must be sorted by PosBegin (see IsSortedByPos),
+    //returns index of item with PosBegin=(AX, AY) or -1
+    function IndexOfPosBegin_Sorted(AX, AY: integer): integer;
+    //auto-detects sortedness and uses binary search or linear scan
+    function IndexOfPosBegin(AX, AY: integer): integer;
   end;
 
   { TATFinderResult2 }
@@ -181,6 +190,23 @@ type
     //FReplacedAtEndOfText: boolean;
     FIsSearchWrapped: boolean;
     //
+    //cache for GetFindAllMatches()/GetFindAllMatchIndex():
+    //holds the results of last DoAction_FindAll for a big document, so that
+    //FindNext/FindPrev (e.g. 'N/1000000' match counter in CudaText) don't
+    //rescan the entire document on every keypress (CudaText issues #6537, #6557)
+    FFindAllCache: TATFinderResults;
+    FFindAllCacheSorted: boolean;
+    FFindAllCacheReusable: boolean;
+    FFindAllCacheStrFind: UnicodeString;
+    FFindAllCacheOptCase: boolean;
+    FFindAllCacheOptWords: boolean;
+    FFindAllCacheOptRegex: boolean;
+    FFindAllCacheOptTokens: TATFinderTokensAllowed;
+    FFindAllCacheMaxLineLen: integer;
+    FFindAllCacheStringsId: QWord;
+    FFindAllCacheStringsVersion: Int64;
+    FFindAllCacheStringsCount: integer;
+    //
     FOnFound: TATFinderFound;
     FOnWrapAtEdge: TNotifyEvent;
     FOnConfirmReplace: TATFinderConfirmReplace;
@@ -206,6 +232,9 @@ type
     procedure GetMarkerPos(out AX, AY: integer);
     procedure GetEditorSelRange(out AX1, AY1, AX2, AY2: integer; out ASelText: UnicodeString);
     procedure DoFixCaretSelectionDirection;
+    //
+    function IsFindAllCacheValid: boolean;
+    procedure RunFindAll_FillCache;
     //
     procedure DoCollect_Usual(AList: TATFinderResults; out AListCount: integer; AWithEvent, AWithConfirm: boolean);
     procedure DoCollect_Regex(AList: TATFinderResults; out AListCount: integer; AFromPos: integer; AWithEvent, AWithConfirm, AReplace: boolean);
@@ -284,6 +313,13 @@ type
       AStyleBorder: TATLineStyle;
       ATagValue: Int64;
       AMaxLines: integer): integer;
+    //
+    //cached variant of FindAll: for 'N/total' match counters (CudaText issues #6537, #6557);
+    //full rescan is done only when editor text / search options are changed,
+    //all next calls reuse the cached list of matches
+    procedure ClearFindAllCache;
+    function GetFindAllMatches: TATFinderResults;
+    function GetFindAllMatchIndex(AX, AY: integer; out AMatchCount: integer): integer;
     //
     property OnFound: TATFinderFound read FOnFound write FOnFound;
     property OnWrapAtEdge: TNotifyEvent read FOnWrapAtEdge write FOnWrapAtEdge;
@@ -479,6 +515,78 @@ end;
 procedure TATFinderResults.Deref(Item: Pointer);
 begin
   PATFinderResult(Item)^.Replacement:= '';
+end;
+
+function TATFinderResults.IsSortedByPos: boolean;
+var
+  PtrItem, PtrPrev: PATFinderResult;
+  i: integer;
+begin
+  Result:= true;
+  PtrPrev:= nil;
+  for i:= 0 to Count-1 do
+  begin
+    PtrItem:= PATFinderResult(ItemPtrRaw(i));
+    if PtrPrev<>nil then
+      if (PtrItem^.PosBegin.Y<PtrPrev^.PosBegin.Y) or
+        ((PtrItem^.PosBegin.Y=PtrPrev^.PosBegin.Y) and
+         (PtrItem^.PosBegin.X<PtrPrev^.PosBegin.X)) then
+        exit(false);
+    PtrPrev:= PtrItem;
+  end;
+end;
+
+function TATFinderResults.IndexOfPosBegin_Sorted(AX, AY: integer): integer;
+var
+  PtrItem: PATFinderResult;
+  NLow, NHigh, NMid: integer;
+begin
+  Result:= -1;
+  NLow:= 0;
+  NHigh:= Count-1;
+  while NLow<=NHigh do
+  begin
+    NMid:= (NLow+NHigh) div 2;
+    PtrItem:= PATFinderResult(ItemPtrRaw(NMid));
+    if (PtrItem^.PosBegin.Y<AY) or
+      ((PtrItem^.PosBegin.Y=AY) and (PtrItem^.PosBegin.X<AX)) then
+      NLow:= NMid+1
+    else
+      NHigh:= NMid-1;
+  end;
+
+  if NLow>Count-1 then exit;
+  PtrItem:= PATFinderResult(ItemPtrRaw(NLow));
+  if (PtrItem^.PosBegin.Y=AY) and (PtrItem^.PosBegin.X=AX) then
+  begin
+    Result:= NLow;
+    //if duplicates exist, return the first of them, like linear scan does
+    while Result>0 do
+    begin
+      PtrItem:= PATFinderResult(ItemPtrRaw(Result-1));
+      if (PtrItem^.PosBegin.Y=AY) and (PtrItem^.PosBegin.X=AX) then
+        Dec(Result)
+      else
+        Break;
+    end;
+  end;
+end;
+
+function TATFinderResults.IndexOfPosBegin(AX, AY: integer): integer;
+var
+  PtrItem: PATFinderResult;
+  i: integer;
+begin
+  if IsSortedByPos then
+    exit(IndexOfPosBegin_Sorted(AX, AY));
+
+  Result:= -1;
+  for i:= 0 to Count-1 do
+  begin
+    PtrItem:= PATFinderResult(ItemPtrRaw(i));
+    if (PtrItem^.PosBegin.Y=AY) and (PtrItem^.PosBegin.X=AX) then
+      exit(i);
+  end;
 end;
 
 
@@ -1047,6 +1155,7 @@ begin
   FreeAndNil(FinderCarets);
   FFragments:= nil;
   FreeAndNil(FBuffer);
+  FreeAndNil(FFindAllCache);
   inherited;
 end;
 
@@ -1244,6 +1353,127 @@ begin
   CurrentFragmentIndex:= 0;
   FreeAndNil(TempResults);
   EndTiming;
+end;
+
+
+function TATEditorFinder.IsFindAllCacheValid: boolean;
+var
+  St: TATStrings;
+begin
+  Result:= false;
+  if FFindAllCache=nil then exit;
+  if not FFindAllCacheReusable then exit;
+  if Editor=nil then exit;
+  St:= Editor.Strings;
+  if St=nil then exit;
+  //'find in selection' result depends on the live selection state, don't cache it
+  if OptInSelection then exit;
+
+  if FFindAllCacheStrFind<>FStrFind then exit;
+  if FFindAllCacheOptCase<>OptCase then exit;
+  if FFindAllCacheOptWords<>OptWords then exit;
+  if FFindAllCacheOptRegex<>OptRegex then exit;
+  if FFindAllCacheOptTokens<>OptTokens then exit;
+  if FFindAllCacheMaxLineLen<>FMaxLineLen then exit;
+
+  //another document?
+  if FFindAllCacheStringsId<>St.InstanceId then exit;
+  //text was edited/undone/reloaded?
+  if FFindAllCacheStringsVersion<>St.ModifiedVersion then exit;
+  if FFindAllCacheStringsCount<>St.Count then exit;
+
+  Result:= true;
+end;
+
+procedure TATEditorFinder.ClearFindAllCache;
+begin
+  FreeAndNil(FFindAllCache);
+  FFindAllCacheReusable:= false;
+end;
+
+procedure TATEditorFinder.RunFindAll_FillCache;
+var
+  //note: local names must not shadow inherited members like 'property MatchPos'
+  SaveMatchEdPos, SaveMatchEdEnd: TPoint;
+  bOldBack, bOldFromCaret,
+  bOldCaretEvent, bOldChangeEvent, bOldDisableProgress: boolean;
+begin
+  ClearFindAllCache;
+  if Editor=nil then exit;
+  if StrFind='' then exit;
+
+  FFindAllCache:= TATFinderResults.Create;
+
+  SaveMatchEdPos:= FMatchEdPos;
+  SaveMatchEdEnd:= FMatchEdEnd;
+
+  bOldBack:= OptBack;
+  bOldFromCaret:= OptFromCaret;
+  bOldCaretEvent:= FEnableCaretEvent;
+  bOldChangeEvent:= GetEnableChangeEvent();
+  bOldDisableProgress:= OptDisableOnProgress;
+  OptBack:= false;
+  OptFromCaret:= false;
+  FEnableCaretEvent:= false;
+  SetEnableChangeEvent(false);
+  OptDisableOnProgress:= true;
+  try
+    DoAction_FindAll(FFindAllCache, false);
+  finally
+    OptBack:= bOldBack;
+    OptFromCaret:= bOldFromCaret;
+    FEnableCaretEvent:= bOldCaretEvent;
+    SetEnableChangeEvent(bOldChangeEvent);
+    OptDisableOnProgress:= bOldDisableProgress;
+  end;
+
+  //avoid scrolling to the last pos of FindAll
+  FMatchEdPos:= SaveMatchEdPos;
+  FMatchEdEnd:= SaveMatchEdEnd;
+
+  FFindAllCacheSorted:= FFindAllCache.IsSortedByPos();
+  //'find in selection' results are limited to current selection fragments,
+  //they must not be reused later
+  FFindAllCacheReusable:= not OptInSelection;
+
+  FFindAllCacheStrFind:= FStrFind;
+  FFindAllCacheOptCase:= OptCase;
+  FFindAllCacheOptWords:= OptWords;
+  FFindAllCacheOptRegex:= OptRegex;
+  FFindAllCacheOptTokens:= OptTokens;
+  FFindAllCacheMaxLineLen:= FMaxLineLen;
+  FFindAllCacheStringsId:= Editor.Strings.InstanceId;
+  FFindAllCacheStringsVersion:= Editor.Strings.ModifiedVersion;
+  FFindAllCacheStringsCount:= Editor.Strings.Count;
+end;
+
+function TATEditorFinder.GetFindAllMatches: TATFinderResults;
+begin
+  Result:= nil;
+  if Editor=nil then exit;
+  if StrFind='' then exit;
+
+  if not IsFindAllCacheValid() then
+    RunFindAll_FillCache();
+
+  Result:= FFindAllCache;
+end;
+
+function TATEditorFinder.GetFindAllMatchIndex(AX, AY: integer; out AMatchCount: integer): integer;
+var
+  List: TATFinderResults;
+begin
+  Result:= -1;
+  AMatchCount:= 0;
+
+  List:= GetFindAllMatches();
+  if List=nil then exit;
+
+  AMatchCount:= List.Count;
+  if FFindAllCacheSorted then
+    Result:= List.IndexOfPosBegin_Sorted(AX, AY)
+  else
+    Result:= List.IndexOfPosBegin(AX, AY);
 end;
 
 
@@ -2648,6 +2878,7 @@ begin
   OptInSelection:= false;
   OptPutBackwardSelection:= false;
 
+  ClearFindAllCache;
   Editor:= nil;
   ClearMatchPos;
 
