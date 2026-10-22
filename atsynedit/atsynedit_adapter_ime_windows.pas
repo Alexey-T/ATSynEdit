@@ -26,15 +26,17 @@ type
     CaretVisible: Boolean;
     CaretTimer: TTimer;
     //clbuffer: array[0..256] of longint;
-    //attrsize: Integer;
-    //attrbuf: array[0..255] of Byte;
+    attrsize: Integer;                        { count of valid items in attrbuf }
+    attrbuf: array[0..256] of Byte;           { ATTR_* of the chars of buffer, from GCS_COMPATTR }
     CompForm: TForm;
+    FGapLine, FGapChar, FGapCells: Integer; //the gap, which the editor makes under CompForm
     procedure CompFormPaint(Sender: TObject);
     procedure UpdateCandidatePos(Sender: TObject);
     procedure UpdateCompForm(Sender: TObject);
     procedure HideCompForm;
     procedure CaretTimerTick(Sender: TObject);
   public
+    function GetImeGap(out ALineIndex, ACharIndex, ACells: integer): boolean; override;
     procedure Stop(Sender: TObject; Success: boolean); override;
     procedure ImeRequest(Sender: TObject; var Msg: TMessage); override;
     procedure ImeNotify(Sender: TObject; var Msg: TMessage); override;
@@ -57,6 +59,12 @@ uses
 
 const
   MaxImeBufSize = 256;
+  //IME composition attributes (GCS_COMPATTR), values are the same as ATTR_* in imm.h
+  cAttrInput = 0;
+  cAttrTargetConverted = 1;
+  cAttrConverted = 2;
+  cAttrTargetNotConverted = 3;
+  cAttrInputError = 4;
 
 // declated here, because FPC 3.3 trunk has typo in declaration
 function ImmGetCandidateWindow(imc: HIMC; par1: DWORD; lpCandidate: LPCANDIDATEFORM): LongBool; stdcall ; external 'imm32' name 'ImmGetCandidateWindow';
@@ -87,14 +95,104 @@ var
   tm, cm: TSize;
   s: UnicodeString;
   i: Integer;
+  //
+  function AttrAt(n: Integer): Byte;
+  begin
+    if (n>=0) and (n<attrsize) then
+      Result:=attrbuf[n]
+    else
+      Result:=cAttrInput;
+  end;
+  //
+  procedure DrawCompText;
+  var
+    sAll, sPart: UnicodeString;
+    i, n, iFrom, x, w, y, k, NThick: Integer; //own 'i': for-loop counter must be local
+    NAttr: Byte;
+    bMulti: Boolean;
+    clText: TColor;
+  begin
+    sAll:=PWideChar(@buffer[0]);
+    n:=Length(sAll);
+    if n=0 then exit;
+    //Several clauses (Japanese, Chinese): the clause which is converted now (cAttrTargetConverted)
+    //is highlighted. If all chars have the same attribute (Korean, one clause), a highlight
+    //would hide the usual look, so the target is drawn with a thick underline only.
+    bMulti:=false;
+    for i:=1 to n-1 do
+      if AttrAt(i)<>AttrAt(0) then
+      begin
+        bMulti:=true;
+        Break;
+      end;
+    clText:=CompForm.Canvas.Font.Color;
+    x:=0;
+    i:=0;
+    while i<n do
+    begin
+      iFrom:=i;
+      NAttr:=AttrAt(i);
+      while (i<n) and (AttrAt(i)=NAttr) do
+        Inc(i);
+      sPart:=Copy(sAll, iFrom+1, i-iFrom);
+      w:=CompForm.Canvas.TextExtent(UTF8Encode(sPart)).cx;
+
+      CompForm.Canvas.Brush.Style:=bsSolid;
+      if bMulti and (NAttr=cAttrTargetConverted) then
+      begin
+        CompForm.Canvas.Brush.Color:=clHighlight;
+        CompForm.Canvas.Font.Color:=clHighlightText;
+      end
+      else
+      begin
+        CompForm.Canvas.Brush.Color:=CompForm.Color;
+        CompForm.Canvas.Font.Color:=clText;
+      end;
+      CompForm.Canvas.TextOut(x,0,UTF8Encode(sPart));
+
+      //underline
+      NThick:=1;
+      CompForm.Canvas.Pen.Mode:=pmCopy;
+      CompForm.Canvas.Pen.Color:=clText;
+      CompForm.Canvas.Pen.Style:=psSolid;
+      case NAttr of
+        cAttrInput:
+          CompForm.Canvas.Pen.Style:=psDot;
+        cAttrTargetConverted:
+          if bMulti then
+            NThick:=0
+          else
+            NThick:=2;
+        cAttrConverted:
+          ;
+        cAttrTargetNotConverted:
+          NThick:=2;
+        cAttrInputError:
+          begin
+            CompForm.Canvas.Pen.Style:=psDash;
+            CompForm.Canvas.Pen.Color:=clRed;
+          end;
+      else
+        NThick:=0;
+      end;
+      y:=CompForm.Height-1;
+      for k:=0 to NThick-1 do
+        CompForm.Canvas.Line(x, y-k, x+w, y-k);
+
+      Inc(x, w);
+    end;
+    CompForm.Canvas.Font.Color:=clText;
+    CompForm.Canvas.Pen.Style:=psSolid;
+  end;
+  //
 begin
   if not Assigned(CompForm) then
     exit;
-  // draw text
   tm:=CompForm.Canvas.TextExtent(buffer);
   CompForm.Width:=tm.cx+CaretWidth;
   CompForm.Height:=CaretHeight;
-  CompForm.Canvas.TextOut(0,0,buffer);
+  // draw text with the attributes of the chars (ATTR_*)
+  DrawCompText;
   // draw IME Caret
   if CaretVisible then
   begin
@@ -162,6 +260,7 @@ var
   CompPos: TATPoint;
   Caret: TATCaretItem;
   CharWidth: Integer;
+  tm: TSize;
 begin
   ed:=TATSynEdit(Sender);
   if not Assigned(CompForm) then begin
@@ -193,25 +292,54 @@ begin
   CaretTimer.Enabled:=ed.OptCaretBlinkEnabled;
   CaretTimer.Interval:=ed.OptCaretBlinkTime;
 
+  //size of the form must be set here (not in CompFormPaint): the editor needs it to make the gap
+  tm:=CompForm.Canvas.TextExtent(buffer);
+  CompForm.Width:=tm.cx+CaretWidth;
+  CompForm.Height:=CaretHeight;
+
   if ed.Carets.Count>0 then begin
     Caret:=ed.Carets[0];
+    FGapLine:=Caret.PosY;
+    FGapChar:=Caret.PosX;
     CompPos:=ed.CaretPosToClientPos(Caret.AsPoint);
     //range checks are needed, if caret is out of visible area
     CompForm.Left:=Min(ed.Width-CompForm.Width, Max(0, CompPos.X));
     CompForm.Top:=Min(ed.Height-CompForm.Height, Max(0, CompPos.Y));
   end else begin
+    FGapLine:=-1;
     CompForm.Left:=0;
     CompForm.Top:=0;
   end;
 
+  //number of blank cells under the form: the editor makes the gap, see TATAdapterIME.GetImeGap
+  FGapCells:= (Int64(CompForm.Width)*ATEditorCharXScale + ed.TextCharSize.XScaled - 1)
+    div ed.TextCharSize.XScaled;
+
   CompForm.Show;
   CompForm.Invalidate;
+  //the editor must be repainted, to make the gap
+  //ed.Update(false, true);
+  ed.Invalidate;
+end;
+
+function TATAdapterWindowsIME.GetImeGap(out ALineIndex, ACharIndex, ACells: integer): boolean;
+begin
+  ALineIndex:= FGapLine;
+  ACharIndex:= FGapChar;
+  ACells:= FGapCells;
+  Result:= Assigned(CompForm) and CompForm.Visible and (FGapLine>=0) and (FGapCells>0);
 end;
 
 procedure TATAdapterWindowsIME.HideCompForm;
 begin
   if Assigned(CompForm) then
-    CompForm.Hide;
+    if CompForm.Visible then
+    begin
+      CompForm.Hide;
+      //repaint the editor, to remove the gap under the form
+      //(CompForm.Parent as TATSynEdit).Update(false, true);
+      (CompForm.Parent as TATSynEdit).Invalidate;
+    end;
 end;
 
 procedure TATAdapterWindowsIME.ImeRequest(Sender: TObject; var Msg: TMessage);
@@ -311,9 +439,9 @@ procedure TATAdapterWindowsIME.ImeStartComposition(Sender: TObject;
   var Msg: TMessage);
 begin
   position:=0;
+  buffer[0]:=#0;
   UpdateCompForm(Sender); // initialize composition form
   FSelText:= TATSynEdit(Sender).TextSelected;
-  buffer[0]:=#0;
   Msg.Result:= -1;
 end;
 
@@ -367,6 +495,15 @@ begin
               end;
               len := len shr 1;
               buffer[len]:=#0;
+              { attributes of the chars (target clause, converted, ...), they are drawn in CompFormPaint }
+              if (imeCode and GCS_COMPATTR<>0) and (len>0) then
+              begin
+                attrsize:=ImmGetCompositionStringW(IMC, GCS_COMPATTR, @attrbuf[0], sizeof(attrbuf));
+                if attrsize<0 then
+                  attrsize:=0;
+              end
+              else
+                attrsize:=0;
               { Position change when pressing left right move on candidate composition window.
                 It need to virtual caret for this. The best idea is add composition modaless form for IME. }
               if imeCode and GCS_CURSORPOS<>0 then begin
