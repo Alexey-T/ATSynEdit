@@ -423,6 +423,7 @@ type
     NMax: Int64;
     NPage: Int64;
     NPosLast: Int64;
+    NPixelOffsetLast: Int64; //with gaps, the last position can be into the gaps under line NPosLast
     NPixelOffset: Int64;
     CharSizeScaled: Int64; //char width/height, multiplied by ATEditorCharXScale
     SmoothMax: Int64;
@@ -3162,6 +3163,7 @@ var
   bScrolled: boolean;
   NPos, NLineIndex, NGapPos, NGapAll: integer;
   CharSizeScaled_Prev: integer;
+  InfoLast: TATEditorScrollInfo;
 begin
   Result:= false;
 
@@ -3194,18 +3196,33 @@ begin
   with FScrollVert do
   begin
     UpdateScrollInfoVertPartial(NPage, NMax);
-    NPosLast:= Max(0, NMax-NPage);
-    if NPos>NPosLast then
-    begin
-      NPos:= NPosLast; //fix CudaText #4737
-      Include(FPaintFlags, TATEditorInternalFlag.RepaintNeeded); //fix CudaText #5755
-    end;
 
     CharSizeScaled_Prev:= CharSizeScaled;
     CharSizeScaled:= FCharSize.Y * ATEditorCharXScale;
     SmoothMax:= NMax * CharSizeScaled div ATEditorCharXScale + NGapAll;
     SmoothPage:= NPage * CharSizeScaled div ATEditorCharXScale;
     SmoothPosLast:= Max(0, SmoothMax - SmoothPage);
+
+    //the last position: without gaps NMax-NPage lines;
+    //with gaps the one SmoothPosLast is at, which can be lines further and pixels into a gap
+    NPosLast:= Max(0, NMax-NPage);
+    NPixelOffsetLast:= 0;
+    if (NGapAll>0) and (SmoothPosLast>0) then
+    begin
+      InfoLast:= FScrollVert;
+      InfoLast.SmoothPosLast:= SmoothPosLast+1; //so the conversion does not stop at SetLast
+      UpdateScrollInfoFromSmoothPos(InfoLast, SmoothPosLast);
+      NPosLast:= Max(NPosLast, InfoLast.NPos);
+      if NPosLast=InfoLast.NPos then
+        NPixelOffsetLast:= InfoLast.NPixelOffset;
+    end;
+
+    if (NPos>NPosLast) or ((NGapAll>0) and (NPos=NPosLast) and (NPixelOffset>NPixelOffsetLast)) then
+    begin
+      NPos:= NPosLast; //fix CudaText #4737
+      NPixelOffset:= NPixelOffsetLast;
+      Include(FPaintFlags, TATEditorInternalFlag.RepaintNeeded); //fix CudaText #5755
+    end;
     if AdjustSmoothPos then
       SmoothPos:= TotalOffset + NGapPos
     else
@@ -9263,10 +9280,9 @@ begin
   if AToBegin then
     FScrollVert.SetZero
   else
-    FScrollVert.SetLast;
+    FScrollVert.SetLast; //with gaps, the end can be pixels into a gap: keep NPixelOffset from SetLast
 
   FScrollHorz.NPixelOffset:= 0;
-  FScrollVert.NPixelOffset:= 0;
 
   UpdateScrollbars(true);
 end;
