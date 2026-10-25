@@ -3204,7 +3204,8 @@ begin
     SmoothPosLast:= Max(0, SmoothMax - SmoothPage);
 
     //the last position: without gaps NMax-NPage lines;
-    //with gaps the one SmoothPosLast is at, which can be lines further and pixels into a gap
+    //with gaps the one SmoothPosLast is at, which can be lines further and pixels into a gap;
+    //fixes ATSynEdit issue #397
     NPosLast:= Max(0, NMax-NPage);
     NPixelOffsetLast:= 0;
     if (NGapAll>0) and (SmoothPosLast>0) then
