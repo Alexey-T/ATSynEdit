@@ -68,6 +68,7 @@ procedure TATEditorScrollInfo.Clear;
 begin
   NPos:= 0;
   NPosLast:= 0;
+  NPixelOffsetLast:= 0;
   NMax:= 0;
   NPage:= 1;
   NPixelOffset:= 0;
@@ -88,7 +89,7 @@ end;
 procedure TATEditorScrollInfo.SetLast;
 begin
   NPos:= NPosLast;
-  NPixelOffset:= 0;
+  NPixelOffset:= NPixelOffsetLast;
   SmoothPos:= SmoothPosLast;
 end;
 
