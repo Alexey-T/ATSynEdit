@@ -280,7 +280,6 @@ procedure SAddStringToHistory(const S: string; List: TStrings; MaxItems: integer
 
 procedure TrimStringList(L: TStringList); inline;
 
-procedure SReplaceAll(var S: string; const SFrom, STo: string); inline;
 procedure SDeleteFrom(var s: string; const SFrom: string); inline;
 procedure SDeleteFrom(var s: UnicodeString; const SFrom: UnicodeString); inline;
 procedure SDeleteFromEol(var S: string);
@@ -1775,11 +1774,6 @@ begin
     Result[i]:= ch;
 end;
 
-
-procedure SReplaceAll(var S: string; const SFrom, STo: string);
-begin
-  S:= StringReplace(S, SFrom, STo, [rfReplaceAll]);
-end;
 
 procedure SDeleteFrom(var s: string; const SFrom: string);
 var
