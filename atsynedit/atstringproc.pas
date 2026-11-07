@@ -300,7 +300,6 @@ procedure SFixGreekTextAfterCaseConversion(var S: UnicodeString; ALastCharIsWord
 procedure SCompressRepeatingSpacesAndEols(var S: string);
 
 function SCalcHashQword(const S: string): QWord;
-function SCalcHashLongint(const S: string): integer;
 
 
 implementation
@@ -2228,29 +2227,6 @@ begin
 end;
 {$pop}
 
-
-{$push}
-{$RANGECHECKS OFF}
-{$OVERFLOWCHECKS OFF}
-function SCalcHashLongint(const S: string): integer;
-var
-  R: integer;
-//
-  procedure _Add(const Value: integer); inline;
-  begin
-    R:= (R shl 5) or (R shr 27);
-    R:= R+Value;
-  end;
-//
-var
-  i: integer;
-begin
-  R:= 0;
-  for i:= 1 to Length(S) do
-    _Add(Ord(S[i]));
-  Result:= R;
-end;
-{$pop}
 
 procedure SCompressRepeatingSpacesAndEols(var S: string);
 //replace #10 with space, then collapse runs of spaces to single space; single pass
