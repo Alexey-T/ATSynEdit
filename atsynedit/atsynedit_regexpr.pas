@@ -6638,15 +6638,17 @@ begin
     Result := False;
     Exit;
   end;
+
   if ATryOnce then
   begin
     NStartingBefore := AOffset;
     if not ABackward then
       Inc(NStartingBefore);
-    Result := ExecPrim(AOffset, False, ABackward, NStartingBefore)
   end
   else
-    Result := ExecPrim(AOffset, False, ABackward, 0);
+    NStartingBefore := 0; // ie ignore that parameter in ExecPrim
+
+  Result := ExecPrim(AOffset, False, ABackward, NStartingBefore);
 end;
 
 function TRegExpr.ExecPos(AOffset, ATryMatchOnlyStartingBefore: Integer): Boolean;
@@ -6752,7 +6754,7 @@ end;
 function TRegExpr.ExecPrim(AOffset: Integer; ASlowChecks, ABackward: Boolean;
   ATryMatchOnlyStartingBefore: Integer): Boolean;
 var
-  Len: Ptrint;
+  Len: PtrInt;
 begin
   Result := False;
 
@@ -6765,7 +6767,7 @@ begin
   if programm = nil then
   begin
     if fRaiseForRuntimeError then begin
-        Compile;
+      Compile;
     end
     else begin
       try
@@ -6796,7 +6798,7 @@ begin
   // If there is a "must appear" string, look for it.
   if ASlowChecks then
     if regMustString <> '' then
-      if StrLPos(fInputStart, PRegExprChar(regMustString), Len, length(regMustString)) = nil then
+      if StrLPos(fInputStart, PRegExprChar(regMustString), Len, Length(regMustString)) = nil then
         Exit;
 
   {$IFDEF RegExpWithStackOverflowCheck_DecStack_Frame}
