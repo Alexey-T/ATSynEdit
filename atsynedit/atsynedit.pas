@@ -1267,6 +1267,7 @@ type
     procedure DoScroll_LineTop(ALine: integer; AUpdate: boolean);
     function DoScroll_IndentFromBottom(AWrapInfoIndex, AIndentVert: integer): boolean;
     procedure DoScroll_IndentFromTop(AWrapInfoIndex, AIndentVert: integer); inline;
+    procedure DoFixCaretIfCutAtBottomEdge; //CudaText #6606
     procedure DoSelectionDeleteColumnBlock;
     function DoSelect_MultiCaretsLookLikeColumnSelection: boolean;
     procedure DoSelect_NormalSelToColumnSel(out ABegin, AEnd: TPoint);
@@ -3176,6 +3177,9 @@ begin
 
   NGapAll:= 0;
   NGapPos:= 0;
+  //init before the 'if (NPos>NPosLast)' check below: it was read
+  //not-initialized, when no Gaps and not AdjustSmoothPos
+  NPos:= Max(0, FScrollVert.NPos);
 
   //consider Gaps for vertical scrollbar
   if Gaps.Count>0 then
@@ -3183,7 +3187,6 @@ begin
     if AdjustSmoothPos then
     begin
       NLineIndex:= 0;
-      NPos:= Max(0, FScrollVert.NPos);
       if FWrapInfo.IsIndexValid(NPos) then
         NLineIndex:= FWrapInfo.Data[NPos].NLineIndex;
       NGapPos:= GapsSizeForRange(-1, NLineIndex-1);
@@ -6513,6 +6516,22 @@ begin
 end;
 
 
+procedure TATSynEdit.DoFixCaretIfCutAtBottomEdge;
+//CudaText #6606: client area was changed (scrollbar shown/hidden), and
+//the caret line can be partly cut at the bottom edge, if the caret scroll
+//was calculated for the old client area. Scroll minimally, to fully show
+//the caret line. Don't touch the scroll, if caret line is fully visible
+//or fully invisible (fully invisible means the user scrolled it away).
+var
+  Caret: TATCaretItem;
+begin
+  if Carets.Count=0 then exit;
+  Caret:= Carets[Carets.Count-1];
+  if (Caret.CoordY<FRectMain.Bottom) and
+    (Caret.CoordY+FCharSize.Y>FRectMain.Bottom) then
+    DoGotoCaret(TATCaretEdge.Bottom, false, false, false, false);
+end;
+
 procedure TATSynEdit.DoPaint(ALineFrom: integer);
 begin
   Exclude(FPaintFlags, TATEditorInternalFlag.RepaintNeeded);
@@ -6538,7 +6557,14 @@ begin
     DoPaintAll(Canvas, ALineFrom);
 
   if UpdateScrollbars(false) then
+  begin
     Include(FPaintFlags, TATEditorInternalFlag.RepaintNeeded);
+    //CudaText #6606: scrollbar was shown/hidden, client area is changed;
+    //refresh the main rects and repair the caret scroll, if the caret line
+    //is now partly cut at the bottom edge
+    GetRectMain(FRectMain);
+    DoFixCaretIfCutAtBottomEdge;
+  end;
 end;
 
 procedure TATSynEdit.DoPaintLockedWarning(C: TCanvas);

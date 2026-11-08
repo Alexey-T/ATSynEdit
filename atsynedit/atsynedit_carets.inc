@@ -888,12 +888,21 @@ begin
     NProximityHorz:= 0;
   end;
 
-  //for y
-  if DoCaretApplyProximityToVertEdge(APos, Coord.Y, NProximityVert, AIndentVert) then
+  //for x
+  //must run before the 'for y' block: horz scrolling can show the horz
+  //scrollbar (style=Auto), which shrinks the page height, and the vert
+  //scrolling below must be calculated for the shrunk page (CudaText #6606)
+  if DoCaretApplyProximityToHorzEdge(Coord.X, NProximityHorz, AIndentHorz) then
     Result:= true;
 
-  //for x
-  if DoCaretApplyProximityToHorzEdge(Coord.X, NProximityHorz, AIndentHorz) then
+  //horz scrollbar could be shown/hidden now: refresh the main rects,
+  //so the 'for y' block below uses the exact page height
+  if Result then
+    if UpdateScrollbars(true) then
+      GetRectMain(FRectMain);
+
+  //for y
+  if DoCaretApplyProximityToVertEdge(APos, Coord.Y, NProximityVert, AIndentVert) then
     Result:= true;
 
   if Result then
