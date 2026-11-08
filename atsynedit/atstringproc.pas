@@ -303,7 +303,7 @@ function SCalcHashQword(const S: string): QWord;
 type
   TATSetOfByte = set of byte;
 
-procedure SUnescapePercentEncodedString(var S: string; const AEncodableChars: TATSetOfByte);
+function SUnescapePercentEncodedString(const S: string; const AEncodableChars: TATSetOfByte): string;
 
 
 implementation
@@ -2258,7 +2258,7 @@ begin
 end;
 
 
-procedure SUnescapePercentEncodedString(var S: string; const AEncodableChars: TATSetOfByte);
+function SUnescapePercentEncodedString(const S: string; const AEncodableChars: TATSetOfByte): string;
 
   //decodes 2 uppercase hex digits at APos, true if decoded char is encodable
   function TryDecodeHexPair(const AStr: string; APos: integer; out ACode: integer): boolean;
@@ -2288,6 +2288,7 @@ procedure SUnescapePercentEncodedString(var S: string; const AEncodableChars: TA
 var
   i, j, N, Code: integer;
 begin
+  Result:= S;
   N:= Length(S);
   if N < 3 then Exit;
 
@@ -2301,29 +2302,30 @@ begin
   end;
   if i > N - 2 then Exit;
 
-  //replace all encodable pairs, compacting string in place:
+  //replace all encodable pairs, compacting string in Result
+  //(copy-on-write: 1st write gives Result its own buffer, S is not modified):
   //result is always shorter, so write pos never overtakes read pos
   j:= i;
   while i <= N - 2 do
   begin
     if (S[i] = '%') and TryDecodeHexPair(S, i + 1, Code) then
     begin
-      S[j]:= Chr(Code);
+      Result[j]:= Chr(Code);
       Inc(j);
       Inc(i, 3);
       Continue;
     end;
-    S[j]:= S[i];
+    Result[j]:= S[i];
     Inc(i);
     Inc(j);
   end;
   while i <= N do
   begin
-    S[j]:= S[i];
+    Result[j]:= S[i];
     Inc(i);
     Inc(j);
   end;
-  SetLength(S, j - 1);
+  SetLength(Result, j - 1);
 end;
 
 
