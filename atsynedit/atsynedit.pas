@@ -376,7 +376,8 @@ type
     ScrolledHorz, //flag "horizontal scroll _position_ is changed"
     RepaintNeeded, //last paint changes some state, so repainting is needed
     ScrollEventNeeded, //last paint detected that OnScroll event must be fired
-    Resize //component was resized after last Paint call
+    Resize, //component was resized after last Paint call
+    FixCaretAfterResize //height was decreased, caret line may need scrolling on next paint (CudaText #6608)
     );
   TATEditorInternalFlags = set of TATEditorInternalFlag;
 
@@ -1241,6 +1242,8 @@ type
       ACaretAtLeft: boolean);
     procedure DoCaretsFixForSurrogatePairs(AMoveRight: boolean);
     procedure DoCaretsFixIfCutAtBottomEdge; //CudaText #6606
+    procedure DoCaretsFixIfHiddenAtBottomEdge; //CudaText #6608
+    function IsLastCaretVisibleVertically: boolean; //CudaText #6608
     function DoCaretsKeepOnScreen(ADirection: TATEditorDirection): boolean;
     procedure DoCaretsAssign(NewCarets: TATCarets);
     procedure DoDropText(AndDeleteSelection: boolean);
@@ -6532,6 +6535,52 @@ begin
     DoGotoCaret(TATCaretEdge.Bottom, false, false, false, false);
 end;
 
+procedure TATSynEdit.DoCaretsFixIfHiddenAtBottomEdge;
+//CudaText #6608: control's height was decreased (e.g. CudaText plugin shows
+//its panel at bottom/top of editor), and the caret line, which was visible
+//before the resize, is now pushed out of the visible area, below the bottom
+//edge (v-scroll-pos was limited for the old bigger height). Scroll minimally,
+//to show the caret line at the bottom edge. Don't touch the scroll, if caret
+//line is still visible (checked by caller: flag is set only if caret line
+//was visible before the resize, so here it's never "user scrolled it away").
+var
+  Caret: TATCaretItem;
+  Coord: TATPoint;
+begin
+  if ModeOneLine then exit;
+  if Carets.Count=0 then exit;
+  if FRectMain=cRectEmpty then exit;
+
+  Caret:= Carets[Carets.Count-1];
+  Coord:= CaretPosToClientPos(Caret.AsPoint);
+  if Coord.Y<0 then exit;
+
+  //caret line is (fully or partly) below the bottom edge,
+  //and it's not above the top edge?
+  if (Coord.Y>=FRectMain.Top) and
+    (Coord.Y+FCharSize.Y>FRectMain.Bottom) then
+  begin
+    DoGotoCaret(TATCaretEdge.Bottom, false, false, false, false);
+    Include(FPaintFlags, TATEditorInternalFlag.RepaintNeeded);
+  end;
+end;
+
+function TATSynEdit.IsLastCaretVisibleVertically: boolean;
+//is the last caret line visible (at least partly) in the current text area?
+var
+  Caret: TATCaretItem;
+  Coord: TATPoint;
+begin
+  Result:= false;
+  if ModeOneLine then exit;
+  if Carets.Count=0 then exit;
+  if FRectMain=cRectEmpty then exit;
+
+  Caret:= Carets[Carets.Count-1];
+  Coord:= CaretPosToClientPos(Caret.AsPoint);
+  Result:= (Coord.Y>=FRectMain.Top) and (Coord.Y<FRectMain.Bottom);
+end;
+
 procedure TATSynEdit.DoPaint(ALineFrom: integer);
 begin
   Exclude(FPaintFlags, TATEditorInternalFlag.RepaintNeeded);
@@ -6564,6 +6613,19 @@ begin
     //is now partly cut at the bottom edge
     GetRectMain(FRectMain);
     DoCaretsFixIfCutAtBottomEdge;
+  end;
+
+  //CudaText #6608: control's height was decreased (e.g. CudaText plugin shows
+  //its panel at bottom/top of editor), and the caret line, which was visible
+  //before the resize, can be pushed out of the visible area; scroll minimally,
+  //to show the caret line at the bottom edge.
+  //Only for ALineFrom<0: for ALineFrom>=0 the v-scroll-pos is reset from
+  //ALineFrom on the 2nd painting pass, which would cancel this fix.
+  if TATEditorInternalFlag.FixCaretAfterResize in FPaintFlags then
+  begin
+    Exclude(FPaintFlags, TATEditorInternalFlag.FixCaretAfterResize);
+    if ALineFrom<0 then
+      DoCaretsFixIfHiddenAtBottomEdge;
   end;
 end;
 
@@ -6762,6 +6824,7 @@ end;
 procedure TATSynEdit.Resize;
 var
   bNeedResetLineTop: boolean;
+  bCaretFixNeeded: boolean;
 begin
   inherited;
   if not IsRepaintEnabled then exit;
@@ -6775,11 +6838,32 @@ begin
     FPaintStarted and //avoid bNeedResetLineTop=True on first showing of 2nd ui-tab in CudaText
     (Height>FLastControlHeight) and
     (FScrollVert.SmoothPos>=FScrollVert.SmoothPosLast);
+
+  //CudaText #6608: height is decreased (e.g. CudaText plugin shows its panel
+  //at bottom/top of editor), and the caret line is visible now: it can be
+  //pushed out of the visible area at the bottom edge, because the v-scroll-pos
+  //was limited for the old bigger height. Remember to fix the scroll after
+  //the next painting.
+  bCaretFixNeeded:=
+    FPaintStarted and
+    (Height<FLastControlHeight) and
+    (Width=FLastControlWidth) and //don't fix it, when wrap-info must be recalculated for new width
+    IsLastCaretVisibleVertically;
+
   FLastControlWidth:= Width;
   FLastControlHeight:= Height;
 
   if bNeedResetLineTop then
     FLineTopTodo:= 0 //fix outdated LineTop after height increased (CudaText #6221)
+  else
+  if bCaretFixNeeded then
+  begin
+    //don't set FLineTopTodo from the current top line: it can be outdated
+    //(limited for the old bigger height), keep the current v-scroll-pos,
+    //DoPaint will fix it for the caret line
+    FLineTopTodo:= 0;
+    Include(FPaintFlags, TATEditorInternalFlag.FixCaretAfterResize);
+  end
   else
     FLineTopTodo:= GetLineTop;
 
