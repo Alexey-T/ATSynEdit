@@ -1240,6 +1240,7 @@ type
     procedure DoCaretsAddOnColumnBlock(ALineFrom, ALineTo, AColFrom, AColTo: integer;
       ACaretAtLeft: boolean);
     procedure DoCaretsFixForSurrogatePairs(AMoveRight: boolean);
+    procedure DoCaretsFixIfCutAtBottomEdge; //CudaText #6606
     function DoCaretsKeepOnScreen(ADirection: TATEditorDirection): boolean;
     procedure DoCaretsAssign(NewCarets: TATCarets);
     procedure DoDropText(AndDeleteSelection: boolean);
@@ -1267,7 +1268,6 @@ type
     procedure DoScroll_LineTop(ALine: integer; AUpdate: boolean);
     function DoScroll_IndentFromBottom(AWrapInfoIndex, AIndentVert: integer): boolean;
     procedure DoScroll_IndentFromTop(AWrapInfoIndex, AIndentVert: integer); inline;
-    procedure DoFixCaretIfCutAtBottomEdge; //CudaText #6606
     procedure DoSelectionDeleteColumnBlock;
     function DoSelect_MultiCaretsLookLikeColumnSelection: boolean;
     procedure DoSelect_NormalSelToColumnSel(out ABegin, AEnd: TPoint);
@@ -6516,7 +6516,7 @@ begin
 end;
 
 
-procedure TATSynEdit.DoFixCaretIfCutAtBottomEdge;
+procedure TATSynEdit.DoCaretsFixIfCutAtBottomEdge;
 //CudaText #6606: client area was changed (scrollbar shown/hidden), and
 //the caret line can be partly cut at the bottom edge, if the caret scroll
 //was calculated for the old client area. Scroll minimally, to fully show
@@ -6563,7 +6563,7 @@ begin
     //refresh the main rects and repair the caret scroll, if the caret line
     //is now partly cut at the bottom edge
     GetRectMain(FRectMain);
-    DoFixCaretIfCutAtBottomEdge;
+    DoCaretsFixIfCutAtBottomEdge;
   end;
 end;
 
