@@ -8671,23 +8671,20 @@ begin
 end;
 
 procedure TATSynEdit.TimerBlinkTick(Sender: TObject);
-var
-  bFocused: boolean;
 begin
   if not FCaretShowEnabled then exit;
   if not IsLibrary then
     if not Application.Active then exit;
 
-  if FCaretStopUnfocused then
-  begin
-    bFocused:= _IsFocused;
-    if not bFocused then
-      if FCaretShown then
-        exit;
-  end;
+  if FCaretStopUnfocused and FCaretShown then
+    if not _IsFocused then
+      exit;
 
   if not DoubleBuffered then
-    FCaretAllowNextBlink:= not FCaretAllowNextBlink
+  begin
+    FCaretAllowNextBlink:= not FCaretAllowNextBlink;
+    DoPaintCarets(Canvas, true);
+  end
   else
   begin
     //CudaText #6635 (GTK3 X11): in buf mode the blink phase must be owned
@@ -8700,10 +8697,7 @@ begin
     //FBitmap and paints the caret according to FCaretShown.
     FCaretShown:= not FCaretShown;
     InvalidateRectsOfCarets;
-    exit;
   end;
-
-  DoPaintCarets(Canvas, true);
 end;
 
 procedure TATSynEdit.TimerScrollTick(Sender: TObject);
