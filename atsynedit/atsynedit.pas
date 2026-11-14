@@ -1431,6 +1431,7 @@ type
       AFontSize: integer; AColorFont, AColorBack, AColorBorder: TColor);
     procedure TimerBlinkDisable;
     procedure TimerBlinkEnable;
+    procedure InvalidateRectsOfCarets;
     procedure DoPaintSelectedLineBG(C: TCanvas;
       const ACharSize: TATEditorCharSize;
       const AVisRect: TRect;
@@ -6490,7 +6491,11 @@ begin
 
   Inc(FPaintCounter);
   FVisibleColumns:= GetVisibleColumns;
-  FCaretShown:= false;
+  //CudaText #6635: in buf mode, don't reset the blink phase here;
+  //FCaretShown is owned by TimerBlinkTick, so any number of paint
+  //passes renders the same (correct) caret phase
+  if not DoubleBuffered then
+    FCaretShown:= false;
   Carets.GetSelections(FSel);
 
   if Assigned(FAdapterHilite) then
@@ -6802,8 +6807,14 @@ begin
   //(cIntFlagBitmap off)
   begin
     if not Assigned(FBitmap) then exit;
-    DoPaintCarets(FBitmap.Canvas, true);
+    //CudaText #6635: blit the clean bitmap, then paint the caret phase
+    //onto the paint-event canvas; FBitmap itself never holds the XOR-ed
+    //caret, so partial repaint passes cannot toggle its content.
+    //AWithInvalidate=false: GTK3 has no "refuse InvalidateRect during
+    //paint" guard like GTK2 (CurrentSentPaintMessageTarget), a queued
+    //caret rect would start a repaint storm, flipping the phase per pass.
     Canvas.Draw(0, 0, FBitmap);
+    DoPaintCarets(Canvas, false);
   end
   else
   //non-buf mode: timer tick clears whole canvas first.
@@ -8677,7 +8688,21 @@ begin
   end;
 
   if not DoubleBuffered then
-    FCaretAllowNextBlink:= not FCaretAllowNextBlink;
+    FCaretAllowNextBlink:= not FCaretAllowNextBlink
+  else
+  begin
+    //CudaText #6635 (GTK3 X11): in buf mode the blink phase must be owned
+    //by this timer only. Painting the caret phase must not depend on how
+    //many LM_PAINT passes GTK3 runs (self-queued invalidations, scrollbar
+    //adjustment updates, X11 exposes): each pass used to XOR the caret
+    //rect again, flipping its visible phase, so the caret flickered with
+    //a period far below OptCaretBlinkTime. Here we only toggle the phase
+    //and damage the caret rects; the next paint pass blits the clean
+    //FBitmap and paints the caret according to FCaretShown.
+    FCaretShown:= not FCaretShown;
+    InvalidateRectsOfCarets;
+    exit;
+  end;
 
   DoPaintCarets(Canvas, true);
 end;
@@ -8860,6 +8885,12 @@ begin
   else
     CaretShape:= FCaretShapeNormal;
 
+  //CudaText #6635: in buf mode the phase is owned by TimerBlinkTick,
+  //paint passes must not toggle it. Non-buf mode keeps the old parity
+  //mechanism (toggle per full pass onto the persistent window surface).
+  if DoubleBuffered then
+    //nothing to toggle
+  else
   if FCaretBlinkEnabled then
     FCaretShown:= not FCaretShown
   else
@@ -8891,6 +8922,17 @@ begin
         Continue;
 
     DoCaretsApplyShape(R, CaretShape, NCharWidth, FCharSize.Y);
+
+    //CudaText #6635, buf mode: caret moved since last paint (typing,
+    //scroll) -- show it immediately, restarting the blink phase;
+    //blink phase OFF -- don't paint the caret at all in this pass
+    if DoubleBuffered then
+    begin
+      if (Caret.OldRect<>R) and FCaretBlinkEnabled then
+        FCaretShown:= true;
+      if FCaretBlinkEnabled and (not FCaretShown) then
+        Continue;
+    end;
 
     if FCaretBlinkEnabled then
     begin
@@ -8957,6 +8999,29 @@ begin
   R.Bottom:= R.Top + FCharSize.Y; //100% height
 
   CanvasFillRect(C, R, Colors.DragDropMarker);
+end;
+
+procedure TATSynEdit.InvalidateRectsOfCarets;
+//CudaText #6635: damage the rects of all carets, so the next paint pass
+//blits the clean bitmap there and applies the new blink phase
+var
+  Caret: TATCaretItem;
+  R: TRect;
+  iCaret: integer;
+  NCharWidth: integer;
+begin
+  if not HandleAllocated then exit;
+  NCharWidth:= FCharSize.XScaled div ATEditorCharXScale;
+  for iCaret:= 0 to FCarets.Count-1 do
+  begin
+    Caret:= FCarets[iCaret];
+    if Caret.CoordX=-1 then Continue;
+    R.Left:= Caret.CoordX;
+    R.Top:= Caret.CoordY;
+    R.Right:= R.Left+NCharWidth;
+    R.Bottom:= R.Top+FCharSize.Y;
+    InvalidateRect(Handle, @R, false);
+  end;
 end;
 
 procedure TATSynEdit.TimerBlinkDisable;
@@ -9792,6 +9857,11 @@ procedure TATSynEdit.TimersStart;
 //TimersStart/Stop are added to minimize count of running timers
 begin
   FTimersEnabled:= true;
+  //CudaText #6635: caret must be visible right after the editor gets
+  //focus; in buf mode the phase is owned by the blink timer, so reset
+  //it here instead of relying on the next full paint pass
+  if DoubleBuffered then
+    FCaretShown:= true;
   if Assigned(FTimerBlink) then
     FTimerBlink.Enabled:= FTimersEnabled and FCaretBlinkEnabled;
 end;
