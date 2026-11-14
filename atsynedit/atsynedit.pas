@@ -6804,7 +6804,6 @@ begin
 
   if DoubleBuffered then
   //buf mode: timer tick don't give painting of whole bitmap
-  //(cIntFlagBitmap off)
   begin
     if not Assigned(FBitmap) then exit;
     //CudaText #6635: blit the clean bitmap, then paint the caret phase
