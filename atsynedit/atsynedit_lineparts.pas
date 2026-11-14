@@ -65,6 +65,10 @@ function DoPartsShow(var P: TATLineParts): string;
 procedure DoPartsDim(var P: TATLineParts; ADimLevel255: integer; AColorBG: TColor);
 procedure DoPartsCutFromOffset(var P: TATLineParts; AOffset: integer);
 
+//IME: makes the blank gap in the parts, see TATAdapterIME.GetImeGap
+function DoPartsInsertGap(var P: TATLineParts; APos, ALen: integer;
+  ADefaultFontColor, ADefaultBG: TColor): boolean;
+
 function ColorBlend(c1, c2: Longint; A: Longint): Longint;
 function ColorBlendHalf(c1, c2: Longint): Longint;
 
@@ -433,6 +437,96 @@ begin
       end;
 end;
 
+
+function DoPartsInsertGap(var P: TATLineParts; APos, ALen: integer;
+  ADefaultFontColor, ADefaultBG: TColor): boolean;
+//Makes a gap of ALen chars at position APos: parts after APos are shifted,
+//a part crossing APos is split, and the gap is filled with a new part
+//(copy of the left neighbour, without borders/font styles).
+//If the line has no parts, APos>0 makes a base part for the chars before APos.
+var
+  NCount, iSplit, iGap, NEnd, k: integer;
+  Gap: TATLinePart;
+begin
+  Result:= false;
+  if ALen<=0 then exit;
+  NCount:= DoPartsGetCount(P);
+
+  if NCount=0 then
+  begin
+    //empty line (or APos>0 after padding with spaces, virtual caret)
+    InitLinePart(Gap);
+    Gap.Offset:= 0;
+    Gap.ColorFont:= ADefaultFontColor;
+    Gap.ColorBG:= ADefaultBG;
+    if APos=0 then
+    begin
+      Gap.Len:= ALen;
+      P[0]:= Gap;
+      exit(true);
+    end;
+    //base part for chars before APos, the gap part is added below
+    Gap.Len:= APos;
+    P[0]:= Gap;
+    NCount:= 1;
+  end
+  else
+  begin
+    //parts end before APos: text was padded with spaces (virtual caret), extend the last part
+    NEnd:= P[NCount-1].Offset+P[NCount-1].Len;
+    if NEnd<APos then
+      P[NCount-1].Len:= P[NCount-1].Len+(APos-NEnd);
+  end;
+
+  //reserve: split (+1), gap (+1), parts added later by DoPartInsert
+  if NCount+8>=cMaxLineParts then exit;
+
+  //1) split the part which crosses APos
+  iSplit:= -1;
+  for k:= 0 to NCount-1 do
+    if (P[k].Offset<APos) and (P[k].Offset+P[k].Len>APos) then
+    begin
+      iSplit:= k;
+      Break;
+    end;
+  if iSplit>=0 then
+  begin
+    for k:= NCount-1 downto iSplit+1 do
+      P[k+1]:= P[k];
+    P[iSplit+1]:= P[iSplit];
+    NEnd:= P[iSplit].Offset+P[iSplit].Len;
+    P[iSplit].Len:= APos-P[iSplit].Offset;
+    P[iSplit+1].Offset:= APos;
+    P[iSplit+1].Len:= NEnd-APos;
+    Inc(NCount);
+  end;
+
+  //2) shift parts which are at/after APos; iGap = index for the gap part
+  iGap:= 0;
+  for k:= 0 to NCount-1 do
+    if P[k].Offset>=APos then
+      P[k].Offset:= P[k].Offset+ALen
+    else
+      iGap:= k+1;
+
+  //3) make room for the gap part and fill it
+  for k:= NCount-1 downto iGap do
+    P[k+1]:= P[k];
+  if iGap>0 then
+    Gap:= P[iGap-1]
+  else
+    Gap:= P[iGap+1];
+  Gap.Offset:= APos;
+  Gap.Len:= ALen;
+  Gap.FontStyles:= 0;
+  Gap.ColorBorder:= clNone;
+  Gap.BorderUp:= TATLineStyle.None;
+  Gap.BorderDown:= TATLineStyle.None;
+  Gap.BorderLeft:= TATLineStyle.None;
+  Gap.BorderRight:= TATLineStyle.None;
+  P[iGap]:= Gap;
+  Result:= true;
+end;
 
 function ConvertFontStylesToInteger(Styles: TFontStyles): integer;
 begin
