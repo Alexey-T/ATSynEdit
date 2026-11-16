@@ -3310,7 +3310,6 @@ procedure TATSynEdit.UpdateScrollbarVert;
 var
   NeedBar: boolean;
   si: TScrollInfo;
-  NewMax, NewSmChange, NewPageSize, NewPos: Int64;
 begin
   case FOptScrollStyleVert of
     TATEditorScrollbarStyle.Hide:
@@ -3326,24 +3325,16 @@ begin
 
   if FScrollbarVert.Visible then
   begin
-    NewMax:= FScrollVert.SmoothMax;
-    NewSmChange:= FScrollVert.CharSizeScaled div ATEditorCharXScale;
-    NewPageSize:= FScrollVert.SmoothPage;
-    NewPos:= FScrollVert.SmoothPos;
+    FScrollbarLock:= true;
 
-    if (FScrollbarVert.Max<>NewMax) or
-      (FScrollbarVert.SmallChange<>NewSmChange) or
-      (FScrollbarVert.PageSize<>NewPageSize) or
-      (FScrollbarVert.Position<>NewPos) then
-    begin
-      FScrollbarLock:= true;
-      FScrollbarVert.Max:= NewMax;
-      FScrollbarVert.SmallChange:= NewSmChange;
-      FScrollbarVert.PageSize:= NewPageSize;
-      FScrollbarVert.Position:= NewPos;
-      FScrollbarVert.Update;
-      FScrollbarLock:= false;
-    end;
+    FScrollbarVert.Min:= 0;
+    FScrollbarVert.Max:= FScrollVert.SmoothMax;
+    FScrollbarVert.SmallChange:= FScrollVert.CharSizeScaled div ATEditorCharXScale;
+    FScrollbarVert.PageSize:= FScrollVert.SmoothPage;
+    FScrollbarVert.Position:= FScrollVert.SmoothPos;
+
+    FScrollbarVert.Update;
+    FScrollbarLock:= false;
   end;
 
   if ShowOsBarVert then
@@ -3372,8 +3363,6 @@ procedure TATSynEdit.UpdateScrollbarHorz;
 var
   NeedBar: boolean;
   si: TScrollInfo;
-  NewMax, NewSmChange, NewPageSize, NewPos: Int64;
-  NewIndCorner: integer;
 begin
   case FOptScrollStyleHorz of
     TATEditorScrollbarStyle.Hide:
@@ -3389,27 +3378,18 @@ begin
 
   if FScrollbarHorz.Visible then
   begin
-    NewMax:= FScrollHorz.SmoothMax;
-    NewSmChange:= FScrollHorz.CharSizeScaled div ATEditorCharXScale;
-    NewPageSize:= FScrollHorz.SmoothPage;
-    NewPos:= FScrollHorz.SmoothPos;
-    NewIndCorner:= IfThen(FScrollbarVert.Visible, 100, 0);
-
-    if (FScrollbarHorz.Max<>NewMax) or
-      (FScrollbarHorz.SmallChange<>NewSmChange) or
-      (FScrollbarHorz.PageSize<>NewPageSize) or
-      (FScrollbarHorz.Position<>NewPos) or
-      (FScrollbarHorz.IndentCorner<>NewIndCorner) then
-    begin
-      FScrollbarLock:= true;
-      FScrollbarHorz.Max:= NewMax;
-      FScrollbarHorz.SmallChange:= NewSmChange;
-      FScrollbarHorz.PageSize:= NewPageSize;
-      FScrollbarHorz.Position:= NewPos;
-      FScrollbarHorz.IndentCorner:= NewIndCorner;
-      FScrollbarHorz.Update;
-      FScrollbarLock:= false;
-    end;
+    FScrollbarLock:= true;
+    FScrollbarHorz.Min:= 0;
+    FScrollbarHorz.Max:= FScrollHorz.SmoothMax;
+    FScrollbarHorz.SmallChange:= FScrollHorz.CharSizeScaled div ATEditorCharXScale;
+    FScrollbarHorz.PageSize:= FScrollHorz.SmoothPage;
+    FScrollbarHorz.Position:= FScrollHorz.SmoothPos;
+    FScrollbarHorz.Update;
+    if FScrollbarVert.Visible then
+      FScrollbarHorz.IndentCorner:= 100
+    else
+      FScrollbarHorz.IndentCorner:= 0;
+    FScrollbarLock:= false;
   end;
 
   if ShowOsBarHorz then
