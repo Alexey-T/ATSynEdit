@@ -3326,14 +3326,11 @@ begin
   if FScrollbarVert.Visible then
   begin
     FScrollbarLock:= true;
-
     FScrollbarVert.Min:= 0;
     FScrollbarVert.Max:= FScrollVert.SmoothMax;
     FScrollbarVert.SmallChange:= FScrollVert.CharSizeScaled div ATEditorCharXScale;
     FScrollbarVert.PageSize:= FScrollVert.SmoothPage;
     FScrollbarVert.Position:= FScrollVert.SmoothPos;
-
-    FScrollbarVert.Update;
     FScrollbarLock:= false;
   end;
 
@@ -3384,11 +3381,7 @@ begin
     FScrollbarHorz.SmallChange:= FScrollHorz.CharSizeScaled div ATEditorCharXScale;
     FScrollbarHorz.PageSize:= FScrollHorz.SmoothPage;
     FScrollbarHorz.Position:= FScrollHorz.SmoothPos;
-    FScrollbarHorz.Update;
-    if FScrollbarVert.Visible then
-      FScrollbarHorz.IndentCorner:= 100
-    else
-      FScrollbarHorz.IndentCorner:= 0;
+    FScrollbarHorz.IndentCorner:= IfThen(FScrollbarVert.Visible, 100, 0);
     FScrollbarLock:= false;
   end;
 
