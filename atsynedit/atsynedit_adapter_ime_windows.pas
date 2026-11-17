@@ -196,6 +196,8 @@ begin
   // draw IME Caret
   if CaretVisible then
   begin
+    if position=0 then
+      position:=1;
     SetLength(s,position);
     for i:=1 to Length(s) do
       s[i]:=buffer[i-1];
