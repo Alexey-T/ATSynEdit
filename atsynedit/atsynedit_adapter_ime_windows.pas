@@ -29,14 +29,14 @@ type
     attrsize: Integer;                        { count of valid items in attrbuf }
     attrbuf: array[0..256] of Byte;           { ATTR_* of the chars of buffer, from GCS_COMPATTR }
     CompForm: TForm;
-    FGapLine, FGapChar, FGapCells: Integer; //the gap, which the editor makes under CompForm
+    FGapLine, FGapChar, FGapWidth: Integer; //pixel width reserved under CompForm
     procedure CompFormPaint(Sender: TObject);
     procedure UpdateCandidatePos(Sender: TObject);
     procedure UpdateCompForm(Sender: TObject);
     procedure HideCompForm;
     procedure CaretTimerTick(Sender: TObject);
   public
-    function GetImeGap(out ALineIndex, ACharIndex, ACells: integer): boolean; override;
+    function GetImeGap(out ALineIndex, ACharIndex, AWidth: integer): boolean; override;
     procedure Stop(Sender: TObject; Success: boolean); override;
     procedure ImeRequest(Sender: TObject; var Msg: TMessage); override;
     procedure ImeNotify(Sender: TObject; var Msg: TMessage); override;
@@ -313,9 +313,8 @@ begin
     CompForm.Top:=0;
   end;
 
-  //number of blank cells under the form: the editor makes the gap, see TATAdapterIME.GetImeGap
-  FGapCells:= (Int64(CompForm.Width)*ATEditorCharXScale + ed.TextCharSize.XScaled - 1)
-    div ed.TextCharSize.XScaled;
+  //The editor reserves the exact pixel width of the composition form.
+  FGapWidth:= CompForm.Width;
 
   CompForm.Show;
   CompForm.Invalidate;
@@ -324,24 +323,30 @@ begin
   ed.Invalidate;
 end;
 
-function TATAdapterWindowsIME.GetImeGap(out ALineIndex, ACharIndex, ACells: integer): boolean;
+function TATAdapterWindowsIME.GetImeGap(out ALineIndex, ACharIndex, AWidth: integer): boolean;
 begin
   ALineIndex:= FGapLine;
   ACharIndex:= FGapChar;
-  ACells:= FGapCells;
-  Result:= Assigned(CompForm) and CompForm.Visible and (FGapLine>=0) and (FGapCells>0);
+  AWidth:= FGapWidth;
+  Result:= Assigned(CompForm) and CompForm.Visible and (FGapLine>=0) and (FGapWidth>0);
 end;
 
 procedure TATAdapterWindowsIME.HideCompForm;
+var
+  Ed: TATSynEdit;
 begin
-  if Assigned(CompForm) then
-    if CompForm.Visible then
-    begin
-      CompForm.Hide;
-      //repaint the editor, to remove the gap under the form
-      //(CompForm.Parent as TATSynEdit).Update(false, true);
-      (CompForm.Parent as TATSynEdit).Invalidate;
-    end;
+  //Clear the editor-side virtual gap synchronously. Do not wait for Paint to
+  //notice that the composition form is hidden: a new composition can start
+  //before the pending repaint and CaretPosToClientPos would then use stale X.
+  FGapLine:= -1;
+  FGapChar:= 0;
+  FGapWidth:= 0;
+  if not Assigned(CompForm) then exit;
+  Ed:= CompForm.Parent as TATSynEdit;
+  Ed.ClearImeGapState;
+  if CompForm.Visible then
+    CompForm.Hide;
+  Ed.Invalidate;
 end;
 
 procedure TATAdapterWindowsIME.ImeRequest(Sender: TObject; var Msg: TMessage);
@@ -440,6 +445,12 @@ end;
 procedure TATAdapterWindowsIME.ImeStartComposition(Sender: TObject;
   var Msg: TMessage);
 begin
+  //A new composition must start from the document caret, not from the
+  //previous composition's virtual-gap-adjusted screen coordinate.
+  TATSynEdit(Sender).ClearImeGapState;
+  FGapLine:= -1;
+  FGapChar:= 0;
+  FGapWidth:= 0;
   position:=0;
   buffer[0]:=#0;
   UpdateCompForm(Sender); // initialize composition form
@@ -561,6 +572,7 @@ var
 begin
   Ed:= TATSynEdit(Sender);
   position:=0;
+  Ed.ClearImeGapState;
   HideCompForm;
   { tweak for emoji window, but don't work currently
     it shows emoji window on previous position.

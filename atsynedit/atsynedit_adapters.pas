@@ -116,9 +116,9 @@ type
   public
     //Is used if the IME composition string is painted by the adapter in a separate window (form)
     //over the editor. Returns True, if the window is shown now. Then the editor makes a gap
-    //of ACells blank cells at the caret position (in the line ALineIndex, before the char ACharIndex),
+    //of AWidth pixels at the caret position (in the line ALineIndex, before the char ACharIndex),
     //so the window covers the gap and not the text of the editor.
-    function GetImeGap(out ALineIndex, ACharIndex, ACells: integer): boolean; virtual;
+    function GetImeGap(out ALineIndex, ACharIndex, AWidth: integer): boolean; virtual;
     procedure Stop(Sender: TObject; Success: boolean); virtual;
     procedure ImeRequest(Sender: TObject; var Msg: TMessage); virtual;
     procedure ImeNotify(Sender: TObject; var Msg: TMessage); virtual;
@@ -142,11 +142,11 @@ implementation
 
 { TATAdapterIME }
 
-function TATAdapterIME.GetImeGap(out ALineIndex, ACharIndex, ACells: integer): boolean;
+function TATAdapterIME.GetImeGap(out ALineIndex, ACharIndex, AWidth: integer): boolean;
 begin
   ALineIndex:= 0;
   ACharIndex:= 0;
-  ACells:= 0;
+  AWidth:= 0;
   Result:= false;
 end;
 

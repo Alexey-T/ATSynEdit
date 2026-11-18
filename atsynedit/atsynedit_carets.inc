@@ -570,6 +570,8 @@ begin
 end;
 
 function TATSynEdit.CaretPosToClientPos(const APos: TPoint): TATPoint;
+var
+  PGapStart: TATPoint;
 begin
   Result:= GenericCaretPosToClientPos(
     APos,
@@ -587,6 +589,30 @@ begin
   if Result.Y>=0 then
     Inc(Result.Y, FSpacingTopEdge1);
 
+  //Caret positions after the virtual IME gap follow the shifted painted text,
+  //but only on the same visual (wrapped) row as the gap.
+  if (FImeGapWidth>0) and (APos.Y=FImeGapLine) and (APos.X>FImeGapChar) and (Result.Y>=0) then
+  begin
+    PGapStart:= GenericCaretPosToClientPos(
+      Point(FImeGapChar, FImeGapLine),
+      WrapInfo,
+      Strings,
+      Gaps,
+      FTabHelper,
+      FRectMain,
+      FScrollHorz,
+      FScrollVert,
+      EditorIndex,
+      FCaretSpecPos or FOptCaretPreferLeftSide
+      );
+    if PGapStart.Y>=0 then
+    begin
+      Inc(PGapStart.Y, FSpacingTopEdge1);
+      if PGapStart.Y=Result.Y then
+        Inc(Result.X, FImeGapWidth);
+    end;
+  end;
+
   {
   if OptWrapMode<>TATEditorWrapMode.ModeOff then
     if Result.X>Width then
@@ -599,10 +625,34 @@ function TATSynEdit.ClientPosToCaretPos(
   out ADetails: TATEditorPosDetails;
   AGapCoordAction: TATEditorGapCoordAction=TATEditorGapCoordAction.ToLineEnd;
   AColumnSelectionAllowsVirtualPos: boolean=false): TPoint;
+var
+  PGapStart: TATPoint;
 begin
   if FOptScrollSmooth then
     Dec(APos.X, FScrollHorz.NPixelOffset); //fix for text partially scrolled, #5349
   Dec(APos.Y, FSpacingTopEdge1);
+
+  //Reverse the virtual horizontal advance when mapping mouse coordinates.
+  //A click inside the reserved window maps to the caret at the gap's start.
+  if (FImeGapWidth>0) and (FImeGapLine>=0) then
+  begin
+    PGapStart:= CaretPosToClientPos(Point(FImeGapChar, FImeGapLine));
+    if FOptScrollSmooth then
+      Dec(PGapStart.X, FScrollHorz.NPixelOffset);
+    Dec(PGapStart.Y, FSpacingTopEdge1);
+    if (APos.Y>=PGapStart.Y) and (APos.Y<PGapStart.Y+FCharSize.Y) then
+    begin
+      if (APos.X>=PGapStart.X) and (APos.X<PGapStart.X+FImeGapWidth) then
+      begin
+        Result:= Point(FImeGapChar, FImeGapLine);
+        ADetails:= Default(TATEditorPosDetails);
+        Exit;
+      end
+      else
+      if APos.X>=PGapStart.X+FImeGapWidth then
+        Dec(APos.X, FImeGapWidth);
+    end;
+  end;
 
   {
   //for debugging breakpoint

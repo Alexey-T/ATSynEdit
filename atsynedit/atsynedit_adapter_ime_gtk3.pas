@@ -16,12 +16,12 @@ type
     buffer: UnicodeString;
     position: Integer;
     CompForm: TForm;
-    FGapLine, FGapChar, FGapCells: Integer; //the gap, which the editor makes under CompForm
+    FGapLine, FGapChar, FGapWidth: Integer; //pixel width reserved under CompForm
     procedure CompFormPaint(Sender: TObject);
     procedure UpdateCompForm(Sender: TObject);
     procedure HideCompForm;
   public
-    function GetImeGap(out ALineIndex, ACharIndex, ACells: integer): boolean; override;
+    function GetImeGap(out ALineIndex, ACharIndex, AWidth: integer): boolean; override;
     procedure Stop(Sender: TObject; Success: boolean); override;
     procedure ImeEnter(Sender: TObject); override;
     procedure ImeExit(Sender: TObject); override;
@@ -115,9 +115,8 @@ begin
     CompForm.Top:=0;
   end;
 
-  //number of blank cells under the form: the editor makes the gap, see TATAdapterIME.GetImeGap
-  FGapCells:= (Int64(CompForm.Width)*ATEditorCharXScale + ed.TextCharSize.XScaled - 1)
-    div ed.TextCharSize.XScaled;
+  //The editor reserves the exact pixel width of the composition form.
+  FGapWidth:= CompForm.Width;
 
   CompForm.Show;
   CompForm.Invalidate;
@@ -126,12 +125,12 @@ begin
   ed.Invalidate;
 end;
 
-function TATAdapterGTK3IME.GetImeGap(out ALineIndex, ACharIndex, ACells: integer): boolean;
+function TATAdapterGTK3IME.GetImeGap(out ALineIndex, ACharIndex, AWidth: integer): boolean;
 begin
   ALineIndex:= FGapLine;
   ACharIndex:= FGapChar;
-  ACells:= FGapCells;
-  Result:= Assigned(CompForm) and CompForm.Visible and (FGapLine>=0) and (FGapCells>0);
+  AWidth:= FGapWidth;
+  Result:= Assigned(CompForm) and CompForm.Visible and (FGapLine>=0) and (FGapWidth>0);
 end;
 
 procedure TATAdapterGTK3IME.HideCompForm;

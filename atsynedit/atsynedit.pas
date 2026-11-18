@@ -697,8 +697,10 @@ type
     FCarets: TATCarets;
     FCaretShowEnabled: boolean;
     FCaretShown: boolean;
-    FImeGapPos: integer; //IME gap in the painted text of the line, see DoImeGapInsert
-    FImeGapCells: integer;
+    FImeGapPos: integer; //0-based gap boundary in the current output fragment
+    FImeGapLine: integer; //document line owning the active virtual gap
+    FImeGapChar: integer; //document caret position where the gap begins
+    FImeGapWidth: integer; //virtual gap width in pixels
     FCaretBlinkEnabled: boolean;
     FCaretBlinkTime: integer;
     FCaretShapeNormal: TATCaretShape;
@@ -1364,7 +1366,7 @@ type
       var AScrollHorz: TATEditorScrollInfo;
       const AWrapIndex: integer;
       var ATempParts: TATLineParts);
-    function DoImeGapInsert(const AWrapItem: TATWrapItem; ACharsSkipped: Int64;
+    function DoImeGapPrepare(const AWrapItem: TATWrapItem; ACharsSkipped: Int64;
       var AText: atString; var AScrollHorz: TATEditorScrollInfo): boolean;
     procedure DoPaintMinimapLine(ARectLine: TRect;
       const ACharSize: TATEditorCharSize;
@@ -1926,6 +1928,7 @@ type
     function DoGetLinkAtPos(AX, AY: integer): atString;
     function DoGetGapRect(AIndex: integer; out ARect: TRect): boolean;
     procedure EditingDone; override;
+    procedure ClearImeGapState; //clear virtual IME gap synchronously on composition end/start
 
   protected
     IsRepaintEnabled: boolean;
@@ -4372,7 +4375,7 @@ begin
   LineSeparator:= St.LinesSeparator[NLinesIndex];
   bLineWithCaret:= IsLineWithCaret(NLinesIndex, FOptShowCurLineIfWithoutSel);
   bLineEolSelected:= IsPosSelected(WrapItem.NCharIndex-1+WrapItem.NLength, WrapItem.NLineIndex);
-  bImeGap:= DoImeGapInsert(WrapItem, NOutputCharsSkipped, StrOutput, AScrollHorz);
+  bImeGap:= DoImeGapPrepare(WrapItem, NOutputCharsSkipped, StrOutput, AScrollHorz);
 
   //horz scrollbar max: is calculated here, to make variable horz bar
   //vert scrollbar max: is calculated in UpdateScrollbars
@@ -4479,9 +4482,6 @@ begin
         DoPartsDim(ATempParts, NDimValue, FColorBG);
     end;
 
-    if bImeGap then
-      DoPartsInsertGap(ATempParts, FImeGapPos, FImeGapCells, Colors.TextFont, NColorEntire);
-
     //adapter may return ColorAfterEol, paint it
     if FOptShowFullHilite then
       if NColorAfter<>clNone then
@@ -4508,6 +4508,13 @@ begin
     TextOutProps.CharIndexInLine:= WrapItem.NCharIndex;
     TextOutProps.CharSize:= ACharSize;
     TextOutProps.CharsSkipped:= NOutputCellPercentsSkipped div 100;
+    TextOutProps.ImeGapOffset:= -1;
+    TextOutProps.ImeGapWidth:= 0;
+    if bImeGap then
+    begin
+      TextOutProps.ImeGapOffset:= FImeGapPos;
+      TextOutProps.ImeGapWidth:= FImeGapWidth;
+    end;
     TextOutProps.TrimmedTrailingNonSpaces:= bTrimmedNonSpaces;
     TextOutProps.DrawEvent:= Event;
     TextOutProps.ControlWidth:= ClientWidth+ACharSize.XScaled div ATEditorCharXScale * 2;
@@ -4571,6 +4578,9 @@ begin
   else
   //paint empty line bg
   begin
+    NOutputStrWidth:= 0;
+    if bImeGap then
+      NOutputStrWidth:= FImeGapWidth;
     if FOptShowFullHilite and
       (ChosenBackColorEnum<>TATEditorChosenBackColor.MarkedRangeBG) then
     begin
@@ -4585,7 +4595,7 @@ begin
       CurrPoint,
       CurrPointText,
       WrapItem,
-      0,
+      NOutputStrWidth,
       AScrollHorz);
   end;
 
@@ -4723,44 +4733,61 @@ begin
     * ACharSize.XScaled*ACharSize.XSpacePercents div ATEditorCharXScale div 100;
 end;
 
-function TATSynEdit.DoImeGapInsert(const AWrapItem: TATWrapItem; ACharsSkipped: Int64;
+procedure TATSynEdit.ClearImeGapState;
+begin
+  FImeGapPos:= -1;
+  FImeGapLine:= -1;
+  FImeGapChar:= 0;
+  FImeGapWidth:= 0;
+end;
+
+function TATSynEdit.DoImeGapPrepare(const AWrapItem: TATWrapItem; ACharsSkipped: Int64;
   var AText: atString; var AScrollHorz: TATEditorScrollInfo): boolean;
-//The IME adapter paints the composition string in a separate window (see TATAdapterIME.GetImeGap).
-//Here the blank cells are inserted into AText (painted text of the wrap item) at the caret,
-//so the text after the caret is moved to the right, and it is not covered by the window.
-//AText is a part of the line, it starts from the char ACharsSkipped (horz scroll).
-//If True is returned, DoPartsInsertGap must be called after the parts of the line are calculated.
+//The IME composition window is external to the editor. Reserve its exact pixel
+//width as a virtual advance in CanvasTextOut; do not modify AText or LineParts.
 var
-  NLine, NChar, NCells, NPos: integer;
+  NLine, NChar, NWidth, NPos, NCells: integer;
 begin
   Result:= false;
-  if FOptMaskCharUsed or (FAdapterIME=nil) then exit;
-  if not FAdapterIME.GetImeGap(NLine, NChar, NCells) then exit;
+  FImeGapPos:= -1;
+  if FOptMaskCharUsed or (FAdapterIME=nil) then
+  begin
+    FImeGapLine:= -1;
+    FImeGapChar:= 0;
+    FImeGapWidth:= 0;
+    exit;
+  end;
+  if not FAdapterIME.GetImeGap(NLine, NChar, NWidth) or (NWidth<=0) then
+  begin
+    FImeGapLine:= -1;
+    FImeGapChar:= 0;
+    FImeGapWidth:= 0;
+    exit;
+  end;
+  //Keep the document-space gap location for caret and mouse coordinate mapping,
+  //even when the current painted wrap item is not the one containing the gap.
+  FImeGapLine:= NLine;
+  FImeGapChar:= NChar;
+  FImeGapWidth:= NWidth;
   if (NLine<>AWrapItem.NLineIndex) or
     not IsWrapItemWithCaret(AWrapItem) then exit;
-  //DoCalcLineHilite does not support the case: all chars of non-empty line are scrolled out
+  //DoCalcLineHilite does not support the case: all chars of non-empty line are scrolled out.
   if (AWrapItem.NLength>0) and (ACharsSkipped>=AWrapItem.NLength) then exit;
 
   NPos:= NChar-(AWrapItem.NCharIndex-1)-ACharsSkipped;
-  if NPos<0 then exit;
-  if NPos>Length(AText) then
-  begin
-    //caret is after the line end (virtual caret): the gap is made after spaces.
-    //AText must hold the whole rest of the line (it must not be cut by the visible width)
-    if (AWrapItem.NFinal<>TATWrapItemFinal.Final) or
-      (NPos>ATEditorOptions.MaxCharsForOutput) or
-      (Length(AText)<AWrapItem.NLength-ACharsSkipped) then exit;
-    AText:= AText+StringOfCharW(' ', NPos-Length(AText));
-  end;
-  Insert(StringOfCharW(' ', NCells), AText, NPos+1);
+  if (NPos<0) or (NPos>Length(AText)) then exit;
   FImeGapPos:= NPos;
-  FImeGapCells:= NCells;
 
-  //horz scrollbar must include the gap
+  //The horizontal scrollbar is expressed in character cells; round up only
+  //for the scrollbar range. Rendering itself uses the exact pixel width.
+  if TextCharSize.XScaled>0 then
+    NCells:= (Int64(NWidth)*ATEditorCharXScale + TextCharSize.XScaled-1) div TextCharSize.XScaled
+  else
+    NCells:= 0;
   AScrollHorz.NMax:= Max(
     AScrollHorz.NMax,
     ACharsSkipped + FTabHelper.CalcCharOffsetLast(AWrapItem.NLineIndex, AText) div 100 +
-      FOptScrollbarHorizontalAddSpace);
+      NCells + FOptScrollbarHorizontalAddSpace);
   Result:= true;
 end;
 
@@ -11050,6 +11077,8 @@ begin
       SText:= StringOfCharW(FOptMaskChar, Length(SText));
 
     TextOutProps.HasAsciiNoTabs:= not FFontProportional and St.LinesHasAsciiNoTabs[WrapItem.NLineIndex];
+    TextOutProps.ImeGapOffset:= -1;
+    TextOutProps.ImeGapWidth:= 0;
     TextOutProps.SuperFast:= false;
     TextOutProps.LineIndex:= WrapItem.NLineIndex;
     TextOutProps.CharIndexInLine:= WrapItem.NCharIndex;

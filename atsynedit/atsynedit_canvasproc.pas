@@ -74,6 +74,8 @@ type
     CharIndexInLine: integer; //for part of long wrapped line, this is the char index of part's begin
     CharSize: TATEditorCharSize;
     CharsSkipped: integer; //count of chars removed from the line start, before passing line to renderer
+    ImeGapOffset: integer; //0-based character boundary in AText; -1 means no gap
+    ImeGapWidth: integer; //virtual horizontal advance in pixels
     TrimmedTrailingNonSpaces: boolean; //lines's trailing non-space chars were removed before passing line to renderer (for speedup for too long line)
     DrawEvent: TATSynEditDrawLineEvent;
     ControlWidth: integer; //width of editor control, plus small delta to render 2 edge chars
@@ -805,6 +807,9 @@ procedure CanvasTextOut(C: TCanvas;
   AParts: PATLineParts;
   out ATextWidth: Int64;
   const AProps: TATCanvasTextOutProps);
+  var
+    NLastPart, NGapPos, NGapWidth, NInitialGap: integer;
+    bPartHasGap: boolean;
   //
   function _IsCharSelected(AColumn: integer): boolean; inline;
   begin
@@ -987,7 +992,7 @@ procedure CanvasTextOut(C: TCanvas;
     BufW: UnicodeString;
     DxPointer: PInteger;
   begin
-    if AProps.HasAsciiNoTabs and not ATEditorOptions.TextoutNeedsOffsets then
+    if AProps.HasAsciiNoTabs and not ATEditorOptions.TextoutNeedsOffsets and (NGapPos<=0) then
     begin
       BufW:= AText;
       DxPointer:= nil;
@@ -995,7 +1000,7 @@ procedure CanvasTextOut(C: TCanvas;
     else
     begin
       BufW:= SRemoveHexDisplayedChars(AText);
-      if AProps.FontProportional or CanvasTextOutNeedsOffsets(C, AText) then
+      if AProps.FontProportional or (NGapPos>0) or CanvasTextOutNeedsOffsets(C, AText) then
         DxPointer:= @Dx.Data[0]
       else
         DxPointer:= nil;
@@ -1024,7 +1029,7 @@ var
     bAllowLigatures: boolean;
     tick: QWord;
   begin
-    if AProps.HasAsciiNoTabs and not ATEditorOptions.TextoutNeedsOffsets then
+    if AProps.HasAsciiNoTabs and not ATEditorOptions.TextoutNeedsOffsets and not bPartHasGap then
     begin
       BufW:= PartStr;
       bAllowLigatures:= AProps.ShowFontLigatures;
@@ -1035,9 +1040,10 @@ var
       BufW:= SRemoveHexDisplayedChars(PartStr);
       bAllowLigatures:=
         AProps.ShowFontLigatures
+        and not bPartHasGap
         and not IsStringWithUnusualWidthChars(BufW); //disable ligatures if unicode chars
 
-      if AProps.FontProportional or CanvasTextOutNeedsOffsets(C, PartStr) then
+      if AProps.FontProportional or bPartHasGap or CanvasTextOutNeedsOffsets(C, PartStr) then
         DxPointer:= @Dx.Data[PartOffset]
       else
         DxPointer:= nil;
@@ -1066,7 +1072,7 @@ var
     i: integer;
     tick: QWord;
   begin
-    if AProps.HasAsciiNoTabs and not ATEditorOptions.TextoutNeedsOffsets then
+    if AProps.HasAsciiNoTabs and not ATEditorOptions.TextoutNeedsOffsets and not bPartHasGap then
     begin
       SetLength(Buf, Length(PartStr));
       for i:= 1 to Length(PartStr) do
@@ -1078,7 +1084,7 @@ var
       BufW:= PartStr;
       Buf:= UTF8Encode(SRemoveHexDisplayedChars(BufW));
 
-      if AProps.FontProportional or CanvasTextOutNeedsOffsets(C, PartStr) then
+      if AProps.FontProportional or bPartHasGap or CanvasTextOutNeedsOffsets(C, PartStr) then
       begin
         _CalcCharSizesUtf8FromWidestring(BufW, @Dx.Data[PartOffset], Dx.Len-PartOffset, DxUTF8);
         DxPointer:= @DxUTF8.Data[0];
@@ -1103,7 +1109,6 @@ var
   //
 var
   NLen, NCharWidthScaled, NDeltaForItalic, iPart, i: integer;
-  NLastPart: integer;
   PartPtr: PATLinePart;
   PartLen: integer;
   PrevColor: TColor;
@@ -1111,7 +1116,11 @@ var
   bItalic: boolean;
 begin
   NLen:= Min(Length(AText), ATEditorMaxFixedArray);
-  if NLen=0 then Exit;
+  if NLen=0 then
+  begin
+    ATextWidth:= Max(0, AProps.ImeGapWidth);
+    Exit;
+  end;
   NCharWidthScaled:= AProps.CharSize.XScaled;
   NDeltaForItalic:= C.Font.Size * ATEditorOptions.ItalicFontLongerInPercents div 100;
 
@@ -1144,6 +1153,31 @@ begin
     for i:= 1 to ListInt.Len-1 do
       Dx.Data[i]:= ListInt.Data[i]-ListInt.Data[i-1];
   end;
+
+  //Apply a virtual gap to the advance of the character immediately before it.
+  //The source string and LineParts remain untouched.
+  NGapWidth:= Max(0, AProps.ImeGapWidth);
+  NGapPos:= AProps.ImeGapOffset;
+  NInitialGap:= 0;
+  if NGapWidth>0 then
+  begin
+    NGapPos:= EnsureRange(NGapPos, 0, NLen);
+    if NGapPos=0 then
+    begin
+      //A gap at the beginning shifts the complete text run.
+      NInitialGap:= NGapWidth;
+      Inc(APosX, NGapWidth);
+    end
+    else
+    begin
+      Inc(Dx.Data[NGapPos-1], NGapWidth);
+      ListInt.Data[0]:= Dx.Data[0];
+      for i:= 1 to ListInt.Len-1 do
+        ListInt.Data[i]:= ListInt.Data[i-1]+Dx.Data[i];
+    end;
+  end
+  else
+    NGapPos:= -1;
 
   if AParts=nil then
   begin
@@ -1233,6 +1267,7 @@ begin
       else
         PixOffset2:= 0;
 
+      bPartHasGap:= (NGapPos>PartOffset) and (NGapPos<=PartOffset+PartLen);
       _PrepareCanvasProps(PartPtr, bItalic);
 
       PartRect:= Rect(
@@ -1312,7 +1347,7 @@ begin
   if AProps.ShowUnprinted then
     _PaintUnprintedChars;
 
-  ATextWidth:= ListInt.Data[ListInt.Len-1];
+  ATextWidth:= ListInt.Data[ListInt.Len-1] + NInitialGap;
 
   if AText<>'' then
     if Assigned(AProps.DrawEvent) then
