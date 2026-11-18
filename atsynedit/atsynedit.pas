@@ -1719,6 +1719,7 @@ type
     property MouseActions: TATEditorMouseActions read FMouseActions write FMouseActions;
     property TabHelper: TATStringTabHelper read FTabHelper;
     property WrapInfo: TATWrapInfo read FWrapInfo;
+    property WrapInfoUpdateNeeded: boolean read FWrapUpdateNeeded write FWrapUpdateNeeded;
     //common
     property ScrollVert: TATEditorScrollInfo read FScrollVert write FScrollVert;
     property ScrollHorz: TATEditorScrollInfo read FScrollHorz write FScrollHorz;
@@ -2790,7 +2791,11 @@ begin
     (FWrapMode=TATEditorWrapMode.ModeOff) and
     (Fold.Count=0) and
     (NLinesCount>2);
-  if FWrapInfo.VirtualMode then exit;
+  if FWrapInfo.VirtualMode then
+  begin
+    //Random(1); //debug
+    exit;
+  end;
 
   bConsiderFolding:= Fold.Count>0;
   NNewVisibleColumns:= GetVisibleColumns;
