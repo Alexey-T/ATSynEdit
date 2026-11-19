@@ -1781,6 +1781,7 @@ type
     property FileName: string read FFileName write FFileName;
     procedure LoadFromFile(const AFilename: string; AOptions: TATLoadStreamOptions); virtual;
     procedure SaveToFile(const AFilename: string); virtual;
+    procedure SaveToStrings(AList: TStrings);
     //cmd
     procedure TextInsertAtCarets(const AText: atString; AKeepCaret,
       AOvrMode, ASelectThen: boolean);
@@ -6153,6 +6154,27 @@ begin
   end;
 
   DoEventChange(0, false{AllowOnChange}); //calling OnChange makes almost no sense on opening file
+end;
+
+procedure TATSynEdit.SaveToStrings(AList: TStrings);
+var
+  St: TATStrings;
+  SLine: UnicodeString;
+  i: integer;
+begin
+  St:= Strings;
+
+  AList.BeginUpdate;
+  try
+    AList.Clear;
+    for i:= 0 to St.Count-1 do
+    begin
+      SLine:= St.Lines[i];
+      AList.Add(UTF8Encode(SLine));
+    end;
+  finally
+    AList.EndUpdate;
+  end;
 end;
 
 procedure TATSynEdit.SaveToFile(const AFilename: string);
