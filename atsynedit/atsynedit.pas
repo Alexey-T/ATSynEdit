@@ -6160,7 +6160,7 @@ procedure TATSynEdit.SaveToStrings(AList: TStrings);
 var
   St: TATStrings;
   SLine: UnicodeString;
-  i: integer;
+  i: SizeInt;
 begin
   St:= Strings;
 
