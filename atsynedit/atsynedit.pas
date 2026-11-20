@@ -8964,7 +8964,6 @@ begin
 
     //when CaretShape's height>100%, and carets are aligned in a column,
     //adjust R to not overlap the previous caret's rect.
-    //note: this doesn't support the case of 2+ caret columns, it still gives ugly caret look.
     if (CaretShape.Height<-100) and (iCaret>0) then
       for jCaret:= Max(0, iCaret-cMaxCaretColumnsToAvoidOverlap) to iCaret-1 do
       begin
