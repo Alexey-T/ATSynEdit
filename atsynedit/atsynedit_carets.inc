@@ -1507,19 +1507,20 @@ function TATSynEdit.DoCaretCalcRect(ACoordX, ACoordY: integer; AShape: TATCaretS
 var
   W, H, Y0, DY: integer;
 begin
-  W:= FCharSize.XScaled div ATEditorCharXScale;
   H:= FCharSize.Y;
 
   Result.Left:= ACoordX;
   Result.Top:= ACoordY;
-  Result.Right:= Result.Left+W;
   Result.Bottom:= Result.Top+H;
 
   //width>100% is not needed
   if AShape.Width>=0 then
     Result.Right:= Result.Left + AShape.Width
   else
+  begin
+    W:= FCharSize.XScaled div ATEditorCharXScale;
     Result.Right:= Result.Left - W * AShape.Width div 100;
+  end;
 
   if AShape.Height>=0 then
     Result.Top:= Result.Bottom - AShape.Height
