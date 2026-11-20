@@ -8936,7 +8936,7 @@ begin
     //blink phase OFF -- don't paint the caret at all in this pass
     if DoubleBuffered then
     begin
-      if (Caret.OldRect<>R) and FCaretBlinkEnabled then
+      if FCaretBlinkEnabled and (Caret.OldRect<>R) then
         FCaretShown:= true;
       if FCaretBlinkEnabled and (not FCaretShown) then
         Continue;
