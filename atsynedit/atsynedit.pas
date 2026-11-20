@@ -1234,6 +1234,7 @@ type
       out AChosenEnum: TATEditorChosenBackColor;
       AHiliteLineWithSelection: boolean);
     function DoCaretCalcRect(ACoordX, ACoordY: integer; AShape: TATCaretShape): TRect;
+    function DoCaretGetShape: TATCaretShape;
     function DoCaretApplyProximityToVertEdge(ACaretPos: TPoint; ACaretCoordY: Int64;
       AProximity, AIndentVert: integer): boolean;
     function DoCaretApplyProximityToHorzEdge(ACaretCoordX: Int64;
@@ -8887,16 +8888,8 @@ begin
   //disable InvalidateRect during Paint
   if (csCustomPaint in ControlState) then
     AWithInvalidate:= false;
-  //if not IsInvalidateAllowed then
-  //  AWithInvalidate:= false;
 
-  if ModeReadOnly then
-    CaretShape:= FCaretShapeReadonly
-  else
-  if ModeOverwrite then
-    CaretShape:= FCaretShapeOverwrite
-  else
-    CaretShape:= FCaretShapeNormal;
+  CaretShape:= DoCaretGetShape;
 
   //CudaText #6635: in buf mode the phase is owned by TimerBlinkTick,
   //paint passes must not toggle it. Non-buf mode keeps the old parity
@@ -9010,6 +9003,17 @@ begin
   CanvasFillRect(C, R, Colors.DragDropMarker);
 end;
 
+function TATSynEdit.DoCaretGetShape: TATCaretShape;
+begin
+  if ModeReadOnly then
+    Result:= FCaretShapeReadonly
+  else
+  if ModeOverwrite then
+    Result:= FCaretShapeOverwrite
+  else
+    Result:= FCaretShapeNormal;
+end;
+
 procedure TATSynEdit.InvalidateRectsOfCarets;
 //CudaText #6635: damage the rects of all carets, so the next paint pass
 //blits the clean bitmap there and applies the new blink phase
@@ -9020,14 +9024,7 @@ var
   iCaret: integer;
 begin
   if not HandleAllocated then exit;
-
-  if ModeReadOnly then
-    CaretShape:= FCaretShapeReadonly
-  else
-  if ModeOverwrite then
-    CaretShape:= FCaretShapeOverwrite
-  else
-    CaretShape:= FCaretShapeNormal;
+  CaretShape:= DoCaretGetShape;
 
   for iCaret:= 0 to FCarets.Count-1 do
   begin
