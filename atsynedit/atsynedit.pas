@@ -8924,6 +8924,7 @@ begin
 
     R:= DoCaretCalcRect(Caret.CoordX, Caret.CoordY, CaretShape);
 
+    //caret must not show over minimap-tooltip
     if FMinimapTooltipVisible and FMinimapTooltipEnabled and (FRectMinimapTooltip.Width>0) then
       if (R.Left>=FRectMinimapTooltip.Left) and
         (R.Right<=FRectMinimapTooltip.Right) and
@@ -9033,6 +9034,12 @@ begin
     Caret:= FCarets[iCaret];
     if Caret.CoordX=-1 then Continue;
     R:= DoCaretCalcRect(Caret.CoordX, Caret.CoordY, CaretShape);
+
+    if R.Left>=FRectMain.Right then Continue;
+    if R.Top>=FRectMain.Bottom then Continue;
+    if R.Right<=FRectMain.Left then Continue;
+    if R.Bottom<=FRectMain.Top then Continue;
+
     InvalidateRect(Handle, @R, false);
   end;
 end;
