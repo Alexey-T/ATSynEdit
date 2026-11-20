@@ -163,7 +163,7 @@ type
     function FindCaretContainingPos(APosX, APosY: integer): integer;
     function FindCaretOnLine(APosY: integer): integer;
     function FindCaretAtPos(APosX, APosY: integer; AUseEndXY: boolean= false): integer;
-    function FindCaretMostLefterOrRighter(ALeft: boolean): integer;
+    procedure FindMostLefterAndRighter(out ALefter, ARighter: integer);
     function IsLineWithCaret(APosY: integer; ADisableSelected: boolean=false): boolean;
     function IsLineWithSelection(APosY: integer): boolean;
     function IsSelection: boolean;
@@ -981,26 +981,33 @@ begin
   until false;
 end;
 
-function TATCarets.FindCaretMostLefterOrRighter(ALeft: boolean): integer;
+procedure TATCarets.FindMostLefterAndRighter(out ALefter, ARighter: integer);
 var
   Item: TATCaretItem;
-  i, NPos: integer;
-  Upd: boolean;
+  L, R, iCaret: integer;
 begin
-  Result:= -1;
-  if Count>0 then
-    NPos:= Items[0].PosX;
-  for i:= 0 to Count-1 do
+  if Count=0 then
   begin
-    Item:= Items[i];
-    if ALeft then
-      Upd:= Item.PosX<=NPos
-    else
-      Upd:= Item.PosX>=NPos;
-    if Upd then
+    ALefter:= -1;
+    ARighter:= -1;
+    exit;
+  end;
+  ALefter:= 0;
+  ARighter:= 0;
+  L:= Items[0].PosX;
+  R:= L;
+  for iCaret:= 0 to Count-1 do
+  begin
+    Item:= Items[iCaret];
+    if Item.PosX<=L then
     begin
-      Result:= i;
-      NPos:= Item.PosX;
+      L:= Item.PosX;
+      ALefter:= iCaret;
+    end;
+    if Item.PosX>=R then
+    begin
+      R:= Item.PosX;
+      ARighter:= iCaret;
     end;
   end;
 end;
@@ -1131,21 +1138,22 @@ end;
 
 function TATCarets.CaretAtEdge(AEdge: TATCaretEdge): TPoint;
 var
-  N: integer;
+  N, K: integer;
 begin
-  Result:= Point(0, 0);
   case AEdge of
     TATCaretEdge.Top:
       N:= 0;
     TATCaretEdge.Bottom:
       N:= Count-1;
     TATCaretEdge.Left:
-      N:= FindCaretMostLefterOrRighter(true);
+      FindMostLefterAndRighter(N, K);
     TATCaretEdge.Right:
-      N:= FindCaretMostLefterOrRighter(false);
+      FindMostLefterAndRighter(K, N);
   end;
   if IsIndexValid(N) then
-    Result:= Items[N].AsPoint;
+    Result:= Items[N].AsPoint
+  else
+    Result:= Point(0, 0);
 end;
 
 function TATCarets.IsJoinNeeded(AIndex1, AIndex2: integer;
