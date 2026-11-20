@@ -161,6 +161,7 @@ type
     procedure Assign(Obj: TATCarets);
     function FindCaretBeforePos(APosX, APosY: integer; ARequireSel: boolean): integer;
     function FindCaretContainingPos(APosX, APosY: integer): integer;
+    function FindCaretOnLine(APosY: integer): integer;
     function IndexOfPosXY(APosX, APosY: integer; AUseEndXY: boolean= false): integer;
     function IndexOfLeftRight(ALeft: boolean): integer;
     function IsLineWithCaret(APosY: integer; ADisableSelected: boolean=false): boolean;
@@ -1004,29 +1005,30 @@ begin
   end;
 end;
 
-function TATCarets.IsLineWithCaret(APosY: integer; ADisableSelected: boolean=false): boolean;
+function TATCarets.FindCaretOnLine(APosY: integer): integer;
 var
   a, b, m, dif: integer;
 begin
-  Result:= false;
   a:= 0;
   b:= Count-1;
   repeat
-    if a>b then exit;
+    if a>b then exit(-1);
     m:= (a+b+1) div 2;
     dif:= Items[m].PosY-APosY;
-    if dif=0 then
-    begin
-      if not ADisableSelected then
-        exit(true)
-      else
-        exit(not Items[m].IsSelection);
-    end;
+    if dif=0 then exit(m);
     if dif>0 then
       b:= m-1
     else
       a:= m+1;
   until false;
+end;
+
+function TATCarets.IsLineWithCaret(APosY: integer; ADisableSelected: boolean=false): boolean;
+var
+  N: integer;
+begin
+  N:= FindCaretOnLine(APosY);
+  Result:= (N>=0) and (not ADisableSelected or not Items[N].IsSelection);
 end;
 
 function TATCarets.IsLineWithSelection(APosY: integer): boolean;
