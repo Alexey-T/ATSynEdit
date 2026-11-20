@@ -8874,8 +8874,6 @@ begin
 end;
 
 procedure TATSynEdit.DoPaintCarets(C: TCanvas; AWithInvalidate: boolean);
-const
-  cMaxCaretColumnsToAvoidOverlap = 2;
 var
   Caret, CaretPrev: TATCaretItem;
   CaretShape: TATCaretShape;
@@ -8965,7 +8963,7 @@ begin
     //when CaretShape's height>100%, and carets are aligned in a column,
     //adjust R to not overlap the previous caret's rect.
     if (CaretShape.Height<-100) and (iCaret>0) then
-      for jCaret:= Max(0, iCaret-cMaxCaretColumnsToAvoidOverlap) to iCaret-1 do
+      for jCaret:= Max(0, iCaret-TATEditorOptions.MaxCaretColumnsAvoidingCoordsOverlap) to iCaret-1 do
       begin
         CaretPrev:= Carets[jCaret];
         if (CaretPrev.CoordX=Caret.CoordX) and (CaretPrev.PosY=Caret.PosY-1) then

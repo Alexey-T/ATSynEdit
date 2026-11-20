@@ -59,6 +59,7 @@ type
     MaxLineLenToCalculateRangeIndents = 1000;
     MaxLineLenToUnderlineHtmlColors = 500;
     GutterShift2ndIconRightByPercents = 50;
+    MaxCaretColumnsAvoidingCoordsOverlap = 2;
 
     GutterTagBookmarks = 1;
     GutterTagNumbers = 2;
