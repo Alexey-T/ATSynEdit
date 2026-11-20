@@ -164,7 +164,6 @@ type
     function FindCaretOnLine(APosY: integer): integer;
     function FindCaretAtPos(APosX, APosY: integer; AUseEndXY: boolean= false): integer;
     procedure FindMostLefterAndRighter(out ALefter, ARighter: integer);
-    function IsLineWithCaret(APosY: integer; ADisableSelected: boolean=false): boolean;
     function IsLineWithSelection(APosY: integer): boolean;
     function IsSelection: boolean;
     function IsSelectionInAllCarets: boolean;
@@ -1028,14 +1027,6 @@ begin
     else
       a:= m+1;
   until false;
-end;
-
-function TATCarets.IsLineWithCaret(APosY: integer; ADisableSelected: boolean=false): boolean;
-var
-  N: integer;
-begin
-  N:= FindCaretOnLine(APosY);
-  Result:= (N>=0) and (not ADisableSelected or not Items[N].IsSelection);
 end;
 
 function TATCarets.IsLineWithSelection(APosY: integer): boolean;

@@ -1,8 +1,11 @@
 {$ifdef nnnn}begin end;{$endif}
 
 function TATSynEdit.IsLineWithCaret(ALine: integer; ADisableSelected: boolean=false): boolean; inline;
+var
+  N: integer;
 begin
-  Result:= FCarets.IsLineWithCaret(ALine, ADisableSelected);
+  N:= FCarets.FindCaretOnLine(ALine);
+  Result:= (N>=0) and (not ADisableSelected or not FCarets[N].IsSelection);
 end;
 
 function TATSynEdit.IsWrapItemWithCaret(constref AWrapItem: TATWrapItem): boolean;
@@ -105,7 +108,7 @@ begin
     Inc(PCoord1.Y, FCharSize.Y);
     PCaret:= ClientPosToCaretPos(PCoord1, Details);
     if PCaret.Y>=0 then
-      if not Carets.IsLineWithCaret(PCaret.Y) then
+      if Carets.FindCaretOnLine(PCaret.Y)=-1 then
         Carets.Add(PCaret.X, PCaret.Y, -1, -1, false{AWithEvent});
   until PCoord1.Y>=PCoord2.Y;
 
