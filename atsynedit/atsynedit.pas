@@ -8956,13 +8956,9 @@ begin
           end;
         end;
       end;
-
-      DoPaintCaretShape(C, R, Caret, CaretShape);
-    end
-    else
-    begin
-      DoPaintCaretShape(C, R, Caret, CaretShape);
     end;
+
+    DoPaintCaretShape(C, R, Caret, CaretShape);
 
     Caret.OldRect:= R;
 
