@@ -8220,7 +8220,7 @@ begin
           then
           begin
             //remove selection from current caret
-            nIndexCaret:= Carets.IndexOfPosXY(FMouseDownPnt.X, FMouseDownPnt.Y, true);
+            nIndexCaret:= Carets.FindCaretAtPos(FMouseDownPnt.X, FMouseDownPnt.Y, true);
             if Carets.IsIndexValid(nIndexCaret) then
             begin
               Caret:= Carets[nIndexCaret];
@@ -8324,7 +8324,7 @@ begin
             //drag with Ctrl pressed: add selection
             if bSelectAdding then
             begin
-              nIndexCaret:= Carets.IndexOfPosXY(FMouseDownPnt.X, FMouseDownPnt.Y, true);
+              nIndexCaret:= Carets.FindCaretAtPos(FMouseDownPnt.X, FMouseDownPnt.Y, true);
               if Carets.IsIndexValid(nIndexCaret) then
                 Carets[nIndexCaret].SelectToPoint(PntText.X, PntText.Y);
             end;
@@ -8765,7 +8765,7 @@ begin
     else
     if IsSelRectEmpty and not FMouseDownAndColumnSelection then
     begin
-      nIndexCaret:= Carets.IndexOfPosXY(FMouseDownPnt.X, FMouseDownPnt.Y, true);
+      nIndexCaret:= Carets.FindCaretAtPos(FMouseDownPnt.X, FMouseDownPnt.Y, true);
       if nIndexCaret>=0 then
         Carets[nIndexCaret].SelectToPoint(PCaret.X, PCaret.Y);
     end

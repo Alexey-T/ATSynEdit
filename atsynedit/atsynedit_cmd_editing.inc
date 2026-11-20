@@ -1037,7 +1037,7 @@ begin
       PosAfter);
 
     if ((Caret.PosX<>PosAfter.X) or (Caret.PosY<>PosAfter.Y)) and
-      (FCarets.IndexOfPosXY(PosAfter.X, PosAfter.Y)>=0) then
+      (FCarets.FindCaretAtPos(PosAfter.X, PosAfter.Y)>=0) then
     begin
       if FCarets.Count>1 then
         FCarets.Delete(iCaret);

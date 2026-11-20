@@ -61,7 +61,7 @@ procedure TATSynEdit.DoCaretAddToPoint(AX, AY: integer);
 var
   N: integer;
 begin
-  N:= Carets.IndexOfPosXY(AX, AY);
+  N:= Carets.FindCaretAtPos(AX, AY);
   if Carets.IsIndexValid(N) then
   begin
     if Carets.Count>1 then

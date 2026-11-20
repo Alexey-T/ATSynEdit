@@ -162,8 +162,8 @@ type
     function FindCaretBeforePos(APosX, APosY: integer; ARequireSel: boolean): integer;
     function FindCaretContainingPos(APosX, APosY: integer): integer;
     function FindCaretOnLine(APosY: integer): integer;
-    function IndexOfPosXY(APosX, APosY: integer; AUseEndXY: boolean= false): integer;
-    function IndexOfLeftRight(ALeft: boolean): integer;
+    function FindCaretAtPos(APosX, APosY: integer; AUseEndXY: boolean= false): integer;
+    function FindCaretMostLefterOrRighter(ALeft: boolean): integer;
     function IsLineWithCaret(APosY: integer; ADisableSelected: boolean=false): boolean;
     function IsLineWithSelection(APosY: integer): boolean;
     function IsSelection: boolean;
@@ -947,7 +947,7 @@ begin
   end;
 end;
 
-function TATCarets.IndexOfPosXY(APosX, APosY: integer; AUseEndXY: boolean = false): integer;
+function TATCarets.FindCaretAtPos(APosX, APosY: integer; AUseEndXY: boolean = false): integer;
 var
   Item: TATCaretItem;
   useX, useY: integer;
@@ -981,7 +981,7 @@ begin
   until false;
 end;
 
-function TATCarets.IndexOfLeftRight(ALeft: boolean): integer;
+function TATCarets.FindCaretMostLefterOrRighter(ALeft: boolean): integer;
 var
   Item: TATCaretItem;
   i, NPos: integer;
@@ -1140,9 +1140,9 @@ begin
     TATCaretEdge.Bottom:
       N:= Count-1;
     TATCaretEdge.Left:
-      N:= IndexOfLeftRight(true);
+      N:= FindCaretMostLefterOrRighter(true);
     TATCaretEdge.Right:
-      N:= IndexOfLeftRight(false);
+      N:= FindCaretMostLefterOrRighter(false);
   end;
   if IsIndexValid(N) then
     Result:= Items[N].AsPoint;
