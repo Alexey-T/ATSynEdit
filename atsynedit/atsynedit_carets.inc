@@ -1503,28 +1503,35 @@ begin
 end;
 
 
-procedure TATSynEdit.DoCaretsApplyShape(var R: TRect; Props: TATCaretShape; W, H: integer);
+procedure TATSynEdit.DoCaretsApplyShape(var R: TRect; Props: TATCaretShape);
 var
-  Y0, DY: integer;
+  W, H, Y0, DY: integer;
 begin
   //width>100% is not needed
   if Props.Width>=0 then
     R.Right:= R.Left + Props.Width
   else
+  begin
+    W:= FCharSize.XScaled div ATEditorCharXScale;
     R.Right:= R.Left - W * Props.Width div 100;
+  end;
 
   if Props.Height>=0 then
     R.Top:= R.Bottom - Props.Height
   else
-  if Props.Height<-100 then
   begin
-    Y0:= (R.Top+R.Bottom) div 2;
-    DY:= -H * Props.Height div 200;
-    R.Top:= Y0-DY;
-    R.Bottom:= Y0+DY;
-  end
-  else
-    R.Top:= R.Bottom + H * Props.Height div 100;
+    H:= FCharSize.Y;
+    //height<-100 means >100%, must be supported
+    if Props.Height<-100 then
+    begin
+      Y0:= (R.Top+R.Bottom) div 2;
+      DY:= -H * Props.Height div 200;
+      R.Top:= Y0-DY;
+      R.Bottom:= Y0+DY;
+    end
+    else
+      R.Top:= R.Bottom + H * Props.Height div 100;
+  end;
 end;
 
 

@@ -1233,7 +1233,7 @@ type
       out AColor: TColor; out AColorForced: boolean;
       out AChosenEnum: TATEditorChosenBackColor;
       AHiliteLineWithSelection: boolean);
-    procedure DoCaretsApplyShape(var R: TRect; Props: TATCaretShape; W, H: integer);
+    procedure DoCaretsApplyShape(var R: TRect; Props: TATCaretShape);
     function DoCaretApplyProximityToVertEdge(ACaretPos: TPoint; ACaretCoordY: Int64;
       AProximity, AIndentVert: integer): boolean;
     function DoCaretApplyProximityToHorzEdge(ACaretCoordX: Int64;
@@ -8934,7 +8934,7 @@ begin
         (R.Bottom<=FRectMinimapTooltip.Bottom) then
         Continue;
 
-    DoCaretsApplyShape(R, CaretShape, NCharWidth, FCharSize.Y);
+    DoCaretsApplyShape(R, CaretShape);
 
     //CudaText #6635, buf mode: caret moved since last paint (typing,
     //scroll) -- show it immediately, restarting the blink phase;
@@ -9019,12 +9019,21 @@ procedure TATSynEdit.InvalidateRectsOfCarets;
 //blits the clean bitmap there and applies the new blink phase
 var
   Caret: TATCaretItem;
+  CaretShape: TATCaretShape;
+  NCharWidth, iCaret: integer;
   R: TRect;
-  iCaret: integer;
-  NCharWidth: integer;
 begin
   if not HandleAllocated then exit;
   NCharWidth:= FCharSize.XScaled div ATEditorCharXScale;
+
+  if ModeReadOnly then
+    CaretShape:= FCaretShapeReadonly
+  else
+  if ModeOverwrite then
+    CaretShape:= FCaretShapeOverwrite
+  else
+    CaretShape:= FCaretShapeNormal;
+
   for iCaret:= 0 to FCarets.Count-1 do
   begin
     Caret:= FCarets[iCaret];
@@ -9033,6 +9042,7 @@ begin
     R.Top:= Caret.CoordY;
     R.Right:= R.Left+NCharWidth;
     R.Bottom:= R.Top+FCharSize.Y;
+    DoCaretsApplyShape(R, CaretShape);
     InvalidateRect(Handle, @R, false);
   end;
 end;
