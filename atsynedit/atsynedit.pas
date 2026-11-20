@@ -1233,7 +1233,7 @@ type
       out AColor: TColor; out AColorForced: boolean;
       out AChosenEnum: TATEditorChosenBackColor;
       AHiliteLineWithSelection: boolean);
-    procedure DoCaretsApplyShape(var R: TRect; Props: TATCaretShape);
+    function DoCaretCalcRect(ACoordX, ACoordY: integer; AShape: TATCaretShape): TRect;
     function DoCaretApplyProximityToVertEdge(ACaretPos: TPoint; ACaretCoordY: Int64;
       AProximity, AIndentVert: integer): boolean;
     function DoCaretApplyProximityToHorzEdge(ACaretCoordX: Int64;
@@ -8922,10 +8922,7 @@ begin
     if Caret.CoordX+NCharWidth<=FRectMain.Left then Continue;
     if Caret.CoordY+FCharSize.Y<=FRectMain.Top then Continue;
 
-    R.Left:= Caret.CoordX;
-    R.Top:= Caret.CoordY;
-    R.Right:= R.Left+NCharWidth;
-    R.Bottom:= R.Top+FCharSize.Y;
+    R:= DoCaretCalcRect(Caret.CoordX, Caret.CoordY, CaretShape);
 
     if FMinimapTooltipVisible and FMinimapTooltipEnabled and (FRectMinimapTooltip.Width>0) then
       if (R.Left>=FRectMinimapTooltip.Left) and
@@ -8933,8 +8930,6 @@ begin
         (R.Top>=FRectMinimapTooltip.Top) and
         (R.Bottom<=FRectMinimapTooltip.Bottom) then
         Continue;
-
-    DoCaretsApplyShape(R, CaretShape);
 
     //CudaText #6635, buf mode: caret moved since last paint (typing,
     //scroll) -- show it immediately, restarting the blink phase;
@@ -9020,11 +9015,10 @@ procedure TATSynEdit.InvalidateRectsOfCarets;
 var
   Caret: TATCaretItem;
   CaretShape: TATCaretShape;
-  NCharWidth, iCaret: integer;
   R: TRect;
+  iCaret: integer;
 begin
   if not HandleAllocated then exit;
-  NCharWidth:= FCharSize.XScaled div ATEditorCharXScale;
 
   if ModeReadOnly then
     CaretShape:= FCaretShapeReadonly
@@ -9038,11 +9032,7 @@ begin
   begin
     Caret:= FCarets[iCaret];
     if Caret.CoordX=-1 then Continue;
-    R.Left:= Caret.CoordX;
-    R.Top:= Caret.CoordY;
-    R.Right:= R.Left+NCharWidth;
-    R.Bottom:= R.Top+FCharSize.Y;
-    DoCaretsApplyShape(R, CaretShape);
+    R:= DoCaretCalcRect(Caret.CoordX, Caret.CoordY, CaretShape);
     InvalidateRect(Handle, @R, false);
   end;
 end;

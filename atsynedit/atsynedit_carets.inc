@@ -1503,34 +1503,38 @@ begin
 end;
 
 
-procedure TATSynEdit.DoCaretsApplyShape(var R: TRect; Props: TATCaretShape);
+function TATSynEdit.DoCaretCalcRect(ACoordX, ACoordY: integer; AShape: TATCaretShape): TRect;
 var
   W, H, Y0, DY: integer;
 begin
-  //width>100% is not needed
-  if Props.Width>=0 then
-    R.Right:= R.Left + Props.Width
-  else
-  begin
-    W:= FCharSize.XScaled div ATEditorCharXScale;
-    R.Right:= R.Left - W * Props.Width div 100;
-  end;
+  W:= FCharSize.XScaled div ATEditorCharXScale;
+  H:= FCharSize.Y;
 
-  if Props.Height>=0 then
-    R.Top:= R.Bottom - Props.Height
+  Result.Left:= ACoordX;
+  Result.Top:= ACoordY;
+  Result.Right:= Result.Left+W;
+  Result.Bottom:= Result.Top+H;
+
+  //width>100% is not needed
+  if AShape.Width>=0 then
+    Result.Right:= Result.Left + AShape.Width
+  else
+    Result.Right:= Result.Left - W * AShape.Width div 100;
+
+  if AShape.Height>=0 then
+    Result.Top:= Result.Bottom - AShape.Height
   else
   begin
-    H:= FCharSize.Y;
     //height<-100 means >100%, must be supported
-    if Props.Height<-100 then
+    if AShape.Height<-100 then
     begin
-      Y0:= (R.Top+R.Bottom) div 2;
-      DY:= -H * Props.Height div 200;
-      R.Top:= Y0-DY;
-      R.Bottom:= Y0+DY;
+      Y0:= (Result.Top+Result.Bottom) div 2;
+      DY:= -H * AShape.Height div 200;
+      Result.Top:= Y0-DY;
+      Result.Bottom:= Y0+DY;
     end
     else
-      R.Top:= R.Bottom + H * Props.Height div 100;
+      Result.Top:= Result.Bottom + H * AShape.Height div 100;
   end;
 end;
 
