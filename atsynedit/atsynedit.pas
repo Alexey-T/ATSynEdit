@@ -8875,7 +8875,7 @@ end;
 
 procedure TATSynEdit.DoPaintCarets(C: TCanvas; AWithInvalidate: boolean);
 var
-  Caret: TATCaretItem;
+  Caret, CaretPrev: TATCaretItem;
   CaretShape: TATCaretShape;
   R, RectCaretOld: TRect;
   NCharWidth: integer;
@@ -8958,9 +8958,19 @@ begin
       end;
     end;
 
-    DoPaintCaretShape(C, R, Caret, CaretShape);
-
     Caret.OldRect:= R;
+
+    //when CaretShape's height>100%, and carets are aligned in a column,
+    //adjust R to not overlap the previous caret's rect.
+    //note: this doesn't support the case of 2+ caret columns, it still gives ugly caret look.
+    if (CaretShape.Height<-100) and (iCaret>0) then
+    begin
+      CaretPrev:= Carets[iCaret-1];
+      if (CaretPrev.CoordX=Caret.CoordX) and (CaretPrev.PosY=Caret.PosY-1) then
+        R.Top:= Max(R.Top, CaretPrev.OldRect.Bottom);
+    end;
+
+    DoPaintCaretShape(C, R, Caret, CaretShape);
 
     if AWithInvalidate then
     begin
