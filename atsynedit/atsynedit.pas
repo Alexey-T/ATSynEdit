@@ -7089,7 +7089,9 @@ begin
   //consider Gaps for vert scrolling
   if bConsiderGaps then
   begin
-    NPos:= Min(AInfo.NPos, AWrapInfo.Count-1);
+    //WrapInfo.Count can be 0 (not calculated yet), Data[] then gives
+    //Default(TATWrapItem): keep NPos>=0 so the walk below stays sane
+    NPos:= Max(0, Min(AInfo.NPos, AWrapInfo.Count-1));
     NPixels:= AInfo.NPixelOffset;
 
     NLineIndex:= AWrapInfo.Data[NPos].NLineIndex - 1;
@@ -7098,8 +7100,15 @@ begin
     repeat
       NPixels:= APos - NPos* AInfo.CharSizeScaled div ATEditorCharXScale
         - NGapsCum;
+      //the walk MUST be allowed to decrement into the 1st line's wrapped
+      //rows: WrapItem.NLineIndex is 0-based, so with NLineIndex=
+      //Data[NPos].NLineIndex-1 here, an "if NLineIndex=0 then Break"
+      //guard fired at the SECOND line, and smooth positions belonging to
+      //the 1st line's wrapped rows / to the gap after the 1st line ended
+      //the walk one line too low, with NEGATIVE NPixels -> negative
+      //NPixelOffset -> GetRectMain() shifts R.Top down -> background
+      //band (white hole) at the editor top, until the next repaint
       if NPos=0 then Break;
-      if NLineIndex=0 then Break;
       if NPixels>=0 then Break;
       Dec(NPos);
       NLineIndex2:= AWrapInfo.Data[NPos].NLineIndex - 1;
