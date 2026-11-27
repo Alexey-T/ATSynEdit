@@ -3092,6 +3092,7 @@ end;
 
 procedure TATSynEdit.SetText(const AValue: UnicodeString);
 begin
+  LastCommand:= 0;
   DoCaretSingle(0, 0);
   BookmarkDeleteAll;
   if Assigned(FMarkers) then
