@@ -778,6 +778,7 @@ var
 begin
   if ACmd<=0 then Exit;
   LastCommandChangedLines:= 0;
+  FLastCommandMultiCarets:= (Carets.Count>1) or ((Carets.Count=1) and Carets[0].IsMultilineSelection);
   FLastCommandMakesColumnSel:= false;
   DoHotspotsExit;
   St:= Strings;

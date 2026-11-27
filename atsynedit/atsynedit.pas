@@ -772,6 +772,7 @@ type
     FLastTextCmd: integer;
     FLastTextCmdText: atString;
     FLastCommand: integer;
+    FLastCommandMultiCarets: boolean;
     FLastCommandChangedText: boolean;
     FLastCommandChangedText2: boolean;
     FLastCommandMakesColumnSel: boolean;
@@ -1898,6 +1899,8 @@ type
     function TextSelected: atString;
     function TextSelectedEx(ACaret: TATCaretItem): atString;
     function TextCurrentWord: atString;
+    property LastCommand: integer read FLastCommand;
+    property LastCommandMultiCarets: boolean read FLastCommandMultiCarets;
     //LastCommandChangedLines: count of lines changed by last call of Strings.ActionTrimSpaces
     property LastCommandChangedLines: integer read GetLastCommandChangedLines write SetLastCommandChangedLines;
     property IsIniting: boolean read FIsIniting write FIsIniting;
