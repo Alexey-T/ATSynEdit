@@ -829,18 +829,17 @@ begin
   if not FCaretVirtual then
     Carets.UpdateMemory(TATCaretMemoryAction.PrepareX, false);
   FIsRunningCommand:= true;
+  FLastCommand:= ACmd;
 
   bTooManyCarets:= Carets.Count>FOptUndoMaxCarets;
   if bTooManyCarets then
     SetEnabledSlowEvents(false);
 
   BeginEditing;
-
   try
     Res:= DoCommandCore(ACmd, AText);
   finally
     EndEditing(TATCommandResult.Text in Res);
-
     if bTooManyCarets then
       SetEnabledSlowEvents(true);
   end;
@@ -851,7 +850,6 @@ begin
       ClearSelRectPoints;
     end;
 
-  FLastCommand:= ACmd;
   FLastCommandChangedText2:= FLastCommandChangedText;
   FLastCommandChangedText:= TATCommandResult.Text in Res;
   if FLastCommandChangedText then
