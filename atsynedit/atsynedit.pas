@@ -1899,8 +1899,8 @@ type
     function TextSelected: atString;
     function TextSelectedEx(ACaret: TATCaretItem): atString;
     function TextCurrentWord: atString;
-    property LastCommand: integer read FLastCommand;
-    property LastCommandMultiCarets: boolean read FLastCommandMultiCarets;
+    property LastCommand: integer read FLastCommand write FLastCommand;
+    property LastCommandMultiCarets: boolean read FLastCommandMultiCarets write FLastCommandMultiCarets;
     //LastCommandChangedLines: count of lines changed by last call of Strings.ActionTrimSpaces
     property LastCommandChangedLines: integer read GetLastCommandChangedLines write SetLastCommandChangedLines;
     property IsIniting: boolean read FIsIniting write FIsIniting;
