@@ -81,10 +81,6 @@ type
     MaxClipboardRecentsMenuitemLen: integer;
     MaxPrecedingLinesForSmartTab: integer;
 
-    //if False, only parsing in the thread is enabled;
-    //if True, fast parsing inside main thread is used when editing a single line
-    EnableFastParse: boolean;
-
     UseGlobalCharSizer: boolean;
     DetectUTF8BufferKb: integer;
     DetectUTF16BufferWords: integer;
@@ -399,7 +395,6 @@ initialization
     MaxClipboardRecentsMenuitemLen:= 60;
     MaxPrecedingLinesForSmartTab:= 300;
 
-    EnableFastParse:= true;
     UseGlobalCharSizer:= true;
     DetectUTF8BufferKb:= 8;
     DetectUTF16BufferWords:= 5;
