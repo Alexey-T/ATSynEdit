@@ -6152,6 +6152,8 @@ begin
     ModifiedOptions:= [];
     FLastHotspot:= -1;
     FLastCaretY:= -1;
+    FLastCommand:= 0;
+    FLastCommandMultiCarets:= false;
 
     Update;
     TimerBlinkEnable;
