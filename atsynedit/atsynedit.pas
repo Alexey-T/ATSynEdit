@@ -6135,6 +6135,9 @@ begin
   FWrapInfo.Clear;
   FWrapUpdateNeeded:= true;
 
+  FLastCommand:= 0;
+  FLastCommandMultiCarets:= false;
+
   if not (TATLoadStreamOption.KeepScroll in AOptions) then
   begin
     FScrollHorz.Clear;
@@ -6152,8 +6155,6 @@ begin
     ModifiedOptions:= [];
     FLastHotspot:= -1;
     FLastCaretY:= -1;
-    FLastCommand:= 0;
-    FLastCommandMultiCarets:= false;
 
     Update;
     TimerBlinkEnable;
