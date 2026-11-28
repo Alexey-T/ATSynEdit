@@ -41,6 +41,11 @@ type
     procedure Clear;
     procedure Setup(const AText: UnicodeString; const ALineLens: array of integer);
     procedure SetupSlow(const AText: UnicodeString);
+    //one line's text changed, no line was added or removed: the text is
+    //patched in place (a single move of the tail) and the offsets of the
+    //following lines shift by the length delta. O(line + tail move +
+    //line count), no full-text rebuild (Setup of a huge text is slow)
+    procedure ChangeLine(ALine: integer; const SNewLine: UnicodeString);
     procedure Assign(Other: TATStringBuffer);
     function CaretToStr(const APnt: TPoint): integer;
     function StrToCaret(APos: integer): TPoint;
@@ -125,6 +130,45 @@ begin
     Inc(Pos, LenEOL);
     FList[i+1]:= Pos;
   end;
+end;
+
+procedure TATStringBuffer.ChangeLine(ALine: integer; const SNewLine: UnicodeString);
+var
+  NPos, NLenOld, NLenNew, NDlt, NLenTail, i: integer;
+begin
+  //line indexes are 0..Count-2 (Count is the count of offset entries)
+  if (ALine<0) or (ALine+1>=Length(FList)) then Exit;
+
+  NPos:= FList[ALine];
+  NLenOld:= FList[ALine+1]-FList[ALine]-LenEOL;
+  NLenNew:= Length(SNewLine);
+  NDlt:= NLenNew-NLenOld;
+
+  //all edits below mutate FText in place: it must not be shared (COW)
+  //UniqueString(FText);
+
+  if NDlt<>0 then
+  begin
+    NLenTail:= Length(FText)-NPos-NLenOld;
+    if NDlt>0 then
+    begin
+      SetLength(FText, Length(FText)+NDlt);
+      if NLenTail>0 then
+        Move(FText[NPos+NLenOld+1], FText[NPos+NLenOld+1+NDlt], NLenTail*SizeOf(WideChar));
+    end
+    else
+    begin
+      if NLenTail>0 then
+        Move(FText[NPos+NLenOld+1], FText[NPos+NLenNew+1], NLenTail*SizeOf(WideChar));
+      SetLength(FText, Length(FText)+NDlt);
+    end;
+    for i:= ALine+1 to High(FList) do
+      Inc(FList[i], NDlt);
+  end;
+
+  if NLenNew>0 then
+    Move(PWideChar(Pointer(SNewLine))^, FText[NPos+1], NLenNew*SizeOf(WideChar));
+  Inc(Version);
 end;
 
 
